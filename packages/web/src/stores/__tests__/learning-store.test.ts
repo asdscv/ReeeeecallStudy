@@ -360,14 +360,24 @@ describe('generatePlan', () => {
       // Still self-rated: nothing grades the text, so the learner remains the evaluator.
       expect(item.evaluator_type).toBe('self_rate')
       // `payload` is the audit trail — the plan says which key it called the reference, so a
-      // template edited tomorrow cannot rewrite what today's plan meant.
-      expect(item.payload).toEqual({
+      // template edited tomorrow cannot rewrite what today's plan meant. Matched loosely: the
+      // payload also carries `is_new`, which these cases are not about.
+      expect(item.payload).toMatchObject({
         typed_answer: {
           resolver: 'card-answer-v1',
           prompt_keys: ['front'],
           reference_keys: ['back'],
         },
       })
+    })
+
+    it('records whether the planner counted the row as intake', async () => {
+      // Recorded, not left to be re-derived. Inferring it from a missing recall estimate reads
+      // every learning-step card as new — the mistake mig 191 removes from the RPC, and the
+      // one `plan-composition` used to make on screen hours after a card had been studied.
+      const item = await generateWith([basicTemplate])
+
+      expect(item.payload).toMatchObject({ is_new: true })
     })
 
     it('reads the layouts, not just the field order, from card_templates', async () => {
@@ -384,7 +394,9 @@ describe('generatePlan', () => {
       const item = await generateWith([])
 
       expect(item.response_type).toBe('self_rate')
-      expect(item.payload).toBeUndefined()
+      // No typed-answer record. `is_new` is still there — it is about the CARD, not the
+      // template, and the planner knows it whether or not a template could be read.
+      expect(item.payload).toEqual({ is_new: true })
     })
 
     it('stays a self-rating when the template declares no answer face', async () => {
@@ -392,7 +404,7 @@ describe('generatePlan', () => {
       const item = await generateWith([{ ...basicTemplate, back_layout: [] }])
 
       expect(item.response_type).toBe('self_rate')
-      expect(item.payload).toBeUndefined()
+      expect(item.payload).toEqual({ is_new: true })
     })
   })
 })

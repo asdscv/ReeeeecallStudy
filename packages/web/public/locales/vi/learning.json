@@ -209,13 +209,19 @@
     "daysLeft": "Còn {{count, number}} ngày",
     "daysLeft_one": "Còn {{count, number}} ngày",
     "daysLeft_other": "Còn {{count, number}} ngày",
-    "withinWindow": "{{known, number}} trong {{attempted, number}} thẻ đã học vẫn trong chu kỳ ôn tập",
     "notStarted": "Chưa học thẻ nào · tổng {{total, number}} thẻ",
-    "overdue": "{{count, number}} thẻ quá hạn ôn tập",
-    "overdue_one": "{{count, number}} thẻ quá hạn ôn tập",
-    "overdue_other": "{{count, number}} thẻ quá hạn ôn tập",
     "unstudied": "{{count, number}} thẻ chưa học",
     "unstudied_one": "{{count, number}} thẻ chưa học",
-    "unstudied_other": "{{count, number}} thẻ chưa học"
+    "unstudied_other": "{{count, number}} thẻ chưa học",
+    "behind": "{{count, number}} thẻ quá hạn ôn tập",
+    "behind_one": "{{count, number}} thẻ quá hạn ôn tập",
+    "behind_other": "{{count, number}} thẻ quá hạn ôn tập",
+    "studied": "Đã học {{attempted, number}} trong {{total, number}} thẻ",
+    "detailStudied": "Đã học {{count, number}}",
+    "detailStudied_one": "Đã học {{count, number}}",
+    "detailStudied_other": "Đã học {{count, number}}",
+    "detailWithinWindow": "{{count, number}} trong chu kỳ ôn tập",
+    "detailWithinWindow_one": "{{count, number}} trong chu kỳ ôn tập",
+    "detailWithinWindow_other": "{{count, number}} trong chu kỳ ôn tập"
   }
 }

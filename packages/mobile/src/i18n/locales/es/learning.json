@@ -210,13 +210,19 @@
     "daysLeft": "Quedan {{count, number}} días",
     "daysLeft_one": "Queda {{count, number}} día",
     "daysLeft_other": "Quedan {{count, number}} días",
-    "withinWindow": "{{known, number}} de {{attempted, number}} tarjetas estudiadas siguen dentro de su ciclo de repaso",
     "notStarted": "Aún sin empezar · {{total, number}} tarjetas",
-    "overdue": "{{count, number}} repasos vencidos",
-    "overdue_one": "{{count, number}} repaso vencido",
-    "overdue_other": "{{count, number}} repasos vencidos",
     "unstudied": "{{count, number}} sin estudiar",
     "unstudied_one": "{{count, number}} sin estudiar",
-    "unstudied_other": "{{count, number}} sin estudiar"
+    "unstudied_other": "{{count, number}} sin estudiar",
+    "behind": "{{count, number}} repasos vencidos",
+    "behind_one": "{{count, number}} repaso vencido",
+    "behind_other": "{{count, number}} repasos vencidos",
+    "studied": "{{attempted, number}} de {{total, number}} tarjetas estudiadas",
+    "detailStudied": "{{count, number}} estudiadas",
+    "detailStudied_one": "{{count, number}} estudiada",
+    "detailStudied_other": "{{count, number}} estudiadas",
+    "detailWithinWindow": "{{count, number}} dentro de su ciclo de repaso",
+    "detailWithinWindow_one": "{{count, number}} dentro de su ciclo de repaso",
+    "detailWithinWindow_other": "{{count, number}} dentro de su ciclo de repaso"
   }
 }

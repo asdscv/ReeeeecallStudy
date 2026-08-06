@@ -209,13 +209,19 @@
     "daysLeft": "{{count, number}}일 남음",
     "daysLeft_one": "{{count, number}}일 남음",
     "daysLeft_other": "{{count, number}}일 남음",
-    "withinWindow": "배운 {{attempted, number}}장 중 {{known, number}}장이 복습 주기 안에 있어요",
     "notStarted": "아직 배운 카드가 없어요 · 전체 {{total, number}}장",
-    "overdue": "복습 밀림 {{count, number}}장",
-    "overdue_one": "복습 밀림 {{count, number}}장",
-    "overdue_other": "복습 밀림 {{count, number}}장",
     "unstudied": "아직 안 배움 {{count, number}}장",
     "unstudied_one": "아직 안 배움 {{count, number}}장",
-    "unstudied_other": "아직 안 배움 {{count, number}}장"
+    "unstudied_other": "아직 안 배움 {{count, number}}장",
+    "behind": "복습이 {{count, number}}장 밀렸어요",
+    "behind_one": "복습이 {{count, number}}장 밀렸어요",
+    "behind_other": "복습이 {{count, number}}장 밀렸어요",
+    "studied": "{{total, number}}장 중 {{attempted, number}}장 배움",
+    "detailStudied": "배운 {{count, number}}장",
+    "detailStudied_one": "배운 {{count, number}}장",
+    "detailStudied_other": "배운 {{count, number}}장",
+    "detailWithinWindow": "복습 주기 안 {{count, number}}장",
+    "detailWithinWindow_one": "복습 주기 안 {{count, number}}장",
+    "detailWithinWindow_other": "복습 주기 안 {{count, number}}장"
   }
 }

@@ -210,13 +210,19 @@
     "daysLeft": "เหลือ {{count, number}} วัน",
     "daysLeft_one": "เหลือ {{count, number}} วัน",
     "daysLeft_other": "เหลือ {{count, number}} วัน",
-    "withinWindow": "{{known, number}} จาก {{attempted, number}} ใบที่เรียนแล้วยังอยู่ในรอบทบทวน",
     "notStarted": "ยังไม่ได้เริ่มเรียน · ทั้งหมด {{total, number}} ใบ",
-    "overdue": "เลยกำหนดทบทวน {{count, number}} ใบ",
-    "overdue_one": "เลยกำหนดทบทวน {{count, number}} ใบ",
-    "overdue_other": "เลยกำหนดทบทวน {{count, number}} ใบ",
     "unstudied": "ยังไม่ได้เรียน {{count, number}} ใบ",
     "unstudied_one": "ยังไม่ได้เรียน {{count, number}} ใบ",
-    "unstudied_other": "ยังไม่ได้เรียน {{count, number}} ใบ"
+    "unstudied_other": "ยังไม่ได้เรียน {{count, number}} ใบ",
+    "behind": "มี {{count, number}} ใบเลยกำหนดทบทวน",
+    "behind_one": "มี {{count, number}} ใบเลยกำหนดทบทวน",
+    "behind_other": "มี {{count, number}} ใบเลยกำหนดทบทวน",
+    "studied": "เรียนแล้ว {{attempted, number}} จาก {{total, number}} ใบ",
+    "detailStudied": "เรียนแล้ว {{count, number}} ใบ",
+    "detailStudied_one": "เรียนแล้ว {{count, number}} ใบ",
+    "detailStudied_other": "เรียนแล้ว {{count, number}} ใบ",
+    "detailWithinWindow": "อยู่ในรอบทบทวน {{count, number}} ใบ",
+    "detailWithinWindow_one": "อยู่ในรอบทบทวน {{count, number}} ใบ",
+    "detailWithinWindow_other": "อยู่ในรอบทบทวน {{count, number}} ใบ"
   }
 }

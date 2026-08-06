@@ -1,0 +1,11 @@
+-- Rollback for 191.
+--
+-- Deliberately EMPTY. Reverting would restore `interval_days <= 0` to the `unseen`
+-- filter, which counts every learning-step card and every card just rated "again" as
+-- never studied — the defect 191 exists to remove. The progress bar would go BACKWARDS
+-- when a learner answers a review, and the screen would print cards they had studied
+-- seconds earlier as "아직 안 배움".
+--
+-- 191 changes no data and holds no lock: it redefines one STABLE, read-only function.
+-- There is nothing to undo and no reason to.
+SELECT 'mig 191 is not reversible by design — see the note above' AS note;

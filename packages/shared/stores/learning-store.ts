@@ -96,8 +96,13 @@ export interface DailyPlanItemRow {
    * `recall_probability` is the estimated chance the learner can recall the item right now
    * (`application/memory.ts`). ABSENT — not null — for a card with no forgetting curve yet,
    * so "we cannot say" and "we say 0%" stay different things all the way to the screen.
+   *
+   * `is_new` is whether the planner counted this row as INTAKE. Recorded because it cannot be
+   * re-derived from the row: a card mid-learning-step has no forgetting curve either, so
+   * "no recall estimate" does NOT mean "never studied". Absent on plans saved before this
+   * existed, which is why readers fall back rather than assume.
    */
-  payload?: { recall_probability?: number } | null
+  payload?: { recall_probability?: number; is_new?: boolean } | null
 }
 
 /**
@@ -550,6 +555,17 @@ function toPlanItemRows(
       .filter((candidate) => typeof candidate.retrievability === 'number')
       .map((candidate) => [candidate.candidateId, candidate.retrievability as number]),
   )
+  // Whether the planner treated this row as INTAKE, recorded rather than re-derived.
+  //
+  // The screens used to infer it from `recall_probability` being absent, which is wrong for
+  // exactly the cards a learner is working hardest on: a card mid-learning-step has no
+  // forgetting curve yet, so it carried no estimate and got labelled "새 카드" hours after
+  // being studied. The planner's own test is `!card.last_reviewed_at` (learning-candidates.ts),
+  // it spends intake and review budget on the two separately, and it is the only place that
+  // knows. So it says so here instead of leaving the UI to guess.
+  const isNewByCandidate = new Map(
+    candidates.map((candidate) => [candidate.candidateId, candidate.isNew === true]),
+  )
   return output.items.map((item) => {
     const card = item.cardId ? cardsById.get(item.cardId) : undefined
     const shape = card
@@ -573,9 +589,11 @@ function toPlanItemRows(
     // (mig 167), so neither record needs a migration. The key is omitted entirely when BOTH
     // are absent, so `save_daily_plan` keeps writing its `'{}'` default for every other item.
     const recall = recallByCandidate.get(item.candidateId)
+    const isNew = isNewByCandidate.get(item.candidateId)
     const payload = {
       ...(planItemAnswerPayload(shape) ?? {}),
       ...(recall === undefined ? {} : { recall_probability: recall }),
+      ...(isNew === undefined ? {} : { is_new: isNew }),
     }
     return {
       activity_id: item.activityId,

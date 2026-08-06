@@ -147,24 +147,50 @@ function GoalProgress({ knowledge }: { knowledge: GoalKnowledge | null }) {
   if (!knowledge || knowledge.total === 0) return null
 
   const summary = goalKnowledgeSummary(knowledge)
-  // Each half is dropped when empty rather than printed as a zero: "복습 밀림 0장" is a sentence
-  // about nothing, and a learner who is fully caught up should see that, not a row of noughts.
-  const detail = [
-    summary.overdue > 0 ? t('progress.overdue', { count: summary.overdue }) : null,
+
+  /**
+   * The headline changes with the state, because the useful sentence does.
+   *
+   * A fixed "배운 N장 중 M장이 복습 주기 안에 있어요" degenerates the moment nothing is overdue:
+   * it becomes "17장 중 17장", which is true, vacuous, and sits above a plan card offering 12
+   * cards it never mentions. Behind on reviews is the one state with something to do today, so
+   * that leads; otherwise the sentence names where the goal stands, against its own total.
+   */
+  const headline = summary.notStarted
+    ? t('progress.notStarted', { total: summary.total })
+    : summary.behind
+      ? t('progress.behind', { count: summary.overdue })
+      : t('progress.studied', { total: summary.total, attempted: summary.attempted })
+
+  /**
+   * The line under it carries what the headline did not, and never a zero.
+   *
+   * When behind, "배운 N장" — the reassurance the headline just took away. Otherwise the split
+   * the headline's `attempted` is made of. `아직 안 배움` is the number that ties this card to
+   * the plan card below it: those cards ARE tomorrow's, and usually today's, work.
+   */
+  const detail = summary.notStarted ? '' : [
+    summary.behind
+      ? t('progress.detailStudied', { count: summary.attempted })
+      : t('progress.detailWithinWindow', { count: summary.withinWindow }),
     summary.unstudied > 0 ? t('progress.unstudied', { count: summary.unstudied }) : null,
   ].filter(Boolean).join(' · ')
 
   return (
     <section className="rounded-xl border border-border bg-card p-4" aria-label={t('progress.title')}>
-      <p className="text-sm text-foreground">
-        {summary.notStarted
-          ? t('progress.notStarted', { total: knowledge.total })
-          : t('progress.withinWindow', {
-            attempted: summary.attempted, known: summary.withinWindow,
-          })}
-      </p>
-      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-        <div className="h-full bg-brand" style={{ width: `${summary.percent}%` }} role="presentation" />
+      <p className="text-sm text-foreground" data-testid="progress-headline">{headline}</p>
+      {/* `attempted / total`. It may only fill when there is no card left to reach — the old
+          `known / attempted` hit 100% as soon as nothing was overdue, so a goal with 12 cards
+          never opened drew a complete bar. */}
+      <div
+        className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted"
+        role="progressbar"
+        aria-valuenow={summary.percent}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={t('progress.title')}
+      >
+        <div className="h-full bg-brand" style={{ width: `${summary.percent}%` }} />
       </div>
       {detail && (
         <p className="mt-1.5 text-[11px] text-content-tertiary" data-testid="progress-detail">

@@ -101,11 +101,13 @@ export function LearningPlanWidget() {
       {state && summary && state.total > 0 ? (
         <>
           <p className="mt-1 text-xs text-muted-foreground">
+            {/* Same sentence the plan screen leads with, from the same helper: behind on
+                reviews when there is something overdue, otherwise where the goal stands. */}
             {summary.notStarted
-              ? t('progress.notStarted', { total: state.total })
-              : t('progress.withinWindow', {
-                attempted: summary.attempted, known: summary.withinWindow,
-              })}
+              ? t('progress.notStarted', { total: summary.total })
+              : summary.behind
+                ? t('progress.behind', { count: summary.overdue })
+                : t('progress.studied', { total: summary.total, attempted: summary.attempted })}
           </p>
           <div
             className="mt-2 h-1.5 w-full rounded-full bg-muted overflow-hidden"

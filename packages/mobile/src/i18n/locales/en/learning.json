@@ -210,13 +210,19 @@
     "daysLeft": "{{count, number}} days left",
     "daysLeft_one": "{{count, number}} day left",
     "daysLeft_other": "{{count, number}} days left",
-    "withinWindow": "{{known, number}} of {{attempted, number}} studied cards are still within their review window",
     "notStarted": "Not started yet · {{total, number}} cards",
-    "overdue": "{{count, number}} reviews overdue",
-    "overdue_one": "{{count, number}} review overdue",
-    "overdue_other": "{{count, number}} reviews overdue",
     "unstudied": "{{count, number}} not studied yet",
     "unstudied_one": "{{count, number}} not studied yet",
-    "unstudied_other": "{{count, number}} not studied yet"
+    "unstudied_other": "{{count, number}} not studied yet",
+    "behind": "{{count, number}} reviews are overdue",
+    "behind_one": "{{count, number}} review is overdue",
+    "behind_other": "{{count, number}} reviews are overdue",
+    "studied": "{{attempted, number}} of {{total, number}} cards studied",
+    "detailStudied": "{{count, number}} studied",
+    "detailStudied_one": "{{count, number}} studied",
+    "detailStudied_other": "{{count, number}} studied",
+    "detailWithinWindow": "{{count, number}} within their review window",
+    "detailWithinWindow_one": "{{count, number}} within its review window",
+    "detailWithinWindow_other": "{{count, number}} within their review window"
   }
 }

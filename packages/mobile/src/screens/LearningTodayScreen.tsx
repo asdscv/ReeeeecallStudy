@@ -278,8 +278,10 @@ export function LearningTodayScreen() {
   )
   // Each half dropped when empty — "복습 밀림 0장" is a sentence about nothing, and a learner who
   // is caught up should see that rather than a row of noughts.
-  const progressDetail = [
-    goalSummary.overdue > 0 ? t('progress.overdue', { count: goalSummary.overdue }) : null,
+  const progressDetail = goalSummary.notStarted ? '' : [
+    goalSummary.behind
+      ? t('progress.detailStudied', { count: goalSummary.attempted })
+      : t('progress.detailWithinWindow', { count: goalSummary.withinWindow }),
     goalSummary.unstudied > 0 ? t('progress.unstudied', { count: goalSummary.unstudied }) : null,
   ].filter(Boolean).join(' · ')
 
@@ -407,10 +409,12 @@ export function LearningTodayScreen() {
                     which sounds like amnesia and means nothing of the kind. */}
                 <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
                   {goalSummary.notStarted
-                    ? t('progress.notStarted', { total: knowledge[goalId].total })
-                    : t('progress.withinWindow', {
-                      attempted: goalSummary.attempted, known: goalSummary.withinWindow,
-                    })}
+                    ? t('progress.notStarted', { total: goalSummary.total })
+                    : goalSummary.behind
+                      ? t('progress.behind', { count: goalSummary.overdue })
+                      : t('progress.studied', {
+                        total: goalSummary.total, attempted: goalSummary.attempted,
+                      })}
                 </Text>
                 {progressDetail !== '' && (
                   <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>

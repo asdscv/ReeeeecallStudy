@@ -7,7 +7,7 @@
  * day. The rest cover the states a user can actually get stuck in (no goal, no decks,
  * nothing due, quota spent) — each of which has to say something different.
  */
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
@@ -409,34 +409,54 @@ describe('LearningTodayPage', () => {
     knowledge: { 'goal-1': { total: known + unknown + unseen, known, unknown, unseen } },
   })
 
-  it('says what `known` measures instead of renaming it 확실', () => {
+  it('leads with the backlog when the learner is behind', () => {
     renderToday(knowledgeOf(1, 18, 10))
 
-    // The denominator is what has been STUDIED (19), not the whole goal (29).
-    expect(screen.getByText(/progress\.withinWindow/)).toBeInTheDocument()
-    expect(screen.queryByText(/progress\.knownNow/)).not.toBeInTheDocument()
-    expect(screen.queryByText(/progress\.breakdown/)).not.toBeInTheDocument()
+    expect(screen.getByTestId('progress-headline')).toHaveTextContent('progress.behind')
+    // And the reassurance the headline gave up moves to the line below.
+    expect(screen.getByTestId('progress-detail')).toHaveTextContent('progress.detailStudied')
   })
 
-  it('puts the overdue work first and drops halves that are empty', () => {
-    renderToday(knowledgeOf(1, 18, 10))
-    expect(screen.getByTestId('progress-detail')).toHaveTextContent('progress.overdue')
+  it('names the goal total once nothing is overdue', () => {
+    // Reported as "17장은 뭐고 12장은 뭐야": with no backlog the old sentence became "17장 중
+    // 17장이 복습 주기 안에" — true, vacuous, and never naming the 29 cards those numbers are
+    // parts of, above a plan card offering the 12 it did not mention.
+    renderToday(knowledgeOf(17, 0, 12))
 
-    cleanup()
-    // Caught up, with cards still to start: no "복습 밀림 0장", which is a sentence about nothing.
-    renderToday(knowledgeOf(19, 0, 10))
+    // This file's `t` mock echoes the KEY only, so which sentence rendered is what can be
+    // asserted here. The numbers inside it are pinned by goal-knowledge-summary.test.ts and by
+    // the bar below, which reads the same `percent`.
+    expect(screen.getByTestId('progress-headline')).toHaveTextContent('progress.studied')
+
     const detail = screen.getByTestId('progress-detail')
+    expect(detail).toHaveTextContent('progress.detailWithinWindow')
+    // The number that ties this card to the plan card below it: those 12 ARE today's work.
     expect(detail).toHaveTextContent('progress.unstudied')
-    expect(detail).not.toHaveTextContent('progress.overdue')
+  })
+
+  it('never fills the bar while a card has not been opened', () => {
+    // 17 studied of 29, nothing overdue. The old ratio was 17/17 and drew a COMPLETE bar over a
+    // goal 59% of the way through — the screen said "finished" about 12 untouched cards.
+    renderToday(knowledgeOf(17, 0, 12))
+
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '59')
+  })
+
+  it('drops a half of the detail line that has nothing in it', () => {
+    // Every card opened, nothing overdue: no "아직 안 배움 0장", which is a sentence about nothing.
+    renderToday(knowledgeOf(29, 0, 0))
+
+    const detail = screen.getByTestId('progress-detail')
+    expect(detail).toHaveTextContent('progress.detailWithinWindow')
+    expect(detail).not.toHaveTextContent('progress.unstudied')
   })
 
   it('reports "not started" rather than a confident 0%', () => {
     renderToday(knowledgeOf(0, 0, 29))
 
-    expect(screen.getByText(/progress\.notStarted/)).toBeInTheDocument()
-    // Nothing overdue and nothing studied — the detail line has nothing to say but the count of
-    // untouched cards, which the headline already gave.
-    expect(screen.getByTestId('progress-detail')).toHaveTextContent('progress.unstudied')
+    expect(screen.getByTestId('progress-headline')).toHaveTextContent('progress.notStarted')
+    // The headline already gave the total, so there is nothing left for a detail line to add.
+    expect(screen.queryByTestId('progress-detail')).not.toBeInTheDocument()
   })
 })
 

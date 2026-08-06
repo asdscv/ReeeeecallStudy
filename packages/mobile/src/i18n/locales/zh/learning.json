@@ -210,13 +210,19 @@
     "daysLeft": "还剩 {{count, number}} 天",
     "daysLeft_one": "还剩 {{count, number}} 天",
     "daysLeft_other": "还剩 {{count, number}} 天",
-    "withinWindow": "已学 {{attempted, number}} 张中有 {{known, number}} 张仍在复习周期内",
     "notStarted": "尚未开始学习 · 共 {{total, number}} 张",
-    "overdue": "复习逾期 {{count, number}} 张",
-    "overdue_one": "复习逾期 {{count, number}} 张",
-    "overdue_other": "复习逾期 {{count, number}} 张",
     "unstudied": "尚未学习 {{count, number}} 张",
     "unstudied_one": "尚未学习 {{count, number}} 张",
-    "unstudied_other": "尚未学习 {{count, number}} 张"
+    "unstudied_other": "尚未学习 {{count, number}} 张",
+    "behind": "有 {{count, number}} 张复习逾期",
+    "behind_one": "有 {{count, number}} 张复习逾期",
+    "behind_other": "有 {{count, number}} 张复习逾期",
+    "studied": "{{total, number}} 张中已学 {{attempted, number}} 张",
+    "detailStudied": "已学 {{count, number}} 张",
+    "detailStudied_one": "已学 {{count, number}} 张",
+    "detailStudied_other": "已学 {{count, number}} 张",
+    "detailWithinWindow": "复习周期内 {{count, number}} 张",
+    "detailWithinWindow_one": "复习周期内 {{count, number}} 张",
+    "detailWithinWindow_other": "复习周期内 {{count, number}} 张"
   }
 }

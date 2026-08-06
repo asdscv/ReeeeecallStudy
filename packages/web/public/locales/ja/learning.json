@@ -209,13 +209,19 @@
     "daysLeft": "残り{{count, number}}日",
     "daysLeft_one": "残り{{count, number}}日",
     "daysLeft_other": "残り{{count, number}}日",
-    "withinWindow": "学習した{{attempted, number}}枚のうち{{known, number}}枚が復習期限内です",
     "notStarted": "まだ学習していません · 全{{total, number}}枚",
-    "overdue": "復習期限切れ {{count, number}}枚",
-    "overdue_one": "復習期限切れ {{count, number}}枚",
-    "overdue_other": "復習期限切れ {{count, number}}枚",
     "unstudied": "未学習 {{count, number}}枚",
     "unstudied_one": "未学習 {{count, number}}枚",
-    "unstudied_other": "未学習 {{count, number}}枚"
+    "unstudied_other": "未学習 {{count, number}}枚",
+    "behind": "復習が{{count, number}}枚たまっています",
+    "behind_one": "復習が{{count, number}}枚たまっています",
+    "behind_other": "復習が{{count, number}}枚たまっています",
+    "studied": "{{total, number}}枚中{{attempted, number}}枚を学習済み",
+    "detailStudied": "学習済み {{count, number}}枚",
+    "detailStudied_one": "学習済み {{count, number}}枚",
+    "detailStudied_other": "学習済み {{count, number}}枚",
+    "detailWithinWindow": "復習期限内 {{count, number}}枚",
+    "detailWithinWindow_one": "復習期限内 {{count, number}}枚",
+    "detailWithinWindow_other": "復習期限内 {{count, number}}枚"
   }
 }

@@ -209,13 +209,19 @@
     "daysLeft": "{{count, number}} hari lagi",
     "daysLeft_one": "{{count, number}} hari lagi",
     "daysLeft_other": "{{count, number}} hari lagi",
-    "withinWindow": "{{known, number}} dari {{attempted, number}} kartu yang dipelajari masih dalam jadwal ulasan",
     "notStarted": "Belum dimulai · {{total, number}} kartu",
-    "overdue": "{{count, number}} ulasan terlambat",
-    "overdue_one": "{{count, number}} ulasan terlambat",
-    "overdue_other": "{{count, number}} ulasan terlambat",
     "unstudied": "{{count, number}} belum dipelajari",
     "unstudied_one": "{{count, number}} belum dipelajari",
-    "unstudied_other": "{{count, number}} belum dipelajari"
+    "unstudied_other": "{{count, number}} belum dipelajari",
+    "behind": "{{count, number}} ulasan terlambat",
+    "behind_one": "{{count, number}} ulasan terlambat",
+    "behind_other": "{{count, number}} ulasan terlambat",
+    "studied": "{{attempted, number}} dari {{total, number}} kartu dipelajari",
+    "detailStudied": "{{count, number}} dipelajari",
+    "detailStudied_one": "{{count, number}} dipelajari",
+    "detailStudied_other": "{{count, number}} dipelajari",
+    "detailWithinWindow": "{{count, number}} dalam jadwal ulasan",
+    "detailWithinWindow_one": "{{count, number}} dalam jadwal ulasan",
+    "detailWithinWindow_other": "{{count, number}} dalam jadwal ulasan"
   }
 }
