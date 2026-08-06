@@ -52,7 +52,22 @@
     "hint": "Hủy, đổi gói hoặc cập nhật phương thức thanh toán.",
     "error": "Không thể mở trang quản lý. Vui lòng thử lại.",
     "cancel": "Hủy đăng ký",
-    "resume": "Tiếp tục đăng ký"
+    "resume": "Tiếp tục đăng ký",
+    "openBillingDirect": "Mở trực tiếp trang thanh toán",
+    "contactSupport": "Liên hệ hỗ trợ",
+    "supportSubject": "Hỗ trợ quản lý đăng ký",
+    "errors": {
+      "UNAUTHORIZED": "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại rồi thử lại.",
+      "NOT_CONFIGURED": "Hiện chưa thể mở trang quản lý đăng ký. Thử lại cũng không giải quyết được — hãy liên hệ với chúng tôi để được xử lý trực tiếp.",
+      "NO_SUBSCRIPTION": "Không tìm thấy đăng ký nào được mua trên web. Nếu bạn đăng ký qua App Store hoặc Google Play, hãy quản lý tại cửa hàng đó.",
+      "PROVIDER_SUB_NOT_FOUND": "Nhà cung cấp thanh toán không tìm thấy đăng ký này — có thể nó được tạo trước khi chúng tôi đổi hệ thống thanh toán. Thử lại sẽ không giải quyết được. Hãy liên hệ, chúng tôi sẽ hủy hoặc hoàn tiền ngay.",
+      "PROVIDER_UNREACHABLE": "Không kết nối được với nhà cung cấp thanh toán. Vui lòng thử lại sau giây lát.",
+      "PROVIDER_ERROR": "Nhà cung cấp thanh toán trả về lỗi. Vui lòng thử lại sau giây lát.",
+      "NO_PORTAL_URL": "Nhà cung cấp thanh toán không trả về liên kết quản lý. Hãy liên hệ để chúng tôi xử lý trực tiếp.",
+      "LOOKUP_FAILED": "Có lỗi từ phía chúng tôi. Vui lòng thử lại sau giây lát.",
+      "NETWORK_ERROR": "Kết nối thất bại. Hãy kiểm tra mạng và thử lại.",
+      "SERVER_ERROR": "Không thể mở trang quản lý. Vui lòng thử lại."
+    }
   },
   "methods": {
     "title": "Chọn phương thức thanh toán",

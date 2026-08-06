@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useLearningStore, type LearningGoalWithDecks } from '../../stores/learning-store'
 import { useConfirmStore } from '../../stores/confirm-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
@@ -17,6 +17,7 @@ export function LearningGoalsPage() {
   const { t } = useTranslation('learning')
   const { goals, goalsLoading, goalsError, fetchGoals, createGoal, updateGoal, archiveGoal } = useLearningStore()
   const confirm = useConfirmStore((state) => state.confirm)
+  const navigate = useNavigate()
 
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<LearningGoalWithDecks | null>(null)
@@ -29,6 +30,11 @@ export function LearningGoalsPage() {
 
   const handleSubmit = async (values: GoalFormValues) => {
     setSubmitting(true)
+    // `settings` carries the two pacing answers ({ cadence, newCardsPerDay }). It was collected
+    // by the form and then dropped HERE, so every goal in production stored `settings = {}` —
+    // which `parseNewCardsPerDay` reads as "uncapped" and `parseCadence` as "every day". The
+    // intake limit had therefore never throttled anything, and the study-days select silently
+    // reopened at 7 after every save.
     const ok = editing
       ? await updateGoal({
         goalId: editing.id,
@@ -36,6 +42,7 @@ export function LearningGoalsPage() {
         dailyMinutes: values.dailyMinutes,
         targetDate: values.targetDate,
         decks: values.decks,
+        settings: values.settings,
       })
       : await createGoal({
         domainId: values.domainId,
@@ -43,6 +50,7 @@ export function LearningGoalsPage() {
         dailyMinutes: values.dailyMinutes,
         targetDate: values.targetDate,
         decks: values.decks,
+        settings: values.settings,
       })
     setSubmitting(false)
     if (ok) { setFormOpen(false); setEditing(null) }
@@ -81,7 +89,7 @@ export function LearningGoalsPage() {
           <button
             type="button"
             onClick={openCreate}
-            className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg cursor-pointer"
+            className="px-3 py-1.5 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover"
           >
             {t('goals.create')}
           </button>
@@ -104,12 +112,24 @@ export function LearningGoalsPage() {
       ) : (
         <ul className="space-y-2">
           {goals.map((goal) => (
-            <li key={goal.id} className="p-3 bg-card rounded-lg border border-border">
+            <li
+              key={goal.id}
+              // The whole card opens the plan, not the 14px of title text. The `<Link>` below
+              // stays: it is what gives the row a tab stop, a link role, and ctrl/middle-click
+              // "open in new tab" — this handler only widens the MOUSE target, which is the
+              // pattern DeckCard.tsx already uses for a card that also carries buttons.
+              onClick={() => navigate(`/learning/${goal.id}`)}
+              className="p-3 bg-card rounded-lg border border-border cursor-pointer transition-colors hover:border-brand/40 hover:bg-accent/40"
+            >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   {/* The card IS the way in. Plans used to be switched with a dropdown repeated
                       on three sibling screens; now the list opens one. */}
-                  <Link to={`/learning/${goal.id}`} className="text-sm text-foreground truncate hover:underline block">
+                  <Link
+                    to={`/learning/${goal.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-sm font-medium text-foreground truncate hover:underline block"
+                  >
                     {goal.title}
                   </Link>
                   <div className="flex flex-wrap items-center gap-2 mt-1">
@@ -132,8 +152,10 @@ export function LearningGoalsPage() {
                     <p className="text-xs text-warning mt-1">{t('goals.noDecksWarning')}</p>
                   )}
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <button type="button" onClick={() => openEdit(goal)} className="text-xs text-primary hover:underline cursor-pointer">
+                {/* The same guard DeckCard.tsx:110 uses: without it 수정 / 보관 would open the
+                    plan on their way to their own handler. */}
+                <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
+                  <button type="button" onClick={() => openEdit(goal)} className="text-xs text-brand hover:underline cursor-pointer">
                     {t('goals.edit')}
                   </button>
                   <button type="button" onClick={() => void handleArchive(goal)} className="text-xs text-destructive hover:underline cursor-pointer">

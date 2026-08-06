@@ -5,6 +5,7 @@ import {
   DEFAULT_NEW_CARDS_PER_DAY,
 } from '@reeeeecall/shared/learning'
 import { useTranslation } from 'react-i18next'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/dialog'
 import type { LearningGoalWithDecks, GoalDeckLink } from '../../stores/learning-store'
 import { useDeckStore } from '../../stores/deck-store'
 import { useAuthStore } from '../../stores/auth-store'
@@ -28,6 +29,23 @@ import { useAuthStore } from '../../stores/auth-store'
  * before anything is saved. It reports the PEAK as well as the average because the average
  * alone is a comfortable lie — load piles up behind intake, and a learner who agreed to 34
  * minutes and met 43 was misled.
+ *
+ * ## What the last pass changed, and why
+ *
+ * The two pacing numbers were unreadable, and one of them was silently contradicted 40px below
+ * itself: "하루에 새로 배울 카드 20" sat next to a projection reading "하루 새 카드 62장" — the
+ * same unit, two different meanings (a CEILING the learner sets, and the RATE the deadline
+ * demands), neither labelled as such. They are now stated as what they are, and when they
+ * disagree the form says so in a sentence instead of leaving the learner to notice.
+ *
+ * The date and the minutes budget used to be two live inputs that answered the same question
+ * from opposite ends, in different places on the screen, with the budget silently winning. They
+ * are now one explicit choice — 목표일 기준 / 하루 시간 기준 — so whichever one is driving the
+ * plan is the one on screen.
+ *
+ * Dismissal is Radix's, not hand-rolled: this used to be a bare `fixed inset-0` div, so clicking
+ * the backdrop or pressing Escape did nothing and `aria-modal="true"` was a claim nothing
+ * enforced. `Dialog` supplies backdrop-close, Escape, focus trap and focus restore.
  */
 
 export interface GoalFormValues {
@@ -56,6 +74,9 @@ const ASSUMED_LAPSE_RATE = 0.10
 
 const DAY_MS = 86_400_000
 
+/** Which side of the same question the learner pinned. See the `basis` state below. */
+type PlanBasis = 'date' | 'minutes'
+
 export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
   goal: LearningGoalWithDecks | null
   onCancel: () => void
@@ -67,16 +88,13 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
   const { user } = useAuthStore()
 
   /**
-   * How often this learner studies. Read from the goal rather than asked for: there is no
-   * control for it yet, and every existing goal was planned as if every day were a study day —
-   * which is exactly what `parseCadence` returns for a goal that has never stored one.
-   */
-  const [studyDays, setStudyDays] = useState(() => parseCadence(goal?.settings).studyDays)
-  /**
+   * How often this learner studies, as `studyDays` out of every 7.
+   *
    * The cycle stays 7 until there is a control for it. The stored shape is already general —
    * `{ cycleDays, studyDays }` says "15 days a month" as easily as "3 a week" — so opening that
    * up later is a second input, not a migration or a rewrite.
    */
+  const [studyDays, setStudyDays] = useState(() => parseCadence(goal?.settings).studyDays)
   const cadence = useMemo(() => ({ cycleDays: 7, studyDays }), [studyDays])
 
   /**
@@ -97,7 +115,13 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
   )
   // The learner may pin either side: a date, or a daily budget. Both are legitimate — "I have
   // until November" and "I have 30 minutes a day" are the same question from opposite ends.
-  const [budgetMinutes, setBudgetMinutes] = useState<number | null>(null)
+  // Which one is pinned is now an explicit choice rather than an emergent one: two live inputs
+  // that both changed the saved budget, with the minutes box quietly outranking the date, is
+  // how the form ended up showing two different finish stories at once.
+  const [basis, setBasis] = useState<PlanBasis>('date')
+  const [budgetMinutes, setBudgetMinutes] = useState<number | null>(
+    () => (goal?.daily_minutes ?? null),
+  )
   const [localError, setLocalError] = useState<string | null>(null)
 
   useEffect(() => { void fetchDecks() }, [fetchDecks])
@@ -176,6 +200,18 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
     ? null
     : new Date(Date.now() + daysForBudget * DAY_MS).toISOString().slice(0, 10)
 
+  /**
+   * The intake rate the deadline demands, against the ceiling the learner set.
+   *
+   * These two numbers are in the same unit and used to sit 40px apart with nothing saying they
+   * measured different things. `projection.newCardsPerDay` is what the date REQUIRES;
+   * `newCardsPerDay` is the ceiling. When the ceiling is lower, the target date is not reachable
+   * at this pace — which is worth one sentence, not a silent contradiction.
+   */
+  const neededNewPerDay = projection?.newCardsPerDay ?? null
+  const capBlocksTarget =
+    basis === 'date' && neededNewPerDay !== null && newCardsPerDay < neededNewPerDay
+
   const submit = () => {
     const trimmed = title.trim()
     if (trimmed.length < 1 || trimmed.length > 500) {
@@ -192,11 +228,15 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
       // existing goal keeps whatever it was created with rather than being silently rewritten.
       domainId: goal?.domain_id ?? availableDomainIds()[0],
       title: trimmed,
-      // The planner's per-day budget. Derived, not typed: the projection when a date is set, the
-      // learner's own figure when they pinned one, and the previous value when editing.
+      // The planner's per-day budget. Derived, not typed: the learner's own figure when they
+      // pinned the minutes side, the projection when they pinned the date, and the previous
+      // value when neither can be computed.
       dailyMinutes: Math.max(1, Math.min(1440, Math.round(
-        budgetMinutes ?? projection?.averageMinutesPerDay ?? goal?.daily_minutes ?? 20,
+        (basis === 'minutes' ? budgetMinutes : projection?.averageMinutesPerDay)
+        ?? goal?.daily_minutes ?? 20,
       ))),
+      // Kept whatever the basis: a deadline is a fact about the goal, not a consequence of
+      // which side of the arithmetic the learner happened to pin.
       targetDate: targetDate || null,
       decks: [...deckIds].map((deck_id) => ({ deck_id, importance: NEUTRAL_IMPORTANCE })),
       // Stored whole rather than merged into whatever was there: these two are the only keys
@@ -207,106 +247,204 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
 
   const minutes = (value: number) => t('form.plan.minutes', { count: Math.max(1, Math.round(value)) })
 
+  const fieldClass =
+    'mt-1.5 w-full px-3 py-2 text-sm bg-background border border-border rounded-lg ' +
+    'text-foreground outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/20'
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div role="dialog" aria-modal="true" aria-label={t(goal ? 'form.editTitle' : 'form.createTitle')}
-        className="w-full max-w-md bg-card rounded-xl border border-border p-4 space-y-3 max-h-[90vh] overflow-y-auto">
-        <h2 className="text-base font-medium text-foreground">
-          {t(goal ? 'form.editTitle' : 'form.createTitle')}
-        </h2>
+    <Dialog open onOpenChange={(next) => { if (!next) onCancel() }}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{t(goal ? 'form.editTitle' : 'form.createTitle')}</DialogTitle>
+        </DialogHeader>
 
-        <label className="block">
-          <span className="text-xs text-muted-foreground">{t('form.goalTitle')}</span>
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            maxLength={500}
-            className="mt-1 w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg"
-            placeholder={t('form.goalTitlePlaceholder')}
-          />
-        </label>
-
-        <div className="block">
-          <span className="text-xs text-muted-foreground">{t('form.decks')}</span>
-          <p className="text-[11px] text-content-tertiary mt-0.5">{t('form.decksHint')}</p>
-          <div className="mt-1 max-h-40 overflow-y-auto border border-border rounded-lg p-2 space-y-1">
-            {decks.length === 0 && <p className="text-xs text-content-tertiary">{t('form.noDecks')}</p>}
-            {decks.map((deck) => (
-              <label key={deck.id} className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={deckIds.has(deck.id)}
-                  onChange={() => toggleDeck(deck.id)}
-                />
-                <span className="truncate">{deck.name}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <label className="block">
-          <span className="text-xs text-muted-foreground">{t('form.targetDate')}</span>
-          <input
-            type="date"
-            value={targetDate}
-            onChange={(e) => { setTargetDate(e.target.value); setBudgetMinutes(null) }}
-            className="mt-1 w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg"
-          />
-        </label>
-
-        <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-5">
           <label className="block">
-            <span className="text-xs text-muted-foreground">{t('form.studyDays')}</span>
-            <select
-              value={studyDays}
-              onChange={(e) => setStudyDays(Number(e.target.value))}
-              className="mt-1 w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg"
-            >
-              {[1, 2, 3, 4, 5, 6, 7].map((n) => (
-                <option key={n} value={n}>{t('form.studyDaysOption', { count: n })}</option>
-              ))}
-            </select>
-          </label>
-
-          <label className="block">
-            <span className="text-xs text-muted-foreground">{t('form.newCardsPerDay')}</span>
+            <span className="text-xs font-medium text-foreground">{t('form.goalTitle')}</span>
             <input
-              type="number"
-              min={0}
-              max={999}
-              value={newCardsPerDay}
-              onChange={(e) => {
-                // Clamped here rather than on submit: a controlled number input that accepts a
-                // value it will later discard shows the learner a figure the plan never used.
-                const next = Number(e.target.value)
-                setNewCardsPerDay(Number.isFinite(next) ? Math.max(0, Math.min(999, Math.trunc(next))) : 0)
-              }}
-              className="mt-1 w-full px-3 py-2 text-sm bg-muted border border-border rounded-lg"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              maxLength={500}
+              className={fieldClass}
+              placeholder={t('form.goalTitlePlaceholder')}
             />
           </label>
-        </div>
-        {/* Said once, plainly, because it is the rule that makes the number safe: intake yields
-            to work already owed, so falling behind pauses new cards instead of compounding. */}
-        <p className="text-[11px] text-content-tertiary">{t('form.newCardsHint')}</p>
 
-        {/* ── The plan this goal implies, before it is saved ────────────────── */}
-        <section
-          aria-label={t('form.plan.title')}
-          className="rounded-lg border border-border bg-muted/40 p-3 space-y-1.5"
-        >
-          <h3 className="text-xs font-medium text-foreground">{t('form.plan.title')}</h3>
+          <div className="block">
+            <span className="text-xs font-medium text-foreground">{t('form.decks')}</span>
+            <p className="text-[11px] text-content-tertiary mt-0.5">{t('form.decksHint')}</p>
+            <div className="mt-1.5 max-h-40 overflow-y-auto border border-border rounded-lg p-2 space-y-0.5">
+              {decks.length === 0 && <p className="text-xs text-content-tertiary">{t('form.noDecks')}</p>}
+              {decks.map((deck) => (
+                <label
+                  key={deck.id}
+                  className="flex items-center gap-2 text-sm text-foreground rounded-md px-1.5 py-1 cursor-pointer hover:bg-accent/60"
+                >
+                  <input
+                    type="checkbox"
+                    checked={deckIds.has(deck.id)}
+                    onChange={() => toggleDeck(deck.id)}
+                    className="accent-brand cursor-pointer"
+                  />
+                  <span className="truncate">{deck.name}</span>
+                </label>
+              ))}
+            </div>
+            {/* What was actually picked, in cards. "덱 3개" says nothing about the size of the
+                job; the split between seen and unseen is what every number below is computed
+                from, so it is stated where the choice is made. */}
+            {selection.total > 0 && (
+              <p className="mt-1.5 text-[11px] text-content-tertiary">
+                {t('form.decksSummary', { total: selection.total, unseen: selection.unseen })}
+              </p>
+            )}
+          </div>
 
-          {selection.total === 0 || (daysAvailable === null && budgetMinutes === null) ? (
-            <p className="text-[11px] text-content-tertiary">{t('form.plan.needDecksAndDate')}</p>
-          ) : (
-            <>
-              {projection && (
+          {/* ── Which side of the question the learner is pinning ──────────────── */}
+          <div>
+            <span className="text-xs font-medium text-foreground">{t('form.basisLabel')}</span>
+            <p className="text-[11px] text-content-tertiary mt-0.5">{t('form.basisHint')}</p>
+            <div
+              role="radiogroup"
+              aria-label={t('form.basisLabel')}
+              className="mt-1.5 grid grid-cols-2 gap-1 rounded-lg bg-muted p-1"
+            >
+              {(['date', 'minutes'] as const).map((option) => {
+                const selected = basis === option
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    onClick={() => setBasis(option)}
+                    className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
+                      selected
+                        ? 'bg-card text-foreground shadow-sm'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {t(option === 'date' ? 'form.basisDate' : 'form.basisMinutes')}
+                  </button>
+                )
+              })}
+            </div>
+
+            {basis === 'date' ? (
+              <label className="block mt-2.5">
+                <span className="text-xs text-muted-foreground">{t('form.targetDate')}</span>
+                <input
+                  type="date"
+                  value={targetDate}
+                  onChange={(e) => setTargetDate(e.target.value)}
+                  className={fieldClass}
+                />
+              </label>
+            ) : (
+              <label className="block mt-2.5">
+                <span className="text-xs text-muted-foreground">{t('form.dailyBudget')}</span>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min={1}
+                    max={1440}
+                    value={budgetMinutes ?? ''}
+                    onChange={(e) => {
+                      // Clamped here rather than only on submit: the preview computes a finish
+                      // date from whatever is typed, and `Math.min(1440, …)` at save time would
+                      // otherwise promise a date the saved goal can never hit.
+                      const raw = e.target.value
+                      if (raw === '') { setBudgetMinutes(null); return }
+                      const next = Number(raw)
+                      setBudgetMinutes(
+                        Number.isFinite(next) ? Math.max(1, Math.min(1440, Math.trunc(next))) : null,
+                      )
+                    }}
+                    className={`${fieldClass} pr-10`}
+                  />
+                  {/* The ko/ja/zh labels named no unit at all, so a three-character box invited
+                      hours. The unit now sits inside the field. */}
+                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-content-tertiary">
+                    {t('form.minutesUnit')}
+                  </span>
+                </div>
+                {/* Still offered, and still saved, even though the date is not what drives the
+                    plan on this side. Deadlines outlive the arithmetic used to plan for them. */}
+                <span className="mt-2.5 block text-xs text-muted-foreground">{t('form.targetDate')}</span>
+                <input
+                  type="date"
+                  value={targetDate}
+                  onChange={(e) => setTargetDate(e.target.value)}
+                  className={fieldClass}
+                />
+              </label>
+            )}
+          </div>
+
+          {/* ── Rhythm and intake ─────────────────────────────────────────────── */}
+          <div className="space-y-3">
+            <label className="block">
+              <span className="text-xs font-medium text-foreground">{t('form.studyDays')}</span>
+              <select
+                value={studyDays}
+                onChange={(e) => setStudyDays(Number(e.target.value))}
+                className={`${fieldClass} cursor-pointer`}
+              >
+                {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+                  <option key={n} value={n}>{t('form.studyDaysOption', { count: n })}</option>
+                ))}
+              </select>
+              {/* The missing sentence. Picking a smaller number makes every minute figure on the
+                  screen go UP, which without this reads as the app punishing the learner. */}
+              <p className="mt-1 text-[11px] text-content-tertiary">{t('form.studyDaysHint')}</p>
+            </label>
+
+            <label className="block">
+              <span className="text-xs font-medium text-foreground">{t('form.newCardsPerDay')}</span>
+              <div className="relative">
+                <input
+                  type="number"
+                  min={0}
+                  max={999}
+                  value={newCardsPerDay}
+                  onChange={(e) => {
+                    // Clamped here rather than on submit: a controlled number input that accepts a
+                    // value it will later discard shows the learner a figure the plan never used.
+                    const next = Number(e.target.value)
+                    setNewCardsPerDay(Number.isFinite(next) ? Math.max(0, Math.min(999, Math.trunc(next))) : 0)
+                  }}
+                  className={`${fieldClass} pr-10`}
+                />
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-content-tertiary">
+                  {t('form.cardsUnit')}
+                </span>
+              </div>
+              {/* What raising or lowering it actually costs — distinct from the reviews-first
+                  rule below, which holds at every value including this one. */}
+              <p className="mt-1 text-[11px] text-content-tertiary">{t('form.newCardsPerDayHint')}</p>
+              {/* 0 is a real answer, not a broken one, and nothing said so. */}
+              {newCardsPerDay === 0 && (
+                <p className="mt-1 text-[11px] text-content-tertiary">{t('form.newCardsPerDayZero')}</p>
+              )}
+              <p className="mt-1 text-[11px] text-content-tertiary">{t('form.newCardsHint')}</p>
+            </label>
+          </div>
+
+          {/* ── The plan this goal implies, before it is saved ────────────────── */}
+          <section
+            aria-label={t('form.plan.title')}
+            className="rounded-lg border border-border bg-muted/40 p-3 space-y-1.5"
+          >
+            <h3 className="text-xs font-semibold text-foreground">{t('form.plan.title')}</h3>
+
+            {selection.total === 0 || (basis === 'date' ? daysAvailable === null : !budgetMinutes) ? (
+              <p className="text-[11px] text-content-tertiary">
+                {t(basis === 'date' ? 'form.plan.needDecksAndDate' : 'form.plan.needDecksAndBudget')}
+              </p>
+            ) : basis === 'date' ? (
+              projection && (
                 <>
-                  <p className="text-sm text-foreground">
-                    {t('form.plan.newPerDay', { count: projection.newCardsPerDay })}
-                    {' · '}
-                    {minutes(projection.averageMinutesPerDay)}
-                  </p>
+                  <p className="text-sm text-foreground">{minutes(projection.averageMinutesPerDay)}</p>
                   {/* Stated separately and never averaged away: this is the day the learner has
                       to actually survive. */}
                   <p className="text-[11px] text-content-tertiary">
@@ -315,56 +453,62 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
                       day: projection.peakDay + 1,
                     })}
                   </p>
+                  {/* The rate the DEADLINE demands, named as such so it cannot be mistaken for
+                      the ceiling set above — they are the same unit and used to disagree in
+                      silence. */}
+                  {neededNewPerDay !== null && (
+                    <p className="text-[11px] text-content-tertiary">
+                      {t('form.plan.newPerDayNeeded', { count: neededNewPerDay })}
+                    </p>
+                  )}
+                  {capBlocksTarget && (
+                    <p className="text-[11px] text-warning">
+                      {t('form.plan.capBelowNeeded', { count: newCardsPerDay })}
+                    </p>
+                  )}
                 </>
-              )}
-
-              {budgetMinutes !== null && (
+              )
+            ) : (
+              <>
                 <p className="text-sm text-foreground">
                   {budgetFinishDate
                     ? t('form.plan.finishBy', { date: budgetFinishDate })
                     : t('form.plan.tooSlow')}
                 </p>
-              )}
-            </>
-          )}
+                {budgetFinishDate && (
+                  <p className="text-[11px] text-content-tertiary">{t('form.plan.peakBasis')}</p>
+                )}
+              </>
+            )}
 
-          <div className="flex items-center gap-2 pt-1">
-            <label className="text-[11px] text-content-tertiary flex items-center gap-1">
-              {t('form.plan.byMinutes')}
-              <input
-                type="number"
-                min={1}
-                max={1440}
-                value={budgetMinutes ?? ''}
-                onChange={(e) => setBudgetMinutes(e.target.value ? Number(e.target.value) : null)}
-                className="w-16 px-1.5 py-1 text-xs bg-background border border-border rounded"
-                aria-label={t('form.plan.byMinutes')}
-              />
-            </label>
+            {/* Only SRS-mode study feeds the plan — cramming and the sequential modes call
+                apply_study_rating with no SRS payload, so they move nothing here. Said out loud
+                rather than left for the learner to discover from a plan that never changes. */}
+            <p className="text-[11px] text-content-tertiary pt-1">{t('form.plan.srsOnly')}</p>
+            <p className="text-[11px] text-content-tertiary">{t('form.plan.estimate')}</p>
+          </section>
+
+          {localError && <p role="alert" className="text-xs text-destructive">{localError}</p>}
+
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-3 py-1.5 text-sm text-muted-foreground rounded-lg cursor-pointer hover:bg-accent"
+            >
+              {t('form.cancel')}
+            </button>
+            <button
+              type="button"
+              onClick={submit}
+              disabled={submitting}
+              className="px-4 py-1.5 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-60"
+            >
+              {submitting ? t('form.saving') : t('form.save')}
+            </button>
           </div>
-
-          {/* Only SRS-mode study feeds the plan — cramming and the sequential modes call
-              apply_study_rating with no SRS payload, so they move nothing here. Said out loud
-              rather than left for the learner to discover from a plan that never changes. */}
-          <p className="text-[11px] text-content-tertiary">{t('form.plan.srsOnly')}</p>
-          <p className="text-[11px] text-content-tertiary">{t('form.plan.estimate')}</p>
-        </section>
-
-        {localError && <p className="text-xs text-danger">{localError}</p>}
-
-        <div className="flex justify-end gap-2 pt-1">
-          <button onClick={onCancel} className="px-3 py-1.5 text-sm text-muted-foreground">
-            {t('form.cancel')}
-          </button>
-          <button
-            onClick={submit}
-            disabled={submitting}
-            className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg disabled:opacity-60"
-          >
-            {submitting ? t('form.saving') : t('form.save')}
-          </button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

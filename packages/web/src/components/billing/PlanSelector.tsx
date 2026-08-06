@@ -7,7 +7,20 @@ import { useBillingStore, PAYMENTS_ACTIVE } from '../../stores/billing-store'
 import { preferredProviderId } from '../../lib/payments'
 import { writeCheckoutLoadingTab } from '../../lib/payments/checkout-tab'
 import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
+import { extractErrorCode } from '@reeeeecall/shared/lib/ai/server-client'
 import { isUnlimitedCardLimit } from '../../lib/card-limit'
+import { SEO } from '../../lib/seo-config'
+
+/** Where a learner whose portal link cannot be minted can still reach their subscription. */
+const SUPPORT_EMAIL = SEO.CONTACT_EMAIL
+/**
+ * LemonSqueezy's own billing page for this store. It authenticates by emailed magic link
+ * against the CUSTOMER, so it works even when the subscription id we stored is orphaned —
+ * which is exactly the case the terminal errors below describe.
+ */
+const LEMONSQUEEZY_BILLING_URL = `https://${
+  String(import.meta.env.VITE_LEMONSQUEEZY_STORE ?? 'sapiotrix').trim()
+}.lemonsqueezy.com/billing`
 
 
 /**
@@ -37,7 +50,19 @@ export function PlanSelector() {
   const fetchSubscription = useBillingStore((s) => s.fetchSubscription)
   const startCheckout = useBillingStore((s) => s.startCheckout)
   const [portalLoading, setPortalLoading] = useState(false)
-  const [portalError, setPortalError] = useState(false)
+  const [portalError, setPortalError] = useState<string | null>(null)
+
+  /**
+   * Failures the user can do nothing about by waiting.
+   *
+   * The old UI said "잠시 후 다시 시도해 주세요" for every one of eight distinct failures,
+   * including the two that are permanent — and it said it to someone who may be trying to
+   * CANCEL a subscription they are still being billed for. For these, the retry wording is
+   * dropped entirely and real escape hatches are offered instead.
+   */
+  const TERMINAL_PORTAL_ERRORS = new Set([
+    'NOT_CONFIGURED', 'PROVIDER_SUB_NOT_FOUND', 'NO_PORTAL_URL', 'NO_SUBSCRIPTION',
+  ])
 
   // Open LemonSqueezy's hosted customer portal (cancel / change plan / update card).
   // LS is Merchant of Record, so we never mutate the subscription ourselves — the
@@ -47,7 +72,7 @@ export function PlanSelector() {
   // async call; null (blocked) → same-tab fallback.
   const openPortal = async () => {
     if (portalLoading) return
-    setPortalError(false)
+    setPortalError(null)
     const tab = typeof window !== 'undefined' ? window.open('about:blank', '_blank') : null
     writeCheckoutLoadingTab(tab)
     setPortalLoading(true)
@@ -58,14 +83,19 @@ export function PlanSelector() {
       const url = (data as { url?: string } | null)?.url
       if (error || !url) {
         tab?.close()
-        setPortalError(true)
+        // supabase-js throws FunctionsHttpError on ANY non-2xx and returns `data: null`, so
+        // the server's `code` is only reachable through the raw Response it parks on
+        // `error.context`. `extractErrorCode` is the reader the AI client already uses for
+        // exactly that; without it every failure — a lapsed key, an orphaned subscription id,
+        // a network drop — collapses into one string that says "try again later".
+        setPortalError(error ? await extractErrorCode(error) : 'NO_PORTAL_URL')
         return
       }
       if (tab && !tab.closed) tab.location.href = url
       else window.location.href = url
     } catch {
       tab?.close()
-      setPortalError(true)
+      setPortalError('NETWORK_ERROR')
     } finally {
       setPortalLoading(false)
     }
@@ -91,6 +121,13 @@ export function PlanSelector() {
   // The current plan is whichever active-subscription product the user holds.
   const currentProductId = subscription?.productId ?? null
   const currentProvider = subscription?.provider ?? null
+  /**
+   * A LemonSqueezy row with no provider id can never mint a portal link — the edge fn's
+   * lookup filters on it being non-null and answers NO_SUBSCRIPTION. Legacy manually-granted
+   * rows are exactly that shape, so the button is replaced by the contact path rather than
+   * offered and guaranteed to fail.
+   */
+  const hasPortalableSubscription = (subscription?.providerSubscriptionId ?? null) !== null
 
   // (P-H5) A live LemonSqueezy (Merchant-of-Record) subscriber must change plans through the
   // hosted portal — NOT by opening a fresh checkout, which would start a SECOND, independently
@@ -192,7 +229,17 @@ export function PlanSelector() {
               </div>
               <button
                 type="button"
-                onClick={() => { if (lockPlanSwitch && !isCurrent) { void openPortal() } else { beginCheckout(p.id) } }}
+                onClick={() => {
+                  if (lockPlanSwitch && !isCurrent) {
+                    // Second entry into the portal, and it needs the same guard as the button
+                    // below: a row with no provider id cannot mint a link, so open LS's own
+                    // billing page rather than spend a round trip earning NO_SUBSCRIPTION.
+                    if (hasPortalableSubscription) void openPortal()
+                    else window.open(LEMONSQUEEZY_BILLING_URL, '_blank', 'noopener')
+                  } else {
+                    beginCheckout(p.id)
+                  }
+                }}
                 disabled={isCurrent || processing || (lockPlanSwitch && portalLoading)}
                 title={
                   isCurrent
@@ -228,22 +275,61 @@ export function PlanSelector() {
           resume (we run the recurring charge ourselves). */}
       {PAYMENTS_ACTIVE && currentProductId != null && currentProvider === 'lemonsqueezy' && (
         <div className="mt-3">
-          <button
-            type="button"
-            onClick={() => void openPortal()}
-            disabled={portalLoading}
-            className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition hover:bg-accent disabled:opacity-60"
-          >
-            {portalLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
+          {hasPortalableSubscription ? (
+            <button
+              type="button"
+              onClick={() => void openPortal()}
+              disabled={portalLoading}
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition hover:bg-accent disabled:opacity-60"
+            >
+              {portalLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ExternalLink className="h-4 w-4" />
+              )}
+              {t('manageSubscription.button')}
+            </button>
+          ) : (
+            <a
+              href={LEMONSQUEEZY_BILLING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition hover:bg-accent no-underline"
+            >
               <ExternalLink className="h-4 w-4" />
-            )}
-            {t('manageSubscription.button')}
-          </button>
+              {t('manageSubscription.openBillingDirect')}
+            </a>
+          )}
           <p className="mt-1.5 text-xs text-muted-foreground">{t('manageSubscription.hint')}</p>
           {portalError && (
-            <p className="mt-1 text-xs text-destructive">{t('manageSubscription.error')}</p>
+            <div role="alert" className="mt-2 rounded-lg border border-destructive/30 bg-destructive/5 p-2.5">
+              <p className="text-xs text-destructive">
+                {t(`manageSubscription.errors.${portalError}`, {
+                  defaultValue: t('manageSubscription.error'),
+                })}
+              </p>
+              {/* A permanent failure needs a way out, not an instruction to wait. LS's own
+                  email-magic-link billing page reaches the subscription even when our stored
+                  id does not, and support can cancel it by hand. */}
+              {TERMINAL_PORTAL_ERRORS.has(portalError) && (
+                <p className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <a
+                    href={LEMONSQUEEZY_BILLING_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-medium text-brand hover:underline"
+                  >
+                    {t('manageSubscription.openBillingDirect')}
+                  </a>
+                  <a
+                    href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(t('manageSubscription.supportSubject'))}`}
+                    className="text-xs font-medium text-brand hover:underline"
+                  >
+                    {t('manageSubscription.contactSupport')}
+                  </a>
+                </p>
+              )}
+            </div>
           )}
         </div>
       )}

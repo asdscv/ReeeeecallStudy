@@ -383,9 +383,17 @@ export function LearningGoalsScreen() {
             {/* The card IS the way in. Plans used to be switched from a chip row inside the plan
                 itself; this list opens one instead. Archived goals stay unopenable — the RPCs
                 reject them, so a tap would only surface a confusing NOT_FOUND. */}
+            {/* The whole open-area is the tap target, not just the one line of title text.
+                It used to be a style-less TouchableOpacity wrapping the title alone — ~18pt
+                tall, under the 44pt floor this file declares for every other control — with
+                the meta line and the warning below it dead to touch. The archive button stays
+                a SIBLING so the container's `accessible: false` keeps it individually
+                reachable under TalkBack. */}
             <TouchableOpacity
               disabled={goal.status !== 'active'}
               onPress={() => navigation.navigate('LearningToday', { goalId: goal.id })}
+              activeOpacity={0.7}
+              style={styles.openArea}
               accessibilityRole="button"
               accessibilityState={{ disabled: goal.status !== 'active' }}
               // testProps sets accessibilityLabel to the id on Android, so the label goes AFTER
@@ -398,18 +406,18 @@ export function LearningGoalsScreen() {
               }]} numberOfLines={1}>
                 {goal.title}
               </Text>
-            </TouchableOpacity>
-            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
-              {t('goals.dailyMinutes', { count: goal.daily_minutes })}
-              {' · '}
-              {t('goals.deckCount', { count: goal.decks.length })}
-              {goal.status !== 'active' ? ` · ${t(`goals.status.${goal.status}`)}` : ''}
-            </Text>
-            {goal.decks.length === 0 && (
-              <Text style={[theme.typography.caption, { color: theme.colors.warning, marginTop: 4 }]}>
-                {t('goals.noDecksWarning')}
+              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
+                {t('goals.dailyMinutes', { count: goal.daily_minutes })}
+                {' · '}
+                {t('goals.deckCount', { count: goal.decks.length })}
+                {goal.status !== 'active' ? ` · ${t(`goals.status.${goal.status}`)}` : ''}
               </Text>
-            )}
+              {goal.decks.length === 0 && (
+                <Text style={[theme.typography.caption, { color: theme.colors.warning, marginTop: 4 }]}>
+                  {t('goals.noDecksWarning')}
+                </Text>
+              )}
+            </TouchableOpacity>
             <TouchableOpacity
               disabled={archivingId !== null}
               onPress={() => confirmArchive(goal.id, goal.title)}
@@ -457,5 +465,8 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   touchRow: { minHeight: MIN_TOUCH, justifyContent: 'center', paddingHorizontal: 4 },
+  // The card's primary action. 44pt is the platform floor the E2E spec measures, and the
+  // title alone never reached it.
+  openArea: { minHeight: MIN_TOUCH, justifyContent: 'center', paddingVertical: 4 },
   disabled: { opacity: 0.5 },
 })
