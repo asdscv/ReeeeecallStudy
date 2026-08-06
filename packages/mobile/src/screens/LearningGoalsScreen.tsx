@@ -57,7 +57,7 @@ export function LearningGoalsScreen() {
   const { t } = useTranslation('learning')
   const theme = useTheme()
   const navigation = useNavigation<NavigationProp<SettingsStackParamList>>()
-  const { goals, goalsLoading, goalsError, fetchGoals, createGoal, archiveGoal } = useLearningStore()
+  const { goals, goalsLoading, goalsError, fetchGoals, createGoal, archiveGoal, deleteGoal } = useLearningStore()
   const { decks, stats, fetchDecks, fetchStats } = useDeckStore()
   const userId = useAuthStore((state) => state.user?.id)
 
@@ -215,6 +215,32 @@ export function LearningGoalsScreen() {
       setStudyDays(7)
       setNewCardsPerDay(DEFAULT_NEW_CARDS_PER_DAY)
     }
+  }
+
+  /**
+   * Delete, not archive — and the dialog says which.
+   *
+   * `Alert.alert` IS the platform's modal, and it is what the archive confirmation already uses,
+   * so a hand-rolled sheet here would be a second confirmation idiom in one screen. The message
+   * names what actually goes (the plans) and what stays (the study record and the cards),
+   * because the learner cannot tell those apart from the button.
+   */
+  const confirmDelete = (goalId: string, goalTitle: string) => {
+    Alert.alert(
+      t('goals.deleteConfirmTitle'),
+      t('goals.deleteConfirmMessage', { title: goalTitle }),
+      [
+        { text: t('form.cancel'), style: 'cancel' },
+        {
+          text: t('goals.delete'),
+          style: 'destructive',
+          onPress: () => {
+            setArchivingId(goalId)
+            void deleteGoal(goalId).finally(() => setArchivingId(null))
+          },
+        },
+      ],
+    )
   }
 
   const confirmArchive = (goalId: string, goalTitle: string) => {
@@ -649,19 +675,36 @@ export function LearningGoalsScreen() {
                 </Text>
               )}
             </TouchableOpacity>
-            <TouchableOpacity
-              disabled={archivingId !== null}
-              onPress={() => confirmArchive(goal.id, goal.title)}
-              style={[styles.touchRow, { alignSelf: 'flex-start' }, archivingId !== null && styles.disabled]}
-              hitSlop={HIT_SLOP}
-              accessibilityRole="button"
-              accessibilityState={{ disabled: archivingId !== null }}
-              {...testProps(`learning-goal-archive-${index}`)}
-            >
-              <Text style={[theme.typography.bodySmall, { color: theme.colors.error }]}>
-                {t('goals.archive')}
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.rowActions}>
+              <TouchableOpacity
+                disabled={archivingId !== null}
+                onPress={() => confirmArchive(goal.id, goal.title)}
+                style={[styles.touchRow, archivingId !== null && styles.disabled]}
+                hitSlop={HIT_SLOP}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: archivingId !== null }}
+                {...testProps(`learning-goal-archive-${index}`)}
+              >
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
+                  {t('goals.archive')}
+                </Text>
+              </TouchableOpacity>
+              {/* The only one of the two that cannot be undone, and the only one in the error
+                  colour. Archiving used to wear it, which left nothing to escalate to. */}
+              <TouchableOpacity
+                disabled={archivingId !== null}
+                onPress={() => confirmDelete(goal.id, goal.title)}
+                style={[styles.touchRow, archivingId !== null && styles.disabled]}
+                hitSlop={HIT_SLOP}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: archivingId !== null }}
+                {...testProps(`learning-goal-delete-${index}`)}
+              >
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.error }]}>
+                  {t('goals.delete')}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         ))}
       </ScrollView>
@@ -709,6 +752,7 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   touchRow: { minHeight: MIN_TOUCH, justifyContent: 'center', paddingHorizontal: 4 },
+  rowActions: { flexDirection: 'row', alignItems: 'center', gap: 16, alignSelf: 'flex-start' },
   // The card's primary action. 44pt is the platform floor the E2E spec measures, and the
   // title alone never reached it.
   openArea: { minHeight: MIN_TOUCH, justifyContent: 'center', paddingVertical: 4 },

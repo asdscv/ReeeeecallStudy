@@ -2,7 +2,8 @@ import { useEffect, useCallback, useState, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { X, Undo2, Keyboard, Lock } from 'lucide-react'
-import { useStudyStore } from '@reeeeecall/shared/stores/study-store'
+import { useStudyStore, type PlanSelection } from '@reeeeecall/shared/stores/study-store'
+import { useLearningStore } from '../stores/learning-store'
 import { useAuthStore } from '../stores/auth-store'
 import { useAchievementStore } from '../stores/achievement-store'
 import { supabase } from '../lib/supabase'
@@ -83,9 +84,57 @@ export function StudySessionPage() {
     fetchProfile()
   }, [user])
 
+  /**
+   * When this session IS a daily plan.
+   *
+   * `/decks/:deckId/study?mode=srs&goalId=…&planDate=…` — the plan screen sends the learner
+   * here rather than to a separate, second study UI. The plan decides WHICH cards; everything
+   * else (flip, the four SRS buttons with their interval previews, undo, the summary, the
+   * keyboard shortcuts) is the study session the rest of the app already uses.
+   */
+  const goalId = searchParams.get('goalId')
+  const planDate = searchParams.get('planDate')
+  const { plan, planItems, planCards, fetchPlan } = useLearningStore()
+
+  useEffect(() => {
+    if (goalId && planDate) void fetchPlan(goalId, planDate)
+  }, [goalId, planDate, fetchPlan])
+
+  /**
+   * This deck's share of the plan, still in the planner's order.
+   *
+   * Pending items only: a session started after some of the day is already done should offer
+   * what is LEFT, not replay finished rows — `record_answer_attempt` would reject the second
+   * completion anyway, so replaying them would spend ratings to earn errors.
+   */
+  const planSelection: PlanSelection | null = useMemo(() => {
+    if (!goalId || !planDate || !deckId) return null
+    if (!plan || plan.goal_id !== goalId || plan.plan_date !== planDate) return null
+    const cardIds: string[] = []
+    const items: Record<string, PlanSelection['items'][string]> = {}
+    for (const item of [...planItems].sort((a, b) => a.position - b.position)) {
+      if (item.status !== 'pending' || !item.card_id) continue
+      if (planCards[item.card_id]?.deck_id !== deckId) continue
+      cardIds.push(item.card_id)
+      items[item.card_id] = {
+        id: item.id,
+        activity_type: item.activity_type,
+        response_type: item.response_type,
+        evaluator_type: item.evaluator_type,
+      }
+    }
+    return cardIds.length > 0 ? { goalId, cardIds, items } : null
+  }, [goalId, planDate, deckId, plan, planItems, planCards])
+
+  /** Where "exit" and "back" go. A plan session came from the plan, not from the deck. */
+  const exitPath = goalId ? `/learning/${goalId}` : `/decks/${deckId}`
+
   // Initialize session on mount
   useEffect(() => {
     if (!deckId) return
+    // A plan session must not start until its plan has been read — an empty selection would
+    // silently fall through to the ordinary due-cards queue and study the wrong thing.
+    if (goalId && planDate && !planSelection) return
 
     const mode = (searchParams.get('mode') ?? 'srs') as StudyMode
     const batchSize = Number(searchParams.get('batchSize')) || 20
@@ -118,12 +167,13 @@ export function StudySessionPage() {
       crammingFilter,
       crammingTimeLimitMinutes,
       crammingShuffle,
+      planSelection: planSelection ?? undefined,
     })
 
     return () => {
       stopSpeaking()
     }
-  }, [deckId, searchParams, initSession])
+  }, [deckId, searchParams, initSession, goalId, planDate, planSelection])
 
   // Cramming timer countdown
   useEffect(() => {
@@ -224,9 +274,9 @@ export function StudySessionPage() {
       exitSession()
     } else {
       reset()
-      navigate(`/decks/${deckId}`)
+      navigate(exitPath)
     }
-  }, [sessionStats.cardsStudied, exitSession, reset, navigate, deckId])
+  }, [sessionStats.cardsStudied, exitSession, reset, navigate, exitPath])
 
   const handleFlip = useCallback(() => {
     flipCard()
@@ -301,7 +351,7 @@ export function StudySessionPage() {
           <h2 className="text-lg font-semibold text-foreground">{t('subscriptionLocked.title')}</h2>
           <p className="mt-2 text-sm text-muted-foreground">{t('subscriptionLocked.desc')}</p>
           <button
-            onClick={() => { reset(); navigate(`/decks/${deckId}`) }}
+            onClick={() => { reset(); navigate(exitPath) }}
             className="mt-5 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-brand-foreground"
           >
             {t('subscriptionLocked.back')}
@@ -322,11 +372,11 @@ export function StudySessionPage() {
           crammingFilter={config?.crammingFilter}
           onBackToDeck={() => {
             reset()
-            navigate(`/decks/${deckId}`)
+            navigate(exitPath)
           }}
           onOtherMode={() => {
             reset()
-            navigate(`/decks/${deckId}/study/setup`)
+            navigate(goalId ? exitPath : `/decks/${deckId}/study/setup`)
           }}
         />
       )
@@ -351,15 +401,15 @@ export function StudySessionPage() {
           summaryType={summaryType}
           onBackToDeck={() => {
             reset()
-            navigate(`/decks/${deckId}`)
+            navigate(exitPath)
           }}
           onCrammingAgain={() => {
             reset()
-            navigate(`/decks/${deckId}/study/setup`)
+            navigate(goalId ? exitPath : `/decks/${deckId}/study/setup`)
           }}
           onOtherMode={() => {
             reset()
-            navigate(`/decks/${deckId}/study/setup`)
+            navigate(goalId ? exitPath : `/decks/${deckId}/study/setup`)
           }}
         />
       )
@@ -371,11 +421,11 @@ export function StudySessionPage() {
         summaryType={summaryType}
         onBackToDeck={() => {
           reset()
-          navigate(`/decks/${deckId}`)
+          navigate(exitPath)
         }}
         onStudyAgain={() => {
           reset()
-          navigate(`/decks/${deckId}/study/setup`)
+          navigate(goalId ? exitPath : `/decks/${deckId}/study/setup`)
         }}
       />
     )

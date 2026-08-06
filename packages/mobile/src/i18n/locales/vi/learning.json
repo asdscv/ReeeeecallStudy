@@ -120,7 +120,10 @@
       "completed": "Hoàn thành",
       "paused": "Tạm dừng"
     },
-    "title": "Mục tiêu học tập"
+    "title": "Mục tiêu học tập",
+    "delete": "Xóa",
+    "deleteConfirmTitle": "Xóa kế hoạch này?",
+    "deleteConfirmMessage": "\"{{title}}\" và mọi kế hoạch hằng ngày nó đã tạo sẽ mất vĩnh viễn. Lịch sử học và thẻ của bạn vẫn còn — chỉ kế hoạch bị xóa. Không thể hoàn tác."
   },
   "history": {
     "itemFallback": "Lần làm {{type}}",
@@ -194,7 +197,8 @@
     "item": {
       "minutes": "~{{count, decimal}} phút",
       "recorded": "Đã ghi lại",
-      "untitled": "(không có nội dung)"
+      "untitled": "(không có nội dung)",
+      "study": "Học"
     },
     "progress": "{{done, number}} / {{total, number}} hoàn thành",
     "rate": {
@@ -223,7 +227,39 @@
     "extendAdded_other": "Đã thêm {{count, number}} mục nữa.",
     "extendTomorrow_one": "Trong đó có {{count, number}} thẻ mới, nên ngày mai sẽ có thêm bấy nhiêu lượt ôn.",
     "extendTomorrow_other": "Trong đó có {{count, number}} thẻ mới, nên ngày mai sẽ có thêm bấy nhiêu lượt ôn.",
-    "extendNothing": "Hiện không còn gì để thêm."
+    "extendNothing": "Hiện không còn gì để thêm.",
+    "remaining": "Còn {{count, number}} thẻ hôm nay",
+    "remaining_one": "Còn {{count, number}} thẻ hôm nay",
+    "remaining_other": "Còn {{count, number}} thẻ hôm nay",
+    "allDone": "Xong hôm nay!",
+    "allDoneNote": "Hôm nay thế là xong. Hẹn gặp lại ngày mai.",
+    "startStudy": "Bắt đầu học",
+    "continueStudy": "Học tiếp",
+    "studyNote": "Chấm điểm ở màn hình học sẽ đặt lịch ôn tiếp theo và đánh dấu vào kế hoạch hôm nay.",
+    "byDeck": "Theo bộ thẻ",
+    "deckDone": "Xong",
+    "listTitle": "Danh sách hôm nay",
+    "days": {
+      "label": "Ngày",
+      "today": "Hôm nay",
+      "tomorrow": "Ngày mai",
+      "inDays": "Sau {{count, number}} ngày",
+      "inDays_one": "Sau {{count, number}} ngày",
+      "inDays_other": "Sau {{count, number}} ngày"
+    },
+    "forecast": {
+      "title": "Ngày đó trông thế nào",
+      "cards": "{{count, number}} thẻ",
+      "cards_one": "{{count, number}} thẻ",
+      "cards_other": "{{count, number}} thẻ",
+      "minutes": "khoảng {{count, number}} phút",
+      "minutes_one": "khoảng {{count, number}} phút",
+      "minutes_other": "khoảng {{count, number}} phút",
+      "breakdown": "{{newCards, number}} thẻ mới · {{reviewCards, number}} ôn lại",
+      "empty": "Ngày đó có vẻ không có thẻ nào đến hạn.",
+      "loading": "Đang tính…",
+      "note": "Đây là ước tính, giả định bạn không học gì từ giờ đến hôm đó — và đó chính là điều sẽ làm nó thay đổi."
+    }
   },
   "progress": {
     "title": "Tiến độ",

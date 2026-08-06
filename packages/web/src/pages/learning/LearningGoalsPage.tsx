@@ -15,7 +15,9 @@ import { GoalFormModal, type GoalFormValues } from './GoalFormModal'
  */
 export function LearningGoalsPage() {
   const { t } = useTranslation('learning')
-  const { goals, goalsLoading, goalsError, fetchGoals, createGoal, updateGoal, archiveGoal } = useLearningStore()
+  const {
+    goals, goalsLoading, goalsError, fetchGoals, createGoal, updateGoal, archiveGoal, deleteGoal,
+  } = useLearningStore()
   const confirm = useConfirmStore((state) => state.confirm)
   const navigate = useNavigate()
 
@@ -63,6 +65,24 @@ export function LearningGoalsPage() {
       danger: true,
     })
     if (ok) await archiveGoal(goal.id)
+  }
+
+  /**
+   * Delete, not archive.
+   *
+   * The confirmation names what actually goes — the plans, not the study record — because the
+   * two are different fates and the learner cannot see the difference from the button. Archiving
+   * keeps everything and only hides it; deleting cascades every daily plan this goal produced,
+   * while the answer attempts survive detached, since the cards really were reviewed.
+   */
+  const handleDelete = async (goal: LearningGoalWithDecks) => {
+    const ok = await confirm({
+      title: t('goals.deleteConfirmTitle'),
+      message: t('goals.deleteConfirmMessage', { title: goal.title }),
+      confirmLabel: t('goals.delete'),
+      danger: true,
+    })
+    if (ok) await deleteGoal(goal.id)
   }
 
   const errorKey = (code: string): string => {
@@ -158,8 +178,13 @@ export function LearningGoalsPage() {
                   <button type="button" onClick={() => openEdit(goal)} className="text-xs text-brand hover:underline cursor-pointer">
                     {t('goals.edit')}
                   </button>
-                  <button type="button" onClick={() => void handleArchive(goal)} className="text-xs text-destructive hover:underline cursor-pointer">
+                  <button type="button" onClick={() => void handleArchive(goal)} className="text-xs text-muted-foreground hover:underline cursor-pointer">
                     {t('goals.archive')}
+                  </button>
+                  {/* Destructive, and the only one of the three that cannot be undone — so it
+                      is the only one in the destructive colour. */}
+                  <button type="button" onClick={() => void handleDelete(goal)} className="text-xs text-destructive hover:underline cursor-pointer">
+                    {t('goals.delete')}
                   </button>
                 </div>
               </div>

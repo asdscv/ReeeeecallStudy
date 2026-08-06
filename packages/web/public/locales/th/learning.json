@@ -58,7 +58,39 @@
     "extendAdded_other": "เพิ่มอีก {{count, number}} รายการแล้ว",
     "extendTomorrow_one": "ในจำนวนนี้เป็นการ์ดใหม่ {{count, number}} ใบ พรุ่งนี้จึงมีทบทวนเพิ่มเท่านั้น",
     "extendTomorrow_other": "ในจำนวนนี้เป็นการ์ดใหม่ {{count, number}} ใบ พรุ่งนี้จึงมีทบทวนเพิ่มเท่านั้น",
-    "extendNothing": "ตอนนี้ไม่มีอะไรให้เพิ่มแล้ว"
+    "extendNothing": "ตอนนี้ไม่มีอะไรให้เพิ่มแล้ว",
+    "remaining": "เหลืออีก {{count, number}} ใบวันนี้",
+    "remaining_one": "เหลืออีก {{count, number}} ใบวันนี้",
+    "remaining_other": "เหลืออีก {{count, number}} ใบวันนี้",
+    "allDone": "วันนี้เสร็จแล้ว!",
+    "allDoneNote": "วันนี้ครบแล้ว เจอกันพรุ่งนี้",
+    "startStudy": "เริ่มเรียน",
+    "continueStudy": "เรียนต่อ",
+    "studyNote": "การให้คะแนนในหน้าเรียนจะตั้งรอบทบทวนถัดไปและบันทึกลงแผนของวันนี้พร้อมกัน",
+    "byDeck": "แยกตามสำรับ",
+    "deckDone": "เสร็จแล้ว",
+    "listTitle": "รายการวันนี้",
+    "days": {
+      "label": "วัน",
+      "today": "วันนี้",
+      "tomorrow": "พรุ่งนี้",
+      "inDays": "อีก {{count, number}} วัน",
+      "inDays_one": "อีก {{count, number}} วัน",
+      "inDays_other": "อีก {{count, number}} วัน"
+    },
+    "forecast": {
+      "title": "วันนั้นจะเป็นอย่างไร",
+      "cards": "{{count, number}} ใบ",
+      "cards_one": "{{count, number}} ใบ",
+      "cards_other": "{{count, number}} ใบ",
+      "minutes": "ราว {{count, number}} นาที",
+      "minutes_one": "ราว {{count, number}} นาที",
+      "minutes_other": "ราว {{count, number}} นาที",
+      "breakdown": "ใหม่ {{newCards, number}} · ทบทวน {{reviewCards, number}}",
+      "empty": "วันนั้นดูเหมือนไม่มีการ์ดถึงกำหนด",
+      "loading": "กำลังคำนวณ…",
+      "note": "เป็นค่าประมาณ โดยสมมติว่าคุณไม่ได้เรียนอะไรเลยจนถึงวันนั้น ซึ่งเป็นสิ่งเดียวที่จะทำให้ตัวเลขเปลี่ยน"
+    }
   },
   "goals": {
     "title": "เป้าหมายการเรียนรู้",
@@ -91,7 +123,10 @@
       "unknown": "เกิดข้อผิดพลาด กรุณาลองอีกครั้ง"
     },
     "deckCount_one": "{{count, number}} สำรับ",
-    "deckCount_other": "{{count, number}} สำรับ"
+    "deckCount_other": "{{count, number}} สำรับ",
+    "delete": "ลบ",
+    "deleteConfirmTitle": "ลบแผนนี้ไหม",
+    "deleteConfirmMessage": "\"{{title}}\" และแผนรายวันทั้งหมดที่แผนนี้สร้างไว้จะหายไปถาวร ประวัติการเรียนและการ์ดของคุณยังอยู่ ลบเฉพาะแผนเท่านั้น การทำรายการนี้ย้อนกลับไม่ได้"
   },
   "form": {
     "createTitle": "เป้าหมายใหม่",

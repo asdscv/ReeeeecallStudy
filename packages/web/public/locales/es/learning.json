@@ -58,7 +58,39 @@
     "extendAdded_other": "Se añadieron {{count, number}} elementos más.",
     "extendTomorrow_one": "{{count, number}} es nueva, así que mañana tendrás ese mismo número de repasos más.",
     "extendTomorrow_other": "{{count, number}} son nuevas, así que mañana tendrás ese mismo número de repasos más.",
-    "extendNothing": "Ahora mismo no hay nada más que añadir."
+    "extendNothing": "Ahora mismo no hay nada más que añadir.",
+    "remaining": "Quedan {{count, number}} hoy",
+    "remaining_one": "Quedan {{count, number}} hoy",
+    "remaining_other": "Quedan {{count, number}} hoy",
+    "allDone": "Hoy está hecho",
+    "allDoneNote": "Eso es todo por hoy. Nos vemos mañana.",
+    "startStudy": "Empezar a estudiar",
+    "continueStudy": "Seguir",
+    "studyNote": "Valorar una tarjeta allí programa su próximo repaso y la marca en este plan.",
+    "byDeck": "Por mazo",
+    "deckDone": "Hecho",
+    "listTitle": "Lista de hoy",
+    "days": {
+      "label": "Día",
+      "today": "Hoy",
+      "tomorrow": "Mañana",
+      "inDays": "En {{count, number}} días",
+      "inDays_one": "En {{count, number}} días",
+      "inDays_other": "En {{count, number}} días"
+    },
+    "forecast": {
+      "title": "Cómo se ve ese día",
+      "cards": "{{count, number}} tarjetas",
+      "cards_one": "{{count, number}} tarjetas",
+      "cards_other": "{{count, number}} tarjetas",
+      "minutes": "unos {{count, number}} min",
+      "minutes_one": "unos {{count, number}} min",
+      "minutes_other": "unos {{count, number}} min",
+      "breakdown": "{{newCards, number}} nuevas · {{reviewCards, number}} de repaso",
+      "empty": "Ese día no parece tocar nada.",
+      "loading": "Calculando…",
+      "note": "Es una estimación: supone que no estudias nada entre hoy y ese día, que es justo lo que la cambiará."
+    }
   },
   "goals": {
     "title": "Objetivos de aprendizaje",
@@ -91,7 +123,10 @@
       "unknown": "Algo salió mal. Inténtalo de nuevo."
     },
     "deckCount_one": "{{count, number}} mazo",
-    "deckCount_other": "{{count, number}} mazos"
+    "deckCount_other": "{{count, number}} mazos",
+    "delete": "Eliminar",
+    "deleteConfirmTitle": "¿Eliminar este plan?",
+    "deleteConfirmMessage": "«{{title}}» y todos los planes diarios que generó desaparecerán para siempre. Tu historial de estudio y tus tarjetas se quedan: solo se elimina el plan. Esto no se puede deshacer."
   },
   "form": {
     "createTitle": "Nuevo objetivo",

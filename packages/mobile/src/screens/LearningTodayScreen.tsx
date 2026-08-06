@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
-  View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator,
-  RefreshControl, AppState, Modal, Pressable,
+  View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator,
+  RefreshControl, AppState, Modal, Pressable, Alert,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation, useRoute, type NavigationProp, type RouteProp } from '@react-navigation/native'
@@ -10,16 +10,17 @@ import { Screen, ScreenHeader } from '../components/ui'
 import { useTheme } from '../theme'
 import { testProps } from '../utils/testProps'
 import { useLearningStore, type AttemptRow, type RemediationAction } from '@reeeeecall/shared/stores/learning-store'
+import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
+import type { PlanSelection } from '@reeeeecall/shared/stores/study-store'
 import { currentPlanContext } from '@reeeeecall/shared/lib/learning-plan-date'
 import { cardPromptLabel } from '@reeeeecall/shared/lib/card-prompt'
 import {
-  attemptNeedsRemediation, attemptTypedAnswer, latestAttemptForCard,
+  attemptNeedsRemediation, attemptTypedAnswer,
 } from '@reeeeecall/shared/lib/learning-attempt-selection'
-import { TYPED_ANSWER_MAX_CHARS } from '@reeeeecall/shared/lib/learning-candidates'
 import { recallPercent } from '@reeeeecall/shared/lib/learning-recall-display'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
-import * as Crypto from 'expo-crypto'
+import { useStudy } from '../hooks/useStudy'
 import type { SettingsStackParamList } from '../navigation/types'
 
 /**
@@ -62,6 +63,10 @@ const planRecallPercent = (item: { payload?: { recall_probability?: number } | n
 
 const MIN_TOUCH = 44
 const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 } as const
+
+/** How far ahead the day strip looks. A week is as far as a forecast stays worth reading. */
+const FORECAST_DAYS = 6
+const DAY_MS = 86_400_000
 
 /**
  * The remediation actions the SERVER serves.
@@ -125,27 +130,22 @@ export function LearningTodayScreen() {
     goals, goalsLoading, fetchGoals,
     plan, planItems, planCards, planTemplateFields, planLoading, planGenerating, planError,
     planBlockedReason,
-    recordingItemId, fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
-    extendPlan, planExtending, planExtension, recordAttempt,
+    fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
+    extendPlan, planExtending, planExtension,
+    planForecast, planForecastLoading, forecastPlan,
     attempts, attemptsLoading, fetchAttempts,
     enrichment, enrichmentPendingCardId, enrichmentError, requestEnrichment,
     enrichmentQuote, loadEnrichmentQuote,
     resolveEnrichment, dismissEnrichment,
     knowledge, fetchGoalKnowledge,
   } = useLearningStore()
+  const { startPlanSession } = useStudy()
+  const { decks, fetchDecks } = useDeckStore()
 
   const [refreshing, setRefreshing] = useState(false)
-  /**
-   * Answers in progress, keyed by plan-item id.
-   *
-   * One map on the screen rather than state inside each row: the rows are produced by a `.map`
-   * in this component's render, and a hook cannot live in a loop. Keyed by item id, not index,
-   * so re-reading the plan cannot move one row's text onto another.
-   *
-   * Cleared per item once its attempt is recorded — the row becomes "Recorded" and its input
-   * disappears, so keeping the string would only leak into a rebuilt plan that reuses the id.
-   */
-  const [answers, setAnswers] = useState<Record<string, string>>({})
+  /** 0 = today's real plan. Anything above it is a forecast, never a saved plan. */
+  const [dayOffset, setDayOffset] = useState(0)
+  const [starting, setStarting] = useState(false)
 
   /**
    * The plan date, kept live.
@@ -301,6 +301,105 @@ export function LearningTodayScreen() {
     if (goal) void extendPlan(goal, currentPlanContext())
   }, [goal, extendPlan])
 
+  useEffect(() => { void fetchDecks() }, [fetchDecks])
+
+  /** The day the strip is pointing at. Offset 0 is the real, saved plan. */
+  const viewedDate = useMemo(
+    () => new Date(Date.parse(`${planDate}T00:00:00Z`) + dayOffset * DAY_MS)
+      .toISOString().slice(0, 10),
+    [planDate, dayOffset],
+  )
+
+  // Forecast on demand, once per date. It runs the real planner and DOES NOT save: every quota
+  // and destructive cost of planning lives in `save_daily_plan`, so a preview is free.
+  useEffect(() => {
+    if (dayOffset === 0 || !goal) return
+    const base = currentPlanContext()
+    void forecastPlan(goal, {
+      ...base,
+      planDate: viewedDate,
+      now: new Date(Date.parse(base.now) + dayOffset * DAY_MS).toISOString(),
+    })
+  }, [dayOffset, goal, viewedDate, forecastPlan])
+
+  /**
+   * The day's work split by deck, because a study session cannot span decks:
+   * `finalize_study_session` takes one `p_deck_id` and refuses a session whose events cover
+   * more than one. Ordered by the plan's own positions, so the primary button starts whichever
+   * deck the planner put first.
+   */
+  const deckGroups = useMemo(() => {
+    const byDeck = new Map<string, {
+      deckId: string; pending: number; done: number; first: number
+      cardIds: string[]; items: PlanSelection['items']
+    }>()
+    for (const item of [...planItems].sort((a, b) => a.position - b.position)) {
+      const deckId = item.card_id ? planCards[item.card_id]?.deck_id : undefined
+      if (!deckId || !item.card_id) continue
+      const entry = byDeck.get(deckId)
+        ?? { deckId, pending: 0, done: 0, first: item.position, cardIds: [], items: {} }
+      if (item.status === 'completed') {
+        entry.done += 1
+      } else {
+        entry.pending += 1
+        // Pending only. Replaying a finished row would spend a rating to earn a P0007 —
+        // `record_answer_attempt` refuses to complete an item twice.
+        entry.cardIds.push(item.card_id)
+        ;(entry.items as Record<string, PlanSelection['items'][string]>)[item.card_id] = {
+          id: item.id,
+          activity_type: item.activity_type,
+          response_type: item.response_type,
+          evaluator_type: item.evaluator_type,
+        }
+      }
+      entry.first = Math.min(entry.first, item.position)
+      byDeck.set(deckId, entry)
+    }
+    return [...byDeck.values()].sort((a, b) => a.first - b.first)
+  }, [planItems, planCards])
+
+  const pendingTotal = deckGroups.reduce((sum, group) => sum + group.pending, 0)
+  const doneTotal = deckGroups.reduce((sum, group) => sum + group.done, 0)
+  const nextDeck = deckGroups.find((group) => group.pending > 0) ?? null
+
+  const deckName = useCallback(
+    (deckId: string) => decks.find((deck) => deck.id === deckId)?.name ?? t('today.item.untitled'),
+    [decks, t],
+  )
+
+  /**
+   * Hand the day to the real study session.
+   *
+   * The session is prepared BEFORE navigating — the same order `StudySetupScreen` uses — so the
+   * study screen never mounts against an empty queue. `StudySession` lives in the Study tab's
+   * stack while this screen is in Settings, hence the parent navigator.
+   */
+  const startDeck = useCallback(async (group: typeof deckGroups[number]) => {
+    if (!goalId || starting) return
+    setStarting(true)
+    try {
+      await startPlanSession(group.deckId, {
+        goalId, cardIds: group.cardIds, items: group.items,
+      })
+      // Cross-stack: `StudySession` lives in the Study tab's stack, this screen in Settings.
+      // Same shape DecksListScreen uses to reach it; the cast is because the drawer/tab param
+      // list is not expressed in this screen's typed navigator.
+      const tabNav = navigation.getParent() as unknown as
+        { navigate: (name: string, params?: unknown) => void } | undefined
+      tabNav?.navigate('StudyTab', { screen: 'StudySession' })
+    } catch {
+      Alert.alert(t('today.error.unknown'))
+    } finally {
+      setStarting(false)
+    }
+  }, [goalId, starting, startPlanSession, navigation, t])
+
+  const dayLabel = useCallback((offset: number) => {
+    if (offset === 0) return t('today.days.today')
+    if (offset === 1) return t('today.days.tomorrow')
+    return t('today.days.inDays', { count: offset })
+  }, [t])
+
   const errorKey = (code: string): string => {
     switch (code) {
       case 'LIMIT_EXCEEDED': return 'today.error.limitExceeded'
@@ -444,6 +543,82 @@ export function LearningTodayScreen() {
               </Text>
             )}
 
+            {/* ── Day strip ────────────────────────────────────────────────────
+                Today is the plan; the rest are forecasts. The same control on purpose —
+                "what is coming" is one question — and the panel below always says which
+                of the two is on screen. */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.dayStrip}
+              accessibilityLabel={t('today.days.label')}
+            >
+              {Array.from({ length: FORECAST_DAYS + 1 }, (_, offset) => {
+                const selected = offset === dayOffset
+                return (
+                  <TouchableOpacity
+                    key={offset}
+                    onPress={() => setDayOffset(offset)}
+                    style={[styles.dayChip, {
+                      borderColor: selected ? theme.colors.primary : theme.colors.border,
+                      backgroundColor: selected ? theme.colors.primaryLight : 'transparent',
+                      borderWidth: selected ? 2 : 1,
+                    }]}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected }}
+                    {...testProps(`learning-day-${offset}`)}
+                  >
+                    <Text style={[theme.typography.caption, {
+                      color: selected ? theme.colors.primary : theme.colors.textSecondary,
+                    }]}>
+                      {dayLabel(offset)}
+                    </Text>
+                  </TouchableOpacity>
+                )
+              })}
+            </ScrollView>
+
+            {dayOffset > 0 ? (
+              /* ── A day that has not happened ───────────────────────────────── */
+              <View
+                style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+                {...testProps('learning-forecast', true)}
+              >
+                <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                  {t('today.forecast.title')}
+                </Text>
+                {planForecastLoading === viewedDate ? (
+                  <ActivityIndicator style={{ marginTop: 8 }} />
+                ) : planForecast[viewedDate] ? (
+                  <>
+                    <Text style={[theme.typography.h3, { color: theme.colors.text, marginTop: 4 }]}>
+                      {t('today.forecast.cards', { count: planForecast[viewedDate]!.totalItems })}
+                    </Text>
+                    <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary, marginTop: 2 }]}>
+                      {t('today.forecast.minutes', {
+                        count: Math.max(1, Math.round(planForecast[viewedDate]!.estimatedMinutes)),
+                      })}
+                      {' · '}
+                      {t('today.forecast.breakdown', {
+                        newCards: planForecast[viewedDate]!.newCards,
+                        reviewCards: planForecast[viewedDate]!.reviewCards,
+                      })}
+                    </Text>
+                  </>
+                ) : (
+                  <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary, marginTop: 4 }]}>
+                    {t('today.forecast.empty')}
+                  </Text>
+                )}
+                {/* Said every time: the number above is only as good as the assumption that
+                    nothing is studied between now and then — which is exactly the assumption
+                    a learner reading a plan is about to break. */}
+                <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 8 }]}>
+                  {t('today.forecast.note')}
+                </Text>
+              </View>
+            ) : (
+              <>
             {planBlockedReason === 'no_decks' && (
               <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
                 {t('today.empty.noDecks')}
@@ -459,185 +634,155 @@ export function LearningTodayScreen() {
               <ActivityIndicator />
             ) : plan ? (
               <>
-                {planItems.map((item, index) => {
-                  const card = item.card_id ? planCards[item.card_id] : undefined
-                  // NOT `Object.values(...)[0]` — jsonb key order is Postgres's, not the
-                  // template's, so that can show the answer instead of the prompt.
-                  const label = cardPromptLabel(card?.field_values, card?.template_id, planTemplateFields)
-                  const done = item.status === 'completed'
-                  // One attempt write at a time in the store, so every row's ratings go
-                  // inert together rather than looking tappable and doing nothing.
-                  const recording = recordingItemId !== null
-                  return (
-                    <View
-                      key={item.id}
-                      style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
-                      {...testProps(`learning-plan-item-${index}`, true)}
-                    >
-                      <Text
-                        style={[theme.typography.bodySmall, {
-                          color: done ? theme.colors.textTertiary : theme.colors.text,
-                          textDecorationLine: done ? 'line-through' : 'none',
-                        }]}
-                        numberOfLines={2}
+                {/* ── The day, and the way into it ─────────────────────────────
+                    This block used to render every plan item as a card with a text box and
+                    three self-rating buttons. That surface recorded an attempt and rescheduled
+                    NOTHING — its own hint said so — so a learner who worked through it moved no
+                    due date and got the same plan back tomorrow. Studying is the study screen's
+                    job now, and one rating there does both halves. */}
+                <View style={[styles.card, {
+                  backgroundColor: theme.colors.surface, borderColor: theme.colors.border,
+                }]} {...testProps('learning-today-summary', true)}>
+                  <View style={styles.summaryRow}>
+                    <Text style={[theme.typography.h3, { color: theme.colors.text }]}
+                      {...testProps('learning-remaining')}>
+                      {pendingTotal > 0
+                        ? t('today.remaining', { count: pendingTotal })
+                        : t('today.allDone')}
+                    </Text>
+                    <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+                      {t('today.progress', { done: doneTotal, total: plan.total_items })}
+                    </Text>
+                  </View>
+                  <View style={[styles.progressTrack, { backgroundColor: theme.colors.border }]}>
+                    <View style={[styles.progressFill, {
+                      backgroundColor: theme.colors.primary,
+                      width: `${plan.total_items > 0
+                        ? Math.round((doneTotal / plan.total_items) * 100) : 0}%`,
+                    }]} />
+                  </View>
+
+                  {nextDeck ? (
+                    <>
+                      <TouchableOpacity
+                        disabled={starting}
+                        onPress={() => void startDeck(nextDeck)}
+                        style={[
+                          styles.primaryBtn,
+                          { backgroundColor: theme.colors.primary },
+                          starting && styles.disabled,
+                        ]}
+                        accessibilityRole="button"
+                        accessibilityState={{ disabled: starting }}
+                        {...testProps('learning-start-study')}
                       >
-                        {label || t('today.item.untitled')}
-                      </Text>
-                      <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
-                        {/* `position` is 0-based in the row; web renders `position + 1` and the two screens
-                            must not number the same plan differently. */}
-                        {`${item.position + 1}. `}
-                        {t(REASON_KEY[item.reason_code] ?? 'today.reason.balanced')}
-                        {/* The planner budgets the day in minutes, so the row that spends the
-                            budget should say what it costs — web already showed this. */}
-                        {item.estimated_minutes !== null
-                          ? ` · ${t('today.item.minutes', { count: item.estimated_minutes })}`
-                          : ''}
-                      </Text>
-
-                      {/* The number the reason is derived from, so "at risk of forgetting" is a
-                          measurement the learner can judge rather than an assertion. Strictly
-                          what the planner recorded — never recomputed from the card row, which
-                          on a subscribed deck belongs to the publisher (#389). Absent for a card
-                          with no forgetting curve yet: a new card is not a forgotten one. */}
-                      {planRecallPercent(item) !== null && (
-                        <Text
-                          style={[theme.typography.caption, { color: theme.colors.textTertiary }]}
-                          {...testProps(`learning-recall-${index}`)}
-                        >
-                          {t('today.recallChance', { percent: planRecallPercent(item) as number })}
+                        <Text style={[theme.typography.bodySmall, { color: theme.colors.textInverse, fontWeight: '600' }]}>
+                          {doneTotal > 0 ? t('today.continueStudy') : t('today.startStudy')}
                         </Text>
-                      )}
+                      </TouchableOpacity>
+                      {/* Said here because the old screen's own hint told learners the
+                          opposite about its buttons. */}
+                      <Text style={[theme.typography.caption, {
+                        color: theme.colors.textTertiary, marginTop: 6, textAlign: 'center',
+                      }]}>
+                        {t('today.studyNote')}
+                      </Text>
+                    </>
+                  ) : (
+                    <Text style={[theme.typography.bodySmall, {
+                      color: theme.colors.success, marginTop: 12, textAlign: 'center',
+                    }]} {...testProps('learning-all-done')}>
+                      {t('today.allDoneNote')}
+                    </Text>
+                  )}
+                </View>
 
-                      {done ? (
+                {/* Per deck, because a session cannot span decks. Only shown when there is
+                    more than one — otherwise the primary button already IS the whole plan. */}
+                {deckGroups.length > 1 && (
+                  <View style={[styles.card, {
+                    backgroundColor: theme.colors.surface, borderColor: theme.colors.border,
+                  }]}>
+                    <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                      {t('today.byDeck')}
+                    </Text>
+                    {deckGroups.map((group, index) => (
+                      <View key={group.deckId} style={styles.deckRowSplit}>
+                        <View style={styles.deckRowText}>
+                          <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]} numberOfLines={1}>
+                            {deckName(group.deckId)}
+                          </Text>
+                          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+                            {group.pending > 0
+                              ? t('today.remaining', { count: group.pending })
+                              : t('today.deckDone')}
+                          </Text>
+                        </View>
+                        {group.pending > 0 && (
+                          <TouchableOpacity
+                            disabled={starting}
+                            onPress={() => void startDeck(group)}
+                            style={[styles.deckStartBtn, { borderColor: theme.colors.border }, starting && styles.disabled]}
+                            hitSlop={HIT_SLOP}
+                            accessibilityRole="button"
+                            accessibilityState={{ disabled: starting }}
+                            {...testProps(`learning-start-deck-${index}`)}
+                          >
+                            <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
+                              {t('today.item.study')}
+                            </Text>
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    ))}
+                  </View>
+                )}
+
+                {/* What is on the list, and why the planner chose it. Read-only. */}
+                <View style={[styles.card, {
+                  backgroundColor: theme.colors.surface, borderColor: theme.colors.border,
+                }]}>
+                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                    {t('today.listTitle')}
+                  </Text>
+                  {[...planItems].sort((a, b) => a.position - b.position).map((item, index) => {
+                    const card = item.card_id ? planCards[item.card_id] : undefined
+                    // NOT `Object.values(...)[0]` — jsonb key order is Postgres's, not the
+                    // template's, so that can show the answer instead of the prompt.
+                    const label = cardPromptLabel(card?.field_values, card?.template_id, planTemplateFields)
+                    const done = item.status === 'completed'
+                    return (
+                      <View key={item.id} style={styles.planRow} {...testProps(`learning-plan-item-${index}`, true)}>
                         <Text
-                          style={[theme.typography.caption, { color: theme.colors.success, marginTop: 6 }]}
-                          {...testProps(`learning-item-recorded-${index}`)}
+                          style={[theme.typography.bodySmall, {
+                            color: done ? theme.colors.textTertiary : theme.colors.text,
+                            textDecorationLine: done ? 'line-through' : 'none',
+                          }]}
+                          numberOfLines={2}
                         >
-                          {t('today.item.recorded')}
+                          {label || t('today.item.untitled')}
                         </Text>
-                      ) : (
-                        <>
-                          {/* Typed recall. Gated on the item's own snapshot — the column
-                              `record_answer_attempt` compares against — so an input can never
-                              appear where sending text would be rejected. The three rating
-                              buttons stay: nothing grades the text, the learner still judges. */}
-                          {item.response_type === 'text' && (
-                            <>
-                              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 6 }]}>
-                                {t('today.answer.label')}
-                              </Text>
-                              <TextInput
-                                value={answers[item.id] ?? ''}
-                                onChangeText={(text) => setAnswers((prev) => ({ ...prev, [item.id]: text }))}
-                                editable={!recording}
-                                multiline
-                                // Capped where the learner can see the input stop, not as the
-                                // server's 64 KiB rejection — which shares an error code with
-                                // the plan-save cap and would read as an unrelated message.
-                                maxLength={TYPED_ANSWER_MAX_CHARS}
-                                placeholder={t('today.answer.placeholder')}
-                                placeholderTextColor={theme.colors.textTertiary}
-                                style={[styles.answerInput, {
-                                  color: theme.colors.text,
-                                  borderColor: theme.colors.border,
-                                  backgroundColor: theme.colors.background,
-                                }]}
-                                accessibilityLabel={t('today.answer.label')}
-                                {...testProps(`learning-answer-${index}`)}
-                              />
-                              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
-                                {t('today.answer.note')}
-                              </Text>
-                            </>
-                          )}
-                          <View style={styles.rateRow}>
-                            {SELF_RATINGS.map((rating) => (
-                              <TouchableOpacity
-                                key={rating.key}
-                                disabled={recording}
-                                onPress={() => {
-                                  if (!goalId) return
-                                  // `recordAttempt` re-reads the PLAN only, so without this the
-                                  // attempt list below would not show the rating that was just
-                                  // given — exactly the moment it matters, since a fresh miss is
-                                  // the thing a learner would pay to have explained.
-                                  //
-                                  // The id is minted here, together with the text: `p_response`
-                                  // is part of the RPC's idempotency comparison, so an id made
-                                  // before the answer was final turns an edit into a P0007.
-                                  void recordAttempt({
-                                    planItem: item,
-                                    goalId,
-                                    score: rating.score,
-                                    text: answers[item.id],
-                                    clientAttemptId: Crypto.randomUUID(),
-                                  }, planDate).then((ok) => {
-                                    if (!ok) return
-                                    setAnswers((prev) => {
-                                      if (!(item.id in prev)) return prev
-                                      const next = { ...prev }
-                                      delete next[item.id]
-                                      return next
-                                    })
-                                    void fetchAttempts(goalId)
-                                  })
-                                }}
-                                style={[
-                                  styles.rateBtn,
-                                  { borderColor: theme.colors.border },
-                                  recording && styles.disabled,
-                                ]}
-                                accessibilityRole="button"
-                                accessibilityState={{ disabled: recording }}
-                                {...testProps(`learning-rate-${rating.id}-${index}`)}
-                              >
-                                <Text style={[theme.typography.caption, { color: theme.colors.text }]}>
-                                  {t(rating.key)}
-                                </Text>
-                              </TouchableOpacity>
-                            ))}
-                          </View>
-                          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>
-                            {t('today.rate.hint')}
-                          </Text>
-                        </>
-                      )}
+                        <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
+                          {/* `position` is 0-based in the row; web renders `position + 1` and
+                              the two screens must not number the same plan differently. */}
+                          {`${item.position + 1}. `}
+                          {t(REASON_KEY[item.reason_code] ?? 'today.reason.balanced')}
+                          {item.estimated_minutes !== null
+                            ? ` · ${t('today.item.minutes', { count: item.estimated_minutes })}`
+                            : ''}
+                          {/* Strictly what the planner recorded — never recomputed from the
+                              card row, which on a subscribed deck belongs to the publisher
+                              (#389). Absent for a card with no forgetting curve yet: a new
+                              card is not a forgotten one. */}
+                          {planRecallPercent(item) !== null
+                            ? ` · ${t('today.recallChance', { percent: planRecallPercent(item) as number })}`
+                            : ''}
+                        </Text>
+                      </View>
+                    )
+                  })}
+                </View>
 
-                      {item.card_id && goalId && (
-                        <TouchableOpacity
-                          disabled={enrichmentPendingCardId !== null}
-                          onPress={() => void requestEnrichment({
-                            action: 'explain', goalId, cardId: item.card_id as string, uiLang: i18n.language,
-                            // Grounded once this card has been attempted, card-scoped until
-                            // then — an explanation of a card nobody has tried yet is still a
-                            // legitimate request. The shared helper picks the attempt so this
-                            // row and the history rows below can never ground the same card in
-                            // two different attempts. `undefined` when there is none: the store
-                            // omits the key entirely rather than sending `null`, which the
-                            // server reads as a different request shape.
-                            attemptId: latestAttemptForCard(goalAttempts, item.card_id)?.id,
-                          })}
-                          style={[
-                            styles.touchRow,
-                            { marginTop: 4 },
-                            enrichmentPendingCardId !== null && styles.disabled,
-                          ]}
-                          hitSlop={HIT_SLOP}
-                          accessibilityRole="button"
-                          accessibilityState={{ disabled: enrichmentPendingCardId !== null }}
-                          {...testProps(`learning-enrich-${index}`)}
-                        >
-                          <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
-                            {enrichmentPendingCardId === item.card_id
-                              ? t('enrichment.requesting')
-                              : `${t('enrichment.explainCta')} · ${t('enrichment.costHint')}`}
-                          </Text>
-                        </TouchableOpacity>
-                      )}
-                    </View>
-                  )
-                })}
 
                 {/* "더 하기" comes FIRST and is the primary action. Rebuilding is the
                     destructive one — it deletes every item and zeroes the day's progress — so
@@ -724,6 +869,8 @@ export function LearningTodayScreen() {
                 </Text>
               </TouchableOpacity>
             ) : null}
+              </>
+            )}
 
             {/* Recent attempts — the review surface, and the only place a paid request can be
                 grounded in a specific miss rather than in the card alone.
@@ -989,18 +1136,27 @@ const styles = StyleSheet.create({
   body: { padding: 16, gap: 10, paddingBottom: 48 },
   card: { padding: 12, borderRadius: 12, borderWidth: 1 },
   headerLink: { minHeight: 32, paddingHorizontal: 6, justifyContent: 'center' },
+  // ── the day's summary and its way in ──────────────────────────────────────
+  summaryRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 },
+  progressTrack: { height: 6, borderRadius: 999, marginTop: 8, overflow: 'hidden' },
+  progressFill: { height: '100%', borderRadius: 999 },
+  planRow: { paddingVertical: 8, gap: 0 },
+  deckRowSplit: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    gap: 8, marginTop: 8,
+  },
+  deckRowText: { flex: 1, minWidth: 0 },
   // 44pt is the iOS HIG minimum and 48dp Material's; a 12px caption inside 6px of padding
   // was 28, which is a mis-tap on a moving train.
-  rateRow: { flexDirection: 'row', gap: 6, marginTop: 8 },
-  // Two lines tall by default and it grows: a recall answer is short, and a box the height of
-  // the card would suggest an essay is wanted. `minHeight` keeps the tap target usable.
-  answerInput: {
-    marginTop: 4, borderWidth: 1, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8,
-    minHeight: MIN_TOUCH, maxHeight: 120, fontSize: 14, textAlignVertical: 'top',
-  },
-  rateBtn: {
+  deckStartBtn: {
     paddingHorizontal: 14, minHeight: MIN_TOUCH, borderRadius: 8, borderWidth: 1,
-    justifyContent: 'center', alignItems: 'center', flex: 1,
+    justifyContent: 'center', alignItems: 'center',
+  },
+  // The day strip. Chips scroll horizontally so a week fits on the narrowest phone.
+  dayStrip: { flexDirection: 'row', gap: 6, paddingVertical: 2 },
+  dayChip: {
+    paddingHorizontal: 14, minHeight: MIN_TOUCH, borderRadius: 999, borderWidth: 1,
+    justifyContent: 'center', alignItems: 'center',
   },
   primaryBtn: { marginTop: 10, minHeight: MIN_TOUCH, paddingVertical: 12, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   secondaryBtn: { marginTop: 4, minHeight: MIN_TOUCH, paddingVertical: 12, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },

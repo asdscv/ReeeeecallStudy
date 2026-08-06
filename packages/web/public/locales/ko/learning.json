@@ -58,7 +58,39 @@
     "extendAdded_other": "{{count, number}}개를 더 넣었습니다.",
     "extendTomorrow_one": "그중 새 카드가 {{count, number}}장이라, 내일 복습이 그만큼 늘어납니다.",
     "extendTomorrow_other": "그중 새 카드가 {{count, number}}장이라, 내일 복습이 그만큼 늘어납니다.",
-    "extendNothing": "지금 더 넣을 것이 없습니다."
+    "extendNothing": "지금 더 넣을 것이 없습니다.",
+    "remaining": "{{count, number}}장 남음",
+    "remaining_one": "{{count, number}}장 남음",
+    "remaining_other": "{{count, number}}장 남음",
+    "allDone": "오늘 끝!",
+    "allDoneNote": "오늘 할 건 다 했어요. 내일 또 만나요.",
+    "startStudy": "학습 시작",
+    "continueStudy": "이어서 학습",
+    "studyNote": "학습 화면에서 평가하면 복습 일정과 오늘의 플랜이 함께 기록됩니다.",
+    "byDeck": "덱별",
+    "deckDone": "완료",
+    "listTitle": "오늘의 목록",
+    "days": {
+      "label": "날짜",
+      "today": "오늘",
+      "tomorrow": "내일",
+      "inDays": "{{count, number}}일 후",
+      "inDays_one": "{{count, number}}일 후",
+      "inDays_other": "{{count, number}}일 후"
+    },
+    "forecast": {
+      "title": "이날 예상 학습량",
+      "cards": "{{count, number}}장",
+      "cards_one": "{{count, number}}장",
+      "cards_other": "{{count, number}}장",
+      "minutes": "약 {{count, number}}분",
+      "minutes_one": "약 {{count, number}}분",
+      "minutes_other": "약 {{count, number}}분",
+      "breakdown": "새 카드 {{newCards, number}} · 복습 {{reviewCards, number}}",
+      "empty": "이날은 복습할 카드가 없을 것 같아요.",
+      "loading": "계산 중…",
+      "note": "예상치입니다. 지금부터 그날까지 아무것도 학습하지 않는다고 가정한 값이라, 실제로 학습하면 달라집니다."
+    }
   },
   "goals": {
     "title": "학습 목표",
@@ -91,7 +123,10 @@
       "unknown": "문제가 발생했습니다. 다시 시도해 주세요."
     },
     "deckCount_one": "덱 {{count, number}}개",
-    "deckCount_other": "덱 {{count, number}}개"
+    "deckCount_other": "덱 {{count, number}}개",
+    "delete": "삭제",
+    "deleteConfirmTitle": "이 플랜을 삭제할까요?",
+    "deleteConfirmMessage": "\"{{title}}\" 과(와) 이 플랜이 만든 모든 일별 플랜이 영구히 사라집니다. 학습 기록과 카드는 그대로 남고, 플랜만 삭제됩니다. 되돌릴 수 없습니다."
   },
   "form": {
     "createTitle": "새 목표",

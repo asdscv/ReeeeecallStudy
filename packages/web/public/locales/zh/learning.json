@@ -58,7 +58,39 @@
     "extendAdded_other": "已添加 {{count, number}} 项。",
     "extendTomorrow_one": "其中 {{count, number}} 张是新卡，明天的复习会相应增加。",
     "extendTomorrow_other": "其中 {{count, number}} 张是新卡，明天的复习会相应增加。",
-    "extendNothing": "目前没有可添加的内容。"
+    "extendNothing": "目前没有可添加的内容。",
+    "remaining": "还剩 {{count, number}} 张",
+    "remaining_one": "还剩 {{count, number}} 张",
+    "remaining_other": "还剩 {{count, number}} 张",
+    "allDone": "今天完成了！",
+    "allDoneNote": "今天的份已经做完了，明天见。",
+    "startStudy": "开始学习",
+    "continueStudy": "继续学习",
+    "studyNote": "在学习页评分会同时安排下次复习并记入今天的计划。",
+    "byDeck": "按卡组",
+    "deckDone": "已完成",
+    "listTitle": "今天的清单",
+    "days": {
+      "label": "日期",
+      "today": "今天",
+      "tomorrow": "明天",
+      "inDays": "{{count, number}} 天后",
+      "inDays_one": "{{count, number}} 天后",
+      "inDays_other": "{{count, number}} 天后"
+    },
+    "forecast": {
+      "title": "那天的预计量",
+      "cards": "{{count, number}} 张",
+      "cards_one": "{{count, number}} 张",
+      "cards_other": "{{count, number}} 张",
+      "minutes": "约 {{count, number}} 分钟",
+      "minutes_one": "约 {{count, number}} 分钟",
+      "minutes_other": "约 {{count, number}} 分钟",
+      "breakdown": "新卡 {{newCards, number}} · 复习 {{reviewCards, number}}",
+      "empty": "那天看起来没有要复习的卡片。",
+      "loading": "计算中…",
+      "note": "这是估算值，前提是从现在到那天什么都不学——一旦你开始学，它就会变。"
+    }
   },
   "goals": {
     "title": "学习目标",
@@ -91,7 +123,10 @@
       "unknown": "出了点问题，请重试。"
     },
     "deckCount_one": "{{count, number}} 个牌组",
-    "deckCount_other": "{{count, number}} 个牌组"
+    "deckCount_other": "{{count, number}} 个牌组",
+    "delete": "删除",
+    "deleteConfirmTitle": "要删除这个计划吗？",
+    "deleteConfirmMessage": "“{{title}}”以及它生成的所有每日计划将被永久删除。你的学习记录和卡片会保留，只删除计划。此操作无法撤销。"
   },
   "form": {
     "createTitle": "新目标",

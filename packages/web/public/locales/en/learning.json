@@ -58,7 +58,39 @@
     "extendAdded_other": "Added {{count, number}} more items.",
     "extendTomorrow_one": "{{count, number}} of them is new, so tomorrow gains that many reviews.",
     "extendTomorrow_other": "{{count, number}} of them are new, so tomorrow gains that many reviews.",
-    "extendNothing": "There's nothing left to add right now."
+    "extendNothing": "There's nothing left to add right now.",
+    "remaining": "{{count, number}} left today",
+    "remaining_one": "{{count, number}} left today",
+    "remaining_other": "{{count, number}} left today",
+    "allDone": "Today's done",
+    "allDoneNote": "That's everything for today. See you tomorrow.",
+    "startStudy": "Start studying",
+    "continueStudy": "Keep going",
+    "studyNote": "Rating a card there schedules its next review and ticks it off this plan.",
+    "byDeck": "By deck",
+    "deckDone": "Done",
+    "listTitle": "Today's list",
+    "days": {
+      "label": "Day",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "inDays": "In {{count, number}} days",
+      "inDays_one": "In {{count, number}} days",
+      "inDays_other": "In {{count, number}} days"
+    },
+    "forecast": {
+      "title": "What that day looks like",
+      "cards": "{{count, number}} cards",
+      "cards_one": "{{count, number}} cards",
+      "cards_other": "{{count, number}} cards",
+      "minutes": "about {{count, number}} min",
+      "minutes_one": "about {{count, number}} min",
+      "minutes_other": "about {{count, number}} min",
+      "breakdown": "{{newCards, number}} new · {{reviewCards, number}} review",
+      "empty": "Nothing looks due on that day.",
+      "loading": "Working it out…",
+      "note": "An estimate. It assumes nothing gets studied between now and then — which is the one thing that will change it."
+    }
   },
   "goals": {
     "title": "Learning goals",
@@ -91,7 +123,10 @@
       "unknown": "Something went wrong. Please try again."
     },
     "deckCount_one": "{{count, number}} deck",
-    "deckCount_other": "{{count, number}} decks"
+    "deckCount_other": "{{count, number}} decks",
+    "delete": "Delete",
+    "deleteConfirmTitle": "Delete this plan?",
+    "deleteConfirmMessage": "\"{{title}}\" and every daily plan it made will be gone for good. Your study record and your cards stay — only the plan is removed. This cannot be undone."
   },
   "form": {
     "createTitle": "New goal",
