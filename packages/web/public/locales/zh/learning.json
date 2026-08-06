@@ -254,10 +254,16 @@
   },
   "progress": {
     "title": "进度",
-    "knownNow": "{{total, number}} 张中已记住 {{known, number}} 张",
-    "breakdown": "牢固 {{known, number}} · 动摇 {{shaky, number}} · 未开始 {{unseen, number}}",
     "daysLeft": "还剩 {{count, number}} 天",
     "daysLeft_one": "还剩 {{count, number}} 天",
-    "daysLeft_other": "还剩 {{count, number}} 天"
+    "daysLeft_other": "还剩 {{count, number}} 天",
+    "withinWindow": "已学 {{attempted, number}} 张中有 {{known, number}} 张仍在复习周期内",
+    "notStarted": "尚未开始学习 · 共 {{total, number}} 张",
+    "overdue": "复习逾期 {{count, number}} 张",
+    "overdue_one": "复习逾期 {{count, number}} 张",
+    "overdue_other": "复习逾期 {{count, number}} 张",
+    "unstudied": "尚未学习 {{count, number}} 张",
+    "unstudied_one": "尚未学习 {{count, number}} 张",
+    "unstudied_other": "尚未学习 {{count, number}} 张"
   }
 }

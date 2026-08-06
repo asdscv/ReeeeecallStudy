@@ -254,10 +254,16 @@
   },
   "progress": {
     "title": "Kemajuan",
-    "knownNow": "{{known, number}} dari {{total, number}} kartu dikuasai",
-    "breakdown": "{{known, number}} kuat · {{shaky, number}} goyah · {{unseen, number}} belum mulai",
     "daysLeft": "{{count, number}} hari lagi",
     "daysLeft_one": "{{count, number}} hari lagi",
-    "daysLeft_other": "{{count, number}} hari lagi"
+    "daysLeft_other": "{{count, number}} hari lagi",
+    "withinWindow": "{{known, number}} dari {{attempted, number}} kartu yang dipelajari masih dalam jadwal ulasan",
+    "notStarted": "Belum dimulai · {{total, number}} kartu",
+    "overdue": "{{count, number}} ulasan terlambat",
+    "overdue_one": "{{count, number}} ulasan terlambat",
+    "overdue_other": "{{count, number}} ulasan terlambat",
+    "unstudied": "{{count, number}} belum dipelajari",
+    "unstudied_one": "{{count, number}} belum dipelajari",
+    "unstudied_other": "{{count, number}} belum dipelajari"
   }
 }

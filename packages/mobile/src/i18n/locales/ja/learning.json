@@ -252,10 +252,16 @@
   },
   "progress": {
     "title": "進捗",
-    "knownNow": "{{total, number}}枚中 {{known, number}}枚を記憶",
-    "breakdown": "確実 {{known, number}} ・ 不安 {{shaky, number}} ・ 未着手 {{unseen, number}}",
     "daysLeft": "残り{{count, number}}日",
     "daysLeft_one": "残り{{count, number}}日",
-    "daysLeft_other": "残り{{count, number}}日"
+    "daysLeft_other": "残り{{count, number}}日",
+    "withinWindow": "学習した{{attempted, number}}枚のうち{{known, number}}枚が復習期限内です",
+    "notStarted": "まだ学習していません · 全{{total, number}}枚",
+    "overdue": "復習期限切れ {{count, number}}枚",
+    "overdue_one": "復習期限切れ {{count, number}}枚",
+    "overdue_other": "復習期限切れ {{count, number}}枚",
+    "unstudied": "未学習 {{count, number}}枚",
+    "unstudied_one": "未学習 {{count, number}}枚",
+    "unstudied_other": "未学習 {{count, number}}枚"
   }
 }

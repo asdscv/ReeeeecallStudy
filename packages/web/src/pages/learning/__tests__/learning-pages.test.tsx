@@ -368,6 +368,46 @@ describe('LearningTodayPage', () => {
 
     expect(screen.getByText('today.extendNothing')).toBeInTheDocument()
   })
+
+  // ── where the goal stands ─────────────────────────────────────────────────
+  //
+  // Reported after studying a single card: "확실 1, 흔들림 18, 미시작 10 뭐지?". Every number was
+  // right. `known` means "not past due", so one rating on an overdue card moves a card there —
+  // but the screen called it 확실 and headlined "29장 중 1장 기억", which reads as having
+  // forgotten 28 cards. The RPC never made that claim.
+  const knowledgeOf = (known: number, unknown: number, unseen: number) => ({
+    knowledge: { 'goal-1': { total: known + unknown + unseen, known, unknown, unseen } },
+  })
+
+  it('says what `known` measures instead of renaming it 확실', () => {
+    renderToday(knowledgeOf(1, 18, 10))
+
+    // The denominator is what has been STUDIED (19), not the whole goal (29).
+    expect(screen.getByText(/progress\.withinWindow/)).toBeInTheDocument()
+    expect(screen.queryByText(/progress\.knownNow/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/progress\.breakdown/)).not.toBeInTheDocument()
+  })
+
+  it('puts the overdue work first and drops halves that are empty', () => {
+    renderToday(knowledgeOf(1, 18, 10))
+    expect(screen.getByTestId('progress-detail')).toHaveTextContent('progress.overdue')
+
+    cleanup()
+    // Caught up, with cards still to start: no "복습 밀림 0장", which is a sentence about nothing.
+    renderToday(knowledgeOf(19, 0, 10))
+    const detail = screen.getByTestId('progress-detail')
+    expect(detail).toHaveTextContent('progress.unstudied')
+    expect(detail).not.toHaveTextContent('progress.overdue')
+  })
+
+  it('reports "not started" rather than a confident 0%', () => {
+    renderToday(knowledgeOf(0, 0, 29))
+
+    expect(screen.getByText(/progress\.notStarted/)).toBeInTheDocument()
+    // Nothing overdue and nothing studied — the detail line has nothing to say but the count of
+    // untouched cards, which the headline already gave.
+    expect(screen.getByTestId('progress-detail')).toHaveTextContent('progress.unstudied')
+  })
 })
 
 // ── attempt recording (Phase 2) ─────────────────────────────────────────────

@@ -13,6 +13,7 @@ import {
 } from '@reeeeecall/shared/lib/learning-attempt-selection'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { planComposition } from '@reeeeecall/shared/lib/plan-composition'
+import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
 import { useDeckStore } from '../../stores/deck-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
 import { EnrichmentModal } from './EnrichmentModal'
@@ -228,33 +229,42 @@ function AttemptHistory({ goalId }: { goalId: string }) {
 }
 
 /**
- * Where a goal stands, in the three numbers that mean something.
+ * Where a goal stands.
  *
- * `unseen` is kept out of the ratio rather than counted as unknown: a deck nobody has opened is
- * "not started", and reporting a confident 0% for it is a different, wronger claim. The bar
- * therefore measures known against what has actually been attempted, and the untouched remainder
- * is stated separately.
+ * The headline names the measurement instead of renaming it: `known` is "still inside its review
+ * window", not "확실히 안다". It used to read "29장 중 1장 기억" over a goal where 18 reviews were
+ * overdue and 10 cards had never been opened — a sentence that sounds like near-total amnesia and
+ * means nothing of the kind. The line under it carries what to do about it.
  */
 function GoalProgress({ knowledge }: { knowledge: GoalKnowledge | null }) {
   const { t } = useTranslation('learning')
   if (!knowledge || knowledge.total === 0) return null
 
-  const attempted = knowledge.known + knowledge.unknown
-  const percent = attempted > 0 ? Math.round((knowledge.known / attempted) * 100) : 0
+  const summary = goalKnowledgeSummary(knowledge)
+  // Each half is dropped when empty rather than printed as a zero: "복습 밀림 0장" is a sentence
+  // about nothing, and a learner who is fully caught up should see that, not a row of noughts.
+  const detail = [
+    summary.overdue > 0 ? t('progress.overdue', { count: summary.overdue }) : null,
+    summary.unstudied > 0 ? t('progress.unstudied', { count: summary.unstudied }) : null,
+  ].filter(Boolean).join(' · ')
 
   return (
     <section className="rounded-xl border border-border bg-card p-4" aria-label={t('progress.title')}>
       <p className="text-sm text-foreground">
-        {t('progress.knownNow', { known: knowledge.known, total: knowledge.total })}
+        {summary.notStarted
+          ? t('progress.notStarted', { total: knowledge.total })
+          : t('progress.withinWindow', {
+            attempted: summary.attempted, known: summary.withinWindow,
+          })}
       </p>
       <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-        <div className="h-full bg-brand" style={{ width: `${percent}%` }} role="presentation" />
+        <div className="h-full bg-brand" style={{ width: `${summary.percent}%` }} role="presentation" />
       </div>
-      <p className="mt-1.5 text-[11px] text-content-tertiary">
-        {t('progress.breakdown', {
-          known: knowledge.known, shaky: knowledge.unknown, unseen: knowledge.unseen,
-        })}
-      </p>
+      {detail && (
+        <p className="mt-1.5 text-[11px] text-content-tertiary" data-testid="progress-detail">
+          {detail}
+        </p>
+      )}
     </section>
   )
 }

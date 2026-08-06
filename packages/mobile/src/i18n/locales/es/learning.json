@@ -252,10 +252,16 @@
   },
   "progress": {
     "title": "Progreso",
-    "knownNow": "{{known, number}} de {{total, number}} tarjetas dominadas",
-    "breakdown": "{{known, number}} firmes · {{shaky, number}} flojas · {{unseen, number}} sin empezar",
     "daysLeft": "Quedan {{count, number}} días",
     "daysLeft_one": "Queda {{count, number}} día",
-    "daysLeft_other": "Quedan {{count, number}} días"
+    "daysLeft_other": "Quedan {{count, number}} días",
+    "withinWindow": "{{known, number}} de {{attempted, number}} tarjetas estudiadas siguen dentro de su ciclo de repaso",
+    "notStarted": "Aún sin empezar · {{total, number}} tarjetas",
+    "overdue": "{{count, number}} repasos vencidos",
+    "overdue_one": "{{count, number}} repaso vencido",
+    "overdue_other": "{{count, number}} repasos vencidos",
+    "unstudied": "{{count, number}} sin estudiar",
+    "unstudied_one": "{{count, number}} sin estudiar",
+    "unstudied_other": "{{count, number}} sin estudiar"
   }
 }

@@ -254,10 +254,16 @@
   },
   "progress": {
     "title": "Tiến độ",
-    "knownNow": "Nhớ {{known, number}} trong {{total, number}} thẻ",
-    "breakdown": "Chắc {{known, number}} · Lung lay {{shaky, number}} · Chưa bắt đầu {{unseen, number}}",
     "daysLeft": "Còn {{count, number}} ngày",
     "daysLeft_one": "Còn {{count, number}} ngày",
-    "daysLeft_other": "Còn {{count, number}} ngày"
+    "daysLeft_other": "Còn {{count, number}} ngày",
+    "withinWindow": "{{known, number}} trong {{attempted, number}} thẻ đã học vẫn trong chu kỳ ôn tập",
+    "notStarted": "Chưa học thẻ nào · tổng {{total, number}} thẻ",
+    "overdue": "{{count, number}} thẻ quá hạn ôn tập",
+    "overdue_one": "{{count, number}} thẻ quá hạn ôn tập",
+    "overdue_other": "{{count, number}} thẻ quá hạn ôn tập",
+    "unstudied": "{{count, number}} thẻ chưa học",
+    "unstudied_one": "{{count, number}} thẻ chưa học",
+    "unstudied_other": "{{count, number}} thẻ chưa học"
   }
 }

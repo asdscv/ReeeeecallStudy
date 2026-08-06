@@ -19,6 +19,7 @@ import {
 } from '@reeeeecall/shared/lib/learning-attempt-selection'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { planComposition } from '@reeeeecall/shared/lib/plan-composition'
+import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
 import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
 import { useStudy } from '../hooks/useStudy'
 import type { SettingsStackParamList } from '../navigation/types'
@@ -350,6 +351,26 @@ export function LearningTodayScreen() {
   /** What is LEFT today. Shared with web so the two screens cannot disagree about it. */
   const composition = useMemo(() => planComposition(planItems), [planItems])
 
+  /**
+   * Where the goal stands. Shared with web and the dashboard tile, which had already drifted into
+   * dividing by different denominators and drawing two bars from one RPC's numbers.
+   *
+   * Computed unconditionally with a zeroed fallback: the card below is rendered behind a guard,
+   * and a hook cannot live inside one.
+   */
+  const goalSummary = useMemo(
+    () => goalKnowledgeSummary(
+      (goalId ? knowledge[goalId] : null) ?? { total: 0, known: 0, unknown: 0, unseen: 0 },
+    ),
+    [goalId, knowledge],
+  )
+  // Each half dropped when empty — "복습 밀림 0장" is a sentence about nothing, and a learner who
+  // is caught up should see that rather than a row of noughts.
+  const progressDetail = [
+    goalSummary.overdue > 0 ? t('progress.overdue', { count: goalSummary.overdue }) : null,
+    goalSummary.unstudied > 0 ? t('progress.unstudied', { count: goalSummary.unstudied }) : null,
+  ].filter(Boolean).join(' · ')
+
   const deckName = useCallback(
     (deckId: string) => decks.find((deck) => deck.id === deckId)?.name ?? t('today.item.untitled'),
     [decks, t],
@@ -474,18 +495,22 @@ export function LearningTodayScreen() {
                 style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
                 {...testProps('learning-progress', true)}
               >
+                {/* `known` means "still inside its review window", not "확실히 안다" — one rating
+                    on an overdue card moves it there. The old headline renamed it and read
+                    "29장 중 1장 기억" over a goal with 18 overdue reviews and 10 untouched cards,
+                    which sounds like amnesia and means nothing of the kind. */}
                 <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
-                  {t('progress.knownNow', {
-                    known: knowledge[goalId].known, total: knowledge[goalId].total,
-                  })}
+                  {goalSummary.notStarted
+                    ? t('progress.notStarted', { total: knowledge[goalId].total })
+                    : t('progress.withinWindow', {
+                      attempted: goalSummary.attempted, known: goalSummary.withinWindow,
+                    })}
                 </Text>
-                <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>
-                  {t('progress.breakdown', {
-                    known: knowledge[goalId].known,
-                    shaky: knowledge[goalId].unknown,
-                    unseen: knowledge[goalId].unseen,
-                  })}
-                </Text>
+                {progressDetail !== '' && (
+                  <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>
+                    {progressDetail}
+                  </Text>
+                )}
               </View>
             )}
 
