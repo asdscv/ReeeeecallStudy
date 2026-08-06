@@ -160,15 +160,8 @@ console.log('[Test 6] Learning screens: every requestable key exists in every lo
   const FAMILIES: Record<string, readonly string[]> = {
     'recommend.status': ['accepted', 'dismissed', 'expired'],
     'goals.status': ['paused', 'completed', 'archived'],
-    'enrichment.error': [
-      'INSUFFICIENT_CREDITS', 'RATE_CAP', 'GROUNDING_REQUIRED', 'INVALID_RESULT',
-      'PROVIDER_ERROR', 'BAD_REQUEST', 'NETWORK', 'UNKNOWN',
-      'COMPARE_NO_ANSWER', 'COMPARE_NO_REFERENCE',
-    ],
-    // `RemediationAction` in shared/stores/learning-store.ts. Only these two are reachable:
-    // an attempt stores `{ self_rated: score }`, so `compare`/`evaluate` have no learner text
-    // to work from and are deliberately not offered.
-    'enrichment.action': ['explain', 'hint', 'compare'],
+    // `enrichment.*` used to live here. The paid AI remediation surface was removed from both
+    // plan screens, so no screen can request those keys and the strings went with it.
     // `today.reason.*` used to live here, one phrase per planner reason code. The per-card
     // list that rendered them is gone from both platforms — see LearningTodayScreen's header —
     // so no screen can request them and the strings went with the list.

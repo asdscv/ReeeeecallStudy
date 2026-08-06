@@ -5,9 +5,6 @@
     "progress": "{{done, number}} of {{total, number}} done",
     "generate": "Build today's plan",
     "generating": "Building…",
-    "regenerate": "Rebuild plan",
-    "regenerating": "Rebuilding…",
-    "completedNote": "This plan is finished, so it can't be rebuilt today.",
     "empty": {
       "noGoal": "You don't have an active learning goal yet. A goal sets your daily minutes and the decks to plan over.",
       "createGoal": "Create a goal",
@@ -28,11 +25,6 @@
       "forbidden": "You don't have access to that.",
       "unknown": "The plan couldn't be built. Please try again."
     },
-    "rate": {
-      "again": "Didn't know",
-      "partial": "Partly",
-      "known": "Knew it"
-    },
     "backToPlans": "All plans",
     "extend": "Study more",
     "extending": "Adding…",
@@ -51,27 +43,6 @@
     "studyNote": "Rating a card there schedules its next review and ticks it off this plan.",
     "byDeck": "By deck",
     "deckDone": "Done",
-    "days": {
-      "label": "Day",
-      "today": "Today",
-      "tomorrow": "Tomorrow",
-      "inDays": "In {{count, number}} days",
-      "inDays_one": "In {{count, number}} days",
-      "inDays_other": "In {{count, number}} days"
-    },
-    "forecast": {
-      "title": "What that day looks like",
-      "cards": "{{count, number}} cards",
-      "cards_one": "{{count, number}} cards",
-      "cards_other": "{{count, number}} cards",
-      "minutes": "about {{count, number}} min",
-      "minutes_one": "about {{count, number}} min",
-      "minutes_other": "about {{count, number}} min",
-      "breakdown": "{{newCards, number}} new · {{reviewCards, number}} review",
-      "empty": "Nothing looks due on that day.",
-      "loading": "Working it out…",
-      "note": "An estimate. It assumes nothing gets studied between now and then — which is the one thing that will change it."
-    },
     "composition": {
       "review": "{{count, number}} reviews",
       "review_one": "{{count, number}} review",
@@ -183,14 +154,9 @@
   },
   "history": {
     "title": "Recent study",
-    "itemFallback": "{{type}} attempt",
-    "youWrote": "You wrote: {{text}}",
     "recap": "{{count, number}} cards · {{minutes, number}} min · {{seconds, number}}s per card on average",
     "recap_one": "{{count, number}} card · {{minutes, number}} min · {{seconds, number}}s per card on average",
     "recap_other": "{{count, number}} cards · {{minutes, number}} min · {{seconds, number}}s per card on average",
-    "reviewTitle": "{{count, number}} to look at again",
-    "reviewTitle_one": "{{count, number}} to look at again",
-    "reviewTitle_other": "{{count, number}} to look at again",
     "band": {
       "known": "{{count, number}} knew it",
       "known_one": "{{count, number}} knew it",
@@ -200,44 +166,7 @@
       "partial_other": "{{count, number}} shaky",
       "missed": "{{count, number}} missed",
       "missed_one": "{{count, number}} missed",
-      "missed_other": "{{count, number}} missed",
-      "partialShort": "Shaky",
-      "missedShort": "Missed"
-    },
-    "reviewCapped": "Showing {{shown, number}} of {{total, number}}."
-  },
-  "enrichment": {
-    "explainCta": "Explain (credits)",
-    "requesting": "Asking…",
-    "costHint": "Uses AI credits from your wallet",
-    "action": {
-      "explain": "AI explanation",
-      "hint": "Study hint",
-      "compare": "Compare my answer"
-    },
-    "quote": "About {{price}} per request · {{balance}} left",
-    "groundedHint": "Answers this attempt, not just the card",
-    "sources": "Sources",
-    "noSources": "This answer is not source-based.",
-    "empty": "The model returned nothing usable.",
-    "chargedNote": "Already charged — discarding does not refund the credits.",
-    "keep": "Keep",
-    "discard": "Discard",
-    "later": "Decide later",
-    "saving": "Saving…",
-    "error": {
-      "BAD_REQUEST": "That request was not valid.",
-      "FORBIDDEN": "You don't have access to that card.",
-      "GROUNDING_REQUIRED": "No citable source was found, so the answer was refused rather than made up.",
-      "INSUFFICIENT_CREDITS": "Not enough AI credits. Top up to continue.",
-      "INVALID_RESULT": "The answer came back unusable. Please try again.",
-      "NETWORK": "Network error. Check your connection.",
-      "NOT_CONFIGURED": "AI generation is not enabled on this server.",
-      "PROVIDER_ERROR": "The AI service failed. Please try again.",
-      "RATE_CAP": "You've hit today's AI request limit. Try again tomorrow.",
-      "UNKNOWN": "Something went wrong. Please try again.",
-      "COMPARE_NO_ANSWER": "Write your answer first — there is nothing to compare yet.",
-      "COMPARE_NO_REFERENCE": "This card does not mark which field is the answer, so there is nothing to compare against."
+      "missed_other": "{{count, number}} missed"
     }
   },
   "insights": {

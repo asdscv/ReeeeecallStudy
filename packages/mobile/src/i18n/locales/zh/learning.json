@@ -1,36 +1,4 @@
 {
-  "enrichment": {
-    "action": {
-      "compare": "对比我的答案",
-      "explain": "AI 解释",
-      "hint": "学习提示"
-    },
-    "chargedNote": "已扣费 — 即使丢弃也不会退还额度。",
-    "costHint": "将使用你钱包中的 AI 额度",
-    "discard": "丢弃",
-    "error": {
-      "BAD_REQUEST": "请求无效。",
-      "COMPARE_NO_ANSWER": "请先写下你的答案——目前还没有可对比的内容。",
-      "COMPARE_NO_REFERENCE": "这张卡片没有标明哪个字段是答案，因此没有可对比的基准。",
-      "FORBIDDEN": "你没有访问该卡片的权限。",
-      "GROUNDING_REQUIRED": "未找到可引用的来源，为避免编造内容已拒绝回答。",
-      "INSUFFICIENT_CREDITS": "AI 额度不足，请充值后继续。",
-      "INVALID_RESULT": "回答内容不可用，请重试。",
-      "NETWORK": "网络错误，请检查连接。",
-      "NOT_CONFIGURED": "此服务器未启用 AI 生成功能。",
-      "PROVIDER_ERROR": "AI 服务出错，请重试。",
-      "RATE_CAP": "今天的 AI 请求次数已用完，请明天再试。",
-      "UNKNOWN": "出了点问题，请重试。"
-    },
-    "explainCta": "解释（额度）",
-    "groundedHint": "解答针对本次作答，而不只是这张卡片",
-    "keep": "保留",
-    "later": "稍后决定",
-    "noSources": "此回答不基于来源。",
-    "quote": "每次请求约 {{price}} · 余额 {{balance}}",
-    "requesting": "请求中…",
-    "sources": "来源"
-  },
   "form": {
     "cancel": "取消",
     "decks": "学习牌组",
@@ -132,17 +100,12 @@
     }
   },
   "history": {
-    "itemFallback": "{{type}} 作答",
     "title": "最近学习",
     "title_one": "最近作答 ({{count, number}})",
     "title_other": "最近作答 ({{count, number}})",
-    "youWrote": "你写的答案：{{text}}",
     "recap": "{{count, number}} 张 · {{minutes, number}} 分钟 · 每张平均 {{seconds, number}} 秒",
     "recap_one": "{{count, number}} 张 · {{minutes, number}} 分钟 · 每张平均 {{seconds, number}} 秒",
     "recap_other": "{{count, number}} 张 · {{minutes, number}} 分钟 · 每张平均 {{seconds, number}} 秒",
-    "reviewTitle": "需要再看的卡片 {{count, number}} 张",
-    "reviewTitle_one": "需要再看的卡片 {{count, number}} 张",
-    "reviewTitle_other": "需要再看的卡片 {{count, number}} 张",
     "band": {
       "known": "记住 {{count, number}}",
       "known_one": "记住 {{count, number}}",
@@ -152,11 +115,8 @@
       "partial_other": "模糊 {{count, number}}",
       "missed": "没记住 {{count, number}}",
       "missed_one": "没记住 {{count, number}}",
-      "missed_other": "没记住 {{count, number}}",
-      "partialShort": "模糊",
-      "missedShort": "没记住"
-    },
-    "reviewCapped": "共 {{total, number}} 张，显示 {{shown, number}} 张。"
+      "missed_other": "没记住 {{count, number}}"
+    }
   },
   "insights": {
     "accuracy": "正确率",
@@ -217,13 +177,6 @@
       "study": "学习"
     },
     "progress": "{{total, number}} 个中完成 {{done, number}} 个",
-    "rate": {
-      "again": "不知道",
-      "known": "知道",
-      "partial": "不确定"
-    },
-    "regenerate": "重新生成计划",
-    "regenerating": "重新生成中…",
     "title": "今日计划",
     "backToPlans": "计划列表",
     "extend": "再学一些",
@@ -243,27 +196,6 @@
     "studyNote": "在学习页评分会同时安排下次复习并记入今天的计划。",
     "byDeck": "按卡组",
     "deckDone": "已完成",
-    "days": {
-      "label": "日期",
-      "today": "今天",
-      "tomorrow": "明天",
-      "inDays": "{{count, number}} 天后",
-      "inDays_one": "{{count, number}} 天后",
-      "inDays_other": "{{count, number}} 天后"
-    },
-    "forecast": {
-      "title": "那天的预计量",
-      "cards": "{{count, number}} 张",
-      "cards_one": "{{count, number}} 张",
-      "cards_other": "{{count, number}} 张",
-      "minutes": "约 {{count, number}} 分钟",
-      "minutes_one": "约 {{count, number}} 分钟",
-      "minutes_other": "约 {{count, number}} 分钟",
-      "breakdown": "新卡 {{newCards, number}} · 复习 {{reviewCards, number}}",
-      "empty": "那天看起来没有要复习的卡片。",
-      "loading": "计算中…",
-      "note": "这是估算值，前提是从现在到那天什么都不学——一旦你开始学，它就会变。"
-    },
     "composition": {
       "review": "复习 {{count, number}} 张",
       "review_one": "复习 {{count, number}} 张",

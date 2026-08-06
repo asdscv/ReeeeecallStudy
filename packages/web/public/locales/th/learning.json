@@ -5,9 +5,6 @@
     "progress": "เสร็จ {{done, number}} จาก {{total, number}}",
     "generate": "สร้างแผนวันนี้",
     "generating": "กำลังสร้าง…",
-    "regenerate": "สร้างแผนใหม่",
-    "regenerating": "กำลังสร้างใหม่…",
-    "completedNote": "แผนนี้เสร็จสิ้นแล้ว ไม่สามารถสร้างใหม่ได้ในวันนี้",
     "empty": {
       "noGoal": "คุณยังไม่มีเป้าหมายการเรียนรู้ที่กำลังดำเนินอยู่ เป้าหมายจะกำหนดจำนวนนาทีต่อวันและสำรับที่ใช้วางแผน",
       "createGoal": "สร้างเป้าหมาย",
@@ -28,11 +25,6 @@
       "forbidden": "คุณไม่มีสิทธิ์เข้าถึง",
       "unknown": "ไม่สามารถสร้างแผนได้ กรุณาลองอีกครั้ง"
     },
-    "rate": {
-      "again": "ไม่รู้",
-      "partial": "ไม่แน่ใจ",
-      "known": "รู้แล้ว"
-    },
     "backToPlans": "แผนทั้งหมด",
     "extend": "เรียนเพิ่ม",
     "extending": "กำลังเพิ่ม…",
@@ -51,27 +43,6 @@
     "studyNote": "การให้คะแนนในหน้าเรียนจะตั้งรอบทบทวนถัดไปและบันทึกลงแผนของวันนี้พร้อมกัน",
     "byDeck": "แยกตามสำรับ",
     "deckDone": "เสร็จแล้ว",
-    "days": {
-      "label": "วัน",
-      "today": "วันนี้",
-      "tomorrow": "พรุ่งนี้",
-      "inDays": "อีก {{count, number}} วัน",
-      "inDays_one": "อีก {{count, number}} วัน",
-      "inDays_other": "อีก {{count, number}} วัน"
-    },
-    "forecast": {
-      "title": "วันนั้นจะเป็นอย่างไร",
-      "cards": "{{count, number}} ใบ",
-      "cards_one": "{{count, number}} ใบ",
-      "cards_other": "{{count, number}} ใบ",
-      "minutes": "ราว {{count, number}} นาที",
-      "minutes_one": "ราว {{count, number}} นาที",
-      "minutes_other": "ราว {{count, number}} นาที",
-      "breakdown": "ใหม่ {{newCards, number}} · ทบทวน {{reviewCards, number}}",
-      "empty": "วันนั้นดูเหมือนไม่มีการ์ดถึงกำหนด",
-      "loading": "กำลังคำนวณ…",
-      "note": "เป็นค่าประมาณ โดยสมมติว่าคุณไม่ได้เรียนอะไรเลยจนถึงวันนั้น ซึ่งเป็นสิ่งเดียวที่จะทำให้ตัวเลขเปลี่ยน"
-    },
     "composition": {
       "review": "ทบทวน {{count, number}} ใบ",
       "review_one": "ทบทวน {{count, number}} ใบ",
@@ -183,14 +154,9 @@
   },
   "history": {
     "title": "การเรียนล่าสุด",
-    "itemFallback": "การทำ {{type}}",
-    "youWrote": "คุณเขียนว่า: {{text}}",
     "recap": "{{count, number}} ใบ · {{minutes, number}} นาที · เฉลี่ย {{seconds, number}} วินาทีต่อใบ",
     "recap_one": "{{count, number}} ใบ · {{minutes, number}} นาที · เฉลี่ย {{seconds, number}} วินาทีต่อใบ",
     "recap_other": "{{count, number}} ใบ · {{minutes, number}} นาที · เฉลี่ย {{seconds, number}} วินาทีต่อใบ",
-    "reviewTitle": "ควรดูอีกครั้ง {{count, number}} ใบ",
-    "reviewTitle_one": "ควรดูอีกครั้ง {{count, number}} ใบ",
-    "reviewTitle_other": "ควรดูอีกครั้ง {{count, number}} ใบ",
     "band": {
       "known": "จำได้ {{count, number}}",
       "known_one": "จำได้ {{count, number}}",
@@ -200,44 +166,7 @@
       "partial_other": "ไม่แน่ใจ {{count, number}}",
       "missed": "จำไม่ได้ {{count, number}}",
       "missed_one": "จำไม่ได้ {{count, number}}",
-      "missed_other": "จำไม่ได้ {{count, number}}",
-      "partialShort": "ไม่แน่ใจ",
-      "missedShort": "จำไม่ได้"
-    },
-    "reviewCapped": "แสดง {{shown, number}} จาก {{total, number}} ใบ"
-  },
-  "enrichment": {
-    "explainCta": "อธิบาย (เครดิต)",
-    "requesting": "กำลังถาม…",
-    "costHint": "ใช้เครดิต AI จากกระเป๋าเงินของคุณ",
-    "action": {
-      "explain": "คำอธิบาย AI",
-      "hint": "คำใบ้สำหรับเรียน",
-      "compare": "เทียบกับคำตอบของฉัน"
-    },
-    "quote": "ประมาณ {{price}} ต่อคำขอ · ยอดคงเหลือ {{balance}}",
-    "groundedHint": "ตอบให้ตรงกับการทำครั้งนี้ ไม่ใช่แค่ตัวการ์ด",
-    "sources": "แหล่งอ้างอิง",
-    "noSources": "คำตอบนี้ไม่ได้อ้างอิงจากแหล่งข้อมูล",
-    "empty": "โมเดลไม่ส่งเนื้อหาที่ใช้ได้กลับมา",
-    "chargedNote": "หักเครดิตแล้ว — ทิ้งไปก็ไม่คืนเครดิต",
-    "keep": "เก็บไว้",
-    "discard": "ทิ้ง",
-    "later": "ตัดสินใจทีหลัง",
-    "saving": "กำลังบันทึก…",
-    "error": {
-      "BAD_REQUEST": "คำขอไม่ถูกต้อง",
-      "FORBIDDEN": "คุณไม่มีสิทธิ์เข้าถึงการ์ดนี้",
-      "GROUNDING_REQUIRED": "ไม่พบแหล่งอ้างอิงที่ใช้ได้ จึงปฏิเสธตอบแทนที่จะแต่งขึ้น",
-      "INSUFFICIENT_CREDITS": "เครดิต AI ไม่เพียงพอ กรุณาเติมเงินเพื่อดำเนินการต่อ",
-      "INVALID_RESULT": "คำตอบที่ได้มาใช้งานไม่ได้ กรุณาลองอีกครั้ง",
-      "NETWORK": "เกิดข้อผิดพลาดของเครือข่าย กรุณาตรวจสอบการเชื่อมต่อ",
-      "NOT_CONFIGURED": "เซิร์ฟเวอร์นี้ยังไม่ได้เปิดใช้งานการสร้างด้วย AI",
-      "PROVIDER_ERROR": "บริการ AI ขัดข้อง กรุณาลองอีกครั้ง",
-      "RATE_CAP": "คุณใช้คำขอ AI ของวันนี้ครบแล้ว ลองอีกครั้งพรุ่งนี้",
-      "UNKNOWN": "เกิดข้อผิดพลาด กรุณาลองอีกครั้ง",
-      "COMPARE_NO_ANSWER": "พิมพ์คำตอบก่อน — ยังไม่มีอะไรให้เทียบ",
-      "COMPARE_NO_REFERENCE": "การ์ดนี้ไม่ได้ระบุว่าช่องไหนคือคำตอบ จึงไม่มีเกณฑ์ให้เทียบ"
+      "missed_other": "จำไม่ได้ {{count, number}}"
     }
   },
   "insights": {

@@ -1,36 +1,4 @@
 {
-  "enrichment": {
-    "action": {
-      "compare": "Compare my answer",
-      "explain": "AI explanation",
-      "hint": "Study hint"
-    },
-    "chargedNote": "Already charged — discarding does not refund the credits.",
-    "costHint": "Uses AI credits from your wallet",
-    "discard": "Discard",
-    "error": {
-      "BAD_REQUEST": "That request was not valid.",
-      "COMPARE_NO_ANSWER": "Write your answer first — there is nothing to compare yet.",
-      "COMPARE_NO_REFERENCE": "This card does not mark which field is the answer, so there is nothing to compare against.",
-      "FORBIDDEN": "You don't have access to that card.",
-      "GROUNDING_REQUIRED": "No citable source was found, so the answer was refused rather than made up.",
-      "INSUFFICIENT_CREDITS": "Not enough AI credits. Top up to continue.",
-      "INVALID_RESULT": "The answer came back unusable. Please try again.",
-      "NETWORK": "Network error. Check your connection.",
-      "NOT_CONFIGURED": "AI generation is not enabled on this server.",
-      "PROVIDER_ERROR": "The AI service failed. Please try again.",
-      "RATE_CAP": "You've hit today's AI request limit. Try again tomorrow.",
-      "UNKNOWN": "Something went wrong. Please try again."
-    },
-    "explainCta": "Explain (credits)",
-    "groundedHint": "Answers this attempt, not just the card",
-    "keep": "Keep",
-    "later": "Decide later",
-    "noSources": "This answer is not source-based.",
-    "quote": "About {{price}} per request · {{balance}} left",
-    "requesting": "Asking…",
-    "sources": "Sources"
-  },
   "form": {
     "cancel": "Cancel",
     "decks": "Decks to study",
@@ -132,17 +100,12 @@
     }
   },
   "history": {
-    "itemFallback": "{{type}} attempt",
     "title": "Recent study",
     "title_one": "Recent attempt ({{count, number}})",
     "title_other": "Recent attempts ({{count, number}})",
-    "youWrote": "You wrote: {{text}}",
     "recap": "{{count, number}} cards · {{minutes, number}} min · {{seconds, number}}s per card on average",
     "recap_one": "{{count, number}} card · {{minutes, number}} min · {{seconds, number}}s per card on average",
     "recap_other": "{{count, number}} cards · {{minutes, number}} min · {{seconds, number}}s per card on average",
-    "reviewTitle": "{{count, number}} to look at again",
-    "reviewTitle_one": "{{count, number}} to look at again",
-    "reviewTitle_other": "{{count, number}} to look at again",
     "band": {
       "known": "{{count, number}} knew it",
       "known_one": "{{count, number}} knew it",
@@ -152,11 +115,8 @@
       "partial_other": "{{count, number}} shaky",
       "missed": "{{count, number}} missed",
       "missed_one": "{{count, number}} missed",
-      "missed_other": "{{count, number}} missed",
-      "partialShort": "Shaky",
-      "missedShort": "Missed"
-    },
-    "reviewCapped": "Showing {{shown, number}} of {{total, number}}."
+      "missed_other": "{{count, number}} missed"
+    }
   },
   "insights": {
     "accuracy": "Accuracy",
@@ -217,13 +177,6 @@
       "study": "Study"
     },
     "progress": "{{done, number}} of {{total, number}} done",
-    "rate": {
-      "again": "Didn't know",
-      "known": "Knew it",
-      "partial": "Partly"
-    },
-    "regenerate": "Rebuild plan",
-    "regenerating": "Rebuilding…",
     "title": "Today's plan",
     "backToPlans": "All plans",
     "extend": "Study more",
@@ -243,27 +196,6 @@
     "studyNote": "Rating a card there schedules its next review and ticks it off this plan.",
     "byDeck": "By deck",
     "deckDone": "Done",
-    "days": {
-      "label": "Day",
-      "today": "Today",
-      "tomorrow": "Tomorrow",
-      "inDays": "In {{count, number}} days",
-      "inDays_one": "In {{count, number}} days",
-      "inDays_other": "In {{count, number}} days"
-    },
-    "forecast": {
-      "title": "What that day looks like",
-      "cards": "{{count, number}} cards",
-      "cards_one": "{{count, number}} cards",
-      "cards_other": "{{count, number}} cards",
-      "minutes": "about {{count, number}} min",
-      "minutes_one": "about {{count, number}} min",
-      "minutes_other": "about {{count, number}} min",
-      "breakdown": "{{newCards, number}} new · {{reviewCards, number}} review",
-      "empty": "Nothing looks due on that day.",
-      "loading": "Working it out…",
-      "note": "An estimate. It assumes nothing gets studied between now and then — which is the one thing that will change it."
-    },
     "composition": {
       "review": "{{count, number}} reviews",
       "review_one": "{{count, number}} review",
