@@ -1,24 +1,18 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router-dom'
 import { Play, Check } from 'lucide-react'
 import {
   useLearningStore,
-  type LearningGoalWithDecks, type AttemptRow, type RemediationAction, type GoalKnowledge,
+  type LearningGoalWithDecks, type GoalKnowledge,
 } from '../../stores/learning-store'
 import { currentPlanContext } from '../../lib/learning-plan-date'
-import { cardPromptLabel } from '@reeeeecall/shared/lib/card-prompt'
-import {
-  attemptNeedsRemediation, attemptTypedAnswer,
-} from '@reeeeecall/shared/lib/learning-attempt-selection'
-import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { planComposition } from '@reeeeecall/shared/lib/plan-composition'
-import { studyRecap, scoreBand } from '@reeeeecall/shared/lib/study-recap'
+import { studyRecap } from '@reeeeecall/shared/lib/study-recap'
 import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
 import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
 import { useDeckStore } from '../../stores/deck-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
-import { EnrichmentModal } from './EnrichmentModal'
 
 /**
  * One goal's plan — today, and the days after it.
@@ -45,12 +39,17 @@ import { EnrichmentModal } from './EnrichmentModal'
  * decks, so a plan covering three decks is three sessions. The deck list below is that fact made
  * visible rather than hidden behind a single button that would silently study only one of them.
  *
- * ## The days after today
+ * ## Why there is no forecast for the days after today
  *
- * A forecast, never a stored plan. Saving one would spend a `save_daily_plan` write on a ranking
- * computed from today's SRS state, and anything studied in between would invalidate it while it
- * sat in the database looking authoritative. So the future days run the planner and keep only
- * the shape, and say on screen that that is what they are.
+ * There was one: a strip of seven date chips, each running the real planner with `now` moved
+ * forward. Correct, and empty. The forecast had to assume nothing is studied between now and
+ * then, so the candidate pool never shrank and the daily budget filled the same way every time
+ * — a learner 18 reviews behind read "28장" seven times in a row. Seven chips that all say one
+ * thing look like information and are not.
+ *
+ * Making it real would mean simulating the SRS forward through ratings nobody has given yet,
+ * which trades one unfounded assumption for a subtler one. So the screen shows the day it can
+ * actually speak for.
  *
  * ## Why there is no per-card list
  *
@@ -67,61 +66,27 @@ import { EnrichmentModal } from './EnrichmentModal'
  */
 
 
-/** Rows shown in the attempt list. The store loads 50; everything on screen counts these. */
-const ATTEMPT_ROWS = 10
-
-/** How far ahead the day strip looks. A week is as far as a forecast stays worth reading. */
-const FORECAST_DAYS = 6
-
-const DAY_MS = 86_400_000
-
 /**
- * The two remediation actions the SERVER serves.
+ * How the day went.
  *
- * `compare` is offered only where the learner actually wrote something, because the server
- * refuses an ungrounded compare and a button that spends a request to earn a refusal is worse
- * than no button at all.
- */
-const REMEDIATION_ACTIONS: ReadonlyArray<{
-  action: RemediationAction
-  labelKey: string
-  offeredFor: (attempt: AttemptRow) => boolean
-}> = [
-  { action: 'explain', labelKey: 'enrichment.action.explain', offeredFor: () => true },
-  { action: 'hint', labelKey: 'enrichment.action.hint', offeredFor: () => true },
-  {
-    action: 'compare',
-    labelKey: 'enrichment.action.compare',
-    offeredFor: (attempt) => attemptTypedAnswer(attempt) !== null,
-  },
-]
-
-/**
- * How the day went, and the cards worth another look.
+ * Two removals got it here. It was "최근 시도": one row per attempt, each a card prompt with a
+ * rating word and a timestamp — a column of vocabulary that answered no question, in the one
+ * place a learner has actually finished something. That collapsed into three numbers, leaving
+ * only the missed cards listed, because those were the rows that carried the paid AI actions.
  *
- * This used to be "최근 시도": one row per attempt, each a card prompt with a rating word and a
- * timestamp beside it. Twenty rows of vocabulary that answered no question — the same failure as
- * the per-card plan list, in the one place a learner has actually finished something and might
- * want to know how it went.
- *
- * So the rows collapse into three numbers (how much, how long, how it went) and what remains
- * listed is only what has something to DO on it: the cards that were missed, which is exactly
- * where paid remediation was already offered. Cards the learner said they KNEW are counted and
- * not printed — there is nothing to ask about them.
+ * Then the AI actions went too, and with them the only reason to name a card here. A list of
+ * words you got wrong, with nothing to do about them, is the thing this section was already
+ * fixed once for. What is left is the answer to "how did I do?" and nothing else.
  */
 function AttemptHistory({ goalId, planDate }: { goalId: string; planDate: string }) {
-  const { t, i18n } = useTranslation('learning')
-  const {
-    attempts, attemptsLoading, planCards, planTemplateFields, fetchAttempts,
-    requestEnrichment, enrichmentPendingCardId, enrichmentQuote, loadEnrichmentQuote,
-  } = useLearningStore()
+  const { t } = useTranslation('learning')
+  const { attempts, attemptsLoading, fetchAttempts } = useLearningStore()
 
   useEffect(() => { void fetchAttempts(goalId) }, [goalId, fetchAttempts])
 
-  // Filtered by goal, NOT rendered straight from the store. `fetchAttempts` never clears
+  // Filtered by goal, NOT rendered straight from the store: `fetchAttempts` never clears
   // `attempts` — it only flips `attemptsLoading` — so after a goal switch the previous goal's
-  // rows stay painted until the new read lands. Those rows carry real card and attempt ids, so
-  // clicking one would spend credits explaining a card from the goal the learner just left.
+  // rows stay counted until the new read lands, and the recap would describe the wrong goal.
   const goalAttempts = useMemo(
     () => attempts.filter((attempt) => attempt.goal_id === goalId),
     [attempts, goalId],
@@ -130,9 +95,8 @@ function AttemptHistory({ goalId, planDate }: { goalId: string; planDate: string
   /**
    * The day the screen is showing, not "the last 50 rows".
    *
-   * The store reads 50 attempts for the goal with no date bound, and the old list simply took
-   * the first ten of them — so a learner returning after a week saw last week's words under a
-   * heading about now. A recap has to name a period, and this screen's period is its plan date.
+   * The store reads 50 attempts for the goal with no date bound, so without this a learner
+   * returning after a week would read last week's work under a heading about now.
    */
   const todaysAttempts = useMemo(
     () => goalAttempts.filter((attempt) => utcToLocalDateKey(attempt.created_at) === planDate),
@@ -140,46 +104,13 @@ function AttemptHistory({ goalId, planDate }: { goalId: string; planDate: string
   )
   const recap = useMemo(() => studyRecap(todaysAttempts), [todaysAttempts])
 
-  // Only what can be acted on stays a row. Capped, and the cap is stated below rather than
-  // silently swallowing the rest.
-  const reviewable = useMemo(
-    () => todaysAttempts.filter((attempt) => attemptNeedsRemediation(attempt) && attempt.card_id),
-    [todaysAttempts],
-  )
-  const visibleAttempts = useMemo(() => reviewable.slice(0, ATTEMPT_ROWS), [reviewable])
-
-  /**
-   * Paid remediation is offered only where there is a premise for it: a miss or a partial
-   * recall, on a row that actually names a card. An attempt the learner just said they KNEW
-   * has nothing to remediate, and charging for one would be selling an answer to a question
-   * the learner did not ask.
-   */
-  const canRemediate = (attempt: AttemptRow): boolean =>
-    attemptNeedsRemediation(attempt) && Boolean(attempt.card_id)
-  const offersRemediation = visibleAttempts.some(canRemediate)
-
-  // Read the wallet only once a row that can be acted on exists, and RE-read it when a request
-  // finishes, because that request just debited the balance this line is quoting.
-  useEffect(() => {
-    if (!offersRemediation || enrichmentPendingCardId !== null) return
-    void loadEnrichmentQuote()
-  }, [offersRemediation, enrichmentPendingCardId, loadEnrichmentQuote])
-
-  // The store's in-flight guard is GLOBAL, so a second click anywhere is silently dropped.
-  // Disable every button while one request is running rather than let a row look clickable.
-  const requestBusy = enrichmentPendingCardId !== null
-
-  // Which ROW is waiting, not which card: someone who missed the same card twice has two rows
-  // sharing one card_id, and keying on the card would make both claim to be the pending one.
-  const [requestingAttemptId, setRequestingAttemptId] = useState<string | null>(null)
-
-  // Nothing studied today is not an error and not an empty state — it is simply a day that has
-  // not started, and the card above already says so.
+  // Nothing studied today is not an error and not an empty state — it is a day that has not
+  // started, and the card above already says so.
   if (attemptsLoading && todaysAttempts.length === 0) return null
   if (recap.count === 0) return null
 
   // Each band omitted when empty: "몰랐음 0" is a sentence about nothing, and a learner who got
-  // everything right should read three words, not a row of zeroes.
+  // everything right should read one word, not a row of zeroes.
   const bands = [
     recap.known > 0 ? t('history.band.known', { count: recap.known }) : null,
     recap.partial > 0 ? t('history.band.partial', { count: recap.partial }) : null,
@@ -189,8 +120,6 @@ function AttemptHistory({ goalId, planDate }: { goalId: string; planDate: string
   return (
     <section className="pt-2">
       <h2 className="text-sm font-medium text-foreground">{t('history.title')}</h2>
-
-      {/* How much, how long, how it went — the three things the list of words never said. */}
       <div className="mt-2 rounded-xl border border-border bg-card p-3" data-testid="study-recap">
         <p className="text-sm text-foreground">
           {t('history.recap', {
@@ -201,94 +130,6 @@ function AttemptHistory({ goalId, planDate }: { goalId: string; planDate: string
         </p>
         {bands && <p className="mt-1 text-xs text-content-tertiary">{bands}</p>}
       </div>
-
-      {visibleAttempts.length > 0 && (
-        <h3 className="mt-3 text-xs font-medium text-muted-foreground">
-          {t('history.reviewTitle', { count: reviewable.length })}
-        </h3>
-      )}
-      {/* What the charge buys, as VISIBLE text rather than a `title` tooltip — a tooltip never
-          reaches a keyboard or touch user. */}
-      {offersRemediation && (
-        <p className="mt-0.5 text-[11px] text-content-tertiary">
-          {t('enrichment.groundedHint')}
-          {/* The price is stated before the click, never in an error afterwards. A quote that
-              could not be read renders NOTHING — `$0.00` would be a lie in the direction that
-              costs the learner money. */}
-          {enrichmentQuote && (
-            <> · {t('enrichment.quote', {
-              price: formatUsdMicro(enrichmentQuote.estPriceMicro),
-              balance: formatUsdMicro(enrichmentQuote.balanceMicro),
-            })}</>
-          )}
-        </p>
-      )}
-      {visibleAttempts.length > 0 && (
-      <ul className="mt-2 divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
-        {visibleAttempts.map((attempt) => {
-          const card = attempt.card_id ? planCards[attempt.card_id] : undefined
-          const label = cardPromptLabel(card?.field_values, card?.template_id, planTemplateFields)
-          const remediable = canRemediate(attempt)
-          const pending = requestingAttemptId === attempt.id
-          const rowName = label || t('history.itemFallback', { type: attempt.activity_type })
-          const typedAnswer = attemptTypedAnswer(attempt)
-          const band = scoreBand(attempt.normalized_score)
-          return (
-            <li key={attempt.id} className="flex items-center justify-between gap-3 px-3 py-2">
-              <span className="min-w-0">
-                <span className="block truncate text-xs text-foreground">{rowName}</span>
-                {typedAnswer && (
-                  <span className="block truncate text-[11px] text-content-tertiary">
-                    {t('history.youWrote', { text: typedAnswer })}
-                  </span>
-                )}
-              </span>
-              <span className="flex shrink-0 items-center gap-2">
-                {/* Which KIND of miss — "애매함" and "몰랐음" want different help. The timestamp
-                    that used to sit here is gone: every row is from today, and the clock time of
-                    a flashcard is not something anyone came here to read. */}
-                {band !== null && band !== 'known' && (
-                  <span className="text-xs text-content-tertiary">{t(`history.band.${band}Short`)}</span>
-                )}
-                {pending && (
-                  <span className="text-xs text-content-tertiary">{t('enrichment.requesting')}</span>
-                )}
-                {remediable && REMEDIATION_ACTIONS.filter(({ offeredFor }) => offeredFor(attempt)).map(({ action, labelKey }) => (
-                  <button
-                    key={action}
-                    type="button"
-                    disabled={requestBusy}
-                    onClick={() => {
-                      setRequestingAttemptId(attempt.id)
-                      void requestEnrichment({
-                        action,
-                        goalId,
-                        cardId: attempt.card_id as string,
-                        attemptId: attempt.id,
-                        uiLang: i18n.language,
-                      }).finally(() => setRequestingAttemptId(null))
-                    }}
-                    // Every row offers the same labels, so the text alone would give up to 20
-                    // buttons two accessible names between them.
-                    aria-label={`${t(labelKey)} — ${rowName}`}
-                    className="cursor-pointer text-xs text-brand hover:underline disabled:opacity-50"
-                  >
-                    {t(labelKey)}
-                  </button>
-                ))}
-              </span>
-            </li>
-          )
-        })}
-      </ul>
-      )}
-
-      {/* Say what was left out. A silent top-N reads as "that was all of them". */}
-      {reviewable.length > ATTEMPT_ROWS && (
-        <p className="mt-1 text-[11px] text-content-tertiary">
-          {t('history.reviewCapped', { shown: ATTEMPT_ROWS, total: reviewable.length })}
-        </p>
-      )}
     </section>
   )
 }
@@ -342,8 +183,6 @@ export function LearningTodayPage() {
     planBlockedReason,
     fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
     extendPlan, planExtending, planExtension,
-    planForecast, planForecastLoading, forecastPlan,
-    enrichment, enrichmentError,
     knowledge, fetchGoalKnowledge,
   } = useLearningStore()
   const { decks, fetchDecks } = useDeckStore()
@@ -354,8 +193,6 @@ export function LearningTodayPage() {
   // One context per mount: the plan date must not drift mid-session, and the planner's
   // `now` is part of its input fingerprint.
   const ctx = useMemo(() => currentPlanContext(), [])
-  /** 0 = today. Anything above it is a forecast, never a saved plan. */
-  const [dayOffset, setDayOffset] = useState(0)
 
   useEffect(() => { void fetchGoals() }, [fetchGoals])
   useEffect(() => { void fetchDecks() }, [fetchDecks])
@@ -401,24 +238,6 @@ export function LearningTodayPage() {
   useEffect(() => {
     if (selectedGoalId) void fetchGoalKnowledge(selectedGoalId, judgedAt)
   }, [selectedGoalId, judgedAt, fetchGoalKnowledge])
-
-  /** The day the strip is pointing at. `dayOffset === 0` is the real, saved plan. */
-  const viewedDate = useMemo(
-    () => new Date(Date.parse(`${ctx.planDate}T00:00:00Z`) + dayOffset * DAY_MS)
-      .toISOString().slice(0, 10),
-    [ctx.planDate, dayOffset],
-  )
-
-  // Forecast on demand, once per date. It runs the real planner, so it is not free — but every
-  // quota and destructive cost lives in the SAVE, which this deliberately never does.
-  useEffect(() => {
-    if (dayOffset === 0 || !goal) return
-    void forecastPlan(goal, {
-      ...ctx,
-      planDate: viewedDate,
-      now: new Date(Date.parse(ctx.now) + dayOffset * DAY_MS).toISOString(),
-    })
-  }, [dayOffset, goal, ctx, viewedDate, forecastPlan])
 
   /**
    * The day's work, split by deck, because a study session cannot span decks.
@@ -485,14 +304,6 @@ export function LearningTodayPage() {
     }
   }
 
-  const dayLabel = (offset: number) => {
-    if (offset === 0) return t('today.days.today')
-    if (offset === 1) return t('today.days.tomorrow')
-    return t('today.days.inDays', { count: offset })
-  }
-
-  const forecast = planForecast[viewedDate]
-
   return (
     <div className="mx-auto max-w-2xl space-y-4 p-4">
       <div className="flex items-center justify-between gap-3">
@@ -502,75 +313,16 @@ export function LearningTodayPage() {
         </Link>
       </div>
 
-      {/* Where this goal stands overall — unchanged by which day the strip is showing. */}
+      {/* Where this goal stands overall. */}
       <GoalProgress knowledge={knowledge[selectedGoalId] ?? null} />
 
-      {/* ── Day strip ─────────────────────────────────────────────────────────
-          Today is the plan; the rest are forecasts. They are the same control on
-          purpose — "what is coming" is one question — but the panel below always
-          says which of the two the learner is looking at. */}
-      <div
-        role="tablist"
-        aria-label={t('today.days.label')}
-        className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-1"
-      >
-        {Array.from({ length: FORECAST_DAYS + 1 }, (_, offset) => {
-          const selected = offset === dayOffset
-          return (
-            <button
-              key={offset}
-              type="button"
-              role="tab"
-              aria-selected={selected}
-              onClick={() => setDayOffset(offset)}
-              className={`shrink-0 cursor-pointer rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                selected
-                  ? 'border-brand bg-brand text-white'
-                  : 'border-border bg-card text-muted-foreground hover:bg-accent'
-              }`}
-            >
-              {dayLabel(offset)}
-            </button>
-          )
-        })}
-      </div>
-
-      {planError && dayOffset === 0 && (
+      {planError && (
         <div role="alert" className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
           {t(errorMessageKey(planError.code))}
         </div>
       )}
 
-      {dayOffset > 0 ? (
-        /* ── A day that has not happened ─────────────────────────────────── */
-        <section className="rounded-xl border border-border bg-card p-4" aria-label={t('today.forecast.title')}>
-          <h2 className="text-sm font-medium text-foreground">{t('today.forecast.title')}</h2>
-          {planForecastLoading === viewedDate ? (
-            <p className="mt-2 text-sm text-muted-foreground" aria-live="polite">
-              {t('today.forecast.loading')}
-            </p>
-          ) : forecast ? (
-            <>
-              <p className="mt-2 text-2xl font-semibold tabular-nums text-foreground">
-                {t('today.forecast.cards', { count: forecast.totalItems })}
-              </p>
-              <p className="mt-0.5 text-sm text-muted-foreground">
-                {t('today.forecast.minutes', { count: Math.max(1, Math.round(forecast.estimatedMinutes)) })}
-                {' · '}
-                {t('today.forecast.breakdown', {
-                  newCards: forecast.newCards, reviewCards: forecast.reviewCards,
-                })}
-              </p>
-            </>
-          ) : (
-            <p className="mt-2 text-sm text-muted-foreground">{t('today.forecast.empty')}</p>
-          )}
-          {/* Said every time, not once: the number above is only as good as the assumption
-              that nothing is studied between now and then, which is exactly the assumption a
-              learner reading a plan is about to break. */}
-          <p className="mt-2 text-[11px] text-content-tertiary">{t('today.forecast.note')}</p>
-        </section>
-      ) : planBlockedReason === 'no_decks' && goal ? (
+      {planBlockedReason === 'no_decks' && goal ? (
         <div className="rounded-xl border border-border bg-card p-4 text-center">
           <p className="text-sm text-muted-foreground">{t('today.empty.noDecks')}</p>
           <Link to="/learning" className="mt-3 inline-block text-sm text-brand hover:underline">
@@ -674,17 +426,22 @@ export function LearningTodayPage() {
             </section>
           )}
 
-          {/* "더 하기" comes first and is the primary of the two: rebuilding DELETES every item
-              and zeroes the day's progress, so the additive option has to be easier to reach. */}
+          {/* "더 하기" appears only once the day is actually finished.
+              Offering it beside "28장 남음" invited a learner to grow a list they had not
+              started — and every card added today comes back tomorrow, so the button's real
+              cost lands on a day they have not seen yet. It is an "I want more", not an
+              "instead of". */}
           <div className="flex flex-col gap-2">
-            <button
-              type="button"
-              onClick={() => { if (goal) void extendPlan(goal, ctx) }}
-              disabled={planExtending || planGenerating || !goal}
-              className="w-full cursor-pointer rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent disabled:opacity-50"
-            >
-              {planExtending ? t('today.extending') : t('today.extend')}
-            </button>
+            {pendingTotal === 0 && (
+              <button
+                type="button"
+                onClick={() => { if (goal) void extendPlan(goal, ctx) }}
+                disabled={planExtending || planGenerating || !goal}
+                className="w-full cursor-pointer rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent disabled:opacity-50"
+              >
+                {planExtending ? t('today.extending') : t('today.extend')}
+              </button>
+            )}
 
             {planExtension && (
               <p className="text-center text-xs text-content-tertiary" aria-live="polite">
@@ -703,17 +460,6 @@ export function LearningTodayPage() {
               </p>
             )}
 
-            <button
-              type="button"
-              onClick={() => { if (goal) void generatePlan(goal, ctx) }}
-              disabled={planGenerating || planExtending || plan.status === 'completed'}
-              className="w-full cursor-pointer rounded-lg px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-accent disabled:opacity-50"
-            >
-              {planGenerating ? t('today.regenerating') : t('today.regenerate')}
-            </button>
-            {plan.status === 'completed' && (
-              <p className="text-center text-xs text-content-tertiary">{t('today.completedNote')}</p>
-            )}
           </div>
         </>
       ) : planGenerating || autoWillRun ? (
@@ -735,16 +481,7 @@ export function LearningTodayPage() {
         </button>
       )}
 
-      {enrichmentError && (
-        <div role="alert" className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
-          {t(`enrichment.error.${enrichmentError}`)}
-        </div>
-      )}
-      {enrichment && <EnrichmentModal preview={enrichment} />}
-
-      {/* Kept on today only: the remediation offer is grounded in an attempt, and a day that
-          has not happened has none. */}
-      {dayOffset === 0 && <AttemptHistory goalId={selectedGoalId} planDate={ctx.planDate} />}
+      <AttemptHistory goalId={selectedGoalId} planDate={ctx.planDate} />
     </div>
   )
 }
