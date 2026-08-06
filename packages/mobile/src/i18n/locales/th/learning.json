@@ -123,17 +123,40 @@
     "title": "เป้าหมายการเรียนรู้",
     "delete": "ลบ",
     "deleteConfirmTitle": "ลบแผนนี้ไหม",
-    "deleteConfirmMessage": "\"{{title}}\" และแผนรายวันทั้งหมดที่แผนนี้สร้างไว้จะหายไปถาวร ประวัติการเรียนและการ์ดของคุณยังอยู่ ลบเฉพาะแผนเท่านั้น การทำรายการนี้ย้อนกลับไม่ได้"
+    "deleteConfirmMessage": "\"{{title}}\" และแผนรายวันทั้งหมดที่แผนนี้สร้างไว้จะหายไปถาวร ประวัติการเรียนและการ์ดของคุณยังอยู่ ลบเฉพาะแผนเท่านั้น การทำรายการนี้ย้อนกลับไม่ได้",
+    "archived": {
+      "show": "ดูคลังเก็บ",
+      "hide": "ซ่อนคลังเก็บ",
+      "empty": "ยังไม่มีแผนที่เก็บไว้",
+      "restore": "เปิดใช้อีกครั้ง"
+    }
   },
   "history": {
     "itemFallback": "การทำ {{type}}",
-    "score": {
-      "unknown": "ไม่มีคะแนน"
-    },
-    "title": "การทำล่าสุด ({{count, number}})",
+    "title": "การเรียนล่าสุด",
     "title_one": "การทำล่าสุด ({{count, number}})",
     "title_other": "การทำล่าสุด ({{count, number}})",
-    "youWrote": "คุณเขียนว่า: {{text}}"
+    "youWrote": "คุณเขียนว่า: {{text}}",
+    "recap": "{{count, number}} ใบ · {{minutes, number}} นาที · เฉลี่ย {{seconds, number}} วินาทีต่อใบ",
+    "recap_one": "{{count, number}} ใบ · {{minutes, number}} นาที · เฉลี่ย {{seconds, number}} วินาทีต่อใบ",
+    "recap_other": "{{count, number}} ใบ · {{minutes, number}} นาที · เฉลี่ย {{seconds, number}} วินาทีต่อใบ",
+    "reviewTitle": "ควรดูอีกครั้ง {{count, number}} ใบ",
+    "reviewTitle_one": "ควรดูอีกครั้ง {{count, number}} ใบ",
+    "reviewTitle_other": "ควรดูอีกครั้ง {{count, number}} ใบ",
+    "band": {
+      "known": "จำได้ {{count, number}}",
+      "known_one": "จำได้ {{count, number}}",
+      "known_other": "จำได้ {{count, number}}",
+      "partial": "ไม่แน่ใจ {{count, number}}",
+      "partial_one": "ไม่แน่ใจ {{count, number}}",
+      "partial_other": "ไม่แน่ใจ {{count, number}}",
+      "missed": "จำไม่ได้ {{count, number}}",
+      "missed_one": "จำไม่ได้ {{count, number}}",
+      "missed_other": "จำไม่ได้ {{count, number}}",
+      "partialShort": "ไม่แน่ใจ",
+      "missedShort": "จำไม่ได้"
+    },
+    "reviewCapped": "แสดง {{shown, number}} จาก {{total, number}} ใบ"
   },
   "insights": {
     "accuracy": "ความถูกต้อง",
@@ -171,11 +194,6 @@
     "title": "คำแนะนำ"
   },
   "today": {
-    "answer": {
-      "label": "คำตอบของคุณ (ไม่บังคับ)",
-      "note": "บันทึกไว้พร้อมการทำครั้งนี้ ไม่มีการให้คะแนน — คุณยังประเมินตัวเองเอง",
-      "placeholder": "พิมพ์สิ่งที่คุณจำได้"
-    },
     "budget": "{{count, number}} นาที/วัน",
     "empty": {
       "createGoal": "สร้างเป้าหมาย",
@@ -195,28 +213,15 @@
     "generate": "สร้างแผนวันนี้",
     "generating": "กำลังสร้าง…",
     "item": {
-      "minutes": "~{{count, decimal}} นาที",
-      "recorded": "บันทึกแล้ว",
       "untitled": "(ไม่มีข้อความ)",
       "study": "เรียน"
     },
     "progress": "เสร็จ {{done, number}} จาก {{total, number}}",
     "rate": {
       "again": "ไม่รู้",
-      "hint": "บันทึกการทำครั้งนี้เท่านั้น — ไม่เปลี่ยนกำหนดการทบทวน",
       "known": "รู้แล้ว",
       "partial": "ไม่แน่ใจ"
     },
-    "reason": {
-      "balanced": "ผสมสมดุล",
-      "due": "ถึงกำหนดทบทวน",
-      "goalRelevance": "ความเกี่ยวข้องกับเป้าหมาย",
-      "importance": "ความสำคัญ",
-      "memoryRisk": "ใกล้ลืม",
-      "recentFailure": "ตอบผิดเมื่อเร็ว ๆ นี้",
-      "slowResponse": "ตอบช้า"
-    },
-    "recallChance": "โอกาสที่ยังจำได้ประมาณ {{percent}}%",
     "regenerate": "สร้างแผนใหม่",
     "regenerating": "กำลังสร้างใหม่…",
     "title": "แผนวันนี้",
@@ -238,7 +243,6 @@
     "studyNote": "การให้คะแนนในหน้าเรียนจะตั้งรอบทบทวนถัดไปและบันทึกลงแผนของวันนี้พร้อมกัน",
     "byDeck": "แยกตามสำรับ",
     "deckDone": "เสร็จแล้ว",
-    "listTitle": "รายการวันนี้",
     "days": {
       "label": "วัน",
       "today": "วันนี้",
@@ -259,14 +263,28 @@
       "empty": "วันนั้นดูเหมือนไม่มีการ์ดถึงกำหนด",
       "loading": "กำลังคำนวณ…",
       "note": "เป็นค่าประมาณ โดยสมมติว่าคุณไม่ได้เรียนอะไรเลยจนถึงวันนั้น ซึ่งเป็นสิ่งเดียวที่จะทำให้ตัวเลขเปลี่ยน"
+    },
+    "composition": {
+      "review": "ทบทวน {{count, number}} ใบ",
+      "review_one": "ทบทวน {{count, number}} ใบ",
+      "review_other": "ทบทวน {{count, number}} ใบ",
+      "fresh": "ใหม่ {{count, number}} ใบ",
+      "fresh_one": "ใหม่ {{count, number}} ใบ",
+      "fresh_other": "ใหม่ {{count, number}} ใบ"
     }
   },
   "progress": {
     "title": "ความคืบหน้า",
-    "knownNow": "จำได้ {{known, number}} จาก {{total, number}} ใบ",
-    "breakdown": "แม่น {{known, number}} · คลอนแคลน {{shaky, number}} · ยังไม่เริ่ม {{unseen, number}}",
     "daysLeft": "เหลือ {{count, number}} วัน",
     "daysLeft_one": "เหลือ {{count, number}} วัน",
-    "daysLeft_other": "เหลือ {{count, number}} วัน"
+    "daysLeft_other": "เหลือ {{count, number}} วัน",
+    "withinWindow": "{{known, number}} จาก {{attempted, number}} ใบที่เรียนแล้วยังอยู่ในรอบทบทวน",
+    "notStarted": "ยังไม่ได้เริ่มเรียน · ทั้งหมด {{total, number}} ใบ",
+    "overdue": "เลยกำหนดทบทวน {{count, number}} ใบ",
+    "overdue_one": "เลยกำหนดทบทวน {{count, number}} ใบ",
+    "overdue_other": "เลยกำหนดทบทวน {{count, number}} ใบ",
+    "unstudied": "ยังไม่ได้เรียน {{count, number}} ใบ",
+    "unstudied_one": "ยังไม่ได้เรียน {{count, number}} ใบ",
+    "unstudied_other": "ยังไม่ได้เรียน {{count, number}} ใบ"
   }
 }

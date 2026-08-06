@@ -7,16 +7,28 @@ import { ListSkeleton } from '../../components/common/Skeleton'
 import { GoalFormModal, type GoalFormValues } from './GoalFormModal'
 
 /**
- * Goal list + create/edit/archive.
+ * Goal list + create/edit/archive, with the archive itself behind a drawer.
  *
- * Archived goals are not listed: `update_learning_goal`, `set_learning_goal_decks` and
- * `save_daily_plan` all reject them, so showing one would only offer dead actions. The
- * archive confirmation says so rather than implying it is a soft hide.
+ * ## Why the archive is a separate list
+ *
+ * Archived goals cannot be planned or edited — `update_learning_goal`, `set_learning_goal_decks`
+ * and `save_daily_plan` all reject them — so mixing them into the working list would offer three
+ * buttons that answer P0007. They get their own list, where the only thing offered is the one
+ * thing that works.
+ *
+ * ## Why the archive is visible at all
+ *
+ * It was not, and that made 보관 strictly worse than 삭제. The status flip was real, but
+ * `fetchGoals` filtered the row out with `.neq('status','archived')` and no screen anywhere read
+ * it back — so "보관" meant "hide forever", while the goal, its deck links and every daily plan it
+ * ever produced sat in the database unreachable. The server had allowed `archived → active` since
+ * mig 167 and nothing had ever called it. This is the missing half.
  */
 export function LearningGoalsPage() {
   const { t } = useTranslation('learning')
   const {
     goals, goalsLoading, goalsError, fetchGoals, createGoal, updateGoal, archiveGoal, deleteGoal,
+    archivedGoals, archivedGoalsLoading, fetchArchivedGoals, restoreGoal,
   } = useLearningStore()
   const confirm = useConfirmStore((state) => state.confirm)
   const navigate = useNavigate()
@@ -24,6 +36,7 @@ export function LearningGoalsPage() {
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<LearningGoalWithDecks | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [archiveOpen, setArchiveOpen] = useState(false)
 
   useEffect(() => { void fetchGoals() }, [fetchGoals])
 
@@ -65,6 +78,30 @@ export function LearningGoalsPage() {
       danger: true,
     })
     if (ok) await archiveGoal(goal.id)
+  }
+
+  /**
+   * Open the drawer, and read the archive the first time it is opened.
+   *
+   * Not read on mount: almost nobody has an archived goal, and every session would pay for the
+   * query. `archivedGoals === null` is "never asked", which is why the store starts it at null
+   * rather than at `[]` — an empty array would let the drawer say the archive is empty before
+   * anything had looked.
+   */
+  const toggleArchive = () => {
+    const next = !archiveOpen
+    setArchiveOpen(next)
+    if (next && archivedGoals === null) void fetchArchivedGoals()
+  }
+
+  /**
+   * Restore, with no confirmation.
+   *
+   * Nothing is destroyed and the button that undoes it is right there, so a modal would only be
+   * ceremony. Archive and delete ask because both take something away.
+   */
+  const handleRestore = async (goal: LearningGoalWithDecks) => {
+    await restoreGoal(goal.id)
   }
 
   /**
@@ -192,6 +229,77 @@ export function LearningGoalsPage() {
           ))}
         </ul>
       )}
+
+      {/* ── The archive ────────────────────────────────────────────────────
+          Collapsed by default and never louder than the working list: it is where finished
+          goals go, not a second inbox. */}
+      <div className="pt-2">
+        <button
+          type="button"
+          onClick={toggleArchive}
+          aria-expanded={archiveOpen}
+          aria-controls="learning-archive"
+          className="text-xs text-muted-foreground hover:text-foreground hover:underline cursor-pointer"
+        >
+          {archiveOpen ? t('goals.archived.hide') : t('goals.archived.show')}
+        </button>
+
+        {archiveOpen && (
+          <div id="learning-archive" className="mt-2" data-testid="learning-archive">
+            {archivedGoalsLoading && archivedGoals === null ? (
+              <ListSkeleton />
+            ) : (archivedGoals ?? []).length === 0 ? (
+              <p className="px-3 py-4 text-center text-xs text-content-tertiary">
+                {t('goals.archived.empty')}
+              </p>
+            ) : (
+              <ul className="space-y-2">
+                {(archivedGoals ?? []).map((goal) => (
+                  // Deliberately NOT clickable, and no <Link>: the plan screen would call
+                  // `save_daily_plan` for a goal the RPC refuses. Restore first, then open it.
+                  <li key={goal.id} className="p-3 bg-muted/40 rounded-lg border border-border">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-muted-foreground truncate">
+                          {goal.title}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2 mt-1">
+                          <span className="text-xs text-content-tertiary">
+                            {t('goals.deckCount', { count: goal.decks.length })}
+                          </span>
+                          {goal.target_date && (
+                            <span className="text-xs text-content-tertiary">
+                              {t('goals.targetDate', { date: goal.target_date })}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => void handleRestore(goal)}
+                          className="text-xs text-brand hover:underline cursor-pointer"
+                        >
+                          {t('goals.archived.restore')}
+                        </button>
+                        {/* Delete stays reachable here. Otherwise the only way to be rid of an
+                            archived goal for good would be to restore it first. */}
+                        <button
+                          type="button"
+                          onClick={() => void handleDelete(goal)}
+                          className="text-xs text-destructive hover:underline cursor-pointer"
+                        >
+                          {t('goals.delete')}
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+      </div>
 
       {formOpen && (
         <GoalFormModal

@@ -123,17 +123,40 @@
     "title": "학습 목표",
     "delete": "삭제",
     "deleteConfirmTitle": "이 플랜을 삭제할까요?",
-    "deleteConfirmMessage": "\"{{title}}\" 과(와) 이 플랜이 만든 모든 일별 플랜이 영구히 사라집니다. 학습 기록과 카드는 그대로 남고, 플랜만 삭제됩니다. 되돌릴 수 없습니다."
+    "deleteConfirmMessage": "\"{{title}}\" 과(와) 이 플랜이 만든 모든 일별 플랜이 영구히 사라집니다. 학습 기록과 카드는 그대로 남고, 플랜만 삭제됩니다. 되돌릴 수 없습니다.",
+    "archived": {
+      "show": "보관함 보기",
+      "hide": "보관함 닫기",
+      "empty": "보관한 플랜이 없어요.",
+      "restore": "다시 활성화"
+    }
   },
   "history": {
     "itemFallback": "{{type}} 시도",
-    "score": {
-      "unknown": "점수 없음"
-    },
-    "title": "최근 시도 ({{count, number}})",
+    "title": "최근 학습",
     "title_one": "최근 시도 ({{count, number}})",
     "title_other": "최근 시도 ({{count, number}})",
-    "youWrote": "작성한 답: {{text}}"
+    "youWrote": "작성한 답: {{text}}",
+    "recap": "{{count, number}}장 · {{minutes, number}}분 · 카드당 평균 {{seconds, number}}초",
+    "recap_one": "{{count, number}}장 · {{minutes, number}}분 · 카드당 평균 {{seconds, number}}초",
+    "recap_other": "{{count, number}}장 · {{minutes, number}}분 · 카드당 평균 {{seconds, number}}초",
+    "reviewTitle": "다시 볼 카드 {{count, number}}장",
+    "reviewTitle_one": "다시 볼 카드 {{count, number}}장",
+    "reviewTitle_other": "다시 볼 카드 {{count, number}}장",
+    "band": {
+      "known": "알았음 {{count, number}}",
+      "known_one": "알았음 {{count, number}}",
+      "known_other": "알았음 {{count, number}}",
+      "partial": "애매함 {{count, number}}",
+      "partial_one": "애매함 {{count, number}}",
+      "partial_other": "애매함 {{count, number}}",
+      "missed": "몰랐음 {{count, number}}",
+      "missed_one": "몰랐음 {{count, number}}",
+      "missed_other": "몰랐음 {{count, number}}",
+      "partialShort": "애매함",
+      "missedShort": "몰랐음"
+    },
+    "reviewCapped": "{{total, number}}장 중 {{shown, number}}장만 표시했어요."
   },
   "insights": {
     "accuracy": "정답률",
@@ -171,11 +194,6 @@
     "title": "추천"
   },
   "today": {
-    "answer": {
-      "label": "내가 쓴 답 (선택)",
-      "note": "시도 기록과 함께 저장됩니다. 채점하지 않으며, 평가는 직접 선택합니다.",
-      "placeholder": "기억나는 대로 입력하세요"
-    },
     "budget": "하루 {{count, number}}분",
     "empty": {
       "createGoal": "목표 만들기",
@@ -195,28 +213,15 @@
     "generate": "오늘 플랜 만들기",
     "generating": "만드는 중…",
     "item": {
-      "minutes": "약 {{count, decimal}}분",
-      "recorded": "기록됨",
       "untitled": "(내용 없음)",
       "study": "학습"
     },
     "progress": "{{total, number}}개 중 {{done, number}}개 완료",
     "rate": {
       "again": "모름",
-      "hint": "시도 기록만 남습니다 — 복습 일정은 바뀌지 않습니다.",
       "known": "알았음",
       "partial": "애매함"
     },
-    "reason": {
-      "balanced": "균형 배분",
-      "due": "복습 시점",
-      "goalRelevance": "목표 관련도",
-      "importance": "중요도",
-      "memoryRisk": "잊기 직전",
-      "recentFailure": "최근 오답",
-      "slowResponse": "응답 지연"
-    },
-    "recallChance": "지금 기억하고 있을 확률 약 {{percent}}%",
     "regenerate": "플랜 다시 만들기",
     "regenerating": "다시 만드는 중…",
     "title": "오늘의 플랜",
@@ -238,7 +243,6 @@
     "studyNote": "학습 화면에서 평가하면 복습 일정과 오늘의 플랜이 함께 기록됩니다.",
     "byDeck": "덱별",
     "deckDone": "완료",
-    "listTitle": "오늘의 목록",
     "days": {
       "label": "날짜",
       "today": "오늘",
@@ -259,14 +263,28 @@
       "empty": "이날은 복습할 카드가 없을 것 같아요.",
       "loading": "계산 중…",
       "note": "예상치입니다. 지금부터 그날까지 아무것도 학습하지 않는다고 가정한 값이라, 실제로 학습하면 달라집니다."
+    },
+    "composition": {
+      "review": "복습 {{count, number}}장",
+      "review_one": "복습 {{count, number}}장",
+      "review_other": "복습 {{count, number}}장",
+      "fresh": "새 카드 {{count, number}}장",
+      "fresh_one": "새 카드 {{count, number}}장",
+      "fresh_other": "새 카드 {{count, number}}장"
     }
   },
   "progress": {
     "title": "진행 상황",
-    "knownNow": "{{total, number}}장 중 {{known, number}}장 기억",
-    "breakdown": "확실 {{known, number}} · 흔들림 {{shaky, number}} · 미시작 {{unseen, number}}",
     "daysLeft": "{{count, number}}일 남음",
     "daysLeft_one": "{{count, number}}일 남음",
-    "daysLeft_other": "{{count, number}}일 남음"
+    "daysLeft_other": "{{count, number}}일 남음",
+    "withinWindow": "배운 {{attempted, number}}장 중 {{known, number}}장이 복습 주기 안에 있어요",
+    "notStarted": "아직 배운 카드가 없어요 · 전체 {{total, number}}장",
+    "overdue": "복습 밀림 {{count, number}}장",
+    "overdue_one": "복습 밀림 {{count, number}}장",
+    "overdue_other": "복습 밀림 {{count, number}}장",
+    "unstudied": "아직 안 배움 {{count, number}}장",
+    "unstudied_one": "아직 안 배움 {{count, number}}장",
+    "unstudied_other": "아직 안 배움 {{count, number}}장"
   }
 }

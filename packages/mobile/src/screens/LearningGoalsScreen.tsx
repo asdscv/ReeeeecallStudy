@@ -57,13 +57,17 @@ export function LearningGoalsScreen() {
   const { t } = useTranslation('learning')
   const theme = useTheme()
   const navigation = useNavigation<NavigationProp<SettingsStackParamList>>()
-  const { goals, goalsLoading, goalsError, fetchGoals, createGoal, archiveGoal, deleteGoal } = useLearningStore()
+  const {
+    goals, goalsLoading, goalsError, fetchGoals, createGoal, archiveGoal, deleteGoal,
+    archivedGoals, archivedGoalsLoading, fetchArchivedGoals, restoreGoal,
+  } = useLearningStore()
   const { decks, stats, fetchDecks, fetchStats } = useDeckStore()
   const userId = useAuthStore((state) => state.user?.id)
 
   const [creating, setCreating] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [archivingId, setArchivingId] = useState<string | null>(null)
+  const [archiveOpen, setArchiveOpen] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
   const [title, setTitle] = useState('')
   const [horizonMonths, setHorizonMonths] = useState<number | null>(null)
@@ -241,6 +245,18 @@ export function LearningGoalsScreen() {
         },
       ],
     )
+  }
+
+  /**
+   * Open the drawer, reading the archive the first time it is pulled.
+   *
+   * `archivedGoals === null` is "never asked"; `[]` is "asked, and there are none". Starting at
+   * `[]` would let the drawer claim the archive is empty before anything had looked.
+   */
+  const toggleArchive = () => {
+    const next = !archiveOpen
+    setArchiveOpen(next)
+    if (next && archivedGoals === null) void fetchArchivedGoals()
   }
 
   const confirmArchive = (goalId: string, goalTitle: string) => {
@@ -707,6 +723,89 @@ export function LearningGoalsScreen() {
             </View>
           </View>
         ))}
+
+        {/* ── The archive ──────────────────────────────────────────────────
+            Collapsed, and read only on the press that opens it: almost nobody has an archived
+            goal, and folding this into `fetchGoals` would charge every session for the query.
+
+            Until this existed, 보관 was strictly worse than 삭제 — the status flip was real, but
+            `fetchGoals` filtered the row out and no screen read it back, so the goal and every
+            plan it produced sat in the database unreachable. */}
+        <TouchableOpacity
+          onPress={toggleArchive}
+          style={styles.touchRow}
+          hitSlop={HIT_SLOP}
+          accessibilityRole="button"
+          accessibilityState={{ expanded: archiveOpen }}
+          {...testProps('learning-archive-toggle')}
+        >
+          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+            {archiveOpen ? t('goals.archived.hide') : t('goals.archived.show')}
+          </Text>
+        </TouchableOpacity>
+
+        {archiveOpen && (archivedGoalsLoading && archivedGoals === null ? (
+          <ActivityIndicator />
+        ) : (archivedGoals ?? []).length === 0 ? (
+          <Text
+            style={[theme.typography.caption, {
+              color: theme.colors.textTertiary, textAlign: 'center', paddingVertical: 12,
+            }]}
+            {...testProps('learning-archive-empty')}
+          >
+            {t('goals.archived.empty')}
+          </Text>
+        ) : (archivedGoals ?? []).map((goal, index) => (
+          // No open-area: the plan screen would call `save_daily_plan` for a goal the RPC
+          // refuses. Reactivate first, and the row moves up into the list above.
+          <View
+            key={goal.id}
+            style={[styles.card, { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
+            {...testProps(`learning-archived-goal-${index}`, true)}
+          >
+            <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]} numberOfLines={1}>
+              {goal.title}
+            </Text>
+            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
+              {t('goals.deckCount', { count: goal.decks.length })}
+            </Text>
+            <View style={styles.rowActions}>
+              <TouchableOpacity
+                disabled={archivingId !== null}
+                onPress={() => {
+                  // No confirmation: nothing is destroyed, and the button that undoes it is the
+                  // 보관 button this row just came from.
+                  setArchivingId(goal.id)
+                  void restoreGoal(goal.id).finally(() => setArchivingId(null))
+                }}
+                style={[styles.touchRow, archivingId !== null && styles.disabled]}
+                hitSlop={HIT_SLOP}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: archivingId !== null }}
+                {...testProps(`learning-archived-restore-${index}`)}
+              >
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.primary }]}>
+                  {t('goals.archived.restore')}
+                </Text>
+              </TouchableOpacity>
+              {/* Kept reachable here, or the only way to be rid of an archived goal for good
+                  would be to reactivate it first. */}
+              <TouchableOpacity
+                disabled={archivingId !== null}
+                onPress={() => confirmDelete(goal.id, goal.title)}
+                style={[styles.touchRow, archivingId !== null && styles.disabled]}
+                hitSlop={HIT_SLOP}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: archivingId !== null }}
+                {...testProps(`learning-archived-delete-${index}`)}
+              >
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.error }]}>
+                  {t('goals.delete')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )))}
       </ScrollView>
     </Screen>
   )

@@ -29,6 +29,7 @@ vi.mock('react-i18next', () => ({
 }))
 
 import { LearningPlanWidget } from '../LearningPlanWidget'
+import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
 
 const goal = (over: Record<string, unknown> = {}) => ({
   id: 'goal-1', domain_id: 'language', title: 'JLPT N2', target_date: null,
@@ -66,8 +67,26 @@ describe('LearningPlanWidget — the number and the sentence agree', () => {
   it('always labels the figure as the present', () => {
     renderWidget({ goals: [goal({ target_date: '2026-12-31' })] })
 
-    expect(screen.getByText(/progress\.knownNow/)).toBeInTheDocument()
+    expect(screen.getByText(/progress\.withinWindow/)).toBeInTheDocument()
     expect(screen.queryByText(/progress\.knownAtTarget/)).not.toBeInTheDocument()
+  })
+
+  it('names what `known` actually measures instead of renaming it', () => {
+    // `get_goal_knowledge` returns cards that are NOT past due — one rating on an overdue card
+    // moves a card there. Calling that "known" and headlining "55 of 120" reads as "you have
+    // forgotten 65 cards", which is a claim the RPC never makes.
+    renderWidget()
+
+    expect(screen.getByText(/progress\.withinWindow/)).toHaveTextContent('"attempted":75')
+  })
+
+  it('says "not started" rather than a confident 0% for an untouched goal', () => {
+    // 0 of 0 is not 0%. A goal nobody has opened has no ratio to report, and printing one would
+    // be a measurement where there is no evidence.
+    renderWidget({ knowledge: { 'goal-1': { total: 120, known: 0, unknown: 0, unseen: 120 } } })
+
+    expect(screen.getByText(/progress\.notStarted/)).toBeInTheDocument()
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0')
   })
 
   it('still counts the days left, which is what a deadline is for', () => {
@@ -90,13 +109,31 @@ describe('LearningPlanWidget — the number and the sentence agree', () => {
     expect(fetchGoalKnowledge).toHaveBeenCalledTimes(1)
   })
 
-  it('measures progress against the whole goal, not against what was attempted', () => {
-    // 55 of 120. Dividing by attempted cards (known + unknown = 75) put a 73% bar next to the
-    // words "55 of 120".
+  it('draws the bar on the same denominator the sentence names', () => {
+    // This is the invariant, and it has now been kept two different ways. While the headline read
+    // "55 of 120", dividing by attempted cards put a 73% bar beside the words "55 of 120", so the
+    // bar was 55/120. The headline now names the STUDIED count — "55 of 75 studied cards are
+    // still within their review window" — so the bar is 55/75. What must never happen again is
+    // the two disagreeing; the number to assert is whatever the sentence just said.
     renderWidget()
 
-    const bar = screen.getByRole('progressbar')
-    expect(bar).toHaveAttribute('aria-valuenow', String(Math.round((55 / 120) * 100)))
+    const sentence = screen.getByText(/progress\.withinWindow/)
+    expect(sentence).toHaveTextContent('"attempted":75')
+    expect(sentence).toHaveTextContent('"known":55')
+    expect(screen.getByRole('progressbar'))
+      .toHaveAttribute('aria-valuenow', String(Math.round((55 / 75) * 100)))
+  })
+
+  it('agrees with the plan screen, which reads the same numbers', () => {
+    // The tile divided by `total` while the plan screen divided by attempted, so one goal's
+    // numbers drew a 46% bar on the dashboard and a 73% bar one click away. Both call
+    // `goalKnowledgeSummary` now; this pins the tile to it.
+    renderWidget()
+
+    expect(screen.getByRole('progressbar'))
+      .toHaveAttribute('aria-valuenow', String(goalKnowledgeSummary(
+        { total: 120, known: 55, unknown: 20, unseen: 45 },
+      ).percent))
   })
 
   it('renders nothing when there is no plannable goal', () => {

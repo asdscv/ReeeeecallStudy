@@ -123,17 +123,40 @@
     "title": "Objetivos de aprendizaje",
     "delete": "Eliminar",
     "deleteConfirmTitle": "¿Eliminar este plan?",
-    "deleteConfirmMessage": "«{{title}}» y todos los planes diarios que generó desaparecerán para siempre. Tu historial de estudio y tus tarjetas se quedan: solo se elimina el plan. Esto no se puede deshacer."
+    "deleteConfirmMessage": "«{{title}}» y todos los planes diarios que generó desaparecerán para siempre. Tu historial de estudio y tus tarjetas se quedan: solo se elimina el plan. Esto no se puede deshacer.",
+    "archived": {
+      "show": "Planes archivados",
+      "hide": "Ocultar archivados",
+      "empty": "Aún no hay nada archivado.",
+      "restore": "Reactivar"
+    }
   },
   "history": {
     "itemFallback": "Intento de {{type}}",
-    "score": {
-      "unknown": "Sin puntuación"
-    },
-    "title": "Intentos recientes ({{count, number}})",
+    "title": "Estudio reciente",
     "title_one": "Intento reciente ({{count, number}})",
     "title_other": "Intentos recientes ({{count, number}})",
-    "youWrote": "Escribiste: {{text}}"
+    "youWrote": "Escribiste: {{text}}",
+    "recap": "{{count, number}} tarjetas · {{minutes, number}} min · {{seconds, number}} s por tarjeta de media",
+    "recap_one": "{{count, number}} tarjeta · {{minutes, number}} min · {{seconds, number}} s por tarjeta de media",
+    "recap_other": "{{count, number}} tarjetas · {{minutes, number}} min · {{seconds, number}} s por tarjeta de media",
+    "reviewTitle": "{{count, number}} para repasar",
+    "reviewTitle_one": "{{count, number}} para repasar",
+    "reviewTitle_other": "{{count, number}} para repasar",
+    "band": {
+      "known": "{{count, number}} acertadas",
+      "known_one": "{{count, number}} acertada",
+      "known_other": "{{count, number}} acertadas",
+      "partial": "{{count, number}} dudosas",
+      "partial_one": "{{count, number}} dudosa",
+      "partial_other": "{{count, number}} dudosas",
+      "missed": "{{count, number}} falladas",
+      "missed_one": "{{count, number}} fallada",
+      "missed_other": "{{count, number}} falladas",
+      "partialShort": "Dudosa",
+      "missedShort": "Fallada"
+    },
+    "reviewCapped": "Mostrando {{shown, number}} de {{total, number}}."
   },
   "insights": {
     "accuracy": "Precisión",
@@ -171,11 +194,6 @@
     "title": "Recomendaciones"
   },
   "today": {
-    "answer": {
-      "label": "Tu respuesta (opcional)",
-      "note": "Se guarda con tu intento. No se califica: la valoración sigue siendo tuya.",
-      "placeholder": "Escribe lo que recuerdes"
-    },
     "budget": "{{count, number}} min/día",
     "empty": {
       "createGoal": "Crear un objetivo",
@@ -195,28 +213,15 @@
     "generate": "Crear plan de hoy",
     "generating": "Creando…",
     "item": {
-      "minutes": "~{{count, decimal}} min",
-      "recorded": "Registrado",
       "untitled": "(sin texto)",
       "study": "Estudiar"
     },
     "progress": "{{done, number}} de {{total, number}} completados",
     "rate": {
       "again": "No lo sabía",
-      "hint": "Registra tu intento; no cambia el calendario de repaso.",
       "known": "Lo sabía",
       "partial": "A medias"
     },
-    "reason": {
-      "balanced": "Mezcla equilibrada",
-      "due": "Pendiente de repaso",
-      "goalRelevance": "Relevancia del objetivo",
-      "importance": "Importancia",
-      "memoryRisk": "A punto de olvidarse",
-      "recentFailure": "Fallo reciente",
-      "slowResponse": "Respuesta lenta"
-    },
-    "recallChance": "Alrededor de un {{percent}}% de probabilidad de recordarla",
     "regenerate": "Recrear plan",
     "regenerating": "Recreando…",
     "title": "Plan de hoy",
@@ -238,7 +243,6 @@
     "studyNote": "Valorar una tarjeta allí programa su próximo repaso y la marca en este plan.",
     "byDeck": "Por mazo",
     "deckDone": "Hecho",
-    "listTitle": "Lista de hoy",
     "days": {
       "label": "Día",
       "today": "Hoy",
@@ -259,14 +263,28 @@
       "empty": "Ese día no parece tocar nada.",
       "loading": "Calculando…",
       "note": "Es una estimación: supone que no estudias nada entre hoy y ese día, que es justo lo que la cambiará."
+    },
+    "composition": {
+      "review": "{{count, number}} de repaso",
+      "review_one": "{{count, number}} de repaso",
+      "review_other": "{{count, number}} de repaso",
+      "fresh": "{{count, number}} nuevas",
+      "fresh_one": "{{count, number}} nueva",
+      "fresh_other": "{{count, number}} nuevas"
     }
   },
   "progress": {
     "title": "Progreso",
-    "knownNow": "{{known, number}} de {{total, number}} tarjetas dominadas",
-    "breakdown": "{{known, number}} firmes · {{shaky, number}} flojas · {{unseen, number}} sin empezar",
     "daysLeft": "Quedan {{count, number}} días",
     "daysLeft_one": "Queda {{count, number}} día",
-    "daysLeft_other": "Quedan {{count, number}} días"
+    "daysLeft_other": "Quedan {{count, number}} días",
+    "withinWindow": "{{known, number}} de {{attempted, number}} tarjetas estudiadas siguen dentro de su ciclo de repaso",
+    "notStarted": "Aún sin empezar · {{total, number}} tarjetas",
+    "overdue": "{{count, number}} repasos vencidos",
+    "overdue_one": "{{count, number}} repaso vencido",
+    "overdue_other": "{{count, number}} repasos vencidos",
+    "unstudied": "{{count, number}} sin estudiar",
+    "unstudied_one": "{{count, number}} sin estudiar",
+    "unstudied_other": "{{count, number}} sin estudiar"
   }
 }

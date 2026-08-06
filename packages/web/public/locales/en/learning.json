@@ -17,18 +17,7 @@
     },
     "item": {
       "study": "Study",
-      "untitled": "(no text)",
-      "minutes": "~{{count, decimal}} min",
-      "recorded": "Recorded"
-    },
-    "reason": {
-      "due": "Due for review",
-      "memoryRisk": "At risk of forgetting",
-      "recentFailure": "Recently missed",
-      "slowResponse": "Slow to answer",
-      "goalRelevance": "Goal relevance",
-      "importance": "Importance",
-      "balanced": "Balanced mix"
+      "untitled": "(no text)"
     },
     "error": {
       "limitExceeded": "You've hit today's limit for rebuilding plans. Try again tomorrow.",
@@ -42,15 +31,8 @@
     "rate": {
       "again": "Didn't know",
       "partial": "Partly",
-      "known": "Knew it",
-      "hint": "Records your attempt — it does not change the review schedule."
+      "known": "Knew it"
     },
-    "answer": {
-      "label": "Your answer (optional)",
-      "placeholder": "Type what you remember",
-      "note": "Saved with your attempt. Nothing grades it — you still rate yourself."
-    },
-    "recallChance": "About {{percent}}% chance you still recall this",
     "backToPlans": "All plans",
     "extend": "Study more",
     "extending": "Adding…",
@@ -69,7 +51,6 @@
     "studyNote": "Rating a card there schedules its next review and ticks it off this plan.",
     "byDeck": "By deck",
     "deckDone": "Done",
-    "listTitle": "Today's list",
     "days": {
       "label": "Day",
       "today": "Today",
@@ -90,6 +71,14 @@
       "empty": "Nothing looks due on that day.",
       "loading": "Working it out…",
       "note": "An estimate. It assumes nothing gets studied between now and then — which is the one thing that will change it."
+    },
+    "composition": {
+      "review": "{{count, number}} reviews",
+      "review_one": "{{count, number}} review",
+      "review_other": "{{count, number}} reviews",
+      "fresh": "{{count, number}} new",
+      "fresh_one": "{{count, number}} new",
+      "fresh_other": "{{count, number}} new"
     }
   },
   "goals": {
@@ -126,7 +115,13 @@
     "deckCount_other": "{{count, number}} decks",
     "delete": "Delete",
     "deleteConfirmTitle": "Delete this plan?",
-    "deleteConfirmMessage": "\"{{title}}\" and every daily plan it made will be gone for good. Your study record and your cards stay — only the plan is removed. This cannot be undone."
+    "deleteConfirmMessage": "\"{{title}}\" and every daily plan it made will be gone for good. Your study record and your cards stay — only the plan is removed. This cannot be undone.",
+    "archived": {
+      "show": "Archived plans",
+      "hide": "Hide archived plans",
+      "empty": "Nothing archived yet.",
+      "restore": "Reactivate"
+    }
   },
   "form": {
     "createTitle": "New goal",
@@ -187,12 +182,29 @@
     "newCardsPerDayZero": "Set it to 0 to start nothing new and just clear the backlog."
   },
   "history": {
-    "title": "Recent attempts ({{count, number}})",
+    "title": "Recent study",
     "itemFallback": "{{type}} attempt",
     "youWrote": "You wrote: {{text}}",
-    "score": {
-      "unknown": "Not scored"
-    }
+    "recap": "{{count, number}} cards · {{minutes, number}} min · {{seconds, number}}s per card on average",
+    "recap_one": "{{count, number}} card · {{minutes, number}} min · {{seconds, number}}s per card on average",
+    "recap_other": "{{count, number}} cards · {{minutes, number}} min · {{seconds, number}}s per card on average",
+    "reviewTitle": "{{count, number}} to look at again",
+    "reviewTitle_one": "{{count, number}} to look at again",
+    "reviewTitle_other": "{{count, number}} to look at again",
+    "band": {
+      "known": "{{count, number}} knew it",
+      "known_one": "{{count, number}} knew it",
+      "known_other": "{{count, number}} knew it",
+      "partial": "{{count, number}} shaky",
+      "partial_one": "{{count, number}} shaky",
+      "partial_other": "{{count, number}} shaky",
+      "missed": "{{count, number}} missed",
+      "missed_one": "{{count, number}} missed",
+      "missed_other": "{{count, number}} missed",
+      "partialShort": "Shaky",
+      "missedShort": "Missed"
+    },
+    "reviewCapped": "Showing {{shown, number}} of {{total, number}}."
   },
   "enrichment": {
     "explainCta": "Explain (credits)",
@@ -265,10 +277,16 @@
   },
   "progress": {
     "title": "Progress",
-    "knownNow": "{{known, number}} of {{total, number}} cards known now",
-    "breakdown": "{{known, number}} solid · {{shaky, number}} slipping · {{unseen, number}} not started",
     "daysLeft": "{{count, number}} days left",
     "daysLeft_one": "{{count, number}} day left",
-    "daysLeft_other": "{{count, number}} days left"
+    "daysLeft_other": "{{count, number}} days left",
+    "withinWindow": "{{known, number}} of {{attempted, number}} studied cards are still within their review window",
+    "notStarted": "Not started yet · {{total, number}} cards",
+    "overdue": "{{count, number}} reviews overdue",
+    "overdue_one": "{{count, number}} review overdue",
+    "overdue_other": "{{count, number}} reviews overdue",
+    "unstudied": "{{count, number}} not studied yet",
+    "unstudied_one": "{{count, number}} not studied yet",
+    "unstudied_other": "{{count, number}} not studied yet"
   }
 }
