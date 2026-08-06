@@ -17,7 +17,6 @@ import {
   buildCandidatesFromCards, legacyCardItemShape, planItemAnswerPayload, RECALL_MINUTES,
   TYPED_ANSWER_MAX_CHARS, type CandidateStudyLog,
 } from '../lib/learning-candidates'
-import { callServerAI, getAiWallet } from '../lib/ai/server-client'
 import {
   summarizeLearning, type InsightAttempt, type InsightPlan, type LearningInsights,
 } from '../lib/learning-insights'
