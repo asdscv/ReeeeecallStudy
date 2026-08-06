@@ -5,9 +5,6 @@
     "progress": "{{total, number}} 件中 {{done, number}} 件完了",
     "generate": "今日のプランを作成",
     "generating": "作成中…",
-    "regenerate": "プランを再作成",
-    "regenerating": "再作成中…",
-    "completedNote": "このプランは完了済みのため、今日は再作成できません。",
     "empty": {
       "noGoal": "進行中の学習目標がありません。目標では1日の学習時間とプランに使うデッキを設定します。",
       "createGoal": "目標を作成",
@@ -28,11 +25,6 @@
       "forbidden": "アクセス権限がありません。",
       "unknown": "プランを作成できませんでした。もう一度お試しください。"
     },
-    "rate": {
-      "again": "わからない",
-      "partial": "あいまい",
-      "known": "わかった"
-    },
     "backToPlans": "プラン一覧",
     "extend": "もっと学習",
     "extending": "追加中…",
@@ -51,27 +43,6 @@
     "studyNote": "学習画面で評価すると、次の復習日と今日のプランの両方に記録されます。",
     "byDeck": "デッキ別",
     "deckDone": "完了",
-    "days": {
-      "label": "日付",
-      "today": "今日",
-      "tomorrow": "明日",
-      "inDays": "{{count, number}}日後",
-      "inDays_one": "{{count, number}}日後",
-      "inDays_other": "{{count, number}}日後"
-    },
-    "forecast": {
-      "title": "その日の予想量",
-      "cards": "{{count, number}}枚",
-      "cards_one": "{{count, number}}枚",
-      "cards_other": "{{count, number}}枚",
-      "minutes": "およそ {{count, number}}分",
-      "minutes_one": "およそ {{count, number}}分",
-      "minutes_other": "およそ {{count, number}}分",
-      "breakdown": "新規 {{newCards, number}} · 復習 {{reviewCards, number}}",
-      "empty": "その日は復習するカードがなさそうです。",
-      "loading": "計算中…",
-      "note": "推定値です。今からその日まで何も学習しない前提の数字なので、学習すれば変わります。"
-    },
     "composition": {
       "review": "復習 {{count, number}}枚",
       "review_one": "復習 {{count, number}}枚",
@@ -183,14 +154,9 @@
   },
   "history": {
     "title": "最近の学習",
-    "itemFallback": "{{type}} の試行",
-    "youWrote": "入力した答え: {{text}}",
     "recap": "{{count, number}}枚 · {{minutes, number}}分 · 1枚あたり平均{{seconds, number}}秒",
     "recap_one": "{{count, number}}枚 · {{minutes, number}}分 · 1枚あたり平均{{seconds, number}}秒",
     "recap_other": "{{count, number}}枚 · {{minutes, number}}分 · 1枚あたり平均{{seconds, number}}秒",
-    "reviewTitle": "見直したいカード {{count, number}}枚",
-    "reviewTitle_one": "見直したいカード {{count, number}}枚",
-    "reviewTitle_other": "見直したいカード {{count, number}}枚",
     "band": {
       "known": "できた {{count, number}}",
       "known_one": "できた {{count, number}}",
@@ -200,44 +166,7 @@
       "partial_other": "あいまい {{count, number}}",
       "missed": "できなかった {{count, number}}",
       "missed_one": "できなかった {{count, number}}",
-      "missed_other": "できなかった {{count, number}}",
-      "partialShort": "あいまい",
-      "missedShort": "できなかった"
-    },
-    "reviewCapped": "{{total, number}}枚中{{shown, number}}枚を表示しています。"
-  },
-  "enrichment": {
-    "explainCta": "解説（クレジット）",
-    "requesting": "問い合わせ中…",
-    "costHint": "ウォレットのAIクレジットを使用します",
-    "action": {
-      "explain": "AI解説",
-      "hint": "学習ヒント",
-      "compare": "自分の答えと比較"
-    },
-    "quote": "1回あたり約 {{price}} · 残高 {{balance}}",
-    "groundedHint": "カードではなく、この試行に合わせて回答します",
-    "sources": "出典",
-    "noSources": "この回答はソースに基づいていません。",
-    "empty": "モデルから利用可能な内容が返されませんでした。",
-    "chargedNote": "すでに課金済みです — 破棄してもクレジットは返金されません。",
-    "keep": "保持",
-    "discard": "破棄",
-    "later": "あとで決める",
-    "saving": "保存中…",
-    "error": {
-      "BAD_REQUEST": "無効なリクエストです。",
-      "FORBIDDEN": "このカードへのアクセス権限がありません。",
-      "GROUNDING_REQUIRED": "引用可能なソースが見つからなかったため、捏造を避けて回答を拒否しました。",
-      "INSUFFICIENT_CREDITS": "AIクレジットが不足しています。チャージしてから続けてください。",
-      "INVALID_RESULT": "回答が利用できない形式で返されました。もう一度お試しください。",
-      "NETWORK": "ネットワークエラーです。接続を確認してください。",
-      "NOT_CONFIGURED": "このサーバーではAI生成が有効になっていません。",
-      "PROVIDER_ERROR": "AIサービスでエラーが発生しました。もう一度お試しください。",
-      "RATE_CAP": "本日のAIリクエスト上限に達しました。明日もう一度お試しください。",
-      "UNKNOWN": "問題が発生しました。もう一度お試しください。",
-      "COMPARE_NO_ANSWER": "先に答えを入力してください — まだ比較するものがありません。",
-      "COMPARE_NO_REFERENCE": "このカードはどの項目が答えかを指定していないため、比較する基準がありません。"
+      "missed_other": "できなかった {{count, number}}"
     }
   },
   "insights": {

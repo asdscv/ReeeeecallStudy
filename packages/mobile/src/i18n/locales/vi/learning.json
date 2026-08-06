@@ -1,36 +1,4 @@
 {
-  "enrichment": {
-    "action": {
-      "compare": "So với câu trả lời của tôi",
-      "explain": "Giải thích AI",
-      "hint": "Gợi ý học tập"
-    },
-    "chargedNote": "Đã tính phí — bỏ đi cũng không hoàn lại tín dụng.",
-    "costHint": "Sử dụng tín dụng AI từ ví của bạn",
-    "discard": "Bỏ",
-    "error": {
-      "BAD_REQUEST": "Yêu cầu không hợp lệ.",
-      "COMPARE_NO_ANSWER": "Hãy viết câu trả lời trước — chưa có gì để so sánh.",
-      "COMPARE_NO_REFERENCE": "Thẻ này không đánh dấu trường nào là đáp án, nên không có gì để đối chiếu.",
-      "FORBIDDEN": "Bạn không có quyền truy cập thẻ này.",
-      "GROUNDING_REQUIRED": "Không tìm thấy nguồn trích dẫn nên câu trả lời đã bị từ chối thay vì bịa đặt.",
-      "INSUFFICIENT_CREDITS": "Không đủ tín dụng AI. Hãy nạp thêm để tiếp tục.",
-      "INVALID_RESULT": "Câu trả lời không sử dụng được. Vui lòng thử lại.",
-      "NETWORK": "Lỗi mạng. Vui lòng kiểm tra kết nối.",
-      "NOT_CONFIGURED": "Tạo nội dung AI chưa được bật trên máy chủ này.",
-      "PROVIDER_ERROR": "Dịch vụ AI gặp sự cố. Vui lòng thử lại.",
-      "RATE_CAP": "Bạn đã dùng hết giới hạn yêu cầu AI hôm nay. Hãy thử lại vào ngày mai.",
-      "UNKNOWN": "Đã xảy ra lỗi. Vui lòng thử lại."
-    },
-    "explainCta": "Giải thích (tín dụng)",
-    "groundedHint": "Trả lời cho lần làm này, không chỉ cho thẻ",
-    "keep": "Giữ lại",
-    "later": "Quyết định sau",
-    "noSources": "Câu trả lời này không dựa trên nguồn.",
-    "quote": "Khoảng {{price}} mỗi yêu cầu · số dư {{balance}}",
-    "requesting": "Đang hỏi…",
-    "sources": "Nguồn"
-  },
   "form": {
     "cancel": "Hủy",
     "decks": "Bộ thẻ để học",
@@ -132,17 +100,12 @@
     }
   },
   "history": {
-    "itemFallback": "Lần làm {{type}}",
     "title": "Học gần đây",
     "title_one": "Lần làm gần đây ({{count, number}})",
     "title_other": "Lần làm gần đây ({{count, number}})",
-    "youWrote": "Bạn đã viết: {{text}}",
     "recap": "{{count, number}} thẻ · {{minutes, number}} phút · trung bình {{seconds, number}} giây mỗi thẻ",
     "recap_one": "{{count, number}} thẻ · {{minutes, number}} phút · trung bình {{seconds, number}} giây mỗi thẻ",
     "recap_other": "{{count, number}} thẻ · {{minutes, number}} phút · trung bình {{seconds, number}} giây mỗi thẻ",
-    "reviewTitle": "{{count, number}} thẻ cần xem lại",
-    "reviewTitle_one": "{{count, number}} thẻ cần xem lại",
-    "reviewTitle_other": "{{count, number}} thẻ cần xem lại",
     "band": {
       "known": "Nhớ {{count, number}}",
       "known_one": "Nhớ {{count, number}}",
@@ -152,11 +115,8 @@
       "partial_other": "Lơ mơ {{count, number}}",
       "missed": "Quên {{count, number}}",
       "missed_one": "Quên {{count, number}}",
-      "missed_other": "Quên {{count, number}}",
-      "partialShort": "Lơ mơ",
-      "missedShort": "Quên"
-    },
-    "reviewCapped": "Hiển thị {{shown, number}} trong {{total, number}} thẻ."
+      "missed_other": "Quên {{count, number}}"
+    }
   },
   "insights": {
     "accuracy": "Độ chính xác",
@@ -217,13 +177,6 @@
       "study": "Học"
     },
     "progress": "{{done, number}} / {{total, number}} hoàn thành",
-    "rate": {
-      "again": "Không biết",
-      "known": "Đã biết",
-      "partial": "Chưa chắc"
-    },
-    "regenerate": "Tạo lại kế hoạch",
-    "regenerating": "Đang tạo lại…",
     "title": "Kế hoạch hôm nay",
     "backToPlans": "Tất cả kế hoạch",
     "extend": "Học thêm",
@@ -243,27 +196,6 @@
     "studyNote": "Chấm điểm ở màn hình học sẽ đặt lịch ôn tiếp theo và đánh dấu vào kế hoạch hôm nay.",
     "byDeck": "Theo bộ thẻ",
     "deckDone": "Xong",
-    "days": {
-      "label": "Ngày",
-      "today": "Hôm nay",
-      "tomorrow": "Ngày mai",
-      "inDays": "Sau {{count, number}} ngày",
-      "inDays_one": "Sau {{count, number}} ngày",
-      "inDays_other": "Sau {{count, number}} ngày"
-    },
-    "forecast": {
-      "title": "Ngày đó trông thế nào",
-      "cards": "{{count, number}} thẻ",
-      "cards_one": "{{count, number}} thẻ",
-      "cards_other": "{{count, number}} thẻ",
-      "minutes": "khoảng {{count, number}} phút",
-      "minutes_one": "khoảng {{count, number}} phút",
-      "minutes_other": "khoảng {{count, number}} phút",
-      "breakdown": "{{newCards, number}} thẻ mới · {{reviewCards, number}} ôn lại",
-      "empty": "Ngày đó có vẻ không có thẻ nào đến hạn.",
-      "loading": "Đang tính…",
-      "note": "Đây là ước tính, giả định bạn không học gì từ giờ đến hôm đó — và đó chính là điều sẽ làm nó thay đổi."
-    },
     "composition": {
       "review": "{{count, number}} thẻ ôn lại",
       "review_one": "{{count, number}} thẻ ôn lại",

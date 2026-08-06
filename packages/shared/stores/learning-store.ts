@@ -311,23 +311,6 @@ export interface AttemptInput {
   clientAttemptId: string
 }
 
-/**
- * A remediation the server generated, charged for, and persisted as a PREVIEW.
- *
- * The money is already spent by the time this exists — `ai-generate` reserves before
- * generating and charges after (mig 168). Accepting or rejecting only decides whether the
- * content is kept, so "reject" is not a refund and the UI must not imply that it is.
- */
-export interface EnrichmentPreview {
-  enrichmentId: string
-  action: RemediationAction
-  content: Record<string, unknown>
-  /** Source citations the server validated. Labor-law content cannot be ungrounded. */
-  sources: EnrichmentSource[]
-  /** Wallet balance in micro-USD after the charge, when the server reported it. */
-  balance: number | null
-}
-
 export interface RecommendationRow {
   id: string
   goal_id: string | null
@@ -344,77 +327,6 @@ export interface RecommendationRow {
 
 /** The deterministic producer's version, recorded on every row it writes. */
 export const WEAK_CARD_RECOMMENDER_VERSION = 'weak-card-v1'
-
-export interface EnrichmentSource {
-  title?: string
-  url?: string
-  clause?: string
-  id?: string
-}
-
-/**
- * Actions the UI offers. Must stay a subset of `SERVED_REMEDIATION_ACTIONS` on the server —
- * that list, not this one, is what actually gates a charge.
- *
- * `compare` is offered ONLY on an attempt that carries the learner's typed answer
- * (`attemptTypedAnswer`), because the server refuses an ungrounded one and a button that spends
- * a request to get a refusal is worse than no button. `evaluate` / `generate` / `recommend`
- * remain unserved.
- */
-export type RemediationAction = 'explain' | 'hint' | 'compare'
-
-/**
- * The price of one remediation, in micro-USD, plus the balance it comes out of.
- *
- * `reserve_ai_remediation` books exactly one paid card-equivalent per request
- * (`paid_cards = 1, billable_fraction = 1.0`, mig 168), so the wallet's per-card estimate IS
- * the per-request estimate. It is an ESTIMATE: the real charge is the model's actual token cost,
- * settled after the call, and the UI must not present it as a fixed price.
- */
-export interface EnrichmentQuote {
-  estPriceMicro: number
-  balanceMicro: number
-}
-
-/**
- * Everything the enrichment call can fail with, kept distinct because the user's next
- * action differs per case: top up, wait for tomorrow, or nothing they can do.
- */
-export type EnrichmentErrorCode =
-  | 'INSUFFICIENT_CREDITS'   // AI_INSUFFICIENT_CREDITS — 402, wallet empty
-  | 'RATE_CAP'               // AI_RATE_CAP — 429, today's request cap
-  | 'GROUNDING_REQUIRED'     // AI_GROUNDING_REQUIRED — refused rather than cite nothing
-  | 'COMPARE_NO_ANSWER'      // AI_COMPARE_NO_ANSWER — nothing typed to compare; the learner can fix this
-  | 'COMPARE_NO_REFERENCE'   // AI_COMPARE_NO_REFERENCE — the card never declared an answer field
-  | 'INVALID_RESULT'         // AI_INVALID_RESULT — model returned something unusable
-  | 'PROVIDER_ERROR'         // AI_PROVIDER_ERROR / AI_PROVIDER_AUTH
-  | 'NOT_CONFIGURED'         // AI_NOT_CONFIGURED — no provider key on this deployment
-  | 'FORBIDDEN'              // reference not accessible
-  | 'BAD_REQUEST'
-  | 'NETWORK'
-  | 'UNKNOWN'
-
-function toEnrichmentError(e: unknown): EnrichmentErrorCode {
-  // callServerAI throws `new Error(<server code>)`, so the message IS the code.
-  const code = e instanceof Error ? e.message : String(e)
-  switch (code) {
-    case 'AI_INSUFFICIENT_CREDITS': return 'INSUFFICIENT_CREDITS'
-    case 'AI_RATE_CAP': return 'RATE_CAP'
-    case 'AI_GROUNDING_REQUIRED': return 'GROUNDING_REQUIRED'
-    case 'AI_COMPARE_NO_ANSWER': return 'COMPARE_NO_ANSWER'
-    case 'AI_COMPARE_NO_REFERENCE': return 'COMPARE_NO_REFERENCE'
-    case 'AI_INVALID_RESULT': return 'INVALID_RESULT'
-    case 'AI_PROVIDER_ERROR':
-    case 'AI_PROVIDER_AUTH': return 'PROVIDER_ERROR'
-    case 'AI_NOT_CONFIGURED': return 'NOT_CONFIGURED'
-    case 'FORBIDDEN': return 'FORBIDDEN'
-    case 'BAD_REQUEST': return 'BAD_REQUEST'
-    case 'NETWORK_ERROR': return 'NETWORK'
-    // AI_PERSISTENCE_ERROR and AI_METER_ERROR are server faults the user cannot act on;
-    // they are surfaced as UNKNOWN rather than pretending to be actionable.
-    default: return 'UNKNOWN'
-  }
-}
 
 export interface PlanContext {
   /** IANA zone, e.g. 'Asia/Seoul'. Supplied by the platform layer: shared code must
@@ -508,21 +420,6 @@ interface LearningState {
    */
   planExtension: { appended: number; newCards: number; reviewsTomorrow: number } | null
   /**
-   * What a FUTURE day is shaped like, keyed by its plan date.
-   *
-   * A forecast, never a plan. It runs the real planner with `now` moved forward and then throws
-   * the ranking away, keeping only the shape — because saving a future plan would be a lie in
-   * two directions at once: it would spend one of the 50 daily `save_daily_plan` writes on a
-   * ranking computed from today's SRS state, and anything studied between now and then would
-   * invalidate it while it sat in the database looking authoritative.
-   *
-   * `null` for a date whose forecast came back empty (nothing will be due), which is a real
-   * answer and different from "not computed yet" (key absent).
-   */
-  planForecast: Record<string, PlanForecast | null>
-  /** The plan date currently being forecast, or null. One at a time — it is a user gesture. */
-  planForecastLoading: string | null
-  /**
    * Goal+date keys already attempted automatically, so a failure is never retried in a loop.
    *
    * `save_daily_plan` is capped at 50 writes per USER per UTC day across every goal, and the
@@ -537,21 +434,6 @@ interface LearningState {
   recordingItemId: string | null
   attempts: AttemptRow[]
   attemptsLoading: boolean
-
-  /** The preview being shown. Null when nothing is open. */
-  enrichment: EnrichmentPreview | null
-  /** Card id the request is running for, so one row can show its own spinner. */
-  enrichmentPendingCardId: string | null
-  enrichmentError: EnrichmentErrorCode | null
-  enrichmentSaving: boolean
-  /**
-   * What one remediation costs, read before the call.
-   *
-   * Null means "we could not read the wallet" — which the UI renders as no number at all, never
-   * as $0.00. A quote that fails must not block a learner who has credits, and must not claim a
-   * price of zero for something that charges.
-   */
-  enrichmentQuote: EnrichmentQuote | null
 
   /**
    * Goal progress from `get_goal_knowledge` (mig 181), keyed by goal id.
@@ -626,35 +508,8 @@ interface LearningState {
    * impossible before — a learner who had done half the plan would have lost the half.
    */
   extendPlan: (goal: LearningGoalWithDecks, ctx: PlanContext) => Promise<boolean>
-  /**
-   * What a future day will look like. Reads only — nothing is saved.
-   *
-   * Every destructive and quota cost of planning lives in `save_daily_plan`, so running the
-   * planner and discarding the result is free. Callers must present it as an estimate: it
-   * assumes nothing is studied between now and then, which is the one thing that will not
-   * be true.
-   */
-  forecastPlan: (goal: LearningGoalWithDecks, ctx: PlanContext) => Promise<void>
   recordAttempt: (input: AttemptInput, planDate: string) => Promise<boolean>
   fetchAttempts: (goalId: string) => Promise<void>
-  requestEnrichment: (input: {
-    action: RemediationAction
-    goalId: string
-    cardId: string
-    /**
-     * The attempt this request is grounded in, when the caller has one.
-     *
-     * Optional: an explanation of a card the learner has not attempted yet is still a
-     * legitimate request. The store never derives this — a paid call must not depend on a
-     * heuristic about which attempt the learner probably meant (design §5).
-     */
-    attemptId?: string | null
-    uiLang: string
-  }) => Promise<boolean>
-  /** Read the wallet so the UI can state the cost BEFORE the click. */
-  loadEnrichmentQuote: () => Promise<void>
-  resolveEnrichment: (status: 'accepted' | 'rejected') => Promise<boolean>
-  dismissEnrichment: () => void
   fetchGoalKnowledge: (goalId: string, atISO: string) => Promise<void>
   fetchInsights: (goalId: string) => Promise<void>
   fetchRecommendations: (goalId: string) => Promise<void>
@@ -750,21 +605,6 @@ const EXTRA_BLOCK_MINUTES = 10
 
 /** Nothing to exclude — `generatePlan` builds the whole day from scratch. */
 const EMPTY_EXCLUSIONS: ReadonlySet<string> = new Set()
-
-/**
- * The shape of a day the learner has not reached yet.
- *
- * Counts and minutes only, deliberately — not the card list. The identities a forecast would
- * name are the least reliable part of it: which cards come due on day N depends on how day N-1
- * actually went, and presenting a list would invite the learner to read it as a commitment.
- */
-export interface PlanForecast {
-  planDate: string
-  totalItems: number
-  estimatedMinutes: number
-  newCards: number
-  reviewCards: number
-}
 
 /** What {@link collectPlanInputs} produces, or why it could not. */
 type PlanInputs =
@@ -1016,17 +856,10 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   autoPlanAttempted: {},
   planExtending: false,
   planExtension: null,
-  planForecast: {},
-  planForecastLoading: null,
   planBlockedReason: null,
   recordingItemId: null,
   attempts: [],
   attemptsLoading: false,
-  enrichment: null,
-  enrichmentPendingCardId: null,
-  enrichmentError: null,
-  enrichmentSaving: false,
-  enrichmentQuote: null,
   knowledge: {},
   knowledgeLoading: false,
   insights: null,
@@ -1202,7 +1035,6 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       // stale surface would target a plan item the cascade has already removed.
       set({
         plan: null, planItems: [], planCards: {}, planAbsentFor: null,
-        planForecast: {}, planForecastLoading: null,
         attempts: get().attempts.filter((attempt) => attempt.goal_id !== goalId),
       })
       await get().fetchGoals()
@@ -1421,73 +1253,6 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     }
   },
 
-  forecastPlan: async (goal, ctx) => {
-    if (get().planForecastLoading === ctx.planDate) return
-    if (ctx.planDate in get().planForecast) return
-    set({ planForecastLoading: ctx.planDate })
-    try {
-      const { data: userData } = await supabase.auth.getUser()
-      const userId = userData?.user?.id
-      if (!userId) return
-
-      // The SAME pipeline `generatePlan` runs, with `now` moved to the future instant. Every
-      // due cutoff in `collectPlanInputs` reads `ctx.now`, so this is genuinely "what would be
-      // due then" rather than today's list relabelled. What it CANNOT know is what gets studied
-      // between now and then — hence a forecast, and hence no write.
-      const inputs = await collectPlanInputs(goal, ctx, userId, EMPTY_EXCLUSIONS)
-      if (inputs.blocked) {
-        set({ planForecast: { ...get().planForecast, [ctx.planDate]: null } })
-        return
-      }
-      const output = buildDailyPlan({
-        goal: toDomainGoal(goal, userId),
-        candidates: inputs.candidates,
-        budgetMinutes: goal.daily_minutes,
-        newCardsPerDay: parseNewCardsPerDay(goal.settings),
-        activityMix: activityMixForDomain(goal.domain_id),
-        now: ctx.now,
-        timezone: ctx.timezone,
-        algorithmVersion: DAILY_PLANNER_VERSION,
-      }, {
-        supportedActivityTypes: supportedActivityTypesForDomain(goal.domain_id),
-      })
-
-      if (output.items.length === 0) {
-        set({ planForecast: { ...get().planForecast, [ctx.planDate]: null } })
-        return
-      }
-
-      // `isNew` comes off the candidate the planner picked, not off the card row: on a
-      // subscribed deck the card carries the PUBLISHER's SRS state, and counting from it is
-      // the defect #389 fixed.
-      const byId = new Map(inputs.candidates.map((candidate) => [candidate.candidateId, candidate]))
-      let newCards = 0
-      for (const item of output.items) {
-        if (byId.get(item.candidateId)?.isNew) newCards += 1
-      }
-
-      set({
-        planForecast: {
-          ...get().planForecast,
-          [ctx.planDate]: {
-            planDate: ctx.planDate,
-            totalItems: output.items.length,
-            estimatedMinutes: output.totalMinutes,
-            newCards,
-            reviewCards: output.items.length - newCards,
-          },
-        },
-      })
-    } catch (e) {
-      // A forecast that cannot be computed says nothing rather than raising: it is a preview of
-      // a day that has not happened, and failing it must not take the plan screen down with it.
-      console.error('[learning-store] forecastPlan failed:', e)
-      set({ planForecast: { ...get().planForecast, [ctx.planDate]: null } })
-    } finally {
-      set({ planForecastLoading: null })
-    }
-  },
-
   extendPlan: async (goal, ctx) => {
     const { plan, planItems, planExtending, planGenerating } = get()
     // Nothing to append TO. The RPC would raise P0003, but the honest reading is that the
@@ -1667,130 +1432,6 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     }
   },
 
-  /**
-   * Ask the server for a remediation on one card, and hold the result as a preview.
-   *
-   * This SPENDS MONEY. `ai-generate` reserves against the wallet before calling the model
-   * and charges the real token cost after (mig 168), so the caller must only reach here on
-   * an explicit user action — and the UI has to say it costs credits BEFORE the click, not
-   * after the charge.
-   *
-   * The server persists the result as `user_enrichments.status = 'preview'` and returns its
-   * id; accepting or rejecting is a separate decision (`resolveEnrichment`). Rejecting is
-   * NOT a refund — the generation already happened.
-   */
-  requestEnrichment: async (input) => {
-    if (get().enrichmentPendingCardId) return false
-    set({ enrichmentPendingCardId: input.cardId, enrichmentError: null, enrichment: null })
-    try {
-      const result = await callServerAI({
-        kind: 'remediation',
-        action: input.action,
-        uiLang: input.uiLang,
-        goalId: input.goalId,
-        cardIds: [input.cardId],
-        // Omitted entirely when absent: the edge function rejects a malformed uuid, and
-        // sending `null` for "no attempt" would be a different request shape than the one
-        // `parseRemediationRefs` treats as "not supplied".
-        ...(input.attemptId ? { attemptId: input.attemptId } : {}),
-      })
-      // No enrichment id means the server could not persist the preview, so there is
-      // nothing to accept later. Surfacing it as an error beats showing content that
-      // silently cannot be kept.
-      if (!result.enrichmentId) {
-        set({ enrichmentError: 'UNKNOWN' })
-        return false
-      }
-      const rawSources = (result.content as { sources?: unknown }).sources
-      set({
-        enrichment: {
-          enrichmentId: result.enrichmentId,
-          action: input.action,
-          content: result.content,
-          sources: Array.isArray(rawSources) ? rawSources as EnrichmentSource[] : [],
-          balance: typeof result.balance === 'number' ? result.balance : null,
-        },
-      })
-      return true
-    } catch (e) {
-      set({ enrichmentError: toEnrichmentError(e) })
-      return false
-    } finally {
-      set({ enrichmentPendingCardId: null })
-    }
-  },
-
-  /**
-   * Read the price of one remediation before offering it.
-   *
-   * Fails SILENTLY into `null`: a wallet read that times out must not stop a learner with
-   * credits from asking a question, and the alternative — rendering 0 — would understate a
-   * real charge. The server remains authoritative and rejects an empty wallet with
-   * `AI_INSUFFICIENT_CREDITS`, which already has its own message.
-   */
-  loadEnrichmentQuote: async () => {
-    const wallet = await getAiWallet()
-    set({
-      enrichmentQuote: wallet
-        ? { estPriceMicro: wallet.estPricePerCardMicro, balanceMicro: wallet.balanceMicroWon }
-        : null,
-    })
-  },
-
-  /**
-   * Keep or discard the open preview.
-   *
-   * `set_user_enrichment_status` only allows a transition OUT OF 'preview' (P0007
-   * otherwise) — the closed statuses are terminal. So a double-click on Accept is a
-   * server-side conflict, not a silent second write, and the store closes the preview on
-   * success either way.
-   */
-  resolveEnrichment: async (status) => {
-    const current = get().enrichment
-    if (!current || get().enrichmentSaving) return false
-    set({ enrichmentSaving: true, enrichmentError: null })
-    try {
-      const { error } = await supabase.rpc('set_user_enrichment_status', {
-        p_enrichment_id: current.enrichmentId,
-        p_status: status,
-      })
-      if (error) throw error
-      set({ enrichment: null })
-      return true
-    } catch (e) {
-      const code = (e as { code?: string }).code
-      // P0007 means it was already finalized — the user's intent is satisfied, so close
-      // the preview instead of trapping them behind an error they cannot clear.
-      if (code === 'P0007') {
-        set({ enrichment: null })
-        return true
-      }
-      set({ enrichmentError: 'UNKNOWN' })
-      return false
-    } finally {
-      set({ enrichmentSaving: false })
-    }
-  },
-
-  /**
-   * Load the diagnostics window for a goal: attempts and plans, aggregated by a pure
-   * function so the arithmetic is testable without a database.
-   *
-   * Windows differ on purpose. Attempts look back 30 days because accuracy needs volume;
-   * plans look back 14 because adherence is a habit question and a three-week-old miss says
-   * nothing about this week.
-   */
-  /**
-   * How much of this goal the learner would still know at `atISO`.
-   *
-   * The retention rule lives in the kernel, not in SQL: `retentionStabilityMultiplier` collapses
-   * the whole forgetting curve into one scalar the database can compare dates with. Changing the
-   * criterion therefore changes this number too, with no migration.
-   *
-   * Failures are swallowed into a null entry rather than surfaced as a page error — progress is
-   * a header on a screen whose real job is serving today's cards, and a summary that cannot load
-   * must not take the plan down with it.
-   */
   fetchGoalKnowledge: async (goalId, atISO) => {
     set({ knowledgeLoading: true })
     try {
@@ -1982,7 +1623,6 @@ export const useLearningStore = create<LearningState>((set, get) => ({
 
   /** Close the preview without deciding. It stays 'preview' server-side and can be
    *  resolved later; the money is spent either way. */
-  dismissEnrichment: () => set({ enrichment: null, enrichmentError: null }),
 
   reset: () => {
     // Bump both generations so any response still in flight is recognised as superseded and
@@ -1999,10 +1639,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       // `autoPlanAttempted` would refuse to build one for the account that signed in.
       planAbsentFor: null, autoPlanAttempted: {},
       planExtending: false, planExtension: null,
-      planForecast: {}, planForecastLoading: null,
       recordingItemId: null, attempts: [], attemptsLoading: false,
-      enrichment: null, enrichmentPendingCardId: null, enrichmentError: null,
-      enrichmentSaving: false, enrichmentQuote: null,
       insights: null, insightsLoading: false, insightsGoalId: null, insightsError: null,
       recommendations: [], recommendationsLoading: false, recommendationsGoalId: null,
       recommendationBusyId: null,

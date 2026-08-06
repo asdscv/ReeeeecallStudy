@@ -5,9 +5,6 @@
     "progress": "{{done, number}} de {{total, number}} completados",
     "generate": "Crear plan de hoy",
     "generating": "Creando…",
-    "regenerate": "Recrear plan",
-    "regenerating": "Recreando…",
-    "completedNote": "Este plan ya se completó, no se puede recrear hoy.",
     "empty": {
       "noGoal": "Aún no tienes un objetivo de aprendizaje activo. Un objetivo establece tus minutos diarios y los mazos para planificar.",
       "createGoal": "Crear un objetivo",
@@ -28,11 +25,6 @@
       "forbidden": "No tienes acceso a eso.",
       "unknown": "No se pudo crear el plan. Inténtalo de nuevo."
     },
-    "rate": {
-      "again": "No lo sabía",
-      "partial": "A medias",
-      "known": "Lo sabía"
-    },
     "backToPlans": "Todos los planes",
     "extend": "Estudiar más",
     "extending": "Añadiendo…",
@@ -51,27 +43,6 @@
     "studyNote": "Valorar una tarjeta allí programa su próximo repaso y la marca en este plan.",
     "byDeck": "Por mazo",
     "deckDone": "Hecho",
-    "days": {
-      "label": "Día",
-      "today": "Hoy",
-      "tomorrow": "Mañana",
-      "inDays": "En {{count, number}} días",
-      "inDays_one": "En {{count, number}} días",
-      "inDays_other": "En {{count, number}} días"
-    },
-    "forecast": {
-      "title": "Cómo se ve ese día",
-      "cards": "{{count, number}} tarjetas",
-      "cards_one": "{{count, number}} tarjetas",
-      "cards_other": "{{count, number}} tarjetas",
-      "minutes": "unos {{count, number}} min",
-      "minutes_one": "unos {{count, number}} min",
-      "minutes_other": "unos {{count, number}} min",
-      "breakdown": "{{newCards, number}} nuevas · {{reviewCards, number}} de repaso",
-      "empty": "Ese día no parece tocar nada.",
-      "loading": "Calculando…",
-      "note": "Es una estimación: supone que no estudias nada entre hoy y ese día, que es justo lo que la cambiará."
-    },
     "composition": {
       "review": "{{count, number}} de repaso",
       "review_one": "{{count, number}} de repaso",
@@ -183,14 +154,9 @@
   },
   "history": {
     "title": "Estudio reciente",
-    "itemFallback": "Intento de {{type}}",
-    "youWrote": "Escribiste: {{text}}",
     "recap": "{{count, number}} tarjetas · {{minutes, number}} min · {{seconds, number}} s por tarjeta de media",
     "recap_one": "{{count, number}} tarjeta · {{minutes, number}} min · {{seconds, number}} s por tarjeta de media",
     "recap_other": "{{count, number}} tarjetas · {{minutes, number}} min · {{seconds, number}} s por tarjeta de media",
-    "reviewTitle": "{{count, number}} para repasar",
-    "reviewTitle_one": "{{count, number}} para repasar",
-    "reviewTitle_other": "{{count, number}} para repasar",
     "band": {
       "known": "{{count, number}} acertadas",
       "known_one": "{{count, number}} acertada",
@@ -200,44 +166,7 @@
       "partial_other": "{{count, number}} dudosas",
       "missed": "{{count, number}} falladas",
       "missed_one": "{{count, number}} fallada",
-      "missed_other": "{{count, number}} falladas",
-      "partialShort": "Dudosa",
-      "missedShort": "Fallada"
-    },
-    "reviewCapped": "Mostrando {{shown, number}} de {{total, number}}."
-  },
-  "enrichment": {
-    "explainCta": "Explicar (créditos)",
-    "requesting": "Consultando…",
-    "costHint": "Utiliza créditos de IA de tu billetera",
-    "action": {
-      "explain": "Explicación IA",
-      "hint": "Pista de estudio",
-      "compare": "Comparar mi respuesta"
-    },
-    "quote": "Unos {{price}} por solicitud · quedan {{balance}}",
-    "groundedHint": "Responde a este intento, no solo a la tarjeta",
-    "sources": "Fuentes",
-    "noSources": "Esta respuesta no está basada en fuentes.",
-    "empty": "El modelo no devolvió nada utilizable.",
-    "chargedNote": "Ya se cobró — descartar no reembolsa los créditos.",
-    "keep": "Conservar",
-    "discard": "Descartar",
-    "later": "Decidir después",
-    "saving": "Guardando…",
-    "error": {
-      "BAD_REQUEST": "La solicitud no es válida.",
-      "FORBIDDEN": "No tienes acceso a esa tarjeta.",
-      "GROUNDING_REQUIRED": "No se encontró una fuente citable, por lo que se rechazó la respuesta en vez de inventarla.",
-      "INSUFFICIENT_CREDITS": "Créditos de IA insuficientes. Recarga para continuar.",
-      "INVALID_RESULT": "La respuesta llegó en un formato inutilizable. Inténtalo de nuevo.",
-      "NETWORK": "Error de red. Comprueba tu conexión.",
-      "NOT_CONFIGURED": "La generación con IA no está habilitada en este servidor.",
-      "PROVIDER_ERROR": "El servicio de IA falló. Inténtalo de nuevo.",
-      "RATE_CAP": "Has alcanzado el límite diario de solicitudes de IA. Inténtalo mañana.",
-      "UNKNOWN": "Algo salió mal. Inténtalo de nuevo.",
-      "COMPARE_NO_ANSWER": "Escribe tu respuesta primero: todavía no hay nada que comparar.",
-      "COMPARE_NO_REFERENCE": "Esta tarjeta no indica qué campo es la respuesta, así que no hay con qué compararla."
+      "missed_other": "{{count, number}} falladas"
     }
   },
   "insights": {
