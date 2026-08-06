@@ -133,13 +133,30 @@
   },
   "history": {
     "itemFallback": "{{type}} 作答",
-    "score": {
-      "unknown": "未评分"
-    },
-    "title": "最近作答 ({{count, number}})",
+    "title": "最近学习",
     "title_one": "最近作答 ({{count, number}})",
     "title_other": "最近作答 ({{count, number}})",
-    "youWrote": "你写的答案：{{text}}"
+    "youWrote": "你写的答案：{{text}}",
+    "recap": "{{count, number}} 张 · {{minutes, number}} 分钟 · 每张平均 {{seconds, number}} 秒",
+    "recap_one": "{{count, number}} 张 · {{minutes, number}} 分钟 · 每张平均 {{seconds, number}} 秒",
+    "recap_other": "{{count, number}} 张 · {{minutes, number}} 分钟 · 每张平均 {{seconds, number}} 秒",
+    "reviewTitle": "需要再看的卡片 {{count, number}} 张",
+    "reviewTitle_one": "需要再看的卡片 {{count, number}} 张",
+    "reviewTitle_other": "需要再看的卡片 {{count, number}} 张",
+    "band": {
+      "known": "记住 {{count, number}}",
+      "known_one": "记住 {{count, number}}",
+      "known_other": "记住 {{count, number}}",
+      "partial": "模糊 {{count, number}}",
+      "partial_one": "模糊 {{count, number}}",
+      "partial_other": "模糊 {{count, number}}",
+      "missed": "没记住 {{count, number}}",
+      "missed_one": "没记住 {{count, number}}",
+      "missed_other": "没记住 {{count, number}}",
+      "partialShort": "模糊",
+      "missedShort": "没记住"
+    },
+    "reviewCapped": "共 {{total, number}} 张，显示 {{shown, number}} 张。"
   },
   "insights": {
     "accuracy": "正确率",

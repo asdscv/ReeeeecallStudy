@@ -13,6 +13,8 @@ import {
 } from '@reeeeecall/shared/lib/learning-attempt-selection'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { planComposition } from '@reeeeecall/shared/lib/plan-composition'
+import { studyRecap, scoreBand } from '@reeeeecall/shared/lib/study-recap'
+import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
 import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
 import { useDeckStore } from '../../stores/deck-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
@@ -94,8 +96,20 @@ const REMEDIATION_ACTIONS: ReadonlyArray<{
   },
 ]
 
-/** Recent attempts for the selected goal — where paid remediation is offered. */
-function AttemptHistory({ goalId }: { goalId: string }) {
+/**
+ * How the day went, and the cards worth another look.
+ *
+ * This used to be "최근 시도": one row per attempt, each a card prompt with a rating word and a
+ * timestamp beside it. Twenty rows of vocabulary that answered no question — the same failure as
+ * the per-card plan list, in the one place a learner has actually finished something and might
+ * want to know how it went.
+ *
+ * So the rows collapse into three numbers (how much, how long, how it went) and what remains
+ * listed is only what has something to DO on it: the cards that were missed, which is exactly
+ * where paid remediation was already offered. Cards the learner said they KNEW are counted and
+ * not printed — there is nothing to ask about them.
+ */
+function AttemptHistory({ goalId, planDate }: { goalId: string; planDate: string }) {
   const { t, i18n } = useTranslation('learning')
   const {
     attempts, attemptsLoading, planCards, planTemplateFields, fetchAttempts,
@@ -112,7 +126,27 @@ function AttemptHistory({ goalId }: { goalId: string }) {
     () => attempts.filter((attempt) => attempt.goal_id === goalId),
     [attempts, goalId],
   )
-  const visibleAttempts = useMemo(() => goalAttempts.slice(0, ATTEMPT_ROWS), [goalAttempts])
+
+  /**
+   * The day the screen is showing, not "the last 50 rows".
+   *
+   * The store reads 50 attempts for the goal with no date bound, and the old list simply took
+   * the first ten of them — so a learner returning after a week saw last week's words under a
+   * heading about now. A recap has to name a period, and this screen's period is its plan date.
+   */
+  const todaysAttempts = useMemo(
+    () => goalAttempts.filter((attempt) => utcToLocalDateKey(attempt.created_at) === planDate),
+    [goalAttempts, planDate],
+  )
+  const recap = useMemo(() => studyRecap(todaysAttempts), [todaysAttempts])
+
+  // Only what can be acted on stays a row. Capped, and the cap is stated below rather than
+  // silently swallowing the rest.
+  const reviewable = useMemo(
+    () => todaysAttempts.filter((attempt) => attemptNeedsRemediation(attempt) && attempt.card_id),
+    [todaysAttempts],
+  )
+  const visibleAttempts = useMemo(() => reviewable.slice(0, ATTEMPT_ROWS), [reviewable])
 
   /**
    * Paid remediation is offered only where there is a premise for it: a miss or a partial
@@ -139,21 +173,40 @@ function AttemptHistory({ goalId }: { goalId: string }) {
   // sharing one card_id, and keying on the card would make both claim to be the pending one.
   const [requestingAttemptId, setRequestingAttemptId] = useState<string | null>(null)
 
-  if (attemptsLoading && goalAttempts.length === 0) return null
-  if (goalAttempts.length === 0) return null
+  // Nothing studied today is not an error and not an empty state — it is simply a day that has
+  // not started, and the card above already says so.
+  if (attemptsLoading && todaysAttempts.length === 0) return null
+  if (recap.count === 0) return null
 
-  const scoreKey = (score: number | null): string => {
-    if (score === null) return 'history.score.unknown'
-    if (score >= 0.75) return 'today.rate.known'
-    if (score >= 0.25) return 'today.rate.partial'
-    return 'today.rate.again'
-  }
+  // Each band omitted when empty: "몰랐음 0" is a sentence about nothing, and a learner who got
+  // everything right should read three words, not a row of zeroes.
+  const bands = [
+    recap.known > 0 ? t('history.band.known', { count: recap.known }) : null,
+    recap.partial > 0 ? t('history.band.partial', { count: recap.partial }) : null,
+    recap.missed > 0 ? t('history.band.missed', { count: recap.missed }) : null,
+  ].filter(Boolean).join(' · ')
 
   return (
     <section className="pt-2">
-      <h2 className="text-sm font-medium text-foreground">
-        {t('history.title', { count: visibleAttempts.length })}
-      </h2>
+      <h2 className="text-sm font-medium text-foreground">{t('history.title')}</h2>
+
+      {/* How much, how long, how it went — the three things the list of words never said. */}
+      <div className="mt-2 rounded-xl border border-border bg-card p-3" data-testid="study-recap">
+        <p className="text-sm text-foreground">
+          {t('history.recap', {
+            count: recap.count,
+            minutes: Math.round(recap.totalMs / 60000),
+            seconds: Math.round(recap.avgMs / 1000),
+          })}
+        </p>
+        {bands && <p className="mt-1 text-xs text-content-tertiary">{bands}</p>}
+      </div>
+
+      {visibleAttempts.length > 0 && (
+        <h3 className="mt-3 text-xs font-medium text-muted-foreground">
+          {t('history.reviewTitle', { count: reviewable.length })}
+        </h3>
+      )}
       {/* What the charge buys, as VISIBLE text rather than a `title` tooltip — a tooltip never
           reaches a keyboard or touch user. */}
       {offersRemediation && (
@@ -170,6 +223,7 @@ function AttemptHistory({ goalId }: { goalId: string }) {
           )}
         </p>
       )}
+      {visibleAttempts.length > 0 && (
       <ul className="mt-2 divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
         {visibleAttempts.map((attempt) => {
           const card = attempt.card_id ? planCards[attempt.card_id] : undefined
@@ -178,6 +232,7 @@ function AttemptHistory({ goalId }: { goalId: string }) {
           const pending = requestingAttemptId === attempt.id
           const rowName = label || t('history.itemFallback', { type: attempt.activity_type })
           const typedAnswer = attemptTypedAnswer(attempt)
+          const band = scoreBand(attempt.normalized_score)
           return (
             <li key={attempt.id} className="flex items-center justify-between gap-3 px-3 py-2">
               <span className="min-w-0">
@@ -189,10 +244,12 @@ function AttemptHistory({ goalId }: { goalId: string }) {
                 )}
               </span>
               <span className="flex shrink-0 items-center gap-2">
-                <span className="text-xs text-content-tertiary">{t(scoreKey(attempt.normalized_score))}</span>
-                <span className="text-[11px] text-content-tertiary">
-                  {new Date(attempt.created_at).toLocaleString()}
-                </span>
+                {/* Which KIND of miss — "애매함" and "몰랐음" want different help. The timestamp
+                    that used to sit here is gone: every row is from today, and the clock time of
+                    a flashcard is not something anyone came here to read. */}
+                {band !== null && band !== 'known' && (
+                  <span className="text-xs text-content-tertiary">{t(`history.band.${band}Short`)}</span>
+                )}
                 {pending && (
                   <span className="text-xs text-content-tertiary">{t('enrichment.requesting')}</span>
                 )}
@@ -224,6 +281,14 @@ function AttemptHistory({ goalId }: { goalId: string }) {
           )
         })}
       </ul>
+      )}
+
+      {/* Say what was left out. A silent top-N reads as "that was all of them". */}
+      {reviewable.length > ATTEMPT_ROWS && (
+        <p className="mt-1 text-[11px] text-content-tertiary">
+          {t('history.reviewCapped', { shown: ATTEMPT_ROWS, total: reviewable.length })}
+        </p>
+      )}
     </section>
   )
 }
@@ -679,7 +744,7 @@ export function LearningTodayPage() {
 
       {/* Kept on today only: the remediation offer is grounded in an attempt, and a day that
           has not happened has none. */}
-      {dayOffset === 0 && <AttemptHistory goalId={selectedGoalId} />}
+      {dayOffset === 0 && <AttemptHistory goalId={selectedGoalId} planDate={ctx.planDate} />}
     </div>
   )
 }

@@ -19,6 +19,7 @@ import {
 } from '@reeeeecall/shared/lib/learning-attempt-selection'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { planComposition } from '@reeeeecall/shared/lib/plan-composition'
+import { studyRecap, scoreBand } from '@reeeeecall/shared/lib/study-recap'
 import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
 import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
 import { useStudy } from '../hooks/useStudy'
@@ -87,23 +88,13 @@ const REMEDIATION_ACTIONS: ReadonlyArray<{
   },
 ]
 
-/** How many recent attempts the list shows — the same window as web's `AttemptHistory`. */
-const ATTEMPT_ROWS = 10
-
 /**
- * Score → band label, using web's thresholds verbatim so the same attempt cannot read
- * "Partly" on the phone and "Knew it" in the browser.
+ * How many missed cards the list shows — the same window as web's `AttemptHistory`.
  *
- * Deliberately NOT `KNOWN_SCORE_THRESHOLD`, even though 0.75 appears in both: that constant
- * gates what a learner can be CHARGED for, and aliasing it here would let a cosmetic tweak to
- * a label silently change who gets offered a paid request.
+ * Anything beyond it is stated below the list rather than silently dropped: a quiet top-N reads
+ * as "that was all of them".
  */
-const scoreKey = (score: number | null): string => {
-  if (score === null) return 'history.score.unknown'
-  if (score >= 0.75) return 'today.rate.known'
-  if (score >= 0.25) return 'today.rate.partial'
-  return 'today.rate.again'
-}
+const ATTEMPT_ROWS = 10
 
 export function LearningTodayScreen() {
   const { t, i18n } = useTranslation('learning')
@@ -245,7 +236,35 @@ export function LearningTodayScreen() {
     () => attempts.filter((attempt) => attempt.goal_id === goalId),
     [attempts, goalId],
   )
-  const recentAttempts = useMemo(() => goalAttempts.slice(0, ATTEMPT_ROWS), [goalAttempts])
+  /**
+   * The day this screen is showing, not "the last 50 rows".
+   *
+   * The store reads 50 attempts for the goal with no date bound and the old list took the first
+   * ten, so a learner returning after a week read last week's words under a heading about now.
+   */
+  const todaysAttempts = useMemo(
+    () => goalAttempts.filter((attempt) => utcToLocalDateKey(attempt.created_at) === planDate),
+    [goalAttempts, planDate],
+  )
+  /** How much, how long, how it went — shared with web so the two cannot disagree. */
+  const recap = useMemo(() => studyRecap(todaysAttempts), [todaysAttempts])
+  /**
+   * Only the rows with something to DO on them.
+   *
+   * This list used to be every attempt, one card prompt per row — a column of vocabulary that
+   * answered no question. Cards the learner said they KNEW are counted in the recap and not
+   * printed: there is nothing to ask about them, and remediation is refused on them anyway.
+   */
+  const reviewable = useMemo(
+    () => todaysAttempts.filter((a) => a.card_id !== null && attemptNeedsRemediation(a)),
+    [todaysAttempts],
+  )
+  const recentAttempts = useMemo(() => reviewable.slice(0, ATTEMPT_ROWS), [reviewable])
+  const recapBands = [
+    recap.known > 0 ? t('history.band.known', { count: recap.known }) : null,
+    recap.partial > 0 ? t('history.band.partial', { count: recap.partial }) : null,
+    recap.missed > 0 ? t('history.band.missed', { count: recap.missed }) : null,
+  ].filter(Boolean).join(' · ')
   // Which ROW is waiting, not which card. The store tracks only the pending CARD, and the
   // learner this feature targets — someone who missed the same card twice — has two remediable
   // rows sharing one card_id. Keying on the card makes both claim to be the request in flight.
@@ -860,17 +879,42 @@ export function LearningTodayScreen() {
                 No timestamp beyond the local date: `toLocaleString` is `Intl`, which these
                 screens do not use (an ICU-less Hermes build has no `Intl` at all), and the
                 list is already newest-first, so the day is the only part that adds anything. */}
-            {attemptsLoading && goalAttempts.length === 0 ? (
+            {attemptsLoading && todaysAttempts.length === 0 ? (
               <ActivityIndicator {...testProps('learning-attempts-loading')} />
-            ) : recentAttempts.length > 0 ? (
+            ) : recap.count > 0 ? (
               <View style={styles.attemptSection} {...testProps('learning-attempt-history', true)}>
-                {/* Counts the rows ON SCREEN, not everything loaded — the store fetches 50 and
-                    this shows ten, so counting the former would print "(40)" above ten rows.
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
+                  {t('history.title')}
+                </Text>
+
+                {/* How the session went, in the three numbers the list of words never gave.
                     `{{count, number}}` with a real number — the Intl-free formatter registered
                     in src/i18n does the grouping. */}
-                <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
-                  {t('history.title', { count: recentAttempts.length })}
-                </Text>
+                <View
+                  style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+                  {...testProps('learning-study-recap', true)}
+                >
+                  <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
+                    {t('history.recap', {
+                      count: recap.count,
+                      minutes: Math.round(recap.totalMs / 60000),
+                      seconds: Math.round(recap.avgMs / 1000),
+                    })}
+                  </Text>
+                  {/* A band with nothing in it is left out — "몰랐음 0" is a sentence about
+                      nothing, and a perfect session should read as three words. */}
+                  {recapBands !== '' && (
+                    <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>
+                      {recapBands}
+                    </Text>
+                  )}
+                </View>
+
+                {recentAttempts.length > 0 && (
+                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 8 }]}>
+                    {t('history.reviewTitle', { count: reviewable.length })}
+                  </Text>
+                )}
 
                 {/* The price, before the tap. `enrichmentQuote === null` means the wallet
                     could not be read — then NO number is shown at all, because "$0.00" for
@@ -917,13 +961,19 @@ export function LearningTodayScreen() {
                         >
                           {label || t('history.itemFallback', { type: attempt.activity_type })}
                         </Text>
-                        <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-                          {t(scoreKey(attempt.normalized_score))}
-                        </Text>
+                        {/* Which KIND of miss — "애매함" and "몰랐음" want different help. */}
+                        {scoreBand(attempt.normalized_score) === 'partial' ? (
+                          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+                            {t('history.band.partialShort')}
+                          </Text>
+                        ) : scoreBand(attempt.normalized_score) === 'missed' ? (
+                          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+                            {t('history.band.missedShort')}
+                          </Text>
+                        ) : null}
                       </View>
-                      <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-                        {utcToLocalDateKey(attempt.created_at)}
-                      </Text>
+                      {/* The date that used to sit here is gone: every row is from the day this
+                          screen is showing, so it could only ever print that same date. */}
                       {/* What the learner wrote, when they wrote anything — the honesty check:
                           a later paid `compare` is grounded in exactly this string, so it has
                           to be visible before anyone pays for an answer about it. */}

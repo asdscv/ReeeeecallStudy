@@ -133,13 +133,30 @@
   },
   "history": {
     "itemFallback": "Percobaan {{type}}",
-    "score": {
-      "unknown": "Tanpa skor"
-    },
-    "title": "Percobaan terbaru ({{count, number}})",
+    "title": "Belajar terbaru",
     "title_one": "Percobaan terbaru ({{count, number}})",
     "title_other": "Percobaan terbaru ({{count, number}})",
-    "youWrote": "Kamu menulis: {{text}}"
+    "youWrote": "Kamu menulis: {{text}}",
+    "recap": "{{count, number}} kartu · {{minutes, number}} menit · rata-rata {{seconds, number}} detik per kartu",
+    "recap_one": "{{count, number}} kartu · {{minutes, number}} menit · rata-rata {{seconds, number}} detik per kartu",
+    "recap_other": "{{count, number}} kartu · {{minutes, number}} menit · rata-rata {{seconds, number}} detik per kartu",
+    "reviewTitle": "{{count, number}} kartu untuk dilihat lagi",
+    "reviewTitle_one": "{{count, number}} kartu untuk dilihat lagi",
+    "reviewTitle_other": "{{count, number}} kartu untuk dilihat lagi",
+    "band": {
+      "known": "Tahu {{count, number}}",
+      "known_one": "Tahu {{count, number}}",
+      "known_other": "Tahu {{count, number}}",
+      "partial": "Ragu {{count, number}}",
+      "partial_one": "Ragu {{count, number}}",
+      "partial_other": "Ragu {{count, number}}",
+      "missed": "Lupa {{count, number}}",
+      "missed_one": "Lupa {{count, number}}",
+      "missed_other": "Lupa {{count, number}}",
+      "partialShort": "Ragu",
+      "missedShort": "Lupa"
+    },
+    "reviewCapped": "Menampilkan {{shown, number}} dari {{total, number}}."
   },
   "insights": {
     "accuracy": "Akurasi",

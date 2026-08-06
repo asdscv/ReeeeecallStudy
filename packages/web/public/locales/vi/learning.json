@@ -182,12 +182,29 @@
     "newCardsPerDayZero": "Đặt 0 để không bắt đầu thẻ mới, chỉ ôn cho hết phần đang tồn."
   },
   "history": {
-    "title": "Lần làm gần đây ({{count, number}})",
+    "title": "Học gần đây",
     "itemFallback": "Lần làm {{type}}",
     "youWrote": "Bạn đã viết: {{text}}",
-    "score": {
-      "unknown": "Chưa có điểm"
-    }
+    "recap": "{{count, number}} thẻ · {{minutes, number}} phút · trung bình {{seconds, number}} giây mỗi thẻ",
+    "recap_one": "{{count, number}} thẻ · {{minutes, number}} phút · trung bình {{seconds, number}} giây mỗi thẻ",
+    "recap_other": "{{count, number}} thẻ · {{minutes, number}} phút · trung bình {{seconds, number}} giây mỗi thẻ",
+    "reviewTitle": "{{count, number}} thẻ cần xem lại",
+    "reviewTitle_one": "{{count, number}} thẻ cần xem lại",
+    "reviewTitle_other": "{{count, number}} thẻ cần xem lại",
+    "band": {
+      "known": "Nhớ {{count, number}}",
+      "known_one": "Nhớ {{count, number}}",
+      "known_other": "Nhớ {{count, number}}",
+      "partial": "Lơ mơ {{count, number}}",
+      "partial_one": "Lơ mơ {{count, number}}",
+      "partial_other": "Lơ mơ {{count, number}}",
+      "missed": "Quên {{count, number}}",
+      "missed_one": "Quên {{count, number}}",
+      "missed_other": "Quên {{count, number}}",
+      "partialShort": "Lơ mơ",
+      "missedShort": "Quên"
+    },
+    "reviewCapped": "Hiển thị {{shown, number}} trong {{total, number}} thẻ."
   },
   "enrichment": {
     "explainCta": "Giải thích (tín dụng)",

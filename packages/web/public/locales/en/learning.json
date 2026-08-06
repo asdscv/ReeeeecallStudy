@@ -182,12 +182,29 @@
     "newCardsPerDayZero": "Set it to 0 to start nothing new and just clear the backlog."
   },
   "history": {
-    "title": "Recent attempts ({{count, number}})",
+    "title": "Recent study",
     "itemFallback": "{{type}} attempt",
     "youWrote": "You wrote: {{text}}",
-    "score": {
-      "unknown": "Not scored"
-    }
+    "recap": "{{count, number}} cards · {{minutes, number}} min · {{seconds, number}}s per card on average",
+    "recap_one": "{{count, number}} card · {{minutes, number}} min · {{seconds, number}}s per card on average",
+    "recap_other": "{{count, number}} cards · {{minutes, number}} min · {{seconds, number}}s per card on average",
+    "reviewTitle": "{{count, number}} to look at again",
+    "reviewTitle_one": "{{count, number}} to look at again",
+    "reviewTitle_other": "{{count, number}} to look at again",
+    "band": {
+      "known": "{{count, number}} knew it",
+      "known_one": "{{count, number}} knew it",
+      "known_other": "{{count, number}} knew it",
+      "partial": "{{count, number}} shaky",
+      "partial_one": "{{count, number}} shaky",
+      "partial_other": "{{count, number}} shaky",
+      "missed": "{{count, number}} missed",
+      "missed_one": "{{count, number}} missed",
+      "missed_other": "{{count, number}} missed",
+      "partialShort": "Shaky",
+      "missedShort": "Missed"
+    },
+    "reviewCapped": "Showing {{shown, number}} of {{total, number}}."
   },
   "enrichment": {
     "explainCta": "Explain (credits)",

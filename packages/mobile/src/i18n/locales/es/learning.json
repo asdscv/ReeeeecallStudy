@@ -133,13 +133,30 @@
   },
   "history": {
     "itemFallback": "Intento de {{type}}",
-    "score": {
-      "unknown": "Sin puntuación"
-    },
-    "title": "Intentos recientes ({{count, number}})",
+    "title": "Estudio reciente",
     "title_one": "Intento reciente ({{count, number}})",
     "title_other": "Intentos recientes ({{count, number}})",
-    "youWrote": "Escribiste: {{text}}"
+    "youWrote": "Escribiste: {{text}}",
+    "recap": "{{count, number}} tarjetas · {{minutes, number}} min · {{seconds, number}} s por tarjeta de media",
+    "recap_one": "{{count, number}} tarjeta · {{minutes, number}} min · {{seconds, number}} s por tarjeta de media",
+    "recap_other": "{{count, number}} tarjetas · {{minutes, number}} min · {{seconds, number}} s por tarjeta de media",
+    "reviewTitle": "{{count, number}} para repasar",
+    "reviewTitle_one": "{{count, number}} para repasar",
+    "reviewTitle_other": "{{count, number}} para repasar",
+    "band": {
+      "known": "{{count, number}} acertadas",
+      "known_one": "{{count, number}} acertada",
+      "known_other": "{{count, number}} acertadas",
+      "partial": "{{count, number}} dudosas",
+      "partial_one": "{{count, number}} dudosa",
+      "partial_other": "{{count, number}} dudosas",
+      "missed": "{{count, number}} falladas",
+      "missed_one": "{{count, number}} fallada",
+      "missed_other": "{{count, number}} falladas",
+      "partialShort": "Dudosa",
+      "missedShort": "Fallada"
+    },
+    "reviewCapped": "Mostrando {{shown, number}} de {{total, number}}."
   },
   "insights": {
     "accuracy": "Precisión",

@@ -182,12 +182,29 @@
     "newCardsPerDayZero": "ตั้งเป็น 0 เพื่อไม่เริ่มการ์ดใหม่ และตามเก็บงานที่ค้างอย่างเดียว"
   },
   "history": {
-    "title": "การทำล่าสุด ({{count, number}})",
+    "title": "การเรียนล่าสุด",
     "itemFallback": "การทำ {{type}}",
     "youWrote": "คุณเขียนว่า: {{text}}",
-    "score": {
-      "unknown": "ไม่มีคะแนน"
-    }
+    "recap": "{{count, number}} ใบ · {{minutes, number}} นาที · เฉลี่ย {{seconds, number}} วินาทีต่อใบ",
+    "recap_one": "{{count, number}} ใบ · {{minutes, number}} นาที · เฉลี่ย {{seconds, number}} วินาทีต่อใบ",
+    "recap_other": "{{count, number}} ใบ · {{minutes, number}} นาที · เฉลี่ย {{seconds, number}} วินาทีต่อใบ",
+    "reviewTitle": "ควรดูอีกครั้ง {{count, number}} ใบ",
+    "reviewTitle_one": "ควรดูอีกครั้ง {{count, number}} ใบ",
+    "reviewTitle_other": "ควรดูอีกครั้ง {{count, number}} ใบ",
+    "band": {
+      "known": "จำได้ {{count, number}}",
+      "known_one": "จำได้ {{count, number}}",
+      "known_other": "จำได้ {{count, number}}",
+      "partial": "ไม่แน่ใจ {{count, number}}",
+      "partial_one": "ไม่แน่ใจ {{count, number}}",
+      "partial_other": "ไม่แน่ใจ {{count, number}}",
+      "missed": "จำไม่ได้ {{count, number}}",
+      "missed_one": "จำไม่ได้ {{count, number}}",
+      "missed_other": "จำไม่ได้ {{count, number}}",
+      "partialShort": "ไม่แน่ใจ",
+      "missedShort": "จำไม่ได้"
+    },
+    "reviewCapped": "แสดง {{shown, number}} จาก {{total, number}} ใบ"
   },
   "enrichment": {
     "explainCta": "อธิบาย (เครดิต)",

@@ -133,13 +133,30 @@
   },
   "history": {
     "itemFallback": "{{type}} 시도",
-    "score": {
-      "unknown": "점수 없음"
-    },
-    "title": "최근 시도 ({{count, number}})",
+    "title": "최근 학습",
     "title_one": "최근 시도 ({{count, number}})",
     "title_other": "최근 시도 ({{count, number}})",
-    "youWrote": "작성한 답: {{text}}"
+    "youWrote": "작성한 답: {{text}}",
+    "recap": "{{count, number}}장 · {{minutes, number}}분 · 카드당 평균 {{seconds, number}}초",
+    "recap_one": "{{count, number}}장 · {{minutes, number}}분 · 카드당 평균 {{seconds, number}}초",
+    "recap_other": "{{count, number}}장 · {{minutes, number}}분 · 카드당 평균 {{seconds, number}}초",
+    "reviewTitle": "다시 볼 카드 {{count, number}}장",
+    "reviewTitle_one": "다시 볼 카드 {{count, number}}장",
+    "reviewTitle_other": "다시 볼 카드 {{count, number}}장",
+    "band": {
+      "known": "알았음 {{count, number}}",
+      "known_one": "알았음 {{count, number}}",
+      "known_other": "알았음 {{count, number}}",
+      "partial": "애매함 {{count, number}}",
+      "partial_one": "애매함 {{count, number}}",
+      "partial_other": "애매함 {{count, number}}",
+      "missed": "몰랐음 {{count, number}}",
+      "missed_one": "몰랐음 {{count, number}}",
+      "missed_other": "몰랐음 {{count, number}}",
+      "partialShort": "애매함",
+      "missedShort": "몰랐음"
+    },
+    "reviewCapped": "{{total, number}}장 중 {{shown, number}}장만 표시했어요."
   },
   "insights": {
     "accuracy": "정답률",

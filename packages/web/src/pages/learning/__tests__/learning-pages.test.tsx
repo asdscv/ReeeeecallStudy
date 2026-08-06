@@ -522,24 +522,65 @@ describe('starting the day', () => {
 })
 
 describe('attempt history', () => {
-  it('lists recent attempts with a human score label', () => {
+  // Attempts are read for the PLAN'S DAY now, not "the last 50 rows" — a learner returning after
+  // a week used to see last week's words under a heading about today. Fixtures therefore have to
+  // land on the day the screen is showing.
+  // Built from a LOCAL wall-clock string so it survives the local-date filter in any timezone —
+  // a fixed UTC instant lands on the previous day west of Greenwich.
+  const attemptAt = (hour: string) => new Date(`${todayKey()}T${hour}:00:00`).toISOString()
+
+  it('says how the day went instead of listing the words that were in it', () => {
+    // The old section printed one row per attempt: card prompt, rating word, timestamp. A column
+    // of vocabulary in the one place a learner has just finished something and wants to know how
+    // it went. Three numbers answer that; twenty rows do not.
     renderToday({
       attempts: [
         { id: 'a1', goal_id: 'goal-1', card_id: 'card-1', activity_id: null, plan_item_id: 'item-1',
           activity_type: 'recall', evaluator_type: 'self_rate', normalized_score: 1,
-          duration_ms: 3000, created_at: '2026-07-31T01:00:00.000Z' },
+          duration_ms: 3000, created_at: attemptAt('01') },
         { id: 'a2', goal_id: 'goal-1', card_id: null, activity_id: null, plan_item_id: null,
           activity_type: 'recall', evaluator_type: 'self_rate', normalized_score: null,
-          duration_ms: 0, created_at: '2026-07-31T00:00:00.000Z' },
+          duration_ms: 0, created_at: attemptAt('00') },
       ],
       planCards: { 'card-1': { id: 'card-1', deck_id: 'deck-7', field_values: { front: '猫' } } },
     })
 
     expect(screen.getByText('history.title')).toBeInTheDocument()
-    expect(screen.getByText('猫')).toBeInTheDocument()
-    expect(screen.getByText('today.rate.known')).toBeInTheDocument()
-    // An unscored attempt must say so rather than rendering as "didn't know" (0 vs null).
-    expect(screen.getByText('history.score.unknown')).toBeInTheDocument()
+    expect(screen.getByTestId('study-recap')).toHaveTextContent('history.recap')
+    // A card the learner KNEW is counted, not printed — there is nothing to ask about it.
+    expect(screen.getByTestId('study-recap')).toHaveTextContent('history.band.known')
+    expect(screen.queryByText('猫')).not.toBeInTheDocument()
+  })
+
+  it('leaves out a band with nothing in it', () => {
+    // "몰랐음 0" is a sentence about nothing, and a clean session should read as one word.
+    renderToday({
+      attempts: [
+        { id: 'a1', goal_id: 'goal-1', card_id: 'card-1', activity_id: null, plan_item_id: 'item-1',
+          activity_type: 'recall', evaluator_type: 'self_rate', normalized_score: 1,
+          duration_ms: 3000, created_at: attemptAt('01') },
+      ],
+    })
+
+    const recap = screen.getByTestId('study-recap')
+    expect(recap).toHaveTextContent('history.band.known')
+    expect(recap).not.toHaveTextContent('history.band.missed')
+    expect(recap).not.toHaveTextContent('history.band.partial')
+  })
+
+  it('counts the day the screen is showing, not the last 50 rows the store holds', () => {
+    // `fetchAttempts` reads 50 for the goal with no date bound, and the old list took the first
+    // ten of them — so someone returning after a week read last week's work under a heading
+    // about now.
+    renderToday({
+      attempts: [
+        { id: 'old', goal_id: 'goal-1', card_id: 'card-1', activity_id: null, plan_item_id: null,
+          activity_type: 'recall', evaluator_type: 'self_rate', normalized_score: 0,
+          duration_ms: 1000, created_at: '2026-01-02T03:00:00.000Z' },
+      ],
+    })
+
+    expect(screen.queryByText('history.title')).not.toBeInTheDocument()
   })
 
   it('renders nothing when there are no attempts yet', () => {
@@ -556,7 +597,7 @@ describe('attempt history', () => {
         { id: 'a1', goal_id: 'goal-1', card_id: 'card-1', activity_id: null, plan_item_id: 'item-1',
           activity_type: 'recall', response_type: 'text', evaluator_type: 'self_rate',
           response: { self_rated: 0, text: 'apfel' }, normalized_score: 0,
-          duration_ms: 0, created_at: '2026-07-31T01:00:00.000Z' },
+          duration_ms: 0, created_at: attemptAt('01') },
       ],
     })
 
@@ -569,7 +610,7 @@ describe('attempt history', () => {
         { id: 'a1', goal_id: 'goal-1', card_id: 'card-1', activity_id: null, plan_item_id: 'item-1',
           activity_type: 'recall', response_type: 'self_rate', evaluator_type: 'self_rate',
           response: { self_rated: 0 }, normalized_score: 0,
-          duration_ms: 0, created_at: '2026-07-31T01:00:00.000Z' },
+          duration_ms: 0, created_at: attemptAt('01') },
       ],
     })
 
@@ -584,7 +625,7 @@ describe('attempt history', () => {
   const missed = {
     id: 'a-missed', goal_id: 'goal-1', card_id: 'card-1', activity_id: null,
     plan_item_id: 'item-1', activity_type: 'recall', evaluator_type: 'self_rate',
-    normalized_score: 0, duration_ms: 0, created_at: '2026-07-31T03:00:00.000Z',
+    normalized_score: 0, duration_ms: 0, created_at: attemptAt('03'),
   }
   const partial = { ...missed, id: 'a-partial', card_id: 'card-2', normalized_score: 0.5 }
   const known = { ...missed, id: 'a-known', card_id: 'card-3', normalized_score: 1 }
@@ -740,7 +781,10 @@ describe('enrichment', () => {
   const attemptOnCard1 = {
     id: 'a-1', goal_id: 'goal-1', card_id: 'card-1', activity_id: null,
     plan_item_id: 'item-1', activity_type: 'recall', evaluator_type: 'self_rate',
-    normalized_score: 0, duration_ms: 0, created_at: '2026-07-31T03:00:00.000Z',
+    normalized_score: 0, duration_ms: 0,
+    // The section is scoped to the plan's own day now, so a fixture frozen in July renders
+    // nothing at all. Built from a LOCAL wall-clock string so it holds in any timezone.
+    created_at: new Date(`${todayKey()}T03:00:00`).toISOString(),
   }
 
   /**

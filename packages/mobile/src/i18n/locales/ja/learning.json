@@ -133,13 +133,30 @@
   },
   "history": {
     "itemFallback": "{{type}} の試行",
-    "score": {
-      "unknown": "スコアなし"
-    },
-    "title": "最近の試行 ({{count, number}})",
+    "title": "最近の学習",
     "title_one": "最近の試行 ({{count, number}})",
     "title_other": "最近の試行 ({{count, number}})",
-    "youWrote": "入力した答え: {{text}}"
+    "youWrote": "入力した答え: {{text}}",
+    "recap": "{{count, number}}枚 · {{minutes, number}}分 · 1枚あたり平均{{seconds, number}}秒",
+    "recap_one": "{{count, number}}枚 · {{minutes, number}}分 · 1枚あたり平均{{seconds, number}}秒",
+    "recap_other": "{{count, number}}枚 · {{minutes, number}}分 · 1枚あたり平均{{seconds, number}}秒",
+    "reviewTitle": "見直したいカード {{count, number}}枚",
+    "reviewTitle_one": "見直したいカード {{count, number}}枚",
+    "reviewTitle_other": "見直したいカード {{count, number}}枚",
+    "band": {
+      "known": "できた {{count, number}}",
+      "known_one": "できた {{count, number}}",
+      "known_other": "できた {{count, number}}",
+      "partial": "あいまい {{count, number}}",
+      "partial_one": "あいまい {{count, number}}",
+      "partial_other": "あいまい {{count, number}}",
+      "missed": "できなかった {{count, number}}",
+      "missed_one": "できなかった {{count, number}}",
+      "missed_other": "できなかった {{count, number}}",
+      "partialShort": "あいまい",
+      "missedShort": "できなかった"
+    },
+    "reviewCapped": "{{total, number}}枚中{{shown, number}}枚を表示しています。"
   },
   "insights": {
     "accuracy": "正答率",
