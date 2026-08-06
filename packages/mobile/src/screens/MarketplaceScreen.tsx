@@ -523,7 +523,13 @@ export function MarketplaceScreen() {
       {/* Category picker modal */}
       <Modal visible={categoryModalOpen} transparent animationType="fade" onRequestClose={() => setCategoryModalOpen(false)}>
         <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setCategoryModalOpen(false)}>
-          <View style={[styles.modalContent, { backgroundColor: theme.colors.surfaceElevated }]}>
+          <View
+              // Claims the touch responder so the overlay TouchableOpacity above cannot
+              // fire from inside the sheet — a plain View let it win on every
+              // non-interactive pixel, so tapping the sheet's own title closed it.
+              onStartShouldSetResponder={() => true}
+              style={[styles.modalContent, { backgroundColor: theme.colors.surfaceElevated }]}
+            >
             <Text style={[styles.modalTitle, { color: theme.colors.text }]}>{t('categoryTitle', { defaultValue: 'Category' })}</Text>
             <FlatList
               data={CATEGORIES}
@@ -552,7 +558,13 @@ export function MarketplaceScreen() {
       {/* Sort picker modal */}
       <Modal visible={sortModalOpen} transparent animationType="fade" onRequestClose={() => setSortModalOpen(false)}>
         <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setSortModalOpen(false)}>
-          <View style={[styles.modalContent, { backgroundColor: theme.colors.surfaceElevated }]}>
+          <View
+              // Claims the touch responder so the overlay TouchableOpacity above cannot
+              // fire from inside the sheet — a plain View let it win on every
+              // non-interactive pixel, so tapping the sheet's own title closed it.
+              onStartShouldSetResponder={() => true}
+              style={[styles.modalContent, { backgroundColor: theme.colors.surfaceElevated }]}
+            >
             <Text style={[styles.modalTitle, { color: theme.colors.text }]}>{t('sortTitle', { defaultValue: 'Sort By' })}</Text>
             <FlatList
               data={SORT_OPTIONS}

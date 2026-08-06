@@ -144,7 +144,14 @@ function DropdownPicker<T extends string>({
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={dropdownStyles.overlay} onPress={onClose}>
-        <View style={[dropdownStyles.sheet, { backgroundColor: theme.colors.surfaceElevated }]}>
+        {/* Claims the touch responder so the overlay's onPress cannot fire from inside the
+            sheet. Without it a plain View lets the ancestor Pressable win on every
+            non-interactive pixel — padding, the gaps between rows — so tapping the sheet
+            itself dismissed it. Same guard StudySetupScreen already uses. */}
+        <View
+          onStartShouldSetResponder={() => true}
+          style={[dropdownStyles.sheet, { backgroundColor: theme.colors.surfaceElevated }]}
+        >
           <ScrollView bounces={false} style={dropdownStyles.scroll}>
             {options.map((opt) => {
               const isSelected = opt.value === selectedValue
