@@ -76,7 +76,14 @@ class LearningTodayPO {
   hasRegenerateAction() { return exists('learning-regenerate') }
   hasCreateGoalCta() { return exists('learning-create-goal') }
 
-  planItem(index = 0) { return exists(`learning-plan-item-${index}`) }
+  /**
+   * The one line that says what the day holds: reviews versus cards never seen.
+   *
+   * It replaced `learning-plan-item-N`, a row per card. That list showed the planner's reason,
+   * recall estimate and minute cost for every item — thirty rows of scroll above the buttons,
+   * nothing on them to tap, and every row reading the same phrase.
+   */
+  composition() { return exists('learning-composition') }
 
   /**
    * The day's primary action.

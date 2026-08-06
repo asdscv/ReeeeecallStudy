@@ -17,8 +17,10 @@ import { cardPromptLabel } from '@reeeeecall/shared/lib/card-prompt'
 import {
   attemptNeedsRemediation, attemptTypedAnswer,
 } from '@reeeeecall/shared/lib/learning-attempt-selection'
-import { recallPercent } from '@reeeeecall/shared/lib/learning-recall-display'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
+import { planComposition } from '@reeeeecall/shared/lib/plan-composition'
+import { studyRecap, scoreBand } from '@reeeeecall/shared/lib/study-recap'
+import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
 import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
 import { useStudy } from '../hooks/useStudy'
 import type { SettingsStackParamList } from '../navigation/types'
@@ -30,9 +32,14 @@ import type { SettingsStackParamList } from '../navigation/types'
  * and are NOT re-implemented here:
  *   * plan generation happens on an explicit press, never in an effect (`save_daily_plan`
  *     is capped at 50 writes per user per day);
- *   * a self-rating records an attempt and does NOT reschedule the card — SRS stays with
- *     the study screen's rating;
+ *   * studying belongs to the study screen, where one rating both reschedules the card and
+ *     completes the plan item (`apply_plan_study_rating`);
  *   * an enrichment request spends real credits, so the label says so before the press.
+ *
+ * There is no per-card list of the day, on either platform. It was thirty rows of scroll that
+ * repeated one phrase, offered nothing to tap, and showed the estimates the planner wrote at
+ * dawn — stale for anyone returning mid-day. What it was really asked, "what am I in for?",
+ * is one line in the summary card: reviews versus cards never seen.
  *
  * The one thing mobile must do differently is the plan date: `currentPlanContext` computes
  * it from the device's local calendar and falls back to a UTC-offset label when the Hermes
@@ -41,26 +48,6 @@ import type { SettingsStackParamList } from '../navigation/types'
  * And because a phone screen is usually resumed rather than opened, the plan date is kept
  * live instead of being frozen at mount — see `planDate` below.
  */
-const SELF_RATINGS: ReadonlyArray<{ score: number; key: string; id: string }> = [
-  { score: 0, key: 'today.rate.again', id: 'again' },
-  { score: 0.5, key: 'today.rate.partial', id: 'partial' },
-  { score: 1, key: 'today.rate.known', id: 'known' },
-]
-
-const REASON_KEY: Record<string, string> = {
-  due: 'today.reason.due',
-  memory_risk: 'today.reason.memoryRisk',
-  recent_failure: 'today.reason.recentFailure',
-  slow_response: 'today.reason.slowResponse',
-  goal_relevance: 'today.reason.goalRelevance',
-  importance: 'today.reason.importance',
-  balanced: 'today.reason.balanced',
-}
-
-/** What the planner recorded for this row, as whole percent, or null if it recorded none. */
-const planRecallPercent = (item: { payload?: { recall_probability?: number } | null }) =>
-  recallPercent(item.payload?.recall_probability)
-
 const MIN_TOUCH = 44
 const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 } as const
 
@@ -101,23 +88,13 @@ const REMEDIATION_ACTIONS: ReadonlyArray<{
   },
 ]
 
-/** How many recent attempts the list shows — the same window as web's `AttemptHistory`. */
-const ATTEMPT_ROWS = 10
-
 /**
- * Score → band label, using web's thresholds verbatim so the same attempt cannot read
- * "Partly" on the phone and "Knew it" in the browser.
+ * How many missed cards the list shows — the same window as web's `AttemptHistory`.
  *
- * Deliberately NOT `KNOWN_SCORE_THRESHOLD`, even though 0.75 appears in both: that constant
- * gates what a learner can be CHARGED for, and aliasing it here would let a cosmetic tweak to
- * a label silently change who gets offered a paid request.
+ * Anything beyond it is stated below the list rather than silently dropped: a quiet top-N reads
+ * as "that was all of them".
  */
-const scoreKey = (score: number | null): string => {
-  if (score === null) return 'history.score.unknown'
-  if (score >= 0.75) return 'today.rate.known'
-  if (score >= 0.25) return 'today.rate.partial'
-  return 'today.rate.again'
-}
+const ATTEMPT_ROWS = 10
 
 export function LearningTodayScreen() {
   const { t, i18n } = useTranslation('learning')
@@ -259,7 +236,35 @@ export function LearningTodayScreen() {
     () => attempts.filter((attempt) => attempt.goal_id === goalId),
     [attempts, goalId],
   )
-  const recentAttempts = useMemo(() => goalAttempts.slice(0, ATTEMPT_ROWS), [goalAttempts])
+  /**
+   * The day this screen is showing, not "the last 50 rows".
+   *
+   * The store reads 50 attempts for the goal with no date bound and the old list took the first
+   * ten, so a learner returning after a week read last week's words under a heading about now.
+   */
+  const todaysAttempts = useMemo(
+    () => goalAttempts.filter((attempt) => utcToLocalDateKey(attempt.created_at) === planDate),
+    [goalAttempts, planDate],
+  )
+  /** How much, how long, how it went — shared with web so the two cannot disagree. */
+  const recap = useMemo(() => studyRecap(todaysAttempts), [todaysAttempts])
+  /**
+   * Only the rows with something to DO on them.
+   *
+   * This list used to be every attempt, one card prompt per row — a column of vocabulary that
+   * answered no question. Cards the learner said they KNEW are counted in the recap and not
+   * printed: there is nothing to ask about them, and remediation is refused on them anyway.
+   */
+  const reviewable = useMemo(
+    () => todaysAttempts.filter((a) => a.card_id !== null && attemptNeedsRemediation(a)),
+    [todaysAttempts],
+  )
+  const recentAttempts = useMemo(() => reviewable.slice(0, ATTEMPT_ROWS), [reviewable])
+  const recapBands = [
+    recap.known > 0 ? t('history.band.known', { count: recap.known }) : null,
+    recap.partial > 0 ? t('history.band.partial', { count: recap.partial }) : null,
+    recap.missed > 0 ? t('history.band.missed', { count: recap.missed }) : null,
+  ].filter(Boolean).join(' · ')
   // Which ROW is waiting, not which card. The store tracks only the pending CARD, and the
   // learner this feature targets — someone who missed the same card twice — has two remediable
   // rows sharing one card_id. Keying on the card makes both claim to be the request in flight.
@@ -361,6 +366,29 @@ export function LearningTodayScreen() {
   const pendingTotal = deckGroups.reduce((sum, group) => sum + group.pending, 0)
   const doneTotal = deckGroups.reduce((sum, group) => sum + group.done, 0)
   const nextDeck = deckGroups.find((group) => group.pending > 0) ?? null
+
+  /** What is LEFT today. Shared with web so the two screens cannot disagree about it. */
+  const composition = useMemo(() => planComposition(planItems), [planItems])
+
+  /**
+   * Where the goal stands. Shared with web and the dashboard tile, which had already drifted into
+   * dividing by different denominators and drawing two bars from one RPC's numbers.
+   *
+   * Computed unconditionally with a zeroed fallback: the card below is rendered behind a guard,
+   * and a hook cannot live inside one.
+   */
+  const goalSummary = useMemo(
+    () => goalKnowledgeSummary(
+      (goalId ? knowledge[goalId] : null) ?? { total: 0, known: 0, unknown: 0, unseen: 0 },
+    ),
+    [goalId, knowledge],
+  )
+  // Each half dropped when empty — "복습 밀림 0장" is a sentence about nothing, and a learner who
+  // is caught up should see that rather than a row of noughts.
+  const progressDetail = [
+    goalSummary.overdue > 0 ? t('progress.overdue', { count: goalSummary.overdue }) : null,
+    goalSummary.unstudied > 0 ? t('progress.unstudied', { count: goalSummary.unstudied }) : null,
+  ].filter(Boolean).join(' · ')
 
   const deckName = useCallback(
     (deckId: string) => decks.find((deck) => deck.id === deckId)?.name ?? t('today.item.untitled'),
@@ -486,18 +514,22 @@ export function LearningTodayScreen() {
                 style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
                 {...testProps('learning-progress', true)}
               >
+                {/* `known` means "still inside its review window", not "확실히 안다" — one rating
+                    on an overdue card moves it there. The old headline renamed it and read
+                    "29장 중 1장 기억" over a goal with 18 overdue reviews and 10 untouched cards,
+                    which sounds like amnesia and means nothing of the kind. */}
                 <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
-                  {t('progress.knownNow', {
-                    known: knowledge[goalId].known, total: knowledge[goalId].total,
-                  })}
+                  {goalSummary.notStarted
+                    ? t('progress.notStarted', { total: knowledge[goalId].total })
+                    : t('progress.withinWindow', {
+                      attempted: goalSummary.attempted, known: goalSummary.withinWindow,
+                    })}
                 </Text>
-                <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>
-                  {t('progress.breakdown', {
-                    known: knowledge[goalId].known,
-                    shaky: knowledge[goalId].unknown,
-                    unseen: knowledge[goalId].unseen,
-                  })}
-                </Text>
+                {progressDetail !== '' && (
+                  <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>
+                    {progressDetail}
+                  </Text>
+                )}
               </View>
             )}
 
@@ -662,6 +694,21 @@ export function LearningTodayScreen() {
                     }]} />
                   </View>
 
+                  {/* Everything the per-card list used to say, in one line. A half with nothing
+                      in it is left out rather than printed as "0": "복습 19장" on its own already
+                      says the day holds no new cards. */}
+                  {(composition.review > 0 || composition.fresh > 0) && (
+                    <Text
+                      style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 6 }]}
+                      {...testProps('learning-composition')}
+                    >
+                      {[
+                        composition.review > 0 ? t('today.composition.review', { count: composition.review }) : null,
+                        composition.fresh > 0 ? t('today.composition.fresh', { count: composition.fresh }) : null,
+                      ].filter(Boolean).join(' · ')}
+                    </Text>
+                  )}
+
                   {nextDeck ? (
                     <>
                       <TouchableOpacity
@@ -737,52 +784,6 @@ export function LearningTodayScreen() {
                     ))}
                   </View>
                 )}
-
-                {/* What is on the list, and why the planner chose it. Read-only. */}
-                <View style={[styles.card, {
-                  backgroundColor: theme.colors.surface, borderColor: theme.colors.border,
-                }]}>
-                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                    {t('today.listTitle')}
-                  </Text>
-                  {[...planItems].sort((a, b) => a.position - b.position).map((item, index) => {
-                    const card = item.card_id ? planCards[item.card_id] : undefined
-                    // NOT `Object.values(...)[0]` — jsonb key order is Postgres's, not the
-                    // template's, so that can show the answer instead of the prompt.
-                    const label = cardPromptLabel(card?.field_values, card?.template_id, planTemplateFields)
-                    const done = item.status === 'completed'
-                    return (
-                      <View key={item.id} style={styles.planRow} {...testProps(`learning-plan-item-${index}`, true)}>
-                        <Text
-                          style={[theme.typography.bodySmall, {
-                            color: done ? theme.colors.textTertiary : theme.colors.text,
-                            textDecorationLine: done ? 'line-through' : 'none',
-                          }]}
-                          numberOfLines={2}
-                        >
-                          {label || t('today.item.untitled')}
-                        </Text>
-                        <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
-                          {/* `position` is 0-based in the row; web renders `position + 1` and
-                              the two screens must not number the same plan differently. */}
-                          {`${item.position + 1}. `}
-                          {t(REASON_KEY[item.reason_code] ?? 'today.reason.balanced')}
-                          {item.estimated_minutes !== null
-                            ? ` · ${t('today.item.minutes', { count: item.estimated_minutes })}`
-                            : ''}
-                          {/* Strictly what the planner recorded — never recomputed from the
-                              card row, which on a subscribed deck belongs to the publisher
-                              (#389). Absent for a card with no forgetting curve yet: a new
-                              card is not a forgotten one. */}
-                          {planRecallPercent(item) !== null
-                            ? ` · ${t('today.recallChance', { percent: planRecallPercent(item) as number })}`
-                            : ''}
-                        </Text>
-                      </View>
-                    )
-                  })}
-                </View>
-
 
                 {/* "더 하기" comes FIRST and is the primary action. Rebuilding is the
                     destructive one — it deletes every item and zeroes the day's progress — so
@@ -878,17 +879,42 @@ export function LearningTodayScreen() {
                 No timestamp beyond the local date: `toLocaleString` is `Intl`, which these
                 screens do not use (an ICU-less Hermes build has no `Intl` at all), and the
                 list is already newest-first, so the day is the only part that adds anything. */}
-            {attemptsLoading && goalAttempts.length === 0 ? (
+            {attemptsLoading && todaysAttempts.length === 0 ? (
               <ActivityIndicator {...testProps('learning-attempts-loading')} />
-            ) : recentAttempts.length > 0 ? (
+            ) : recap.count > 0 ? (
               <View style={styles.attemptSection} {...testProps('learning-attempt-history', true)}>
-                {/* Counts the rows ON SCREEN, not everything loaded — the store fetches 50 and
-                    this shows ten, so counting the former would print "(40)" above ten rows.
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
+                  {t('history.title')}
+                </Text>
+
+                {/* How the session went, in the three numbers the list of words never gave.
                     `{{count, number}}` with a real number — the Intl-free formatter registered
                     in src/i18n does the grouping. */}
-                <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
-                  {t('history.title', { count: recentAttempts.length })}
-                </Text>
+                <View
+                  style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+                  {...testProps('learning-study-recap', true)}
+                >
+                  <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
+                    {t('history.recap', {
+                      count: recap.count,
+                      minutes: Math.round(recap.totalMs / 60000),
+                      seconds: Math.round(recap.avgMs / 1000),
+                    })}
+                  </Text>
+                  {/* A band with nothing in it is left out — "몰랐음 0" is a sentence about
+                      nothing, and a perfect session should read as three words. */}
+                  {recapBands !== '' && (
+                    <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>
+                      {recapBands}
+                    </Text>
+                  )}
+                </View>
+
+                {recentAttempts.length > 0 && (
+                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 8 }]}>
+                    {t('history.reviewTitle', { count: reviewable.length })}
+                  </Text>
+                )}
 
                 {/* The price, before the tap. `enrichmentQuote === null` means the wallet
                     could not be read — then NO number is shown at all, because "$0.00" for
@@ -935,13 +961,19 @@ export function LearningTodayScreen() {
                         >
                           {label || t('history.itemFallback', { type: attempt.activity_type })}
                         </Text>
-                        <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-                          {t(scoreKey(attempt.normalized_score))}
-                        </Text>
+                        {/* Which KIND of miss — "애매함" and "몰랐음" want different help. */}
+                        {scoreBand(attempt.normalized_score) === 'partial' ? (
+                          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+                            {t('history.band.partialShort')}
+                          </Text>
+                        ) : scoreBand(attempt.normalized_score) === 'missed' ? (
+                          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+                            {t('history.band.missedShort')}
+                          </Text>
+                        ) : null}
                       </View>
-                      <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-                        {utcToLocalDateKey(attempt.created_at)}
-                      </Text>
+                      {/* The date that used to sit here is gone: every row is from the day this
+                          screen is showing, so it could only ever print that same date. */}
                       {/* What the learner wrote, when they wrote anything — the honesty check:
                           a later paid `compare` is grounded in exactly this string, so it has
                           to be visible before anyone pays for an answer about it. */}
@@ -1140,7 +1172,6 @@ const styles = StyleSheet.create({
   summaryRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 },
   progressTrack: { height: 6, borderRadius: 999, marginTop: 8, overflow: 'hidden' },
   progressFill: { height: '100%', borderRadius: 999 },
-  planRow: { paddingVertical: 8, gap: 0 },
   deckRowSplit: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     gap: 8, marginTop: 8,

@@ -5,7 +5,6 @@ import { Play, Check } from 'lucide-react'
 import {
   useLearningStore,
   type LearningGoalWithDecks, type AttemptRow, type RemediationAction, type GoalKnowledge,
-  type DailyPlanItemRow,
 } from '../../stores/learning-store'
 import { currentPlanContext } from '../../lib/learning-plan-date'
 import { cardPromptLabel } from '@reeeeecall/shared/lib/card-prompt'
@@ -13,7 +12,10 @@ import {
   attemptNeedsRemediation, attemptTypedAnswer,
 } from '@reeeeecall/shared/lib/learning-attempt-selection'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
-import { recallPercent } from '@reeeeecall/shared/lib/learning-recall-display'
+import { planComposition } from '@reeeeecall/shared/lib/plan-composition'
+import { studyRecap, scoreBand } from '@reeeeecall/shared/lib/study-recap'
+import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
+import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
 import { useDeckStore } from '../../stores/deck-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
 import { EnrichmentModal } from './EnrichmentModal'
@@ -49,18 +51,21 @@ import { EnrichmentModal } from './EnrichmentModal'
  * computed from today's SRS state, and anything studied in between would invalidate it while it
  * sat in the database looking authoritative. So the future days run the planner and keep only
  * the shape, and say on screen that that is what they are.
+ *
+ * ## Why there is no per-card list
+ *
+ * There was one: every item in the day, with its planner reason, its recall estimate and its
+ * minute cost. It cost thirty rows of scroll to reach the buttons under it and gave nothing
+ * back. Every row read the same ("잊기 직전 · 29% · 약 0.5분"), so the reasoning meant to build
+ * trust turned into wallpaper; nothing on it was actionable, since the studying happens in the
+ * study session; and the numbers were the snapshot the planner wrote at dawn, so a learner
+ * returning mid-day read stale estimates for the cards they had not reached yet.
+ *
+ * What that list was actually asked was "what am I in for?", and that answer fits on one line —
+ * the split between cards coming back and cards never seen. It sits in the summary card above,
+ * next to the count it qualifies.
  */
 
-/** Planner reason codes (daily-plan-v2) → the phrase shown on the row. */
-const REASON_KEY: Record<string, string> = {
-  due: 'today.reason.due',
-  memory_risk: 'today.reason.memoryRisk',
-  recent_failure: 'today.reason.recentFailure',
-  slow_response: 'today.reason.slowResponse',
-  goal_relevance: 'today.reason.goalRelevance',
-  importance: 'today.reason.importance',
-  balanced: 'today.reason.balanced',
-}
 
 /** Rows shown in the attempt list. The store loads 50; everything on screen counts these. */
 const ATTEMPT_ROWS = 10
@@ -92,50 +97,19 @@ const REMEDIATION_ACTIONS: ReadonlyArray<{
 ]
 
 /**
- * One row of the day's list — read-only.
+ * How the day went, and the cards worth another look.
  *
- * Deliberately carries no controls. It used to hold a textarea and three rating buttons, which
- * is what made this page look like a study screen while rescheduling nothing. What it shows is
- * what the planner decided and why, so the learner can judge the plan before starting it.
+ * This used to be "최근 시도": one row per attempt, each a card prompt with a rating word and a
+ * timestamp beside it. Twenty rows of vocabulary that answered no question — the same failure as
+ * the per-card plan list, in the one place a learner has actually finished something and might
+ * want to know how it went.
+ *
+ * So the rows collapse into three numbers (how much, how long, how it went) and what remains
+ * listed is only what has something to DO on it: the cards that were missed, which is exactly
+ * where paid remediation was already offered. Cards the learner said they KNEW are counted and
+ * not printed — there is nothing to ask about them.
  */
-function PlanItemRow({ position, cardText, reasonLabel, minutes, done, recall }: {
-  position: number
-  cardText: string
-  reasonLabel: string
-  minutes: number | null
-  done: boolean
-  /**
-   * Estimated chance the learner still recalls this card, whole percent, or null.
-   *
-   * Null when the card has no forgetting curve yet. The row then says nothing rather than
-   * "0%" — a new card is not a forgotten one.
-   */
-  recall: number | null
-}) {
-  const { t } = useTranslation('learning')
-  return (
-    <li className="flex items-start gap-3 px-3 py-2">
-      <span className="w-5 shrink-0 pt-0.5 text-xs tabular-nums text-content-tertiary">
-        {done ? <Check className="h-3.5 w-3.5 text-success" aria-label={t('today.item.recorded')} /> : position + 1}
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className={`truncate text-sm ${done ? 'text-content-tertiary line-through' : 'text-foreground'}`}>
-          {cardText || t('today.item.untitled')}
-        </p>
-        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-content-tertiary">
-          <span>{reasonLabel}</span>
-          {/* The number the reason is derived from. Shown so "at risk of forgetting" is a
-              measurement the learner can judge rather than an assertion they must trust. */}
-          {recall !== null && <span>{t('today.recallChance', { percent: recall })}</span>}
-          {minutes !== null && <span>{t('today.item.minutes', { count: minutes })}</span>}
-        </div>
-      </div>
-    </li>
-  )
-}
-
-/** Recent attempts for the selected goal — where paid remediation is offered. */
-function AttemptHistory({ goalId }: { goalId: string }) {
+function AttemptHistory({ goalId, planDate }: { goalId: string; planDate: string }) {
   const { t, i18n } = useTranslation('learning')
   const {
     attempts, attemptsLoading, planCards, planTemplateFields, fetchAttempts,
@@ -152,7 +126,27 @@ function AttemptHistory({ goalId }: { goalId: string }) {
     () => attempts.filter((attempt) => attempt.goal_id === goalId),
     [attempts, goalId],
   )
-  const visibleAttempts = useMemo(() => goalAttempts.slice(0, ATTEMPT_ROWS), [goalAttempts])
+
+  /**
+   * The day the screen is showing, not "the last 50 rows".
+   *
+   * The store reads 50 attempts for the goal with no date bound, and the old list simply took
+   * the first ten of them — so a learner returning after a week saw last week's words under a
+   * heading about now. A recap has to name a period, and this screen's period is its plan date.
+   */
+  const todaysAttempts = useMemo(
+    () => goalAttempts.filter((attempt) => utcToLocalDateKey(attempt.created_at) === planDate),
+    [goalAttempts, planDate],
+  )
+  const recap = useMemo(() => studyRecap(todaysAttempts), [todaysAttempts])
+
+  // Only what can be acted on stays a row. Capped, and the cap is stated below rather than
+  // silently swallowing the rest.
+  const reviewable = useMemo(
+    () => todaysAttempts.filter((attempt) => attemptNeedsRemediation(attempt) && attempt.card_id),
+    [todaysAttempts],
+  )
+  const visibleAttempts = useMemo(() => reviewable.slice(0, ATTEMPT_ROWS), [reviewable])
 
   /**
    * Paid remediation is offered only where there is a premise for it: a miss or a partial
@@ -179,21 +173,40 @@ function AttemptHistory({ goalId }: { goalId: string }) {
   // sharing one card_id, and keying on the card would make both claim to be the pending one.
   const [requestingAttemptId, setRequestingAttemptId] = useState<string | null>(null)
 
-  if (attemptsLoading && goalAttempts.length === 0) return null
-  if (goalAttempts.length === 0) return null
+  // Nothing studied today is not an error and not an empty state — it is simply a day that has
+  // not started, and the card above already says so.
+  if (attemptsLoading && todaysAttempts.length === 0) return null
+  if (recap.count === 0) return null
 
-  const scoreKey = (score: number | null): string => {
-    if (score === null) return 'history.score.unknown'
-    if (score >= 0.75) return 'today.rate.known'
-    if (score >= 0.25) return 'today.rate.partial'
-    return 'today.rate.again'
-  }
+  // Each band omitted when empty: "몰랐음 0" is a sentence about nothing, and a learner who got
+  // everything right should read three words, not a row of zeroes.
+  const bands = [
+    recap.known > 0 ? t('history.band.known', { count: recap.known }) : null,
+    recap.partial > 0 ? t('history.band.partial', { count: recap.partial }) : null,
+    recap.missed > 0 ? t('history.band.missed', { count: recap.missed }) : null,
+  ].filter(Boolean).join(' · ')
 
   return (
     <section className="pt-2">
-      <h2 className="text-sm font-medium text-foreground">
-        {t('history.title', { count: visibleAttempts.length })}
-      </h2>
+      <h2 className="text-sm font-medium text-foreground">{t('history.title')}</h2>
+
+      {/* How much, how long, how it went — the three things the list of words never said. */}
+      <div className="mt-2 rounded-xl border border-border bg-card p-3" data-testid="study-recap">
+        <p className="text-sm text-foreground">
+          {t('history.recap', {
+            count: recap.count,
+            minutes: Math.round(recap.totalMs / 60000),
+            seconds: Math.round(recap.avgMs / 1000),
+          })}
+        </p>
+        {bands && <p className="mt-1 text-xs text-content-tertiary">{bands}</p>}
+      </div>
+
+      {visibleAttempts.length > 0 && (
+        <h3 className="mt-3 text-xs font-medium text-muted-foreground">
+          {t('history.reviewTitle', { count: reviewable.length })}
+        </h3>
+      )}
       {/* What the charge buys, as VISIBLE text rather than a `title` tooltip — a tooltip never
           reaches a keyboard or touch user. */}
       {offersRemediation && (
@@ -210,6 +223,7 @@ function AttemptHistory({ goalId }: { goalId: string }) {
           )}
         </p>
       )}
+      {visibleAttempts.length > 0 && (
       <ul className="mt-2 divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
         {visibleAttempts.map((attempt) => {
           const card = attempt.card_id ? planCards[attempt.card_id] : undefined
@@ -218,6 +232,7 @@ function AttemptHistory({ goalId }: { goalId: string }) {
           const pending = requestingAttemptId === attempt.id
           const rowName = label || t('history.itemFallback', { type: attempt.activity_type })
           const typedAnswer = attemptTypedAnswer(attempt)
+          const band = scoreBand(attempt.normalized_score)
           return (
             <li key={attempt.id} className="flex items-center justify-between gap-3 px-3 py-2">
               <span className="min-w-0">
@@ -229,10 +244,12 @@ function AttemptHistory({ goalId }: { goalId: string }) {
                 )}
               </span>
               <span className="flex shrink-0 items-center gap-2">
-                <span className="text-xs text-content-tertiary">{t(scoreKey(attempt.normalized_score))}</span>
-                <span className="text-[11px] text-content-tertiary">
-                  {new Date(attempt.created_at).toLocaleString()}
-                </span>
+                {/* Which KIND of miss — "애매함" and "몰랐음" want different help. The timestamp
+                    that used to sit here is gone: every row is from today, and the clock time of
+                    a flashcard is not something anyone came here to read. */}
+                {band !== null && band !== 'known' && (
+                  <span className="text-xs text-content-tertiary">{t(`history.band.${band}Short`)}</span>
+                )}
                 {pending && (
                   <span className="text-xs text-content-tertiary">{t('enrichment.requesting')}</span>
                 )}
@@ -264,38 +281,55 @@ function AttemptHistory({ goalId }: { goalId: string }) {
           )
         })}
       </ul>
+      )}
+
+      {/* Say what was left out. A silent top-N reads as "that was all of them". */}
+      {reviewable.length > ATTEMPT_ROWS && (
+        <p className="mt-1 text-[11px] text-content-tertiary">
+          {t('history.reviewCapped', { shown: ATTEMPT_ROWS, total: reviewable.length })}
+        </p>
+      )}
     </section>
   )
 }
 
 /**
- * Where a goal stands, in the three numbers that mean something.
+ * Where a goal stands.
  *
- * `unseen` is kept out of the ratio rather than counted as unknown: a deck nobody has opened is
- * "not started", and reporting a confident 0% for it is a different, wronger claim. The bar
- * therefore measures known against what has actually been attempted, and the untouched remainder
- * is stated separately.
+ * The headline names the measurement instead of renaming it: `known` is "still inside its review
+ * window", not "확실히 안다". It used to read "29장 중 1장 기억" over a goal where 18 reviews were
+ * overdue and 10 cards had never been opened — a sentence that sounds like near-total amnesia and
+ * means nothing of the kind. The line under it carries what to do about it.
  */
 function GoalProgress({ knowledge }: { knowledge: GoalKnowledge | null }) {
   const { t } = useTranslation('learning')
   if (!knowledge || knowledge.total === 0) return null
 
-  const attempted = knowledge.known + knowledge.unknown
-  const percent = attempted > 0 ? Math.round((knowledge.known / attempted) * 100) : 0
+  const summary = goalKnowledgeSummary(knowledge)
+  // Each half is dropped when empty rather than printed as a zero: "복습 밀림 0장" is a sentence
+  // about nothing, and a learner who is fully caught up should see that, not a row of noughts.
+  const detail = [
+    summary.overdue > 0 ? t('progress.overdue', { count: summary.overdue }) : null,
+    summary.unstudied > 0 ? t('progress.unstudied', { count: summary.unstudied }) : null,
+  ].filter(Boolean).join(' · ')
 
   return (
     <section className="rounded-xl border border-border bg-card p-4" aria-label={t('progress.title')}>
       <p className="text-sm text-foreground">
-        {t('progress.knownNow', { known: knowledge.known, total: knowledge.total })}
+        {summary.notStarted
+          ? t('progress.notStarted', { total: knowledge.total })
+          : t('progress.withinWindow', {
+            attempted: summary.attempted, known: summary.withinWindow,
+          })}
       </p>
       <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-        <div className="h-full bg-brand" style={{ width: `${percent}%` }} role="presentation" />
+        <div className="h-full bg-brand" style={{ width: `${summary.percent}%` }} role="presentation" />
       </div>
-      <p className="mt-1.5 text-[11px] text-content-tertiary">
-        {t('progress.breakdown', {
-          known: knowledge.known, shaky: knowledge.unknown, unseen: knowledge.unseen,
-        })}
-      </p>
+      {detail && (
+        <p className="mt-1.5 text-[11px] text-content-tertiary" data-testid="progress-detail">
+          {detail}
+        </p>
+      )}
     </section>
   )
 }
@@ -304,7 +338,7 @@ export function LearningTodayPage() {
   const { t } = useTranslation('learning')
   const {
     goals, goalsLoading, fetchGoals,
-    plan, planItems, planCards, planTemplateFields, planLoading, planGenerating, planError,
+    plan, planItems, planCards, planLoading, planGenerating, planError,
     planBlockedReason,
     fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
     extendPlan, planExtending, planExtension,
@@ -417,10 +451,8 @@ export function LearningTodayPage() {
   const pendingTotal = deckGroups.reduce((sum, group) => sum + group.pending, 0)
   const doneTotal = deckGroups.reduce((sum, group) => sum + group.done, 0)
 
-  const sortedItems = useMemo(
-    () => [...planItems].sort((a: DailyPlanItemRow, b: DailyPlanItemRow) => a.position - b.position),
-    [planItems],
-  )
+  /** What is LEFT today. Shared with mobile so the two screens cannot disagree about it. */
+  const composition = useMemo(() => planComposition(planItems), [planItems])
 
   if (goalsLoading && goals.length === 0) return <ListSkeleton />
 
@@ -573,6 +605,18 @@ export function LearningTodayPage() {
               />
             </div>
 
+            {/* All of what the per-card list used to say, in one line. A half with nothing in it
+                is left out rather than printed as "0" — "복습 19장" alone already says the day has
+                no new cards, and a zero invites the reader to wonder what went wrong. */}
+            {(composition.review > 0 || composition.fresh > 0) && (
+              <p className="mt-2 text-xs text-content-tertiary" data-testid="today-composition">
+                {[
+                  composition.review > 0 ? t('today.composition.review', { count: composition.review }) : null,
+                  composition.fresh > 0 ? t('today.composition.fresh', { count: composition.fresh }) : null,
+                ].filter(Boolean).join(' · ')}
+              </p>
+            )}
+
             {nextDeck ? (
               <>
                 <Link
@@ -629,33 +673,6 @@ export function LearningTodayPage() {
               </ul>
             </section>
           )}
-
-          {/* What is actually on the list, and why the planner chose it. Read-only: this is a
-              plan, and the studying happens in the study session. */}
-          <section className="overflow-hidden rounded-xl border border-border bg-card">
-            <h2 className="border-b border-border px-3 py-2 text-xs font-medium text-muted-foreground">
-              {t('today.listTitle')}
-            </h2>
-            <ul className="divide-y divide-border">
-              {sortedItems.map((item) => {
-                const card = item.card_id ? planCards[item.card_id] : undefined
-                return (
-                  <PlanItemRow
-                    key={item.id}
-                    position={item.position}
-                    cardText={cardPromptLabel(card?.field_values, card?.template_id, planTemplateFields)}
-                    reasonLabel={t(REASON_KEY[item.reason_code] ?? 'today.reason.balanced')}
-                    // Strictly what the planner recorded when it chose this row. Deliberately
-                    // NOT recomputed from the card: on a subscribed deck `cards.interval_days`
-                    // is the PUBLISHER's, which is the defect #389 fixed.
-                    recall={recallPercent(item.payload?.recall_probability)}
-                    minutes={item.estimated_minutes}
-                    done={item.status === 'completed'}
-                  />
-                )
-              })}
-            </ul>
-          </section>
 
           {/* "더 하기" comes first and is the primary of the two: rebuilding DELETES every item
               and zeroes the day's progress, so the additive option has to be easier to reach. */}
@@ -727,7 +744,7 @@ export function LearningTodayPage() {
 
       {/* Kept on today only: the remediation offer is grounded in an attempt, and a day that
           has not happened has none. */}
-      {dayOffset === 0 && <AttemptHistory goalId={selectedGoalId} />}
+      {dayOffset === 0 && <AttemptHistory goalId={selectedGoalId} planDate={ctx.planDate} />}
     </div>
   )
 }

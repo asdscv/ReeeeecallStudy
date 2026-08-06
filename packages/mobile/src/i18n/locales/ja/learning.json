@@ -123,17 +123,40 @@
     "title": "学習目標",
     "delete": "削除",
     "deleteConfirmTitle": "このプランを削除しますか？",
-    "deleteConfirmMessage": "「{{title}}」と、このプランが作成したすべての日次プランが完全に消えます。学習記録とカードは残り、プランだけが削除されます。元に戻せません。"
+    "deleteConfirmMessage": "「{{title}}」と、このプランが作成したすべての日次プランが完全に消えます。学習記録とカードは残り、プランだけが削除されます。元に戻せません。",
+    "archived": {
+      "show": "アーカイブを見る",
+      "hide": "アーカイブを閉じる",
+      "empty": "アーカイブしたプランはありません。",
+      "restore": "再開する"
+    }
   },
   "history": {
     "itemFallback": "{{type}} の試行",
-    "score": {
-      "unknown": "スコアなし"
-    },
-    "title": "最近の試行 ({{count, number}})",
+    "title": "最近の学習",
     "title_one": "最近の試行 ({{count, number}})",
     "title_other": "最近の試行 ({{count, number}})",
-    "youWrote": "入力した答え: {{text}}"
+    "youWrote": "入力した答え: {{text}}",
+    "recap": "{{count, number}}枚 · {{minutes, number}}分 · 1枚あたり平均{{seconds, number}}秒",
+    "recap_one": "{{count, number}}枚 · {{minutes, number}}分 · 1枚あたり平均{{seconds, number}}秒",
+    "recap_other": "{{count, number}}枚 · {{minutes, number}}分 · 1枚あたり平均{{seconds, number}}秒",
+    "reviewTitle": "見直したいカード {{count, number}}枚",
+    "reviewTitle_one": "見直したいカード {{count, number}}枚",
+    "reviewTitle_other": "見直したいカード {{count, number}}枚",
+    "band": {
+      "known": "できた {{count, number}}",
+      "known_one": "できた {{count, number}}",
+      "known_other": "できた {{count, number}}",
+      "partial": "あいまい {{count, number}}",
+      "partial_one": "あいまい {{count, number}}",
+      "partial_other": "あいまい {{count, number}}",
+      "missed": "できなかった {{count, number}}",
+      "missed_one": "できなかった {{count, number}}",
+      "missed_other": "できなかった {{count, number}}",
+      "partialShort": "あいまい",
+      "missedShort": "できなかった"
+    },
+    "reviewCapped": "{{total, number}}枚中{{shown, number}}枚を表示しています。"
   },
   "insights": {
     "accuracy": "正答率",
@@ -171,11 +194,6 @@
     "title": "おすすめ"
   },
   "today": {
-    "answer": {
-      "label": "あなたの答え（任意）",
-      "note": "試行の記録と一緒に保存されます。採点はされず、評価は自分で選びます。",
-      "placeholder": "覚えている内容を入力してください"
-    },
     "budget": "1日 {{count, number}} 分",
     "empty": {
       "createGoal": "目標を作成",
@@ -195,28 +213,15 @@
     "generate": "今日のプランを作成",
     "generating": "作成中…",
     "item": {
-      "minutes": "約 {{count, decimal}} 分",
-      "recorded": "記録済み",
       "untitled": "（テキストなし）",
       "study": "学習"
     },
     "progress": "{{total, number}} 件中 {{done, number}} 件完了",
     "rate": {
       "again": "わからない",
-      "hint": "試行の記録のみです — 復習スケジュールは変わりません。",
       "known": "わかった",
       "partial": "あいまい"
     },
-    "reason": {
-      "balanced": "バランス配分",
-      "due": "復習期限",
-      "goalRelevance": "目標との関連度",
-      "importance": "重要度",
-      "memoryRisk": "忘れかけ",
-      "recentFailure": "最近の不正解",
-      "slowResponse": "回答が遅い"
-    },
-    "recallChance": "いま思い出せる確率 約{{percent}}%",
     "regenerate": "プランを再作成",
     "regenerating": "再作成中…",
     "title": "今日のプラン",
@@ -238,7 +243,6 @@
     "studyNote": "学習画面で評価すると、次の復習日と今日のプランの両方に記録されます。",
     "byDeck": "デッキ別",
     "deckDone": "完了",
-    "listTitle": "今日のリスト",
     "days": {
       "label": "日付",
       "today": "今日",
@@ -259,14 +263,28 @@
       "empty": "その日は復習するカードがなさそうです。",
       "loading": "計算中…",
       "note": "推定値です。今からその日まで何も学習しない前提の数字なので、学習すれば変わります。"
+    },
+    "composition": {
+      "review": "復習 {{count, number}}枚",
+      "review_one": "復習 {{count, number}}枚",
+      "review_other": "復習 {{count, number}}枚",
+      "fresh": "新規 {{count, number}}枚",
+      "fresh_one": "新規 {{count, number}}枚",
+      "fresh_other": "新規 {{count, number}}枚"
     }
   },
   "progress": {
     "title": "進捗",
-    "knownNow": "{{total, number}}枚中 {{known, number}}枚を記憶",
-    "breakdown": "確実 {{known, number}} ・ 不安 {{shaky, number}} ・ 未着手 {{unseen, number}}",
     "daysLeft": "残り{{count, number}}日",
     "daysLeft_one": "残り{{count, number}}日",
-    "daysLeft_other": "残り{{count, number}}日"
+    "daysLeft_other": "残り{{count, number}}日",
+    "withinWindow": "学習した{{attempted, number}}枚のうち{{known, number}}枚が復習期限内です",
+    "notStarted": "まだ学習していません · 全{{total, number}}枚",
+    "overdue": "復習期限切れ {{count, number}}枚",
+    "overdue_one": "復習期限切れ {{count, number}}枚",
+    "overdue_other": "復習期限切れ {{count, number}}枚",
+    "unstudied": "未学習 {{count, number}}枚",
+    "unstudied_one": "未学習 {{count, number}}枚",
+    "unstudied_other": "未学習 {{count, number}}枚"
   }
 }

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { useLearningStore } from '../../stores/learning-store'
+import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
 
 /**
  * The learning plan, in one line, on the dashboard.
@@ -65,7 +66,9 @@ export function LearningPlanWidget() {
   const state = knowledge[focus.id]
   // Over the TOTAL, matching the sentence beside it. Dividing by attempted cards instead put a
   // 50% bar next to the words "5 of 100 cards known".
-  const percent = state && state.total > 0 ? Math.round((state.known / state.total) * 100) : 0
+  // Shared with the plan screen. This tile used to divide by `total` while that screen divided by
+  // what had actually been studied, so one goal's numbers drew two different bars in two places.
+  const summary = state ? goalKnowledgeSummary(state) : null
   // `now` is read ONCE per mount, not per render. `Date.now()` inline is impure during render:
   // React may render twice for the same state and the two passes would disagree, and the repo's
   // lint rule rejects it for exactly that reason. A dashboard tile that freezes its clock at
@@ -95,20 +98,24 @@ export function LearningPlanWidget() {
         )}
       </div>
 
-      {state && state.total > 0 ? (
+      {state && summary && state.total > 0 ? (
         <>
           <p className="mt-1 text-xs text-muted-foreground">
-            {t('progress.knownNow', { known: state.known, total: state.total })}
+            {summary.notStarted
+              ? t('progress.notStarted', { total: state.total })
+              : t('progress.withinWindow', {
+                attempted: summary.attempted, known: summary.withinWindow,
+              })}
           </p>
           <div
             className="mt-2 h-1.5 w-full rounded-full bg-muted overflow-hidden"
             role="progressbar"
-            aria-valuenow={percent}
+            aria-valuenow={summary.percent}
             aria-valuemin={0}
             aria-valuemax={100}
             aria-label={t('progress.title')}
           >
-            <div className="h-full bg-primary" style={{ width: `${percent}%` }} />
+            <div className="h-full bg-primary" style={{ width: `${summary.percent}%` }} />
           </div>
         </>
       ) : (

@@ -123,17 +123,40 @@
     "title": "学习目标",
     "delete": "删除",
     "deleteConfirmTitle": "要删除这个计划吗？",
-    "deleteConfirmMessage": "“{{title}}”以及它生成的所有每日计划将被永久删除。你的学习记录和卡片会保留，只删除计划。此操作无法撤销。"
+    "deleteConfirmMessage": "“{{title}}”以及它生成的所有每日计划将被永久删除。你的学习记录和卡片会保留，只删除计划。此操作无法撤销。",
+    "archived": {
+      "show": "查看归档",
+      "hide": "收起归档",
+      "empty": "还没有归档的计划。",
+      "restore": "重新启用"
+    }
   },
   "history": {
     "itemFallback": "{{type}} 作答",
-    "score": {
-      "unknown": "未评分"
-    },
-    "title": "最近作答 ({{count, number}})",
+    "title": "最近学习",
     "title_one": "最近作答 ({{count, number}})",
     "title_other": "最近作答 ({{count, number}})",
-    "youWrote": "你写的答案：{{text}}"
+    "youWrote": "你写的答案：{{text}}",
+    "recap": "{{count, number}} 张 · {{minutes, number}} 分钟 · 每张平均 {{seconds, number}} 秒",
+    "recap_one": "{{count, number}} 张 · {{minutes, number}} 分钟 · 每张平均 {{seconds, number}} 秒",
+    "recap_other": "{{count, number}} 张 · {{minutes, number}} 分钟 · 每张平均 {{seconds, number}} 秒",
+    "reviewTitle": "需要再看的卡片 {{count, number}} 张",
+    "reviewTitle_one": "需要再看的卡片 {{count, number}} 张",
+    "reviewTitle_other": "需要再看的卡片 {{count, number}} 张",
+    "band": {
+      "known": "记住 {{count, number}}",
+      "known_one": "记住 {{count, number}}",
+      "known_other": "记住 {{count, number}}",
+      "partial": "模糊 {{count, number}}",
+      "partial_one": "模糊 {{count, number}}",
+      "partial_other": "模糊 {{count, number}}",
+      "missed": "没记住 {{count, number}}",
+      "missed_one": "没记住 {{count, number}}",
+      "missed_other": "没记住 {{count, number}}",
+      "partialShort": "模糊",
+      "missedShort": "没记住"
+    },
+    "reviewCapped": "共 {{total, number}} 张，显示 {{shown, number}} 张。"
   },
   "insights": {
     "accuracy": "正确率",
@@ -171,11 +194,6 @@
     "title": "推荐"
   },
   "today": {
-    "answer": {
-      "label": "你的答案（可选）",
-      "note": "与本次作答一同保存。不评分，仍由你自己评价。",
-      "placeholder": "输入你记得的内容"
-    },
     "budget": "每天 {{count, number}} 分钟",
     "empty": {
       "createGoal": "创建目标",
@@ -195,28 +213,15 @@
     "generate": "生成今日计划",
     "generating": "生成中…",
     "item": {
-      "minutes": "约 {{count, decimal}} 分钟",
-      "recorded": "已记录",
       "untitled": "（无内容）",
       "study": "学习"
     },
     "progress": "{{total, number}} 个中完成 {{done, number}} 个",
     "rate": {
       "again": "不知道",
-      "hint": "仅记录本次作答 — 不会改变复习计划。",
       "known": "知道",
       "partial": "不确定"
     },
-    "reason": {
-      "balanced": "均衡搭配",
-      "due": "到期复习",
-      "goalRelevance": "目标相关度",
-      "importance": "重要程度",
-      "memoryRisk": "即将忘记",
-      "recentFailure": "最近答错",
-      "slowResponse": "回答较慢"
-    },
-    "recallChance": "你现在还记得的概率约 {{percent}}%",
     "regenerate": "重新生成计划",
     "regenerating": "重新生成中…",
     "title": "今日计划",
@@ -238,7 +243,6 @@
     "studyNote": "在学习页评分会同时安排下次复习并记入今天的计划。",
     "byDeck": "按卡组",
     "deckDone": "已完成",
-    "listTitle": "今天的清单",
     "days": {
       "label": "日期",
       "today": "今天",
@@ -259,14 +263,28 @@
       "empty": "那天看起来没有要复习的卡片。",
       "loading": "计算中…",
       "note": "这是估算值，前提是从现在到那天什么都不学——一旦你开始学，它就会变。"
+    },
+    "composition": {
+      "review": "复习 {{count, number}} 张",
+      "review_one": "复习 {{count, number}} 张",
+      "review_other": "复习 {{count, number}} 张",
+      "fresh": "新卡 {{count, number}} 张",
+      "fresh_one": "新卡 {{count, number}} 张",
+      "fresh_other": "新卡 {{count, number}} 张"
     }
   },
   "progress": {
     "title": "进度",
-    "knownNow": "{{total, number}} 张中已记住 {{known, number}} 张",
-    "breakdown": "牢固 {{known, number}} · 动摇 {{shaky, number}} · 未开始 {{unseen, number}}",
     "daysLeft": "还剩 {{count, number}} 天",
     "daysLeft_one": "还剩 {{count, number}} 天",
-    "daysLeft_other": "还剩 {{count, number}} 天"
+    "daysLeft_other": "还剩 {{count, number}} 天",
+    "withinWindow": "已学 {{attempted, number}} 张中有 {{known, number}} 张仍在复习周期内",
+    "notStarted": "尚未开始学习 · 共 {{total, number}} 张",
+    "overdue": "复习逾期 {{count, number}} 张",
+    "overdue_one": "复习逾期 {{count, number}} 张",
+    "overdue_other": "复习逾期 {{count, number}} 张",
+    "unstudied": "尚未学习 {{count, number}} 张",
+    "unstudied_one": "尚未学习 {{count, number}} 张",
+    "unstudied_other": "尚未学习 {{count, number}} 张"
   }
 }

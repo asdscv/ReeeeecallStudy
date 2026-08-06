@@ -459,6 +459,16 @@ interface LearningState {
   goalsLoading: boolean
   goalsError: LearningError | null
 
+  /**
+   * Archived goals, or `null` when the archive has never been opened.
+   *
+   * `null` and `[]` are different answers and the screens rely on it: `null` means "not asked
+   * yet", `[]` means "asked, and there are none". An empty array on first render would let the
+   * drawer claim the archive is empty before anything had read it.
+   */
+  archivedGoals: LearningGoalWithDecks[] | null
+  archivedGoalsLoading: boolean
+
   plan: DailyPlanRow | null
   planItems: DailyPlanItemRow[]
   /** Cards referenced by the current plan's items, by card id. */
@@ -577,6 +587,15 @@ interface LearningState {
   createGoal: (input: CreateGoalInput) => Promise<string | null>
   updateGoal: (input: UpdateGoalInput) => Promise<boolean>
   archiveGoal: (goalId: string) => Promise<boolean>
+  fetchArchivedGoals: () => Promise<void>
+  /**
+   * Move an archived goal back to `active`, with its plans and history intact.
+   *
+   * The counterpart `archiveGoal` never had. Without it, archiving was a one-way trip into a
+   * list nothing rendered — strictly worse than deleting, because the rows stayed and the
+   * learner could neither see nor recover them.
+   */
+  restoreGoal: (goalId: string) => Promise<boolean>
   /**
    * Permanently remove a goal, its deck links and every plan it produced.
    *
@@ -956,10 +975,36 @@ async function collectPlanInputs(
   return { deckIds, cards, templatesById, candidates }
 }
 
+/**
+ * Hydrate goal rows with their deck links — one query for the whole batch, not one per goal.
+ *
+ * Shared by the working list and the archive so the two cannot describe the same goal
+ * differently: a restored goal must arrive in the active list with exactly the decks the
+ * archive said it had.
+ */
+async function withDeckLinks(goals: LearningGoalRow[]): Promise<LearningGoalWithDecks[]> {
+  const { data: linkRows, error } = await supabase
+    .from('learning_goal_decks')
+    .select('goal_id, deck_id, importance')
+    .in('goal_id', goals.map((goal) => goal.id))
+  if (error) throw error
+
+  const byGoal = new Map<string, GoalDeckLink[]>()
+  for (const row of (linkRows ?? []) as Array<GoalDeckLink & { goal_id: string }>) {
+    const bucket = byGoal.get(row.goal_id)
+    const link = { deck_id: row.deck_id, importance: Number(row.importance) }
+    if (bucket) bucket.push(link)
+    else byGoal.set(row.goal_id, [link])
+  }
+  return goals.map((goal) => ({ ...goal, decks: byGoal.get(goal.id) ?? [] }))
+}
+
 export const useLearningStore = create<LearningState>((set, get) => ({
   goals: [],
   goalsLoading: false,
   goalsError: null,
+  archivedGoals: null,
+  archivedGoalsLoading: false,
   plan: null,
   planItems: [],
   planCards: {},
@@ -997,8 +1042,9 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     if (get().goalsLoading) return
     set({ goalsLoading: true, goalsError: null })
     try {
-      // Archived goals are excluded: they cannot be planned or edited (the RPCs
-      // reject them), so listing them would only offer dead actions.
+      // Archived goals are excluded from the working list: they cannot be planned or edited
+      // (the RPCs reject them), so listing them here would only offer dead actions. They are
+      // read separately by `fetchArchivedGoals`, where the only action offered is restore.
       const { data: goalRows, error: goalError } = await supabase
         .from('learning_goals')
         .select('id, domain_id, title, target_date, daily_minutes, status, target, settings, created_at, updated_at')
@@ -1012,25 +1058,64 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         return
       }
 
-      const { data: linkRows, error: linkError } = await supabase
-        .from('learning_goal_decks')
-        .select('goal_id, deck_id, importance')
-        .in('goal_id', goals.map((goal) => goal.id))
-      if (linkError) throw linkError
-
-      const byGoal = new Map<string, GoalDeckLink[]>()
-      for (const row of (linkRows ?? []) as Array<GoalDeckLink & { goal_id: string }>) {
-        const bucket = byGoal.get(row.goal_id)
-        const link = { deck_id: row.deck_id, importance: Number(row.importance) }
-        if (bucket) bucket.push(link)
-        else byGoal.set(row.goal_id, [link])
-      }
-
-      set({ goals: goals.map((goal) => ({ ...goal, decks: byGoal.get(goal.id) ?? [] })) })
+      set({ goals: await withDeckLinks(goals) })
     } catch (e) {
       set({ goalsError: toLearningError(e) })
     } finally {
       set({ goalsLoading: false })
+    }
+  },
+
+  /**
+   * The archive, read only when the learner opens it.
+   *
+   * Not folded into `fetchGoals`: every session pays for that read, and almost nobody has an
+   * archived goal. This runs on the press that reveals the drawer.
+   */
+  fetchArchivedGoals: async () => {
+    if (get().archivedGoalsLoading) return
+    set({ archivedGoalsLoading: true, goalsError: null })
+    try {
+      const { data: goalRows, error: goalError } = await supabase
+        .from('learning_goals')
+        .select('id, domain_id, title, target_date, daily_minutes, status, target, settings, created_at, updated_at')
+        .eq('status', 'archived')
+        // Most recently touched first: `updated_at` is when it was archived, and the one you
+        // put away last is the one you are looking for.
+        .order('updated_at', { ascending: false })
+      if (goalError) throw goalError
+
+      const goals = (goalRows ?? []) as LearningGoalRow[]
+      set({ archivedGoals: goals.length === 0 ? [] : await withDeckLinks(goals) })
+    } catch (e) {
+      set({ goalsError: toLearningError(e) })
+    } finally {
+      set({ archivedGoalsLoading: false })
+    }
+  },
+
+  /**
+   * Put an archived goal back to work.
+   *
+   * `update_learning_goal` has allowed `archived → active` since mig 167 — "Archived goals can
+   * only transition to active" — and nothing ever called it. Archiving was therefore a one-way
+   * trip: `fetchGoals` filtered the row out and no screen could reach it again. The goal, its
+   * deck links and every daily_plan it ever had were still in the database the whole time.
+   *
+   * Both lists are re-read, because the goal has to leave one and appear in the other.
+   */
+  restoreGoal: async (goalId) => {
+    set({ goalsError: null })
+    try {
+      const { error } = await supabase.rpc('update_learning_goal', {
+        p_goal_id: goalId, p_status: 'active',
+      })
+      if (error) throw error
+      await Promise.all([get().fetchGoals(), get().fetchArchivedGoals()])
+      return true
+    } catch (e) {
+      set({ goalsError: toLearningError(e) })
+      return false
     }
   },
 
@@ -1096,7 +1181,10 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     try {
       const { error } = await supabase.rpc('archive_learning_goal', { p_goal_id: goalId })
       if (error) throw error
+      // The archive list is refreshed only if it has already been opened. Reading it for someone
+      // who never looked would spend a round trip to fill a drawer nobody has pulled.
       await get().fetchGoals()
+      if (get().archivedGoals !== null) await get().fetchArchivedGoals()
       return true
     } catch (e) {
       set({ goalsError: toLearningError(e) })
@@ -1118,6 +1206,9 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         attempts: get().attempts.filter((attempt) => attempt.goal_id !== goalId),
       })
       await get().fetchGoals()
+      // An archived goal can be deleted from the archive drawer, and leaving it painted there
+      // would offer a restore that answers P0003.
+      if (get().archivedGoals !== null) await get().fetchArchivedGoals()
       return true
     } catch (e) {
       set({ goalsError: toLearningError(e) })

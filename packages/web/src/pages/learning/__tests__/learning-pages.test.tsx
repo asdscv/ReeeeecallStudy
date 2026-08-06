@@ -69,6 +69,12 @@ const baseState = (over: StoreState = {}): StoreState => ({
   createGoal: vi.fn(),
   updateGoal: vi.fn(),
   archiveGoal: vi.fn(),
+  deleteGoal: vi.fn(),
+  // `null`, like the real store: "never asked", as distinct from "asked, and empty".
+  archivedGoals: null,
+  archivedGoalsLoading: false,
+  fetchArchivedGoals: vi.fn(),
+  restoreGoal: vi.fn(),
   setGoalDecks: vi.fn(),
   fetchPlan: vi.fn(),
   generatePlan: vi.fn(),
@@ -206,7 +212,7 @@ describe('LearningTodayPage', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('today.error.limitExceeded')
   })
 
-  it('renders a plan item with its reason and a link into the card\'s deck', () => {
+  it('sends the day into the real study session, carrying the plan with it', () => {
     renderToday({
       plan: {
         id: 'plan-1', goal_id: 'goal-1', plan_date: '2026-07-31', timezone: 'Asia/Seoul',
@@ -222,48 +228,79 @@ describe('LearningTodayPage', () => {
       planCards: { 'card-1': { id: 'card-1', deck_id: 'deck-7', field_values: { front: '猫' } } },
     })
 
-    expect(screen.getByText('猫')).toBeInTheDocument()
-    expect(screen.getByText('today.reason.recentFailure')).toBeInTheDocument()
-    // The way into the day is the real study session, carrying the plan with it. It used to be
-    // `/decks/:id/study/setup` — the whole deck, no plan context — so the plan and the session
-    // each did their own thing and neither knew about the other.
+    // It used to be `/decks/:id/study/setup` — the whole deck, no plan context — so the plan and
+    // the session each did their own thing and neither knew about the other.
     expect(screen.getByRole('link', { name: /today\.startStudy/ }))
       .toHaveAttribute('href', `/decks/deck-7/study?mode=srs&goalId=goal-1&planDate=${todayKey()}`)
   })
 
-  // ── the memory model, made visible ────────────────────────────────────────
+  // ── what the day is made of ───────────────────────────────────────────────
   //
-  // Until this shipped, the plan asserted "at risk of forgetting" and showed no number, so the
-  // FSRS work behind it was invisible — and an estimate a learner cannot see is one they cannot
-  // judge.
-  const planWith = (payload: unknown) => ({
+  // This replaced a per-card list: one row per item, each with its planner reason, its recall
+  // estimate and its minute cost. Thirty rows of scroll, nothing on them to tap, every row
+  // reading the same phrase, and the numbers frozen at the moment the planner ran. The question
+  // it was actually answering — "what am I in for?" — is reviews versus cards never seen.
+  const item = (id: string, payload: unknown, status = 'pending') => ({
+    id, plan_id: 'plan-1', position: 0, activity_id: null, card_id: `card-${id}`,
+    concept_id: null, activity_type: 'recall', stimulus_type: 'text',
+    response_type: 'self_rate', evaluator_type: 'self_rate', reason_code: 'memory_risk',
+    priority: 0.7, estimated_minutes: 0.5, status, payload,
+  })
+  const mixedPlan = (planItems: unknown[]) => ({
     plan: {
       id: 'plan-1', goal_id: 'goal-1', plan_date: '2026-07-31', timezone: 'Asia/Seoul',
       algorithm_version: 'daily-plan-v2', input_fingerprint: 'fnv1a32:abc', status: 'pending',
-      budget_minutes: 20, completed_minutes: 0, completed_items: 0, total_items: 1,
+      budget_minutes: 20, completed_minutes: 0, completed_items: 0, total_items: planItems.length,
     },
-    planItems: [{
-      id: 'item-1', plan_id: 'plan-1', position: 0, activity_id: null, card_id: 'card-1',
-      concept_id: null, activity_type: 'recall', stimulus_type: 'text',
-      response_type: 'self_rate', evaluator_type: 'self_rate', reason_code: 'memory_risk',
-      priority: 0.7, estimated_minutes: 0.5, status: 'pending', payload,
-    }],
-    planCards: { 'card-1': { id: 'card-1', deck_id: 'deck-7', field_values: { front: '猫' } } },
+    planItems,
+    planCards: Object.fromEntries((planItems as { card_id: string }[]).map((row) => [
+      row.card_id, { id: row.card_id, deck_id: 'deck-7', field_values: { front: '猫' } },
+    ])),
   })
 
-  it('shows the recall probability the planner chose the row on', () => {
-    renderToday(planWith({ recall_probability: 0.523 }))
+  it('splits the remaining work into reviews and cards never seen', () => {
+    renderToday(mixedPlan([
+      item('a', { recall_probability: 0.523 }),
+      item('b', { recall_probability: 0.1 }),
+      item('c', {}),
+    ]))
 
-    expect(screen.getByText('today.recallChance')).toBeInTheDocument()
+    const line = screen.getByTestId('today-composition')
+    expect(line).toHaveTextContent('today.composition.review')
+    expect(line).toHaveTextContent('today.composition.fresh')
+    // No per-card rows: the card's own text appears nowhere on the plan screen.
+    expect(screen.queryByText('猫')).not.toBeInTheDocument()
   })
 
-  it('says nothing at all for a card with no forgetting curve', () => {
-    // A new card, or a plan saved before the estimate was recorded. "0%" would tell the learner
-    // they have certainly forgotten something they may never have studied.
-    renderToday(planWith({}))
+  it('leaves out a half with nothing in it rather than printing a zero', () => {
+    renderToday(mixedPlan([item('a', { recall_probability: 0.523 })]))
 
-    expect(screen.queryByText('today.recallChance')).not.toBeInTheDocument()
-    expect(screen.queryByText(/%/)).not.toBeInTheDocument()
+    const line = screen.getByTestId('today-composition')
+    expect(line).toHaveTextContent('today.composition.review')
+    expect(line).not.toHaveTextContent('today.composition.fresh')
+  })
+
+  it('counts what is left, not what the morning held', () => {
+    // A finished item stops being something the learner is "in for". Counting it would leave the
+    // line describing a day that has already partly happened, beside a number that does not.
+    renderToday(mixedPlan([
+      item('a', { recall_probability: 0.523 }, 'completed'),
+      item('b', {}),
+    ]))
+
+    const line = screen.getByTestId('today-composition')
+    expect(line).toHaveTextContent('today.composition.fresh')
+    expect(line).not.toHaveTextContent('today.composition.review')
+  })
+
+  it('treats a recall estimate of zero as a review, not a new card', () => {
+    // `0` is a card that has been studied and forgotten; a new card has no estimate at all. A
+    // truthiness check here would file every forgotten card under "new".
+    renderToday(mixedPlan([item('a', { recall_probability: 0 })]))
+
+    const line = screen.getByTestId('today-composition')
+    expect(line).toHaveTextContent('today.composition.review')
+    expect(line).not.toHaveTextContent('today.composition.fresh')
   })
 
   it('will not rebuild a completed plan (the RPC refuses it)', () => {
@@ -336,6 +373,46 @@ describe('LearningTodayPage', () => {
     })
 
     expect(screen.getByText('today.extendNothing')).toBeInTheDocument()
+  })
+
+  // ── where the goal stands ─────────────────────────────────────────────────
+  //
+  // Reported after studying a single card: "확실 1, 흔들림 18, 미시작 10 뭐지?". Every number was
+  // right. `known` means "not past due", so one rating on an overdue card moves a card there —
+  // but the screen called it 확실 and headlined "29장 중 1장 기억", which reads as having
+  // forgotten 28 cards. The RPC never made that claim.
+  const knowledgeOf = (known: number, unknown: number, unseen: number) => ({
+    knowledge: { 'goal-1': { total: known + unknown + unseen, known, unknown, unseen } },
+  })
+
+  it('says what `known` measures instead of renaming it 확실', () => {
+    renderToday(knowledgeOf(1, 18, 10))
+
+    // The denominator is what has been STUDIED (19), not the whole goal (29).
+    expect(screen.getByText(/progress\.withinWindow/)).toBeInTheDocument()
+    expect(screen.queryByText(/progress\.knownNow/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/progress\.breakdown/)).not.toBeInTheDocument()
+  })
+
+  it('puts the overdue work first and drops halves that are empty', () => {
+    renderToday(knowledgeOf(1, 18, 10))
+    expect(screen.getByTestId('progress-detail')).toHaveTextContent('progress.overdue')
+
+    cleanup()
+    // Caught up, with cards still to start: no "복습 밀림 0장", which is a sentence about nothing.
+    renderToday(knowledgeOf(19, 0, 10))
+    const detail = screen.getByTestId('progress-detail')
+    expect(detail).toHaveTextContent('progress.unstudied')
+    expect(detail).not.toHaveTextContent('progress.overdue')
+  })
+
+  it('reports "not started" rather than a confident 0%', () => {
+    renderToday(knowledgeOf(0, 0, 29))
+
+    expect(screen.getByText(/progress\.notStarted/)).toBeInTheDocument()
+    // Nothing overdue and nothing studied — the detail line has nothing to say but the count of
+    // untouched cards, which the headline already gave.
+    expect(screen.getByTestId('progress-detail')).toHaveTextContent('progress.unstudied')
   })
 })
 
@@ -430,36 +507,80 @@ describe('starting the day', () => {
     ])
   })
 
-  it('shows a completed row as done rather than as work left', () => {
+  it('marks a deck whose items are all finished as done, with no way back in', () => {
     renderToday({
       plan: { ...planRow, completed_items: 1 },
       planItems: [{ ...planItem, status: 'completed' as const }],
       planCards: cards,
     })
 
-    expect(screen.getByLabelText('today.item.recorded')).toBeInTheDocument()
+    // A 학습 link on a finished deck would spend a rating to earn a P0007 —
+    // `record_answer_attempt` refuses to complete an item twice.
+    expect(screen.queryByRole('link', { name: 'today.item.study' })).not.toBeInTheDocument()
+    expect(screen.getByText('today.allDone')).toBeInTheDocument()
   })
 })
 
 describe('attempt history', () => {
-  it('lists recent attempts with a human score label', () => {
+  // Attempts are read for the PLAN'S DAY now, not "the last 50 rows" — a learner returning after
+  // a week used to see last week's words under a heading about today. Fixtures therefore have to
+  // land on the day the screen is showing.
+  // Built from a LOCAL wall-clock string so it survives the local-date filter in any timezone —
+  // a fixed UTC instant lands on the previous day west of Greenwich.
+  const attemptAt = (hour: string) => new Date(`${todayKey()}T${hour}:00:00`).toISOString()
+
+  it('says how the day went instead of listing the words that were in it', () => {
+    // The old section printed one row per attempt: card prompt, rating word, timestamp. A column
+    // of vocabulary in the one place a learner has just finished something and wants to know how
+    // it went. Three numbers answer that; twenty rows do not.
     renderToday({
       attempts: [
         { id: 'a1', goal_id: 'goal-1', card_id: 'card-1', activity_id: null, plan_item_id: 'item-1',
           activity_type: 'recall', evaluator_type: 'self_rate', normalized_score: 1,
-          duration_ms: 3000, created_at: '2026-07-31T01:00:00.000Z' },
+          duration_ms: 3000, created_at: attemptAt('01') },
         { id: 'a2', goal_id: 'goal-1', card_id: null, activity_id: null, plan_item_id: null,
           activity_type: 'recall', evaluator_type: 'self_rate', normalized_score: null,
-          duration_ms: 0, created_at: '2026-07-31T00:00:00.000Z' },
+          duration_ms: 0, created_at: attemptAt('00') },
       ],
       planCards: { 'card-1': { id: 'card-1', deck_id: 'deck-7', field_values: { front: '猫' } } },
     })
 
     expect(screen.getByText('history.title')).toBeInTheDocument()
-    expect(screen.getByText('猫')).toBeInTheDocument()
-    expect(screen.getByText('today.rate.known')).toBeInTheDocument()
-    // An unscored attempt must say so rather than rendering as "didn't know" (0 vs null).
-    expect(screen.getByText('history.score.unknown')).toBeInTheDocument()
+    expect(screen.getByTestId('study-recap')).toHaveTextContent('history.recap')
+    // A card the learner KNEW is counted, not printed — there is nothing to ask about it.
+    expect(screen.getByTestId('study-recap')).toHaveTextContent('history.band.known')
+    expect(screen.queryByText('猫')).not.toBeInTheDocument()
+  })
+
+  it('leaves out a band with nothing in it', () => {
+    // "몰랐음 0" is a sentence about nothing, and a clean session should read as one word.
+    renderToday({
+      attempts: [
+        { id: 'a1', goal_id: 'goal-1', card_id: 'card-1', activity_id: null, plan_item_id: 'item-1',
+          activity_type: 'recall', evaluator_type: 'self_rate', normalized_score: 1,
+          duration_ms: 3000, created_at: attemptAt('01') },
+      ],
+    })
+
+    const recap = screen.getByTestId('study-recap')
+    expect(recap).toHaveTextContent('history.band.known')
+    expect(recap).not.toHaveTextContent('history.band.missed')
+    expect(recap).not.toHaveTextContent('history.band.partial')
+  })
+
+  it('counts the day the screen is showing, not the last 50 rows the store holds', () => {
+    // `fetchAttempts` reads 50 for the goal with no date bound, and the old list took the first
+    // ten of them — so someone returning after a week read last week's work under a heading
+    // about now.
+    renderToday({
+      attempts: [
+        { id: 'old', goal_id: 'goal-1', card_id: 'card-1', activity_id: null, plan_item_id: null,
+          activity_type: 'recall', evaluator_type: 'self_rate', normalized_score: 0,
+          duration_ms: 1000, created_at: '2026-01-02T03:00:00.000Z' },
+      ],
+    })
+
+    expect(screen.queryByText('history.title')).not.toBeInTheDocument()
   })
 
   it('renders nothing when there are no attempts yet', () => {
@@ -476,7 +597,7 @@ describe('attempt history', () => {
         { id: 'a1', goal_id: 'goal-1', card_id: 'card-1', activity_id: null, plan_item_id: 'item-1',
           activity_type: 'recall', response_type: 'text', evaluator_type: 'self_rate',
           response: { self_rated: 0, text: 'apfel' }, normalized_score: 0,
-          duration_ms: 0, created_at: '2026-07-31T01:00:00.000Z' },
+          duration_ms: 0, created_at: attemptAt('01') },
       ],
     })
 
@@ -489,7 +610,7 @@ describe('attempt history', () => {
         { id: 'a1', goal_id: 'goal-1', card_id: 'card-1', activity_id: null, plan_item_id: 'item-1',
           activity_type: 'recall', response_type: 'self_rate', evaluator_type: 'self_rate',
           response: { self_rated: 0 }, normalized_score: 0,
-          duration_ms: 0, created_at: '2026-07-31T01:00:00.000Z' },
+          duration_ms: 0, created_at: attemptAt('01') },
       ],
     })
 
@@ -504,7 +625,7 @@ describe('attempt history', () => {
   const missed = {
     id: 'a-missed', goal_id: 'goal-1', card_id: 'card-1', activity_id: null,
     plan_item_id: 'item-1', activity_type: 'recall', evaluator_type: 'self_rate',
-    normalized_score: 0, duration_ms: 0, created_at: '2026-07-31T03:00:00.000Z',
+    normalized_score: 0, duration_ms: 0, created_at: attemptAt('03'),
   }
   const partial = { ...missed, id: 'a-partial', card_id: 'card-2', normalized_score: 0.5 }
   const known = { ...missed, id: 'a-known', card_id: 'card-3', normalized_score: 1 }
@@ -660,7 +781,10 @@ describe('enrichment', () => {
   const attemptOnCard1 = {
     id: 'a-1', goal_id: 'goal-1', card_id: 'card-1', activity_id: null,
     plan_item_id: 'item-1', activity_type: 'recall', evaluator_type: 'self_rate',
-    normalized_score: 0, duration_ms: 0, created_at: '2026-07-31T03:00:00.000Z',
+    normalized_score: 0, duration_ms: 0,
+    // The section is scoped to the plan's own day now, so a fixture frozen in July renders
+    // nothing at all. Built from a LOCAL wall-clock string so it holds in any timezone.
+    created_at: new Date(`${todayKey()}T03:00:00`).toISOString(),
   }
 
   /**
@@ -782,6 +906,83 @@ describe('LearningGoalsPage', () => {
     await userEvent.click(screen.getByRole('button', { name: 'goals.archive' }))
 
     expect(state.archiveGoal).not.toHaveBeenCalled()
+  })
+
+  // ── the archive drawer ────────────────────────────────────────────────────
+  //
+  // 보관 used to be a one-way trip: the status flip was real, but `fetchGoals` filtered the row
+  // out and nothing anywhere read it back, so the goal and every plan it produced sat in the
+  // database unreachable. `update_learning_goal` had allowed archived → active since mig 167 and
+  // no client had ever called it.
+  const archivedGoal = {
+    ...goal, id: 'goal-9', title: 'JLPT N3', status: 'archived',
+    decks: [{ deck_id: 'deck-3', importance: 0.5 }],
+  }
+
+  it('keeps the archive closed, and unread, until it is asked for', () => {
+    const state = renderGoals()
+
+    expect(screen.queryByTestId('learning-archive')).not.toBeInTheDocument()
+    expect(state.fetchArchivedGoals).not.toHaveBeenCalled()
+  })
+
+  it('reads the archive on the press that opens it', async () => {
+    const state = renderGoals()
+
+    await userEvent.click(screen.getByRole('button', { name: 'goals.archived.show' }))
+
+    expect(state.fetchArchivedGoals).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not re-read an archive it already holds', async () => {
+    // `null` is the only value that means "never asked" — `[]` is a real answer. Re-fetching on
+    // every open would spend a round trip to learn what the store already knows.
+    const state = renderGoals({ archivedGoals: [] })
+
+    await userEvent.click(screen.getByRole('button', { name: 'goals.archived.show' }))
+
+    expect(state.fetchArchivedGoals).not.toHaveBeenCalled()
+  })
+
+  it('lists an archived goal and reactivates it', async () => {
+    const state = renderGoals({ archivedGoals: [archivedGoal] })
+
+    await userEvent.click(screen.getByRole('button', { name: 'goals.archived.show' }))
+    expect(screen.getByText('JLPT N3')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'goals.archived.restore' }))
+    expect(state.restoreGoal).toHaveBeenCalledWith('goal-9')
+    // Nothing is destroyed and 보관 is right there to undo it, so no modal.
+    expect(mockConfirm).not.toHaveBeenCalled()
+  })
+
+  it('offers no way to open an archived plan', async () => {
+    // `save_daily_plan` rejects an archived goal, so a link into the plan screen would be a tap
+    // that can only produce an error. Reactivate first.
+    renderGoals({ archivedGoals: [archivedGoal] })
+
+    await userEvent.click(screen.getByRole('button', { name: 'goals.archived.show' }))
+
+    expect(screen.queryByRole('link', { name: 'JLPT N3' })).not.toBeInTheDocument()
+  })
+
+  it('still offers delete inside the archive', async () => {
+    // Otherwise the only way to be rid of an archived goal for good would be to reactivate it.
+    const state = renderGoals({ goals: [], archivedGoals: [archivedGoal] })
+
+    await userEvent.click(screen.getByRole('button', { name: 'goals.archived.show' }))
+    await userEvent.click(screen.getByRole('button', { name: 'goals.delete' }))
+
+    expect(mockConfirm).toHaveBeenCalled()
+    expect(state.deleteGoal).toHaveBeenCalledWith('goal-9')
+  })
+
+  it('says the archive is empty only after it has looked', async () => {
+    renderGoals({ archivedGoals: [] })
+
+    await userEvent.click(screen.getByRole('button', { name: 'goals.archived.show' }))
+
+    expect(screen.getByText('goals.archived.empty')).toBeInTheDocument()
   })
 
   it('shows an empty state instead of a bare list', () => {
