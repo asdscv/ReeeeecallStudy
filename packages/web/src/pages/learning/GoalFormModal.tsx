@@ -490,7 +490,10 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
 
           {localError && <p role="alert" className="text-xs text-destructive">{localError}</p>}
 
-          <div className="flex justify-end gap-2">
+          {/* Pinned to the bottom of the dialog's own scroll area. The form is taller than
+              85vh on a laptop, so a footer in normal flow left 저장 half-cut at the fold —
+              the one control the learner is looking for. */}
+          <div className="sticky -bottom-4 -mx-4 flex justify-end gap-2 border-t border-border bg-background px-4 py-3 sm:-bottom-6 sm:-mx-6 sm:px-6">
             <button
               type="button"
               onClick={onCancel}

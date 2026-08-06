@@ -81,4 +81,69 @@ describe('study-validation', () => {
     expect(normalizeRatingForMode('sequential', 'next')).toBe('next')
     expect(normalizeRatingForMode('random', 'again')).toBeNull()
   })
+
+  // ── the plan session ──────────────────────────────────────────────────────
+  //
+  // These exist because the normalizer nearly ate the feature: it returns a CLOSED shape, so
+  // the first working build passed `planSelection` into `initSession`, had it silently dropped
+  // here, and studied the deck's ordinary due queue (75 cards) while the plan said 60. Nothing
+  // failed — it just studied the wrong cards.
+  const planSelection = () => ({
+    goalId: 'goal-1',
+    cardIds: ['card-1'],
+    items: {
+      'card-1': {
+        id: 'item-1', activity_type: 'recall',
+        response_type: 'self_rate', evaluator_type: 'self_rate',
+      },
+    },
+  })
+
+  it('carries a plan selection through instead of dropping it', () => {
+    const config = normalizeStudyConfig({ ...base(), planSelection: planSelection() })
+    expect(config.planSelection).toEqual(planSelection())
+  })
+
+  it('refuses a plan session in any mode but SRS', () => {
+    // The other five send no SRS payload and reschedule nothing, so completing the day's items
+    // from one would leave every planner input untouched — tomorrow's plan would be identical.
+    for (const mode of ['cramming', 'random', 'sequential', 'sequential_review'] as const) {
+      expect(() => normalizeStudyConfig({
+        ...base(), mode, batchSize: 20,
+        crammingFilter: { type: 'all' }, crammingTimeLimitMinutes: null,
+        uploadDateStart: '2026-08-01', uploadDateEnd: '2026-08-02',
+        planSelection: planSelection(),
+      })).toThrow(StudyValidationError)
+    }
+  })
+
+  it('refuses a selection with no cards, or an item missing its snapshot fields', () => {
+    expect(() => normalizeStudyConfig({
+      ...base(), planSelection: { ...planSelection(), cardIds: [] },
+    })).toThrow(StudyValidationError)
+
+    // `record_answer_attempt` asserts these three against the stored row and raises P0007 on a
+    // mismatch, so a missing one has to stop the session starting, not the first rating.
+    expect(() => normalizeStudyConfig({
+      ...base(),
+      planSelection: {
+        goalId: 'goal-1', cardIds: ['card-1'],
+        items: { 'card-1': { id: 'item-1', activity_type: 'recall' } },
+      },
+    })).toThrow(StudyValidationError)
+
+    expect(() => normalizeStudyConfig({
+      ...base(), planSelection: { ...planSelection(), items: {} },
+    })).toThrow(StudyValidationError)
+  })
+
+  it('dedupes a repeated card id', () => {
+    // The queue looks each id up once; a repeat would put the card in the session twice and the
+    // second rating would be refused as a re-completion.
+    const config = normalizeStudyConfig({
+      ...base(),
+      planSelection: { ...planSelection(), cardIds: ['card-1', 'card-1'] },
+    })
+    expect(config.planSelection?.cardIds).toEqual(['card-1'])
+  })
 })

@@ -1024,6 +1024,50 @@ describe('goal writes', () => {
     expect(ok).toBe(false)
     expect(useLearningStore.getState().goalsError?.code).toBe('NOT_FOUND')
   })
+
+  it('clears everything that described the goal it just deleted', async () => {
+    // Server-side the plan cascades. Locally it does not: `fetchGoals` alone would leave the
+    // plan, its items and its forecast painted on screen, and the day's list would keep
+    // offering to study a plan whose rows no longer exist.
+    useLearningStore.setState({
+      plan: { id: 'plan-1', goal_id: 'goal-1' } as never,
+      planItems: [{ id: 'item-1' }] as never,
+      planCards: { 'card-1': { id: 'card-1' } } as never,
+      planAbsentFor: 'goal-1|2026-08-06',
+      planForecast: { '2026-08-07': { planDate: '2026-08-07', totalItems: 3, estimatedMinutes: 2, newCards: 1, reviewCards: 2 } },
+      attempts: [
+        { id: 'a-1', goal_id: 'goal-1' },
+        { id: 'a-2', goal_id: 'goal-2' },
+      ] as never,
+    })
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+    queue('learning_goals', { data: [], error: null })
+
+    const ok = await useLearningStore.getState().deleteGoal('goal-1')
+
+    expect(ok).toBe(true)
+    expect(mockRpc.mock.calls[0]).toEqual(['delete_learning_goal', { p_goal_id: 'goal-1' }])
+    const state = useLearningStore.getState()
+    expect(state.plan).toBeNull()
+    expect(state.planItems).toEqual([])
+    expect(state.planForecast).toEqual({})
+    expect(state.planAbsentFor).toBeNull()
+    // Another goal's attempts are untouched — they describe study that still exists.
+    expect(state.attempts.map((a) => a.id)).toEqual(['a-2'])
+  })
+
+  it('reports a delete the server refused, and changes nothing', async () => {
+    useLearningStore.setState({ plan: { id: 'plan-1' } as never })
+    mockRpc.mockResolvedValue({
+      data: null, error: { code: 'P0003', message: 'Goal not found or not owned' },
+    })
+
+    const ok = await useLearningStore.getState().deleteGoal('goal-1')
+
+    expect(ok).toBe(false)
+    expect(useLearningStore.getState().goalsError?.code).toBe('NOT_FOUND')
+    expect(useLearningStore.getState().plan).not.toBeNull()
+  })
 })
 
 // ── extendPlan ─────────────────────────────────────────────────────────────

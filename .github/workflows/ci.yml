@@ -440,6 +440,11 @@ jobs:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/learning_goal_links_test.sql
 
+      - name: Run plan-study assertions (migs 187/188 — schedule+plan in one transaction, goal delete cascade)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/plan_study_rating_test.sql
+
       - name: Run study recommendation assertions (mig 174 — decisions survive regeneration, terminal states)
         env:
           PGPASSWORD: postgres
