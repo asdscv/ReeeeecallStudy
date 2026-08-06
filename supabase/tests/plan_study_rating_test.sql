@@ -163,6 +163,119 @@ BEGIN
   RAISE NOTICE 'apply_plan_study_rating: all assertions passed';
 END $$;
 
+-- ── undoing a plan rating unwinds BOTH halves (mig 189) ─────────────────────
+--
+-- The hole 187 left open, found by pressing 되돌리기 on a real database: the card went
+-- back to its old schedule while the plan kept saying the item was done, and the item
+-- could never be completed again.
+DO $$
+DECLARE
+  v_goal     uuid;
+  v_plan_id  uuid;
+  v_item_id  uuid;
+  v_card     cards%ROWTYPE;
+  v_before   cards%ROWTYPE;
+  v_item     daily_plan_items%ROWTYPE;
+  v_plan_row daily_plans%ROWTYPE;
+  v_left     integer;
+  v_new_srs  jsonb := jsonb_build_object(
+    'srs_status', 'review', 'ease_factor', 2.6, 'interval_days', 1,
+    'repetitions', 1, 'next_review_at', '2026-08-09T00:00:00Z',
+    'last_reviewed_at', '2026-08-08T00:00:00Z'
+  );
+BEGIN
+  v_goal := (create_learning_goal('language', 'Undo goal', 20)->>'goal_id')::uuid;
+  PERFORM set_learning_goal_decks(v_goal, jsonb_build_array(
+    jsonb_build_object('deck_id', 'b1200000-0000-4000-8000-000000000001', 'importance', 0.5)));
+  v_plan_id := (save_daily_plan(
+    v_goal, '2026-08-08'::date, 'Asia/Seoul', 'daily-plan-v2', 'fnv1a32:undo', 20,
+    jsonb_build_array(jsonb_build_object(
+      'card_id', 'b1300000-0000-4000-8000-000000000001',
+      'activity_type', 'recall', 'stimulus_type', 'text',
+      'response_type', 'self_rate', 'evaluator_type', 'self_rate',
+      'reason_code', 'due'
+    )))->>'plan_id')::uuid;
+  SELECT id INTO v_item_id FROM daily_plan_items WHERE plan_id = v_plan_id;
+
+  -- Snapshot the exact state to restore to. The card has already been rated by the block
+  -- above, so "not review" is not the test — "identical to what it was" is.
+  SELECT * INTO v_before FROM cards WHERE id = 'b1300000-0000-4000-8000-000000000001';
+  v_left := v_before.srs_revision;
+  PERFORM apply_plan_study_rating(
+    p_event_id           => 'b1500000-0000-4000-8000-000000000011',
+    p_client_session_id  => 'b1600000-0000-4000-8000-000000000011',
+    p_card_id            => 'b1300000-0000-4000-8000-000000000001',
+    p_deck_id            => 'b1200000-0000-4000-8000-000000000001',
+    p_rating             => 'good',
+    p_srs_source         => 'embedded',
+    p_client_attempt_id  => 'b1700000-0000-4000-8000-000000000011',
+    p_goal_id            => v_goal,
+    p_plan_item_id       => v_item_id,
+    p_activity_type      => 'recall',
+    p_response_type      => 'self_rate',
+    p_evaluator_type     => 'self_rate',
+    p_expected_revision  => v_left,
+    p_new_srs            => v_new_srs,
+    p_review_duration_ms => 120000
+  );
+
+  SELECT * INTO v_plan_row FROM daily_plans WHERE id = v_plan_id;
+  ASSERT v_plan_row.completed_items = 1, 'setup: item did not complete';
+  ASSERT v_plan_row.completed_minutes = 2, 'setup: minutes did not move';
+
+  PERFORM undo_plan_study_rating(
+    'b1500000-0000-4000-8000-000000000011', 'b1700000-0000-4000-8000-000000000011');
+
+  -- half one: the card is back where it was
+  SELECT * INTO v_card FROM cards WHERE id = 'b1300000-0000-4000-8000-000000000001';
+  ASSERT v_card.srs_status = v_before.srs_status
+     AND v_card.interval_days = v_before.interval_days
+     AND v_card.repetitions = v_before.repetitions
+     AND v_card.next_review_at IS NOT DISTINCT FROM v_before.next_review_at,
+    'card was not rolled back: ' || v_card.srs_status || '/' || v_card.repetitions
+      || ' (was ' || v_before.srs_status || '/' || v_before.repetitions || ')';
+
+  -- half two: so is the plan. THIS is what was broken.
+  SELECT * INTO v_item FROM daily_plan_items WHERE id = v_item_id;
+  ASSERT v_item.status = 'pending', 'plan item stayed ' || v_item.status || ' after undo';
+  ASSERT v_item.completion_attempt_id IS NULL, 'completion_attempt_id survived the undo';
+
+  SELECT * INTO v_plan_row FROM daily_plans WHERE id = v_plan_id;
+  ASSERT v_plan_row.completed_items = 0,
+    'completed_items stayed ' || v_plan_row.completed_items;
+  ASSERT v_plan_row.completed_minutes = 0,
+    'completed_minutes stayed ' || v_plan_row.completed_minutes;
+  ASSERT v_plan_row.status = 'pending', 'plan status stayed ' || v_plan_row.status;
+
+  -- the retracted answer leaves no record to quote back at the learner
+  SELECT count(*) INTO v_left FROM answer_attempts
+   WHERE client_attempt_id = 'b1700000-0000-4000-8000-000000000011';
+  ASSERT v_left = 0, 'the retracted attempt survived';
+
+  -- and the item is completable again, which it was not before this fix
+  SELECT srs_revision INTO v_left FROM cards WHERE id = 'b1300000-0000-4000-8000-000000000001';
+  PERFORM apply_plan_study_rating(
+    p_event_id           => 'b1500000-0000-4000-8000-000000000012',
+    p_client_session_id  => 'b1600000-0000-4000-8000-000000000011',
+    p_card_id            => 'b1300000-0000-4000-8000-000000000001',
+    p_deck_id            => 'b1200000-0000-4000-8000-000000000001',
+    p_rating             => 'again',
+    p_srs_source         => 'embedded',
+    p_client_attempt_id  => 'b1700000-0000-4000-8000-000000000012',
+    p_goal_id            => v_goal,
+    p_plan_item_id       => v_item_id,
+    p_activity_type      => 'recall',
+    p_response_type      => 'self_rate',
+    p_evaluator_type     => 'self_rate',
+    p_expected_revision  => v_left,
+    p_new_srs            => v_new_srs
+  );
+  SELECT * INTO v_plan_row FROM daily_plans WHERE id = v_plan_id;
+  ASSERT v_plan_row.completed_items = 1, 're-rating after an undo did not complete the item';
+
+  RAISE NOTICE 'undo_plan_study_rating: all assertions passed';
+END $$;
+
 -- ── delete_learning_goal ────────────────────────────────────────────────────
 DO $$
 DECLARE

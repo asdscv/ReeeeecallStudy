@@ -104,7 +104,8 @@
     "progressSoFar": "Aquí está tu progreso hasta ahora.",
     "knowIt": "Lo sé",
     "dontKnow": "No lo sé",
-    "next": "Siguiente"
+    "next": "Siguiente",
+    "backToPlan": "Volver al plan"
   },
   "weekdays": {
     "sun": "Dom",

@@ -370,6 +370,8 @@ export function StudySessionPage() {
         <NoCardsDue
           mode={config?.mode ?? 'srs'}
           crammingFilter={config?.crammingFilter}
+          backLabel={goalId ? t('summary.backToPlan') : undefined}
+          otherModeLabel={goalId ? null : undefined}
           onBackToDeck={() => {
             reset()
             navigate(exitPath)
@@ -419,6 +421,11 @@ export function StudySessionPage() {
       <StudySummary
         stats={sessionStats}
         summaryType={summaryType}
+        // A plan session came from the plan and goes back to it. Left as the defaults, this
+        // offered "덱으로 돌아가기" and "다시 학습" — two labels, one destination, and neither
+        // of them the deck.
+        backLabel={goalId ? t('summary.backToPlan') : undefined}
+        againLabel={goalId ? null : undefined}
         onBackToDeck={() => {
           reset()
           navigate(exitPath)
