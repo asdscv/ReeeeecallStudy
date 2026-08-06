@@ -5,7 +5,6 @@ import { Play, Check } from 'lucide-react'
 import {
   useLearningStore,
   type LearningGoalWithDecks, type AttemptRow, type RemediationAction, type GoalKnowledge,
-  type DailyPlanItemRow,
 } from '../../stores/learning-store'
 import { currentPlanContext } from '../../lib/learning-plan-date'
 import { cardPromptLabel } from '@reeeeecall/shared/lib/card-prompt'
@@ -13,7 +12,7 @@ import {
   attemptNeedsRemediation, attemptTypedAnswer,
 } from '@reeeeecall/shared/lib/learning-attempt-selection'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
-import { recallPercent } from '@reeeeecall/shared/lib/learning-recall-display'
+import { planComposition } from '@reeeeecall/shared/lib/plan-composition'
 import { useDeckStore } from '../../stores/deck-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
 import { EnrichmentModal } from './EnrichmentModal'
@@ -49,18 +48,21 @@ import { EnrichmentModal } from './EnrichmentModal'
  * computed from today's SRS state, and anything studied in between would invalidate it while it
  * sat in the database looking authoritative. So the future days run the planner and keep only
  * the shape, and say on screen that that is what they are.
+ *
+ * ## Why there is no per-card list
+ *
+ * There was one: every item in the day, with its planner reason, its recall estimate and its
+ * minute cost. It cost thirty rows of scroll to reach the buttons under it and gave nothing
+ * back. Every row read the same ("잊기 직전 · 29% · 약 0.5분"), so the reasoning meant to build
+ * trust turned into wallpaper; nothing on it was actionable, since the studying happens in the
+ * study session; and the numbers were the snapshot the planner wrote at dawn, so a learner
+ * returning mid-day read stale estimates for the cards they had not reached yet.
+ *
+ * What that list was actually asked was "what am I in for?", and that answer fits on one line —
+ * the split between cards coming back and cards never seen. It sits in the summary card above,
+ * next to the count it qualifies.
  */
 
-/** Planner reason codes (daily-plan-v2) → the phrase shown on the row. */
-const REASON_KEY: Record<string, string> = {
-  due: 'today.reason.due',
-  memory_risk: 'today.reason.memoryRisk',
-  recent_failure: 'today.reason.recentFailure',
-  slow_response: 'today.reason.slowResponse',
-  goal_relevance: 'today.reason.goalRelevance',
-  importance: 'today.reason.importance',
-  balanced: 'today.reason.balanced',
-}
 
 /** Rows shown in the attempt list. The store loads 50; everything on screen counts these. */
 const ATTEMPT_ROWS = 10
@@ -90,49 +92,6 @@ const REMEDIATION_ACTIONS: ReadonlyArray<{
     offeredFor: (attempt) => attemptTypedAnswer(attempt) !== null,
   },
 ]
-
-/**
- * One row of the day's list — read-only.
- *
- * Deliberately carries no controls. It used to hold a textarea and three rating buttons, which
- * is what made this page look like a study screen while rescheduling nothing. What it shows is
- * what the planner decided and why, so the learner can judge the plan before starting it.
- */
-function PlanItemRow({ position, cardText, reasonLabel, minutes, done, recall }: {
-  position: number
-  cardText: string
-  reasonLabel: string
-  minutes: number | null
-  done: boolean
-  /**
-   * Estimated chance the learner still recalls this card, whole percent, or null.
-   *
-   * Null when the card has no forgetting curve yet. The row then says nothing rather than
-   * "0%" — a new card is not a forgotten one.
-   */
-  recall: number | null
-}) {
-  const { t } = useTranslation('learning')
-  return (
-    <li className="flex items-start gap-3 px-3 py-2">
-      <span className="w-5 shrink-0 pt-0.5 text-xs tabular-nums text-content-tertiary">
-        {done ? <Check className="h-3.5 w-3.5 text-success" aria-label={t('today.item.recorded')} /> : position + 1}
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className={`truncate text-sm ${done ? 'text-content-tertiary line-through' : 'text-foreground'}`}>
-          {cardText || t('today.item.untitled')}
-        </p>
-        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-content-tertiary">
-          <span>{reasonLabel}</span>
-          {/* The number the reason is derived from. Shown so "at risk of forgetting" is a
-              measurement the learner can judge rather than an assertion they must trust. */}
-          {recall !== null && <span>{t('today.recallChance', { percent: recall })}</span>}
-          {minutes !== null && <span>{t('today.item.minutes', { count: minutes })}</span>}
-        </div>
-      </div>
-    </li>
-  )
-}
 
 /** Recent attempts for the selected goal — where paid remediation is offered. */
 function AttemptHistory({ goalId }: { goalId: string }) {
@@ -304,7 +263,7 @@ export function LearningTodayPage() {
   const { t } = useTranslation('learning')
   const {
     goals, goalsLoading, fetchGoals,
-    plan, planItems, planCards, planTemplateFields, planLoading, planGenerating, planError,
+    plan, planItems, planCards, planLoading, planGenerating, planError,
     planBlockedReason,
     fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
     extendPlan, planExtending, planExtension,
@@ -417,10 +376,8 @@ export function LearningTodayPage() {
   const pendingTotal = deckGroups.reduce((sum, group) => sum + group.pending, 0)
   const doneTotal = deckGroups.reduce((sum, group) => sum + group.done, 0)
 
-  const sortedItems = useMemo(
-    () => [...planItems].sort((a: DailyPlanItemRow, b: DailyPlanItemRow) => a.position - b.position),
-    [planItems],
-  )
+  /** What is LEFT today. Shared with mobile so the two screens cannot disagree about it. */
+  const composition = useMemo(() => planComposition(planItems), [planItems])
 
   if (goalsLoading && goals.length === 0) return <ListSkeleton />
 
@@ -573,6 +530,18 @@ export function LearningTodayPage() {
               />
             </div>
 
+            {/* All of what the per-card list used to say, in one line. A half with nothing in it
+                is left out rather than printed as "0" — "복습 19장" alone already says the day has
+                no new cards, and a zero invites the reader to wonder what went wrong. */}
+            {(composition.review > 0 || composition.fresh > 0) && (
+              <p className="mt-2 text-xs text-content-tertiary" data-testid="today-composition">
+                {[
+                  composition.review > 0 ? t('today.composition.review', { count: composition.review }) : null,
+                  composition.fresh > 0 ? t('today.composition.fresh', { count: composition.fresh }) : null,
+                ].filter(Boolean).join(' · ')}
+              </p>
+            )}
+
             {nextDeck ? (
               <>
                 <Link
@@ -629,33 +598,6 @@ export function LearningTodayPage() {
               </ul>
             </section>
           )}
-
-          {/* What is actually on the list, and why the planner chose it. Read-only: this is a
-              plan, and the studying happens in the study session. */}
-          <section className="overflow-hidden rounded-xl border border-border bg-card">
-            <h2 className="border-b border-border px-3 py-2 text-xs font-medium text-muted-foreground">
-              {t('today.listTitle')}
-            </h2>
-            <ul className="divide-y divide-border">
-              {sortedItems.map((item) => {
-                const card = item.card_id ? planCards[item.card_id] : undefined
-                return (
-                  <PlanItemRow
-                    key={item.id}
-                    position={item.position}
-                    cardText={cardPromptLabel(card?.field_values, card?.template_id, planTemplateFields)}
-                    reasonLabel={t(REASON_KEY[item.reason_code] ?? 'today.reason.balanced')}
-                    // Strictly what the planner recorded when it chose this row. Deliberately
-                    // NOT recomputed from the card: on a subscribed deck `cards.interval_days`
-                    // is the PUBLISHER's, which is the defect #389 fixed.
-                    recall={recallPercent(item.payload?.recall_probability)}
-                    minutes={item.estimated_minutes}
-                    done={item.status === 'completed'}
-                  />
-                )
-              })}
-            </ul>
-          </section>
 
           {/* "더 하기" comes first and is the primary of the two: rebuilding DELETES every item
               and zeroes the day's progress, so the additive option has to be easier to reach. */}

@@ -17,18 +17,7 @@
     },
     "item": {
       "study": "Học",
-      "untitled": "(không có nội dung)",
-      "minutes": "~{{count, decimal}} phút",
-      "recorded": "Đã ghi lại"
-    },
-    "reason": {
-      "due": "Đến hạn ôn tập",
-      "memoryRisk": "Sắp quên",
-      "recentFailure": "Trả lời sai gần đây",
-      "slowResponse": "Trả lời chậm",
-      "goalRelevance": "Liên quan đến mục tiêu",
-      "importance": "Mức quan trọng",
-      "balanced": "Phân bổ cân bằng"
+      "untitled": "(không có nội dung)"
     },
     "error": {
       "limitExceeded": "Bạn đã dùng hết số lần tạo lại kế hoạch hôm nay. Hãy thử lại vào ngày mai.",
@@ -42,15 +31,8 @@
     "rate": {
       "again": "Không biết",
       "partial": "Chưa chắc",
-      "known": "Đã biết",
-      "hint": "Chỉ ghi lại lần làm bài — không thay đổi lịch ôn tập."
+      "known": "Đã biết"
     },
-    "answer": {
-      "label": "Câu trả lời của bạn (không bắt buộc)",
-      "placeholder": "Nhập những gì bạn còn nhớ",
-      "note": "Được lưu cùng lần làm bài. Không chấm điểm — bạn vẫn tự đánh giá."
-    },
-    "recallChance": "Khoảng {{percent}}% khả năng bạn vẫn nhớ thẻ này",
     "backToPlans": "Tất cả kế hoạch",
     "extend": "Học thêm",
     "extending": "Đang thêm…",
@@ -69,7 +51,6 @@
     "studyNote": "Chấm điểm ở màn hình học sẽ đặt lịch ôn tiếp theo và đánh dấu vào kế hoạch hôm nay.",
     "byDeck": "Theo bộ thẻ",
     "deckDone": "Xong",
-    "listTitle": "Danh sách hôm nay",
     "days": {
       "label": "Ngày",
       "today": "Hôm nay",
@@ -90,6 +71,14 @@
       "empty": "Ngày đó có vẻ không có thẻ nào đến hạn.",
       "loading": "Đang tính…",
       "note": "Đây là ước tính, giả định bạn không học gì từ giờ đến hôm đó — và đó chính là điều sẽ làm nó thay đổi."
+    },
+    "composition": {
+      "review": "{{count, number}} thẻ ôn lại",
+      "review_one": "{{count, number}} thẻ ôn lại",
+      "review_other": "{{count, number}} thẻ ôn lại",
+      "fresh": "{{count, number}} thẻ mới",
+      "fresh_one": "{{count, number}} thẻ mới",
+      "fresh_other": "{{count, number}} thẻ mới"
     }
   },
   "goals": {

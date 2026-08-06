@@ -17,18 +17,7 @@
     },
     "item": {
       "study": "학습",
-      "untitled": "(내용 없음)",
-      "minutes": "약 {{count, decimal}}분",
-      "recorded": "기록됨"
-    },
-    "reason": {
-      "due": "복습 시점",
-      "memoryRisk": "잊기 직전",
-      "recentFailure": "최근 오답",
-      "slowResponse": "응답 지연",
-      "goalRelevance": "목표 관련도",
-      "importance": "중요도",
-      "balanced": "균형 배분"
+      "untitled": "(내용 없음)"
     },
     "error": {
       "limitExceeded": "오늘의 플랜 재생성 한도를 모두 썼습니다. 내일 다시 시도해 주세요.",
@@ -42,15 +31,8 @@
     "rate": {
       "again": "모름",
       "partial": "애매함",
-      "known": "알았음",
-      "hint": "시도 기록만 남습니다 — 복습 일정은 바뀌지 않습니다."
+      "known": "알았음"
     },
-    "answer": {
-      "label": "내가 쓴 답 (선택)",
-      "placeholder": "기억나는 대로 입력하세요",
-      "note": "시도 기록과 함께 저장됩니다. 채점하지 않으며, 평가는 직접 선택합니다."
-    },
-    "recallChance": "지금 기억하고 있을 확률 약 {{percent}}%",
     "backToPlans": "플랜 목록",
     "extend": "더 하기",
     "extending": "추가하는 중…",
@@ -69,7 +51,6 @@
     "studyNote": "학습 화면에서 평가하면 복습 일정과 오늘의 플랜이 함께 기록됩니다.",
     "byDeck": "덱별",
     "deckDone": "완료",
-    "listTitle": "오늘의 목록",
     "days": {
       "label": "날짜",
       "today": "오늘",
@@ -90,6 +71,14 @@
       "empty": "이날은 복습할 카드가 없을 것 같아요.",
       "loading": "계산 중…",
       "note": "예상치입니다. 지금부터 그날까지 아무것도 학습하지 않는다고 가정한 값이라, 실제로 학습하면 달라집니다."
+    },
+    "composition": {
+      "review": "복습 {{count, number}}장",
+      "review_one": "복습 {{count, number}}장",
+      "review_other": "복습 {{count, number}}장",
+      "fresh": "새 카드 {{count, number}}장",
+      "fresh_one": "새 카드 {{count, number}}장",
+      "fresh_other": "새 카드 {{count, number}}장"
     }
   },
   "goals": {

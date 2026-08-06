@@ -171,11 +171,6 @@
     "title": "Recommendations"
   },
   "today": {
-    "answer": {
-      "label": "Your answer (optional)",
-      "note": "Saved with your attempt. Nothing grades it — you still rate yourself.",
-      "placeholder": "Type what you remember"
-    },
     "budget": "{{count, number}} min/day",
     "empty": {
       "createGoal": "Create a goal",
@@ -195,28 +190,15 @@
     "generate": "Build today's plan",
     "generating": "Building…",
     "item": {
-      "minutes": "~{{count, decimal}} min",
-      "recorded": "Recorded",
       "untitled": "(no text)",
       "study": "Study"
     },
     "progress": "{{done, number}} of {{total, number}} done",
     "rate": {
       "again": "Didn't know",
-      "hint": "Records your attempt — it does not change the review schedule.",
       "known": "Knew it",
       "partial": "Partly"
     },
-    "reason": {
-      "balanced": "Balanced mix",
-      "due": "Due for review",
-      "goalRelevance": "Goal relevance",
-      "importance": "Importance",
-      "memoryRisk": "At risk of forgetting",
-      "recentFailure": "Recently missed",
-      "slowResponse": "Slow to answer"
-    },
-    "recallChance": "About {{percent}}% chance you still recall this",
     "regenerate": "Rebuild plan",
     "regenerating": "Rebuilding…",
     "title": "Today's plan",
@@ -238,7 +220,6 @@
     "studyNote": "Rating a card there schedules its next review and ticks it off this plan.",
     "byDeck": "By deck",
     "deckDone": "Done",
-    "listTitle": "Today's list",
     "days": {
       "label": "Day",
       "today": "Today",
@@ -259,6 +240,14 @@
       "empty": "Nothing looks due on that day.",
       "loading": "Working it out…",
       "note": "An estimate. It assumes nothing gets studied between now and then — which is the one thing that will change it."
+    },
+    "composition": {
+      "review": "{{count, number}} reviews",
+      "review_one": "{{count, number}} review",
+      "review_other": "{{count, number}} reviews",
+      "fresh": "{{count, number}} new",
+      "fresh_one": "{{count, number}} new",
+      "fresh_other": "{{count, number}} new"
     }
   },
   "progress": {

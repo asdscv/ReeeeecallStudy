@@ -17,18 +17,7 @@
     },
     "item": {
       "study": "Study",
-      "untitled": "(no text)",
-      "minutes": "~{{count, decimal}} min",
-      "recorded": "Recorded"
-    },
-    "reason": {
-      "due": "Due for review",
-      "memoryRisk": "At risk of forgetting",
-      "recentFailure": "Recently missed",
-      "slowResponse": "Slow to answer",
-      "goalRelevance": "Goal relevance",
-      "importance": "Importance",
-      "balanced": "Balanced mix"
+      "untitled": "(no text)"
     },
     "error": {
       "limitExceeded": "You've hit today's limit for rebuilding plans. Try again tomorrow.",
@@ -42,15 +31,8 @@
     "rate": {
       "again": "Didn't know",
       "partial": "Partly",
-      "known": "Knew it",
-      "hint": "Records your attempt — it does not change the review schedule."
+      "known": "Knew it"
     },
-    "answer": {
-      "label": "Your answer (optional)",
-      "placeholder": "Type what you remember",
-      "note": "Saved with your attempt. Nothing grades it — you still rate yourself."
-    },
-    "recallChance": "About {{percent}}% chance you still recall this",
     "backToPlans": "All plans",
     "extend": "Study more",
     "extending": "Adding…",
@@ -69,7 +51,6 @@
     "studyNote": "Rating a card there schedules its next review and ticks it off this plan.",
     "byDeck": "By deck",
     "deckDone": "Done",
-    "listTitle": "Today's list",
     "days": {
       "label": "Day",
       "today": "Today",
@@ -90,6 +71,14 @@
       "empty": "Nothing looks due on that day.",
       "loading": "Working it out…",
       "note": "An estimate. It assumes nothing gets studied between now and then — which is the one thing that will change it."
+    },
+    "composition": {
+      "review": "{{count, number}} reviews",
+      "review_one": "{{count, number}} review",
+      "review_other": "{{count, number}} reviews",
+      "fresh": "{{count, number}} new",
+      "fresh_one": "{{count, number}} new",
+      "fresh_other": "{{count, number}} new"
     }
   },
   "goals": {

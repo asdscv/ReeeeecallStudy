@@ -17,18 +17,7 @@
     },
     "item": {
       "study": "Estudiar",
-      "untitled": "(sin texto)",
-      "minutes": "~{{count, decimal}} min",
-      "recorded": "Registrado"
-    },
-    "reason": {
-      "due": "Pendiente de repaso",
-      "memoryRisk": "A punto de olvidarse",
-      "recentFailure": "Fallo reciente",
-      "slowResponse": "Respuesta lenta",
-      "goalRelevance": "Relevancia del objetivo",
-      "importance": "Importancia",
-      "balanced": "Mezcla equilibrada"
+      "untitled": "(sin texto)"
     },
     "error": {
       "limitExceeded": "Has alcanzado el límite de reconstrucciones de hoy. Inténtalo mañana.",
@@ -42,15 +31,8 @@
     "rate": {
       "again": "No lo sabía",
       "partial": "A medias",
-      "known": "Lo sabía",
-      "hint": "Registra tu intento; no cambia el calendario de repaso."
+      "known": "Lo sabía"
     },
-    "answer": {
-      "label": "Tu respuesta (opcional)",
-      "placeholder": "Escribe lo que recuerdes",
-      "note": "Se guarda con tu intento. No se califica: la valoración sigue siendo tuya."
-    },
-    "recallChance": "Alrededor de un {{percent}}% de probabilidad de recordarla",
     "backToPlans": "Todos los planes",
     "extend": "Estudiar más",
     "extending": "Añadiendo…",
@@ -69,7 +51,6 @@
     "studyNote": "Valorar una tarjeta allí programa su próximo repaso y la marca en este plan.",
     "byDeck": "Por mazo",
     "deckDone": "Hecho",
-    "listTitle": "Lista de hoy",
     "days": {
       "label": "Día",
       "today": "Hoy",
@@ -90,6 +71,14 @@
       "empty": "Ese día no parece tocar nada.",
       "loading": "Calculando…",
       "note": "Es una estimación: supone que no estudias nada entre hoy y ese día, que es justo lo que la cambiará."
+    },
+    "composition": {
+      "review": "{{count, number}} de repaso",
+      "review_one": "{{count, number}} de repaso",
+      "review_other": "{{count, number}} de repaso",
+      "fresh": "{{count, number}} nuevas",
+      "fresh_one": "{{count, number}} nueva",
+      "fresh_other": "{{count, number}} nuevas"
     }
   },
   "goals": {

@@ -206,7 +206,7 @@ describe('LearningTodayPage', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('today.error.limitExceeded')
   })
 
-  it('renders a plan item with its reason and a link into the card\'s deck', () => {
+  it('sends the day into the real study session, carrying the plan with it', () => {
     renderToday({
       plan: {
         id: 'plan-1', goal_id: 'goal-1', plan_date: '2026-07-31', timezone: 'Asia/Seoul',
@@ -222,48 +222,79 @@ describe('LearningTodayPage', () => {
       planCards: { 'card-1': { id: 'card-1', deck_id: 'deck-7', field_values: { front: '猫' } } },
     })
 
-    expect(screen.getByText('猫')).toBeInTheDocument()
-    expect(screen.getByText('today.reason.recentFailure')).toBeInTheDocument()
-    // The way into the day is the real study session, carrying the plan with it. It used to be
-    // `/decks/:id/study/setup` — the whole deck, no plan context — so the plan and the session
-    // each did their own thing and neither knew about the other.
+    // It used to be `/decks/:id/study/setup` — the whole deck, no plan context — so the plan and
+    // the session each did their own thing and neither knew about the other.
     expect(screen.getByRole('link', { name: /today\.startStudy/ }))
       .toHaveAttribute('href', `/decks/deck-7/study?mode=srs&goalId=goal-1&planDate=${todayKey()}`)
   })
 
-  // ── the memory model, made visible ────────────────────────────────────────
+  // ── what the day is made of ───────────────────────────────────────────────
   //
-  // Until this shipped, the plan asserted "at risk of forgetting" and showed no number, so the
-  // FSRS work behind it was invisible — and an estimate a learner cannot see is one they cannot
-  // judge.
-  const planWith = (payload: unknown) => ({
+  // This replaced a per-card list: one row per item, each with its planner reason, its recall
+  // estimate and its minute cost. Thirty rows of scroll, nothing on them to tap, every row
+  // reading the same phrase, and the numbers frozen at the moment the planner ran. The question
+  // it was actually answering — "what am I in for?" — is reviews versus cards never seen.
+  const item = (id: string, payload: unknown, status = 'pending') => ({
+    id, plan_id: 'plan-1', position: 0, activity_id: null, card_id: `card-${id}`,
+    concept_id: null, activity_type: 'recall', stimulus_type: 'text',
+    response_type: 'self_rate', evaluator_type: 'self_rate', reason_code: 'memory_risk',
+    priority: 0.7, estimated_minutes: 0.5, status, payload,
+  })
+  const mixedPlan = (planItems: unknown[]) => ({
     plan: {
       id: 'plan-1', goal_id: 'goal-1', plan_date: '2026-07-31', timezone: 'Asia/Seoul',
       algorithm_version: 'daily-plan-v2', input_fingerprint: 'fnv1a32:abc', status: 'pending',
-      budget_minutes: 20, completed_minutes: 0, completed_items: 0, total_items: 1,
+      budget_minutes: 20, completed_minutes: 0, completed_items: 0, total_items: planItems.length,
     },
-    planItems: [{
-      id: 'item-1', plan_id: 'plan-1', position: 0, activity_id: null, card_id: 'card-1',
-      concept_id: null, activity_type: 'recall', stimulus_type: 'text',
-      response_type: 'self_rate', evaluator_type: 'self_rate', reason_code: 'memory_risk',
-      priority: 0.7, estimated_minutes: 0.5, status: 'pending', payload,
-    }],
-    planCards: { 'card-1': { id: 'card-1', deck_id: 'deck-7', field_values: { front: '猫' } } },
+    planItems,
+    planCards: Object.fromEntries((planItems as { card_id: string }[]).map((row) => [
+      row.card_id, { id: row.card_id, deck_id: 'deck-7', field_values: { front: '猫' } },
+    ])),
   })
 
-  it('shows the recall probability the planner chose the row on', () => {
-    renderToday(planWith({ recall_probability: 0.523 }))
+  it('splits the remaining work into reviews and cards never seen', () => {
+    renderToday(mixedPlan([
+      item('a', { recall_probability: 0.523 }),
+      item('b', { recall_probability: 0.1 }),
+      item('c', {}),
+    ]))
 
-    expect(screen.getByText('today.recallChance')).toBeInTheDocument()
+    const line = screen.getByTestId('today-composition')
+    expect(line).toHaveTextContent('today.composition.review')
+    expect(line).toHaveTextContent('today.composition.fresh')
+    // No per-card rows: the card's own text appears nowhere on the plan screen.
+    expect(screen.queryByText('猫')).not.toBeInTheDocument()
   })
 
-  it('says nothing at all for a card with no forgetting curve', () => {
-    // A new card, or a plan saved before the estimate was recorded. "0%" would tell the learner
-    // they have certainly forgotten something they may never have studied.
-    renderToday(planWith({}))
+  it('leaves out a half with nothing in it rather than printing a zero', () => {
+    renderToday(mixedPlan([item('a', { recall_probability: 0.523 })]))
 
-    expect(screen.queryByText('today.recallChance')).not.toBeInTheDocument()
-    expect(screen.queryByText(/%/)).not.toBeInTheDocument()
+    const line = screen.getByTestId('today-composition')
+    expect(line).toHaveTextContent('today.composition.review')
+    expect(line).not.toHaveTextContent('today.composition.fresh')
+  })
+
+  it('counts what is left, not what the morning held', () => {
+    // A finished item stops being something the learner is "in for". Counting it would leave the
+    // line describing a day that has already partly happened, beside a number that does not.
+    renderToday(mixedPlan([
+      item('a', { recall_probability: 0.523 }, 'completed'),
+      item('b', {}),
+    ]))
+
+    const line = screen.getByTestId('today-composition')
+    expect(line).toHaveTextContent('today.composition.fresh')
+    expect(line).not.toHaveTextContent('today.composition.review')
+  })
+
+  it('treats a recall estimate of zero as a review, not a new card', () => {
+    // `0` is a card that has been studied and forgotten; a new card has no estimate at all. A
+    // truthiness check here would file every forgotten card under "new".
+    renderToday(mixedPlan([item('a', { recall_probability: 0 })]))
+
+    const line = screen.getByTestId('today-composition')
+    expect(line).toHaveTextContent('today.composition.review')
+    expect(line).not.toHaveTextContent('today.composition.fresh')
   })
 
   it('will not rebuild a completed plan (the RPC refuses it)', () => {
@@ -430,14 +461,17 @@ describe('starting the day', () => {
     ])
   })
 
-  it('shows a completed row as done rather than as work left', () => {
+  it('marks a deck whose items are all finished as done, with no way back in', () => {
     renderToday({
       plan: { ...planRow, completed_items: 1 },
       planItems: [{ ...planItem, status: 'completed' as const }],
       planCards: cards,
     })
 
-    expect(screen.getByLabelText('today.item.recorded')).toBeInTheDocument()
+    // A 학습 link on a finished deck would spend a rating to earn a P0007 —
+    // `record_answer_attempt` refuses to complete an item twice.
+    expect(screen.queryByRole('link', { name: 'today.item.study' })).not.toBeInTheDocument()
+    expect(screen.getByText('today.allDone')).toBeInTheDocument()
   })
 })
 

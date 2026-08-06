@@ -169,9 +169,9 @@ console.log('[Test 6] Learning screens: every requestable key exists in every lo
     // an attempt stores `{ self_rated: score }`, so `compare`/`evaluate` have no learner text
     // to work from and are deliberately not offered.
     'enrichment.action': ['explain', 'hint', 'compare'],
-    'today.reason': [
-      'due', 'memoryRisk', 'recentFailure', 'slowResponse', 'goalRelevance', 'importance', 'balanced',
-    ],
+    // `today.reason.*` used to live here, one phrase per planner reason code. The per-card
+    // list that rendered them is gone from both platforms — see LearningTodayScreen's header —
+    // so no screen can request them and the strings went with the list.
   }
   for (const [prefix, values] of Object.entries(FAMILIES)) {
     for (const value of values) required.add(`${prefix}.${value}`)
@@ -267,7 +267,6 @@ console.log('[Test 8] Counted strings inflect in languages that inflect')
     'goals.dailyMinutes',  // "20 min/day" — abbreviation, no plural form
     'today.budget',        // same string, same reason
     'insights.seconds',    // "3s"
-    'today.item.minutes',  // "~3 min" — abbreviation, and the web copy uses the same form
     'form.plan.minutes',   // "88 min/day" — same unit abbreviation on the plan preview
   ])
 

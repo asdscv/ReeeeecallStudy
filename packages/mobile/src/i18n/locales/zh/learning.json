@@ -171,11 +171,6 @@
     "title": "推荐"
   },
   "today": {
-    "answer": {
-      "label": "你的答案（可选）",
-      "note": "与本次作答一同保存。不评分，仍由你自己评价。",
-      "placeholder": "输入你记得的内容"
-    },
     "budget": "每天 {{count, number}} 分钟",
     "empty": {
       "createGoal": "创建目标",
@@ -195,28 +190,15 @@
     "generate": "生成今日计划",
     "generating": "生成中…",
     "item": {
-      "minutes": "约 {{count, decimal}} 分钟",
-      "recorded": "已记录",
       "untitled": "（无内容）",
       "study": "学习"
     },
     "progress": "{{total, number}} 个中完成 {{done, number}} 个",
     "rate": {
       "again": "不知道",
-      "hint": "仅记录本次作答 — 不会改变复习计划。",
       "known": "知道",
       "partial": "不确定"
     },
-    "reason": {
-      "balanced": "均衡搭配",
-      "due": "到期复习",
-      "goalRelevance": "目标相关度",
-      "importance": "重要程度",
-      "memoryRisk": "即将忘记",
-      "recentFailure": "最近答错",
-      "slowResponse": "回答较慢"
-    },
-    "recallChance": "你现在还记得的概率约 {{percent}}%",
     "regenerate": "重新生成计划",
     "regenerating": "重新生成中…",
     "title": "今日计划",
@@ -238,7 +220,6 @@
     "studyNote": "在学习页评分会同时安排下次复习并记入今天的计划。",
     "byDeck": "按卡组",
     "deckDone": "已完成",
-    "listTitle": "今天的清单",
     "days": {
       "label": "日期",
       "today": "今天",
@@ -259,6 +240,14 @@
       "empty": "那天看起来没有要复习的卡片。",
       "loading": "计算中…",
       "note": "这是估算值，前提是从现在到那天什么都不学——一旦你开始学，它就会变。"
+    },
+    "composition": {
+      "review": "复习 {{count, number}} 张",
+      "review_one": "复习 {{count, number}} 张",
+      "review_other": "复习 {{count, number}} 张",
+      "fresh": "新卡 {{count, number}} 张",
+      "fresh_one": "新卡 {{count, number}} 张",
+      "fresh_other": "新卡 {{count, number}} 张"
     }
   },
   "progress": {

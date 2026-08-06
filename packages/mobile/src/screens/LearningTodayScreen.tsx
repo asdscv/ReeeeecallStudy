@@ -17,8 +17,8 @@ import { cardPromptLabel } from '@reeeeecall/shared/lib/card-prompt'
 import {
   attemptNeedsRemediation, attemptTypedAnswer,
 } from '@reeeeecall/shared/lib/learning-attempt-selection'
-import { recallPercent } from '@reeeeecall/shared/lib/learning-recall-display'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
+import { planComposition } from '@reeeeecall/shared/lib/plan-composition'
 import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
 import { useStudy } from '../hooks/useStudy'
 import type { SettingsStackParamList } from '../navigation/types'
@@ -30,9 +30,14 @@ import type { SettingsStackParamList } from '../navigation/types'
  * and are NOT re-implemented here:
  *   * plan generation happens on an explicit press, never in an effect (`save_daily_plan`
  *     is capped at 50 writes per user per day);
- *   * a self-rating records an attempt and does NOT reschedule the card — SRS stays with
- *     the study screen's rating;
+ *   * studying belongs to the study screen, where one rating both reschedules the card and
+ *     completes the plan item (`apply_plan_study_rating`);
  *   * an enrichment request spends real credits, so the label says so before the press.
+ *
+ * There is no per-card list of the day, on either platform. It was thirty rows of scroll that
+ * repeated one phrase, offered nothing to tap, and showed the estimates the planner wrote at
+ * dawn — stale for anyone returning mid-day. What it was really asked, "what am I in for?",
+ * is one line in the summary card: reviews versus cards never seen.
  *
  * The one thing mobile must do differently is the plan date: `currentPlanContext` computes
  * it from the device's local calendar and falls back to a UTC-offset label when the Hermes
@@ -41,26 +46,6 @@ import type { SettingsStackParamList } from '../navigation/types'
  * And because a phone screen is usually resumed rather than opened, the plan date is kept
  * live instead of being frozen at mount — see `planDate` below.
  */
-const SELF_RATINGS: ReadonlyArray<{ score: number; key: string; id: string }> = [
-  { score: 0, key: 'today.rate.again', id: 'again' },
-  { score: 0.5, key: 'today.rate.partial', id: 'partial' },
-  { score: 1, key: 'today.rate.known', id: 'known' },
-]
-
-const REASON_KEY: Record<string, string> = {
-  due: 'today.reason.due',
-  memory_risk: 'today.reason.memoryRisk',
-  recent_failure: 'today.reason.recentFailure',
-  slow_response: 'today.reason.slowResponse',
-  goal_relevance: 'today.reason.goalRelevance',
-  importance: 'today.reason.importance',
-  balanced: 'today.reason.balanced',
-}
-
-/** What the planner recorded for this row, as whole percent, or null if it recorded none. */
-const planRecallPercent = (item: { payload?: { recall_probability?: number } | null }) =>
-  recallPercent(item.payload?.recall_probability)
-
 const MIN_TOUCH = 44
 const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 } as const
 
@@ -362,6 +347,9 @@ export function LearningTodayScreen() {
   const doneTotal = deckGroups.reduce((sum, group) => sum + group.done, 0)
   const nextDeck = deckGroups.find((group) => group.pending > 0) ?? null
 
+  /** What is LEFT today. Shared with web so the two screens cannot disagree about it. */
+  const composition = useMemo(() => planComposition(planItems), [planItems])
+
   const deckName = useCallback(
     (deckId: string) => decks.find((deck) => deck.id === deckId)?.name ?? t('today.item.untitled'),
     [decks, t],
@@ -662,6 +650,21 @@ export function LearningTodayScreen() {
                     }]} />
                   </View>
 
+                  {/* Everything the per-card list used to say, in one line. A half with nothing
+                      in it is left out rather than printed as "0": "복습 19장" on its own already
+                      says the day holds no new cards. */}
+                  {(composition.review > 0 || composition.fresh > 0) && (
+                    <Text
+                      style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 6 }]}
+                      {...testProps('learning-composition')}
+                    >
+                      {[
+                        composition.review > 0 ? t('today.composition.review', { count: composition.review }) : null,
+                        composition.fresh > 0 ? t('today.composition.fresh', { count: composition.fresh }) : null,
+                      ].filter(Boolean).join(' · ')}
+                    </Text>
+                  )}
+
                   {nextDeck ? (
                     <>
                       <TouchableOpacity
@@ -737,52 +740,6 @@ export function LearningTodayScreen() {
                     ))}
                   </View>
                 )}
-
-                {/* What is on the list, and why the planner chose it. Read-only. */}
-                <View style={[styles.card, {
-                  backgroundColor: theme.colors.surface, borderColor: theme.colors.border,
-                }]}>
-                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                    {t('today.listTitle')}
-                  </Text>
-                  {[...planItems].sort((a, b) => a.position - b.position).map((item, index) => {
-                    const card = item.card_id ? planCards[item.card_id] : undefined
-                    // NOT `Object.values(...)[0]` — jsonb key order is Postgres's, not the
-                    // template's, so that can show the answer instead of the prompt.
-                    const label = cardPromptLabel(card?.field_values, card?.template_id, planTemplateFields)
-                    const done = item.status === 'completed'
-                    return (
-                      <View key={item.id} style={styles.planRow} {...testProps(`learning-plan-item-${index}`, true)}>
-                        <Text
-                          style={[theme.typography.bodySmall, {
-                            color: done ? theme.colors.textTertiary : theme.colors.text,
-                            textDecorationLine: done ? 'line-through' : 'none',
-                          }]}
-                          numberOfLines={2}
-                        >
-                          {label || t('today.item.untitled')}
-                        </Text>
-                        <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
-                          {/* `position` is 0-based in the row; web renders `position + 1` and
-                              the two screens must not number the same plan differently. */}
-                          {`${item.position + 1}. `}
-                          {t(REASON_KEY[item.reason_code] ?? 'today.reason.balanced')}
-                          {item.estimated_minutes !== null
-                            ? ` · ${t('today.item.minutes', { count: item.estimated_minutes })}`
-                            : ''}
-                          {/* Strictly what the planner recorded — never recomputed from the
-                              card row, which on a subscribed deck belongs to the publisher
-                              (#389). Absent for a card with no forgetting curve yet: a new
-                              card is not a forgotten one. */}
-                          {planRecallPercent(item) !== null
-                            ? ` · ${t('today.recallChance', { percent: planRecallPercent(item) as number })}`
-                            : ''}
-                        </Text>
-                      </View>
-                    )
-                  })}
-                </View>
-
 
                 {/* "더 하기" comes FIRST and is the primary action. Rebuilding is the
                     destructive one — it deletes every item and zeroes the day's progress — so
@@ -1140,7 +1097,6 @@ const styles = StyleSheet.create({
   summaryRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 },
   progressTrack: { height: 6, borderRadius: 999, marginTop: 8, overflow: 'hidden' },
   progressFill: { height: '100%', borderRadius: 999 },
-  planRow: { paddingVertical: 8, gap: 0 },
   deckRowSplit: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     gap: 8, marginTop: 8,
