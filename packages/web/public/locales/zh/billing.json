@@ -52,7 +52,22 @@
     "hint": "在此取消、更换套餐或更新支付方式。",
     "error": "无法打开管理页面，请重试。",
     "cancel": "取消订阅",
-    "resume": "恢复订阅"
+    "resume": "恢复订阅",
+    "openBillingDirect": "直接打开支付服务页面",
+    "contactSupport": "联系我们",
+    "supportSubject": "订阅管理咨询",
+    "errors": {
+      "UNAUTHORIZED": "登录已过期，请重新登录后再试。",
+      "NOT_CONFIGURED": "目前无法打开订阅管理。重试也无法解决，请联系我们，我们会直接为您处理。",
+      "NO_SUBSCRIPTION": "未找到在网页端购买的订阅。若您在 App Store 或 Google Play 订阅，请在对应商店的订阅管理中修改。",
+      "PROVIDER_SUB_NOT_FOUND": "支付服务商找不到此订阅，可能是在我们更换支付系统之前创建的。重试无法解决，请联系我们，我们会立即为您取消或退款。",
+      "PROVIDER_UNREACHABLE": "无法连接支付服务商，请稍后再试。",
+      "PROVIDER_ERROR": "支付服务商返回了错误，请稍后再试。",
+      "NO_PORTAL_URL": "支付服务商未返回管理链接。请联系我们，我们会直接为您处理。",
+      "LOOKUP_FAILED": "我们这边出现了问题，请稍后再试。",
+      "NETWORK_ERROR": "连接失败，请检查网络后重试。",
+      "SERVER_ERROR": "无法打开管理页面，请重试。"
+    }
   },
   "methods": {
     "title": "选择支付方式",

@@ -136,7 +136,7 @@ describe('Learning engine screens', () => {
     // link, and `measuredHeight` returns the FIRST id present — on an empty list it would be the
     // only match and this assertion would fail by construction rather than on a real regression.
     const { id: measuredId, height: measured } = await measuredHeight([
-      'learning-rate-known-0', 'learning-generate', 'learning-regenerate', 'learning-create-goal',
+      'learning-start-study', 'learning-generate', 'learning-regenerate', 'learning-create-goal',
     ])
 
     expect(measured).toBeGreaterThan(0)

@@ -52,7 +52,22 @@
     "hint": "Batalkan, ganti paket, atau perbarui metode pembayaran.",
     "error": "Tidak dapat membuka halaman pengelolaan. Coba lagi.",
     "cancel": "Batalkan langganan",
-    "resume": "Lanjutkan langganan"
+    "resume": "Lanjutkan langganan",
+    "openBillingDirect": "Buka halaman penagihan langsung",
+    "contactSupport": "Hubungi kami",
+    "supportSubject": "Bantuan pengelolaan langganan",
+    "errors": {
+      "UNAUTHORIZED": "Sesi Anda kedaluwarsa. Masuk lagi lalu coba kembali.",
+      "NOT_CONFIGURED": "Pengelolaan langganan belum bisa dibuka saat ini. Mencoba lagi tidak akan membantu — hubungi kami dan kami tangani langsung.",
+      "NO_SUBSCRIPTION": "Tidak ada langganan yang dibeli lewat web. Jika Anda berlangganan di App Store atau Google Play, kelola di toko tersebut.",
+      "PROVIDER_SUB_NOT_FOUND": "Penyedia pembayaran tidak menemukan langganan ini — mungkin dibuat sebelum kami memindahkan sistem pembayaran. Mencoba lagi tidak akan membantu. Hubungi kami dan kami batalkan atau kembalikan dananya segera.",
+      "PROVIDER_UNREACHABLE": "Tidak dapat terhubung ke penyedia pembayaran. Coba lagi sebentar lagi.",
+      "PROVIDER_ERROR": "Penyedia pembayaran mengembalikan galat. Coba lagi sebentar lagi.",
+      "NO_PORTAL_URL": "Penyedia pembayaran tidak mengembalikan tautan pengelolaan. Hubungi kami dan kami tangani langsung.",
+      "LOOKUP_FAILED": "Ada masalah di sisi kami. Coba lagi sebentar lagi.",
+      "NETWORK_ERROR": "Koneksi gagal. Periksa jaringan Anda lalu coba lagi.",
+      "SERVER_ERROR": "Tidak dapat membuka halaman pengelolaan. Coba lagi."
+    }
   },
   "methods": {
     "title": "Pilih metode pembayaran",

@@ -52,7 +52,22 @@
     "hint": "Cancel, change plan, or update your payment method.",
     "error": "Couldn't open the management page. Please try again.",
     "cancel": "Cancel subscription",
-    "resume": "Resume subscription"
+    "resume": "Resume subscription",
+    "openBillingDirect": "Open the billing page directly",
+    "contactSupport": "Contact support",
+    "supportSubject": "Subscription management help",
+    "errors": {
+      "UNAUTHORIZED": "Your session expired. Sign in again and retry.",
+      "NOT_CONFIGURED": "Subscription management is unavailable right now. Retrying will not help — please contact us and we will handle it for you.",
+      "NO_SUBSCRIPTION": "We can't find a subscription purchased on the web. If you subscribed in the App Store or Google Play, manage it there.",
+      "PROVIDER_SUB_NOT_FOUND": "Our payment provider cannot find this subscription — it may predate a change in our billing setup. Retrying will not help. Contact us and we will cancel or refund it immediately.",
+      "PROVIDER_UNREACHABLE": "We couldn't reach the payment provider. Please try again in a moment.",
+      "PROVIDER_ERROR": "The payment provider returned an error. Please try again in a moment.",
+      "NO_PORTAL_URL": "The payment provider didn't return a management link. Contact us and we will handle it directly.",
+      "LOOKUP_FAILED": "Something went wrong on our side. Please try again in a moment.",
+      "NETWORK_ERROR": "Connection failed. Check your network and try again.",
+      "SERVER_ERROR": "Couldn't open the management page. Please try again."
+    }
   },
   "methods": {
     "title": "Choose a payment method",

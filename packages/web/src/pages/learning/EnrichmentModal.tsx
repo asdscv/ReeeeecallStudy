@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/dialog'
 import { useLearningStore, type EnrichmentPreview } from '../../stores/learning-store'
 
 /**
@@ -54,26 +55,19 @@ export function EnrichmentModal({ preview }: { preview: EnrichmentPreview }) {
   const { enrichmentSaving, resolveEnrichment, dismissEnrichment } = useLearningStore()
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={t(`enrichment.action.${preview.action}`)}
-        className="w-full max-w-lg bg-card rounded-xl border border-border p-4 space-y-3 max-h-[90vh] overflow-y-auto"
-      >
-        <div className="flex items-start justify-between gap-3">
-          <h2 className="text-base font-medium text-foreground">
+    /* Backdrop and Escape map to `dismissEnrichment` — "later", the preview stays pending —
+       and never to `resolveEnrichment('rejected')`. The generation is ALREADY charged, so
+       wiring an outside click to the discard action would silently burn credits the learner
+       paid for on a gesture they did not mean as a decision. */
+    <Dialog open onOpenChange={(next) => { if (!next) dismissEnrichment() }}>
+      <DialogContent className="sm:max-w-lg" aria-label={t(`enrichment.action.${preview.action}`)}>
+        <DialogHeader>
+          <DialogTitle className="text-base font-medium">
             {t(`enrichment.action.${preview.action}`)}
-          </h2>
-          <button
-            type="button"
-            onClick={dismissEnrichment}
-            className="text-xs text-content-tertiary hover:underline cursor-pointer shrink-0"
-          >
-            {t('enrichment.later')}
-          </button>
-        </div>
+          </DialogTitle>
+        </DialogHeader>
 
+      <div className="space-y-3">
         <ContentBlocks content={preview.content} />
 
         <div className="pt-1 border-t border-border">
@@ -87,7 +81,7 @@ export function EnrichmentModal({ preview }: { preview: EnrichmentPreview }) {
               {preview.sources.map((source, i) => (
                 <li key={i} className="text-xs text-foreground">
                   {source.url ? (
-                    <a href={source.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                    <a href={source.url} target="_blank" rel="noopener noreferrer" className="text-brand hover:underline">
                       {source.title || source.url}
                     </a>
                   ) : (
@@ -106,12 +100,19 @@ export function EnrichmentModal({ preview }: { preview: EnrichmentPreview }) {
             "keep this?" and an implied "cancel for a refund". */}
         <p className="text-[11px] text-content-tertiary">{t('enrichment.chargedNote')}</p>
 
-        <div className="flex justify-end gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <button
+            type="button"
+            onClick={dismissEnrichment}
+            className="mr-auto text-xs text-content-tertiary hover:underline cursor-pointer"
+          >
+            {t('enrichment.later')}
+          </button>
           <button
             type="button"
             disabled={enrichmentSaving}
             onClick={() => void resolveEnrichment('rejected')}
-            className="px-3 py-1.5 text-sm border border-border rounded-lg cursor-pointer disabled:opacity-50"
+            className="px-3 py-1.5 text-sm border border-border rounded-lg cursor-pointer hover:bg-accent disabled:opacity-50"
           >
             {t('enrichment.discard')}
           </button>
@@ -119,12 +120,13 @@ export function EnrichmentModal({ preview }: { preview: EnrichmentPreview }) {
             type="button"
             disabled={enrichmentSaving}
             onClick={() => void resolveEnrichment('accepted')}
-            className="px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg cursor-pointer disabled:opacity-50"
+            className="px-4 py-1.5 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50"
           >
             {enrichmentSaving ? t('enrichment.saving') : t('enrichment.keep')}
           </button>
         </div>
       </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

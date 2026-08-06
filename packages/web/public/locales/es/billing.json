@@ -52,7 +52,22 @@
     "hint": "Cancela, cambia de plan o actualiza tu método de pago.",
     "error": "No se pudo abrir la página de gestión. Inténtalo de nuevo.",
     "cancel": "Cancelar suscripción",
-    "resume": "Reanudar suscripción"
+    "resume": "Reanudar suscripción",
+    "openBillingDirect": "Abrir la página de facturación directamente",
+    "contactSupport": "Contactar con soporte",
+    "supportSubject": "Ayuda con la gestión de la suscripción",
+    "errors": {
+      "UNAUTHORIZED": "Tu sesión caducó. Inicia sesión de nuevo e inténtalo otra vez.",
+      "NOT_CONFIGURED": "La gestión de la suscripción no está disponible ahora mismo. Reintentar no servirá: escríbenos y lo resolvemos nosotros.",
+      "NO_SUBSCRIPTION": "No encontramos ninguna suscripción comprada en la web. Si te suscribiste en App Store o Google Play, gestiónala allí.",
+      "PROVIDER_SUB_NOT_FOUND": "Nuestro proveedor de pagos no encuentra esta suscripción; puede ser anterior a un cambio en nuestro sistema de facturación. Reintentar no servirá. Escríbenos y la cancelamos o reembolsamos de inmediato.",
+      "PROVIDER_UNREACHABLE": "No pudimos conectar con el proveedor de pagos. Inténtalo de nuevo en un momento.",
+      "PROVIDER_ERROR": "El proveedor de pagos devolvió un error. Inténtalo de nuevo en un momento.",
+      "NO_PORTAL_URL": "El proveedor de pagos no devolvió un enlace de gestión. Escríbenos y lo resolvemos directamente.",
+      "LOOKUP_FAILED": "Algo falló por nuestra parte. Inténtalo de nuevo en un momento.",
+      "NETWORK_ERROR": "Fallo de conexión. Revisa tu red e inténtalo de nuevo.",
+      "SERVER_ERROR": "No se pudo abrir la página de gestión. Inténtalo de nuevo."
+    }
   },
   "methods": {
     "title": "Elige un método de pago",

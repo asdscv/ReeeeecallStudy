@@ -10,7 +10,8 @@ import { useTheme } from '../theme'
 import type { SettingsStackParamList } from '../navigation/types'
 import { testProps } from '../utils/testProps'
 import {
-  availableDomainIds, projectWorkload, EVERY_DAY, studyDaysBetween, perStudyDayMultiplier,
+  availableDomainIds, projectWorkload, daysForDailyBudget, studyDaysBetween,
+  perStudyDayMultiplier, DEFAULT_NEW_CARDS_PER_DAY,
 } from '@reeeeecall/shared/learning'
 import { useLearningStore } from '@reeeeecall/shared/stores/learning-store'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
@@ -36,6 +37,12 @@ import { useAuthStore } from '@reeeeecall/shared/stores/auth-store'
  */
 const HORIZONS_MONTHS = [1, 3, 6, 12] as const
 
+/** Which side of the same question the learner pinned — mirrors the web form's `basis`. */
+type PlanBasis = 'date' | 'minutes'
+
+/** The rhythms offered. Same 1..7 range the web select has, as chips. */
+const STUDY_DAY_CHOICES = [1, 2, 3, 4, 5, 6, 7] as const
+
 /** Neutral weight for every deck, now that the learner is not asked to rank them. */
 const NEUTRAL_IMPORTANCE = 0.5
 const CONSOLIDATION_DAYS = 14
@@ -50,7 +57,7 @@ export function LearningGoalsScreen() {
   const { t } = useTranslation('learning')
   const theme = useTheme()
   const navigation = useNavigation<NavigationProp<SettingsStackParamList>>()
-  const { goals, goalsLoading, goalsError, fetchGoals, createGoal, archiveGoal } = useLearningStore()
+  const { goals, goalsLoading, goalsError, fetchGoals, createGoal, archiveGoal, deleteGoal } = useLearningStore()
   const { decks, stats, fetchDecks, fetchStats } = useDeckStore()
   const userId = useAuthStore((state) => state.user?.id)
 
@@ -62,6 +69,18 @@ export function LearningGoalsScreen() {
   const [horizonMonths, setHorizonMonths] = useState<number | null>(null)
   const [deckIds, setDeckIds] = useState<Set<string>>(new Set())
   const [localError, setLocalError] = useState<string | null>(null)
+  // The learner pins ONE side — a horizon, or a daily budget — and the app answers the other.
+  // Two live inputs both feeding the saved budget is how the web form ended up showing two
+  // different finish stories at once, so mobile states the choice instead of inferring it.
+  const [basis, setBasis] = useState<PlanBasis>('date')
+  const [budgetMinutes, setBudgetMinutes] = useState<number | null>(null)
+  /** How often they study, `studyDays` out of 7. Was hardcoded to every day with no control. */
+  const [studyDays, setStudyDays] = useState(7)
+  /**
+   * New cards to start per study day. Mobile had no control at all, so every goal created on a
+   * phone planned UNCAPPED — `parseNewCardsPerDay` reads a missing value as no limit.
+   */
+  const [newCardsPerDay, setNewCardsPerDay] = useState(DEFAULT_NEW_CARDS_PER_DAY)
 
   useEffect(() => { void fetchGoals() }, [fetchGoals])
   useEffect(() => { if (creating) void fetchDecks() }, [creating, fetchDecks])
@@ -81,12 +100,16 @@ export function LearningGoalsScreen() {
 
   const daysAvailable = horizonMonths === null ? null : Math.round(horizonMonths * 30.44)
 
-  /**
-   * This screen only CREATES goals — there is no edit mode on mobile — so the rhythm is always
-   * the default until a control for it exists. Named rather than inlined so the scaling below
-   * reads the same on both platforms.
-   */
-  const cadence = EVERY_DAY
+  /** `studyDays` out of every 7. The cycle stays 7 until there is a control for it. */
+  const cadence = useMemo(() => ({ cycleDays: 7, studyDays }), [studyDays])
+
+  const workloadInput = {
+    unseenCards: selection.unseen,
+    seenCards: selection.seen,
+    secondsPerCard: ASSUMED_SECONDS_PER_CARD,
+    lapseRate: ASSUMED_LAPSE_RATE,
+    consolidationDays: CONSOLIDATION_DAYS,
+  }
 
   /**
    * The projection runs over CALENDAR days because that is when reviews come due; studying fewer
@@ -96,18 +119,41 @@ export function LearningGoalsScreen() {
   const projection = useMemo(() => {
     if (selection.total === 0 || daysAvailable === null) return null
     if (studyDaysBetween(cadence, daysAvailable) < 1) return null
-    const raw = projectWorkload({
-      unseenCards: selection.unseen, seenCards: selection.seen, daysAvailable,
-      secondsPerCard: ASSUMED_SECONDS_PER_CARD, lapseRate: ASSUMED_LAPSE_RATE,
-      consolidationDays: CONSOLIDATION_DAYS,
-    })
+    const raw = projectWorkload({ ...workloadInput, daysAvailable })
     const perDay = perStudyDayMultiplier(cadence)
     return {
       ...raw,
       averageMinutesPerDay: raw.averageMinutesPerDay * perDay,
       peakMinutesPerDay: raw.peakMinutesPerDay * perDay,
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selection.unseen, selection.seen, selection.total, daysAvailable, cadence])
+
+  /** Budget-driven: when it finishes. Null when the budget cannot keep up at all. */
+  const daysForBudget = useMemo(() => {
+    if (selection.total === 0 || budgetMinutes === null || budgetMinutes <= 0) return null
+    // The budget is what the learner does IN A SESSION, so spread it back over calendar days
+    // before asking how long it takes — otherwise a three-days-a-week learner is told the
+    // finish date of someone studying daily.
+    return daysForDailyBudget({
+      ...workloadInput,
+      minutesPerDay: budgetMinutes / perStudyDayMultiplier(cadence),
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selection.unseen, selection.seen, selection.total, budgetMinutes, cadence])
+
+  const budgetFinishDate = daysForBudget === null
+    ? null
+    : new Date(Date.now() + daysForBudget * DAY_MS).toISOString().slice(0, 10)
+
+  /**
+   * The intake rate the horizon demands, against the ceiling the learner set. Same unit, two
+   * different meanings — so when the ceiling is the lower of the two, the form says so instead
+   * of showing both numbers and letting them quietly disagree.
+   */
+  const neededNewPerDay = projection?.newCardsPerDay ?? null
+  const capBlocksTarget =
+    basis === 'date' && neededNewPerDay !== null && newCardsPerDay < neededNewPerDay
 
 
   const reload = useCallback(async () => {
@@ -144,13 +190,19 @@ export function LearningGoalsScreen() {
       // identical apart from their id, so the choice never changed a plan.
       domainId: availableDomainIds()[0],
       title: trimmed,
-      // Derived from the horizon rather than typed. The learner cannot know this number; the
+      // Derived, not typed: the learner's own figure when they pinned the minutes side, the
+      // projection when they pinned a horizon. The learner cannot know the second number; the
       // app can, from unseen-card count and the time available.
-      dailyMinutes: Math.max(1, Math.min(1440, Math.round(projection?.averageMinutesPerDay ?? 20))),
+      dailyMinutes: Math.max(1, Math.min(1440, Math.round(
+        (basis === 'minutes' ? budgetMinutes : projection?.averageMinutesPerDay) ?? 20,
+      ))),
       targetDate: daysAvailable === null
         ? null
         : new Date(Date.now() + daysAvailable * DAY_MS).toISOString().slice(0, 10),
       decks: [...deckIds].map((deck_id) => ({ deck_id, importance: NEUTRAL_IMPORTANCE })),
+      // Mobile sent nothing here, so every phone-created goal planned with an uncapped intake
+      // and an every-day rhythm no matter what its owner intended.
+      settings: { cadence, newCardsPerDay },
     })
     setSubmitting(false)
     if (id) {
@@ -158,7 +210,37 @@ export function LearningGoalsScreen() {
       setTitle('')
       setDeckIds(new Set())
       setHorizonMonths(null)
+      setBudgetMinutes(null)
+      setBasis('date')
+      setStudyDays(7)
+      setNewCardsPerDay(DEFAULT_NEW_CARDS_PER_DAY)
     }
+  }
+
+  /**
+   * Delete, not archive — and the dialog says which.
+   *
+   * `Alert.alert` IS the platform's modal, and it is what the archive confirmation already uses,
+   * so a hand-rolled sheet here would be a second confirmation idiom in one screen. The message
+   * names what actually goes (the plans) and what stays (the study record and the cards),
+   * because the learner cannot tell those apart from the button.
+   */
+  const confirmDelete = (goalId: string, goalTitle: string) => {
+    Alert.alert(
+      t('goals.deleteConfirmTitle'),
+      t('goals.deleteConfirmMessage', { title: goalTitle }),
+      [
+        { text: t('form.cancel'), style: 'cancel' },
+        {
+          text: t('goals.delete'),
+          style: 'destructive',
+          onPress: () => {
+            setArchivingId(goalId)
+            void deleteGoal(goalId).finally(() => setArchivingId(null))
+          },
+        },
+      ],
+    )
   }
 
   const confirmArchive = (goalId: string, goalTitle: string) => {
@@ -276,33 +358,179 @@ export function LearningGoalsScreen() {
               )
             })}
 
-            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 10 }]}>
-              {t('form.targetDate')}
+            {/* What the selection actually amounts to, in cards. "\ub371 2\uac1c" says nothing about
+                the size of the job, and every number below is computed from this split. */}
+            {selection.total > 0 && (
+              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 6 }]}
+                {...testProps('learning-goal-decks-summary')}>
+                {t('form.decksSummary', { total: selection.total, unseen: selection.unseen })}
+              </Text>
+            )}
+
+            {/* \u2500\u2500 Which side of the question the learner is pinning \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */}
+            <Text style={[theme.typography.caption, { color: theme.colors.text, marginTop: 14 }]}>
+              {t('form.basisLabel')}
             </Text>
-            <View style={styles.chipRow}>
-              {HORIZONS_MONTHS.map((months) => {
-                const selected = months === horizonMonths
+            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+              {t('form.basisHint')}
+            </Text>
+            <View style={styles.chipRow} accessibilityRole="radiogroup">
+              {(['date', 'minutes'] as const).map((option) => {
+                const selected = basis === option
                 return (
                   <TouchableOpacity
-                    key={months}
-                    onPress={() => setHorizonMonths(selected ? null : months)}
+                    key={option}
+                    onPress={() => setBasis(option)}
                     style={[styles.chip, {
                       borderColor: selected ? theme.colors.primary : theme.colors.border,
                       borderWidth: selected ? 2 : 1,
                     }]}
-                    accessibilityRole="button"
+                    accessibilityRole="radio"
                     accessibilityState={{ selected }}
-                    {...testProps(`learning-goal-horizon-${months}`)}
+                    {...testProps(`learning-goal-basis-${option}`)}
                   >
                     <Text style={[theme.typography.caption, {
                       color: selected ? theme.colors.primary : theme.colors.textSecondary,
                     }]}>
-                      {selected ? '\u2713 ' : ''}{t('form.horizonMonths', { count: months })}
+                      {selected ? '\u2713 ' : ''}
+                      {t(option === 'date' ? 'form.basisDate' : 'form.basisMinutes')}
                     </Text>
                   </TouchableOpacity>
                 )
               })}
             </View>
+
+            {basis === 'date' ? (
+              <>
+                <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 10 }]}>
+                  {t('form.targetDate')}
+                </Text>
+                <View style={styles.chipRow}>
+                  {HORIZONS_MONTHS.map((months) => {
+                    const selected = months === horizonMonths
+                    return (
+                      <TouchableOpacity
+                        key={months}
+                        onPress={() => setHorizonMonths(selected ? null : months)}
+                        style={[styles.chip, {
+                          borderColor: selected ? theme.colors.primary : theme.colors.border,
+                          borderWidth: selected ? 2 : 1,
+                        }]}
+                        accessibilityRole="button"
+                        accessibilityState={{ selected }}
+                        {...testProps(`learning-goal-horizon-${months}`)}
+                      >
+                        <Text style={[theme.typography.caption, {
+                          color: selected ? theme.colors.primary : theme.colors.textSecondary,
+                        }]}>
+                          {selected ? '\u2713 ' : ''}{t('form.horizonMonths', { count: months })}
+                        </Text>
+                      </TouchableOpacity>
+                    )
+                  })}
+                </View>
+              </>
+            ) : (
+              <>
+                <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 10 }]}>
+                  {t('form.dailyBudget')}
+                </Text>
+                <View style={styles.unitField}>
+                  <TextInput
+                    value={budgetMinutes === null ? '' : String(budgetMinutes)}
+                    onChangeText={(text) => {
+                      // Clamped as it is typed rather than only on save: the finish date below
+                      // is computed from this value, and clamping later would promise a date
+                      // the saved goal can never hit.
+                      const digits = text.replace(/[^0-9]/g, '')
+                      setBudgetMinutes(digits === ''
+                        ? null
+                        : Math.max(1, Math.min(1440, Number.parseInt(digits, 10))))
+                    }}
+                    keyboardType="number-pad"
+                    maxLength={4}
+                    placeholder="30"
+                    placeholderTextColor={theme.colors.textTertiary}
+                    style={[styles.unitInput, { color: theme.colors.text, borderColor: theme.colors.border }]}
+                    {...testProps('learning-goal-budget-minutes')}
+                  />
+                  {/* The unit sits in the field: the ko/ja/zh labels name none, so a bare
+                      three-character box invites hours. */}
+                  <Text style={[theme.typography.caption, styles.unitSuffix, { color: theme.colors.textTertiary }]}>
+                    {t('form.minutesUnit')}
+                  </Text>
+                </View>
+              </>
+            )}
+
+            {/* \u2500\u2500 Rhythm and intake \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */}
+            <Text style={[theme.typography.caption, { color: theme.colors.text, marginTop: 14 }]}>
+              {t('form.studyDays')}
+            </Text>
+            <View style={styles.chipRow}>
+              {STUDY_DAY_CHOICES.map((n) => {
+                const selected = n === studyDays
+                return (
+                  <TouchableOpacity
+                    key={n}
+                    onPress={() => setStudyDays(n)}
+                    style={[styles.dayChip, {
+                      borderColor: selected ? theme.colors.primary : theme.colors.border,
+                      borderWidth: selected ? 2 : 1,
+                    }]}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected }}
+                    accessibilityLabel={t('form.studyDaysOption', { count: n })}
+                    {...testProps(`learning-goal-study-days-${n}`)}
+                  >
+                    <Text style={[theme.typography.caption, {
+                      color: selected ? theme.colors.primary : theme.colors.textSecondary,
+                    }]}>
+                      {n}
+                    </Text>
+                  </TouchableOpacity>
+                )
+              })}
+            </View>
+            {/* The missing sentence: choosing fewer days makes every minute figure go UP, which
+                without this reads as the app punishing the learner. */}
+            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>
+              {t('form.studyDaysHint')}
+            </Text>
+
+            <Text style={[theme.typography.caption, { color: theme.colors.text, marginTop: 14 }]}>
+              {t('form.newCardsPerDay')}
+            </Text>
+            <View style={styles.unitField}>
+              <TextInput
+                value={String(newCardsPerDay)}
+                onChangeText={(text) => {
+                  const digits = text.replace(/[^0-9]/g, '')
+                  setNewCardsPerDay(digits === ''
+                    ? 0
+                    : Math.max(0, Math.min(999, Number.parseInt(digits, 10))))
+                }}
+                keyboardType="number-pad"
+                maxLength={3}
+                style={[styles.unitInput, { color: theme.colors.text, borderColor: theme.colors.border }]}
+                {...testProps('learning-goal-new-cards')}
+              />
+              <Text style={[theme.typography.caption, styles.unitSuffix, { color: theme.colors.textTertiary }]}>
+                {t('form.cardsUnit')}
+              </Text>
+            </View>
+            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>
+              {t('form.newCardsPerDayHint')}
+            </Text>
+            {/* 0 is a real answer, not a broken one, and nothing said so. */}
+            {newCardsPerDay === 0 && (
+              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
+                {t('form.newCardsPerDayZero')}
+              </Text>
+            )}
+            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
+              {t('form.newCardsHint')}
+            </Text>
 
             {/* What this goal will actually cost, before it is saved. The peak is stated next to
                 the average because load piles up behind intake and the average alone understates
@@ -312,12 +540,10 @@ export function LearningGoalsScreen() {
               <Text style={[theme.typography.caption, { color: theme.colors.text }]}>
                 {t('form.plan.title')}
               </Text>
-              {projection ? (
+              {basis === 'date' ? (projection ? (
                 <>
                   <Text style={[theme.typography.bodySmall, { color: theme.colors.text, marginTop: 2 }]}
                     {...testProps('learning-goal-plan-summary')}>
-                    {t('form.plan.newPerDay', { count: projection.newCardsPerDay })}
-                    {' · '}
                     {t('form.plan.minutes', { count: Math.max(1, Math.round(projection.averageMinutesPerDay)) })}
                   </Text>
                   <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
@@ -326,10 +552,41 @@ export function LearningGoalsScreen() {
                       day: projection.peakDay + 1,
                     })}
                   </Text>
+                  {/* The rate the HORIZON demands, named as such so it cannot be read as the
+                      ceiling set above — they share a unit and used to disagree in silence. */}
+                  {neededNewPerDay !== null && (
+                    <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+                      {t('form.plan.newPerDayNeeded', { count: neededNewPerDay })}
+                    </Text>
+                  )}
+                  {capBlocksTarget && (
+                    <Text style={[theme.typography.caption, { color: theme.colors.warning }]}
+                      {...testProps('learning-goal-cap-warning')}>
+                      {t('form.plan.capBelowNeeded', { count: newCardsPerDay })}
+                    </Text>
+                  )}
                 </>
               ) : (
                 <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
                   {t('form.plan.needDecksAndDate')}
+                </Text>
+              )) : selection.total > 0 && budgetMinutes ? (
+                <>
+                  <Text style={[theme.typography.bodySmall, { color: theme.colors.text, marginTop: 2 }]}
+                    {...testProps('learning-goal-plan-summary')}>
+                    {budgetFinishDate
+                      ? t('form.plan.finishBy', { date: budgetFinishDate })
+                      : t('form.plan.tooSlow')}
+                  </Text>
+                  {budgetFinishDate && (
+                    <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+                      {t('form.plan.peakBasis')}
+                    </Text>
+                  )}
+                </>
+              ) : (
+                <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
+                  {t('form.plan.needDecksAndBudget')}
                 </Text>
               )}
               {/* Cramming and the sequential modes call apply_study_rating with no SRS payload,
@@ -383,9 +640,17 @@ export function LearningGoalsScreen() {
             {/* The card IS the way in. Plans used to be switched from a chip row inside the plan
                 itself; this list opens one instead. Archived goals stay unopenable — the RPCs
                 reject them, so a tap would only surface a confusing NOT_FOUND. */}
+            {/* The whole open-area is the tap target, not just the one line of title text.
+                It used to be a style-less TouchableOpacity wrapping the title alone — ~18pt
+                tall, under the 44pt floor this file declares for every other control — with
+                the meta line and the warning below it dead to touch. The archive button stays
+                a SIBLING so the container's `accessible: false` keeps it individually
+                reachable under TalkBack. */}
             <TouchableOpacity
               disabled={goal.status !== 'active'}
               onPress={() => navigation.navigate('LearningToday', { goalId: goal.id })}
+              activeOpacity={0.7}
+              style={styles.openArea}
               accessibilityRole="button"
               accessibilityState={{ disabled: goal.status !== 'active' }}
               // testProps sets accessibilityLabel to the id on Android, so the label goes AFTER
@@ -398,31 +663,48 @@ export function LearningGoalsScreen() {
               }]} numberOfLines={1}>
                 {goal.title}
               </Text>
-            </TouchableOpacity>
-            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
-              {t('goals.dailyMinutes', { count: goal.daily_minutes })}
-              {' · '}
-              {t('goals.deckCount', { count: goal.decks.length })}
-              {goal.status !== 'active' ? ` · ${t(`goals.status.${goal.status}`)}` : ''}
-            </Text>
-            {goal.decks.length === 0 && (
-              <Text style={[theme.typography.caption, { color: theme.colors.warning, marginTop: 4 }]}>
-                {t('goals.noDecksWarning')}
+              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
+                {t('goals.dailyMinutes', { count: goal.daily_minutes })}
+                {' · '}
+                {t('goals.deckCount', { count: goal.decks.length })}
+                {goal.status !== 'active' ? ` · ${t(`goals.status.${goal.status}`)}` : ''}
               </Text>
-            )}
-            <TouchableOpacity
-              disabled={archivingId !== null}
-              onPress={() => confirmArchive(goal.id, goal.title)}
-              style={[styles.touchRow, { alignSelf: 'flex-start' }, archivingId !== null && styles.disabled]}
-              hitSlop={HIT_SLOP}
-              accessibilityRole="button"
-              accessibilityState={{ disabled: archivingId !== null }}
-              {...testProps(`learning-goal-archive-${index}`)}
-            >
-              <Text style={[theme.typography.bodySmall, { color: theme.colors.error }]}>
-                {t('goals.archive')}
-              </Text>
+              {goal.decks.length === 0 && (
+                <Text style={[theme.typography.caption, { color: theme.colors.warning, marginTop: 4 }]}>
+                  {t('goals.noDecksWarning')}
+                </Text>
+              )}
             </TouchableOpacity>
+            <View style={styles.rowActions}>
+              <TouchableOpacity
+                disabled={archivingId !== null}
+                onPress={() => confirmArchive(goal.id, goal.title)}
+                style={[styles.touchRow, archivingId !== null && styles.disabled]}
+                hitSlop={HIT_SLOP}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: archivingId !== null }}
+                {...testProps(`learning-goal-archive-${index}`)}
+              >
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
+                  {t('goals.archive')}
+                </Text>
+              </TouchableOpacity>
+              {/* The only one of the two that cannot be undone, and the only one in the error
+                  colour. Archiving used to wear it, which left nothing to escalate to. */}
+              <TouchableOpacity
+                disabled={archivingId !== null}
+                onPress={() => confirmDelete(goal.id, goal.title)}
+                style={[styles.touchRow, archivingId !== null && styles.disabled]}
+                hitSlop={HIT_SLOP}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: archivingId !== null }}
+                {...testProps(`learning-goal-delete-${index}`)}
+              >
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.error }]}>
+                  {t('goals.delete')}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         ))}
       </ScrollView>
@@ -446,6 +728,19 @@ const styles = StyleSheet.create({
     marginTop: 4, borderWidth: 1, borderRadius: 8, paddingHorizontal: 10,
     minHeight: MIN_TOUCH,
   },
+  // A number box that carries its unit. Without one, "30" in a box labelled only "하루에 쓸 수
+  // 있는 시간" reads as hours just as easily as minutes.
+  unitField: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
+  unitInput: {
+    borderWidth: 1, borderRadius: 8, paddingHorizontal: 10,
+    minHeight: MIN_TOUCH, minWidth: 96, textAlign: 'center',
+  },
+  unitSuffix: { minWidth: 40 },
+  // Seven chips have to fit one row on a small phone, so these are square rather than pill-wide.
+  dayChip: {
+    width: MIN_TOUCH, minHeight: MIN_TOUCH, borderRadius: 999, borderWidth: 1,
+    alignItems: 'center', justifyContent: 'center',
+  },
   deckRow: {
     marginTop: 6, borderWidth: 1, borderRadius: 8, paddingHorizontal: 10,
     minHeight: MIN_TOUCH, justifyContent: 'center',
@@ -457,5 +752,9 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   touchRow: { minHeight: MIN_TOUCH, justifyContent: 'center', paddingHorizontal: 4 },
+  rowActions: { flexDirection: 'row', alignItems: 'center', gap: 16, alignSelf: 'flex-start' },
+  // The card's primary action. 44pt is the platform floor the E2E spec measures, and the
+  // title alone never reached it.
+  openArea: { minHeight: MIN_TOUCH, justifyContent: 'center', paddingVertical: 4 },
   disabled: { opacity: 0.5 },
 })

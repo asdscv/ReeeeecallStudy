@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react'
-import { useStudyStore } from '@reeeeecall/shared/stores/study-store'
+import { useStudyStore, type PlanSelection } from '@reeeeecall/shared/stores/study-store'
 import type { StudyMode } from '@reeeeecall/shared/types/database'
 import type { CrammingFilter } from '@reeeeecall/shared/lib/cramming-queue'
 import { calculateStudyProgress } from '@reeeeecall/shared/lib/study-progress'
@@ -30,6 +30,26 @@ export function useStudy() {
       crammingFilter,
       crammingTimeLimitMinutes,
       crammingShuffle,
+    })
+  }, [store])
+
+  /**
+   * Start one deck's share of a daily plan.
+   *
+   * Always `srs`: the other five modes send no SRS payload and reschedule nothing
+   * (`modeFeedsSrsSchedule`), so completing plan items from one of them would mark the day done
+   * while leaving every input the planner reads untouched — and `apply_plan_study_rating`
+   * refuses anything but the four SRS ratings anyway.
+   *
+   * The batch size is the plan's own count, not the learner's default: the planner already
+   * decided how much today is, including its new-card cap.
+   */
+  const startPlanSession = useCallback(async (deckId: string, planSelection: PlanSelection) => {
+    await store.initSession({
+      deckId,
+      mode: 'srs',
+      batchSize: planSelection.cardIds.length,
+      planSelection,
     })
   }, [store])
 
@@ -103,6 +123,7 @@ export function useStudy() {
     crammingManager: store.crammingManager,
     // Actions
     startSession,
+    startPlanSession,
     flipCard,
     rateCard,
     undoLastRating,
