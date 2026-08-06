@@ -104,7 +104,8 @@
     "progressSoFar": "여기까지의 학습 결과입니다.",
     "knowIt": "알고 있음",
     "dontKnow": "모름",
-    "next": "다음"
+    "next": "다음",
+    "backToPlan": "플랜으로 돌아가기"
   },
   "weekdays": {
     "sun": "일",

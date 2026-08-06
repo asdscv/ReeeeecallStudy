@@ -11,9 +11,20 @@ interface StudySummaryProps {
   summaryType?: SessionSummaryType
   onBackToDeck: () => void
   onStudyAgain: () => void
+  /**
+   * Overrides for a session that did not come from a deck.
+   *
+   * A plan session ends here too, and both of the default buttons were lying: "덱으로
+   * 돌아가기" went to the PLAN, and "다시 학습" went to the same place — two buttons, two
+   * labels, one destination, neither of them the deck.
+   */
+  backLabel?: string
+  againLabel?: string | null
 }
 
-export function StudySummary({ stats, summaryType = 'complete', onBackToDeck, onStudyAgain }: StudySummaryProps) {
+export function StudySummary({
+  stats, summaryType = 'complete', onBackToDeck, onStudyAgain, backLabel, againLabel,
+}: StudySummaryProps) {
   const { t } = useTranslation('study')
   const minutes = Math.floor(stats.totalDurationMs / 60000)
   const seconds = Math.floor((stats.totalDurationMs % 60000) / 1000)
@@ -59,16 +70,24 @@ export function StudySummary({ stats, summaryType = 'complete', onBackToDeck, on
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <button
             onClick={onBackToDeck}
-            className="flex-1 px-4 py-3 bg-card border border-border text-foreground hover:bg-muted rounded-xl font-medium transition cursor-pointer text-sm sm:text-base"
+            className={`flex-1 px-4 py-3 rounded-xl font-medium transition cursor-pointer text-sm sm:text-base ${
+              againLabel === null
+                ? 'bg-brand hover:bg-brand-hover text-white'
+                : 'bg-card border border-border text-foreground hover:bg-muted'
+            }`}
           >
-            {t('summary.backToDeck')}
+            {backLabel ?? t('summary.backToDeck')}
           </button>
-          <button
-            onClick={onStudyAgain}
-            className="flex-1 px-4 py-3 bg-brand hover:bg-brand-hover text-white rounded-xl font-medium transition cursor-pointer text-sm sm:text-base"
-          >
-            {t('summary.studyAgain')}
-          </button>
+          {/* `null` means there is no second destination — a plan session's "again" would be
+              the same place as "back", and two buttons that do one thing is worse than one. */}
+          {againLabel !== null && (
+            <button
+              onClick={onStudyAgain}
+              className="flex-1 px-4 py-3 bg-brand hover:bg-brand-hover text-white rounded-xl font-medium transition cursor-pointer text-sm sm:text-base"
+            >
+              {againLabel ?? t('summary.studyAgain')}
+            </button>
+          )}
         </div>
       </div>
     </div>

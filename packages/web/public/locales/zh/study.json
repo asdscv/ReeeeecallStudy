@@ -104,7 +104,8 @@
     "progressSoFar": "以下是您目前的学习进度。",
     "knowIt": "认识",
     "dontKnow": "不认识",
-    "next": "下一张"
+    "next": "下一张",
+    "backToPlan": "返回计划"
   },
   "weekdays": {
     "sun": "日",

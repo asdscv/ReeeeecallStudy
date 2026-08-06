@@ -104,7 +104,8 @@
     "progressSoFar": "Đây là tiến trình của bạn.",
     "knowIt": "Biết rồi",
     "dontKnow": "Không biết",
-    "next": "Tiếp"
+    "next": "Tiếp",
+    "backToPlan": "Quay lại kế hoạch"
   },
   "weekdays": {
     "sun": "CN",

@@ -724,7 +724,13 @@ export function SettingsScreen() {
 
           <Modal visible={langDropdownOpen} transparent animationType="fade" onRequestClose={() => setLangDropdownOpen(false)}>
             <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setLangDropdownOpen(false)}>
-              <View style={[styles.modalContent, { backgroundColor: theme.colors.surfaceElevated }]}>
+              <View
+              // Claims the touch responder so the overlay TouchableOpacity above cannot
+              // fire from inside the sheet — a plain View let it win on every
+              // non-interactive pixel, so tapping the sheet's own title closed it.
+              onStartShouldSetResponder={() => true}
+              style={[styles.modalContent, { backgroundColor: theme.colors.surfaceElevated }]}
+            >
                 <Text style={[styles.modalTitle, { color: theme.colors.text }]}>{t('language.title')}</Text>
                 <FlatList
                   data={LANGUAGES}

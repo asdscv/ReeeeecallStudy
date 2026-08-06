@@ -8,9 +8,18 @@
 //
 // This fn returns a FRESH signed portal URL for the caller's own subscription:
 //   POST /subscription-portal
-//   200 { url }              → open in a new tab
-//   404 { code:'NO_SUBSCRIPTION' } when the caller has no LS subscription
-//   401 unauth · 503 not configured (LEMONSQUEEZY_API_KEY unset) · 502 LS error
+//   200 { url }                              → open in a new tab
+//   401 { code:'UNAUTHORIZED' }
+//   404 { code:'NO_SUBSCRIPTION' }           caller has no LS subscription
+//   409 { code:'PROVIDER_SUB_NOT_FOUND' }    LS 404s the id we stored — PERMANENT, see below
+//   500 { code:'LOOKUP_FAILED' }
+//   502 { code:'PROVIDER_UNREACHABLE' | 'PROVIDER_ERROR' | 'NO_PORTAL_URL' }
+//   503 { code:'NOT_CONFIGURED' }            LEMONSQUEEZY_API_KEY unset
+//
+// Every path carries a `code` because the caller cannot see the body otherwise: supabase-js
+// throws FunctionsHttpError on any non-2xx and hands back `data: null`, so the client has to
+// read `error.context.json()` — and it can only tell a retryable failure from a permanent one
+// if the body names which happened.
 //
 // The signed portal URL expires, so it is fetched per request (GET /v1/subscriptions/
 // <id> → data.attributes.urls.customer_portal), never stored.
@@ -59,7 +68,7 @@ Deno.serve(async (req) => {
   if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405, cors)
 
   const userId = await verifyUser(req.headers.get('Authorization'))
-  if (!userId) return json({ error: 'Unauthorized' }, 401, cors)
+  if (!userId) return json({ error: 'Unauthorized', code: 'UNAUTHORIZED' }, 401, cors)
 
   const apiKey = ENV('LEMONSQUEEZY_API_KEY')
   if (!apiKey) return json({ error: 'Not configured', code: 'NOT_CONFIGURED' }, 503, cors)
@@ -79,7 +88,7 @@ Deno.serve(async (req) => {
 
   if (subErr) {
     console.error('[subscription-portal] sub lookup failed:', subErr.message)
-    return json({ error: 'Lookup failed' }, 500, cors)
+    return json({ error: 'Lookup failed', code: 'LOOKUP_FAILED' }, 500, cors)
   }
   const subId = (sub as { provider_subscription_id?: string } | null)?.provider_subscription_id
   if (!subId) return json({ error: 'No subscription', code: 'NO_SUBSCRIPTION' }, 404, cors)
@@ -92,17 +101,31 @@ Deno.serve(async (req) => {
     })
   } catch (e) {
     console.error('[subscription-portal] LS fetch threw:', e)
-    return json({ error: 'Provider unreachable' }, 502, cors)
+    return json({ error: 'Provider unreachable', code: 'PROVIDER_UNREACHABLE' }, 502, cors)
   }
   if (!resp.ok) {
-    console.error('[subscription-portal] LS returned', resp.status)
-    return json({ error: 'Provider error' }, 502, cors)
+    const detail = await resp.text().catch(() => '')
+    console.error('[subscription-portal] LS returned', resp.status, detail.slice(0, 500))
+    // 404/410 is NOT a provider outage — it means the id WE stored does not exist under the
+    // API key we now hold. That is what happens to any subscription minted before an LS
+    // store/key rotation: the key authenticates fine (LS answers 401 when it does not), the
+    // subscription is simply unknown to the store the key belongs to. Reported as its own
+    // code because it is PERMANENT: "try again later" can never succeed, and the person
+    // seeing it may be trying to CANCEL a subscription they are still being billed for.
+    if (resp.status === 404 || resp.status === 410) {
+      return json(
+        { error: 'Provider subscription not found', code: 'PROVIDER_SUB_NOT_FOUND', subId },
+        409,
+        cors,
+      )
+    }
+    return json({ error: 'Provider error', code: 'PROVIDER_ERROR' }, 502, cors)
   }
   const body = await resp.json().catch(() => null) as
     | { data?: { attributes?: { urls?: { customer_portal?: string } } } }
     | null
   const url = body?.data?.attributes?.urls?.customer_portal
-  if (!url) return json({ error: 'No portal url' }, 502, cors)
+  if (!url) return json({ error: 'No portal url', code: 'NO_PORTAL_URL' }, 502, cors)
 
   return json({ url }, 200, cors)
 })

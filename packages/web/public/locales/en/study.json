@@ -104,7 +104,8 @@
     "progressSoFar": "Here's your progress so far.",
     "knowIt": "Know It",
     "dontKnow": "Don't Know",
-    "next": "Next"
+    "next": "Next",
+    "backToPlan": "Back to plan"
   },
   "weekdays": {
     "sun": "Sun",

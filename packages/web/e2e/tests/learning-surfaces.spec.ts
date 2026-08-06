@@ -82,11 +82,23 @@ test.describe('learning surfaces', () => {
     const target = new Date(Date.now() + 90 * 86_400_000).toISOString().slice(0, 10)
     await dialog.locator('input[type="date"]').fill(target)
 
-    const preview = dialog.getByLabel(/예상 학습 계획|Estimated plan/i)
+    const preview = dialog.getByLabel(/이렇게 진행됩니다|Here's how it will go/i)
     await expect(preview).toBeVisible()
     // The peak is reported next to the average, because the average alone understates the day
     // the learner actually has to survive.
     await expect(preview).toContainText(/분|min/)
+
+    // The two pacing numbers must each carry the sentence that says what they DO. They read as
+    // bare figures before — a ceiling and a required rate, same unit, 40px apart, neither
+    // labelled — and that is the confusion this screen was rebuilt around.
+    expect(text).not.toBe('')
+    const paced = (await dialog.innerText()) ?? ''
+    expect(paced).toMatch(/쉬는 날에도|Reviews keep piling up/i)
+    expect(paced).toMatch(/복습을 약 7번|roughly seven reviews/i)
+    // And the date-or-minutes tug-of-war is one explicit choice, not two live inputs that both
+    // changed the saved budget with the minutes box quietly winning.
+    expect(paced).toMatch(/무엇을 기준으로|What should we plan around/i)
+
     await page.screenshot({ path: `${SHOTS}/06-goal-form-with-plan.png`, fullPage: true })
   })
 

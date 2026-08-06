@@ -45,23 +45,52 @@
     "save": "保存",
     "saving": "保存中…",
     "plan": {
-      "title": "予想学習プラン",
-      "needDecksAndDate": "デッキと目標日を決めると1日の分量を計算します。",
-      "minutes": "1日 {{count, number}}分",
-      "peak": "最も忙しい日 {{minutes, number}}分（{{day, number}}日目）",
+      "title": "こう進みます",
+      "needDecksAndDate": "デッキと目標日を決めると、1日の分量を計算します。",
+      "minutes": "学習する日は1日およそ {{count, number}}分",
+      "peak": "一番忙しい日はおよそ {{minutes, number}}分です（今日から {{day, number}}日目）",
       "byMinutes": "または1日の時間で",
-      "finishBy": "{{date}}頃に完了",
-      "tooSlow": "この時間では復習量に追いつけません。",
-      "srsOnly": "SRSモードの学習のみこのプランに反映されます。",
-      "estimate": "推定値です。実際の成績から毎日再計算されます。",
+      "finishBy": "{{date}}ごろ終わります",
+      "tooSlow": "この時間では復習量にすら追いつけません。",
+      "srsOnly": "SRSモードで学習した分だけがこの計画に反映されます。",
+      "estimate": "推定値です。実際の成績をもとに毎日計算し直します。",
       "newPerDay_one": "1日の新規カード {{count, number}}枚",
       "newPerDay_other": "1日の新規カード {{count, number}}枚",
-      "newPerDay": "1日の新規カード {{count, number}}枚"
+      "newPerDay": "1日の新規カード {{count, number}}枚",
+      "needDecksAndBudget": "デッキを選んで1日の学習時間を入れると、いつ終わるか計算します。",
+      "minutes_one": "学習する日は1日およそ {{count, number}}分",
+      "minutes_other": "学習する日は1日およそ {{count, number}}分",
+      "newPerDayNeeded": "目標日に間に合わせるには、1日 {{count, number}}枚ずつ新しく始める必要があります",
+      "newPerDayNeeded_one": "目標日に間に合わせるには、1日 {{count, number}}枚ずつ新しく始める必要があります",
+      "newPerDayNeeded_other": "目標日に間に合わせるには、1日 {{count, number}}枚ずつ新しく始める必要があります",
+      "capBelowNeeded": "今の設定は1日 {{count, number}}枚なので、このままだと目標日を過ぎます。",
+      "capBelowNeeded_one": "今の設定は1日 {{count, number}}枚なので、このままだと目標日を過ぎます。",
+      "capBelowNeeded_other": "今の設定は1日 {{count, number}}枚なので、このままだと目標日を過ぎます。",
+      "peakBasis": "一番忙しい日もこの時間に収まるように計算しています。"
     },
     "targetDate": "目標日（任意）",
     "horizonMonths_one": "{{count, number}}か月後",
     "horizonMonths_other": "{{count, number}}か月後",
-    "horizonMonths": "{{count, number}}か月後"
+    "horizonMonths": "{{count, number}}か月後",
+    "createTitle": "新しい目標",
+    "editTitle": "目標を編集",
+    "decksSummary": "カード {{total, number}}枚 · 未着手 {{unseen, number}}枚",
+    "basisLabel": "何を基準に計画しますか？",
+    "basisHint": "どちらか一方を決めれば、もう一方は計算します。",
+    "basisDate": "目標日",
+    "basisMinutes": "1日の学習時間",
+    "dailyBudget": "1日に使える時間",
+    "minutesUnit": "分",
+    "cardsUnit": "枚",
+    "studyDays": "週に何日学習しますか？",
+    "studyDaysOption": "週 {{count, number}}日",
+    "studyDaysOption_one": "週 {{count, number}}日",
+    "studyDaysOption_other": "週 {{count, number}}日",
+    "studyDaysHint": "休んだ日にも復習は溜まり続けます。学習する日が少ないほど、1日の量はその分増えます。",
+    "newCardsPerDay": "学習日ごとに始める新しいカード",
+    "newCardsPerDayHint": "新しいカード1枚は、今後1年でおよそ7回の復習を生みます。数を増やすと速く覚えられますが、毎日の復習も一緒に増えます。",
+    "newCardsPerDayZero": "0にすると新しいカードは始めず、溜まった復習だけを消化します。",
+    "newCardsHint": "復習がいつも先です。遅れたら、追いつくまで新しいカードは自動的に止まります。"
   },
   "goals": {
     "archive": "アーカイブ",
@@ -91,7 +120,10 @@
       "completed": "完了",
       "paused": "一時停止"
     },
-    "title": "学習目標"
+    "title": "学習目標",
+    "delete": "削除",
+    "deleteConfirmTitle": "このプランを削除しますか？",
+    "deleteConfirmMessage": "「{{title}}」と、このプランが作成したすべての日次プランが完全に消えます。学習記録とカードは残り、プランだけが削除されます。元に戻せません。"
   },
   "history": {
     "itemFallback": "{{type}} の試行",
@@ -165,7 +197,8 @@
     "item": {
       "minutes": "約 {{count, decimal}} 分",
       "recorded": "記録済み",
-      "untitled": "（テキストなし）"
+      "untitled": "（テキストなし）",
+      "study": "学習"
     },
     "progress": "{{total, number}} 件中 {{done, number}} 件完了",
     "rate": {
@@ -194,7 +227,39 @@
     "extendAdded_other": "{{count, number}}件を追加しました。",
     "extendTomorrow_one": "うち新規カードが{{count, number}}枚なので、明日の復習がその分増えます。",
     "extendTomorrow_other": "うち新規カードが{{count, number}}枚なので、明日の復習がその分増えます。",
-    "extendNothing": "今は追加できるものがありません。"
+    "extendNothing": "今は追加できるものがありません。",
+    "remaining": "残り {{count, number}}枚",
+    "remaining_one": "残り {{count, number}}枚",
+    "remaining_other": "残り {{count, number}}枚",
+    "allDone": "今日は終わり！",
+    "allDoneNote": "今日の分は終わりました。また明日。",
+    "startStudy": "学習を始める",
+    "continueStudy": "続きから",
+    "studyNote": "学習画面で評価すると、次の復習日と今日のプランの両方に記録されます。",
+    "byDeck": "デッキ別",
+    "deckDone": "完了",
+    "listTitle": "今日のリスト",
+    "days": {
+      "label": "日付",
+      "today": "今日",
+      "tomorrow": "明日",
+      "inDays": "{{count, number}}日後",
+      "inDays_one": "{{count, number}}日後",
+      "inDays_other": "{{count, number}}日後"
+    },
+    "forecast": {
+      "title": "その日の予想量",
+      "cards": "{{count, number}}枚",
+      "cards_one": "{{count, number}}枚",
+      "cards_other": "{{count, number}}枚",
+      "minutes": "およそ {{count, number}}分",
+      "minutes_one": "およそ {{count, number}}分",
+      "minutes_other": "およそ {{count, number}}分",
+      "breakdown": "新規 {{newCards, number}} · 復習 {{reviewCards, number}}",
+      "empty": "その日は復習するカードがなさそうです。",
+      "loading": "計算中…",
+      "note": "推定値です。今からその日まで何も学習しない前提の数字なので、学習すれば変わります。"
+    }
   },
   "progress": {
     "title": "進捗",

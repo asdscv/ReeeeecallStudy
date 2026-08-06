@@ -104,7 +104,8 @@
     "progressSoFar": "ここまでの学習状況です。",
     "knowIt": "わかる",
     "dontKnow": "わからない",
-    "next": "次へ"
+    "next": "次へ",
+    "backToPlan": "プランに戻る"
   },
   "weekdays": {
     "sun": "日",

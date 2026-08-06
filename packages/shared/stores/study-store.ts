@@ -16,6 +16,35 @@ import type { Card, CardTemplate, StudyMode, DeckStudyState, SrsSettings } from 
 
 type Phase = 'idle' | 'loading' | 'studying' | 'completed'
 
+/**
+ * The plan-item facts `record_answer_attempt` asserts an attempt against.
+ *
+ * Carried rather than re-read: the RPC compares these three against the row's own snapshot and
+ * raises P0007 on any mismatch, so they have to be the values the screen is actually showing.
+ */
+export interface PlanItemRef {
+  id: string
+  activity_type: string
+  response_type: string
+  evaluator_type: string
+}
+
+/**
+ * Study exactly this deck's share of a daily plan, in the order the planner ranked it.
+ *
+ * A study session is deck-scoped all the way down — `finalize_study_session` takes one
+ * `p_deck_id` and refuses a session whose events span decks — so a plan covering three decks is
+ * three sessions, not one heterogeneous queue. The caller splits it; this store studies one
+ * deck's share and reports back which cards it finished.
+ */
+export interface PlanSelection {
+  goalId: string
+  /** Ordered card ids — the planner's ranking, preserved. */
+  cardIds: readonly string[]
+  /** card_id → its plan item. */
+  items: Readonly<Record<string, PlanItemRef>>
+}
+
 interface StudyConfig {
   deckId: string
   mode: StudyMode
@@ -25,7 +54,19 @@ interface StudyConfig {
   crammingFilter?: CrammingFilter
   crammingTimeLimitMinutes?: number | null
   crammingShuffle?: boolean
+  /**
+   * Present when this session IS the day's plan for one deck.
+   *
+   * Only meaningful with `mode: 'srs'`. The other five modes send no SRS payload and move no
+   * schedule (`modeFeedsSrsSchedule`), so completing plan items from one of them would mark the
+   * day done while leaving every input the planner reads untouched — tomorrow's plan would come
+   * back identical. `apply_plan_study_rating` refuses anything but the four SRS ratings.
+   */
+  planSelection?: PlanSelection
 }
+
+/** PostgREST puts `.in()` values in the query string, so a 500-item plan would blow the URL. */
+const PLAN_CARD_FETCH_CHUNK = 100
 
 interface SessionStats {
   totalCards: number
@@ -38,6 +79,14 @@ interface LastRatedCard {
   cardId: string
   /** Server rating-event id (apply_study_rating) so undo can compensate the DB. */
   ratingEventId: string | null
+  /**
+   * The attempt this rating also recorded, when the session is a daily plan.
+   *
+   * Undo has to reverse BOTH halves or it recreates the split `apply_plan_study_rating`
+   * exists to prevent, backwards: the card goes back to its old schedule while the plan
+   * keeps claiming it is done, and the item can never be completed again.
+   */
+  planAttemptId: string | null
   previousCard: Card
   rating: string
   previousIndex: number
@@ -349,6 +398,46 @@ export const useStudyStore = create<StudyState>((set, get) => ({
 
     switch (config.mode) {
       case 'srs': {
+        // ── The day's plan for this deck ──────────────────────────────────────
+        // The planner has already decided WHICH cards and HOW MANY, including its own
+        // new-card intake cap, so none of the due/limit logic below applies: re-deriving
+        // the queue here would silently drop rows the plan promised. Order is the
+        // planner's ranking, not next_review_at.
+        if (config.planSelection) {
+          const wanted = config.planSelection.cardIds
+          const rank = new Map(wanted.map((id, index) => [id, index]))
+          let planCards: Card[]
+          if (mergedAll) {
+            planCards = mergedAll.filter((card) => rank.has(card.id))
+          } else {
+            planCards = []
+            for (let i = 0; i < wanted.length; i += PLAN_CARD_FETCH_CHUNK) {
+              const { data } = await supabase
+                .from('cards')
+                .select('*')
+                .eq('deck_id', config.deckId)
+                .in('id', wanted.slice(i, i + PLAN_CARD_FETCH_CHUNK) as string[])
+              planCards.push(...((data ?? []) as Card[]))
+            }
+          }
+          // A card the plan names but this deck no longer has (deleted since the plan was
+          // built) simply does not appear. Its plan item stays pending, which is the honest
+          // record — better than a queue entry that cannot be rendered.
+          cards = planCards.sort((a, b) => (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0))
+
+          if (cards.length > 0) {
+            const queueCards: QueueCard[] = cards.map(c => ({
+              id: c.id,
+              srs_status: c.srs_status,
+              ease_factor: c.ease_factor,
+              interval_days: c.interval_days,
+              repetitions: c.repetitions,
+            }))
+            srsQueueManager = new SrsQueueManager(queueCards, srsSettings ?? undefined)
+          }
+          break
+        }
+
         // Fetch user's daily_new_limit from profile
         let newCardLimit = config.batchSize
         const { data: profile } = await supabase
@@ -654,6 +743,18 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     // allocated before any side effect and reused by undo.
     const ratingEventId = newPersistenceId()
 
+    /**
+     * The plan item this card came from, when this session IS the day's plan.
+     *
+     * Resolved here rather than at persist time because the undo snapshot below has to
+     * carry the attempt id: undoing a plan rating must reopen the plan item too, and the
+     * only handle on that item is the attempt that completed it.
+     */
+    const planItem = config.planSelection?.items[card.id] ?? null
+    // Minted beside the rating it describes: `p_response` is part of the RPC's idempotency
+    // comparison, so an id created any earlier could be replayed against a different rating.
+    const clientAttemptId = planItem ? newPersistenceId() : null
+
     // Save undo state before rating (including queue manager snapshots)
     set({
       isRating: true,
@@ -661,6 +762,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       lastRatedCard: {
         cardId: card.id,
         ratingEventId,
+        planAttemptId: clientAttemptId,
         previousCard: { ...card },
         rating,
         previousIndex: currentIndex,
@@ -840,24 +942,56 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       set({ clientSessionId: persistSessionId })
     }
 
+    // `planItem` / `clientAttemptId` are resolved with the undo snapshot above: present means
+    // the rating goes through `apply_plan_study_rating`, which runs the same
+    // `apply_study_rating` body AND completes the plan item in one transaction. Two separate
+    // calls cannot be made safe from a client: whichever half fails second leaves the plan and
+    // the schedule disagreeing. A card the plan does not name (an SRS requeue can only replay
+    // cards already in the queue, so this is defensive) falls back to the plain rating.
     const applyRating = async () => {
-      const { data, error } = await supabase.rpc('apply_study_rating', {
-        p_event_id: ratingEventId,
-        p_client_session_id: persistSessionId,
-        p_card_id: card.id,
-        p_deck_id: config.deckId,
-        p_study_mode: config.mode,
-        p_rating: rating,
-        p_srs_source: persistSource,
-        p_expected_revision: expectedRevision,
-        p_new_srs: newSrsPayload,
-        p_review_duration_ms: durationMs,
-      })
+      const { data, error } = planItem && config.planSelection && isSrsPersist
+        ? await supabase.rpc('apply_plan_study_rating', {
+          p_event_id: ratingEventId,
+          p_client_session_id: persistSessionId,
+          p_card_id: card.id,
+          p_deck_id: config.deckId,
+          p_rating: rating,
+          p_srs_source: persistSource,
+          p_client_attempt_id: clientAttemptId,
+          p_goal_id: config.planSelection.goalId,
+          p_plan_item_id: planItem.id,
+          p_activity_type: planItem.activity_type,
+          p_response_type: planItem.response_type,
+          p_evaluator_type: planItem.evaluator_type,
+          p_expected_revision: expectedRevision,
+          p_new_srs: newSrsPayload,
+          p_review_duration_ms: durationMs,
+        }).then((r) => ({
+          // The wrapper nests the rating result so the caller can see both halves; unwrap it
+          // here so everything downstream reads the same shape as the plain path.
+          data: (r.data as { rating?: unknown } | null)?.rating ?? null,
+          error: r.error,
+        }))
+        : await supabase.rpc('apply_study_rating', {
+          p_event_id: ratingEventId,
+          p_client_session_id: persistSessionId,
+          p_card_id: card.id,
+          p_deck_id: config.deckId,
+          p_study_mode: config.mode,
+          p_rating: rating,
+          p_srs_source: persistSource,
+          p_expected_revision: expectedRevision,
+          p_new_srs: newSrsPayload,
+          p_review_duration_ms: durationMs,
+        })
 
       if (error) {
         // Never retry here: PT409 means another device already advanced the card and
         // re-sending would clobber it; 22023/42501/55000 are not retryable either.
-        console.error('[study-store] apply_study_rating failed:', error.message, error.code)
+        console.error(
+          `[study-store] ${planItem ? 'apply_plan_study_rating' : 'apply_study_rating'} failed:`,
+          error.message, error.code,
+        )
         set({
           persistenceError: {
             scope: 'rating',
@@ -1071,15 +1205,33 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     // next rating of that card would then be recorded twice.
     // undo_study_rating is idempotent and only accepts the session's latest event.
     const undoEventId = lastRatedCard.ratingEventId
+    // The attempt this rating also recorded, when the session is a plan. Undoing only the
+    // schedule half would leave the plan claiming a card is done that has just been put back
+    // on its old due date — and the item could never be completed again, because
+    // `record_answer_attempt` only acts on a 'pending' row.
+    const undoAttemptId = lastRatedCard.planAttemptId
     let restoredRevision: number | null = null
 
     if (undoEventId) {
       let accepted = true
       const undoRating = async () => {
-        const { data, error } = await supabase.rpc('undo_study_rating', { p_event_id: undoEventId })
+        const { data, error } = undoAttemptId
+          ? await supabase.rpc('undo_plan_study_rating', {
+            p_event_id: undoEventId,
+            p_client_attempt_id: undoAttemptId,
+            // The wrapper nests the rating result; unwrap so everything below reads the
+            // same shape as the plain path.
+          }).then((r) => ({
+            data: (r.data as { rating?: unknown } | null)?.rating ?? null,
+            error: r.error,
+          }))
+          : await supabase.rpc('undo_study_rating', { p_event_id: undoEventId })
         if (error) {
           accepted = false
-          console.error('[study-store] undo_study_rating failed:', error.message, error.code)
+          console.error(
+            `[study-store] ${undoAttemptId ? 'undo_plan_study_rating' : 'undo_study_rating'} failed:`,
+            error.message, error.code,
+          )
           set({
             persistenceError: {
               scope: 'undo',

@@ -77,13 +77,21 @@ class LearningTodayPO {
   hasCreateGoalCta() { return exists('learning-create-goal') }
 
   planItem(index = 0) { return exists(`learning-plan-item-${index}`) }
-  ratingButton(kind: 'again' | 'partial' | 'known', index = 0) {
-    return exists(`learning-rate-${kind}-${index}`)
-  }
-  tapRating(kind: 'again' | 'partial' | 'known', index = 0) {
-    return tap(`learning-rate-${kind}-${index}`)
-  }
-  recorded(index = 0) { return exists(`learning-item-recorded-${index}`) }
+
+  /**
+   * The day's primary action.
+   *
+   * The per-row rating buttons this used to expose are gone: they recorded an attempt and
+   * rescheduled nothing, so working through them moved no due date and produced the same plan
+   * again tomorrow. The plan hands the studying to the real study session now.
+   */
+  startStudy() { return exists('learning-start-study') }
+  tapStartStudy() { return tap('learning-start-study') }
+  allDone() { return exists('learning-all-done') }
+  /** The strip that switches between today and the forecast for a later day. */
+  dayChip(offset = 0) { return exists(`learning-day-${offset}`) }
+  tapDay(offset: number) { return tap(`learning-day-${offset}`) }
+  forecast() { return exists('learning-forecast') }
 
   /** Get back to the today screen from wherever the previous test left off. */
   async ensureVisible(): Promise<boolean> {

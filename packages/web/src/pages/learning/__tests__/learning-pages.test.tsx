@@ -78,6 +78,11 @@ const baseState = (over: StoreState = {}): StoreState => ({
   extendPlan: vi.fn(),
   planExtending: false,
   planExtension: null,
+  // The day strip's future days. Keyed by plan date, and `{}` means "nothing forecast yet" —
+  // which is what every test here is, since none of them switch off today.
+  planForecast: {},
+  planForecastLoading: null,
+  forecastPlan: vi.fn(),
   recordingItemId: null,
   attempts: [],
   attemptsLoading: false,
@@ -219,8 +224,11 @@ describe('LearningTodayPage', () => {
 
     expect(screen.getByText('猫')).toBeInTheDocument()
     expect(screen.getByText('today.reason.recentFailure')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'today.item.study' }))
-      .toHaveAttribute('href', '/decks/deck-7/study/setup')
+    // The way into the day is the real study session, carrying the plan with it. It used to be
+    // `/decks/:id/study/setup` — the whole deck, no plan context — so the plan and the session
+    // each did their own thing and neither knew about the other.
+    expect(screen.getByRole('link', { name: /today\.startStudy/ }))
+      .toHaveAttribute('href', `/decks/deck-7/study?mode=srs&goalId=goal-1&planDate=${todayKey()}`)
   })
 
   // ── the memory model, made visible ────────────────────────────────────────
@@ -332,7 +340,7 @@ describe('LearningTodayPage', () => {
 })
 
 // ── attempt recording (Phase 2) ─────────────────────────────────────────────
-describe('recording an attempt', () => {
+describe('starting the day', () => {
   const planItem = {
     id: 'item-1', plan_id: 'plan-1', position: 0, activity_id: null, card_id: 'card-1',
     concept_id: null, activity_type: 'recall', stimulus_type: 'text',
@@ -344,123 +352,92 @@ describe('recording an attempt', () => {
     algorithm_version: 'daily-plan-v1', input_fingerprint: 'fnv1a32:abc', status: 'pending',
     budget_minutes: 20, completed_minutes: 0, completed_items: 0, total_items: 1,
   }
+  const cards = { 'card-1': { id: 'card-1', deck_id: 'deck-7', field_values: { front: '\u732b' } } }
 
-  it('offers three self-ratings on a pending item and records the one clicked', async () => {
-    const state = renderToday({ plan: planRow, planItems: [planItem],
-      planCards: { 'card-1': { id: 'card-1', deck_id: 'deck-7', field_values: { front: '猫' } } } })
+  /**
+   * The negative that defines this screen now.
+   *
+   * It used to render every plan item as a row with a textarea and three self-rating buttons.
+   * That surface recorded an attempt and rescheduled NOTHING — its own small print said so —
+   * so a learner who did their whole plan there moved no card's due date and got the same plan
+   * back tomorrow. Studying belongs to the study session, which is one link away.
+   */
+  it('offers no rating surface of its own', () => {
+    renderToday({ plan: planRow, planItems: [planItem], planCards: cards })
 
-    await userEvent.click(screen.getByRole('button', { name: 'today.rate.partial' }))
-
-    expect(state.recordAttempt).toHaveBeenCalledTimes(1)
-    const [input, planDate] = (state.recordAttempt as ReturnType<typeof vi.fn>).mock.calls[0]
-    expect(input.score).toBe(0.5)
-    expect(input.goalId).toBe('goal-1')
-    // The RPC rejects an attempt whose targets do not match the stored plan item (P0007),
-    // so the row must hand over the item it rendered — not a re-derived copy.
-    expect(input.planItem).toBe(planItem)
-    expect(input.clientAttemptId).toMatch(/^[0-9a-f-]{36}$/i)
-    expect(planDate).toMatch(/^\d{4}-\d{2}-\d{2}$/)
-  })
-
-  it('maps the three choices to 0 / 0.5 / 1', async () => {
-    const state = renderToday({ plan: planRow, planItems: [planItem] })
-    for (const [name, score] of [['today.rate.again', 0], ['today.rate.partial', 0.5], ['today.rate.known', 1]] as const) {
-      await userEvent.click(screen.getByRole('button', { name }))
-      const calls = (state.recordAttempt as ReturnType<typeof vi.fn>).mock.calls
-      expect(calls[calls.length - 1][0].score).toBe(score)
-    }
-  })
-
-  it('shows a completed item as recorded instead of offering to rate it again', () => {
-    renderToday({ plan: planRow, planItems: [{ ...planItem, status: 'completed' as const }] })
-
-    expect(screen.getByText('today.item.recorded')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'today.rate.known' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'today.rate.partial' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'today.rate.again' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
   })
 
-  it('disables the ratings for the row being recorded', () => {
-    renderToday({ plan: planRow, planItems: [planItem], recordingItemId: 'item-1' })
+  it('carries the plan into the study session, so one rating does both halves', () => {
+    renderToday({ plan: planRow, planItems: [planItem], planCards: cards })
 
-    expect(screen.getByRole('button', { name: 'today.rate.known' })).toBeDisabled()
+    const cta = screen.getByRole('link', { name: /today\.startStudy/ })
+    // goalId + planDate are what make this a PLAN session: the session page reads them, loads
+    // the day's items, and rates through `apply_plan_study_rating` — one transaction that
+    // reschedules the card and completes the plan item together.
+    expect(cta).toHaveAttribute(
+      'href', `/decks/deck-7/study?mode=srs&goalId=goal-1&planDate=${todayKey()}`,
+    )
   })
 
-  // ── typed answers (Stage 2) ───────────────────────────────────────────────
-  //
-  // The input appears only where the plan row says `response_type === 'text'`. That is the same
-  // column `record_answer_attempt` compares against, so a box that appeared anywhere else would
-  // collect an answer the RPC then refuses to store.
-  describe('typed answer', () => {
-    const typedItem = { ...planItem, response_type: 'text' }
-
-    it('offers a field to write in when the item asks for one', () => {
-      renderToday({ plan: planRow, planItems: [typedItem] })
-
-      const field = screen.getByRole('textbox', { name: 'today.answer.label' })
-      expect(field).toBeInTheDocument()
-      // The learner has to be told what this text is for. Nothing grades it, and the same three
-      // rating buttons are still what records the attempt.
-      expect(screen.getByText('today.answer.note')).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'today.rate.known' })).toBeInTheDocument()
+  it('says "keep going" once part of the day is already done', () => {
+    renderToday({
+      plan: { ...planRow, total_items: 2, completed_items: 1 },
+      planItems: [{ ...planItem, status: 'completed' as const },
+        { ...planItem, id: 'item-2', position: 1, card_id: 'card-2' }],
+      planCards: { ...cards, 'card-2': { id: 'card-2', deck_id: 'deck-7', field_values: { front: '\u72ac' } } },
     })
 
-    it('does not offer one on a self-rating item', () => {
-      renderToday({ plan: planRow, planItems: [planItem] })
-
-      expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
-    })
-
-    it('does not offer one on an item already recorded', () => {
-      renderToday({ plan: planRow, planItems: [{ ...typedItem, status: 'completed' as const }] })
-
-      expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
-    })
-
-    it('sends what was written together with the rating', async () => {
-      const state = renderToday({ plan: planRow, planItems: [typedItem] })
-
-      await userEvent.type(screen.getByRole('textbox', { name: 'today.answer.label' }), '사과')
-      await userEvent.click(screen.getByRole('button', { name: 'today.rate.partial' }))
-
-      const [input] = (state.recordAttempt as ReturnType<typeof vi.fn>).mock.calls[0]
-      expect(input.text).toBe('사과')
-      expect(input.score).toBe(0.5)
-    })
-
-    it('keeps each row\'s answer to itself', async () => {
-      const second = { ...typedItem, id: 'item-2', position: 1, card_id: 'card-2' }
-      const state = renderToday({
-        plan: { ...planRow, total_items: 2 }, planItems: [typedItem, second],
-      })
-
-      const fields = screen.getAllByRole('textbox', { name: 'today.answer.label' })
-      await userEvent.type(fields[0], 'first')
-      await userEvent.click(screen.getAllByRole('button', { name: 'today.rate.known' })[1])
-
-      // The second row must not submit the first row's words — that would attribute an answer
-      // to a card the learner never wrote it for, and a later paid comparison would be grounded
-      // in it.
-      const [input] = (state.recordAttempt as ReturnType<typeof vi.fn>).mock.calls[0]
-      expect(input.planItem.id).toBe('item-2')
-      expect(input.text).toBe('')
-    })
-
-    it('stops the input at the cap the server would reject past', async () => {
-      renderToday({ plan: planRow, planItems: [typedItem] })
-
-      // maxLength, not a truncation after the fact: the learner sees the field stop rather than
-      // discovering later that part of the answer was dropped.
-      expect(screen.getByRole('textbox', { name: 'today.answer.label' }))
-        .toHaveAttribute('maxLength', '2000')
-    })
+    expect(screen.getByRole('link', { name: /today\.continueStudy/ })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /today\.startStudy/ })).not.toBeInTheDocument()
   })
 
-  it('leaves other rows usable while one is recording', () => {
-    const second = { ...planItem, id: 'item-2', position: 1 }
-    renderToday({ plan: { ...planRow, total_items: 2 }, planItems: [planItem, second], recordingItemId: 'item-1' })
+  it('says the day is finished instead of offering a start button', () => {
+    renderToday({
+      plan: { ...planRow, completed_items: 1 },
+      planItems: [{ ...planItem, status: 'completed' as const }],
+      planCards: cards,
+    })
 
-    const buttons = screen.getAllByRole('button', { name: 'today.rate.known' })
-    expect(buttons[0]).toBeDisabled()
-    expect(buttons[1]).toBeEnabled()
+    expect(screen.getByText('today.allDoneNote')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /today\.startStudy/ })).not.toBeInTheDocument()
+  })
+
+  /**
+   * `finalize_study_session` takes ONE deck id and refuses a session whose rating events span
+   * decks, so a plan over two decks is two sessions. Showing them is the alternative to a
+   * single button that would silently study only the first.
+   */
+  it('lists each deck separately, because a session cannot span decks', () => {
+    renderToday({
+      plan: { ...planRow, total_items: 2 },
+      planItems: [planItem, { ...planItem, id: 'item-2', position: 1, card_id: 'card-2' }],
+      planCards: {
+        ...cards,
+        'card-2': { id: 'card-2', deck_id: 'deck-9', field_values: { front: '\u72ac' } },
+      },
+    })
+
+    // Both decks, each with its own way in. The primary CTA starts whichever the planner put
+    // first; the list is the complete picture, so the second deck is never stranded.
+    const links = screen.getAllByRole('link', { name: 'today.item.study' })
+    expect(links.map((link) => link.getAttribute('href'))).toEqual([
+      `/decks/deck-7/study?mode=srs&goalId=goal-1&planDate=${todayKey()}`,
+      `/decks/deck-9/study?mode=srs&goalId=goal-1&planDate=${todayKey()}`,
+    ])
+  })
+
+  it('shows a completed row as done rather than as work left', () => {
+    renderToday({
+      plan: { ...planRow, completed_items: 1 },
+      planItems: [{ ...planItem, status: 'completed' as const }],
+      planCards: cards,
+    })
+
+    expect(screen.getByLabelText('today.item.recorded')).toBeInTheDocument()
   })
 })
 
@@ -679,72 +656,42 @@ describe('enrichment', () => {
     planCards: { 'card-1': { id: 'card-1', deck_id: 'deck-7', field_values: { front: '猫' } } },
     ...over,
   })
-
-  it('labels the request as costing credits BEFORE it is clicked', () => {
-    withPlan()
-
-    // The charge happens server-side before the user sees any result, so the cost cannot
-    // be disclosed in an error afterwards.
-    const cta = screen.getByRole('button', { name: 'enrichment.explainCta' })
-    expect(cta).toBeInTheDocument()
-    expect(cta).toHaveAttribute('title', 'enrichment.costHint')
-  })
-
-  it('requests an explanation for that card only', async () => {
-    const state = withPlan()
-
-    await userEvent.click(screen.getByRole('button', { name: 'enrichment.explainCta' }))
-
-    expect(state.requestEnrichment).toHaveBeenCalledWith({
-      action: 'explain', goalId: 'goal-1', cardId: 'card-1', uiLang: expect.any(String),
-    })
-  })
-
-  it('does not offer it on a row with no card', () => {
-    renderToday({ plan: planRow, planItems: [{ ...planItem, card_id: null, activity_id: 'act-1' }] })
-
-    expect(screen.queryByRole('button', { name: 'enrichment.explainCta' })).not.toBeInTheDocument()
-  })
-
-  // Design §6: the plan-row button stays card-scoped, and becomes attempt-grounded once that
-  // item HAS an attempt. Without this the web plan row buys the generic answer at the price
-  // the phone charges for a grounded one, and mig 178's `attempt_id` is written NULL.
+  /** A miss on card-1 — the premise the paid actions are offered against. */
   const attemptOnCard1 = {
     id: 'a-1', goal_id: 'goal-1', card_id: 'card-1', activity_id: null,
     plan_item_id: 'item-1', activity_type: 'recall', evaluator_type: 'self_rate',
     normalized_score: 0, duration_ms: 0, created_at: '2026-07-31T03:00:00.000Z',
   }
 
-  it('grounds the plan row in this card’s latest attempt once it has one', async () => {
-    const state = withPlan({ attempts: [attemptOnCard1] })
+  /**
+   * The plan list carries NO paid button any more.
+   *
+   * It used to offer one per row, card-scoped, and design §6 then required it to become
+   * attempt-grounded once the item had an attempt — a rule that could be got wrong (and was:
+   * a stale row from another goal would ground the request in the wrong attempt, which the
+   * server cannot catch, because mig 178's pair check only asks that attempt and enrichment
+   * name the same CARD). Offering it only from the attempt list removes the class of bug: an
+   * attempt row cannot be grounded in anything but its own attempt.
+   */
+  it('offers no paid button from the plan list', () => {
+    withPlan()
 
-    await userEvent.click(screen.getByRole('button', { name: 'enrichment.explainCta' }))
+    expect(screen.queryByRole('button', { name: 'enrichment.explainCta' })).not.toBeInTheDocument()
+  })
+
+  it('offers one from the attempt it is grounded in, with the price stated first', async () => {
+    const state = withPlan({
+      attempts: [attemptOnCard1],
+      enrichmentQuote: { estPriceMicro: 1200, balanceMicro: 500000 },
+    })
+
+    expect(screen.getByText('enrichment.groundedHint', { exact: false })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: /enrichment\.action\.explain/ }))
 
     expect(state.requestEnrichment).toHaveBeenCalledWith({
       action: 'explain', goalId: 'goal-1', cardId: 'card-1', attemptId: 'a-1',
       uiLang: expect.any(String),
     })
-  })
-
-  it('never grounds it in another goal’s attempt on the same card', async () => {
-    // `fetchAttempts` does not clear `attempts` on a goal switch, so the previous goal's rows
-    // survive one round trip. A card in both goals' decks would otherwise ground this paid
-    // request in the goal the learner just left — and the server cannot catch it, because
-    // mig 178's pair check only asks that attempt and enrichment name the same CARD.
-    const state = withPlan({ attempts: [{ ...attemptOnCard1, id: 'a-other', goal_id: 'goal-2' }] })
-
-    await userEvent.click(screen.getByRole('button', { name: 'enrichment.explainCta' }))
-
-    // No `attemptId` KEY at all — not `undefined`, which the store would forward as a field.
-    expect(state.requestEnrichment).toHaveBeenCalledWith({
-      action: 'explain', goalId: 'goal-1', cardId: 'card-1', uiLang: expect.any(String),
-    })
-  })
-
-  it('disables the row being requested', () => {
-    withPlan({ enrichmentPendingCardId: 'card-1' })
-
-    expect(screen.getByRole('button', { name: 'enrichment.requesting' })).toBeDisabled()
   })
 
   it('renders each failure with its own message', () => {

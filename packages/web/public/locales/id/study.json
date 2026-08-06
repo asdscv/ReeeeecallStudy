@@ -104,7 +104,8 @@
     "progressSoFar": "Berikut progres Anda sejauh ini.",
     "knowIt": "Tahu",
     "dontKnow": "Tidak Tahu",
-    "next": "Berikutnya"
+    "next": "Berikutnya",
+    "backToPlan": "Kembali ke rencana"
   },
   "weekdays": {
     "sun": "Min",

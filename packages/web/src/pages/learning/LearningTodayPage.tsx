@@ -1,27 +1,54 @@
-import { useEffect, useId, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router-dom'
+import { Play, Check } from 'lucide-react'
 import {
   useLearningStore,
   type LearningGoalWithDecks, type AttemptRow, type RemediationAction, type GoalKnowledge,
+  type DailyPlanItemRow,
 } from '../../stores/learning-store'
 import { currentPlanContext } from '../../lib/learning-plan-date'
 import { cardPromptLabel } from '@reeeeecall/shared/lib/card-prompt'
 import {
-  attemptNeedsRemediation, attemptTypedAnswer, latestAttemptForCard,
+  attemptNeedsRemediation, attemptTypedAnswer,
 } from '@reeeeecall/shared/lib/learning-attempt-selection'
-import { TYPED_ANSWER_MAX_CHARS } from '@reeeeecall/shared/lib/learning-candidates'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { recallPercent } from '@reeeeecall/shared/lib/learning-recall-display'
+import { useDeckStore } from '../../stores/deck-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
 import { EnrichmentModal } from './EnrichmentModal'
 
 /**
- * Today's plan for one goal.
+ * One goal's plan — today, and the days after it.
  *
- * Plan generation is EXPLICIT — a button, never an effect. `save_daily_plan` is capped
- * at 50 writes per user per day, so a generate-on-render path would spend a real quota
- * and then start failing for the rest of the day. Reading is automatic; writing is not.
+ * ## What this screen stopped being
+ *
+ * It used to BE the study session: every card in the day's plan rendered as a row with a
+ * textarea and three self-rating buttons, all of it on one scrolling page. That surface looked
+ * like studying and was not — the small print under the buttons said so out loud
+ * ("복습 일정은 바뀌지 않습니다"), because `record_answer_attempt` logs an attempt and
+ * reschedules nothing. A learner who did their whole plan there moved no card's due date, and
+ * tomorrow's plan came back identical. The per-row 학습 link went somewhere better — the real
+ * study session — but it opened the WHOLE deck and knew nothing about the plan, so the two
+ * surfaces double-counted each other.
+ *
+ * Now the plan is a plan: it says what today is, and hands the studying to the study session
+ * the rest of the app already uses (`/decks/:deckId/study?goalId=…&planDate=…`). One rating
+ * there both reschedules the card and completes the plan item — `apply_plan_study_rating`,
+ * one transaction — so doing the plan is doing the studying.
+ *
+ * ## Why a session per deck
+ *
+ * `finalize_study_session` takes one `p_deck_id` and refuses a session whose rating events span
+ * decks, so a plan covering three decks is three sessions. The deck list below is that fact made
+ * visible rather than hidden behind a single button that would silently study only one of them.
+ *
+ * ## The days after today
+ *
+ * A forecast, never a stored plan. Saving one would spend a `save_daily_plan` write on a ranking
+ * computed from today's SRS state, and anything studied in between would invalidate it while it
+ * sat in the database looking authoritative. So the future days run the planner and keep only
+ * the shape, and say on screen that that is what they are.
  */
 
 /** Planner reason codes (daily-plan-v2) → the phrase shown on the row. */
@@ -38,28 +65,21 @@ const REASON_KEY: Record<string, string> = {
 /** Rows shown in the attempt list. The store loads 50; everything on screen counts these. */
 const ATTEMPT_ROWS = 10
 
+/** How far ahead the day strip looks. A week is as far as a forecast stays worth reading. */
+const FORECAST_DAYS = 6
+
+const DAY_MS = 86_400_000
+
 /**
  * The two remediation actions the SERVER serves.
  *
- * `compare` and `evaluate` are absent because `SERVED_ACTIONS` in the edge function refuses
- * them (Stage 0 of the compare/evaluate plan) — not, any longer, because there is nothing to
- * compare: a typed item now stores `{ self_rated, text }`. What is still missing is the
- * server-side reference answer and the refuse-don't-degrade path, so adding an entry here would
- * charge the wallet for a request the function rejects.
- *
- * The labels say what the model produces ("AI explanation" / "Study hint"), never that it read
- * an answer, because these two are grounded in the score and the card.
+ * `compare` is offered only where the learner actually wrote something, because the server
+ * refuses an ungrounded compare and a button that spends a request to earn a refusal is worse
+ * than no button at all.
  */
 const REMEDIATION_ACTIONS: ReadonlyArray<{
   action: RemediationAction
   labelKey: string
-  /**
-   * Whether this action can be honestly offered for a given attempt.
-   *
-   * Per-action rather than one shared condition, because `compare` has a premise the other two
-   * do not: it needs the learner's own words. The server refuses an ungrounded compare, so a
-   * button that spends a request to earn a refusal is worse than no button at all.
-   */
   offeredFor: (attempt: AttemptRow) => boolean
 }> = [
   { action: 'explain', labelKey: 'enrichment.action.explain', offeredFor: () => true },
@@ -71,159 +91,50 @@ const REMEDIATION_ACTIONS: ReadonlyArray<{
   },
 ]
 
-/** Self-rating choices for a legacy recall item (evaluator_type = self_rate). */
-const SELF_RATINGS: ReadonlyArray<{ score: number; key: string }> = [
-  { score: 0, key: 'today.rate.again' },
-  { score: 0.5, key: 'today.rate.partial' },
-  { score: 1, key: 'today.rate.known' },
-]
-
-function PlanItemRow({ position, cardText, deckId, reasonLabel, minutes, done, typed, onRate, recording, onExplain, explaining, busy, recallPercent }: {
+/**
+ * One row of the day's list — read-only.
+ *
+ * Deliberately carries no controls. It used to hold a textarea and three rating buttons, which
+ * is what made this page look like a study screen while rescheduling nothing. What it shows is
+ * what the planner decided and why, so the learner can judge the plan before starting it.
+ */
+function PlanItemRow({ position, cardText, reasonLabel, minutes, done, recall }: {
   position: number
   cardText: string
-  deckId: string | null
   reasonLabel: string
   minutes: number | null
   done: boolean
   /**
-   * This item asks for a written answer — `response_type === 'text'`, decided at plan time by
-   * the card's template. False keeps the row exactly as it was before typed answers existed.
-   */
-  typed: boolean
-  onRate: (score: number, text: string) => void
-  recording: boolean
-  onExplain: (() => void) | null
-  /**
    * Estimated chance the learner still recalls this card, whole percent, or null.
    *
    * Null when the card has no forgetting curve yet. The row then says nothing rather than
-   * "0%" — a new card is not a forgotten one, and the difference is the whole point of the
-   * null discipline in the memory model.
+   * "0%" — a new card is not a forgotten one.
    */
-  recallPercent: number | null
-  /** This row's card is the one being fetched — drives the label. */
-  explaining: boolean
-  /** ANY request is in flight — drives the disabled state, because the store drops seconds. */
-  busy: boolean
+  recall: number | null
 }) {
   const { t } = useTranslation('learning')
-  /**
-   * The answer in progress, held on the ROW.
-   *
-   * Local because it is not shared state and not worth a store round trip — and because the row
-   * unmounts when the plan is re-read after the attempt is recorded, which clears it for free.
-   */
-  const [answer, setAnswer] = useState('')
-  // Generated, not derived from `position`: two rows must never share an id, and `position` is
-  // reused across plans.
-  const answerFieldId = useId()
   return (
-    <li className="p-3 bg-card rounded-lg border border-border">
-      <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0 flex items-center gap-3">
-          <span className="text-xs text-content-tertiary w-5 shrink-0">{position + 1}</span>
-          <div className="min-w-0">
-            <p className={`text-sm truncate ${done ? 'text-content-tertiary line-through' : 'text-foreground'}`}>
-              {cardText || t('today.item.untitled')}
-            </p>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-xs text-content-tertiary">{reasonLabel}</span>
-              {/* The number the reason is derived from. Shown so "at risk of forgetting" is a
-                  measurement the learner can judge rather than an assertion they must trust. */}
-              {recallPercent !== null && (
-                <span className="text-xs text-content-tertiary">
-                  {t('today.recallChance', { percent: recallPercent })}
-                </span>
-              )}
-              {minutes !== null && (
-                <span className="text-xs text-content-tertiary">
-                  {t('today.item.minutes', { count: minutes })}
-                </span>
-              )}
-            </div>
-          </div>
+    <li className="flex items-start gap-3 px-3 py-2">
+      <span className="w-5 shrink-0 pt-0.5 text-xs tabular-nums text-content-tertiary">
+        {done ? <Check className="h-3.5 w-3.5 text-success" aria-label={t('today.item.recorded')} /> : position + 1}
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className={`truncate text-sm ${done ? 'text-content-tertiary line-through' : 'text-foreground'}`}>
+          {cardText || t('today.item.untitled')}
+        </p>
+        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-content-tertiary">
+          <span>{reasonLabel}</span>
+          {/* The number the reason is derived from. Shown so "at risk of forgetting" is a
+              measurement the learner can judge rather than an assertion they must trust. */}
+          {recall !== null && <span>{t('today.recallChance', { percent: recall })}</span>}
+          {minutes !== null && <span>{t('today.item.minutes', { count: minutes })}</span>}
         </div>
-        <span className="flex items-center gap-3 shrink-0">
-          {onExplain && (
-            /* Paid: the server reserves against the wallet before the model call and charges
-               the real token cost after, so the label has to say it costs credits BEFORE the
-               click — not in an error afterwards. */
-            <button
-              type="button"
-              disabled={busy}
-              onClick={onExplain}
-              title={t('enrichment.costHint')}
-              className="text-xs text-primary hover:underline cursor-pointer disabled:opacity-50"
-            >
-              {explaining ? t('enrichment.requesting') : t('enrichment.explainCta')}
-            </button>
-          )}
-          {deckId && (
-            <Link
-              to={`/decks/${deckId}/study/setup`}
-              className="text-xs text-primary hover:underline"
-            >
-              {t('today.item.study')}
-            </Link>
-          )}
-        </span>
       </div>
-
-      {/* Self-rating records the attempt. It does NOT reschedule the card: SRS scheduling
-          stays with the study screen's rating (apply_study_rating), and mixing the two would
-          mean one action quietly moving two different things. */}
-      {done ? (
-        <p className="mt-2 text-xs text-success">{t('today.item.recorded')}</p>
-      ) : (
-        <>
-          {/* Typed recall — production instead of recognition. Deliberately paired with the
-              SAME three rating buttons rather than replacing them: nothing grades the text, so
-              the learner is still the evaluator, and the buttons are what submits. */}
-          {typed && (
-            <div className="mt-2">
-              <label htmlFor={answerFieldId} className="block text-xs text-content-tertiary">
-                {t('today.answer.label')}
-              </label>
-              <textarea
-                id={answerFieldId}
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                disabled={recording}
-                rows={2}
-                // Enforced HERE, where the learner can see the input stop, rather than as the
-                // server's 64 KiB rejection — which shares its error code with the plan-save
-                // cap and would surface as a message about rebuilding plans.
-                maxLength={TYPED_ANSWER_MAX_CHARS}
-                placeholder={t('today.answer.placeholder')}
-                className="mt-1 w-full px-2 py-1.5 text-sm bg-muted border border-border rounded-md text-foreground disabled:opacity-50"
-              />
-              {/* Says what the text is and is not: stored with the attempt, never graded. A
-                  learner who believes it is being marked would read their own self-rating as a
-                  second opinion on it. */}
-              <p className="mt-0.5 text-[11px] text-content-tertiary">{t('today.answer.note')}</p>
-            </div>
-          )}
-          <div className="mt-2 flex items-center gap-2">
-            {SELF_RATINGS.map((rating) => (
-              <button
-                key={rating.key}
-                type="button"
-                disabled={recording}
-                onClick={() => onRate(rating.score, answer)}
-                className="px-2 py-1 text-xs border border-border rounded-md cursor-pointer disabled:opacity-50"
-              >
-                {t(rating.key)}
-              </button>
-            ))}
-            <span className="text-[11px] text-content-tertiary">{t('today.rate.hint')}</span>
-          </div>
-        </>
-      )}
     </li>
   )
 }
 
-/** Recent attempts for the selected goal — the review surface for Phase 2. */
+/** Recent attempts for the selected goal — where paid remediation is offered. */
 function AttemptHistory({ goalId }: { goalId: string }) {
   const { t, i18n } = useTranslation('learning')
   const {
@@ -241,8 +152,6 @@ function AttemptHistory({ goalId }: { goalId: string }) {
     () => attempts.filter((attempt) => attempt.goal_id === goalId),
     [attempts, goalId],
   )
-  // The store loads 50; the list shows 10. Everything below counts the VISIBLE rows, so the
-  // heading, the price line and the wallet read all describe what is actually on screen.
   const visibleAttempts = useMemo(() => goalAttempts.slice(0, ATTEMPT_ROWS), [goalAttempts])
 
   /**
@@ -255,24 +164,19 @@ function AttemptHistory({ goalId }: { goalId: string }) {
     attemptNeedsRemediation(attempt) && Boolean(attempt.card_id)
   const offersRemediation = visibleAttempts.some(canRemediate)
 
-  // Read the wallet only once a row that can be acted on exists — a learner who is never
-  // offered remediation should never trigger a wallet call — and RE-read it when a request
-  // finishes, because that request just debited the balance this line is quoting. Keyed on
-  // `enrichmentPendingCardId` returning to null, which is exactly "a request just settled".
+  // Read the wallet only once a row that can be acted on exists, and RE-read it when a request
+  // finishes, because that request just debited the balance this line is quoting.
   useEffect(() => {
     if (!offersRemediation || enrichmentPendingCardId !== null) return
     void loadEnrichmentQuote()
   }, [offersRemediation, enrichmentPendingCardId, loadEnrichmentQuote])
 
-  // The store's in-flight guard is GLOBAL (`if (get().enrichmentPendingCardId) return false`),
-  // so a second click anywhere is silently dropped. Disable every button while one request is
-  // running rather than let a row look clickable and do nothing.
+  // The store's in-flight guard is GLOBAL, so a second click anywhere is silently dropped.
+  // Disable every button while one request is running rather than let a row look clickable.
   const requestBusy = enrichmentPendingCardId !== null
 
-  // Which ROW is waiting, not which card. The store only tracks the pending CARD, and the
-  // learner this feature is for — someone who missed the same card twice — has two rows
-  // sharing one card_id. Keying the indicator on the card would make both of them claim to
-  // be the request in flight.
+  // Which ROW is waiting, not which card: someone who missed the same card twice has two rows
+  // sharing one card_id, and keying on the card would make both claim to be the pending one.
   const [requestingAttemptId, setRequestingAttemptId] = useState<string | null>(null)
 
   if (attemptsLoading && goalAttempts.length === 0) return null
@@ -286,13 +190,12 @@ function AttemptHistory({ goalId }: { goalId: string }) {
   }
 
   return (
-    <div className="pt-2">
+    <section className="pt-2">
       <h2 className="text-sm font-medium text-foreground">
         {t('history.title', { count: visibleAttempts.length })}
       </h2>
       {/* What the charge buys, as VISIBLE text rather than a `title` tooltip — a tooltip never
-          reaches a keyboard or touch user, and it is the sentence that tells the learner the
-          answer is about one attempt rather than the card in general. */}
+          reaches a keyboard or touch user. */}
       {offersRemediation && (
         <p className="mt-0.5 text-[11px] text-content-tertiary">
           {t('enrichment.groundedHint')}
@@ -307,35 +210,29 @@ function AttemptHistory({ goalId }: { goalId: string }) {
           )}
         </p>
       )}
-      <ul className="mt-2 space-y-1">
+      <ul className="mt-2 divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
         {visibleAttempts.map((attempt) => {
           const card = attempt.card_id ? planCards[attempt.card_id] : undefined
           const label = cardPromptLabel(card?.field_values, card?.template_id, planTemplateFields)
           const remediable = canRemediate(attempt)
           const pending = requestingAttemptId === attempt.id
           const rowName = label || t('history.itemFallback', { type: attempt.activity_type })
-          // What the learner actually wrote, when they wrote anything. Shown because it is the
-          // honesty check on the whole feature: a later paid `compare` is grounded in exactly
-          // this string, so the learner has to be able to see it before paying for an answer
-          // about it.
           const typedAnswer = attemptTypedAnswer(attempt)
           return (
-            <li key={attempt.id} className="flex items-center justify-between gap-3 px-3 py-2 bg-card rounded-lg border border-border">
+            <li key={attempt.id} className="flex items-center justify-between gap-3 px-3 py-2">
               <span className="min-w-0">
-                <span className="block text-xs text-foreground truncate">{rowName}</span>
+                <span className="block truncate text-xs text-foreground">{rowName}</span>
                 {typedAnswer && (
-                  <span className="block text-[11px] text-content-tertiary truncate">
+                  <span className="block truncate text-[11px] text-content-tertiary">
                     {t('history.youWrote', { text: typedAnswer })}
                   </span>
                 )}
               </span>
-              <span className="flex items-center gap-2 shrink-0">
+              <span className="flex shrink-0 items-center gap-2">
                 <span className="text-xs text-content-tertiary">{t(scoreKey(attempt.normalized_score))}</span>
                 <span className="text-[11px] text-content-tertiary">
                   {new Date(attempt.created_at).toLocaleString()}
                 </span>
-                {/* The progress note sits on the row rather than on a button: the store knows
-                    only that A request is running, not which of the two actions it was. */}
                 {pending && (
                   <span className="text-xs text-content-tertiary">{t('enrichment.requesting')}</span>
                 )}
@@ -349,18 +246,15 @@ function AttemptHistory({ goalId }: { goalId: string }) {
                       void requestEnrichment({
                         action,
                         goalId,
-                        // Non-null by `canRemediate`; the id is what makes the answer about
-                        // THIS failure instead of the card in general.
                         cardId: attempt.card_id as string,
                         attemptId: attempt.id,
                         uiLang: i18n.language,
                       }).finally(() => setRequestingAttemptId(null))
                     }}
-                    // Every row offers the same two labels, so the text alone would give up to
-                    // 20 buttons two accessible names between them. The name has to say which
-                    // item is being paid for.
+                    // Every row offers the same labels, so the text alone would give up to 20
+                    // buttons two accessible names between them.
                     aria-label={`${t(labelKey)} — ${rowName}`}
-                    className="text-xs text-primary hover:underline cursor-pointer disabled:opacity-50"
+                    className="cursor-pointer text-xs text-brand hover:underline disabled:opacity-50"
                   >
                     {t(labelKey)}
                   </button>
@@ -370,7 +264,7 @@ function AttemptHistory({ goalId }: { goalId: string }) {
           )
         })}
       </ul>
-    </div>
+    </section>
   )
 }
 
@@ -381,16 +275,6 @@ function AttemptHistory({ goalId }: { goalId: string }) {
  * "not started", and reporting a confident 0% for it is a different, wronger claim. The bar
  * therefore measures known against what has actually been attempted, and the untouched remainder
  * is stated separately.
- *
- * There is no "완료" figure here on purpose. Any interval threshold — 21 days, 56, 365 — is a
- * state lapses knock cards out of daily, so a simulation of this app's scheduler settles at ~99%
- * and never fills.
- *
- * Nor is there a target-date projection. Judging at the deadline answers "what would I still
- * know if I stopped today" — a forecast, and a bleak one: on a real account it rendered
- * "0 of 120 known" for someone who had studied 55 cards, because every interval was shorter than
- * the time remaining. Worth showing eventually, with the assumption written next to it. Not as
- * the line that tells a learner where they stand.
  */
 function GoalProgress({ knowledge }: { knowledge: GoalKnowledge | null }) {
   const { t } = useTranslation('learning')
@@ -400,12 +284,12 @@ function GoalProgress({ knowledge }: { knowledge: GoalKnowledge | null }) {
   const percent = attempted > 0 ? Math.round((knowledge.known / attempted) * 100) : 0
 
   return (
-    <section className="p-4 bg-card rounded-xl border border-border" aria-label={t('progress.title')}>
+    <section className="rounded-xl border border-border bg-card p-4" aria-label={t('progress.title')}>
       <p className="text-sm text-foreground">
         {t('progress.knownNow', { known: knowledge.known, total: knowledge.total })}
       </p>
-      <div className="mt-2 h-1.5 w-full rounded-full bg-muted overflow-hidden">
-        <div className="h-full bg-primary" style={{ width: `${percent}%` }} role="presentation" />
+      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+        <div className="h-full bg-brand" style={{ width: `${percent}%` }} role="presentation" />
       </div>
       <p className="mt-1.5 text-[11px] text-content-tertiary">
         {t('progress.breakdown', {
@@ -422,22 +306,25 @@ export function LearningTodayPage() {
     goals, goalsLoading, fetchGoals,
     plan, planItems, planCards, planTemplateFields, planLoading, planGenerating, planError,
     planBlockedReason,
-    recordingItemId, fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
-    extendPlan, planExtending, planExtension, recordAttempt,
-    attempts, fetchAttempts,
-    enrichment, enrichmentPendingCardId, enrichmentError, requestEnrichment,
+    fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
+    extendPlan, planExtending, planExtension,
+    planForecast, planForecastLoading, forecastPlan,
+    enrichment, enrichmentError,
     knowledge, fetchGoalKnowledge,
   } = useLearningStore()
-  const { i18n } = useTranslation('learning')
+  const { decks, fetchDecks } = useDeckStore()
 
-  // The goal comes from the URL now, not a dropdown. `/learning` lists the plans and each one
-  // links here, so the three learning screens no longer each ask "which goal?" separately.
+  // The goal comes from the URL, not a dropdown. `/learning` lists the plans and each one
+  // links here, so the learning screens no longer each ask "which goal?" separately.
   const { goalId: routeGoalId } = useParams<{ goalId: string }>()
   // One context per mount: the plan date must not drift mid-session, and the planner's
   // `now` is part of its input fingerprint.
   const ctx = useMemo(() => currentPlanContext(), [])
+  /** 0 = today. Anything above it is a forecast, never a saved plan. */
+  const [dayOffset, setDayOffset] = useState(0)
 
   useEffect(() => { void fetchGoals() }, [fetchGoals])
+  useEffect(() => { void fetchDecks() }, [fetchDecks])
 
   const plannableGoals = useMemo(
     () => goals.filter((goal) => goal.status === 'active'),
@@ -454,73 +341,98 @@ export function LearningTodayPage() {
     if (selectedGoalId) void fetchPlan(selectedGoalId, ctx.planDate)
   }, [selectedGoalId, ctx.planDate, fetchPlan])
 
-
   const goal: LearningGoalWithDecks | undefined =
     plannableGoals.find((candidate) => candidate.id === selectedGoalId)
 
   /**
    * Build today's plan on open, once the read has come back empty.
    *
-   * This deliberately reverses the rule the earlier test pinned ("opening the page must not
-   * write a plan"). That guard existed because a naive mount effect would fire on `plan === null`
-   * — which is also the initial state and the failed-read state — and spend the 50-writes-a-day
-   * cap. `autoGeneratePlan` acts only on `planAbsentFor`, a fact only a SUCCESSFUL read sets, and
-   * attempts once per goal per day. The reason to reverse it: a learner opening the app to an
-   * empty screen and a button is being asked to do the one thing the app knows how to do itself.
+   * `autoGeneratePlan` acts only on `planAbsentFor`, a fact only a SUCCESSFUL read sets, and
+   * attempts once per goal per day — so it cannot spend the 50-writes-a-day cap on the initial
+   * or failed-read states, which also present as `plan === null`.
    */
   useEffect(() => {
     if (goal) void autoGeneratePlan(goal, ctx)
   }, [goal, ctx, autoGeneratePlan, planAbsentFor])
 
-  /**
-   * Whether automation still has its turn — the same four conditions `autoGeneratePlan` checks.
-   *
-   * Read here so the manual button does not appear for the one frame between the empty read and
-   * the effect that acts on it. Duplicating the conditions is the lesser evil: the alternative is
-   * a store flag written by the effect, which would be a second source of truth for the same
-   * question and could disagree with the one that actually gates the write.
-   */
+  /** The same four conditions `autoGeneratePlan` checks, so the manual button does not flash. */
   const autoWillRun = !!goal
     && planAbsentFor === `${goal.id}|${ctx.planDate}`
     && !autoPlanAttempted[`${goal.id}|${ctx.planDate}`]
     && !!goal.decks?.length
 
-  // Progress is judged at the goal's target date when it has one — "what will I still know on
-  // exam day" — and at today otherwise. Server-aggregated: the plan only loads DUE cards.
-  // NOW, not the target date. At the deadline this reported "0 of 120 known" for an account
-  // that had studied 55 cards, because the projection assumes you stop today — true, and useless
-  // as a status line. See GoalProgress for where the deadline belongs instead.
+  // Judged at NOW, not the target date. At the deadline this reported "0 of 120 known" for an
+  // account that had studied 55 cards, because the projection assumes you stop today.
   const judgedAt = ctx.now
   useEffect(() => {
     if (selectedGoalId) void fetchGoalKnowledge(selectedGoalId, judgedAt)
   }, [selectedGoalId, judgedAt, fetchGoalKnowledge])
 
+  /** The day the strip is pointing at. `dayOffset === 0` is the real, saved plan. */
+  const viewedDate = useMemo(
+    () => new Date(Date.parse(`${ctx.planDate}T00:00:00Z`) + dayOffset * DAY_MS)
+      .toISOString().slice(0, 10),
+    [ctx.planDate, dayOffset],
+  )
+
+  // Forecast on demand, once per date. It runs the real planner, so it is not free — but every
+  // quota and destructive cost lives in the SAVE, which this deliberately never does.
+  useEffect(() => {
+    if (dayOffset === 0 || !goal) return
+    void forecastPlan(goal, {
+      ...ctx,
+      planDate: viewedDate,
+      now: new Date(Date.parse(ctx.now) + dayOffset * DAY_MS).toISOString(),
+    })
+  }, [dayOffset, goal, ctx, viewedDate, forecastPlan])
+
   /**
-   * The same goal filter `AttemptHistory` applies, for the same reason — and it has to be
-   * here too, not only there. `fetchAttempts` never clears `attempts`, so after a goal switch
-   * the previous goal's rows survive one round trip. A card that belongs to both goals' decks
-   * would then let the plan row ground a paid request in the OTHER goal's attempt, and the
-   * server cannot catch it: `persist_ai_remediation`'s pair check only asks that the attempt
-   * and the enrichment name the same CARD (mig 178), which that attempt does. The result is a
-   * stored `attempt_id` that misdescribes the answer — worse than none, because provenance
-   * reads as verified.
+   * The day's work, split by deck, because a study session cannot span decks.
+   *
+   * Ordered by the plan's own positions so the deck the planner put first is the one the
+   * primary button starts.
    */
-  const goalAttempts = useMemo(
-    () => attempts.filter((attempt) => attempt.goal_id === selectedGoalId),
-    [attempts, selectedGoalId],
+  const deckGroups = useMemo(() => {
+    const byDeck = new Map<string, { deckId: string; pending: number; done: number; first: number }>()
+    for (const item of planItems) {
+      const deckId = item.card_id ? planCards[item.card_id]?.deck_id : undefined
+      if (!deckId) continue
+      const entry = byDeck.get(deckId)
+        ?? { deckId, pending: 0, done: 0, first: item.position }
+      if (item.status === 'completed') entry.done += 1
+      else entry.pending += 1
+      entry.first = Math.min(entry.first, item.position)
+      byDeck.set(deckId, entry)
+    }
+    return [...byDeck.values()].sort((a, b) => a.first - b.first)
+  }, [planItems, planCards])
+
+  const deckName = (deckId: string) =>
+    decks.find((deck) => deck.id === deckId)?.name ?? t('today.item.untitled')
+
+  const studyHref = (deckId: string) =>
+    `/decks/${deckId}/study?mode=srs&goalId=${selectedGoalId}&planDate=${ctx.planDate}`
+
+  const nextDeck = deckGroups.find((group) => group.pending > 0) ?? null
+  const pendingTotal = deckGroups.reduce((sum, group) => sum + group.pending, 0)
+  const doneTotal = deckGroups.reduce((sum, group) => sum + group.done, 0)
+
+  const sortedItems = useMemo(
+    () => [...planItems].sort((a: DailyPlanItemRow, b: DailyPlanItemRow) => a.position - b.position),
+    [planItems],
   )
 
   if (goalsLoading && goals.length === 0) return <ListSkeleton />
 
   if (!selectedGoalId) {
     return (
-      <div className="max-w-2xl mx-auto p-4">
+      <div className="mx-auto max-w-2xl p-4">
         <h1 className="text-lg font-medium text-foreground">{t('today.title')}</h1>
-        <div className="mt-4 p-6 bg-card rounded-xl border border-border text-center">
+        <div className="mt-4 rounded-xl border border-border bg-card p-6 text-center">
           <p className="text-sm text-muted-foreground">{t('today.empty.noGoal')}</p>
           <Link
             to="/learning"
-            className="inline-block mt-3 px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg"
+            className="mt-3 inline-block rounded-lg bg-brand px-3 py-1.5 text-sm font-medium text-white no-underline"
           >
             {t('today.backToPlans')}
           </Link>
@@ -541,189 +453,281 @@ export function LearningTodayPage() {
     }
   }
 
+  const dayLabel = (offset: number) => {
+    if (offset === 0) return t('today.days.today')
+    if (offset === 1) return t('today.days.tomorrow')
+    return t('today.days.inDays', { count: offset })
+  }
+
+  const forecast = planForecast[viewedDate]
+
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-4">
+    <div className="mx-auto max-w-2xl space-y-4 p-4">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-lg font-medium text-foreground truncate">{goal?.title ?? t('today.title')}</h1>
-        <Link to="/learning" className="text-xs text-primary hover:underline shrink-0">
+        <h1 className="truncate text-lg font-medium text-foreground">{goal?.title ?? t('today.title')}</h1>
+        <Link to="/learning" className="shrink-0 text-xs text-brand hover:underline">
           {t('today.backToPlans')}
         </Link>
       </div>
 
-      {/* Where this goal actually stands. Judged at the target date when there is one, so the
-          number answers "what will I know on the day" rather than "what do I know right now" —
-          the first is the question a deadline makes people ask. */}
+      {/* Where this goal stands overall — unchanged by which day the strip is showing. */}
       <GoalProgress knowledge={knowledge[selectedGoalId] ?? null} />
 
-      {goal && (
-        <div className="p-4 bg-card rounded-xl border border-border">
-          <p className="text-sm font-medium text-foreground">{goal.title}</p>
-          <p className="text-xs text-content-tertiary mt-1">
-            {t('today.budget', { count: goal.daily_minutes })}
-            {plan && ` · ${t('today.progress', { done: plan.completed_items, total: plan.total_items })}`}
-          </p>
-        </div>
-      )}
+      {/* ── Day strip ─────────────────────────────────────────────────────────
+          Today is the plan; the rest are forecasts. They are the same control on
+          purpose — "what is coming" is one question — but the panel below always
+          says which of the two the learner is looking at. */}
+      <div
+        role="tablist"
+        aria-label={t('today.days.label')}
+        className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-1"
+      >
+        {Array.from({ length: FORECAST_DAYS + 1 }, (_, offset) => {
+          const selected = offset === dayOffset
+          return (
+            <button
+              key={offset}
+              type="button"
+              role="tab"
+              aria-selected={selected}
+              onClick={() => setDayOffset(offset)}
+              className={`shrink-0 cursor-pointer rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                selected
+                  ? 'border-brand bg-brand text-white'
+                  : 'border-border bg-card text-muted-foreground hover:bg-accent'
+              }`}
+            >
+              {dayLabel(offset)}
+            </button>
+          )
+        })}
+      </div>
 
-      {planError && (
-        <div role="alert" className="p-3 bg-destructive/10 border border-destructive/30 rounded-lg text-sm text-destructive">
+      {planError && dayOffset === 0 && (
+        <div role="alert" className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
           {t(errorMessageKey(planError.code))}
         </div>
       )}
 
-      {planBlockedReason === 'no_decks' && goal && (
-        <div className="p-4 bg-card rounded-xl border border-border text-center">
+      {dayOffset > 0 ? (
+        /* ── A day that has not happened ─────────────────────────────────── */
+        <section className="rounded-xl border border-border bg-card p-4" aria-label={t('today.forecast.title')}>
+          <h2 className="text-sm font-medium text-foreground">{t('today.forecast.title')}</h2>
+          {planForecastLoading === viewedDate ? (
+            <p className="mt-2 text-sm text-muted-foreground" aria-live="polite">
+              {t('today.forecast.loading')}
+            </p>
+          ) : forecast ? (
+            <>
+              <p className="mt-2 text-2xl font-semibold tabular-nums text-foreground">
+                {t('today.forecast.cards', { count: forecast.totalItems })}
+              </p>
+              <p className="mt-0.5 text-sm text-muted-foreground">
+                {t('today.forecast.minutes', { count: Math.max(1, Math.round(forecast.estimatedMinutes)) })}
+                {' · '}
+                {t('today.forecast.breakdown', {
+                  newCards: forecast.newCards, reviewCards: forecast.reviewCards,
+                })}
+              </p>
+            </>
+          ) : (
+            <p className="mt-2 text-sm text-muted-foreground">{t('today.forecast.empty')}</p>
+          )}
+          {/* Said every time, not once: the number above is only as good as the assumption
+              that nothing is studied between now and then, which is exactly the assumption a
+              learner reading a plan is about to break. */}
+          <p className="mt-2 text-[11px] text-content-tertiary">{t('today.forecast.note')}</p>
+        </section>
+      ) : planBlockedReason === 'no_decks' && goal ? (
+        <div className="rounded-xl border border-border bg-card p-4 text-center">
           <p className="text-sm text-muted-foreground">{t('today.empty.noDecks')}</p>
-          <Link to="/learning/goals" className="inline-block mt-3 text-sm text-primary hover:underline">
+          <Link to="/learning" className="mt-3 inline-block text-sm text-brand hover:underline">
             {t('today.empty.attachDecks')}
           </Link>
         </div>
-      )}
-
-      {planBlockedReason === 'no_candidates' && (
-        <div className="p-4 bg-card rounded-xl border border-border text-center">
+      ) : planBlockedReason === 'no_candidates' ? (
+        <div className="rounded-xl border border-border bg-card p-4 text-center">
           <p className="text-sm text-muted-foreground">{t('today.empty.nothingDue')}</p>
         </div>
-      )}
-
-      {enrichmentError && (
-        <div role="alert" className="p-3 bg-destructive/10 border border-destructive/30 rounded-lg text-sm text-destructive">
-          {t(`enrichment.error.${enrichmentError}`)}
-        </div>
-      )}
-
-      {enrichment && <EnrichmentModal preview={enrichment} />}
-
-      {selectedGoalId && <AttemptHistory goalId={selectedGoalId} />}
-
-      {planLoading ? (
+      ) : planLoading ? (
         <ListSkeleton />
       ) : plan ? (
         <>
-          <ul className="space-y-2">
-            {planItems.map((item) => {
-              const card = item.card_id ? planCards[item.card_id] : undefined
-              const firstField = cardPromptLabel(card?.field_values, card?.template_id, planTemplateFields)
-              return (
-                <PlanItemRow
-                  key={item.id}
-                  position={item.position}
-                  cardText={firstField}
-                  deckId={card?.deck_id ?? null}
-                  reasonLabel={t(REASON_KEY[item.reason_code] ?? 'today.reason.balanced')}
-                  // Strictly what the planner recorded when it chose this row. Deliberately NOT
-                  // recomputed from the card here: on a subscribed deck `cards.interval_days`
-                  // is the PUBLISHER's, which is the defect #389 fixed — a fallback would walk
-                  // straight back into it. A plan saved before this feature shows no number,
-                  // which is the honest answer.
-                  recallPercent={recallPercent(item.payload?.recall_probability)}
-                  minutes={item.estimated_minutes}
-                  done={item.status === 'completed'}
-                  // The plan row's own snapshot decides this — the same column
-                  // `record_answer_attempt` compares against, so the input can never appear on
-                  // an item the RPC would then reject for sending text.
-                  typed={item.response_type === 'text'}
-                  recording={recordingItemId === item.id}
-                  explaining={enrichmentPendingCardId === item.card_id}
-                  // Disabled on the GLOBAL flag, not just this card: the store drops any second
-                  // request while one is running, so a full-opacity button on another row would
-                  // look clickable and silently do nothing.
-                  busy={enrichmentPendingCardId !== null}
-                  onExplain={item.card_id && selectedGoalId ? () => {
-                    void requestEnrichment({
-                      action: 'explain',
-                      goalId: selectedGoalId,
-                      cardId: item.card_id as string,
-                      // Grounded once the item HAS an attempt (design §6) — same rule mobile
-                      // uses, so the two platforms cannot buy different answers for the same
-                      // card. Undefined when there is none, and the store omits the key.
-                      attemptId: latestAttemptForCard(goalAttempts, item.card_id)?.id,
-                      uiLang: i18n.language,
-                    })
-                  } : null}
-                  onRate={(score, text) => {
-                    if (!selectedGoalId) return
-                    // One id per attempt, generated at click time — TOGETHER with the text.
-                    // `p_response` is part of the RPC's idempotency comparison, so an id minted
-                    // before the answer was final would make a retry with edited text a P0007.
-                    // Refresh the attempt list too: `recordAttempt` re-reads only the plan, so
-                    // without this the miss the learner JUST recorded — the one this whole
-                    // feature exists to explain — never appears in the list below.
-                    void recordAttempt({
-                      planItem: item,
-                      goalId: selectedGoalId,
-                      score,
-                      text,
-                      clientAttemptId: crypto.randomUUID(),
-                    }, ctx.planDate).then((ok) => {
-                      if (ok && selectedGoalId) void fetchAttempts(selectedGoalId)
-                    })
-                  }}
-                />
-              )
-            })}
-          </ul>
-          {/* "더 하기" comes FIRST, and is the primary action once the day is done.
-              Rebuilding is the destructive one — it deletes every item and zeroes the day's
-              progress — so the additive option has to be the one that is easier to reach. */}
-          <button
-            type="button"
-            onClick={() => { if (goal) void extendPlan(goal, ctx) }}
-            disabled={planExtending || planGenerating || !goal}
-            className="w-full px-3 py-2 text-sm bg-primary text-primary-foreground rounded-lg cursor-pointer disabled:opacity-50"
-          >
-            {planExtending ? t('today.extending') : t('today.extend')}
-          </button>
+          {/* ── Today, and the way into it ──────────────────────────────── */}
+          <section className="rounded-xl border border-border bg-card p-4">
+            <div className="flex items-baseline justify-between gap-3">
+              <p className="text-2xl font-semibold tabular-nums text-foreground">
+                {pendingTotal > 0
+                  ? t('today.remaining', { count: pendingTotal })
+                  : t('today.allDone')}
+              </p>
+              <p className="shrink-0 text-xs text-content-tertiary">
+                {t('today.progress', { done: doneTotal, total: plan.total_items })}
+              </p>
+            </div>
+            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className="h-full bg-brand transition-[width]"
+                style={{ width: `${plan.total_items > 0 ? Math.round((doneTotal / plan.total_items) * 100) : 0}%` }}
+                role="presentation"
+              />
+            </div>
 
-          {planExtension && (
-            <p className="text-xs text-content-tertiary text-center" aria-live="polite">
-              {planExtension.appended === 0
-                ? t('today.extendNothing')
-                : (
-                  <>
-                    {t('today.extendAdded', { count: planExtension.appended })}
-                    {/* The cost, said out loud. Every card started today comes back tomorrow,
-                        and a button that grows tomorrow's list in silence is how a learner
-                        ends up abandoning a goal they were doing well at. */}
-                    {planExtension.reviewsTomorrow > 0
-                      && ` ${t('today.extendTomorrow', { count: planExtension.reviewsTomorrow })}`}
-                  </>
-                )}
-            </p>
+            {nextDeck ? (
+              <>
+                <Link
+                  to={studyHref(nextDeck.deckId)}
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-4 py-3 text-sm font-semibold text-white no-underline transition-colors hover:bg-brand-hover"
+                >
+                  <Play className="h-4 w-4" fill="currentColor" />
+                  {doneTotal > 0 ? t('today.continueStudy') : t('today.startStudy')}
+                </Link>
+                {/* The rating in there does both halves at once. Said here because the old
+                    screen's own small print told learners the opposite about its buttons. */}
+                <p className="mt-2 text-center text-[11px] text-content-tertiary">
+                  {t('today.studyNote')}
+                </p>
+              </>
+            ) : (
+              <p className="mt-4 rounded-xl bg-success/10 px-4 py-3 text-center text-sm font-medium text-success">
+                {t('today.allDoneNote')}
+              </p>
+            )}
+          </section>
+
+          {/* Per deck, because a study session cannot span decks — one button that silently
+              studied only the first would be worse than saying so. Hidden when there is only
+              one deck, where the primary button already IS the whole plan. */}
+          {deckGroups.length > 1 && (
+            <section className="overflow-hidden rounded-xl border border-border bg-card">
+              <h2 className="border-b border-border px-3 py-2 text-xs font-medium text-muted-foreground">
+                {t('today.byDeck')}
+              </h2>
+              <ul className="divide-y divide-border">
+                {deckGroups.map((group) => (
+                  <li key={group.deckId} className="flex items-center justify-between gap-3 px-3 py-2.5">
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm text-foreground">{deckName(group.deckId)}</span>
+                      <span className="block text-xs text-content-tertiary">
+                        {group.pending > 0
+                          ? t('today.remaining', { count: group.pending })
+                          : t('today.deckDone')}
+                      </span>
+                    </span>
+                    {group.pending > 0 ? (
+                      <Link
+                        to={studyHref(group.deckId)}
+                        className="shrink-0 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground no-underline transition-colors hover:bg-accent"
+                      >
+                        {t('today.item.study')}
+                      </Link>
+                    ) : (
+                      <Check className="h-4 w-4 shrink-0 text-success" aria-label={t('today.deckDone')} />
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </section>
           )}
 
-          <button
-            type="button"
-            onClick={() => { if (goal) void generatePlan(goal, ctx) }}
-            disabled={planGenerating || planExtending || plan.status === 'completed'}
-            className="w-full px-3 py-2 text-sm border border-border rounded-lg cursor-pointer disabled:opacity-50"
-          >
-            {planGenerating ? t('today.regenerating') : t('today.regenerate')}
-          </button>
-          {plan.status === 'completed' && (
-            <p className="text-xs text-content-tertiary text-center">{t('today.completedNote')}</p>
-          )}
+          {/* What is actually on the list, and why the planner chose it. Read-only: this is a
+              plan, and the studying happens in the study session. */}
+          <section className="overflow-hidden rounded-xl border border-border bg-card">
+            <h2 className="border-b border-border px-3 py-2 text-xs font-medium text-muted-foreground">
+              {t('today.listTitle')}
+            </h2>
+            <ul className="divide-y divide-border">
+              {sortedItems.map((item) => {
+                const card = item.card_id ? planCards[item.card_id] : undefined
+                return (
+                  <PlanItemRow
+                    key={item.id}
+                    position={item.position}
+                    cardText={cardPromptLabel(card?.field_values, card?.template_id, planTemplateFields)}
+                    reasonLabel={t(REASON_KEY[item.reason_code] ?? 'today.reason.balanced')}
+                    // Strictly what the planner recorded when it chose this row. Deliberately
+                    // NOT recomputed from the card: on a subscribed deck `cards.interval_days`
+                    // is the PUBLISHER's, which is the defect #389 fixed.
+                    recall={recallPercent(item.payload?.recall_probability)}
+                    minutes={item.estimated_minutes}
+                    done={item.status === 'completed'}
+                  />
+                )
+              })}
+            </ul>
+          </section>
+
+          {/* "더 하기" comes first and is the primary of the two: rebuilding DELETES every item
+              and zeroes the day's progress, so the additive option has to be easier to reach. */}
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => { if (goal) void extendPlan(goal, ctx) }}
+              disabled={planExtending || planGenerating || !goal}
+              className="w-full cursor-pointer rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent disabled:opacity-50"
+            >
+              {planExtending ? t('today.extending') : t('today.extend')}
+            </button>
+
+            {planExtension && (
+              <p className="text-center text-xs text-content-tertiary" aria-live="polite">
+                {planExtension.appended === 0
+                  ? t('today.extendNothing')
+                  : (
+                    <>
+                      {t('today.extendAdded', { count: planExtension.appended })}
+                      {/* The cost, said out loud. Every card started today comes back tomorrow,
+                          and a button that grows tomorrow's list in silence is how a learner
+                          ends up abandoning a goal they were doing well at. */}
+                      {planExtension.reviewsTomorrow > 0
+                        && ` ${t('today.extendTomorrow', { count: planExtension.reviewsTomorrow })}`}
+                    </>
+                  )}
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={() => { if (goal) void generatePlan(goal, ctx) }}
+              disabled={planGenerating || planExtending || plan.status === 'completed'}
+              className="w-full cursor-pointer rounded-lg px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-accent disabled:opacity-50"
+            >
+              {planGenerating ? t('today.regenerating') : t('today.regenerate')}
+            </button>
+            {plan.status === 'completed' && (
+              <p className="text-center text-xs text-content-tertiary">{t('today.completedNote')}</p>
+            )}
+          </div>
         </>
       ) : planGenerating || autoWillRun ? (
         // Building it. No button: the learner is not being asked for anything, they are being
         // told what is happening.
-        <p className="py-3 text-sm text-center text-muted-foreground" aria-live="polite">
+        <p className="py-3 text-center text-sm text-muted-foreground" aria-live="polite">
           {t('today.generating')}
         </p>
       ) : (
         // Only reachable once automation has had its turn and produced nothing — a failed save,
         // or a goal the learner has already regenerated today. The button is the way back.
-        !planBlockedReason && (
-          <button
-            type="button"
-            onClick={() => { if (goal) void generatePlan(goal, ctx) }}
-            disabled={!goal}
-            className="w-full px-3 py-2 text-sm bg-primary text-primary-foreground rounded-lg cursor-pointer disabled:opacity-50"
-          >
-            {t('today.generate')}
-          </button>
-        )
+        <button
+          type="button"
+          onClick={() => { if (goal) void generatePlan(goal, ctx) }}
+          disabled={!goal}
+          className="w-full cursor-pointer rounded-lg bg-brand px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
+        >
+          {t('today.generate')}
+        </button>
       )}
+
+      {enrichmentError && (
+        <div role="alert" className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+          {t(`enrichment.error.${enrichmentError}`)}
+        </div>
+      )}
+      {enrichment && <EnrichmentModal preview={enrichment} />}
+
+      {/* Kept on today only: the remediation offer is grounded in an attempt, and a day that
+          has not happened has none. */}
+      {dayOffset === 0 && <AttemptHistory goalId={selectedGoalId} />}
     </div>
   )
 }

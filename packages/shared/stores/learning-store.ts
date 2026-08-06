@@ -498,6 +498,21 @@ interface LearningState {
    */
   planExtension: { appended: number; newCards: number; reviewsTomorrow: number } | null
   /**
+   * What a FUTURE day is shaped like, keyed by its plan date.
+   *
+   * A forecast, never a plan. It runs the real planner with `now` moved forward and then throws
+   * the ranking away, keeping only the shape — because saving a future plan would be a lie in
+   * two directions at once: it would spend one of the 50 daily `save_daily_plan` writes on a
+   * ranking computed from today's SRS state, and anything studied between now and then would
+   * invalidate it while it sat in the database looking authoritative.
+   *
+   * `null` for a date whose forecast came back empty (nothing will be due), which is a real
+   * answer and different from "not computed yet" (key absent).
+   */
+  planForecast: Record<string, PlanForecast | null>
+  /** The plan date currently being forecast, or null. One at a time — it is a user gesture. */
+  planForecastLoading: string | null
+  /**
    * Goal+date keys already attempted automatically, so a failure is never retried in a loop.
    *
    * `save_daily_plan` is capped at 50 writes per USER per UTC day across every goal, and the
@@ -562,6 +577,14 @@ interface LearningState {
   createGoal: (input: CreateGoalInput) => Promise<string | null>
   updateGoal: (input: UpdateGoalInput) => Promise<boolean>
   archiveGoal: (goalId: string) => Promise<boolean>
+  /**
+   * Permanently remove a goal, its deck links and every plan it produced.
+   *
+   * Distinct from `archiveGoal`, which is a status flip that keeps all of it. The answer
+   * attempts survive with `goal_id` NULL — they are the record of study that genuinely
+   * happened, and the card's SRS state rests on them.
+   */
+  deleteGoal: (goalId: string) => Promise<boolean>
   setGoalDecks: (goalId: string, decks: GoalDeckLink[]) => Promise<boolean>
 
   fetchPlan: (goalId: string, planDate: string) => Promise<void>
@@ -584,6 +607,15 @@ interface LearningState {
    * impossible before — a learner who had done half the plan would have lost the half.
    */
   extendPlan: (goal: LearningGoalWithDecks, ctx: PlanContext) => Promise<boolean>
+  /**
+   * What a future day will look like. Reads only — nothing is saved.
+   *
+   * Every destructive and quota cost of planning lives in `save_daily_plan`, so running the
+   * planner and discarding the result is free. Callers must present it as an estimate: it
+   * assumes nothing is studied between now and then, which is the one thing that will not
+   * be true.
+   */
+  forecastPlan: (goal: LearningGoalWithDecks, ctx: PlanContext) => Promise<void>
   recordAttempt: (input: AttemptInput, planDate: string) => Promise<boolean>
   fetchAttempts: (goalId: string) => Promise<void>
   requestEnrichment: (input: {
@@ -699,6 +731,21 @@ const EXTRA_BLOCK_MINUTES = 10
 
 /** Nothing to exclude — `generatePlan` builds the whole day from scratch. */
 const EMPTY_EXCLUSIONS: ReadonlySet<string> = new Set()
+
+/**
+ * The shape of a day the learner has not reached yet.
+ *
+ * Counts and minutes only, deliberately — not the card list. The identities a forecast would
+ * name are the least reliable part of it: which cards come due on day N depends on how day N-1
+ * actually went, and presenting a list would invite the learner to read it as a commitment.
+ */
+export interface PlanForecast {
+  planDate: string
+  totalItems: number
+  estimatedMinutes: number
+  newCards: number
+  reviewCards: number
+}
 
 /** What {@link collectPlanInputs} produces, or why it could not. */
 type PlanInputs =
@@ -924,6 +971,8 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   autoPlanAttempted: {},
   planExtending: false,
   planExtension: null,
+  planForecast: {},
+  planForecastLoading: null,
   planBlockedReason: null,
   recordingItemId: null,
   attempts: [],
@@ -1047,6 +1096,27 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     try {
       const { error } = await supabase.rpc('archive_learning_goal', { p_goal_id: goalId })
       if (error) throw error
+      await get().fetchGoals()
+      return true
+    } catch (e) {
+      set({ goalsError: toLearningError(e) })
+      return false
+    }
+  },
+
+  deleteGoal: async (goalId) => {
+    set({ goalsError: null })
+    try {
+      const { error } = await supabase.rpc('delete_learning_goal', { p_goal_id: goalId })
+      if (error) throw error
+      // Clear anything that described the goal that no longer exists. `fetchGoals` alone would
+      // leave the plan, its items and its forecast painted on screen, and a rating from that
+      // stale surface would target a plan item the cascade has already removed.
+      set({
+        plan: null, planItems: [], planCards: {}, planAbsentFor: null,
+        planForecast: {}, planForecastLoading: null,
+        attempts: get().attempts.filter((attempt) => attempt.goal_id !== goalId),
+      })
       await get().fetchGoals()
       return true
     } catch (e) {
@@ -1257,6 +1327,73 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       return false
     } finally {
       set({ planGenerating: false })
+    }
+  },
+
+  forecastPlan: async (goal, ctx) => {
+    if (get().planForecastLoading === ctx.planDate) return
+    if (ctx.planDate in get().planForecast) return
+    set({ planForecastLoading: ctx.planDate })
+    try {
+      const { data: userData } = await supabase.auth.getUser()
+      const userId = userData?.user?.id
+      if (!userId) return
+
+      // The SAME pipeline `generatePlan` runs, with `now` moved to the future instant. Every
+      // due cutoff in `collectPlanInputs` reads `ctx.now`, so this is genuinely "what would be
+      // due then" rather than today's list relabelled. What it CANNOT know is what gets studied
+      // between now and then — hence a forecast, and hence no write.
+      const inputs = await collectPlanInputs(goal, ctx, userId, EMPTY_EXCLUSIONS)
+      if (inputs.blocked) {
+        set({ planForecast: { ...get().planForecast, [ctx.planDate]: null } })
+        return
+      }
+      const output = buildDailyPlan({
+        goal: toDomainGoal(goal, userId),
+        candidates: inputs.candidates,
+        budgetMinutes: goal.daily_minutes,
+        newCardsPerDay: parseNewCardsPerDay(goal.settings),
+        activityMix: activityMixForDomain(goal.domain_id),
+        now: ctx.now,
+        timezone: ctx.timezone,
+        algorithmVersion: DAILY_PLANNER_VERSION,
+      }, {
+        supportedActivityTypes: supportedActivityTypesForDomain(goal.domain_id),
+      })
+
+      if (output.items.length === 0) {
+        set({ planForecast: { ...get().planForecast, [ctx.planDate]: null } })
+        return
+      }
+
+      // `isNew` comes off the candidate the planner picked, not off the card row: on a
+      // subscribed deck the card carries the PUBLISHER's SRS state, and counting from it is
+      // the defect #389 fixed.
+      const byId = new Map(inputs.candidates.map((candidate) => [candidate.candidateId, candidate]))
+      let newCards = 0
+      for (const item of output.items) {
+        if (byId.get(item.candidateId)?.isNew) newCards += 1
+      }
+
+      set({
+        planForecast: {
+          ...get().planForecast,
+          [ctx.planDate]: {
+            planDate: ctx.planDate,
+            totalItems: output.items.length,
+            estimatedMinutes: output.totalMinutes,
+            newCards,
+            reviewCards: output.items.length - newCards,
+          },
+        },
+      })
+    } catch (e) {
+      // A forecast that cannot be computed says nothing rather than raising: it is a preview of
+      // a day that has not happened, and failing it must not take the plan screen down with it.
+      console.error('[learning-store] forecastPlan failed:', e)
+      set({ planForecast: { ...get().planForecast, [ctx.planDate]: null } })
+    } finally {
+      set({ planForecastLoading: null })
     }
   },
 
@@ -1771,6 +1908,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       // `autoPlanAttempted` would refuse to build one for the account that signed in.
       planAbsentFor: null, autoPlanAttempted: {},
       planExtending: false, planExtension: null,
+      planForecast: {}, planForecastLoading: null,
       recordingItemId: null, attempts: [], attemptsLoading: false,
       enrichment: null, enrichmentPendingCardId: null, enrichmentError: null,
       enrichmentSaving: false, enrichmentQuote: null,

@@ -7,6 +7,9 @@ interface NoCardsDueProps {
   crammingFilter?: CrammingFilter
   onBackToDeck: () => void
   onOtherMode: () => void
+  /** A plan session did not come from a deck; see StudySummary for the same override. */
+  backLabel?: string
+  otherModeLabel?: string | null
 }
 
 function getContent(mode: StudyMode, crammingFilter?: CrammingFilter) {
@@ -22,7 +25,9 @@ function getContent(mode: StudyMode, crammingFilter?: CrammingFilter) {
   return { emoji: '\uD83D\uDCDA', titleKey: 'noCards.generic.title', messageKey: 'noCards.generic.message' }
 }
 
-export function NoCardsDue({ mode, crammingFilter, onBackToDeck, onOtherMode }: NoCardsDueProps) {
+export function NoCardsDue({
+  mode, crammingFilter, onBackToDeck, onOtherMode, backLabel, otherModeLabel,
+}: NoCardsDueProps) {
   const { t } = useTranslation('study')
   const { emoji, titleKey, messageKey } = getContent(mode, crammingFilter)
 
@@ -36,16 +41,24 @@ export function NoCardsDue({ mode, crammingFilter, onBackToDeck, onOtherMode }: 
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <button
             onClick={onBackToDeck}
-            className="flex-1 px-4 py-3 bg-card border border-border text-foreground hover:bg-muted rounded-xl font-medium transition cursor-pointer text-sm sm:text-base"
+            className={`flex-1 px-4 py-3 rounded-xl font-medium transition cursor-pointer text-sm sm:text-base ${
+              otherModeLabel === null
+                ? 'bg-brand hover:bg-brand-hover text-white'
+                : 'bg-card border border-border text-foreground hover:bg-muted'
+            }`}
           >
-            {t('summary.backToDeck')}
+            {backLabel ?? t('summary.backToDeck')}
           </button>
-          <button
-            onClick={onOtherMode}
-            className="flex-1 px-4 py-3 bg-brand hover:bg-brand-hover text-white rounded-xl font-medium transition cursor-pointer text-sm sm:text-base"
-          >
-            {t('noCards.otherMode')}
-          </button>
+          {/* "다른 모드로" has nothing to offer a plan session: the plan chose the mode, and
+              the button went back to the plan anyway. */}
+          {otherModeLabel !== null && (
+            <button
+              onClick={onOtherMode}
+              className="flex-1 px-4 py-3 bg-brand hover:bg-brand-hover text-white rounded-xl font-medium transition cursor-pointer text-sm sm:text-base"
+            >
+              {otherModeLabel ?? t('noCards.otherMode')}
+            </button>
+          )}
         </div>
       </div>
     </div>
