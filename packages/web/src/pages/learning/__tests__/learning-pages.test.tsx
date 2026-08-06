@@ -69,6 +69,12 @@ const baseState = (over: StoreState = {}): StoreState => ({
   createGoal: vi.fn(),
   updateGoal: vi.fn(),
   archiveGoal: vi.fn(),
+  deleteGoal: vi.fn(),
+  // `null`, like the real store: "never asked", as distinct from "asked, and empty".
+  archivedGoals: null,
+  archivedGoalsLoading: false,
+  fetchArchivedGoals: vi.fn(),
+  restoreGoal: vi.fn(),
   setGoalDecks: vi.fn(),
   fetchPlan: vi.fn(),
   generatePlan: vi.fn(),
@@ -856,6 +862,83 @@ describe('LearningGoalsPage', () => {
     await userEvent.click(screen.getByRole('button', { name: 'goals.archive' }))
 
     expect(state.archiveGoal).not.toHaveBeenCalled()
+  })
+
+  // ── the archive drawer ────────────────────────────────────────────────────
+  //
+  // 보관 used to be a one-way trip: the status flip was real, but `fetchGoals` filtered the row
+  // out and nothing anywhere read it back, so the goal and every plan it produced sat in the
+  // database unreachable. `update_learning_goal` had allowed archived → active since mig 167 and
+  // no client had ever called it.
+  const archivedGoal = {
+    ...goal, id: 'goal-9', title: 'JLPT N3', status: 'archived',
+    decks: [{ deck_id: 'deck-3', importance: 0.5 }],
+  }
+
+  it('keeps the archive closed, and unread, until it is asked for', () => {
+    const state = renderGoals()
+
+    expect(screen.queryByTestId('learning-archive')).not.toBeInTheDocument()
+    expect(state.fetchArchivedGoals).not.toHaveBeenCalled()
+  })
+
+  it('reads the archive on the press that opens it', async () => {
+    const state = renderGoals()
+
+    await userEvent.click(screen.getByRole('button', { name: 'goals.archived.show' }))
+
+    expect(state.fetchArchivedGoals).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not re-read an archive it already holds', async () => {
+    // `null` is the only value that means "never asked" — `[]` is a real answer. Re-fetching on
+    // every open would spend a round trip to learn what the store already knows.
+    const state = renderGoals({ archivedGoals: [] })
+
+    await userEvent.click(screen.getByRole('button', { name: 'goals.archived.show' }))
+
+    expect(state.fetchArchivedGoals).not.toHaveBeenCalled()
+  })
+
+  it('lists an archived goal and reactivates it', async () => {
+    const state = renderGoals({ archivedGoals: [archivedGoal] })
+
+    await userEvent.click(screen.getByRole('button', { name: 'goals.archived.show' }))
+    expect(screen.getByText('JLPT N3')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'goals.archived.restore' }))
+    expect(state.restoreGoal).toHaveBeenCalledWith('goal-9')
+    // Nothing is destroyed and 보관 is right there to undo it, so no modal.
+    expect(mockConfirm).not.toHaveBeenCalled()
+  })
+
+  it('offers no way to open an archived plan', async () => {
+    // `save_daily_plan` rejects an archived goal, so a link into the plan screen would be a tap
+    // that can only produce an error. Reactivate first.
+    renderGoals({ archivedGoals: [archivedGoal] })
+
+    await userEvent.click(screen.getByRole('button', { name: 'goals.archived.show' }))
+
+    expect(screen.queryByRole('link', { name: 'JLPT N3' })).not.toBeInTheDocument()
+  })
+
+  it('still offers delete inside the archive', async () => {
+    // Otherwise the only way to be rid of an archived goal for good would be to reactivate it.
+    const state = renderGoals({ goals: [], archivedGoals: [archivedGoal] })
+
+    await userEvent.click(screen.getByRole('button', { name: 'goals.archived.show' }))
+    await userEvent.click(screen.getByRole('button', { name: 'goals.delete' }))
+
+    expect(mockConfirm).toHaveBeenCalled()
+    expect(state.deleteGoal).toHaveBeenCalledWith('goal-9')
+  })
+
+  it('says the archive is empty only after it has looked', async () => {
+    renderGoals({ archivedGoals: [] })
+
+    await userEvent.click(screen.getByRole('button', { name: 'goals.archived.show' }))
+
+    expect(screen.getByText('goals.archived.empty')).toBeInTheDocument()
   })
 
   it('shows an empty state instead of a bare list', () => {

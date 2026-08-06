@@ -115,7 +115,13 @@
     "deckCount_other": "{{count, number}} decks",
     "delete": "Delete",
     "deleteConfirmTitle": "Delete this plan?",
-    "deleteConfirmMessage": "\"{{title}}\" and every daily plan it made will be gone for good. Your study record and your cards stay — only the plan is removed. This cannot be undone."
+    "deleteConfirmMessage": "\"{{title}}\" and every daily plan it made will be gone for good. Your study record and your cards stay — only the plan is removed. This cannot be undone.",
+    "archived": {
+      "show": "Archived plans",
+      "hide": "Hide archived plans",
+      "empty": "Nothing archived yet.",
+      "restore": "Reactivate"
+    }
   },
   "form": {
     "createTitle": "New goal",

@@ -115,7 +115,13 @@
     "deckCount_other": "{{count, number}} bộ thẻ",
     "delete": "Xóa",
     "deleteConfirmTitle": "Xóa kế hoạch này?",
-    "deleteConfirmMessage": "\"{{title}}\" và mọi kế hoạch hằng ngày nó đã tạo sẽ mất vĩnh viễn. Lịch sử học và thẻ của bạn vẫn còn — chỉ kế hoạch bị xóa. Không thể hoàn tác."
+    "deleteConfirmMessage": "\"{{title}}\" và mọi kế hoạch hằng ngày nó đã tạo sẽ mất vĩnh viễn. Lịch sử học và thẻ của bạn vẫn còn — chỉ kế hoạch bị xóa. Không thể hoàn tác.",
+    "archived": {
+      "show": "Xem kho lưu trữ",
+      "hide": "Ẩn kho lưu trữ",
+      "empty": "Chưa có kế hoạch nào được lưu trữ.",
+      "restore": "Kích hoạt lại"
+    }
   },
   "form": {
     "createTitle": "Mục tiêu mới",

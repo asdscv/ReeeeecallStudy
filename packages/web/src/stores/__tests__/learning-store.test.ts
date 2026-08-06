@@ -1070,6 +1070,82 @@ describe('goal writes', () => {
   })
 })
 
+// ── the archive ────────────────────────────────────────────────────────────
+//
+// `archive_learning_goal` shipped without the half that reads the result back. The status flip
+// was real, but `fetchGoals` filtered the row out with `.neq('status','archived')` and no screen
+// anywhere listed one — so 보관 meant "hide forever" while the goal, its deck links and every
+// daily plan it produced stayed in the database, unreachable. `update_learning_goal` had allowed
+// `archived → active` since mig 167 and nothing had ever called it.
+describe('the archive', () => {
+  const archivedRow = { ...goalRow, id: 'goal-9', title: 'JLPT N3', status: 'archived' as const }
+
+  it('starts at null, which is not the same answer as an empty archive', () => {
+    // The drawer reads this to tell "not asked yet" from "asked, and there is nothing" — with
+    // `[]` it would claim the archive is empty before anything had looked.
+    expect(useLearningStore.getState().archivedGoals).toBeNull()
+  })
+
+  it('reads only archived goals, newest put-away first', async () => {
+    queue('learning_goals', { data: [archivedRow], error: null })
+    queue('learning_goal_decks', { data: [{ goal_id: 'goal-9', deck_id: 'deck-3', importance: 0.5 }], error: null })
+
+    await useLearningStore.getState().fetchArchivedGoals()
+
+    const archived = useLearningStore.getState().archivedGoals
+    expect(archived).toHaveLength(1)
+    // Hydrated with deck links like the working list, so a restored goal arrives with exactly
+    // the decks the archive showed.
+    expect(archived?.[0].decks).toEqual([{ deck_id: 'deck-3', importance: 0.5 }])
+  })
+
+  it('answers [] rather than null once it has looked and found nothing', async () => {
+    queue('learning_goals', { data: [], error: null })
+
+    await useLearningStore.getState().fetchArchivedGoals()
+
+    expect(useLearningStore.getState().archivedGoals).toEqual([])
+  })
+
+  it('restores through the transition the server already allowed', async () => {
+    mockRpc.mockResolvedValue({ data: null, error: null })
+    queue('learning_goals', { data: [goalRow], error: null })     // fetchGoals
+    queue('learning_goal_decks', { data: [], error: null })
+    queue('learning_goals', { data: [], error: null })            // fetchArchivedGoals
+
+    const ok = await useLearningStore.getState().restoreGoal('goal-9')
+
+    expect(ok).toBe(true)
+    expect(mockRpc).toHaveBeenCalledWith('update_learning_goal', {
+      p_goal_id: 'goal-9', p_status: 'active',
+    })
+  })
+
+  it('reports a refused restore instead of moving the row locally', async () => {
+    useLearningStore.setState({ archivedGoals: [{ ...archivedRow, decks: [] }] })
+    mockRpc.mockResolvedValue({
+      data: null, error: { code: 'P0007', message: 'Archived goals can only transition to active' },
+    })
+
+    const ok = await useLearningStore.getState().restoreGoal('goal-9')
+
+    expect(ok).toBe(false)
+    expect(useLearningStore.getState().archivedGoals).toHaveLength(1)
+  })
+
+  it('does not read the archive for someone who never opened it', async () => {
+    // `archivedGoals === null` means the drawer was never pulled. Refreshing it on every archive
+    // would spend a round trip filling a list nobody is looking at.
+    useLearningStore.setState({ archivedGoals: null })
+    mockRpc.mockResolvedValue({ data: null, error: null })
+    queue('learning_goals', { data: [], error: null })   // fetchGoals only
+
+    await useLearningStore.getState().archiveGoal('goal-1')
+
+    expect(useLearningStore.getState().archivedGoals).toBeNull()
+  })
+})
+
 // ── extendPlan ─────────────────────────────────────────────────────────────
 //
 // "더 하기". The operation that could not exist before mig 185: the only way to add work to a

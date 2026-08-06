@@ -123,7 +123,13 @@
     "title": "学習目標",
     "delete": "削除",
     "deleteConfirmTitle": "このプランを削除しますか？",
-    "deleteConfirmMessage": "「{{title}}」と、このプランが作成したすべての日次プランが完全に消えます。学習記録とカードは残り、プランだけが削除されます。元に戻せません。"
+    "deleteConfirmMessage": "「{{title}}」と、このプランが作成したすべての日次プランが完全に消えます。学習記録とカードは残り、プランだけが削除されます。元に戻せません。",
+    "archived": {
+      "show": "アーカイブを見る",
+      "hide": "アーカイブを閉じる",
+      "empty": "アーカイブしたプランはありません。",
+      "restore": "再開する"
+    }
   },
   "history": {
     "itemFallback": "{{type}} の試行",

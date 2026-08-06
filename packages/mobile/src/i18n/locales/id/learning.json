@@ -123,7 +123,13 @@
     "title": "Tujuan belajar",
     "delete": "Hapus",
     "deleteConfirmTitle": "Hapus rencana ini?",
-    "deleteConfirmMessage": "\"{{title}}\" dan semua rencana harian yang dibuatnya akan hilang selamanya. Riwayat belajar dan kartu Anda tetap ada — hanya rencananya yang dihapus. Tindakan ini tidak bisa dibatalkan."
+    "deleteConfirmMessage": "\"{{title}}\" dan semua rencana harian yang dibuatnya akan hilang selamanya. Riwayat belajar dan kartu Anda tetap ada — hanya rencananya yang dihapus. Tindakan ini tidak bisa dibatalkan.",
+    "archived": {
+      "show": "Lihat arsip",
+      "hide": "Sembunyikan arsip",
+      "empty": "Belum ada rencana yang diarsipkan.",
+      "restore": "Aktifkan lagi"
+    }
   },
   "history": {
     "itemFallback": "Percobaan {{type}}",

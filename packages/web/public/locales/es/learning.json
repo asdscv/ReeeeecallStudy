@@ -115,7 +115,13 @@
     "deckCount_other": "{{count, number}} mazos",
     "delete": "Eliminar",
     "deleteConfirmTitle": "¿Eliminar este plan?",
-    "deleteConfirmMessage": "«{{title}}» y todos los planes diarios que generó desaparecerán para siempre. Tu historial de estudio y tus tarjetas se quedan: solo se elimina el plan. Esto no se puede deshacer."
+    "deleteConfirmMessage": "«{{title}}» y todos los planes diarios que generó desaparecerán para siempre. Tu historial de estudio y tus tarjetas se quedan: solo se elimina el plan. Esto no se puede deshacer.",
+    "archived": {
+      "show": "Planes archivados",
+      "hide": "Ocultar archivados",
+      "empty": "Aún no hay nada archivado.",
+      "restore": "Reactivar"
+    }
   },
   "form": {
     "createTitle": "Nuevo objetivo",

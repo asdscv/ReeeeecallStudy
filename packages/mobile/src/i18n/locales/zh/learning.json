@@ -123,7 +123,13 @@
     "title": "学习目标",
     "delete": "删除",
     "deleteConfirmTitle": "要删除这个计划吗？",
-    "deleteConfirmMessage": "“{{title}}”以及它生成的所有每日计划将被永久删除。你的学习记录和卡片会保留，只删除计划。此操作无法撤销。"
+    "deleteConfirmMessage": "“{{title}}”以及它生成的所有每日计划将被永久删除。你的学习记录和卡片会保留，只删除计划。此操作无法撤销。",
+    "archived": {
+      "show": "查看归档",
+      "hide": "收起归档",
+      "empty": "还没有归档的计划。",
+      "restore": "重新启用"
+    }
   },
   "history": {
     "itemFallback": "{{type}} 作答",
