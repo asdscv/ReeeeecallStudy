@@ -43,7 +43,22 @@ const FAMILIES: Array<[string, readonly string[]]> = [
   ['gap', QUIZ_GAPS],
   ['level', QUIZ_LEVELS],
   ['aspect', QUIZ_ASPECTS],
+  // Rendered after answering, to explain why an option was wrong.
+  ['flaw', QUIZ_FLAWS],
 ]
+
+/**
+ * Difficulty bands are ROWS, not an enum — adding one is an INSERT. Their labels are still
+ * `t('difficulty.' || level)`, so a band shipped without translations would render a bare
+ * number. The seeded levels are 1..3; this asserts a label and a hint for each, and the same
+ * for any level added later, by reading the migration rather than hardcoding the list.
+ */
+const SEEDED_LEVELS = (() => {
+  const sql = readFileSync(join(ROOT, 'supabase/migrations/197_quiz_difficulty.sql'), 'utf-8')
+  const block = sql.match(/INSERT INTO public\.quiz_difficulty_levels[^;]*;/s)
+  if (!block) throw new Error('difficulty seed block not found in 197')
+  return [...block[0].matchAll(/\(\s*(\d+),\s*\d+,\s*\d+\s*\)/g)].map((m) => m[1])
+})()
 
 describe('every quiz grade label is translated', () => {
   for (const platform of PLATFORMS) {
@@ -72,6 +87,15 @@ describe('every quiz grade label is translated', () => {
         // already gone wrong — so a missing one is doubly unlikely to be noticed in testing.
         for (const code of QUIZ_ERROR_CODES) {
           if (typeof data.error?.[code] !== 'string') missing.push(`error.${code}`)
+        }
+        // The generic fallback is what makes a hundred bands possible without a hundred
+        // translations: an unnamed band renders "Level 7". Without it, inserting a band shows
+        // a learner a bare number in every language.
+        if (typeof data.difficulty?.generic !== 'string') missing.push('difficulty.generic')
+        // The seeded bands are the ones we chose to name; a new one may rely on the fallback.
+        for (const lvl of SEEDED_LEVELS) {
+          if (typeof data.difficulty?.[lvl] !== 'string') missing.push(`difficulty.${lvl}`)
+          if (typeof data.difficultyHint?.[lvl] !== 'string') missing.push(`difficultyHint.${lvl}`)
         }
 
         expect(missing, `${platform.name}/${locale}/quiz.json is missing computed-key strings`)

@@ -115,10 +115,26 @@ describe('buildQuizCardSource', () => {
 // ─── multiple choice generation ─────────────────────────────────────────────
 
 const mcq = (distractors: unknown, cardId = 'c1') => ({ items: [{ cardId, distractors }] })
+/**
+ * Three distractors that satisfy the DEFAULT band.
+ *
+ * `DEFAULT_DIFFICULTY` is the hardest one — all three near-misses — so the middle entry, which
+ * used to be `right_category_wrong_item` (a FAR flaw), now uses a near one. The band is
+ * enforced, not suggested, so a fixture that mixes near and far is a fixture for a different
+ * band and has to say so.
+ */
 const threeGood = [
   { text: 'water moving through a solid wall', flaw: 'adjacent_sense' },
-  { text: 'salt moving across a semipermeable membrane', flaw: 'right_category_wrong_item' },
+  { text: 'salt moving across a semipermeable membrane', flaw: 'plausible_form' },
   { text: 'a membrane moving across water', flaw: 'opposite' },
+]
+
+/** An EASY band: no near-misses at all, which is what makes a first-encounter quiz possible. */
+const EASY = { level: 1, nearRequired: 0, optionCount: 4, allowedFlaws: [] as const }
+const threeFar = [
+  { text: 'the boiling point of mercury', flaw: 'unrelated' },
+  { text: 'a kind of sedimentary rock', flaw: 'unrelated' },
+  { text: 'any movement of any substance', flaw: 'overgeneral' },
 ]
 
 describe('validateMultipleChoiceGeneration', () => {
@@ -163,7 +179,7 @@ describe('validateMultipleChoiceGeneration', () => {
     const ok = validateMultipleChoiceGeneration({
       items: [{ cardId: 'c1', distractors: [
         { text: 'sodium', flaw: 'partial' },
-        { text: 'calcium / magnesium', flaw: 'right_category_wrong_item' },
+        { text: 'calcium / magnesium', flaw: 'plausible_form' },
         { text: 'chloride / bicarbonate', flaw: 'adjacent_sense' },
       ] }],
     }, [multi], itemId)
@@ -664,5 +680,58 @@ describe('inline markup in a model-authored question', () => {
     // A whitelist of tag names, not `<[^>]*>`: a maths deck must keep its own text.
     expect(stripQuestionMarkup('Is x<y>z true?')).toBe('Is x<y>z true?')
     expect(stripQuestionMarkup('When is a < b?')).toBe('When is a < b?')
+  })
+})
+
+describe('difficulty bands', () => {
+  // The band is ENFORCED, not requested. A model told "make it easy" writes near-misses anyway,
+  // because easy is the shape it has least practice at.
+  it('accepts an all-far batch at the easy band and refuses it at the default', () => {
+    const easy = validateMultipleChoiceGeneration(mcq(threeFar), [card()], itemId, EASY)
+    expect(easy.items).toHaveLength(1)
+
+    const hard = validateMultipleChoiceGeneration(mcq(threeFar), [card()], itemId)
+    expect(hard.items).toEqual([])
+    expect(hard.dropped.map((d) => d.reason)).toContain('wrong_difficulty_mix')
+  })
+
+  it('refuses a near-miss slipped into an easy band', () => {
+    const sneaky = [...threeFar.slice(0, 2), { text: 'water crossing a membrane', flaw: 'adjacent_sense' }]
+    const out = validateMultipleChoiceGeneration(mcq(sneaky), [card()], itemId, EASY)
+
+    expect(out.items).toEqual([])
+    expect(out.dropped.map((d) => d.reason)).toContain('wrong_difficulty_mix')
+  })
+
+  it('builds as many options as the band asks for', () => {
+    // The option count is a band property (2..6), not a constant. A six-option question needs
+    // five distractors, and the correct answer still lands at a position the model cannot see.
+    const six = { level: 9, nearRequired: 5, optionCount: 6, allowedFlaws: [] as const }
+    const five = [
+      { text: 'water moving through an impermeable solid wall', flaw: 'adjacent_sense' },
+      { text: 'a semipermeable membrane moving across water', flaw: 'opposite' },
+      { text: 'water moving across a semipermeable membraine', flaw: 'plausible_form' },
+      { text: 'salt moving across a semipermeable barrier', flaw: 'opposite' },
+      { text: 'water moving through a mechanical sieve', flaw: 'adjacent_sense' },
+    ]
+    const out = validateMultipleChoiceGeneration(mcq(five), [card()], itemId, six)
+
+    expect(out.items).toHaveLength(1)
+    const item = out.items[0]
+    if (item.type !== 'multiple_choice') throw new Error('unreachable')
+    expect(item.options).toHaveLength(6)
+    expect(item.correctIndex).toBeGreaterThanOrEqual(0)
+    expect(item.correctIndex).toBeLessThan(6)
+    expect(item.options[item.correctIndex]).toBe(card().answerText)
+  })
+
+  it('honours a band that restricts which flaws may be used', () => {
+    const lookalikeOnly = {
+      level: 7, nearRequired: 3, optionCount: 4, allowedFlaws: ['plausible_form'] as const,
+    }
+    const out = validateMultipleChoiceGeneration(mcq(threeGood), [card()], itemId, lookalikeOnly)
+
+    expect(out.items).toEqual([])
+    expect(out.dropped.map((d) => d.reason)).toContain('wrong_difficulty_mix')
   })
 })

@@ -49,7 +49,8 @@
     "covered": "Jatah gratis menutup {{units, number}} unit",
     "retakeFree": "Mengerjakan ulang tidak dikenakan biaya.",
     "confirm": "Buat kuis",
-    "generating": "Menyusun soal…"
+    "generating": "Menyusun soal…",
+    "difficulty": "Tingkat kesulitan"
   },
   "run": {
     "loading": "Memuat…",
@@ -93,7 +94,9 @@
     "QUIZ_ITEM_GONE": "Soal ini sudah tidak ada.",
     "UNKNOWN": "Terjadi kesalahan. Silakan coba lagi.",
     "QUIZ_CARDS_TOO_SHORT": "Kartu-kartu ini terlalu pendek untuk soal esai — esai dinilai dari istilah yang diambil dari kartu itu sendiri. Coba jawaban singkat atau pilihan ganda untuk dek ini.",
-    "AI_PROVIDER_ERROR": "Layanan AI sedang sibuk. Anda tidak dikenakan biaya — coba lagi sebentar."
+    "AI_PROVIDER_ERROR": "Layanan AI sedang sibuk. Anda tidak dikenakan biaya — coba lagi sebentar.",
+    "AI_PROVIDER_DAILY_LIMIT": "Batas AI harian aplikasi ini sudah tercapai. Anda tidak dikenakan biaya — batas ini disetel ulang besok.",
+    "AI_PROVIDER_BUSY": "Layanan AI sedang sibuk. Anda tidak dikenakan biaya — coba lagi sebentar."
   },
   "verdict": {
     "equivalent": "Benar",
@@ -129,5 +132,26 @@
   "span": {
     "learner": "Dalam jawaban Anda",
     "reference": "Dalam kartu"
+  },
+  "difficulty": {
+    "1": "Mudah",
+    "2": "Sedang",
+    "3": "Sulit",
+    "label": "Tingkat kesulitan",
+    "generic": "Level {{level, number}}"
+  },
+  "difficultyHint": {
+    "1": "Pilihan salah datang dari bidang yang sama sekali lain — mengenali topiknya sudah cukup.",
+    "2": "Hanya satu dari tiga yang benar-benar menjebak; dua lainnya jauh.",
+    "3": "Setiap pilihan salah nyaris benar. Anda harus benar-benar tahu jawabannya."
+  },
+  "flaw": {
+    "opposite": "Kebalikannya",
+    "adjacent_sense": "Makna berdekatan",
+    "right_category_wrong_item": "Jenis benar, bukan yang ini",
+    "partial": "Hanya sebagian",
+    "overgeneral": "Terlalu luas",
+    "plausible_form": "Bentuknya mirip",
+    "unrelated": "Tidak berkaitan"
   }
 }

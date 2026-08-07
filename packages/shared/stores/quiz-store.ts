@@ -52,6 +52,16 @@ export interface QuizQuote {
 
 export interface QuizzableCount { total: number; eligible: number }
 
+/**
+ * A difficulty band, as the server lists them.
+ *
+ * Deliberately NOT an enum. The bands are rows in `quiz_difficulty_levels`, so adding or
+ * retuning one is an INSERT, and this client renders whatever it is given. `nearRequired` is
+ * how many of the three wrong options are near-misses — 0 is "recognise the subject area",
+ * 3 is "you must know the answer".
+ */
+export interface QuizDifficultyBand { level: number; near_required: number }
+
 export interface QuizSetRow {
   id: string
   deck_id: string
@@ -112,7 +122,8 @@ export const QUIZ_ERROR_CODES = [
   'AI_INSUFFICIENT_CREDITS', 'AI_PRICE_CHANGED', 'AI_REQUEST_TOO_LARGE',
   'QUIZ_NOT_ENOUGH_CARDS', 'AI_RATE_CAP', 'FORBIDDEN', 'AI_EMPTY_RESULT',
   'QUIZ_UNGRADEABLE', 'QUIZ_GRADE_REFUSED', 'QUIZ_ITEM_GONE',
-  'QUIZ_CARDS_TOO_SHORT', 'AI_PROVIDER_ERROR', 'UNKNOWN',
+  'QUIZ_CARDS_TOO_SHORT', 'AI_PROVIDER_ERROR', 'AI_PROVIDER_BUSY', 'AI_PROVIDER_DAILY_LIMIT',
+  'UNKNOWN',
 ] as const
 export type QuizErrorCode = typeof QUIZ_ERROR_CODES[number]
 
@@ -162,6 +173,7 @@ interface QuizState {
 
   fetchSets: () => Promise<void>
   countQuizzable: (deckId: string, scope?: QuizScopeKind, tags?: string[], cardIds?: string[]) => Promise<QuizzableCount>
+  difficultyLevels: () => Promise<QuizDifficultyBand[]>
   quote: (action: QuizAction, count: number) => Promise<QuizQuote>
   grantTrial: () => Promise<number>
 
@@ -174,6 +186,7 @@ interface QuizState {
     scope?: QuizScopeKind
     tags?: string[]
     cardIds?: string[]
+    difficulty?: number
     maxPriceMicro: number
   }) => Promise<string>
 
@@ -216,6 +229,12 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     return (data ?? { total: 0, eligible: 0 }) as QuizzableCount
   },
 
+  difficultyLevels: async () => {
+    const { data, error } = await supabase.rpc('get_quiz_difficulty_levels')
+    if (error) throw error
+    return (data ?? []) as QuizDifficultyBand[]
+  },
+
   quote: async (action, count) => {
     const { data, error } = await supabase.rpc('get_ai_quiz_quote', {
       p_action: action, p_count: count,
@@ -247,6 +266,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
         p_scope_kind: input.scope ?? 'deck',
         p_tags: input.tags ?? [],
         p_card_ids: input.cardIds ?? [],
+        p_difficulty: input.difficulty ?? 3,
       })
       if (createError) {
         throw new QuizError(createError.code === 'P0010' ? 'QUIZ_NOT_ENOUGH_CARDS'

@@ -49,7 +49,8 @@
     "covered": "{{units, number}} units covered by your free allowance",
     "retakeFree": "Taking it again costs nothing.",
     "confirm": "Create quiz",
-    "generating": "Writing questions…"
+    "generating": "Writing questions…",
+    "difficulty": "Difficulty"
   },
   "run": {
     "loading": "Loading…",
@@ -93,7 +94,9 @@
     "QUIZ_ITEM_GONE": "This question no longer exists.",
     "UNKNOWN": "Something went wrong. Please try again.",
     "QUIZ_CARDS_TOO_SHORT": "These cards are too short to build essay questions from — an essay is graded against terms taken from the card itself. Try short answer or multiple choice for this deck.",
-    "AI_PROVIDER_ERROR": "The AI service is busy right now. Nothing was charged — try again in a moment."
+    "AI_PROVIDER_ERROR": "The AI service is busy right now. Nothing was charged — try again in a moment.",
+    "AI_PROVIDER_DAILY_LIMIT": "The daily AI limit for this app has been reached. Nothing was charged — it resets tomorrow.",
+    "AI_PROVIDER_BUSY": "The AI service is busy. Nothing was charged — try again in a moment."
   },
   "verdict": {
     "equivalent": "Correct",
@@ -129,5 +132,26 @@
   "span": {
     "learner": "In your answer",
     "reference": "In the card"
+  },
+  "difficulty": {
+    "1": "Easy",
+    "2": "Medium",
+    "3": "Hard",
+    "label": "Difficulty",
+    "generic": "Level {{level, number}}"
+  },
+  "difficultyHint": {
+    "1": "The wrong options come from somewhere else entirely — recognising the subject is enough.",
+    "2": "One of the three is a real trap; the other two are not close.",
+    "3": "Every wrong option is a near-miss. You have to know the answer."
+  },
+  "flaw": {
+    "opposite": "The opposite",
+    "adjacent_sense": "A close neighbour",
+    "right_category_wrong_item": "Right kind, wrong one",
+    "partial": "Only part of it",
+    "overgeneral": "Too broad",
+    "plausible_form": "Looks similar",
+    "unrelated": "Unrelated"
   }
 }

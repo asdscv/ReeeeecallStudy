@@ -112,11 +112,26 @@ BEGIN
   EXCEPTION WHEN check_violation THEN NULL;
   END;
 
+  -- Three options is LEGAL since mig 198: the option count is a property of the difficulty
+  -- band (2..6), not a constant. What must still hold is that `correct_index` points INSIDE
+  -- the array — an index past the end would render a question with no correct answer.
+  INSERT INTO quiz_questions (set_id, owner_user_id, card_id, question_type, position, stem,
+                              options, correct_index, reference_answer, source_fingerprint)
+    VALUES (v_set, v_owner, v_card, 'mcq', 3, 'q', ARRAY['a','b','c'], 2, 'answer', 'fp4');
+
   BEGIN
     INSERT INTO quiz_questions (set_id, owner_user_id, card_id, question_type, position, stem,
                                 options, correct_index, reference_answer, source_fingerprint)
-      VALUES (v_set, v_owner, v_card, 'mcq', 3, 'q', ARRAY['a','b','c'], 0, 'answer', 'fp4');
-    RAISE EXCEPTION 'FAIL: mcq accepted with 3 options';
+      VALUES (v_set, v_owner, v_card, 'mcq', 7, 'q', ARRAY['a','b','c'], 3, 'answer', 'fp8');
+    RAISE EXCEPTION 'FAIL: correct_index pointed past the end of the options';
+  EXCEPTION WHEN check_violation THEN NULL;
+  END;
+
+  BEGIN
+    INSERT INTO quiz_questions (set_id, owner_user_id, card_id, question_type, position, stem,
+                                options, correct_index, reference_answer, source_fingerprint)
+      VALUES (v_set, v_owner, v_card, 'mcq', 8, 'q', ARRAY['a','b','c','d','e','f','g'], 0, 'answer', 'fp9');
+    RAISE EXCEPTION 'FAIL: mcq accepted 7 options — past what a phone can show';
   EXCEPTION WHEN check_violation THEN NULL;
   END;
 
@@ -177,6 +192,23 @@ BEGIN
     INSERT INTO quiz_run_items (run_id, question_id, position, option_order)
       VALUES (v_run, v_q, 2, ARRAY[0,1,2,4]::smallint[]);
     RAISE EXCEPTION 'FAIL: option_order accepted an out-of-range index';
+  EXCEPTION WHEN check_violation THEN NULL;
+  END;
+
+  -- Any length from 2 to 6, since a band sets the option count — but still a PERMUTATION of
+  -- 0..n-1, which is what makes mapping a display position back to a canonical one total.
+  INSERT INTO quiz_run_items (run_id, question_id, position, option_order)
+    VALUES (v_run, v_q, 3, ARRAY[2,0,5,1,4,3]::smallint[]);
+  BEGIN
+    INSERT INTO quiz_run_items (run_id, question_id, position, option_order)
+      VALUES (v_run, v_q, 4, ARRAY[0,1,2,3,4,5,6]::smallint[]);
+    RAISE EXCEPTION 'FAIL: option_order accepted 7 entries';
+  EXCEPTION WHEN check_violation THEN NULL;
+  END;
+  BEGIN
+    INSERT INTO quiz_run_items (run_id, question_id, position, option_order)
+      VALUES (v_run, v_q, 5, ARRAY[1,2,3]::smallint[]);
+    RAISE EXCEPTION 'FAIL: option_order accepted a permutation not starting at 0';
   EXCEPTION WHEN check_violation THEN NULL;
   END;
 

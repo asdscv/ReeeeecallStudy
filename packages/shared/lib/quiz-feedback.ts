@@ -37,6 +37,9 @@ export type QuizAspect = typeof QUIZ_ASPECTS[number]
 export const QUIZ_FLAWS = [
   'opposite', 'adjacent_sense', 'right_category_wrong_item', 'partial', 'overgeneral',
   'plausible_form',
+  // Added with difficulty bands: an EASY item needs a wrong option that is not a near-miss
+  // at all, and every other flaw here is one.
+  'unrelated',
 ] as const
 export type QuizFlaw = typeof QUIZ_FLAWS[number]
 

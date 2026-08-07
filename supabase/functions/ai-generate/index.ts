@@ -33,7 +33,8 @@ import {
   buildQuizCardSource,
   validateMultipleChoiceGeneration, validateShortAnswerGeneration, validateEssayGeneration,
   gradeGate, validateShortAnswerGrade, validateEssayGrade,
-  type QuizCardSource, type QuizItem, type EssayCriterion,
+  DEFAULT_DIFFICULTY, isMcqDistractorFlaw,
+  type QuizCardSource, type QuizItem, type EssayCriterion, type QuizDifficulty,
 } from '../_shared/ai-quiz.ts'
 import {
   buildMcqGenerationPrompt, buildShortAnswerGenerationPrompt, buildEssayGenerationPrompt,
@@ -53,6 +54,9 @@ const MAX_FIELD_STR = 200                  // cap field key/name/hint length (L2
 const MAX_EXISTING_CARDS_BYTES = 8000      // cap dedup payload size (L2)
 const PROVIDER_RETRY_DELAYS = [2000, 8000] // ms; per-minute provider rate limits
 const PROVIDER_TIMEOUT_MS = 30000          // abort a hung provider call (L1)
+// A per-MINUTE limit clears inside this; a per-DAY one never will, and waiting the full hint
+// only burns the edge invocation before failing anyway.
+const PROVIDER_MAX_BACKOFF_MS = 12000
 const MAX_IMAGE_BYTES = 7_000_000          // ~5MB image as a base64 data URL (vision)
 const MAX_IMAGES = 8                        // cap images per generation (context + payload)
 
@@ -231,6 +235,31 @@ const sumUsage = (a: TokenUsage | null, b: TokenUsage | null): TokenUsage | null
     ? { prompt_tokens: a.prompt_tokens + b.prompt_tokens, completion_tokens: a.completion_tokens + b.completion_tokens }
     : null
 
+/**
+ * How long the provider asked us to wait, in ms, or null if it did not say.
+ *
+ * Two sources, in order of trust: the `Retry-After` header (seconds, or an HTTP date), then
+ * Gemini's own "Please retry in 24.546171743s" inside the error body. Reading the body is not
+ * elegant, but the alternative is guessing — and guessing is what made every 429 fatal.
+ */
+function retryAfterMs(res: Response, body: string): number | null {
+  const header = res.headers.get('retry-after')
+  if (header) {
+    const secs = Number(header)
+    if (Number.isFinite(secs) && secs >= 0) return Math.ceil(secs * 1000)
+    const at = Date.parse(header)
+    if (Number.isFinite(at)) return Math.max(0, at - Date.now())
+  }
+  const m = body.match(/retry in ([0-9.]+)s/i)
+  if (m) {
+    const secs = Number(m[1])
+    // +1s: the provider's window is measured from ITS clock, and landing exactly on the
+    // boundary is another 429 and another round trip.
+    if (Number.isFinite(secs) && secs >= 0) return Math.ceil(secs * 1000) + 1000
+  }
+  return null
+}
+
 async function providerRequest(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrls?: string[]): Promise<ProviderResult> {
   // Vision: the OpenAI-compatible shape carries the image(s) in the user message
   // as a content array — one text part plus one image_url part per image (the API
@@ -272,14 +301,44 @@ async function providerRequest(m: ResolvedModel, systemPrompt: string, userPromp
     }
 
     if (res.status === 401 || res.status === 403) throw new Error('PROVIDER_AUTH')
+    // A DAILY quota is not something a retry can outlast. Gemini names it in the violation
+    // (`GenerateRequestsPerDayPerProjectPerModel-FreeTier`), and its own "retry in 58s" hint is
+    // misleading there — waiting it out costs a minute of the caller's time and then fails.
+    // Free tier on gemini-2.5-flash-lite is 20 requests A DAY, so this is a real state, not a
+    // theoretical one, and the honest answer is to say so immediately.
+    const dailyExhausted = res.status === 429
+      && /PerDay|per day/i.test(await res.clone().text().catch(() => ''))
+    if (dailyExhausted) {
+      const body = await res.text().catch(() => '')
+      console.error(`[ai-generate] provider daily quota exhausted: ${body.slice(0, 200)}`)
+      throw new Error(`PROVIDER_LIMIT:${body.slice(0, 2000).replace(/\s+/g, ' ')}`)
+    }
     if ((res.status === 429 || res.status >= 500) && attempt < PROVIDER_RETRY_DELAYS.length) {
-      await sleep(PROVIDER_RETRY_DELAYS[attempt])
+      // Wait as long as the PROVIDER says to, not as long as we guessed.
+      //
+      // The free tier is 20 requests per minute and answers a 429 with "Please retry in
+      // 24.5s" plus a Retry-After header. Our fixed 2s and 8s are both spent before that
+      // window opens, so every retry is thrown at a closed door and the caller sees a hard
+      // failure ~10s in — for a limit that would have cleared in 25.
+      //
+      // Capped at PROVIDER_MAX_BACKOFF_MS so a provider asking for minutes cannot hold an
+      // edge invocation open past its own timeout.
+      const hinted = retryAfterMs(res, await res.clone().text().catch(() => ''))
+      await sleep(Math.min(hinted ?? PROVIDER_RETRY_DELAYS[attempt], PROVIDER_MAX_BACKOFF_MS))
       continue
     }
     if (!res.ok) {
       const errBody = await res.text().catch(() => '')
       console.error(`[ai-generate] provider ${res.status}: ${errBody.slice(0, 300)}`)
-      throw new Error('PROVIDER_ERROR')
+      // 429 after the retries are spent is a LIMIT, not a fault, and the two need different
+      // words: "the service is busy, try again" sends someone back in a minute, while a
+      // generic failure reads as "this feature is broken". The provider's own reason travels
+      // with it so an operator can tell a per-minute rate limit from a daily quota without
+      // reading edge logs — which the CLI cannot fetch.
+      if (res.status === 429) {
+        throw new Error(`PROVIDER_LIMIT:${errBody.slice(0, 2000).replace(/\s+/g, ' ')}`)
+      }
+      throw new Error(`PROVIDER_FAIL:${res.status} ${errBody.slice(0, 300).replace(/\s+/g, ' ')}`)
     }
 
     const data = await res.json() as Record<string, any>
@@ -654,14 +713,15 @@ Deno.serve(async (req) => {
       // same eligibility rule that counted them for the quote. Re-selecting here would be a
       // fourth copy of that rule and could disagree with the number the learner approved.
       const setResult = await service.from('quiz_sets')
-        .select('id, owner_user_id, deck_id, question_type, scope_kind, scope_tags, scope_card_ids, requested_count, content_locale')
+        .select('id, owner_user_id, deck_id, question_type, scope_kind, scope_tags, scope_card_ids, requested_count, content_locale, difficulty')
         .eq('id', setId).eq('owner_user_id', userId).maybeSingle()
       if (setResult.error || !setResult.data) {
         return json({ error: 'Quiz set not accessible', code: 'FORBIDDEN' }, 403, cors)
       }
       const quizSet = setResult.data as {
         deck_id: string; question_type: string; scope_kind: string
-        scope_tags: string[]; scope_card_ids: string[]; requested_count: number; content_locale: string
+        scope_tags: string[]; scope_card_ids: string[]; requested_count: number
+        content_locale: string; difficulty: number
       }
       if (quizSet.question_type !== qType) {
         return json({ error: 'Question type does not match the set', code: 'BAD_REQUEST' }, 400, cors)
@@ -733,14 +793,37 @@ Deno.serve(async (req) => {
         }
         if (sources.length === 0) throw new Error('QUIZ_NO_ELIGIBLE_CARDS')
 
-        const prompt = qType === 'mcq' ? buildMcqGenerationPrompt(sources)
+        // Resolved from the band the SET recorded, never from the request body: the learner
+        // picked it at creation time, and a later call must not be able to quietly change it.
+        let difficulty: QuizDifficulty = DEFAULT_DIFFICULTY
+        if (qType === 'mcq') {
+          const bandResult = await service.from('quiz_difficulty_levels')
+            .select('level, near_required, option_count, allowed_flaws')
+            .eq('level', quizSet.difficulty).maybeSingle()
+          const band = bandResult.data as {
+            level: number; near_required: number; option_count: number; allowed_flaws: string[]
+          } | null
+          if (band) {
+            difficulty = {
+              level: band.level,
+              nearRequired: band.near_required,
+              optionCount: band.option_count,
+              // Filtered against the contract rather than trusted: a name the validator does
+              // not know would restrict the band to nothing and drop every item, which reads
+              // as a model failure instead of a typo in a config row.
+              allowedFlaws: (band.allowed_flaws ?? []).filter(isMcqDistractorFlaw),
+            }
+          }
+        }
+
+        const prompt = qType === 'mcq' ? buildMcqGenerationPrompt(sources, difficulty)
           : qType === 'short' ? buildShortAnswerGenerationPrompt(sources)
           : buildEssayGenerationPrompt(sources)
         const generated = await generate(model, prompt.systemPrompt, prompt.userPrompt)
 
         const makeItemId = (cardId: string, index: number) => `${setId}:${cardId}:${index}`
         const outcome = qType === 'mcq'
-          ? validateMultipleChoiceGeneration(generated.json, sources, makeItemId)
+          ? validateMultipleChoiceGeneration(generated.json, sources, makeItemId, difficulty)
           : qType === 'short'
             ? validateShortAnswerGeneration(generated.json, sources, makeItemId)
             : validateEssayGeneration(generated.json, sources, makeItemId)
@@ -815,15 +898,26 @@ Deno.serve(async (req) => {
         const code = message === 'QUIZ_NO_ELIGIBLE_CARDS' ? 'QUIZ_NOT_ENOUGH_CARDS'
           : message.startsWith('QUIZ_CARDS_TOO_SHORT') ? 'QUIZ_CARDS_TOO_SHORT'
           : message.startsWith('QUIZ_UNSERVABLE') ? 'AI_EMPTY_RESULT'
+          : message.startsWith('PROVIDER_LIMIT')
+            ? (/PerDay|per day/i.test(message) ? 'AI_PROVIDER_DAILY_LIMIT' : 'AI_PROVIDER_BUSY')
+          : message.startsWith('PROVIDER_FAIL') ? 'AI_PROVIDER_ERROR'
           : message.startsWith('CONTEXT_LOAD') ? 'AI_CONTEXT_ERROR'
           : message.startsWith('PERSISTENCE:') ? 'AI_PERSISTENCE_ERROR'
           : 'AI_PROVIDER_ERROR'
         const status = code === 'QUIZ_NOT_ENOUGH_CARDS' || code === 'QUIZ_CARDS_TOO_SHORT'
           || code === 'AI_EMPTY_RESULT' ? 422
-          : code === 'AI_CONTEXT_ERROR' ? 400 : 502
+          : code === 'AI_CONTEXT_ERROR' ? 400
+          : code === 'AI_PROVIDER_BUSY' || code === 'AI_PROVIDER_DAILY_LIMIT' ? 429 : 502
         const marker = ['QUIZ_UNSERVABLE:', 'QUIZ_CARDS_TOO_SHORT:'].find((m) => message.startsWith(m))
         const dropped = marker ? JSON.parse(message.slice(marker.length)) : undefined
-        return json({ error: 'Quiz generation failed', code, dropped }, status, cors)
+        // Operator-facing, and safe: it is the provider's own words about OUR key, with no
+        // learner content in it. Without it, diagnosing a limit means reading edge logs the
+        // CLI cannot fetch.
+        const providerReason = message.startsWith('PROVIDER_LIMIT:')
+          ? message.slice('PROVIDER_LIMIT:'.length)
+          : message.startsWith('PROVIDER_FAIL:') ? message.slice('PROVIDER_FAIL:'.length)
+          : undefined
+        return json({ error: 'Quiz generation failed', code, dropped, providerReason }, status, cors)
       }
     }
 
