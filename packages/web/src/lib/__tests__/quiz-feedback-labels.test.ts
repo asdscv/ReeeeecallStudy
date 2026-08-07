@@ -27,6 +27,7 @@ import { fileURLToPath } from 'node:url'
 import {
   QUIZ_VERDICTS, QUIZ_GAPS, QUIZ_LEVELS, QUIZ_ASPECTS, QUIZ_FLAWS,
 } from '@reeeeecall/shared/lib/quiz-feedback'
+import { QUIZ_ERROR_CODES } from '@reeeeecall/shared/stores/quiz-store'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../../../..')
 const LOCALES = ['en', 'ko', 'ja', 'zh', 'vi', 'th', 'id', 'es'] as const
@@ -66,6 +67,11 @@ describe('every quiz grade label is translated', () => {
         if (typeof data.level?.unjudgeableNote !== 'string') missing.push('level.unjudgeableNote')
         for (const side of ['learner', 'reference']) {
           if (typeof data.span?.[side] !== 'string') missing.push(`span.${side}`)
+        }
+        // Same computed-key hazard, on the path a learner only reaches when something has
+        // already gone wrong — so a missing one is doubly unlikely to be noticed in testing.
+        for (const code of QUIZ_ERROR_CODES) {
+          if (typeof data.error?.[code] !== 'string') missing.push(`error.${code}`)
         }
 
         expect(missing, `${platform.name}/${locale}/quiz.json is missing computed-key strings`)

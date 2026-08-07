@@ -91,7 +91,9 @@
     "QUIZ_UNGRADEABLE": "This answer cannot be graded — it is empty, or too long.",
     "QUIZ_GRADE_REFUSED": "Grading did not work, and you were not charged. Try again.",
     "QUIZ_ITEM_GONE": "This question no longer exists.",
-    "UNKNOWN": "Something went wrong. Please try again."
+    "UNKNOWN": "Something went wrong. Please try again.",
+    "QUIZ_CARDS_TOO_SHORT": "These cards are too short to build essay questions from — an essay is graded against terms taken from the card itself. Try short answer or multiple choice for this deck.",
+    "AI_PROVIDER_ERROR": "The AI service is busy right now. Nothing was charged — try again in a moment."
   },
   "verdict": {
     "equivalent": "Correct",

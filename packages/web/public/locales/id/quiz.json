@@ -91,7 +91,9 @@
     "QUIZ_UNGRADEABLE": "Jawaban ini tidak bisa dinilai — kosong, atau terlalu panjang.",
     "QUIZ_GRADE_REFUSED": "Penilaian gagal dan Anda tidak dikenakan biaya. Coba lagi.",
     "QUIZ_ITEM_GONE": "Soal ini sudah tidak ada.",
-    "UNKNOWN": "Terjadi kesalahan. Silakan coba lagi."
+    "UNKNOWN": "Terjadi kesalahan. Silakan coba lagi.",
+    "QUIZ_CARDS_TOO_SHORT": "Kartu-kartu ini terlalu pendek untuk soal esai — esai dinilai dari istilah yang diambil dari kartu itu sendiri. Coba jawaban singkat atau pilihan ganda untuk dek ini.",
+    "AI_PROVIDER_ERROR": "Layanan AI sedang sibuk. Anda tidak dikenakan biaya — coba lagi sebentar."
   },
   "verdict": {
     "equivalent": "Benar",
