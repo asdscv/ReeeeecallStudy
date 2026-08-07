@@ -343,6 +343,44 @@ export function answerParts(answer: string): string[] {
   return [...new Set(parts.length > 0 ? parts : [normalizeAnswer(answer)])].filter((p) => p.length > 0)
 }
 
+/**
+ * Inline markup a model reaches for when it wants to emphasise a word.
+ *
+ * A real generation returned `When you <b>pledge</b> something, you ____.` The screens render a
+ * question as TEXT — React escapes it — so the learner sees the tags. That is the same failure
+ * as the AI feature that printed raw JSON at people, arriving by a narrower door.
+ *
+ * Stripped rather than rejected: the question is good, and discarding it would throw away an
+ * item the learner paid for over a formatting slip. A WHITELIST of tag names, not a general
+ * `<[^>]*>`, so a maths card asking about `x<y>z` keeps its text.
+ */
+const MARKUP_TAG = /<\/?(?:b|i|u|em|strong|br|p|span|div|code|mark|small|sub|sup)\b[^>]*>/gi
+
+/** A model-authored question with inline markup removed and whitespace collapsed. */
+export function stripQuestionMarkup(question: string): string {
+  return question.replace(MARKUP_TAG, '').replace(/\s+/g, ' ').trim()
+}
+
+/**
+ * Words that name OUR data rather than the learner's subject.
+ *
+ * A real generation produced "What is the prompt for '빌려주다'?" — the model copied the noun
+ * out of the instruction that described the angle. The instruction is fixed too, but a rule the
+ * model is asked to follow is not the same as one it cannot break, and this is the only
+ * model-authored string this feature renders.
+ *
+ * Deliberately short and English-only: these are the identifiers in our JSON, and a question in
+ * any language that contains one of them was written about the payload rather than the subject.
+ * A learner's own card could legitimately contain "card" (a deck about poker, say) — so this is
+ * matched on WORD BOUNDARIES and only in the question, never in an answer or a distractor.
+ */
+const SCHEMA_WORDS = /\b(prompt|cardId|otherFields|probeFieldKey|answer field|field_\d+)\b/i
+
+/** Whether a model-authored question is talking about our JSON instead of the learner's cards. */
+export function leaksSchemaWord(question: string): boolean {
+  return SCHEMA_WORDS.test(question)
+}
+
 export type ScriptClass =
   | 'han' | 'kana' | 'hangul' | 'thai' | 'cyrillic' | 'arabic' | 'devanagari' | 'latin' | 'unknown'
 
@@ -550,7 +588,8 @@ export function angleGrounding(
 export const QUIZ_DROP_REASONS = [
   'unknown_card', 'duplicate_card', 'bad_shape', 'bad_enum', 'question_too_long',
   'answer_leaked_in_question', 'anchor_missing', 'too_few_distractors', 'distractor_equals_answer',
-  'distractor_duplicated', 'distractor_contains_answer', 'flaw_repeated', 'partial_not_applicable',
+  'distractor_duplicated', 'distractor_contains_answer', 'partial_not_applicable',
+  'schema_word_leaked',
   'length_cue', 'script_mismatch', 'bad_weights', 'bad_criteria', 'ungrounded_mention',
 ] as const
 export type QuizDropReason = typeof QUIZ_DROP_REASONS[number]
@@ -595,8 +634,14 @@ function rawItems(raw: unknown): Record<string, unknown>[] {
  *   * containment either way → "a mammal" against "a mammal that lays eggs" leaves two defensible
  *     answers. Drop, EXCEPT for `partial`, whose entire definition is a proper part of a
  *     multi-part answer — and which is therefore only legal when the answer HAS parts.
- *   * a repeated flaw → three shades of one distractor, and the shape most likely to hide a
- *     correct answer among them. Drop the later one.
+ *
+ * A repeated FLAW LABEL is explicitly allowed. Requiring three different labels was tried and
+ * removed: on a real eight-word deck (lend / borrow / owe / repay / lease / rent …) it dropped
+ * every single item, because the three best distractors for a vocabulary card genuinely are
+ * three `adjacent_sense` neighbours. Worse, the rule did not prevent what it was aimed at — a
+ * model with three near-synonyms simply mislabels one of them to satisfy it, which produces a
+ * WRONG post-answer explanation. Substance is checked by the equality, duplication and
+ * containment tests above; the label is a rendering hint, not a distinctness guarantee.
  *   * a script the answer is not written in → the classic "English distractors against a 漢字
  *     answer", which a learner spots without reading them.
  *
@@ -625,7 +670,6 @@ export function validateMultipleChoiceGeneration(
     const parts = answerParts(card.answerText)
     const multiPart = parts.length > 1
     const seen = new Set<string>([answerNorm])
-    const flawsUsed = new Set<McqDistractorFlaw>()
     const texts: string[] = []
     const flaws: McqDistractorFlaw[] = []
 
@@ -636,7 +680,6 @@ export function validateMultipleChoiceGeneration(
       const flaw = d.flaw
       if (text === '' || text.length > MAX_DISTRACTOR_CHARS) { drop(cardId, 'bad_shape'); continue }
       if (!isMcqDistractorFlaw(flaw)) { drop(cardId, 'bad_enum'); continue }
-      if (flawsUsed.has(flaw)) { drop(cardId, 'flaw_repeated'); continue }
 
       const norm = normalizeAnswer(text)
       if (norm === '') { drop(cardId, 'bad_shape'); continue }
@@ -655,7 +698,6 @@ export function validateMultipleChoiceGeneration(
       if (!scriptCompatible(text, card.answerText)) { drop(cardId, 'script_mismatch'); continue }
 
       seen.add(norm)
-      flawsUsed.add(flaw)
       texts.push(text)
       flaws.push(flaw)
     }
@@ -722,9 +764,12 @@ export function validateShortAnswerGeneration(
     if (used.has(cardId)) { drop(cardId, 'duplicate_card'); continue }
     if (!isShortAnswerAngle(entry.angle)) { drop(cardId, 'bad_enum'); continue }
 
-    const question = typeof entry.question === 'string' ? entry.question.trim() : ''
+    const question = stripQuestionMarkup(
+      typeof entry.question === 'string' ? entry.question : '')
     if (question === '') { drop(cardId, 'bad_shape'); continue }
     if (question.length > MAX_QUESTION_CHARS) { drop(cardId, 'question_too_long'); continue }
+    // Written about our JSON rather than about the card. See `leaksSchemaWord`.
+    if (leaksSchemaWord(question)) { drop(cardId, 'schema_word_leaked'); continue }
 
     const probeFieldKey = typeof entry.probeFieldKey === 'string' ? entry.probeFieldKey : undefined
     const grounding = angleGrounding(entry.angle, card, probeFieldKey)
@@ -784,9 +829,12 @@ export function validateEssayGeneration(
     if (used.has(cardId)) { drop(cardId, 'duplicate_card'); continue }
     if (!isEssayLengthBand(entry.lengthBand)) { drop(cardId, 'bad_enum'); continue }
 
-    const question = typeof entry.question === 'string' ? entry.question.trim() : ''
+    const question = stripQuestionMarkup(
+      typeof entry.question === 'string' ? entry.question : '')
     if (question === '') { drop(cardId, 'bad_shape'); continue }
     if (question.length > MAX_QUESTION_CHARS) { drop(cardId, 'question_too_long'); continue }
+    // Written about our JSON rather than about the card. See `leaksSchemaWord`.
+    if (leaksSchemaWord(question)) { drop(cardId, 'schema_word_leaked'); continue }
     // An essay question may reword freely, but it must be about THIS card, and it must not hand
     // over the answer it is asking the learner to reconstruct.
     if (!containsNormalized(question, card.promptText)) { drop(cardId, 'anchor_missing'); continue }
