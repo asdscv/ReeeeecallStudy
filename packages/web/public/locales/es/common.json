@@ -16,7 +16,8 @@
     "leaderboard": "Leaderboard",
     "analytics": "Analytics",
     "publisher": "Estadísticas del editor",
-    "wallet": "Cartera"
+    "wallet": "Cartera",
+    "quiz": "Cuestionario"
   },
   "actions": {
     "save": "Guardar",

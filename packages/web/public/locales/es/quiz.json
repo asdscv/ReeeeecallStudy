@@ -1,0 +1,96 @@
+{
+  "type": {
+    "mcq": "Opción múltiple",
+    "short": "Respuesta corta",
+    "essay": "Ensayo"
+  },
+  "home": {
+    "title": "Cuestionario",
+    "subtitle": "Ponte a prueba con un mazo. Las preguntas salen de tus propias tarjetas.",
+    "create": "Nuevo cuestionario",
+    "take": "Empezar",
+    "starting": "Empezando…",
+    "retakeFree": "Repetir es gratis",
+    "questions_one": "{{count, number}} pregunta",
+    "questions_other": "{{count, number}} preguntas",
+    "trial": {
+      "title": "Tu crédito de prueba está listo",
+      "body_one": "{{count, number}} unidad de prueba: suficiente para una tanda entera.",
+      "body_other": "{{count, number}} unidades de prueba: suficiente para una tanda entera."
+    },
+    "empty": {
+      "title": "Aún no hay cuestionarios",
+      "body": "Créalo desde cualquier mazo; tarda unos segundos."
+    },
+    "pricingNote": "{{price}} por unidad. La opción múltiple siempre se corrige gratis."
+  },
+  "setup": {
+    "title": "Nuevo cuestionario",
+    "subtitle": "Elige un mazo y un tipo de pregunta. Verás el precio antes de gastar nada.",
+    "deck": "Mazo",
+    "deckPlaceholder": "Elige un mazo",
+    "untitled": "Cuestionario",
+    "type": "Tipo de pregunta",
+    "typeHint": {
+      "mcq": "Cuatro opciones, corregidas al instante y gratis.",
+      "short": "Responde con una palabra o una frase. Corrige la IA y se cobra por respuesta.",
+      "essay": "Escribe unas frases; se corrige con una rúbrica. Lo más exigente y lo más caro."
+    },
+    "count": "Preguntas",
+    "eligible": "{{eligible, number}} de {{total, number}} tarjetas sirven para preguntar",
+    "noEligible": {
+      "title": "Ninguna de estas {{total, number}} tarjetas sirve para preguntar",
+      "body": "El cuestionario necesita saber qué campo del reverso es la respuesta. Abre la plantilla del mazo y marca ese campo como principal."
+    },
+    "tooFewForMcq_one": "La opción múltiple saca los distractores de otras tarjetas, así que necesita al menos cuatro. Este mazo tiene {{count, number}}.",
+    "tooFewForMcq_other": "La opción múltiple saca los distractores de otras tarjetas, así que necesita al menos cuatro. Este mazo tiene {{count, number}}.",
+    "price": "Precio",
+    "free": "Gratis",
+    "covered": "Tu cuota gratuita cubre {{units, number}} unidades",
+    "retakeFree": "Repetirlo no cuesta nada.",
+    "confirm": "Crear cuestionario",
+    "generating": "Escribiendo preguntas…"
+  },
+  "run": {
+    "loading": "Cargando…",
+    "empty": "Las preguntas de esta tanda ya no existen: se borraron las tarjetas de las que salían.",
+    "backToQuiz": "Volver a cuestionarios",
+    "progress": "{{current, number}} / {{total, number}}",
+    "leave": "Salir",
+    "placeholder": {
+      "short": "Escribe tu respuesta",
+      "essay": "Redacta tu respuesta"
+    },
+    "submit": "Enviar",
+    "next": "Siguiente",
+    "finish": "Terminar",
+    "grading": "Corrigiendo…",
+    "gradeFor": "Corregir esta respuesta · {{price}}",
+    "scored": "{{score, number}}%",
+    "reference": "Respuesta: {{answer}}"
+  },
+  "result": {
+    "percent": "{{percent, number}}%",
+    "of": "{{raw, number}} de {{max, number}}",
+    "attempt_one": "Intento {{count, number}}",
+    "attempt_other": "Intento {{count, number}}",
+    "item": "Pregunta {{n, number}}",
+    "ungraded": "Sin corregir",
+    "markCorrect": "Yo tenía razón",
+    "markWrong": "Me equivoqué",
+    "retake": "Repetirlo"
+  },
+  "error": {
+    "AI_INSUFFICIENT_CREDITS": "No tienes saldo suficiente. Recarga para seguir.",
+    "AI_PRICE_CHANGED": "El precio cambió mientras decidías. Compruébalo e inténtalo de nuevo.",
+    "AI_REQUEST_TOO_LARGE": "Es más de lo que cabe en un cuestionario. Pide menos preguntas.",
+    "QUIZ_NOT_ENOUGH_CARDS": "Este mazo no tiene suficientes tarjetas que sirvan para preguntar.",
+    "AI_RATE_CAP": "Has llegado al límite de peticiones de hoy. Inténtalo mañana.",
+    "FORBIDDEN": "No tienes acceso a eso.",
+    "AI_EMPTY_RESULT": "Las preguntas no salieron utilizables, así que no se te cobró. Inténtalo otra vez.",
+    "QUIZ_UNGRADEABLE": "Esta respuesta no se puede corregir: está vacía o es demasiado larga.",
+    "QUIZ_GRADE_REFUSED": "La corrección falló y no se te cobró. Inténtalo otra vez.",
+    "QUIZ_ITEM_GONE": "Esta pregunta ya no existe.",
+    "UNKNOWN": "Algo salió mal. Inténtalo de nuevo."
+  }
+}

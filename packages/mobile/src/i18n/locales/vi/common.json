@@ -14,7 +14,8 @@
     "learningPlan": "Kế hoạch học",
     "achievements": "Thành tích",
     "publisherStats": "Thống kê nhà xuất bản",
-    "wallet": "Ví"
+    "wallet": "Ví",
+    "quiz": "Kiểm tra"
   },
   "actions": {
     "save": "Lưu",

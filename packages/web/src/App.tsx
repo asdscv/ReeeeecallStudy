@@ -21,6 +21,8 @@ import { StudySetupPage } from './pages/StudySetupPage'
 import { TemplateEditPage } from './pages/TemplateEditPage'
 import { QuickStudyPage } from './pages/QuickStudyPage'
 import { LearningTodayPage } from './pages/learning/LearningTodayPage'
+import { QuizHomePage } from './pages/quiz/QuizHomePage'
+import { QuizSetupPage } from './pages/quiz/QuizSetupPage'
 import { LearningGoalsPage } from './pages/learning/LearningGoalsPage'
 import { StudyHistoryPage } from './pages/StudyHistoryPage'
 import { SessionDetailPage } from './pages/SessionDetailPage'
@@ -47,6 +49,13 @@ import { GlobalConfirmDialog } from './components/common/GlobalConfirmDialog'
 /* ------------------------------------------------------------------ */
 
 // Study
+// Taking a quiz is a focus surface like the study session: lazy, and outside Layout.
+const QuizRunPage = lazy(() =>
+  import('./pages/quiz/QuizRunPage').then(m => ({ default: m.QuizRunPage }))
+)
+const QuizResultPage = lazy(() =>
+  import('./pages/quiz/QuizResultPage').then(m => ({ default: m.QuizResultPage }))
+)
 const StudySessionPage = lazy(() =>
   import('./pages/StudySessionPage').then(m => ({ default: m.StudySessionPage }))
 )
@@ -240,6 +249,19 @@ function App() {
               }
             />
 
+            {/* Taking a quiz — outside Layout for the same reason the study session is:
+                nothing on screen should compete with the question. */}
+            <Route
+              path="/quiz/:runId/run"
+              element={
+                <ProtectedRoute>
+                  <StudyErrorBoundary>
+                    <QuizRunPage />
+                  </StudyErrorBoundary>
+                </ProtectedRoute>
+              }
+            />
+
             {/* Study session (outside Layout for fullscreen focus) */}
             <Route
               path="/decks/:deckId/study"
@@ -268,6 +290,11 @@ function App() {
                   belongs inside the plan it describes. */}
               <Route path="/learning" element={<LearningGoalsPage />} />
               <Route path="/learning/:goalId" element={<LearningTodayPage />} />
+              {/* Quiz is its own menu, not a study mode: card study is six orderings of
+                  show-flip-self-rate, and quiz is a different act entirely. */}
+              <Route path="/quiz" element={<QuizHomePage />} />
+              <Route path="/quiz/new" element={<QuizSetupPage />} />
+              <Route path="/quiz/:runId/result" element={<QuizResultPage />} />
               <Route path="/history" element={<StudyHistoryPage />} />
               <Route path="/history/detail" element={<SessionDetailPage />} />
               <Route path="/ai-generate" element={<AIGeneratePage />} />
