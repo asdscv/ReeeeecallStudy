@@ -66,6 +66,9 @@ import { ListSkeleton } from '../../components/common/Skeleton'
  */
 
 
+/** Deck names printed before the count takes over. Three fits one line on a narrow phone. */
+const DECK_NAMES_SHOWN = 3
+
 /**
  * How the day went.
  *
@@ -390,6 +393,35 @@ export function LearningTodayPage() {
   const deckName = (deckId: string) =>
     decks.find((deck) => deck.id === deckId)?.name ?? t('today.item.untitled')
 
+  /**
+   * The goal's decks, named.
+   *
+   * Resolved against the deck store rather than stored on the goal: a renamed deck should read
+   * as its new name here, and a deck the learner can no longer see should simply not appear
+   * rather than render an id. `goal.decks` is the goal's own link table, so this is the set the
+   * PLANNER draws from — not merely the decks that happened to appear in today's plan, which
+   * would hide a deck that contributed nothing today.
+   */
+  const deckNames = useMemo(() => {
+    if (!goal) return []
+    return goal.decks
+      .map((link) => decks.find((deck) => deck.id === link.deck_id)?.name)
+      .filter((name): name is string => !!name)
+  }, [goal, decks])
+
+  /**
+   * At most three names, then a count. Dozens of decks is a real case and the alternative is a
+   * paragraph of deck names sitting above the number the learner opened the screen for.
+   */
+  const deckSummary = useMemo(() => {
+    if (deckNames.length === 0) return ''
+    if (deckNames.length <= DECK_NAMES_SHOWN) return deckNames.join(', ')
+    return t('today.deckListMore', {
+      names: deckNames.slice(0, DECK_NAMES_SHOWN).join(', '),
+      count: deckNames.length - DECK_NAMES_SHOWN,
+    })
+  }, [deckNames, t])
+
   const studyHref = (deckId: string) =>
     `/decks/${deckId}/study?mode=srs&goalId=${selectedGoalId}&planDate=${ctx.planDate}`
 
@@ -434,7 +466,16 @@ export function LearningTodayPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-4 p-4">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="truncate text-lg font-medium text-foreground">{goal?.title ?? t('today.title')}</h1>
+        <div className="min-w-0">
+          <h1 className="truncate text-lg font-medium text-foreground">{goal?.title ?? t('today.title')}</h1>
+          {/* Which decks this plan draws from. A goal can hold dozens, so the line names a few
+              and counts the rest rather than wrapping to four lines above the day's numbers. */}
+          {deckSummary && (
+            <p className="mt-0.5 truncate text-xs text-content-tertiary" title={deckNames.join(', ')}>
+              {deckSummary}
+            </p>
+          )}
+        </div>
         <Link to="/learning" className="shrink-0 text-xs text-brand hover:underline">
           {t('today.backToPlans')}
         </Link>

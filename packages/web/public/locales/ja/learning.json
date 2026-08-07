@@ -50,7 +50,10 @@
       "fresh": "新規 {{count, number}}枚",
       "fresh_one": "新規 {{count, number}}枚",
       "fresh_other": "新規 {{count, number}}枚"
-    }
+    },
+    "deckListMore": "{{names}} ほか{{count, number}}件",
+    "deckListMore_one": "{{names}} ほか{{count, number}}件",
+    "deckListMore_other": "{{names}} ほか{{count, number}}件"
   },
   "goals": {
     "title": "学習目標",

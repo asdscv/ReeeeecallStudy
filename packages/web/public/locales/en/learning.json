@@ -50,7 +50,10 @@
       "fresh": "{{count, number}} new",
       "fresh_one": "{{count, number}} new",
       "fresh_other": "{{count, number}} new"
-    }
+    },
+    "deckListMore": "{{names}} +{{count, number}} more",
+    "deckListMore_one": "{{names}} +{{count, number}} more",
+    "deckListMore_other": "{{names}} +{{count, number}} more"
   },
   "goals": {
     "title": "Learning goals",

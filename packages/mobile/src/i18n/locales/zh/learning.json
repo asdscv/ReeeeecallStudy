@@ -210,7 +210,10 @@
       "fresh": "新卡 {{count, number}} 张",
       "fresh_one": "新卡 {{count, number}} 张",
       "fresh_other": "新卡 {{count, number}} 张"
-    }
+    },
+    "deckListMore": "{{names}} 等 {{count, number}} 个",
+    "deckListMore_one": "{{names}} 等 {{count, number}} 个",
+    "deckListMore_other": "{{names}} 等 {{count, number}} 个"
   },
   "progress": {
     "title": "进度",

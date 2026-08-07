@@ -50,6 +50,9 @@ import type { SettingsStackParamList } from '../navigation/types'
  * And because a phone screen is usually resumed rather than opened, the plan date is kept
  * live instead of being frozen at mount — see `planDate` below.
  */
+/** Deck names printed before the count takes over. Three fits one line on a narrow phone. */
+const DECK_NAMES_SHOWN = 3
+
 const MIN_TOUCH = 44
 const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 } as const
 
@@ -250,6 +253,24 @@ export function LearningTodayScreen() {
       setStarting(false)
     }
   }, [startCardSession, navigation, t])
+
+  /**
+   * The goal's decks, named — resolved against the deck store so a rename shows through and a
+   * deck the learner can no longer see simply drops out. `goal.decks` is the goal's own link
+   * table, i.e. what the PLANNER draws from, not merely what appeared in today's plan.
+   */
+  const deckSummary = useMemo(() => {
+    if (!goal) return ''
+    const names = goal.decks
+      .map((link) => decks.find((deck) => deck.id === link.deck_id)?.name)
+      .filter((name): name is string => !!name)
+    if (names.length === 0) return ''
+    if (names.length <= DECK_NAMES_SHOWN) return names.join(', ')
+    return t('today.deckListMore', {
+      names: names.slice(0, DECK_NAMES_SHOWN).join(', '),
+      count: names.length - DECK_NAMES_SHOWN,
+    })
+  }, [goal, decks, t])
 
   const recapBands = [
     recap.known > 0 ? t('history.band.known', { count: recap.known }) : null,
@@ -479,6 +500,17 @@ export function LearningTodayScreen() {
             {goal && (
               <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
                 <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>{goal.title}</Text>
+                {/* Which decks this plan draws from. A goal can hold dozens, so three names
+                    and a count rather than a paragraph above the day's numbers. */}
+                {deckSummary !== '' && (
+                  <Text
+                    style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}
+                    numberOfLines={1}
+                    {...testProps('learning-deck-summary')}
+                  >
+                    {deckSummary}
+                  </Text>
+                )}
                 <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
                   {t('today.budget', { count: goal.daily_minutes })}
                   {plan ? ` · ${t('today.progress', { done: plan.completed_items, total: plan.total_items })}` : ''}

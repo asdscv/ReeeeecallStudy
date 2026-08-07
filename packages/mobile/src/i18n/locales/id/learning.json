@@ -210,7 +210,10 @@
       "fresh": "{{count, number}} baru",
       "fresh_one": "{{count, number}} baru",
       "fresh_other": "{{count, number}} baru"
-    }
+    },
+    "deckListMore": "{{names}} +{{count, number}} lainnya",
+    "deckListMore_one": "{{names}} +{{count, number}} lainnya",
+    "deckListMore_other": "{{names}} +{{count, number}} lainnya"
   },
   "progress": {
     "title": "Kemajuan",

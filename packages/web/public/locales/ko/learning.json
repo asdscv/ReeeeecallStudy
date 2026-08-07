@@ -50,7 +50,10 @@
       "fresh": "새 카드 {{count, number}}장",
       "fresh_one": "새 카드 {{count, number}}장",
       "fresh_other": "새 카드 {{count, number}}장"
-    }
+    },
+    "deckListMore": "{{names}} 외 {{count, number}}개",
+    "deckListMore_one": "{{names}} 외 {{count, number}}개",
+    "deckListMore_other": "{{names}} 외 {{count, number}}개"
   },
   "goals": {
     "title": "학습 목표",

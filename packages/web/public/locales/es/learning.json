@@ -50,7 +50,10 @@
       "fresh": "{{count, number}} nuevas",
       "fresh_one": "{{count, number}} nueva",
       "fresh_other": "{{count, number}} nuevas"
-    }
+    },
+    "deckListMore": "{{names}} +{{count, number}} más",
+    "deckListMore_one": "{{names}} +{{count, number}} más",
+    "deckListMore_other": "{{names}} +{{count, number}} más"
   },
   "goals": {
     "title": "Objetivos de aprendizaje",

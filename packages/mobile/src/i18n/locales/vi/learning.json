@@ -210,7 +210,10 @@
       "fresh": "{{count, number}} thẻ mới",
       "fresh_one": "{{count, number}} thẻ mới",
       "fresh_other": "{{count, number}} thẻ mới"
-    }
+    },
+    "deckListMore": "{{names}} và {{count, number}} bộ khác",
+    "deckListMore_one": "{{names}} và {{count, number}} bộ khác",
+    "deckListMore_other": "{{names}} và {{count, number}} bộ khác"
   },
   "progress": {
     "title": "Tiến độ",

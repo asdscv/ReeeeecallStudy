@@ -14,9 +14,12 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
 type StoreState = Record<string, unknown>
 
-const { storeState, mockConfirm } = vi.hoisted(() => ({
+const { storeState, mockConfirm, deckState } = vi.hoisted(() => ({
   storeState: { current: {} as StoreState },
   mockConfirm: vi.fn(),
+  // Mutable so a test can hand the screen more decks than it will name. The goal-deck summary
+  // resolves names through this store, so a fixed list could not exercise the "+N more" path.
+  deckState: { decks: [{ id: 'deck-1', name: 'Deck one' }] as Array<{ id: string; name: string }> },
 }))
 
 vi.mock('../../../stores/learning-store', () => ({
@@ -32,7 +35,7 @@ vi.mock('../../../stores/deck-store', () => ({
   // preview from `get_deck_stats`, and an omitted field here is a mock defect, not a
   // component contract to code defensively around.
   useDeckStore: () => ({
-    decks: [{ id: 'deck-1', name: 'Deck one' }],
+    decks: deckState.decks,
     stats: [{ deck_id: 'deck-1', deck_name: 'Deck one', total_cards: 40, new_cards: 30, review_cards: 8, learning_cards: 2, last_studied: null }],
     fetchDecks: vi.fn(), fetchStats: vi.fn(),
   }),
@@ -147,6 +150,7 @@ const renderGoals = (over: StoreState = {}) => {
 beforeEach(() => {
   vi.clearAllMocks()
   mockConfirm.mockResolvedValue(true)
+  deckState.decks = [{ id: 'deck-1', name: 'Deck one' }]
 })
 
 describe('LearningTodayPage', () => {
@@ -217,6 +221,43 @@ describe('LearningTodayPage', () => {
     renderToday({ planError: { code: 'LIMIT_EXCEEDED', message: 'limit' } })
 
     expect(screen.getByRole('alert')).toHaveTextContent('today.error.limitExceeded')
+  })
+
+  it('names the decks the plan draws from', () => {
+    // Asked for: "화면들어가면 어떤 덱 선택되어 있는지 표시". Read from `goal.decks` — the
+    // goal's own link table, i.e. what the PLANNER draws from — not from the decks that
+    // happen to appear in today's plan, which would hide one that contributed nothing today.
+    renderToday()
+
+    expect(screen.getByText('Deck one')).toBeInTheDocument()
+  })
+
+  it('counts the rest once there are too many to name', () => {
+    // "수십 개 선택할 수도 있으니까 적당히 잘 표시할 수 잇또록". Three names then a count,
+    // rather than a paragraph of deck names above the number the learner opened the screen for.
+    deckState.decks = Array.from({ length: 9 }, (_, i) => ({ id: `d${i}`, name: `Deck ${i}` }))
+    renderToday({
+      goals: [{
+        ...goal,
+        decks: deckState.decks.map((deck) => ({ deck_id: deck.id, importance: 0.5 })),
+      }],
+    })
+
+    expect(screen.getByText(/today\.deckListMore/)).toBeInTheDocument()
+  })
+
+  it('drops a deck it cannot name rather than printing an id', () => {
+    // A deck deleted or no longer visible. An id on screen is worse than a shorter list.
+    deckState.decks = [{ id: 'deck-1', name: 'Deck one' }]
+    renderToday({
+      goals: [{
+        ...goal,
+        decks: [{ deck_id: 'deck-1', importance: 0.5 }, { deck_id: 'GONE', importance: 0.5 }],
+      }],
+    })
+
+    expect(screen.getByText('Deck one')).toBeInTheDocument()
+    expect(screen.queryByText(/GONE/)).not.toBeInTheDocument()
   })
 
   it('sends the day into the real study session, carrying the plan with it', () => {

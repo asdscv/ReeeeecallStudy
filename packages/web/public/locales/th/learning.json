@@ -50,7 +50,10 @@
       "fresh": "ใหม่ {{count, number}} ใบ",
       "fresh_one": "ใหม่ {{count, number}} ใบ",
       "fresh_other": "ใหม่ {{count, number}} ใบ"
-    }
+    },
+    "deckListMore": "{{names}} และอีก {{count, number}} ชุด",
+    "deckListMore_one": "{{names}} และอีก {{count, number}} ชุด",
+    "deckListMore_other": "{{names}} และอีก {{count, number}} ชุด"
   },
   "goals": {
     "title": "เป้าหมายการเรียนรู้",
