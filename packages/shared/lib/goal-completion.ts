@@ -24,7 +24,15 @@
  */
 import { INTERVALS_DAYS } from '../learning/application/workload'
 
-/** An interval at or above this counts as retained. Fourth rung of INTERVALS_DAYS. */
+/**
+ * An interval at or above this counts as retained. Fourth rung of INTERVALS_DAYS.
+ *
+ * The SAME line the rest of the app already draws: `mature_card_count` (mig 183) uses
+ * `interval_days >= 21` inclusive, and the dashboard's `getMasteryRate` reads it. Migration 183
+ * exists because two surfaces once disagreed about what "mastered" meant — the older rule fired
+ * after a single correct answer — so this deliberately reuses the settled definition rather than
+ * introducing a third one. If 21 ever moves, it has to move in both places at once.
+ */
 export const MATURE_INTERVAL_DAYS = INTERVALS_DAYS[3] ?? 21
 
 /** Share of a goal's cards that must be mature. */
