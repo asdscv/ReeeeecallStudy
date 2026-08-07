@@ -92,5 +92,40 @@
     "QUIZ_GRADE_REFUSED": "Chấm bài không thành công và bạn không bị tính phí. Hãy thử lại.",
     "QUIZ_ITEM_GONE": "Câu hỏi này không còn nữa.",
     "UNKNOWN": "Đã xảy ra lỗi. Vui lòng thử lại."
+  },
+  "verdict": {
+    "equivalent": "Đúng",
+    "equivalent_with_error": "Đúng, có sơ suất nhỏ",
+    "partial": "Đúng một phần",
+    "different": "Không phải cái này",
+    "empty": "Không có gì để chấm",
+    "unjudgeable": "Không thể đánh giá"
+  },
+  "gap": {
+    "missing_part": "Thiếu một phần",
+    "extra_claim": "Nói nhiều hơn thẻ",
+    "wrong_direction": "Ngược chiều",
+    "too_vague": "Quá chung chung",
+    "spelling": "Chính tả",
+    "wrong_language": "Sai ngôn ngữ"
+  },
+  "level": {
+    "met": "Đạt",
+    "partial": "Một phần",
+    "not_met": "Chưa đạt",
+    "unjudgeable": "Chưa đánh giá",
+    "unjudgeableNote": "Một phần không đánh giá được nên không bị trừ điểm."
+  },
+  "aspect": {
+    "covers_answer": "Nêu được ý chính",
+    "uses_key_terms": "Dùng thuật ngữ chính",
+    "explains_why": "Giải thích lý do",
+    "gives_example": "Cho ví dụ",
+    "states_limits": "Nêu giới hạn",
+    "structure": "Bố cục"
+  },
+  "span": {
+    "learner": "Trong câu trả lời của bạn",
+    "reference": "Trong thẻ"
   }
 }

@@ -92,5 +92,40 @@
     "QUIZ_GRADE_REFUSED": "La corrección falló y no se te cobró. Inténtalo otra vez.",
     "QUIZ_ITEM_GONE": "Esta pregunta ya no existe.",
     "UNKNOWN": "Algo salió mal. Inténtalo de nuevo."
+  },
+  "verdict": {
+    "equivalent": "Correcto",
+    "equivalent_with_error": "Correcto, con un desliz",
+    "partial": "Parcialmente correcto",
+    "different": "No es esto",
+    "empty": "No hay nada que corregir",
+    "unjudgeable": "No se pudo juzgar"
+  },
+  "gap": {
+    "missing_part": "Falta una parte",
+    "extra_claim": "Dice más que la tarjeta",
+    "wrong_direction": "Al revés",
+    "too_vague": "Demasiado vago",
+    "spelling": "Ortografía",
+    "wrong_language": "Idioma equivocado"
+  },
+  "level": {
+    "met": "Cubierto",
+    "partial": "En parte",
+    "not_met": "Sin cubrir",
+    "unjudgeable": "Sin juzgar",
+    "unjudgeableNote": "Parte de esto no se pudo juzgar, así que no te ha penalizado."
+  },
+  "aspect": {
+    "covers_answer": "Cubre la respuesta",
+    "uses_key_terms": "Usa los términos clave",
+    "explains_why": "Explica el porqué",
+    "gives_example": "Da un ejemplo",
+    "states_limits": "Señala los límites",
+    "structure": "Estructura"
+  },
+  "span": {
+    "learner": "En tu respuesta",
+    "reference": "En la tarjeta"
   }
 }

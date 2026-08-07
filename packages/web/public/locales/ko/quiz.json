@@ -92,5 +92,40 @@
     "QUIZ_GRADE_REFUSED": "채점에 실패했고 요금은 청구되지 않았어요. 다시 시도해 주세요.",
     "QUIZ_ITEM_GONE": "이 문제는 더 이상 없어요.",
     "UNKNOWN": "문제가 생겼어요. 다시 시도해 주세요."
+  },
+  "verdict": {
+    "equivalent": "정답",
+    "equivalent_with_error": "정답, 사소한 실수",
+    "partial": "부분 정답",
+    "different": "이건 아니에요",
+    "empty": "채점할 내용이 없어요",
+    "unjudgeable": "판단할 수 없었어요"
+  },
+  "gap": {
+    "missing_part": "빠진 부분이 있어요",
+    "extra_claim": "카드에 없는 내용이에요",
+    "wrong_direction": "방향이 반대예요",
+    "too_vague": "너무 막연해요",
+    "spelling": "철자",
+    "wrong_language": "언어가 달라요"
+  },
+  "level": {
+    "met": "충족",
+    "partial": "일부",
+    "not_met": "미충족",
+    "unjudgeable": "판단 안 됨",
+    "unjudgeableNote": "일부는 판단할 수 없어서 점수에 불리하게 반영하지 않았어요."
+  },
+  "aspect": {
+    "covers_answer": "핵심을 담았는가",
+    "uses_key_terms": "핵심 용어를 썼는가",
+    "explains_why": "이유를 설명했는가",
+    "gives_example": "예를 들었는가",
+    "states_limits": "한계를 밝혔는가",
+    "structure": "구성"
+  },
+  "span": {
+    "learner": "내 답에서",
+    "reference": "카드에서"
   }
 }

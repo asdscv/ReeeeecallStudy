@@ -92,5 +92,40 @@
     "QUIZ_GRADE_REFUSED": "Penilaian gagal dan Anda tidak dikenakan biaya. Coba lagi.",
     "QUIZ_ITEM_GONE": "Soal ini sudah tidak ada.",
     "UNKNOWN": "Terjadi kesalahan. Silakan coba lagi."
+  },
+  "verdict": {
+    "equivalent": "Benar",
+    "equivalent_with_error": "Benar, ada kekeliruan kecil",
+    "partial": "Sebagian benar",
+    "different": "Bukan ini",
+    "empty": "Tidak ada yang bisa dinilai",
+    "unjudgeable": "Tidak bisa dinilai"
+  },
+  "gap": {
+    "missing_part": "Ada bagian yang hilang",
+    "extra_claim": "Melebihi isi kartu",
+    "wrong_direction": "Arahnya terbalik",
+    "too_vague": "Terlalu kabur",
+    "spelling": "Ejaan",
+    "wrong_language": "Bahasa keliru"
+  },
+  "level": {
+    "met": "Terpenuhi",
+    "partial": "Sebagian",
+    "not_met": "Belum terpenuhi",
+    "unjudgeable": "Tidak dinilai",
+    "unjudgeableNote": "Sebagian tidak bisa dinilai, jadi tidak mengurangi nilai Anda."
+  },
+  "aspect": {
+    "covers_answer": "Mencakup jawaban",
+    "uses_key_terms": "Memakai istilah kunci",
+    "explains_why": "Menjelaskan alasan",
+    "gives_example": "Memberi contoh",
+    "states_limits": "Menyebut batasan",
+    "structure": "Struktur"
+  },
+  "span": {
+    "learner": "Dalam jawaban Anda",
+    "reference": "Dalam kartu"
   }
 }

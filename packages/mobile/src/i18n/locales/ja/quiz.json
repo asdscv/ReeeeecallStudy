@@ -92,5 +92,40 @@
     "QUIZ_GRADE_REFUSED": "採点に失敗し、料金は発生していません。もう一度お試しください。",
     "QUIZ_ITEM_GONE": "この問題はもうありません。",
     "UNKNOWN": "問題が発生しました。もう一度お試しください。"
+  },
+  "verdict": {
+    "equivalent": "正解",
+    "equivalent_with_error": "正解、軽微な誤り",
+    "partial": "部分正解",
+    "different": "これではありません",
+    "empty": "採点する内容がありません",
+    "unjudgeable": "判断できませんでした"
+  },
+  "gap": {
+    "missing_part": "抜けている部分があります",
+    "extra_claim": "カードにない内容です",
+    "wrong_direction": "向きが逆です",
+    "too_vague": "漠然としています",
+    "spelling": "つづり",
+    "wrong_language": "言語が違います"
+  },
+  "level": {
+    "met": "満たしている",
+    "partial": "一部",
+    "not_met": "満たしていない",
+    "unjudgeable": "判断なし",
+    "unjudgeableNote": "一部は判断できなかったため、減点していません。"
+  },
+  "aspect": {
+    "covers_answer": "要点を押さえている",
+    "uses_key_terms": "重要語を使っている",
+    "explains_why": "理由を説明している",
+    "gives_example": "例を挙げている",
+    "states_limits": "限界に触れている",
+    "structure": "構成"
+  },
+  "span": {
+    "learner": "あなたの答えの中で",
+    "reference": "カードの中で"
   }
 }
