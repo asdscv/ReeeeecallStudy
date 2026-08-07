@@ -20,12 +20,14 @@ import {
   quizReferenceAnswer as sharedReference,
   quizPromptText as sharedPrompt,
   quizContextLines as sharedContext,
+  quizContextFields as sharedContextFields,
 } from '@reeeeecall/shared/lib/quiz-answer-field'
 import {
   resolveQuizCardFaces as edgeResolve,
   quizReferenceAnswer as edgeReference,
   quizPromptText as edgePrompt,
   quizContextLines as edgeContext,
+  quizContextFields as edgeContextFields,
 } from '../../../../../supabase/functions/_shared/quiz-answer-field.ts'
 
 const t = (key: string) => ({ key, name: key, type: 'text', order: 0 })
@@ -154,6 +156,7 @@ describe('shared and edge quiz resolvers agree', () => {
       expect(edgeReference(template as any, card)).toEqual(sharedReference(template as any, card))
       expect(edgePrompt(template as any, card)).toEqual(sharedPrompt(template as any, card))
       expect(edgeContext(template as any, card)).toEqual(sharedContext(template as any, card))
+      expect(edgeContextFields(template as any, card)).toEqual(sharedContextFields(template as any, card))
       /* eslint-enable @typescript-eslint/no-explicit-any */
     })
   }

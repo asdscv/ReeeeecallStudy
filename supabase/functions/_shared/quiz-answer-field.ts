@@ -21,7 +21,7 @@
 
 /** Structural shapes, declared locally so this file imports nothing. */
 export interface QuizLayoutItem { field_key: string; style: string }
-export interface QuizTemplateField { key: string; type: string }
+export interface QuizTemplateField { key: string; type: string; name?: string }
 export interface QuizAnswerTemplate {
   fields: QuizTemplateField[]
   front_layout: QuizLayoutItem[]
@@ -136,4 +136,23 @@ export function quizContextLines(
   const faces = resolveQuizCardFaces(template, card)
   if (!faces) return []
   return faces.contextKeys.map((key) => card.field_values[key].trim()).filter((v) => v !== '')
+}
+
+/**
+ * The context fields with the names their template gave them.
+ *
+ * `quizContextLines` returns values only, which is enough for a grader but not for a question:
+ * a `field_probe` built from an unnamed field asks "what is the context0 of lend?". The template
+ * already names every field, so the name travels with the value.
+ */
+export function quizContextFields(
+  template: QuizAnswerTemplate | null | undefined,
+  card: QuizAnswerCard,
+): Array<{ key: string; label: string; value: string }> {
+  const faces = resolveQuizCardFaces(template, card)
+  if (!faces || !template) return []
+  const nameByKey = new Map((template.fields ?? []).map((field) => [field.key, field.name]))
+  return faces.contextKeys
+    .map((key) => ({ key, label: nameByKey.get(key) ?? key, value: card.field_values[key].trim() }))
+    .filter((entry) => entry.value !== '')
 }
