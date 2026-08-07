@@ -170,6 +170,28 @@ export function WalletSummary() {
         <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 8 }]}>{t('free.note')}</Text>
       </View>
 
+      {/* Quiz allowance — a separate currency from the card numbers above: quiz is metered
+          in units, and the one-time trial is not a daily reset. Hidden entirely when quiz
+          free usage is off, so it never renders a row of zeroes at someone who cannot use it. */}
+      {(summary.quizFreeLimit > 0 || summary.quizTrialRemaining > 0) && (
+        <View style={{ paddingTop: 16, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={[styles.subTitle, { color: theme.colors.text }]}>{t('quiz.title')}</Text>
+            <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
+              {t('quiz.freeCount', { used: summary.quizFreeUsedToday, limit: summary.quizFreeLimit })}
+            </Text>
+          </View>
+          {summary.quizTrialRemaining > 0 && (
+            <Text style={[theme.typography.caption, { color: theme.colors.primary, marginTop: 4 }]}>
+              {t('quiz.trial', { count: summary.quizTrialRemaining })}
+            </Text>
+          )}
+          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 4 }]}>
+            {t('quiz.note')}
+          </Text>
+        </View>
+      )}
+
       {/* History — collapsed to the most recent HISTORY_PREVIEW entries with a
           show-all toggle, rather than paginated. Settings is one long ScrollView, so
           dumping all 30 ledger rows buried every section below it; and page-flipping

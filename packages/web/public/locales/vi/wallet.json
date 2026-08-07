@@ -27,5 +27,12 @@
     "spend_image": "Ảnh AI",
     "admin_adjustment": "Điều chỉnh"
   },
-  "cardPlanHint": "Các gói giới hạn thẻ được quản lý trong Lưu trữ thẻ."
+  "cardPlanHint": "Các gói giới hạn thẻ được quản lý trong Lưu trữ thẻ.",
+  "quiz": {
+    "title": "Hạn mức kiểm tra",
+    "freeCount": "Hôm nay {{used, number}} / {{limit, number}} đơn vị",
+    "trial_one": "Còn {{count, number}} đơn vị dùng thử",
+    "trial_other": "Còn {{count, number}} đơn vị dùng thử",
+    "note": "Trắc nghiệm chấm miễn phí. Chấm trả lời ngắn và tự luận dùng đơn vị."
+  }
 }

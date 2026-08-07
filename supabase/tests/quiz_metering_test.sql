@@ -40,6 +40,9 @@ DECLARE
   v_paid   integer;
   v_trial  integer;
   v_price  bigint;
+  v_refunded boolean;
+  v_done   integer;
+  v_key    text;
 BEGIN
   -- ── Fixtures ──────────────────────────────────────────────────────────────
   INSERT INTO card_templates (user_id, name, fields, front_layout, back_layout)
@@ -274,6 +277,64 @@ BEGIN
   IF v_free <> 7 OR v_paid <> 5 THEN
     RAISE EXCEPTION 'FAIL: release of a quiz job moved card counters to %/% — a silent free-quota leak',
       v_free, v_paid;
+  END IF;
+
+  -- ── 14) An abandoned hold does not shorten the wallet forever ────────────
+  -- pg_cron is not installed, so `sweep_ai_quiz_holds` would never run on its own.
+  -- Reserve settles the CALLER's own stale holds first — the only wallet a stale hold
+  -- can block is theirs. Without this the learner is permanently short by the
+  -- abandoned amount, with nothing on any screen to explain it.
+  PERFORM set_config('request.jwt.claim.role', 'authenticated', true);
+  UPDATE ai_pricing_settings SET free_quiz_units_per_day = 0, quiz_trial_units = 0 WHERE id = 1;
+  UPDATE ai_quiz_trial SET units_remaining = 0 WHERE user_id = v_uid;
+  INSERT INTO ai_credit_balance (user_id, balance) VALUES (v_uid, 100000)
+    ON CONFLICT (user_id) DO UPDATE SET balance = 100000;
+
+  -- 8 mcq = 16 units = $0.08 of a $0.10 balance. Held, never delivered.
+  r1 := public.reserve_ai_quiz('generate_mcq', 8, gen_random_uuid(), 999999, v_deck);
+  q := public.get_ai_quiz_quote('generate_mcq', 4);
+  IF (q->>'sufficient')::boolean IS NOT FALSE THEN
+    RAISE EXCEPTION 'FAIL: the hold should have made a second request unaffordable: %', q;
+  END IF;
+
+  -- Still fresh: not swept, and the balance is still blocked.
+  BEGIN
+    PERFORM public.reserve_ai_quiz('generate_mcq', 4, gen_random_uuid(), 999999, v_deck);
+    RAISE EXCEPTION 'FAIL: reserved past a live hold';
+  EXCEPTION WHEN sqlstate 'P0002' THEN NULL;
+  END;
+
+  -- Now abandon it.
+  UPDATE ai_generation_jobs SET created_at = now() - INTERVAL '31 minutes'
+   WHERE id = r1->>'job_ref';
+
+  r2 := public.reserve_ai_quiz('generate_mcq', 4, gen_random_uuid(), 999999, v_deck);
+  IF (r2->>'job_ref') IS NULL THEN
+    RAISE EXCEPTION 'FAIL: a stale hold still blocked the wallet';
+  END IF;
+  SELECT refunded, quiz_units_done INTO v_refunded, v_done
+    FROM ai_generation_jobs WHERE id = r1->>'job_ref';
+  IF v_refunded IS NOT TRUE OR v_done <> 0 THEN
+    RAISE EXCEPTION 'FAIL: stale hold was not settled at zero (refunded=%, done=%)', v_refunded, v_done;
+  END IF;
+  -- Settling at zero writes no ledger row: nothing was delivered, so nothing is owed.
+  SELECT count(*) INTO v_rows FROM ai_credit_ledger
+   WHERE user_id = v_uid AND ref = r1->>'job_ref';
+  IF v_rows <> 0 THEN RAISE EXCEPTION 'FAIL: sweeping a hold charged for it'; END IF;
+
+  -- ── 15) The wallet summary reports the quiz allowance ────────────────────
+  -- Without these keys the 60-unit trial exists only inside a quote on the setup
+  -- screen, where a learner who has not opened quiz can never find it.
+  q := public.get_ai_wallet_summary()::jsonb;
+  FOREACH v_key IN ARRAY ARRAY['quiz_unit_price_micro', 'quiz_free_limit',
+                               'quiz_free_used_today', 'quiz_free_remaining_today',
+                               'quiz_trial_remaining'] LOOP
+    IF NOT (q ? v_key) THEN
+      RAISE EXCEPTION 'FAIL: wallet summary is missing %', v_key;
+    END IF;
+  END LOOP;
+  IF (q->>'quiz_unit_price_micro')::bigint <> 5000 THEN
+    RAISE EXCEPTION 'FAIL: wallet reported unit price %', q->>'quiz_unit_price_micro';
   END IF;
 
   RAISE NOTICE 'quiz_metering_test: all assertions passed';
