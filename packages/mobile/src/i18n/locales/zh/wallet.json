@@ -38,5 +38,12 @@
   "consent": {
     "creditPack": "我同意点数将立即发放，且一旦使用任何点数，即失去本次购买的撤回权。",
     "policyLink": "退款政策"
+  },
+  "quiz": {
+    "title": "测验额度",
+    "freeCount": "今日 {{used, number}} / {{limit, number}} 个单位",
+    "trial_one": "试用剩余 {{count, number}} 个单位",
+    "trial_other": "试用剩余 {{count, number}} 个单位",
+    "note": "选择题批改免费。简答与论述批改会消耗单位。"
   }
 }

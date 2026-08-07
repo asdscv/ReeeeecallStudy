@@ -27,5 +27,12 @@
     "spend_image": "AI 图片",
     "admin_adjustment": "调整"
   },
-  "cardPlanHint": "卡片上限方案在“卡片存储”中管理。"
+  "cardPlanHint": "卡片上限方案在“卡片存储”中管理。",
+  "quiz": {
+    "title": "测验额度",
+    "freeCount": "今日 {{used, number}} / {{limit, number}} 个单位",
+    "trial_one": "试用剩余 {{count, number}} 个单位",
+    "trial_other": "试用剩余 {{count, number}} 个单位",
+    "note": "选择题批改免费。简答与论述批改会消耗单位。"
+  }
 }
