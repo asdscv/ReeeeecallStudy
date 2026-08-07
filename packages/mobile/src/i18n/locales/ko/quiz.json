@@ -1,0 +1,96 @@
+{
+  "type": {
+    "mcq": "객관식",
+    "short": "주관식",
+    "essay": "서술형"
+  },
+  "home": {
+    "title": "퀴즈",
+    "subtitle": "덱으로 실력을 확인해요. 문제는 내 카드에서 만들어져요.",
+    "create": "새 퀴즈",
+    "take": "풀기",
+    "starting": "시작하는 중…",
+    "retakeFree": "다시 풀기는 무료",
+    "questions_one": "{{count, number}}문항",
+    "questions_other": "{{count, number}}문항",
+    "trial": {
+      "title": "퀴즈 체험분이 준비됐어요",
+      "body_one": "체험용 {{count, number}}유닛 — 한 세트를 끝까지 풀기에 충분해요.",
+      "body_other": "체험용 {{count, number}}유닛 — 한 세트를 끝까지 풀기에 충분해요."
+    },
+    "empty": {
+      "title": "아직 만든 퀴즈가 없어요",
+      "body": "아무 덱에서나 몇 초면 만들 수 있어요."
+    },
+    "pricingNote": "유닛당 {{price}}. 객관식 채점은 언제나 무료예요."
+  },
+  "setup": {
+    "title": "새 퀴즈",
+    "subtitle": "덱과 문제 유형을 고르세요. 결제 전에 가격을 먼저 보여드려요.",
+    "deck": "덱",
+    "deckPlaceholder": "덱을 고르세요",
+    "untitled": "퀴즈",
+    "type": "문제 유형",
+    "typeHint": {
+      "mcq": "4지선다. 바로, 무료로 채점돼요.",
+      "short": "단어나 구절로 답해요. AI가 채점하고 답안마다 과금돼요.",
+      "essay": "몇 문장으로 답하고 루브릭으로 채점해요. 가장 어렵고 가장 비싸요."
+    },
+    "count": "문항 수",
+    "eligible": "카드 {{total, number}}장 중 {{eligible, number}}장을 퀴즈로 만들 수 있어요",
+    "noEligible": {
+      "title": "이 카드 {{total, number}}장은 퀴즈로 만들 수 없어요",
+      "body": "퀴즈는 카드 뒷면의 어느 필드가 정답인지 알아야 해요. 덱의 템플릿을 열어 그 필드를 대표 필드로 지정해 주세요."
+    },
+    "tooFewForMcq_one": "객관식은 다른 카드에서 오답 보기를 가져오기 때문에 최소 4장이 필요해요. 이 덱은 {{count, number}}장이에요.",
+    "tooFewForMcq_other": "객관식은 다른 카드에서 오답 보기를 가져오기 때문에 최소 4장이 필요해요. 이 덱은 {{count, number}}장이에요.",
+    "price": "가격",
+    "free": "무료",
+    "covered": "무료 제공분으로 {{units, number}}유닛이 처리돼요",
+    "retakeFree": "다시 풀 때는 비용이 들지 않아요.",
+    "confirm": "퀴즈 만들기",
+    "generating": "문제를 만드는 중…"
+  },
+  "run": {
+    "loading": "불러오는 중…",
+    "empty": "이 세트의 문제가 사라졌어요. 문제를 만든 카드가 삭제됐어요.",
+    "backToQuiz": "퀴즈 목록으로",
+    "progress": "{{current, number}} / {{total, number}}",
+    "leave": "나가기",
+    "placeholder": {
+      "short": "답을 입력하세요",
+      "essay": "답을 작성하세요"
+    },
+    "submit": "제출",
+    "next": "다음",
+    "finish": "마치기",
+    "grading": "채점하는 중…",
+    "gradeFor": "이 답안 채점 · {{price}}",
+    "scored": "{{score, number}}점",
+    "reference": "정답: {{answer}}"
+  },
+  "result": {
+    "percent": "{{percent, number}}%",
+    "of": "{{max, number}}문항 중 {{raw, number}}문항",
+    "attempt_one": "{{count, number}}번째 시도",
+    "attempt_other": "{{count, number}}번째 시도",
+    "item": "{{n, number}}번 문항",
+    "ungraded": "채점 안 됨",
+    "markCorrect": "내가 맞았어요",
+    "markWrong": "내가 틀렸어요",
+    "retake": "다시 풀기"
+  },
+  "error": {
+    "AI_INSUFFICIENT_CREDITS": "충전금이 부족해요. 충전하면 계속할 수 있어요.",
+    "AI_PRICE_CHANGED": "고르는 사이에 가격이 바뀌었어요. 확인하고 다시 시도해 주세요.",
+    "AI_REQUEST_TOO_LARGE": "한 퀴즈에 담기에는 너무 많아요. 문항 수를 줄여 주세요.",
+    "QUIZ_NOT_ENOUGH_CARDS": "이 덱에는 퀴즈로 만들 수 있는 카드가 부족해요.",
+    "AI_RATE_CAP": "오늘의 요청 한도에 도달했어요. 내일 다시 시도해 주세요.",
+    "FORBIDDEN": "접근 권한이 없어요.",
+    "AI_EMPTY_RESULT": "쓸 만한 문제가 나오지 않아서 요금은 청구되지 않았어요. 다시 시도해 주세요.",
+    "QUIZ_UNGRADEABLE": "이 답안은 채점할 수 없어요. 비어 있거나 너무 길어요.",
+    "QUIZ_GRADE_REFUSED": "채점에 실패했고 요금은 청구되지 않았어요. 다시 시도해 주세요.",
+    "QUIZ_ITEM_GONE": "이 문제는 더 이상 없어요.",
+    "UNKNOWN": "문제가 생겼어요. 다시 시도해 주세요."
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "type": {
+    "mcq": "Pilihan ganda",
+    "short": "Jawaban singkat",
+    "essay": "Esai"
+  },
+  "home": {
+    "title": "Kuis",
+    "subtitle": "Uji diri lewat satu dek. Soal dibuat dari kartu Anda sendiri.",
+    "create": "Kuis baru",
+    "take": "Kerjakan",
+    "starting": "Memulai…",
+    "retakeFree": "Mengulang gratis",
+    "questions_one": "{{count, number}} soal",
+    "questions_other": "{{count, number}} soal",
+    "trial": {
+      "title": "Kredit percobaan Anda siap",
+      "body_one": "{{count, number}} unit percobaan — cukup untuk satu set penuh.",
+      "body_other": "{{count, number}} unit percobaan — cukup untuk satu set penuh."
+    },
+    "empty": {
+      "title": "Belum ada kuis",
+      "body": "Buat dari dek mana pun, hanya perlu beberapa detik."
+    },
+    "pricingNote": "{{price}} per unit. Pilihan ganda selalu dinilai gratis."
+  },
+  "setup": {
+    "title": "Kuis baru",
+    "subtitle": "Pilih dek dan jenis soal. Harga selalu ditampilkan sebelum ada yang dipotong.",
+    "deck": "Dek",
+    "deckPlaceholder": "Pilih dek",
+    "untitled": "Kuis",
+    "type": "Jenis soal",
+    "typeHint": {
+      "mcq": "Empat pilihan, dinilai seketika dan gratis.",
+      "short": "Jawab dengan kata atau frasa. Dinilai AI, dikenakan biaya per jawaban.",
+      "essay": "Tulis beberapa kalimat, dinilai dengan rubrik. Paling menuntut dan paling mahal."
+    },
+    "count": "Jumlah soal",
+    "eligible": "{{eligible, number}} dari {{total, number}} kartu bisa dijadikan soal",
+    "noEligible": {
+      "title": "Tak satu pun dari {{total, number}} kartu ini bisa dijadikan soal",
+      "body": "Kuis perlu tahu bidang mana di balik kartu yang merupakan jawabannya. Buka templat dek dan tandai bidang itu sebagai bidang utama."
+    },
+    "tooFewForMcq_one": "Pilihan ganda mengambil pengecoh dari kartu lain, jadi perlu minimal 4. Dek ini punya {{count, number}}.",
+    "tooFewForMcq_other": "Pilihan ganda mengambil pengecoh dari kartu lain, jadi perlu minimal 4. Dek ini punya {{count, number}}.",
+    "price": "Harga",
+    "free": "Gratis",
+    "covered": "Jatah gratis menutup {{units, number}} unit",
+    "retakeFree": "Mengerjakan ulang tidak dikenakan biaya.",
+    "confirm": "Buat kuis",
+    "generating": "Menyusun soal…"
+  },
+  "run": {
+    "loading": "Memuat…",
+    "empty": "Soal dalam set ini sudah hilang — kartu asalnya telah dihapus.",
+    "backToQuiz": "Kembali ke kuis",
+    "progress": "{{current, number}} / {{total, number}}",
+    "leave": "Keluar",
+    "placeholder": {
+      "short": "Ketik jawaban Anda",
+      "essay": "Tulis jawaban Anda"
+    },
+    "submit": "Kirim",
+    "next": "Berikutnya",
+    "finish": "Selesai",
+    "grading": "Menilai…",
+    "gradeFor": "Nilai jawaban ini · {{price}}",
+    "scored": "Nilai {{score, number}}%",
+    "reference": "Jawaban: {{answer}}"
+  },
+  "result": {
+    "percent": "{{percent, number}}%",
+    "of": "{{raw, number}} dari {{max, number}}",
+    "attempt_one": "Percobaan {{count, number}}",
+    "attempt_other": "Percobaan {{count, number}}",
+    "item": "Soal {{n, number}}",
+    "ungraded": "Belum dinilai",
+    "markCorrect": "Saya benar",
+    "markWrong": "Saya salah",
+    "retake": "Kerjakan lagi"
+  },
+  "error": {
+    "AI_INSUFFICIENT_CREDITS": "Saldo tidak cukup. Isi ulang untuk melanjutkan.",
+    "AI_PRICE_CHANGED": "Harga berubah saat Anda memutuskan. Periksa lalu coba lagi.",
+    "AI_REQUEST_TOO_LARGE": "Melebihi kapasitas satu kuis. Kurangi jumlah soal.",
+    "QUIZ_NOT_ENOUGH_CARDS": "Dek ini tidak punya cukup kartu yang bisa dijadikan soal.",
+    "AI_RATE_CAP": "Anda mencapai batas permintaan hari ini. Coba lagi besok.",
+    "FORBIDDEN": "Anda tidak punya akses ke sana.",
+    "AI_EMPTY_RESULT": "Soal yang dihasilkan tidak layak pakai, jadi Anda tidak dikenakan biaya. Coba lagi.",
+    "QUIZ_UNGRADEABLE": "Jawaban ini tidak bisa dinilai — kosong, atau terlalu panjang.",
+    "QUIZ_GRADE_REFUSED": "Penilaian gagal dan Anda tidak dikenakan biaya. Coba lagi.",
+    "QUIZ_ITEM_GONE": "Soal ini sudah tidak ada.",
+    "UNKNOWN": "Terjadi kesalahan. Silakan coba lagi."
+  }
+}

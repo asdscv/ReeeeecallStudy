@@ -1,0 +1,230 @@
+import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useNavigate, useParams } from 'react-router-dom'
+import {
+  useQuizStore, QuizError, QUIZ_GRADE_ACTION,
+  type QuizRunItem, type QuizSubmitResult,
+} from '@reeeeecall/shared/stores/quiz-store'
+import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
+
+/**
+ * Taking the quiz. Outside the app Layout, like the study session, so nothing competes with
+ * the question.
+ *
+ * Multiple choice is graded the instant it is submitted, in SQL, for free. Short answer and
+ * essay cost money to grade, so they are quoted and confirmed per answer — which is also why
+ * they are not graded automatically on submit: spending is always a gesture.
+ */
+export function QuizRunPage() {
+  const { t } = useTranslation('quiz')
+  const { runId } = useParams<{ runId: string }>()
+  const navigate = useNavigate()
+  const { run, loading, loadRun, submit, gradeWithAi, quote, grading, finishRun } = useQuizStore()
+
+  const [index, setIndex] = useState(0)
+  const [choice, setChoice] = useState<number | null>(null)
+  const [text, setText] = useState('')
+  const [result, setResult] = useState<QuizSubmitResult | null>(null)
+  // Keyed by item for the same reason the deck counts are on the setup screen: clearing it
+  // synchronously inside the effect is a cascading render, and an unkeyed value would quote
+  // the previous question's price on this one — an essay costs four times a short answer.
+  const [gradePrice, setGradePrice] = useState<{ itemId: string; micro: number } | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [startedAt, setStartedAt] = useState(() => Date.now())
+
+  useEffect(() => { if (runId) void loadRun(runId) }, [runId, loadRun])
+
+  const items = useMemo(() => run?.items ?? [], [run])
+  const item: QuizRunItem | undefined = items[index]
+
+  // Re-quote per item: the price depends on the type, and an essay costs four times a short
+  // answer. Quoting once for the run would show the wrong number on most of it.
+  useEffect(() => {
+    if (!item || item.question_type === 'mcq' || item.answered) return
+    const itemId = item.item_id
+    let cancelled = false
+    void quote(QUIZ_GRADE_ACTION[item.question_type], 1)
+      .then((q) => { if (!cancelled) setGradePrice({ itemId, micro: q.price_micro }) })
+      .catch(() => { if (!cancelled) setGradePrice(null) })
+    return () => { cancelled = true }
+  }, [item, quote])
+
+  const shownPrice = item && gradePrice?.itemId === item.item_id ? gradePrice.micro : null
+
+  const goTo = (next: number) => {
+    setIndex(next); setChoice(null); setText(''); setResult(null); setError(null)
+    setStartedAt(Date.now())
+  }
+
+  const submitAnswer = async () => {
+    if (!item) return
+    setError(null)
+    try {
+      const payload = item.question_type === 'mcq'
+        ? { choice }
+        : { text: text.trim() }
+      const submitted = await submit(item.item_id, payload as Record<string, unknown>, Date.now() - startedAt)
+      setResult(submitted)
+      if (runId) await loadRun(runId)
+    } catch (e) {
+      setError(t(`error.${e instanceof QuizError ? e.code : 'UNKNOWN'}`))
+    }
+  }
+
+  const requestGrade = async () => {
+    if (!item || shownPrice === null) return
+    setError(null)
+    try {
+      await gradeWithAi(item.item_id, text.trim(), shownPrice)
+    } catch (e) {
+      setError(t(`error.${e instanceof QuizError ? e.code : 'UNKNOWN'}`))
+    }
+  }
+
+  const finish = async () => {
+    if (!runId) return
+    await finishRun(runId)
+    navigate(`/quiz/${runId}/result`)
+  }
+
+  if (loading && !run) {
+    return <div className="max-w-2xl mx-auto p-8 text-center text-sm text-content-tertiary">{t('run.loading')}</div>
+  }
+  if (!run || items.length === 0) {
+    // Every question in the set can be cascaded away by card deletion. An empty run is a
+    // real state with a real explanation, not a crash.
+    return (
+      <div className="max-w-2xl mx-auto p-8 text-center space-y-3">
+        <p className="text-sm text-muted-foreground">{t('run.empty')}</p>
+        <button
+          type="button"
+          onClick={() => navigate('/quiz')}
+          className="px-3 py-1.5 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer"
+        >
+          {t('run.backToQuiz')}
+        </button>
+      </div>
+    )
+  }
+  if (!item) return null
+
+  const answered = item.answered || result !== null
+  const isLast = index === items.length - 1
+
+  return (
+    <div className="max-w-2xl mx-auto p-4 space-y-4 min-h-screen">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-xs text-content-tertiary">
+          {t('run.progress', { current: index + 1, total: items.length })}
+        </span>
+        <button
+          type="button"
+          onClick={() => navigate('/quiz')}
+          className="text-xs text-content-tertiary hover:text-foreground cursor-pointer"
+        >
+          {t('run.leave')}
+        </button>
+      </div>
+
+      <div className="p-4 bg-card rounded-xl border border-border">
+        <p className="text-base text-foreground whitespace-pre-wrap">{item.stem}</p>
+      </div>
+
+      {item.question_type === 'mcq' && item.options && (
+        <ul className="space-y-2">
+          {item.options.map((option, optionIndex) => {
+            const isCorrect = answered && result?.correct_display_index === optionIndex
+            const isPicked = choice === optionIndex
+            return (
+              <li key={optionIndex}>
+                <button
+                  type="button"
+                  disabled={answered}
+                  onClick={() => setChoice(optionIndex)}
+                  className={`w-full text-left px-3 py-2 text-sm rounded-lg border cursor-pointer transition-colors disabled:cursor-default ${
+                    isCorrect ? 'bg-brand/10 border-brand text-foreground'
+                      : isPicked ? 'bg-accent border-brand/40 text-foreground'
+                      : 'bg-card border-border text-foreground hover:border-brand/40'
+                  }`}
+                >
+                  {option}
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+
+      {item.question_type !== 'mcq' && (
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          disabled={answered}
+          rows={item.question_type === 'essay' ? 8 : 3}
+          placeholder={t(`run.placeholder.${item.question_type}`)}
+          className="w-full px-3 py-2 text-sm bg-background border border-border rounded-lg text-foreground disabled:opacity-60"
+        />
+      )}
+
+      {answered && item.score !== null && (
+        <div className="p-3 bg-card rounded-lg border border-border">
+          <p className="text-sm text-foreground">
+            {t('run.scored', { score: Math.round((item.score ?? 0) * 100) })}
+          </p>
+          {item.reference_answer && (
+            <p className="text-xs text-content-tertiary mt-1">
+              {t('run.reference', { answer: item.reference_answer })}
+            </p>
+          )}
+        </div>
+      )}
+
+      {error && (
+        <div role="alert" className="p-3 bg-destructive/10 border border-destructive/30 rounded-lg text-sm text-destructive">
+          {error}
+        </div>
+      )}
+
+      <div className="flex gap-2">
+        {!answered ? (
+          <button
+            type="button"
+            onClick={() => void submitAnswer()}
+            disabled={item.question_type === 'mcq' ? choice === null : text.trim() === ''}
+            className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50"
+          >
+            {t('run.submit')}
+          </button>
+        ) : item.question_type !== 'mcq' && item.score === null ? (
+          // Grading is a separate, priced gesture. Submitting recorded the answer for free;
+          // paying to have it judged is the learner's call, and the price is on the button.
+          <button
+            type="button"
+            onClick={() => void requestGrade()}
+            disabled={grading || shownPrice === null}
+            className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50"
+          >
+            {grading ? t('run.grading')
+              : t('run.gradeFor', { price: shownPrice === 0 ? t('setup.free') : formatUsdMicro(shownPrice ?? 0) })}
+          </button>
+        ) : isLast ? (
+          <button
+            type="button"
+            onClick={() => void finish()}
+            className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover"
+          >
+            {t('run.finish')}
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => goTo(index + 1)}
+            className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover"
+          >
+            {t('run.next')}
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}

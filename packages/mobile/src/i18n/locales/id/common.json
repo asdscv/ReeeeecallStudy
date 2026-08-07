@@ -14,7 +14,8 @@
     "learningPlan": "Rencana belajar",
     "achievements": "Pencapaian",
     "publisherStats": "Statistik Penerbit",
-    "wallet": "Dompet"
+    "wallet": "Dompet",
+    "quiz": "Kuis"
   },
   "actions": {
     "save": "Simpan",

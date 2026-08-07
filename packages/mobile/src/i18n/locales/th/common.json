@@ -14,7 +14,8 @@
     "learningPlan": "แผนการเรียน",
     "achievements": "ความสำเร็จ",
     "publisherStats": "สถิติผู้เผยแพร่",
-    "wallet": "กระเป๋าเงิน"
+    "wallet": "กระเป๋าเงิน",
+    "quiz": "แบบทดสอบ"
   },
   "actions": {
     "save": "บันทึก",

@@ -16,11 +16,20 @@ export type AuthStackParamList = {
   ForgotPassword: undefined
 }
 
+// Quiz stack — its own act, not a study mode. See QuizStack.tsx.
+export type QuizStackParamList = {
+  QuizHome: undefined
+  QuizSetup: undefined
+  QuizRun: { runId: string }
+  QuizResult: { runId: string }
+}
+
 // Main tabs (로그인 후)
 export type MainTabParamList = {
   HomeTab: undefined
   DecksTab: undefined
   StudyTab: undefined
+  QuizTab: undefined
   MarketplaceTab: undefined
   SettingsTab: undefined
 }

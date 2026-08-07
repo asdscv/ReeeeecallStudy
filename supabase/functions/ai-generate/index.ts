@@ -26,6 +26,19 @@ import { resolveModel, type ResolvedModel } from '../_shared/ai-providers.ts'
 import { opsGate } from '../_shared/ops-gate.ts'
 import { buildRemediationPrompt, compareGroundingError, parseRemediationRefs, validateRemediationResult } from '../_shared/ai-remediation.ts'
 import { resolveCardAnswerFaces } from '../_shared/card-answer.ts'
+import {
+  quizPromptText, quizReferenceAnswer, quizContextFields,
+} from '../_shared/quiz-answer-field.ts'
+import {
+  buildQuizCardSource,
+  validateMultipleChoiceGeneration, validateShortAnswerGeneration, validateEssayGeneration,
+  gradeGate, validateShortAnswerGrade, validateEssayGrade,
+  type QuizCardSource, type QuizItem, type EssayCriterion,
+} from '../_shared/ai-quiz.ts'
+import {
+  buildMcqGenerationPrompt, buildShortAnswerGenerationPrompt, buildEssayGenerationPrompt,
+  buildShortAnswerGradePrompt, buildEssayGradePrompt, MAX_QUIZ_BATCH,
+} from '../_shared/ai-quiz-prompts.ts'
 
 // Provider + model are resolved per request from the registry (env-driven) —
 // see _shared/ai-providers.ts. Switching provider/model needs no code change.
@@ -122,6 +135,64 @@ async function chargeGeneration(userId: string, jobRef: string | undefined, m: R
       console.error('[ai-generate] charge threw (job', jobRef, 'attempt', attempt, '):', ce)
     }
   }
+  return null
+}
+
+// SETTLE a quiz job (mig 194). Deliberately NOT `chargeGeneration`: quiz is priced per
+// unit from a list, not per card by markup, and `charge_ai_generation` refuses quiz jobs
+// outright — if it did not, it would price them at zero AND stamp them charged, after
+// which the hold could never be released.
+//
+// `delivered` is the count of items actually persisted, so an under-delivery is charged
+// for what shipped and the rest of the hold is returned. Best-effort like the charge path
+// above: it must never mask a delivered 200.
+async function settleQuiz(
+  userId: string, jobRef: string | undefined, delivered: number,
+  m: ResolvedModel, usage: TokenUsage | null,
+): Promise<{ price_micro?: number; balance?: number } | null> {
+  if (!jobRef) return null
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const { data, error } = await sbServiceRole().rpc('settle_ai_quiz', {
+        p_user_id: userId,
+        p_job_ref: jobRef,
+        p_delivered: delivered,
+        p_provider: m.provider,
+        p_model: m.model,
+        p_tokens_in: usage?.prompt_tokens ?? null,
+        p_tokens_out: usage?.completion_tokens ?? null,
+      })
+      if (!error) return (data ?? null) as { price_micro?: number; balance?: number } | null
+      console.error('[ai-generate] quiz settle failed (job', jobRef, 'attempt', attempt, '):', error.message)
+    } catch (se) {
+      console.error('[ai-generate] quiz settle threw (job', jobRef, 'attempt', attempt, '):', se)
+    }
+  }
+  return null
+}
+
+/**
+ * A stable fingerprint of the card text a question was written from.
+ *
+ * This is what `content_version` on `learning_activities` was created for and never wired up:
+ * it answers "has the source card changed since this question was written". Web Crypto, so no
+ * dependency and no hand-rolled hash.
+ */
+async function sha256Hex(text: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('')
+}
+
+/** Reserve errors are the same four everywhere; map them once. */
+function quizReserveResponse(code: string | undefined, cors: Record<string, string>): Response | null {
+  if (code === 'P0002') return json({ error: 'Insufficient AI balance', code: 'AI_INSUFFICIENT_CREDITS' }, 402, cors)
+  if (code === 'P0008') return json({ error: 'Price changed since the quote', code: 'AI_PRICE_CHANGED' }, 409, cors)
+  // P0009 is a SIZE error and 23514 is the daily cap. They are separate codes precisely so
+  // this does not tell a learner who asked for too many questions that they are rate-limited.
+  if (code === 'P0009') return json({ error: 'Request too large', code: 'AI_REQUEST_TOO_LARGE' }, 400, cors)
+  if (code === 'P0010') return json({ error: 'Not enough quizzable cards', code: 'QUIZ_NOT_ENOUGH_CARDS' }, 422, cors)
+  if (code === '23514') return json({ error: 'Too many requests today', code: 'AI_RATE_CAP' }, 429, cors)
+  if (code === '42501') return json({ error: 'Not accessible', code: 'FORBIDDEN' }, 403, cors)
   return null
 }
 
@@ -376,7 +447,7 @@ Deno.serve(async (req) => {
     if (!body) return json({ error: 'Invalid body', code: 'BAD_REQUEST' }, 400, cors)
 
     const kind = body.kind
-    if (kind !== 'template' && kind !== 'deck' && kind !== 'cards' && kind !== 'image' && kind !== 'image_deck' && kind !== 'remediation') {
+    if (kind !== 'template' && kind !== 'deck' && kind !== 'cards' && kind !== 'image' && kind !== 'image_deck' && kind !== 'remediation' && kind !== 'quiz_generate' && kind !== 'quiz_grade') {
       return json({ error: 'Invalid kind', code: 'BAD_REQUEST' }, 400, cors)
     }
     const uiLang = typeof body.uiLang === 'string' ? body.uiLang : 'en'
@@ -559,6 +630,307 @@ Deno.serve(async (req) => {
           : message.startsWith('INVALID_REMEDIATION:') ? 'AI_INVALID_RESULT'
           : 'AI_PROVIDER_ERROR'
         return json({ error: 'Remediation failed', code }, status, cors)
+      }
+    }
+
+    // ── Quiz generation — the set is the paid asset; retaking it is free ──
+    //
+    // The model NEVER writes the correct answer. For multiple choice it returns distractors
+    // and this function inserts the card's own primary field at a position derived from the
+    // item id, so a wrong answer cannot be smuggled into the correct slot and position bias
+    // is unreachable rather than merely mitigated.
+    if (kind === 'quiz_generate') {
+      const setId = typeof body.setId === 'string' ? body.setId : null
+      const clientRef = typeof body.clientRef === 'string' ? body.clientRef : null
+      const maxPrice = typeof body.maxPriceMicro === 'number' ? body.maxPriceMicro : null
+      const qType = body.questionType
+      if (!setId || !clientRef || maxPrice === null
+          || (qType !== 'mcq' && qType !== 'short' && qType !== 'essay')) {
+        return json({ error: 'Invalid quiz generation request', code: 'BAD_REQUEST' }, 400, cors)
+      }
+
+      const service = sbServiceRole()
+      // The set already exists — `create_quiz_set` made it and chose the cards, using the
+      // same eligibility rule that counted them for the quote. Re-selecting here would be a
+      // fourth copy of that rule and could disagree with the number the learner approved.
+      const setResult = await service.from('quiz_sets')
+        .select('id, owner_user_id, deck_id, question_type, scope_kind, scope_tags, scope_card_ids, requested_count, content_locale')
+        .eq('id', setId).eq('owner_user_id', userId).maybeSingle()
+      if (setResult.error || !setResult.data) {
+        return json({ error: 'Quiz set not accessible', code: 'FORBIDDEN' }, 403, cors)
+      }
+      const quizSet = setResult.data as {
+        deck_id: string; question_type: string; scope_kind: string
+        scope_tags: string[]; scope_card_ids: string[]; requested_count: number; content_locale: string
+      }
+      if (quizSet.question_type !== qType) {
+        return json({ error: 'Question type does not match the set', code: 'BAD_REQUEST' }, 400, cors)
+      }
+
+      const cardIds = Array.isArray(body.cardIds)
+        ? body.cardIds.filter((v: unknown): v is string => typeof v === 'string')
+        : []
+      const batchCap = MAX_QUIZ_BATCH[
+        qType === 'mcq' ? 'multiple_choice' : qType === 'short' ? 'short_answer' : 'essay'
+      ]
+      if (cardIds.length === 0 || cardIds.length > batchCap) {
+        return json({ error: 'Request too large', code: 'AI_REQUEST_TOO_LARGE' }, 400, cors)
+      }
+
+      const action = qType === 'mcq' ? 'generate_mcq' : qType === 'short' ? 'generate_short' : 'generate_essay'
+      const { data: reserveRaw, error: reserveError } = await sbUser.rpc('reserve_ai_quiz', {
+        p_action: action,
+        p_count: cardIds.length,
+        p_client_ref: clientRef,
+        p_max_price_micro: maxPrice,
+        p_deck_id: quizSet.deck_id,
+        p_card_ids: cardIds,
+        p_set_id: setId,
+      })
+      if (reserveError) {
+        const mapped = quizReserveResponse(reserveError.code, cors)
+        if (mapped) return mapped
+        console.error('[ai-generate] quiz reserve error:', reserveError.message)
+        return json({ error: 'Metering error', code: 'AI_METER_ERROR' }, 500, cors)
+      }
+      const meter = (reserveRaw ?? {}) as { job_ref?: string; replayed?: boolean }
+
+      try {
+        const cardsResult = await service.from('cards')
+          .select('id, template_id, field_values')
+          .in('id', cardIds).eq('deck_id', quizSet.deck_id)
+        if (cardsResult.error) throw new Error(`CONTEXT_LOAD:${cardsResult.error.message}`)
+        const cards = (cardsResult.data ?? []) as Array<{ id: string; template_id: string; field_values: Record<string, string> }>
+
+        const templateIds = [...new Set(cards.map((c) => c.template_id))]
+        const templatesResult = await service.from('card_templates')
+          .select('id, fields, front_layout, back_layout').in('id', templateIds)
+        if (templatesResult.error) throw new Error(`CONTEXT_LOAD:${templatesResult.error.message}`)
+        const templateById = new Map(
+          (templatesResult.data ?? []).map((t: Record<string, unknown>) => [t.id as string, t]),
+        )
+
+        // Resolve every card to its ONE graded field. A card that cannot be resolved is
+        // excluded, never included with a positional guess — for the official word templates
+        // that guess is inverted and would build the whole quiz around the wrong half.
+        const sources: QuizCardSource[] = []
+        const fingerprints = new Map<string, string>()
+        for (const card of cards) {
+          // deno-lint-ignore no-explicit-any
+          const template = templateById.get(card.template_id) as any
+          const prompt = quizPromptText(template, card)
+          const answer = quizReferenceAnswer(template, card)
+          if (!prompt || !answer) continue
+          // The template's own field names travel with the values. Without them a
+          // `field_probe` question reads "what is the context0 of lend?" — the model can only
+          // ask about a field it can name.
+          const source = buildQuizCardSource(card.id, prompt, answer, quizContextFields(template, card))
+          if (!source) continue
+          sources.push(source)
+          // Answers the question `content_version` was created for and never wired up:
+          // has the source card changed since this question was written?
+          fingerprints.set(card.id, await sha256Hex(`${prompt} ${answer}`))
+        }
+        if (sources.length === 0) throw new Error('QUIZ_NO_ELIGIBLE_CARDS')
+
+        const prompt = qType === 'mcq' ? buildMcqGenerationPrompt(sources)
+          : qType === 'short' ? buildShortAnswerGenerationPrompt(sources)
+          : buildEssayGenerationPrompt(sources)
+        const generated = await generate(model, prompt.systemPrompt, prompt.userPrompt)
+
+        const makeItemId = (cardId: string, index: number) => `${setId}:${cardId}:${index}`
+        const outcome = qType === 'mcq'
+          ? validateMultipleChoiceGeneration(generated.json, sources, makeItemId)
+          : qType === 'short'
+            ? validateShortAnswerGeneration(generated.json, sources, makeItemId)
+            : validateEssayGeneration(generated.json, sources, makeItemId)
+
+        // The drop reasons ARE the prompt's report card; they are the only signal that would
+        // ever tell us a prompt change made distractors worse.
+        if (outcome.dropped.length > 0) {
+          console.warn('[ai-generate] quiz drops:', JSON.stringify(outcome.dropped))
+        }
+        // Fewer than half the requested items is not a quiz worth charging for.
+        if (!outcome.servable) {
+          // The reasons travel with the error. They are enum members plus card ids the caller
+          // already owns — no card content — and without them an empty result is unfalsifiable:
+          // "the model wrote nothing usable" and "our validator is too strict" look identical.
+          throw new Error(`QUIZ_UNSERVABLE:${JSON.stringify(outcome.dropped)}`)
+        }
+
+        const questions = outcome.items.map((item: QuizItem) => {
+          const base = {
+            card_id: item.cardId,
+            stem: item.question,
+            source_fingerprint: fingerprints.get(item.cardId) ?? 'unknown',
+            reference_context: sources.find((s) => s.cardId === item.cardId)?.extraFields
+              .map((f) => `${f.label}: ${f.value}`).join(' / ') || null,
+          }
+          if (item.type === 'multiple_choice') {
+            return {
+              ...base,
+              options: item.options,
+              correct_index: item.correctIndex,
+              reference_answer: item.options[item.correctIndex],
+              meta: { flaws: item.flaws },
+            }
+          }
+          if (item.type === 'short_answer') {
+            return { ...base, reference_answer: item.expected, meta: { angle: item.angle, crossLingual: item.crossLingual } }
+          }
+          return {
+            ...base,
+            reference_answer: item.reference,
+            rubric: item.criteria,
+            meta: { lengthBand: item.lengthBand },
+          }
+        })
+
+        const { error: persistError } = await service.rpc('persist_quiz_questions', {
+          p_set_id: setId,
+          p_questions: questions,
+        })
+        if (persistError) throw new Error(`PERSISTENCE:${persistError.message}`)
+
+        // Charged for what shipped, not for what was asked for.
+        const settled = await settleQuiz(userId, meter.job_ref, questions.length, model, generated.usage)
+        return json({
+          setId, generated: questions.length, requested: cardIds.length,
+          dropped: outcome.dropped.length, balance: settled?.balance ?? null,
+        }, 200, cors)
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'UNKNOWN'
+        console.error('[ai-generate] quiz generation failure:', message)
+        await releaseJob(userId, meter.job_ref)
+        const code = message === 'QUIZ_NO_ELIGIBLE_CARDS' ? 'QUIZ_NOT_ENOUGH_CARDS'
+          : message.startsWith('QUIZ_UNSERVABLE') ? 'AI_EMPTY_RESULT'
+          : message.startsWith('CONTEXT_LOAD') ? 'AI_CONTEXT_ERROR'
+          : message.startsWith('PERSISTENCE:') ? 'AI_PERSISTENCE_ERROR'
+          : 'AI_PROVIDER_ERROR'
+        const status = code === 'QUIZ_NOT_ENOUGH_CARDS' ? 422
+          : code === 'AI_EMPTY_RESULT' ? 422 : code === 'AI_CONTEXT_ERROR' ? 400 : 502
+        const dropped = message.startsWith('QUIZ_UNSERVABLE:')
+          ? JSON.parse(message.slice('QUIZ_UNSERVABLE:'.length)) : undefined
+        return json({ error: 'Quiz generation failed', code, dropped }, status, cors)
+      }
+    }
+
+    // ── Quiz grading — the repeating meter ──
+    //
+    // Charged per submitted answer, because unlike generation this cannot be cached: the
+    // learner writes something different every time. Multiple choice never reaches here —
+    // `submit_quiz_answer` grades it by index comparison in SQL, for free, and `grade_mcq`
+    // has no row in `ai_quiz_price_units` so it cannot even be reserved.
+    if (kind === 'quiz_grade') {
+      const itemId = typeof body.runItemId === 'string' ? body.runItemId : null
+      const clientRef = typeof body.clientRef === 'string' ? body.clientRef : null
+      const maxPrice = typeof body.maxPriceMicro === 'number' ? body.maxPriceMicro : null
+      const learner = typeof body.answer === 'string' ? body.answer : ''
+      if (!itemId || !clientRef || maxPrice === null) {
+        return json({ error: 'Invalid quiz grading request', code: 'BAD_REQUEST' }, 400, cors)
+      }
+
+      const service = sbServiceRole()
+      const itemResult = await service.from('quiz_run_items')
+        .select('id, question_id, run_id, status, quiz_runs!inner(user_id)')
+        .eq('id', itemId).maybeSingle()
+      if (itemResult.error || !itemResult.data
+          || (itemResult.data as { quiz_runs?: { user_id?: string } }).quiz_runs?.user_id !== userId) {
+        return json({ error: 'Quiz item not accessible', code: 'FORBIDDEN' }, 403, cors)
+      }
+      const questionId = (itemResult.data as { question_id: string | null }).question_id
+      if (!questionId) return json({ error: 'This question no longer exists', code: 'QUIZ_ITEM_GONE' }, 410, cors)
+
+      const qResult = await service.from('quiz_questions')
+        .select('id, question_type, stem, reference_answer, reference_context, rubric, meta')
+        .eq('id', questionId).maybeSingle()
+      if (qResult.error || !qResult.data) {
+        return json({ error: 'This question no longer exists', code: 'QUIZ_ITEM_GONE' }, 410, cors)
+      }
+      const question = qResult.data as {
+        question_type: string; stem: string; reference_answer: string
+        reference_context: string | null; rubric: EssayCriterion[] | null
+        meta: { crossLingual?: boolean } | null
+      }
+      if (question.question_type === 'mcq') {
+        return json({ error: 'Multiple choice is graded without AI', code: 'BAD_REQUEST' }, 400, cors)
+      }
+      const quizType = question.question_type === 'essay' ? 'essay' : 'short_answer'
+
+      // BEFORE the reservation. An empty submission does not need a model to be graded 0
+      // and must not cost one; an over-length submission is refused rather than truncated,
+      // because grading the first 2000 characters of a 4000-character essay grades an essay
+      // the learner did not write — and charges them for it.
+      const gate = gradeGate(quizType, learner)
+      if (!gate.ok) {
+        return json({ error: 'Answer cannot be graded', code: 'QUIZ_UNGRADEABLE', reason: gate.refusal }, 400, cors)
+      }
+
+      const action = quizType === 'essay' ? 'grade_essay' : 'grade_short'
+      const { data: reserveRaw, error: reserveError } = await sbUser.rpc('reserve_ai_quiz', {
+        p_action: action,
+        p_count: 1,
+        p_client_ref: clientRef,
+        p_max_price_micro: maxPrice,
+        p_run_item_id: itemId,
+      })
+      if (reserveError) {
+        const mapped = quizReserveResponse(reserveError.code, cors)
+        if (mapped) return mapped
+        console.error('[ai-generate] quiz grade reserve error:', reserveError.message)
+        return json({ error: 'Metering error', code: 'AI_METER_ERROR' }, 500, cors)
+      }
+      const meter = (reserveRaw ?? {}) as { job_ref?: string }
+
+      try {
+        const gradeInput = {
+          question: question.stem,
+          reference: question.reference_answer,
+          learner: learner.trim(),
+          crossLingual: question.meta?.crossLingual === true,
+        }
+        const criteria = question.rubric ?? []
+        if (quizType === 'essay' && criteria.length === 0) throw new Error('QUIZ_NO_RUBRIC')
+
+        const prompt = quizType === 'essay'
+          ? buildEssayGradePrompt(gradeInput, criteria)
+          : buildShortAnswerGradePrompt(gradeInput)
+        const generated = await generate(model, prompt.systemPrompt, prompt.userPrompt)
+
+        const verdict = quizType === 'essay'
+          ? validateEssayGrade(generated.json, criteria, gradeInput)
+          : validateShortAnswerGrade(generated.json, gradeInput)
+
+        // A refusal is not a zero. Releasing means the learner is charged nothing and no
+        // score is written — scoring them 0 because our grader returned nonsense would put
+        // our failure on their record.
+        if (!verdict.graded) {
+          await releaseJob(userId, meter.job_ref)
+          return json({ error: 'Grading failed', code: 'QUIZ_GRADE_REFUSED', reason: verdict.refusal }, 422, cors)
+        }
+
+        const grade = verdict.grade as { score: number }
+        const { error: applyError } = await service.rpc('apply_quiz_grade', {
+          p_run_item_id: itemId,
+          p_score: grade.score,
+          p_evaluator_result: grade,
+          // Everything the screen renders: a label from a closed set, and spans into text
+          // the learner already has. Not one character of model-written prose.
+          p_feedback: grade,
+          p_evaluator_version: `${model.provider}:${model.model}`,
+        })
+        if (applyError) throw new Error(`PERSISTENCE:${applyError.message}`)
+
+        const settled = await settleQuiz(userId, meter.job_ref, 1, model, generated.usage)
+        return json({ itemId, grade, balance: settled?.balance ?? null }, 200, cors)
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'UNKNOWN'
+        console.error('[ai-generate] quiz grading failure:', message)
+        await releaseJob(userId, meter.job_ref)
+        const code = message === 'QUIZ_NO_RUBRIC' ? 'QUIZ_ITEM_GONE'
+          : message.startsWith('PERSISTENCE:') ? 'AI_PERSISTENCE_ERROR'
+          : 'AI_PROVIDER_ERROR'
+        return json({ error: 'Quiz grading failed', code }, code === 'QUIZ_ITEM_GONE' ? 410 : 502, cors)
       }
     }
 

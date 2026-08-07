@@ -14,7 +14,8 @@
     "learningPlan": "学習プラン",
     "achievements": "実績",
     "publisherStats": "パブリッシャー統計",
-    "wallet": "ウォレット"
+    "wallet": "ウォレット",
+    "quiz": "クイズ"
   },
   "actions": {
     "save": "保存",

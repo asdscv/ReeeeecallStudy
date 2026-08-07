@@ -26,6 +26,7 @@ const resources = {
     sharing: require('./locales/en/sharing.json'),
     'ai-generate': require('./locales/en/ai-generate.json'),
     learning: require('./locales/en/learning.json'),
+    quiz: require('./locales/en/quiz.json'),
     wallet: require('./locales/en/wallet.json'),
   },
   ko: {
@@ -45,6 +46,7 @@ const resources = {
     sharing: require('./locales/ko/sharing.json'),
     'ai-generate': require('./locales/ko/ai-generate.json'),
     learning: require('./locales/ko/learning.json'),
+    quiz: require('./locales/ko/quiz.json'),
     wallet: require('./locales/ko/wallet.json'),
   },
   ja: {
@@ -64,6 +66,7 @@ const resources = {
     sharing: require('./locales/ja/sharing.json'),
     'ai-generate': require('./locales/ja/ai-generate.json'),
     learning: require('./locales/ja/learning.json'),
+    quiz: require('./locales/ja/quiz.json'),
     wallet: require('./locales/ja/wallet.json'),
   },
   zh: {
@@ -83,6 +86,7 @@ const resources = {
     sharing: require('./locales/zh/sharing.json'),
     'ai-generate': require('./locales/zh/ai-generate.json'),
     learning: require('./locales/zh/learning.json'),
+    quiz: require('./locales/zh/quiz.json'),
     wallet: require('./locales/zh/wallet.json'),
   },
   vi: {
@@ -102,6 +106,7 @@ const resources = {
     sharing: require('./locales/vi/sharing.json'),
     'ai-generate': require('./locales/vi/ai-generate.json'),
     learning: require('./locales/vi/learning.json'),
+    quiz: require('./locales/vi/quiz.json'),
     wallet: require('./locales/vi/wallet.json'),
   },
   th: {
@@ -121,6 +126,7 @@ const resources = {
     sharing: require('./locales/th/sharing.json'),
     'ai-generate': require('./locales/th/ai-generate.json'),
     learning: require('./locales/th/learning.json'),
+    quiz: require('./locales/th/quiz.json'),
     wallet: require('./locales/th/wallet.json'),
   },
   id: {
@@ -140,6 +146,7 @@ const resources = {
     sharing: require('./locales/id/sharing.json'),
     'ai-generate': require('./locales/id/ai-generate.json'),
     learning: require('./locales/id/learning.json'),
+    quiz: require('./locales/id/quiz.json'),
     wallet: require('./locales/id/wallet.json'),
   },
   es: {
@@ -159,6 +166,7 @@ const resources = {
     sharing: require('./locales/es/sharing.json'),
     'ai-generate': require('./locales/es/ai-generate.json'),
     learning: require('./locales/es/learning.json'),
+    quiz: require('./locales/es/quiz.json'),
     wallet: require('./locales/es/wallet.json'),
   },
 }
@@ -209,7 +217,7 @@ i18n
     fallbackLng: 'en',
     supportedLngs,
 
-    ns: ['common', 'auth', 'dashboard', 'decks', 'study', 'marketplace', 'settings', 'history', 'import-export', 'guide', 'errors', 'paywall', 'update', 'sharing', 'ai-generate', 'learning'],
+    ns: ['common', 'auth', 'dashboard', 'decks', 'study', 'marketplace', 'settings', 'history', 'import-export', 'guide', 'errors', 'paywall', 'update', 'sharing', 'ai-generate', 'learning', 'quiz'],
     defaultNS: 'common',
 
     interpolation: { escapeValue: false },

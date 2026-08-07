@@ -15,6 +15,7 @@ const TAB_ICONS: Record<keyof MainTabParamList, { active: string; inactive: stri
   HomeTab: { active: '🏠', inactive: '🏠' },
   DecksTab: { active: '📚', inactive: '📚' },
   StudyTab: { active: '🧠', inactive: '🧠' },
+  QuizTab: { active: '❓', inactive: '❓' },
   MarketplaceTab: { active: '🏪', inactive: '🏪' },
   SettingsTab: { active: '⚙️', inactive: '⚙️' },
 }

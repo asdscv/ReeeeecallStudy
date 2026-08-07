@@ -14,7 +14,8 @@
     "learningPlan": "Plan de estudio",
     "achievements": "Logros",
     "publisherStats": "Estadísticas del editor",
-    "wallet": "Cartera"
+    "wallet": "Cartera",
+    "quiz": "Cuestionario"
   },
   "actions": {
     "save": "Guardar",
