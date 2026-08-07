@@ -147,3 +147,55 @@ describe('study-validation', () => {
     expect(config.planSelection?.cardIds).toEqual(['card-1'])
   })
 })
+
+// ── cardSelection ──────────────────────────────────────────────────────────
+//
+// "다시 볼 카드": study exactly the cards the diagnostics named. They are usually NOT due, so
+// the ordinary SRS queue would never serve them — which is the whole reason this exists rather
+// than a filter on the normal session.
+describe('normalizeStudyConfig — cardSelection', () => {
+  const base = () => ({ deckId: 'deck-1', mode: 'srs', batchSize: 20 })
+
+  it('keeps the caller\'s order, because it is a ranking', () => {
+    // Worst-scoring card first. Sorting would silently reorder the learner's queue.
+    const config = normalizeStudyConfig({ ...base(), cardSelection: ['c', 'a', 'b'] })
+    expect(config.cardSelection).toEqual(['c', 'a', 'b'])
+  })
+
+  it('drops a duplicate rather than rejecting the session', () => {
+    // Studying one card twice in a queue asks the learner to rate a card whose schedule the
+    // first rating already moved. A caller bug should not cost them the session.
+    const config = normalizeStudyConfig({ ...base(), cardSelection: ['a', 'b', 'a'] })
+    expect(config.cardSelection).toEqual(['a', 'b'])
+  })
+
+  it('refuses a non-SRS mode', () => {
+    // Cramming moves no schedule (`modeFeedsSrsSchedule`), so re-studying a card the learner
+    // keeps failing in one of those modes would change nothing about when it comes back.
+    expect(() => normalizeStudyConfig({ ...base(), mode: 'cramming', cardSelection: ['a'] }))
+      .toThrow(StudyValidationError)
+  })
+
+  it('refuses to hold both selections at once', () => {
+    // Both name a queue and only one can win. Silently picking is how a learner ends up
+    // studying something other than what they pressed.
+    expect(() => normalizeStudyConfig({
+      ...base(),
+      planSelection: {
+        goalId: 'goal-1', planDate: '2026-08-07', cardIds: ['a'],
+        items: { a: { id: 'i1', activity_type: 'recall', response_type: 'self_rate', evaluator_type: 'self_rate' } },
+      },
+      cardSelection: ['a'],
+    })).toThrow(StudyValidationError)
+  })
+
+  it('refuses an empty or malformed list instead of starting an empty session', () => {
+    expect(() => normalizeStudyConfig({ ...base(), cardSelection: [] })).toThrow(StudyValidationError)
+    expect(() => normalizeStudyConfig({ ...base(), cardSelection: 'a,b' })).toThrow(StudyValidationError)
+    expect(() => normalizeStudyConfig({ ...base(), cardSelection: ['a', 42] })).toThrow(StudyValidationError)
+  })
+
+  it('is absent when not asked for', () => {
+    expect(normalizeStudyConfig(base()).cardSelection).toBeUndefined()
+  })
+})

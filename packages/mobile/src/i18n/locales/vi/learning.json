@@ -138,7 +138,14 @@
     "typicalTime": "Thời gian thường",
     "weakEmpty": "Không có thẻ nào tụt lại.",
     "weakHint": "Thẻ có ít nhất 2 lần làm với trung bình dưới 60%.",
-    "weakTitle": "Cần xem lại"
+    "weakTitle": "Cần xem lại",
+    "accuracyValue": "Độ chính xác {{pct, number}}%",
+    "typicalValue": "Thường {{seconds, decimal}} giây",
+    "adherenceValue": "Hoàn thành kế hoạch {{pct, number}}%",
+    "weakCount": "{{count, number}} thẻ",
+    "weakCount_one": "{{count, number}} thẻ",
+    "weakCount_other": "{{count, number}} thẻ",
+    "weakStudy": "Chỉ học những thẻ này"
   },
   "recommend": {
     "accept": "Chấp nhận",
@@ -203,20 +210,36 @@
       "fresh": "{{count, number}} thẻ mới",
       "fresh_one": "{{count, number}} thẻ mới",
       "fresh_other": "{{count, number}} thẻ mới"
-    }
+    },
+    "deckListMore": "{{names}} và {{count, number}} bộ khác",
+    "deckListMore_one": "{{names}} và {{count, number}} bộ khác",
+    "deckListMore_other": "{{names}} và {{count, number}} bộ khác"
   },
   "progress": {
     "title": "Tiến độ",
     "daysLeft": "Còn {{count, number}} ngày",
     "daysLeft_one": "Còn {{count, number}} ngày",
     "daysLeft_other": "Còn {{count, number}} ngày",
-    "withinWindow": "{{known, number}} trong {{attempted, number}} thẻ đã học vẫn trong chu kỳ ôn tập",
     "notStarted": "Chưa học thẻ nào · tổng {{total, number}} thẻ",
-    "overdue": "{{count, number}} thẻ quá hạn ôn tập",
-    "overdue_one": "{{count, number}} thẻ quá hạn ôn tập",
-    "overdue_other": "{{count, number}} thẻ quá hạn ôn tập",
     "unstudied": "{{count, number}} thẻ chưa học",
     "unstudied_one": "{{count, number}} thẻ chưa học",
-    "unstudied_other": "{{count, number}} thẻ chưa học"
+    "unstudied_other": "{{count, number}} thẻ chưa học",
+    "behind": "{{count, number}} thẻ quá hạn ôn tập",
+    "behind_one": "{{count, number}} thẻ quá hạn ôn tập",
+    "behind_other": "{{count, number}} thẻ quá hạn ôn tập",
+    "studied": "Đã học {{attempted, number}} trong {{total, number}} thẻ",
+    "detailStudied": "Đã học {{count, number}}",
+    "detailStudied_one": "Đã học {{count, number}}",
+    "detailStudied_other": "Đã học {{count, number}}",
+    "detailWithinWindow": "{{count, number}} trong chu kỳ ôn tập",
+    "detailWithinWindow_one": "{{count, number}} trong chu kỳ ôn tập",
+    "detailWithinWindow_other": "{{count, number}} trong chu kỳ ôn tập"
+  },
+  "completion": {
+    "done": "Đã hoàn thành mục tiêu",
+    "progress": "{{mature, number}}/{{required, number}} thẻ đã ghi nhớ",
+    "eta": "còn khoảng {{count, number}} ngày",
+    "eta_one": "còn khoảng {{count, number}} ngày",
+    "eta_other": "còn khoảng {{count, number}} ngày"
   }
 }

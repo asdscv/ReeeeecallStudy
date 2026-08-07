@@ -138,7 +138,14 @@
     "typicalTime": "Waktu biasa",
     "weakEmpty": "Tidak ada yang tertinggal.",
     "weakHint": "Kartu dengan minimal dua percobaan dan rata-rata di bawah 60%.",
-    "weakTitle": "Perlu dilihat lagi"
+    "weakTitle": "Perlu dilihat lagi",
+    "accuracyValue": "Akurasi {{pct, number}}%",
+    "typicalValue": "Biasanya {{seconds, decimal}} detik",
+    "adherenceValue": "Rencana {{pct, number}}% selesai",
+    "weakCount": "{{count, number}} kartu",
+    "weakCount_one": "{{count, number}} kartu",
+    "weakCount_other": "{{count, number}} kartu",
+    "weakStudy": "Pelajari kartu ini saja"
   },
   "recommend": {
     "accept": "Terima",
@@ -203,20 +210,36 @@
       "fresh": "{{count, number}} baru",
       "fresh_one": "{{count, number}} baru",
       "fresh_other": "{{count, number}} baru"
-    }
+    },
+    "deckListMore": "{{names}} +{{count, number}} lainnya",
+    "deckListMore_one": "{{names}} +{{count, number}} lainnya",
+    "deckListMore_other": "{{names}} +{{count, number}} lainnya"
   },
   "progress": {
     "title": "Kemajuan",
     "daysLeft": "{{count, number}} hari lagi",
     "daysLeft_one": "{{count, number}} hari lagi",
     "daysLeft_other": "{{count, number}} hari lagi",
-    "withinWindow": "{{known, number}} dari {{attempted, number}} kartu yang dipelajari masih dalam jadwal ulasan",
     "notStarted": "Belum dimulai · {{total, number}} kartu",
-    "overdue": "{{count, number}} ulasan terlambat",
-    "overdue_one": "{{count, number}} ulasan terlambat",
-    "overdue_other": "{{count, number}} ulasan terlambat",
     "unstudied": "{{count, number}} belum dipelajari",
     "unstudied_one": "{{count, number}} belum dipelajari",
-    "unstudied_other": "{{count, number}} belum dipelajari"
+    "unstudied_other": "{{count, number}} belum dipelajari",
+    "behind": "{{count, number}} ulasan terlambat",
+    "behind_one": "{{count, number}} ulasan terlambat",
+    "behind_other": "{{count, number}} ulasan terlambat",
+    "studied": "{{attempted, number}} dari {{total, number}} kartu dipelajari",
+    "detailStudied": "{{count, number}} dipelajari",
+    "detailStudied_one": "{{count, number}} dipelajari",
+    "detailStudied_other": "{{count, number}} dipelajari",
+    "detailWithinWindow": "{{count, number}} dalam jadwal ulasan",
+    "detailWithinWindow_one": "{{count, number}} dalam jadwal ulasan",
+    "detailWithinWindow_other": "{{count, number}} dalam jadwal ulasan"
+  },
+  "completion": {
+    "done": "Target tercapai",
+    "progress": "{{mature, number}} dari {{required, number}} kartu melekat",
+    "eta": "sekitar {{count, number}} hari lagi",
+    "eta_one": "sekitar {{count, number}} hari lagi",
+    "eta_other": "sekitar {{count, number}} hari lagi"
   }
 }

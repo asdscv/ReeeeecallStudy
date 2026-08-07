@@ -9,8 +9,10 @@
 import { describe, it, expect } from 'vitest'
 import { planComposition } from '@reeeeecall/shared/lib/plan-composition'
 
-const item = (status: string, payload?: { recall_probability?: number } | null) =>
-  ({ status, payload })
+const item = (
+  status: string,
+  payload?: { recall_probability?: number; is_new?: boolean } | null,
+) => ({ status, payload })
 
 describe('planComposition', () => {
   it('splits pending work into reviews and cards never studied', () => {
@@ -29,6 +31,26 @@ describe('planComposition', () => {
       item('completed', {}),
       item('pending', { recall_probability: 0.4 }),
     ])).toEqual({ review: 1, fresh: 0 })
+  })
+
+  it('believes the planner over any inference, both ways', () => {
+    // The planner spends intake and review budget separately and its own test is
+    // `!card.last_reviewed_at`, so `is_new` is the answer — not something to re-derive.
+    // A card mid-learning-step has no forgetting curve AND has been studied: exactly the row
+    // the old inference got backwards, and the reason mig 191 exists.
+    expect(planComposition([item('pending', { is_new: false })]))
+      .toEqual({ review: 1, fresh: 0 })
+    expect(planComposition([item('pending', { is_new: true, recall_probability: 0.4 })]))
+      .toEqual({ review: 0, fresh: 1 })
+  })
+
+  it('falls back to the old inference only when the planner said nothing', () => {
+    // Plans written before `is_new` was recorded still have to render. They are wrong in the
+    // same old way, but a plan saved yesterday is not a reason to show a broken screen.
+    expect(planComposition([item('pending', { recall_probability: 0.9 })]))
+      .toEqual({ review: 1, fresh: 0 })
+    expect(planComposition([item('pending', {})]))
+      .toEqual({ review: 0, fresh: 1 })
   })
 
   it('treats a recall estimate of zero as a review, not a new card', () => {

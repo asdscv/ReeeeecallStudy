@@ -16,6 +16,10 @@ import { currentPlanContext } from '@reeeeecall/shared/lib/learning-plan-date'
 import { planComposition } from '@reeeeecall/shared/lib/plan-composition'
 import { studyRecap } from '@reeeeecall/shared/lib/study-recap'
 import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
+import { goalCompletion } from '@reeeeecall/shared/lib/goal-completion'
+import {
+  parseNewCardsPerDay, DEFAULT_NEW_CARDS_PER_DAY,
+} from '@reeeeecall/shared/learning/application/cadence'
 import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
 import { useStudy } from '../hooks/useStudy'
 import type { SettingsStackParamList } from '../navigation/types'
@@ -50,6 +54,9 @@ import type { SettingsStackParamList } from '../navigation/types'
  * And because a phone screen is usually resumed rather than opened, the plan date is kept
  * live instead of being frozen at mount — see `planDate` below.
  */
+/** Deck names printed before the count takes over. Three fits one line on a narrow phone. */
+const DECK_NAMES_SHOWN = 3
+
 const MIN_TOUCH = 44
 const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 } as const
 
@@ -68,8 +75,10 @@ export function LearningTodayScreen() {
     extendPlan, planExtending, planExtension,
     attempts, attemptsLoading, fetchAttempts,
     knowledge, fetchGoalKnowledge,
+    insights, weakCardDecks, insightsGoalId, fetchInsights,
+    completeGoalIfEarned,
   } = useLearningStore()
-  const { startPlanSession } = useStudy()
+  const { startPlanSession, startCardSession } = useStudy()
   const { decks, fetchDecks } = useDeckStore()
 
   const [refreshing, setRefreshing] = useState(false)
@@ -99,7 +108,13 @@ export function LearningTodayScreen() {
 
   useEffect(() => { void fetchGoals() }, [fetchGoals])
 
-  const active = useMemo(() => goals.filter((g) => g.status === 'active'), [goals])
+  // 'completed' belongs here too. Finishing a goal is a MILESTONE, not a stop: the cards keep
+  // coming due and `save_daily_plan` rejects only archived goals. Filtering it out would make a
+  // goal vanish from this screen at the exact moment it was achieved.
+  const active = useMemo(
+    () => goals.filter((g) => g.status === 'active' || g.status === 'completed'),
+    [goals],
+  )
   // The plan is addressed by the route now, mirroring web's /learning/:goalId. A route id that
   // names no plannable goal (archived, deleted) resolves to nothing rather than quietly showing
   // a different plan under the same navigation entry.
@@ -152,8 +167,12 @@ export function LearningTodayScreen() {
   // eventually with its assumption stated; not as the line that says where you stand.
   const judgedAt = mountedAt
   useEffect(() => {
-    if (goalId) void fetchGoalKnowledge(goalId, judgedAt)
-  }, [goalId, judgedAt, fetchGoalKnowledge])
+    if (!goalId) return
+    void fetchGoalKnowledge(goalId, judgedAt)
+    // Same breath as reading the progress: the ratio can only move when a card's interval
+    // does, and this screen is where the learner lands after studying. The server judges.
+    void completeGoalIfEarned(goalId)
+  }, [goalId, judgedAt, fetchGoalKnowledge, completeGoalIfEarned])
 
   /**
    * Attempts are goal-scoped, not date-scoped, so this deliberately does NOT depend on
@@ -199,6 +218,90 @@ export function LearningTodayScreen() {
   )
   /** How much, how long, how it went — shared with web so the two cannot disagree. */
   const recap = useMemo(() => studyRecap(todaysAttempts), [todaysAttempts])
+  useEffect(() => { if (goalId) void fetchInsights(goalId) }, [goalId, fetchInsights])
+
+  /**
+   * Weak cards grouped by the deck holding them. A session takes ONE deck
+   * (`finalize_study_session` refuses events spanning decks), and `summarizeLearning` works
+   * from attempt rows which carry no deck — hence `weakCardDecks` from the store.
+   */
+  const weakByDeck = useMemo(() => {
+    if (!insights || insightsGoalId !== goalId) return []
+    const byDeck = new Map<string, string[]>()
+    for (const card of insights.weakCards) {
+      const deckId = weakCardDecks[card.cardId]
+      if (!deckId) continue
+      const bucket = byDeck.get(deckId)
+      if (bucket) bucket.push(card.cardId)
+      else byDeck.set(deckId, [card.cardId])
+    }
+    return [...byDeck.entries()].map(([deckId, cardIds]) => ({ deckId, cardIds }))
+  }, [insights, weakCardDecks, insightsGoalId, goalId])
+
+  // `accuracy` is null when nothing carried a score, which is a different claim from 0%.
+  const insightStats = useMemo(() => {
+    if (!insights) return ''
+    const pct = (v: number | null) => (v === null ? null : Math.round(v * 100))
+    const accuracy = pct(insights.accuracy)
+    const adherence = pct(insights.overallAdherence)
+    return [
+      accuracy === null ? t('insights.notScoredYet') : t('insights.accuracyValue', { pct: accuracy }),
+      insights.medianDurationMs === null
+        ? null
+        : t('insights.typicalValue', { seconds: Math.round(insights.medianDurationMs / 100) / 10 }),
+      adherence === null ? null : t('insights.adherenceValue', { pct: adherence }),
+    ].filter(Boolean).join(' · ')
+  }, [insights, t])
+
+  const studyWeak = useCallback(async (group: { deckId: string; cardIds: string[] }) => {
+    setStarting(true)
+    try {
+      await startCardSession(group.deckId, group.cardIds)
+      // Cross-stack, same shape `startDeck` uses: `StudySession` lives in the Study tab's
+      // stack while this screen lives in Settings.
+      const tabNav = navigation.getParent() as unknown as
+        { navigate: (name: string, params?: unknown) => void } | undefined
+      tabNav?.navigate('StudyTab', { screen: 'StudySession' })
+    } catch {
+      Alert.alert(t('today.error.unknown'))
+    } finally {
+      setStarting(false)
+    }
+  }, [startCardSession, navigation, t])
+
+  /**
+   * The goal's decks, named — resolved against the deck store so a rename shows through and a
+   * deck the learner can no longer see simply drops out. `goal.decks` is the goal's own link
+   * table, i.e. what the PLANNER draws from, not merely what appeared in today's plan.
+   */
+  const deckSummary = useMemo(() => {
+    if (!goal) return ''
+    const names = goal.decks
+      .map((link) => decks.find((deck) => deck.id === link.deck_id)?.name)
+      .filter((name): name is string => !!name)
+    if (names.length === 0) return ''
+    if (names.length <= DECK_NAMES_SHOWN) return names.join(', ')
+    return t('today.deckListMore', {
+      names: names.slice(0, DECK_NAMES_SHOWN).join(', '),
+      count: names.length - DECK_NAMES_SHOWN,
+    })
+  }, [goal, decks, t])
+
+  /**
+   * Where this goal stands against the completion rule. `null` when there is nothing to say —
+   * no goal loaded, or a goal holding no cards, which is never "complete" (0/0 is not 100%).
+   */
+  const goalCompletionState = useMemo(() => {
+    const k = goalId ? knowledge[goalId] : null
+    if (!k || k.total === 0) return null
+    return goalCompletion(k, {
+      newCardsPerDay: parseNewCardsPerDay(goal?.settings) ?? DEFAULT_NEW_CARDS_PER_DAY,
+      adherence: insightsGoalId === goalId ? insights?.overallAdherence ?? null : null,
+    })
+  }, [goalId, knowledge, goal, insights, insightsGoalId])
+  /** Already STAMPED. A record of having earned it, not a live reading of the ratio. */
+  const goalDone = goal?.status === 'completed'
+
   const recapBands = [
     recap.known > 0 ? t('history.band.known', { count: recap.known }) : null,
     recap.partial > 0 ? t('history.band.partial', { count: recap.partial }) : null,
@@ -278,8 +381,10 @@ export function LearningTodayScreen() {
   )
   // Each half dropped when empty — "복습 밀림 0장" is a sentence about nothing, and a learner who
   // is caught up should see that rather than a row of noughts.
-  const progressDetail = [
-    goalSummary.overdue > 0 ? t('progress.overdue', { count: goalSummary.overdue }) : null,
+  const progressDetail = goalSummary.notStarted ? '' : [
+    goalSummary.behind
+      ? t('progress.detailStudied', { count: goalSummary.attempted })
+      : t('progress.detailWithinWindow', { count: goalSummary.withinWindow }),
     goalSummary.unstudied > 0 ? t('progress.unstudied', { count: goalSummary.unstudied }) : null,
   ].filter(Boolean).join(' · ')
 
@@ -407,11 +512,38 @@ export function LearningTodayScreen() {
                     which sounds like amnesia and means nothing of the kind. */}
                 <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
                   {goalSummary.notStarted
-                    ? t('progress.notStarted', { total: knowledge[goalId].total })
-                    : t('progress.withinWindow', {
-                      attempted: goalSummary.attempted, known: goalSummary.withinWindow,
-                    })}
+                    ? t('progress.notStarted', { total: goalSummary.total })
+                    : goalSummary.behind
+                      ? t('progress.behind', { count: goalSummary.overdue })
+                      : t('progress.studied', {
+                        total: goalSummary.total, attempted: goalSummary.attempted,
+                      })}
                 </Text>
+                {/* Where the finish line is. A goal had none until mig 192: the status value,
+                    the transition and the `target` column all existed and nothing ever decided.
+                    Under SRS nothing decides itself either — intervals grow and reviews never
+                    stop — so this is the product saying when it calls the work done. */}
+                {goalDone ? (
+                  <Text
+                    style={[theme.typography.caption, { color: theme.colors.success, marginTop: 4 }]}
+                    {...testProps('learning-goal-complete')}
+                  >
+                    {t('completion.done')}
+                  </Text>
+                ) : goalCompletionState !== null && (
+                  <Text
+                    style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}
+                    {...testProps('learning-goal-completion')}
+                  >
+                    {t('completion.progress', {
+                      mature: goalCompletionState.mature,
+                      required: goalCompletionState.required,
+                    })}
+                    {goalCompletionState.daysToComplete !== null
+                      ? ' · ' + t('completion.eta', { count: goalCompletionState.daysToComplete })
+                      : ''}
+                  </Text>
+                )}
                 {progressDetail !== '' && (
                   <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>
                     {progressDetail}
@@ -423,6 +555,17 @@ export function LearningTodayScreen() {
             {goal && (
               <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
                 <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>{goal.title}</Text>
+                {/* Which decks this plan draws from. A goal can hold dozens, so three names
+                    and a count rather than a paragraph above the day's numbers. */}
+                {deckSummary !== '' && (
+                  <Text
+                    style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}
+                    numberOfLines={1}
+                    {...testProps('learning-deck-summary')}
+                  >
+                    {deckSummary}
+                  </Text>
+                )}
                 <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 2 }]}>
                   {t('today.budget', { count: goal.daily_minutes })}
                   {plan ? ` · ${t('today.progress', { done: plan.completed_items, total: plan.total_items })}` : ''}
@@ -702,6 +845,59 @@ export function LearningTodayScreen() {
 
               </View>
             ) : null}
+
+            {/* ── What is working and what is not, over 30 days ─────────────────
+                The engine (`summarizeLearning`) and the copy in all 16 locale files existed
+                the whole time with nothing rendering them. Weak cards are a COUNT and a
+                BUTTON, never a list: a column of cards you got wrong with nothing to do about
+                it is the shape this screen has already been cleaned of twice. One button per
+                deck, because `finalize_study_session` refuses a session spanning decks. */}
+            {insights && insightsGoalId === goalId && insights.attemptCount > 0 && (
+              <View style={styles.attemptSection} {...testProps('learning-insights', true)}>
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
+                  {t('insights.title')}
+                </Text>
+                <View style={[styles.card, {
+                  backgroundColor: theme.colors.surface, borderColor: theme.colors.border,
+                }]}>
+                  <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
+                    {insightStats}
+                  </Text>
+                  <Text style={[theme.typography.caption, {
+                    color: theme.colors.textTertiary, marginTop: 4,
+                  }]}>
+                    {t('insights.scopeNote')}
+                  </Text>
+                </View>
+
+                {weakByDeck.map((group, index) => (
+                  <TouchableOpacity
+                    key={group.deckId}
+                    disabled={starting}
+                    onPress={() => void studyWeak(group)}
+                    style={[
+                      styles.card,
+                      { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+                      starting && styles.disabled,
+                    ]}
+                    accessibilityRole="button"
+                    accessibilityState={{ disabled: starting }}
+                    {...testProps('learning-weak-study-' + index)}
+                  >
+                    <Text style={[theme.typography.bodySmall, { color: theme.colors.primary }]}>
+                      {weakByDeck.length > 1 ? deckName(group.deckId) : t('insights.weakStudy')}
+                      {' · '}
+                      {t('insights.weakCount', { count: group.cardIds.length })}
+                    </Text>
+                    <Text style={[theme.typography.caption, {
+                      color: theme.colors.textTertiary, marginTop: 2,
+                    }]}>
+                      {t('insights.weakHint')}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
           </>
         )}
       </ScrollView>

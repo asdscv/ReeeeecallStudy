@@ -39,6 +39,7 @@ vi.mock('../../lib/supabase', () => ({ supabase: mockSupabase }))
 vi.mock('@reeeeecall/shared/lib/supabase', () => ({ supabase: mockSupabase }))
 
 import { useLearningStore, type LearningGoalWithDecks } from '../learning-store'
+import { DEFAULT_NEW_CARDS_PER_DAY } from '@reeeeecall/shared/learning/application/cadence'
 
 /** A thenable PostgREST-builder stub: every filter returns itself, awaiting resolves. */
 function q(result: unknown) {
@@ -174,6 +175,36 @@ describe('generatePlan', () => {
     expect(useLearningStore.getState().planBlockedReason).toBe('no_candidates')
     expect(useLearningStore.getState().planError).toBeNull()
     expect(mockRpc).not.toHaveBeenCalled()
+  })
+
+  it('caps new-card intake at the number the form has always shown', async () => {
+    // Reported: a 29-card goal whose FIRST plan was all 29 cards, so from day two there were
+    // no new cards left and every plan was pure review.
+    //
+    // The goal's settings were `{}`. `parseNewCardsPerDay({})` returns undefined, and the
+    // planner read `undefined ?? Infinity` — uncapped. That was a deliberate compatibility
+    // choice ("an existing goal plans exactly as it did"), but the behaviour it preserved is
+    // the entire deck on day one, and `GoalFormModal` had always DISPLAYED 20 for exactly
+    // these goals. On a 4,000-card deck the same path commits a year of reviews in one sitting.
+    const unseen = Array.from({ length: 40 }, (_, i) =>
+      cardRow('new-' + i, {
+        srs_status: 'new', interval_days: 0, repetitions: 0,
+        last_reviewed_at: null, next_review_at: null,
+      }))
+    queue('cards', { data: unseen, error: null })
+    queue('study_logs', { data: [], error: null })
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+    queue('daily_plans', { data: null, error: null })
+    queue('daily_plan_items', { data: [], error: null })
+
+    // settings `{}` — the shape every goal saved before the form started persisting them has.
+    await useLearningStore.getState().generatePlan(
+      { ...goalWithDecks([{ deck_id: 'deck-1', importance: 0.9 }]), settings: {} }, CTX)
+
+    const [, args] = mockRpc.mock.calls[0] as [string, Record<string, unknown>]
+    const items = args.p_items as unknown[]
+    expect(items.length).toBeGreaterThan(0)
+    expect(items.length).toBeLessThanOrEqual(DEFAULT_NEW_CARDS_PER_DAY)
   })
 
   it('saves a plan whose items carry the full activity shape, then re-reads it', async () => {
@@ -360,14 +391,24 @@ describe('generatePlan', () => {
       // Still self-rated: nothing grades the text, so the learner remains the evaluator.
       expect(item.evaluator_type).toBe('self_rate')
       // `payload` is the audit trail — the plan says which key it called the reference, so a
-      // template edited tomorrow cannot rewrite what today's plan meant.
-      expect(item.payload).toEqual({
+      // template edited tomorrow cannot rewrite what today's plan meant. Matched loosely: the
+      // payload also carries `is_new`, which these cases are not about.
+      expect(item.payload).toMatchObject({
         typed_answer: {
           resolver: 'card-answer-v1',
           prompt_keys: ['front'],
           reference_keys: ['back'],
         },
       })
+    })
+
+    it('records whether the planner counted the row as intake', async () => {
+      // Recorded, not left to be re-derived. Inferring it from a missing recall estimate reads
+      // every learning-step card as new — the mistake mig 191 removes from the RPC, and the
+      // one `plan-composition` used to make on screen hours after a card had been studied.
+      const item = await generateWith([basicTemplate])
+
+      expect(item.payload).toMatchObject({ is_new: true })
     })
 
     it('reads the layouts, not just the field order, from card_templates', async () => {
@@ -384,7 +425,9 @@ describe('generatePlan', () => {
       const item = await generateWith([])
 
       expect(item.response_type).toBe('self_rate')
-      expect(item.payload).toBeUndefined()
+      // No typed-answer record. `is_new` is still there — it is about the CARD, not the
+      // template, and the planner knows it whether or not a template could be read.
+      expect(item.payload).toEqual({ is_new: true })
     })
 
     it('stays a self-rating when the template declares no answer face', async () => {
@@ -392,7 +435,7 @@ describe('generatePlan', () => {
       const item = await generateWith([{ ...basicTemplate, back_layout: [] }])
 
       expect(item.response_type).toBe('self_rate')
-      expect(item.payload).toBeUndefined()
+      expect(item.payload).toEqual({ is_new: true })
     })
   })
 })

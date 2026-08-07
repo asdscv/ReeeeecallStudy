@@ -138,7 +138,14 @@
     "typicalTime": "เวลาโดยทั่วไป",
     "weakEmpty": "ไม่มีการ์ดที่ตามไม่ทัน",
     "weakHint": "การ์ดที่ทำอย่างน้อย 2 ครั้ง โดยมีค่าเฉลี่ยต่ำกว่า 60%",
-    "weakTitle": "ควรดูอีกครั้ง"
+    "weakTitle": "ควรดูอีกครั้ง",
+    "accuracyValue": "ความแม่นยำ {{pct, number}}%",
+    "typicalValue": "ปกติ {{seconds, decimal}} วินาที",
+    "adherenceValue": "ทำตามแผน {{pct, number}}%",
+    "weakCount": "{{count, number}} ใบ",
+    "weakCount_one": "{{count, number}} ใบ",
+    "weakCount_other": "{{count, number}} ใบ",
+    "weakStudy": "เรียนเฉพาะใบเหล่านี้"
   },
   "recommend": {
     "accept": "ยอมรับ",
@@ -203,20 +210,36 @@
       "fresh": "ใหม่ {{count, number}} ใบ",
       "fresh_one": "ใหม่ {{count, number}} ใบ",
       "fresh_other": "ใหม่ {{count, number}} ใบ"
-    }
+    },
+    "deckListMore": "{{names}} และอีก {{count, number}} ชุด",
+    "deckListMore_one": "{{names}} และอีก {{count, number}} ชุด",
+    "deckListMore_other": "{{names}} และอีก {{count, number}} ชุด"
   },
   "progress": {
     "title": "ความคืบหน้า",
     "daysLeft": "เหลือ {{count, number}} วัน",
     "daysLeft_one": "เหลือ {{count, number}} วัน",
     "daysLeft_other": "เหลือ {{count, number}} วัน",
-    "withinWindow": "{{known, number}} จาก {{attempted, number}} ใบที่เรียนแล้วยังอยู่ในรอบทบทวน",
     "notStarted": "ยังไม่ได้เริ่มเรียน · ทั้งหมด {{total, number}} ใบ",
-    "overdue": "เลยกำหนดทบทวน {{count, number}} ใบ",
-    "overdue_one": "เลยกำหนดทบทวน {{count, number}} ใบ",
-    "overdue_other": "เลยกำหนดทบทวน {{count, number}} ใบ",
     "unstudied": "ยังไม่ได้เรียน {{count, number}} ใบ",
     "unstudied_one": "ยังไม่ได้เรียน {{count, number}} ใบ",
-    "unstudied_other": "ยังไม่ได้เรียน {{count, number}} ใบ"
+    "unstudied_other": "ยังไม่ได้เรียน {{count, number}} ใบ",
+    "behind": "มี {{count, number}} ใบเลยกำหนดทบทวน",
+    "behind_one": "มี {{count, number}} ใบเลยกำหนดทบทวน",
+    "behind_other": "มี {{count, number}} ใบเลยกำหนดทบทวน",
+    "studied": "เรียนแล้ว {{attempted, number}} จาก {{total, number}} ใบ",
+    "detailStudied": "เรียนแล้ว {{count, number}} ใบ",
+    "detailStudied_one": "เรียนแล้ว {{count, number}} ใบ",
+    "detailStudied_other": "เรียนแล้ว {{count, number}} ใบ",
+    "detailWithinWindow": "อยู่ในรอบทบทวน {{count, number}} ใบ",
+    "detailWithinWindow_one": "อยู่ในรอบทบทวน {{count, number}} ใบ",
+    "detailWithinWindow_other": "อยู่ในรอบทบทวน {{count, number}} ใบ"
+  },
+  "completion": {
+    "done": "บรรลุเป้าหมายแล้ว",
+    "progress": "จำได้แล้ว {{mature, number}} จาก {{required, number}} ใบ",
+    "eta": "อีกประมาณ {{count, number}} วัน",
+    "eta_one": "อีกประมาณ {{count, number}} วัน",
+    "eta_other": "อีกประมาณ {{count, number}} วัน"
   }
 }

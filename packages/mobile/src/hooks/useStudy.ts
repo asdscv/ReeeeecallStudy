@@ -53,6 +53,22 @@ export function useStudy() {
     })
   }, [store])
 
+  /**
+   * Study exactly these cards — the diagnostics panel's "다시 볼 카드" button.
+   *
+   * Always SRS: a card the learner keeps failing has to have its schedule moved, and the
+   * cramming modes move nothing (`modeFeedsSrsSchedule`). No plan item is completed, because
+   * these cards were not on today's plan — that is why the ordinary queue never serves them.
+   */
+  const startCardSession = useCallback(async (deckId: string, cardIds: string[]) => {
+    await store.initSession({
+      deckId,
+      mode: 'srs',
+      batchSize: cardIds.length,
+      cardSelection: cardIds,
+    })
+  }, [store])
+
   const flipCard = useCallback(() => {
     store.flipCard()
     haptics.tap()
@@ -124,6 +140,7 @@ export function useStudy() {
     // Actions
     startSession,
     startPlanSession,
+    startCardSession,
     flipCard,
     rateCard,
     undoLastRating,

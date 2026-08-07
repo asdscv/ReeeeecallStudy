@@ -22,6 +22,17 @@
  * They had already drifted — the widget drew `known / total` while the plan page drew
  * `known / attempted`, so the same goal showed 3% in one place and 5% in the other from one
  * RPC's numbers. One function, one ratio.
+ *
+ * ## Why the card names the total
+ *
+ * Reported next: "17장은 뭐고 12장은 뭐야". The card said "배운 17장 중 17장이 복습 주기 안에
+ * 있어요 / 아직 안 배움 12장" above a plan card saying "12장 남음", and nothing on screen said
+ * that 17 + 12 = the goal's 29 cards, or that the 12 unstudied ARE today's 12. Two counts in the
+ * same unit, drawn from different populations, with the population itself never named.
+ *
+ * Worse, the bar was full. `known / attempted` reaches 100% as soon as nothing is overdue, so a
+ * goal 59% of the way through drew a complete bar. The ratio is `attempted / total` now, and the
+ * headline — not the bar — carries whether the learner is behind.
  */
 
 /** The shape `get_goal_knowledge` returns. */
@@ -33,7 +44,9 @@ export interface GoalKnowledgeCounts {
 }
 
 export interface GoalKnowledgeSummary {
-  /** Cards with any review history. The denominator: never-studied cards are not evidence. */
+  /** Every card the goal's decks hold. The anchor both numbers below are parts of. */
+  total: number
+  /** Cards with any review history — studied at least once, whatever state they are in now. */
   attempted: number
   /** Of `attempted`, how many are still inside their review window. */
   withinWindow: number
@@ -41,10 +54,22 @@ export interface GoalKnowledgeSummary {
   overdue: number
   /** Never studied. */
   unstudied: number
-  /** `withinWindow / attempted` as a whole percent, or 0 when nothing has been studied. */
+  /**
+   * How far through the goal's cards the learner has got: `attempted / total`, whole percent.
+   *
+   * Deliberately NOT `withinWindow / attempted`, which is what this used to be. That ratio hits
+   * 100% the moment nothing is overdue — so a goal with 17 cards studied and 12 never opened
+   * drew a full bar and read as finished. A progress bar may only fill when there is no card
+   * left to reach; "nothing is overdue" is a different claim and the headline makes it.
+   */
   percent: number
   /**
-   * Nothing has been studied yet, so the ratio has no meaning.
+   * Reviews are past due. The one state the learner has to act on TODAY, so the headline leads
+   * with it and everything else moves to the line below.
+   */
+  behind: boolean
+  /**
+   * Nothing has been studied yet, so there is no progress to report.
    *
    * A brand-new goal must read as "not started", never as a confident 0% — those are different
    * claims and only one of them is true.
@@ -55,11 +80,13 @@ export interface GoalKnowledgeSummary {
 export function goalKnowledgeSummary(counts: GoalKnowledgeCounts): GoalKnowledgeSummary {
   const attempted = counts.known + counts.unknown
   return {
+    total: counts.total,
     attempted,
     withinWindow: counts.known,
     overdue: counts.unknown,
     unstudied: counts.unseen,
-    percent: attempted > 0 ? Math.round((counts.known / attempted) * 100) : 0,
+    percent: counts.total > 0 ? Math.round((attempted / counts.total) * 100) : 0,
+    behind: counts.unknown > 0,
     notStarted: attempted === 0,
   }
 }

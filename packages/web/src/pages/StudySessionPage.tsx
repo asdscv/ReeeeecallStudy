@@ -94,6 +94,20 @@ export function StudySessionPage() {
    */
   const goalId = searchParams.get('goalId')
   const planDate = searchParams.get('planDate')
+
+  /**
+   * An explicit card list, from the diagnostics panel's "다시 볼 카드" button.
+   *
+   * In the URL rather than in navigation state so the session survives a reload and can be
+   * shared between tabs, like every other study parameter here. Bounded by `WEAK_LIMIT` (10)
+   * on the producing side, so ten uuids is the longest this can be.
+   */
+  const cardSelection = useMemo(() => {
+    const raw = searchParams.get('cards')
+    if (!raw) return null
+    const ids = raw.split(',').map((id) => id.trim()).filter(Boolean)
+    return ids.length > 0 ? ids : null
+  }, [searchParams])
   const { plan, planItems, planCards, fetchPlan } = useLearningStore()
 
   useEffect(() => {
@@ -168,12 +182,13 @@ export function StudySessionPage() {
       crammingTimeLimitMinutes,
       crammingShuffle,
       planSelection: planSelection ?? undefined,
+      cardSelection: cardSelection ?? undefined,
     })
 
     return () => {
       stopSpeaking()
     }
-  }, [deckId, searchParams, initSession, goalId, planDate, planSelection])
+  }, [deckId, searchParams, initSession, goalId, planDate, planSelection, cardSelection])
 
   // Cramming timer countdown
   useEffect(() => {

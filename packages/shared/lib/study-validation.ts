@@ -36,6 +36,7 @@ export interface StudyConfigInput {
   crammingTimeLimitMinutes?: unknown
   crammingShuffle?: unknown
   planSelection?: unknown
+  cardSelection?: unknown
 }
 
 /**
@@ -67,6 +68,14 @@ export interface NormalizedStudyConfig {
   crammingTimeLimitMinutes?: number | null
   crammingShuffle?: boolean
   planSelection?: NormalizedPlanSelection
+  /**
+   * Study exactly these cards, in this order, and nothing else.
+   *
+   * The diagnostics panel's "다시 볼 카드" button: cards the learner keeps failing, which are
+   * usually NOT due, so the ordinary SRS queue would refuse to serve them. Distinct from
+   * `planSelection` — it completes no plan item, because these cards were not on the plan.
+   */
+  cardSelection?: string[]
 }
 
 export class StudyValidationError extends Error {
@@ -132,6 +141,30 @@ function normalizeCrammingFilter(raw: unknown): CrammingFilter {
     default:
       throw new StudyValidationError('Invalid cramming filter')
   }
+}
+
+/**
+ * A bare list of card ids, deduplicated, order preserved.
+ *
+ * Order is the caller's ranking (worst-scoring card first), so it is kept rather than sorted.
+ * Duplicates are dropped rather than rejected: two rows naming the same card is a caller bug
+ * that should not cost the learner a session, and studying a card twice in one queue would
+ * ask them to rate a card whose schedule the first rating already moved.
+ */
+function normalizeCardSelection(raw: unknown): string[] {
+  if (!Array.isArray(raw)) throw new StudyValidationError('cardSelection must be an array')
+  const out: string[] = []
+  const seen = new Set<string>()
+  for (const value of raw) {
+    if (typeof value !== 'string' || value.length === 0) {
+      throw new StudyValidationError('cardSelection must hold non-empty card ids')
+    }
+    if (seen.has(value)) continue
+    seen.add(value)
+    out.push(value)
+  }
+  if (out.length === 0) throw new StudyValidationError('cardSelection cannot be empty')
+  return out
 }
 
 function normalizePlanSelection(raw: unknown): NormalizedPlanSelection {
@@ -232,6 +265,21 @@ export function normalizeStudyConfig(input: StudyConfigInput): NormalizedStudyCo
       throw new StudyValidationError('A plan session must be SRS mode')
     }
     normalized.planSelection = normalizePlanSelection(input.planSelection)
+  }
+
+  // Same SRS-only rule, same reason: a cramming session moves no schedule, so re-studying a
+  // card the learner keeps failing in one of those modes would change nothing about when it
+  // comes back. The whole point of the button is to move those cards.
+  if (input.cardSelection != null) {
+    if (input.mode !== 'srs') {
+      throw new StudyValidationError('A card-selection session must be SRS mode')
+    }
+    if (normalized.planSelection) {
+      // Both would name a queue and only one can win. Silently picking is how a learner ends
+      // up studying something other than what they pressed.
+      throw new StudyValidationError('planSelection and cardSelection are mutually exclusive')
+    }
+    normalized.cardSelection = normalizeCardSelection(input.cardSelection)
   }
 
   return normalized
