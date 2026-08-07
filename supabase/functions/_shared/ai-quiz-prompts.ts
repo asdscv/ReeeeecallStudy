@@ -132,7 +132,7 @@ ${flaws}
 
 Rules:
 ${bullets([
-  `Exactly ${MCQ_DISTRACTOR_COUNT} distractors per card, each with a DIFFERENT flaw. Three shades of one flaw is one distractor shown three times.`,
+  `Exactly ${MCQ_DISTRACTOR_COUNT} distractors per card. They may share a flaw label — three close neighbours of the answer is often the best set a card can have. What they must not share is substance: three ways of writing the same wrong idea is one distractor shown three times.`,
   'A distractor must be UNAMBIGUOUSLY WRONG for this card. If you cannot say which flaw it has, it is probably also correct — do not write it.',
   'Never write a distractor that restates the answer, contains the whole answer, or is contained by it (except "partial", above).',
   'Write distractors in the same language and script as the `answer`. An option in another language is spotted without being read.',
@@ -148,10 +148,10 @@ ${bullets([
 
 export function buildShortAnswerGenerationPrompt(sources: readonly QuizCardSource[]) {
   const angles = bullets([
-    '"reverse" — give the ANSWER text in the question and ask which prompt it belongs to. Expected answer: the card\'s prompt.',
+    '"reverse" — quote the ANSWER text and ask what it corresponds to on the front of the card, worded the way a learner would ask it. Expected answer: the card\'s prompt.',
     '"cloze" — write one sentence containing the card\'s PROMPT text verbatim, with the answer replaced by "____". Expected answer: the card\'s answer.',
     '"restate" — ask for the same thing the card asks for, worded differently. Expected answer: the card\'s answer.',
-    '"field_probe" — ask for one of the card\'s `otherFields` by its label; set "probeFieldKey" to that field\'s key. Expected answer: that field\'s value. Only available when the card has otherFields.',
+    '"field_probe" — ask for one of the extra fields USING ITS LABEL as the learner would say it ("What is the pronunciation of X?"); set "probeFieldKey" to that field\'s key. Expected answer: that field\'s value. Only available when the card has extra fields.',
   ])
 
   const systemPrompt = `${GROUNDING}
@@ -170,6 +170,8 @@ ${angles}
 Rules:
 ${bullets([
   'The question must NEVER contain the expected answer, in any spelling, spacing, or script. This is checked; a leaked question is discarded.',
+  'Plain text only. No HTML, no markdown, no <b> or ** — the question is rendered as text and a learner would read the tags.',
+  'Write TO a learner, never ABOUT the data. The words "prompt", "answer field", "card", "field", "otherFields" and "cardId" are our internal names for this JSON — a question containing one of them shows the learner our schema. This is checked; such a question is discarded.',
   'For "reverse", "cloze" and "field_probe" the question MUST contain its source text verbatim (the answer, the prompt, and the prompt respectively). This is checked too.',
   'Write the question in the same language as the text it quotes.',
   'Ask for something the card can settle. Never ask for an opinion, a comparison with material outside the card, or anything the card does not state.',

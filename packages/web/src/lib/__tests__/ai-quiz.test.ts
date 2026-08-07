@@ -17,6 +17,8 @@ import {
   validateShortAnswerGeneration, validateShortAnswerGrade,
   ESSAY_WEIGHT_TOTAL, MAX_LEARNER_CHARS, MCQ_OPTION_COUNT, SHORT_ANSWER_BANDS,
   type EssayCriterion, type QuizCardSource, type QuizGradeInput,
+  leaksSchemaWord,
+  stripQuestionMarkup,
 } from '../../../../../supabase/functions/_shared/ai-quiz.ts'
 
 const itemId = (cardId: string, i: number) => `item-${cardId}-${i}`
@@ -176,14 +178,24 @@ describe('validateMultipleChoiceGeneration', () => {
     expect(out.dropped.map((d) => d.reason)).toContain('partial_not_applicable')
   })
 
-  it('refuses two distractors with the same flaw', () => {
-    // Three shades of one near-miss is one distractor shown three times — and the shape most
-    // likely to hide a fourth correct answer among them.
+  it('ACCEPTS three distractors that share a flaw', () => {
+    // This was a refusal, and it was wrong. Run against a real eight-word deck
+    // (lend / borrow / owe / repay / lease / rent …) the distinct-flaw rule dropped EVERY item:
+    // the three best distractors for a vocabulary card genuinely are three `adjacent_sense`
+    // neighbours. It also failed at what it was aimed at, because a model holding three
+    // near-synonyms just mislabels one to get past it — and then the post-answer explanation
+    // says the wrong thing. Substance is guarded by the equality, duplication and containment
+    // checks; the flaw is a rendering hint.
     const out = validateMultipleChoiceGeneration(
       mcq(threeGood.map((d) => ({ ...d, flaw: 'adjacent_sense' }))), [card()], itemId,
     )
-    expect(out.items).toEqual([])
-    expect(out.dropped.map((d) => d.reason)).toContain('flaw_repeated')
+    expect(out.items).toHaveLength(1)
+    const item = out.items[0]
+    expect(item.type).toBe('multiple_choice')
+    if (item.type !== 'multiple_choice') throw new Error('unreachable')
+    expect(item.flaws.filter(Boolean)).toEqual(
+      ['adjacent_sense', 'adjacent_sense', 'adjacent_sense'],
+    )
   })
 
   it('refuses a flaw outside the set', () => {
@@ -602,5 +614,55 @@ describe('validateEssayGrade', () => {
     }
     // An empty rubric is our bug, not the model's, and is still not a grade.
     expect(validateEssayGrade({ criteria: [] }, [], input()).graded).toBe(false)
+  })
+})
+
+describe('a question written about our JSON instead of the learner\'s card', () => {
+  // A real production generation returned "What is the prompt for '빌려주다'?" — the model
+  // copied the noun straight out of the instruction describing the angle. The instruction was
+  // fixed, but an instruction the model is asked to follow is not the same as one it cannot
+  // break, and the question is the ONE model-authored string this feature renders.
+  it('catches the identifiers that name our payload', () => {
+    for (const q of [
+      "What is the prompt for '빌려주다'?",
+      'Which cardId does this belong to?',
+      'Pick one of the otherFields.',
+      'What goes in field_2?',
+      'Which answer field is this?',
+    ]) {
+      expect(leaksSchemaWord(q), q).toBe(true)
+    }
+  })
+
+  it('leaves a real question alone, including one that happens to say "card"', () => {
+    // Matched on word boundaries and only against the question, so a deck about poker or
+    // payment terminals is not collateral damage.
+    for (const q of [
+      'Which English word means 빌려주다?',
+      'What is the pronunciation of lend?',
+      'Name the card that beats a full house.',
+      '이 단어의 뜻은?',
+      'Prompted by what?',
+    ]) {
+      expect(leaksSchemaWord(q), q).toBe(false)
+    }
+  })
+})
+
+describe('inline markup in a model-authored question', () => {
+  // A real production generation returned "When you <b>pledge</b> something, you ____." The
+  // screens render a question as text, so the learner would read the tags — the same failure as
+  // the AI feature that printed raw JSON, arriving through a narrower door.
+  it('strips the tags a model reaches for, and keeps the words', () => {
+    expect(stripQuestionMarkup('When you <b>pledge</b> something, you ____.'))
+      .toBe('When you pledge something, you ____.')
+    expect(stripQuestionMarkup('<p>What is <em>lend</em>?</p><br/>')).toBe('What is lend?')
+    expect(stripQuestionMarkup('  spaced   out  ')).toBe('spaced out')
+  })
+
+  it('leaves comparisons alone', () => {
+    // A whitelist of tag names, not `<[^>]*>`: a maths deck must keep its own text.
+    expect(stripQuestionMarkup('Is x<y>z true?')).toBe('Is x<y>z true?')
+    expect(stripQuestionMarkup('When is a < b?')).toBe('When is a < b?')
   })
 })

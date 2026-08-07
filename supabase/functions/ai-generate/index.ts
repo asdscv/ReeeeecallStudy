@@ -751,7 +751,12 @@ Deno.serve(async (req) => {
           console.warn('[ai-generate] quiz drops:', JSON.stringify(outcome.dropped))
         }
         // Fewer than half the requested items is not a quiz worth charging for.
-        if (!outcome.servable) throw new Error('QUIZ_UNSERVABLE')
+        if (!outcome.servable) {
+          // The reasons travel with the error. They are enum members plus card ids the caller
+          // already owns — no card content — and without them an empty result is unfalsifiable:
+          // "the model wrote nothing usable" and "our validator is too strict" look identical.
+          throw new Error(`QUIZ_UNSERVABLE:${JSON.stringify(outcome.dropped)}`)
+        }
 
         const questions = outcome.items.map((item: QuizItem) => {
           const base = {
@@ -798,13 +803,15 @@ Deno.serve(async (req) => {
         console.error('[ai-generate] quiz generation failure:', message)
         await releaseJob(userId, meter.job_ref)
         const code = message === 'QUIZ_NO_ELIGIBLE_CARDS' ? 'QUIZ_NOT_ENOUGH_CARDS'
-          : message === 'QUIZ_UNSERVABLE' ? 'AI_EMPTY_RESULT'
+          : message.startsWith('QUIZ_UNSERVABLE') ? 'AI_EMPTY_RESULT'
           : message.startsWith('CONTEXT_LOAD') ? 'AI_CONTEXT_ERROR'
           : message.startsWith('PERSISTENCE:') ? 'AI_PERSISTENCE_ERROR'
           : 'AI_PROVIDER_ERROR'
         const status = code === 'QUIZ_NOT_ENOUGH_CARDS' ? 422
           : code === 'AI_EMPTY_RESULT' ? 422 : code === 'AI_CONTEXT_ERROR' ? 400 : 502
-        return json({ error: 'Quiz generation failed', code }, status, cors)
+        const dropped = message.startsWith('QUIZ_UNSERVABLE:')
+          ? JSON.parse(message.slice('QUIZ_UNSERVABLE:'.length)) : undefined
+        return json({ error: 'Quiz generation failed', code, dropped }, status, cors)
       }
     }
 
