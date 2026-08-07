@@ -91,7 +91,9 @@
     "QUIZ_UNGRADEABLE": "Không chấm được câu trả lời này — nó trống hoặc quá dài.",
     "QUIZ_GRADE_REFUSED": "Chấm bài không thành công và bạn không bị tính phí. Hãy thử lại.",
     "QUIZ_ITEM_GONE": "Câu hỏi này không còn nữa.",
-    "UNKNOWN": "Đã xảy ra lỗi. Vui lòng thử lại."
+    "UNKNOWN": "Đã xảy ra lỗi. Vui lòng thử lại.",
+    "QUIZ_CARDS_TOO_SHORT": "Các thẻ này quá ngắn để ra đề tự luận — bài tự luận được chấm theo các cụm từ lấy từ chính thẻ. Hãy thử trả lời ngắn hoặc trắc nghiệm cho bộ này.",
+    "AI_PROVIDER_ERROR": "Dịch vụ AI đang bận. Bạn không bị tính phí — hãy thử lại sau giây lát."
   },
   "verdict": {
     "equivalent": "Đúng",

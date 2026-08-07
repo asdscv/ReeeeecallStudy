@@ -752,6 +752,16 @@ Deno.serve(async (req) => {
         }
         // Fewer than half the requested items is not a quiz worth charging for.
         if (!outcome.servable) {
+          // One drop reason dominating the batch is not a generation failure, it is a MISMATCH
+          // between the deck and the question type, and the learner can act on it. An essay
+          // rubric grounds its criteria in terms quoted from the card; a two-word vocabulary
+          // card has nothing to quote, so every item comes back `ungrounded_mention`. Telling
+          // that learner "the AI produced nothing usable" sends them to retry forever.
+          const reasons = outcome.dropped.map((d) => d.reason)
+          const ungrounded = reasons.filter((r) => r === 'ungrounded_mention').length
+          if (reasons.length > 0 && ungrounded * 2 >= reasons.length) {
+            throw new Error(`QUIZ_CARDS_TOO_SHORT:${JSON.stringify(outcome.dropped)}`)
+          }
           // The reasons travel with the error. They are enum members plus card ids the caller
           // already owns — no card content — and without them an empty result is unfalsifiable:
           // "the model wrote nothing usable" and "our validator is too strict" look identical.
@@ -803,14 +813,16 @@ Deno.serve(async (req) => {
         console.error('[ai-generate] quiz generation failure:', message)
         await releaseJob(userId, meter.job_ref)
         const code = message === 'QUIZ_NO_ELIGIBLE_CARDS' ? 'QUIZ_NOT_ENOUGH_CARDS'
+          : message.startsWith('QUIZ_CARDS_TOO_SHORT') ? 'QUIZ_CARDS_TOO_SHORT'
           : message.startsWith('QUIZ_UNSERVABLE') ? 'AI_EMPTY_RESULT'
           : message.startsWith('CONTEXT_LOAD') ? 'AI_CONTEXT_ERROR'
           : message.startsWith('PERSISTENCE:') ? 'AI_PERSISTENCE_ERROR'
           : 'AI_PROVIDER_ERROR'
-        const status = code === 'QUIZ_NOT_ENOUGH_CARDS' ? 422
-          : code === 'AI_EMPTY_RESULT' ? 422 : code === 'AI_CONTEXT_ERROR' ? 400 : 502
-        const dropped = message.startsWith('QUIZ_UNSERVABLE:')
-          ? JSON.parse(message.slice('QUIZ_UNSERVABLE:'.length)) : undefined
+        const status = code === 'QUIZ_NOT_ENOUGH_CARDS' || code === 'QUIZ_CARDS_TOO_SHORT'
+          || code === 'AI_EMPTY_RESULT' ? 422
+          : code === 'AI_CONTEXT_ERROR' ? 400 : 502
+        const marker = ['QUIZ_UNSERVABLE:', 'QUIZ_CARDS_TOO_SHORT:'].find((m) => message.startsWith(m))
+        const dropped = marker ? JSON.parse(message.slice(marker.length)) : undefined
         return json({ error: 'Quiz generation failed', code, dropped }, status, cors)
       }
     }
