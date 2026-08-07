@@ -1,0 +1,96 @@
+{
+  "type": {
+    "mcq": "Trắc nghiệm",
+    "short": "Trả lời ngắn",
+    "essay": "Tự luận"
+  },
+  "home": {
+    "title": "Kiểm tra",
+    "subtitle": "Tự kiểm tra bằng một bộ thẻ. Câu hỏi được tạo từ chính thẻ của bạn.",
+    "create": "Tạo bài mới",
+    "take": "Làm bài",
+    "starting": "Đang bắt đầu…",
+    "retakeFree": "Làm lại miễn phí",
+    "questions_one": "{{count, number}} câu",
+    "questions_other": "{{count, number}} câu",
+    "trial": {
+      "title": "Bạn đã có phần dùng thử",
+      "body_one": "{{count, number}} đơn vị dùng thử — đủ để hoàn thành trọn một bài.",
+      "body_other": "{{count, number}} đơn vị dùng thử — đủ để hoàn thành trọn một bài."
+    },
+    "empty": {
+      "title": "Chưa có bài kiểm tra nào",
+      "body": "Tạo từ bất kỳ bộ thẻ nào, chỉ mất vài giây."
+    },
+    "pricingNote": "{{price}} mỗi đơn vị. Trắc nghiệm luôn được chấm miễn phí."
+  },
+  "setup": {
+    "title": "Bài kiểm tra mới",
+    "subtitle": "Chọn bộ thẻ và loại câu hỏi. Bạn luôn thấy giá trước khi bị trừ tiền.",
+    "deck": "Bộ thẻ",
+    "deckPlaceholder": "Chọn bộ thẻ",
+    "untitled": "Bài kiểm tra",
+    "type": "Loại câu hỏi",
+    "typeHint": {
+      "mcq": "Bốn lựa chọn, chấm ngay và miễn phí.",
+      "short": "Trả lời bằng một từ hoặc cụm từ. AI chấm, tính phí theo từng câu.",
+      "essay": "Viết vài câu, chấm theo tiêu chí. Khó nhất và đắt nhất."
+    },
+    "count": "Số câu hỏi",
+    "eligible": "{{eligible, number}} trong {{total, number}} thẻ có thể ra đề",
+    "noEligible": {
+      "title": "Không thẻ nào trong {{total, number}} thẻ này ra đề được",
+      "body": "Bài kiểm tra cần biết trường nào ở mặt sau thẻ là đáp án. Hãy mở mẫu thẻ của bộ và đánh dấu trường đó là trường chính."
+    },
+    "tooFewForMcq_one": "Trắc nghiệm lấy phương án sai từ các thẻ khác nên cần ít nhất 4 thẻ. Bộ này có {{count, number}} thẻ.",
+    "tooFewForMcq_other": "Trắc nghiệm lấy phương án sai từ các thẻ khác nên cần ít nhất 4 thẻ. Bộ này có {{count, number}} thẻ.",
+    "price": "Giá",
+    "free": "Miễn phí",
+    "covered": "Phần miễn phí bù {{units, number}} đơn vị",
+    "retakeFree": "Làm lại không tốn phí.",
+    "confirm": "Tạo bài kiểm tra",
+    "generating": "Đang soạn câu hỏi…"
+  },
+  "run": {
+    "loading": "Đang tải…",
+    "empty": "Các câu hỏi trong bài này không còn — những thẻ tạo ra chúng đã bị xoá.",
+    "backToQuiz": "Về danh sách",
+    "progress": "{{current, number}} / {{total, number}}",
+    "leave": "Thoát",
+    "placeholder": {
+      "short": "Nhập câu trả lời",
+      "essay": "Viết câu trả lời"
+    },
+    "submit": "Nộp",
+    "next": "Tiếp",
+    "finish": "Kết thúc",
+    "grading": "Đang chấm…",
+    "gradeFor": "Chấm câu này · {{price}}",
+    "scored": "Được {{score, number}}%",
+    "reference": "Đáp án: {{answer}}"
+  },
+  "result": {
+    "percent": "{{percent, number}}%",
+    "of": "{{raw, number}} trên {{max, number}}",
+    "attempt_one": "Lần {{count, number}}",
+    "attempt_other": "Lần {{count, number}}",
+    "item": "Câu {{n, number}}",
+    "ungraded": "Chưa chấm",
+    "markCorrect": "Tôi đúng",
+    "markWrong": "Tôi sai",
+    "retake": "Làm lại"
+  },
+  "error": {
+    "AI_INSUFFICIENT_CREDITS": "Không đủ số dư. Hãy nạp thêm để tiếp tục.",
+    "AI_PRICE_CHANGED": "Giá đã thay đổi trong lúc bạn cân nhắc. Hãy kiểm tra và thử lại.",
+    "AI_REQUEST_TOO_LARGE": "Vượt quá sức chứa của một bài. Hãy giảm số câu hỏi.",
+    "QUIZ_NOT_ENOUGH_CARDS": "Bộ thẻ này không đủ thẻ để ra đề.",
+    "AI_RATE_CAP": "Bạn đã đạt giới hạn yêu cầu hôm nay. Hãy thử lại vào ngày mai.",
+    "FORBIDDEN": "Bạn không có quyền truy cập.",
+    "AI_EMPTY_RESULT": "Không tạo được câu hỏi dùng được nên bạn không bị tính phí. Hãy thử lại.",
+    "QUIZ_UNGRADEABLE": "Không chấm được câu trả lời này — nó trống hoặc quá dài.",
+    "QUIZ_GRADE_REFUSED": "Chấm bài không thành công và bạn không bị tính phí. Hãy thử lại.",
+    "QUIZ_ITEM_GONE": "Câu hỏi này không còn nữa.",
+    "UNKNOWN": "Đã xảy ra lỗi. Vui lòng thử lại."
+  }
+}

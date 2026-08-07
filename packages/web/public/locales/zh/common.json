@@ -16,7 +16,8 @@
     "leaderboard": "Leaderboard",
     "analytics": "Analytics",
     "publisher": "发布者统计",
-    "wallet": "钱包"
+    "wallet": "钱包",
+    "quiz": "测验"
   },
   "actions": {
     "save": "保存",

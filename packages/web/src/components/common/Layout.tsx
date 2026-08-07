@@ -41,6 +41,7 @@ export function Layout() {
     { kind: 'link', path: '/dashboard', label: t('nav.dashboard'), icon: '📊' },
     { kind: 'group', label: t('nav.study'), icon: '📚', children: [
       { path: '/learning', label: t('nav.learningPlan'), icon: '🎯' },
+      { path: '/quiz', label: t('nav.quiz'), icon: '❓' },
       { path: '/ai-generate', label: t('nav.aiGenerate'), icon: '🤖' },
       { path: '/decks', label: t('nav.decks'), icon: '📚' },
       { path: '/templates', label: t('nav.cards'), icon: '📋' },

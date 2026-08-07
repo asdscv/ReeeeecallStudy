@@ -1,0 +1,96 @@
+{
+  "type": {
+    "mcq": "Multiple choice",
+    "short": "Short answer",
+    "essay": "Essay"
+  },
+  "home": {
+    "title": "Quiz",
+    "subtitle": "Test yourself on a deck. Questions are written from your own cards.",
+    "create": "New quiz",
+    "take": "Take",
+    "starting": "Starting…",
+    "retakeFree": "Retakes are free",
+    "questions_one": "{{count, number}} question",
+    "questions_other": "{{count, number}} questions",
+    "trial": {
+      "title": "Your quiz credit is ready",
+      "body_one": "{{count, number}} unit to try, on us — enough for a whole set.",
+      "body_other": "{{count, number}} units to try, on us — enough for a whole set."
+    },
+    "empty": {
+      "title": "No quizzes yet",
+      "body": "Make one from any deck. It takes a few seconds."
+    },
+    "pricingNote": "{{price}} per unit. Multiple choice is graded free, every time."
+  },
+  "setup": {
+    "title": "New quiz",
+    "subtitle": "Pick a deck and a question type. You see the price before anything is spent.",
+    "deck": "Deck",
+    "deckPlaceholder": "Choose a deck",
+    "untitled": "Quiz",
+    "type": "Question type",
+    "typeHint": {
+      "mcq": "Four options, graded instantly and free.",
+      "short": "A word or a phrase. Graded by AI, charged per answer.",
+      "essay": "A few sentences, graded against a rubric. The most demanding, and the most expensive."
+    },
+    "count": "Questions",
+    "eligible": "{{eligible, number}} of {{total, number}} cards can be quizzed",
+    "noEligible": {
+      "title": "None of these {{total, number}} cards can be quizzed",
+      "body": "A quiz has to know which field on the back of a card is the answer. Open the deck's template and mark that field as the main one."
+    },
+    "tooFewForMcq_one": "Multiple choice draws its wrong options from other cards, so it needs at least four. This deck has {{count, number}}.",
+    "tooFewForMcq_other": "Multiple choice draws its wrong options from other cards, so it needs at least four. This deck has {{count, number}}.",
+    "price": "Price",
+    "free": "Free",
+    "covered": "{{units, number}} units covered by your free allowance",
+    "retakeFree": "Taking it again costs nothing.",
+    "confirm": "Create quiz",
+    "generating": "Writing questions…"
+  },
+  "run": {
+    "loading": "Loading…",
+    "empty": "The questions in this set are gone — the cards they came from were deleted.",
+    "backToQuiz": "Back to quizzes",
+    "progress": "{{current, number}} / {{total, number}}",
+    "leave": "Leave",
+    "placeholder": {
+      "short": "Type your answer",
+      "essay": "Write your answer"
+    },
+    "submit": "Submit",
+    "next": "Next",
+    "finish": "Finish",
+    "grading": "Grading…",
+    "gradeFor": "Grade this answer · {{price}}",
+    "scored": "Scored {{score, number}}%",
+    "reference": "Answer: {{answer}}"
+  },
+  "result": {
+    "percent": "{{percent, number}}%",
+    "of": "{{raw, number}} of {{max, number}}",
+    "attempt_one": "Attempt {{count, number}}",
+    "attempt_other": "Attempt {{count, number}}",
+    "item": "Question {{n, number}}",
+    "ungraded": "Not graded",
+    "markCorrect": "I was right",
+    "markWrong": "I was wrong",
+    "retake": "Take it again"
+  },
+  "error": {
+    "AI_INSUFFICIENT_CREDITS": "Not enough credit. Top up to keep going.",
+    "AI_PRICE_CHANGED": "The price changed while you were deciding. Check it and try again.",
+    "AI_REQUEST_TOO_LARGE": "That is more than one quiz can hold. Ask for fewer questions.",
+    "QUIZ_NOT_ENOUGH_CARDS": "This deck does not have enough quizzable cards.",
+    "AI_RATE_CAP": "You have reached today's request limit. Try again tomorrow.",
+    "FORBIDDEN": "You do not have access to that.",
+    "AI_EMPTY_RESULT": "The questions did not come out usable, so you were not charged. Try again.",
+    "QUIZ_UNGRADEABLE": "This answer cannot be graded — it is empty, or too long.",
+    "QUIZ_GRADE_REFUSED": "Grading did not work, and you were not charged. Try again.",
+    "QUIZ_ITEM_GONE": "This question no longer exists.",
+    "UNKNOWN": "Something went wrong. Please try again."
+  }
+}

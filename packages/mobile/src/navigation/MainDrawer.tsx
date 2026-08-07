@@ -11,6 +11,7 @@ import { getMobileSupabase } from '../adapters'
 import { HomeStack } from './HomeStack'
 import { DecksStack } from './DecksStack'
 import { StudyStack } from './StudyStack'
+import { QuizStack } from './QuizStack'
 import { MarketplaceStack } from './MarketplaceStack'
 import { SettingsStack } from './SettingsStack'
 import type { MainTabParamList } from './types'
@@ -110,6 +111,8 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
           <View>
             <MenuItem icon="🎯" label={t('nav.learningPlan')} indent active={isActive('LearningGoals')} theme={theme}
               onPress={() => go('SettingsTab', 'LearningGoals')} testID="drawer-learning-plan" />
+            <MenuItem icon="❓" label={t('nav.quiz')} indent active={isActive('QuizHome')} theme={theme}
+              onPress={() => go('QuizTab', 'QuizHome', 'QuizTab')} testID="drawer-quiz" />
             <MenuItem icon="🤖" label={t('nav.aiGenerate')} indent active={isActive('AIGenerate')} theme={theme}
               onPress={() => go('SettingsTab', 'AIGenerate')} testID="drawer-ai-generate" />
             <MenuItem icon="📚" label={t('nav.decks')} indent active={isActive('DecksTab')} theme={theme}
@@ -253,6 +256,7 @@ export function MainDrawer() {
       <Drawer.Screen name="HomeTab" component={HomeStack} />
       <Drawer.Screen name="DecksTab" component={DecksStack} />
       <Drawer.Screen name="StudyTab" component={StudyStack} />
+      <Drawer.Screen name="QuizTab" component={QuizStack} />
       <Drawer.Screen name="MarketplaceTab" component={MarketplaceStack} />
       <Drawer.Screen name="SettingsTab" component={SettingsStack} />
     </Drawer.Navigator>

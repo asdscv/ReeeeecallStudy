@@ -16,7 +16,8 @@
     "leaderboard": "Leaderboard",
     "analytics": "Analytics",
     "publisher": "パブリッシャー統計",
-    "wallet": "ウォレット"
+    "wallet": "ウォレット",
+    "quiz": "クイズ"
   },
   "actions": {
     "save": "保存",
