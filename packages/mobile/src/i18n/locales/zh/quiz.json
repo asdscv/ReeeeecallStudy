@@ -91,7 +91,9 @@
     "QUIZ_UNGRADEABLE": "无法批改这个答案——内容为空或过长。",
     "QUIZ_GRADE_REFUSED": "批改失败，未向你扣费。请重试。",
     "QUIZ_ITEM_GONE": "这道题已不存在。",
-    "UNKNOWN": "出了点问题，请重试。"
+    "UNKNOWN": "出了点问题，请重试。",
+    "QUIZ_CARDS_TOO_SHORT": "这些卡片太短，无法出论述题——论述题按卡片本身的用词批改。这个牌组更适合简答或选择题。",
+    "AI_PROVIDER_ERROR": "AI 服务当前繁忙。未扣费，请稍后再试。"
   },
   "verdict": {
     "equivalent": "正确",

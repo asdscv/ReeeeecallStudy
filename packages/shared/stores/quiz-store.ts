@@ -108,16 +108,17 @@ export interface QuizSubmitResult {
  * because the server raises separate SQLSTATEs for them: telling someone who asked for
  * too many questions that they are rate-limited sends them away for a day for nothing.
  */
-export type QuizErrorCode =
-  | 'AI_INSUFFICIENT_CREDITS' | 'AI_PRICE_CHANGED' | 'AI_REQUEST_TOO_LARGE'
-  | 'QUIZ_NOT_ENOUGH_CARDS' | 'AI_RATE_CAP' | 'FORBIDDEN' | 'AI_EMPTY_RESULT'
-  | 'QUIZ_UNGRADEABLE' | 'QUIZ_GRADE_REFUSED' | 'QUIZ_ITEM_GONE' | 'UNKNOWN'
-
-const KNOWN_CODES = new Set<QuizErrorCode>([
+export const QUIZ_ERROR_CODES = [
   'AI_INSUFFICIENT_CREDITS', 'AI_PRICE_CHANGED', 'AI_REQUEST_TOO_LARGE',
   'QUIZ_NOT_ENOUGH_CARDS', 'AI_RATE_CAP', 'FORBIDDEN', 'AI_EMPTY_RESULT',
   'QUIZ_UNGRADEABLE', 'QUIZ_GRADE_REFUSED', 'QUIZ_ITEM_GONE',
-])
+  'QUIZ_CARDS_TOO_SHORT', 'AI_PROVIDER_ERROR', 'UNKNOWN',
+] as const
+export type QuizErrorCode = typeof QUIZ_ERROR_CODES[number]
+
+// Everything except UNKNOWN, which is what an unrecognised code BECOMES rather than
+// something the server sends.
+const KNOWN_CODES = new Set<string>(QUIZ_ERROR_CODES.filter((c) => c !== 'UNKNOWN'))
 
 /**
  * An edge-function failure reduced to a code this app has a translated string for.

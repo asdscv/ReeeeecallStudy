@@ -350,6 +350,11 @@ jobs:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/quiz_run_rpcs_test.sql
 
+      - name: Run quiz smoke + net-zero + dry-run + isolation audit
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/quiz_smoke_test.sql
+
       - name: Run owned-card limit assertions
         env:
           PGPASSWORD: postgres

@@ -91,7 +91,9 @@
     "QUIZ_UNGRADEABLE": "Esta respuesta no se puede corregir: está vacía o es demasiado larga.",
     "QUIZ_GRADE_REFUSED": "La corrección falló y no se te cobró. Inténtalo otra vez.",
     "QUIZ_ITEM_GONE": "Esta pregunta ya no existe.",
-    "UNKNOWN": "Algo salió mal. Inténtalo de nuevo."
+    "UNKNOWN": "Algo salió mal. Inténtalo de nuevo.",
+    "QUIZ_CARDS_TOO_SHORT": "Estas tarjetas son demasiado breves para plantear ensayos: un ensayo se corrige con términos tomados de la propia tarjeta. Prueba respuesta corta u opción múltiple con este mazo.",
+    "AI_PROVIDER_ERROR": "El servicio de IA está saturado ahora mismo. No se te ha cobrado; inténtalo en un momento."
   },
   "verdict": {
     "equivalent": "Correcto",
