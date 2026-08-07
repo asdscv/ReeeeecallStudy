@@ -94,7 +94,9 @@
     "QUIZ_ITEM_GONE": "This question no longer exists.",
     "UNKNOWN": "Something went wrong. Please try again.",
     "QUIZ_CARDS_TOO_SHORT": "These cards are too short to build essay questions from — an essay is graded against terms taken from the card itself. Try short answer or multiple choice for this deck.",
-    "AI_PROVIDER_ERROR": "The AI service is busy right now. Nothing was charged — try again in a moment."
+    "AI_PROVIDER_ERROR": "The AI service is busy right now. Nothing was charged — try again in a moment.",
+    "AI_PROVIDER_DAILY_LIMIT": "The daily AI limit for this app has been reached. Nothing was charged — it resets tomorrow.",
+    "AI_PROVIDER_BUSY": "The AI service is busy. Nothing was charged — try again in a moment."
   },
   "verdict": {
     "equivalent": "Correct",
