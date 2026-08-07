@@ -92,5 +92,40 @@
     "QUIZ_GRADE_REFUSED": "การตรวจไม่สำเร็จ และไม่มีการเรียกเก็บเงิน ลองใหม่อีกครั้ง",
     "QUIZ_ITEM_GONE": "ไม่มีคำถามนี้แล้ว",
     "UNKNOWN": "เกิดข้อผิดพลาด กรุณาลองใหม่"
+  },
+  "verdict": {
+    "equivalent": "ถูกต้อง",
+    "equivalent_with_error": "ถูกต้อง มีจุดพลาดเล็กน้อย",
+    "partial": "ถูกบางส่วน",
+    "different": "ไม่ใช่ข้อนี้",
+    "empty": "ไม่มีอะไรให้ตรวจ",
+    "unjudgeable": "ตัดสินไม่ได้"
+  },
+  "gap": {
+    "missing_part": "ขาดบางส่วน",
+    "extra_claim": "เกินจากที่การ์ดระบุ",
+    "wrong_direction": "กลับทิศทาง",
+    "too_vague": "กว้างเกินไป",
+    "spelling": "การสะกด",
+    "wrong_language": "ภาษาไม่ตรง"
+  },
+  "level": {
+    "met": "ครบ",
+    "partial": "บางส่วน",
+    "not_met": "ไม่ครบ",
+    "unjudgeable": "ไม่ได้ตัดสิน",
+    "unjudgeableNote": "บางส่วนตัดสินไม่ได้ จึงไม่ถูกหักคะแนน"
+  },
+  "aspect": {
+    "covers_answer": "ครอบคลุมคำตอบ",
+    "uses_key_terms": "ใช้คำสำคัญ",
+    "explains_why": "อธิบายเหตุผล",
+    "gives_example": "ยกตัวอย่าง",
+    "states_limits": "ระบุข้อจำกัด",
+    "structure": "โครงสร้าง"
+  },
+  "span": {
+    "learner": "ในคำตอบของคุณ",
+    "reference": "ในการ์ด"
   }
 }
