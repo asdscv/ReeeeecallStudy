@@ -234,5 +234,12 @@
     "detailWithinWindow": "อยู่ในรอบทบทวน {{count, number}} ใบ",
     "detailWithinWindow_one": "อยู่ในรอบทบทวน {{count, number}} ใบ",
     "detailWithinWindow_other": "อยู่ในรอบทบทวน {{count, number}} ใบ"
+  },
+  "completion": {
+    "done": "บรรลุเป้าหมายแล้ว",
+    "progress": "จำได้แล้ว {{mature, number}} จาก {{required, number}} ใบ",
+    "eta": "อีกประมาณ {{count, number}} วัน",
+    "eta_one": "อีกประมาณ {{count, number}} วัน",
+    "eta_other": "อีกประมาณ {{count, number}} วัน"
   }
 }

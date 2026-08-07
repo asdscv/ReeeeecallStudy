@@ -234,5 +234,12 @@
     "detailWithinWindow": "復習期限内 {{count, number}}枚",
     "detailWithinWindow_one": "復習期限内 {{count, number}}枚",
     "detailWithinWindow_other": "復習期限内 {{count, number}}枚"
+  },
+  "completion": {
+    "done": "目標達成",
+    "progress": "{{required, number}}枚中{{mature, number}}枚が定着",
+    "eta": "完了まで約{{count, number}}日",
+    "eta_one": "完了まで約{{count, number}}日",
+    "eta_other": "完了まで約{{count, number}}日"
   }
 }

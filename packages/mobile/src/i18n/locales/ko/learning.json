@@ -234,5 +234,12 @@
     "detailWithinWindow": "복습 주기 안 {{count, number}}장",
     "detailWithinWindow_one": "복습 주기 안 {{count, number}}장",
     "detailWithinWindow_other": "복습 주기 안 {{count, number}}장"
+  },
+  "completion": {
+    "done": "목표 달성",
+    "progress": "{{required, number}}장 중 {{mature, number}}장 정착",
+    "eta": "완료까지 약 {{count, number}}일",
+    "eta_one": "완료까지 약 {{count, number}}일",
+    "eta_other": "완료까지 약 {{count, number}}일"
   }
 }

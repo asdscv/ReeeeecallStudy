@@ -58,6 +58,8 @@ const baseState = (over: StoreState = {}): StoreState => ({
   knowledge: {},
   knowledgeLoading: false,
   fetchGoalKnowledge: vi.fn(),
+  // Server-judged completion stamp. A no-op here; its own cases drive it directly.
+  completeGoalIfEarned: vi.fn().mockResolvedValue(false),
   goals: [goal],
   goalsLoading: false,
   goalsError: null,
@@ -455,6 +457,73 @@ describe('LearningTodayPage', () => {
   // forgotten 28 cards. The RPC never made that claim.
   const knowledgeOf = (known: number, unknown: number, unseen: number) => ({
     knowledge: { 'goal-1': { total: known + unknown + unseen, known, unknown, unseen } },
+  })
+
+  // ── the finish line ───────────────────────────────────────────────────────
+  //
+  // "로직으로 저 학습플랜 완료하는건 언제야?" — there was no answer anywhere. The status value,
+  // the transition and the `target` column all existed; nothing ever decided.
+  const withMastery = (over: Record<string, number>) => ({
+    knowledge: {
+      'goal-1': {
+        total: 10, unseen: 0, known: 10, unknown: 0,
+        mature: 0, rung1: 0, rung3: 0, rung8: 0, ...over,
+      },
+    },
+    insightsGoalId: 'goal-1',
+  })
+
+  it('asks the server whether the goal has earned its stamp', () => {
+    // The client says WHICH goal, never whether. `complete_goal_if_earned` re-checks — the
+    // rule lives in one place rather than in whichever client implemented it.
+    const state = renderToday()
+
+    expect(state.completeGoalIfEarned).toHaveBeenCalledWith('goal-1')
+  })
+
+  it('says how far the goal is from its finish line, and when', () => {
+    // 10 cards, needs 8 mature, has 6, and two are one review from maturing.
+    renderToday(withMastery({ mature: 6, rung8: 2, rung1: 2 }))
+
+    const line = screen.getByTestId('goal-completion')
+    expect(line).toHaveTextContent('completion.progress')
+    expect(line).toHaveTextContent('completion.eta')
+  })
+
+  it('gives no date when there is no honest one', () => {
+    // Unseen cards with no intake cap: "start them all at once" has no day count. The line
+    // still says how far off the goal is — a missing date is not a missing sentence.
+    renderToday({
+      ...withMastery({ mature: 0, unseen: 10, known: 0 }),
+      goals: [{ ...goal, settings: {} }],
+    })
+
+    const line = screen.getByTestId('goal-completion')
+    expect(line).toHaveTextContent('completion.progress')
+  })
+
+  it('keeps a completed goal open rather than making it vanish', () => {
+    // Found while writing the test above: `plannableGoals` filtered on status === 'active', so
+    // stamping a goal completed removed it from this screen entirely — the learner would reach
+    // the milestone and be shown "no goal". `save_daily_plan` rejects only ARCHIVED goals, so
+    // the server was always willing; the client was not.
+    renderToday({ goals: [{ ...goal, status: 'completed' }] })
+
+    expect(screen.queryByText('today.empty.noGoal')).not.toBeInTheDocument()
+    expect(screen.getByText('JLPT N2')).toBeInTheDocument()
+  })
+
+  it('shows the stamp rather than recomputing the ratio', () => {
+    // Completion is a RECORD. `again_days = 0` drops a lapsed card out of mature, so a live
+    // reading would un-complete a finished goal on one wrong answer — 100% to 50% on a
+    // two-card goal. The goal below is stamped while its current ratio is 0%.
+    renderToday({
+      ...withMastery({ mature: 0, rung1: 10 }),
+      goals: [{ ...goal, status: 'completed' }],
+    })
+
+    expect(screen.getByTestId('goal-complete')).toHaveTextContent('completion.done')
+    expect(screen.queryByTestId('goal-completion')).not.toBeInTheDocument()
   })
 
   it('leads with the backlog when the learner is behind', () => {

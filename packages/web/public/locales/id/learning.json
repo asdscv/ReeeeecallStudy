@@ -233,5 +233,12 @@
     "detailWithinWindow": "{{count, number}} dalam jadwal ulasan",
     "detailWithinWindow_one": "{{count, number}} dalam jadwal ulasan",
     "detailWithinWindow_other": "{{count, number}} dalam jadwal ulasan"
+  },
+  "completion": {
+    "done": "Target tercapai",
+    "progress": "{{mature, number}} dari {{required, number}} kartu melekat",
+    "eta": "sekitar {{count, number}} hari lagi",
+    "eta_one": "sekitar {{count, number}} hari lagi",
+    "eta_other": "sekitar {{count, number}} hari lagi"
   }
 }

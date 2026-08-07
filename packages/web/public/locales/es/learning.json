@@ -233,5 +233,12 @@
     "detailWithinWindow": "{{count, number}} dentro de su ciclo de repaso",
     "detailWithinWindow_one": "{{count, number}} dentro de su ciclo de repaso",
     "detailWithinWindow_other": "{{count, number}} dentro de su ciclo de repaso"
+  },
+  "completion": {
+    "done": "Objetivo completado",
+    "progress": "{{mature, number}} de {{required, number}} tarjetas consolidadas",
+    "eta": "quedan unos {{count, number}} días",
+    "eta_one": "queda 1 día",
+    "eta_other": "quedan unos {{count, number}} días"
   }
 }

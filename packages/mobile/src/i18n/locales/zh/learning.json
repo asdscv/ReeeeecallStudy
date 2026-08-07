@@ -234,5 +234,12 @@
     "detailWithinWindow": "复习周期内 {{count, number}} 张",
     "detailWithinWindow_one": "复习周期内 {{count, number}} 张",
     "detailWithinWindow_other": "复习周期内 {{count, number}} 张"
+  },
+  "completion": {
+    "done": "目标达成",
+    "progress": "{{required, number}} 张中 {{mature, number}} 张已巩固",
+    "eta": "距完成约 {{count, number}} 天",
+    "eta_one": "距完成约 {{count, number}} 天",
+    "eta_other": "距完成约 {{count, number}} 天"
   }
 }

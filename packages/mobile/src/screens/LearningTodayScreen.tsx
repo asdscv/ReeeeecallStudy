@@ -16,6 +16,10 @@ import { currentPlanContext } from '@reeeeecall/shared/lib/learning-plan-date'
 import { planComposition } from '@reeeeecall/shared/lib/plan-composition'
 import { studyRecap } from '@reeeeecall/shared/lib/study-recap'
 import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
+import { goalCompletion } from '@reeeeecall/shared/lib/goal-completion'
+import {
+  parseNewCardsPerDay, DEFAULT_NEW_CARDS_PER_DAY,
+} from '@reeeeecall/shared/learning/application/cadence'
 import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
 import { useStudy } from '../hooks/useStudy'
 import type { SettingsStackParamList } from '../navigation/types'
@@ -72,6 +76,7 @@ export function LearningTodayScreen() {
     attempts, attemptsLoading, fetchAttempts,
     knowledge, fetchGoalKnowledge,
     insights, weakCardDecks, insightsGoalId, fetchInsights,
+    completeGoalIfEarned,
   } = useLearningStore()
   const { startPlanSession, startCardSession } = useStudy()
   const { decks, fetchDecks } = useDeckStore()
@@ -103,7 +108,13 @@ export function LearningTodayScreen() {
 
   useEffect(() => { void fetchGoals() }, [fetchGoals])
 
-  const active = useMemo(() => goals.filter((g) => g.status === 'active'), [goals])
+  // 'completed' belongs here too. Finishing a goal is a MILESTONE, not a stop: the cards keep
+  // coming due and `save_daily_plan` rejects only archived goals. Filtering it out would make a
+  // goal vanish from this screen at the exact moment it was achieved.
+  const active = useMemo(
+    () => goals.filter((g) => g.status === 'active' || g.status === 'completed'),
+    [goals],
+  )
   // The plan is addressed by the route now, mirroring web's /learning/:goalId. A route id that
   // names no plannable goal (archived, deleted) resolves to nothing rather than quietly showing
   // a different plan under the same navigation entry.
@@ -156,8 +167,12 @@ export function LearningTodayScreen() {
   // eventually with its assumption stated; not as the line that says where you stand.
   const judgedAt = mountedAt
   useEffect(() => {
-    if (goalId) void fetchGoalKnowledge(goalId, judgedAt)
-  }, [goalId, judgedAt, fetchGoalKnowledge])
+    if (!goalId) return
+    void fetchGoalKnowledge(goalId, judgedAt)
+    // Same breath as reading the progress: the ratio can only move when a card's interval
+    // does, and this screen is where the learner lands after studying. The server judges.
+    void completeGoalIfEarned(goalId)
+  }, [goalId, judgedAt, fetchGoalKnowledge, completeGoalIfEarned])
 
   /**
    * Attempts are goal-scoped, not date-scoped, so this deliberately does NOT depend on
@@ -271,6 +286,21 @@ export function LearningTodayScreen() {
       count: names.length - DECK_NAMES_SHOWN,
     })
   }, [goal, decks, t])
+
+  /**
+   * Where this goal stands against the completion rule. `null` when there is nothing to say —
+   * no goal loaded, or a goal holding no cards, which is never "complete" (0/0 is not 100%).
+   */
+  const goalCompletionState = useMemo(() => {
+    const k = goalId ? knowledge[goalId] : null
+    if (!k || k.total === 0) return null
+    return goalCompletion(k, {
+      newCardsPerDay: parseNewCardsPerDay(goal?.settings) ?? DEFAULT_NEW_CARDS_PER_DAY,
+      adherence: insightsGoalId === goalId ? insights?.overallAdherence ?? null : null,
+    })
+  }, [goalId, knowledge, goal, insights, insightsGoalId])
+  /** Already STAMPED. A record of having earned it, not a live reading of the ratio. */
+  const goalDone = goal?.status === 'completed'
 
   const recapBands = [
     recap.known > 0 ? t('history.band.known', { count: recap.known }) : null,
@@ -489,6 +519,31 @@ export function LearningTodayScreen() {
                         total: goalSummary.total, attempted: goalSummary.attempted,
                       })}
                 </Text>
+                {/* Where the finish line is. A goal had none until mig 192: the status value,
+                    the transition and the `target` column all existed and nothing ever decided.
+                    Under SRS nothing decides itself either — intervals grow and reviews never
+                    stop — so this is the product saying when it calls the work done. */}
+                {goalDone ? (
+                  <Text
+                    style={[theme.typography.caption, { color: theme.colors.success, marginTop: 4 }]}
+                    {...testProps('learning-goal-complete')}
+                  >
+                    {t('completion.done')}
+                  </Text>
+                ) : goalCompletionState !== null && (
+                  <Text
+                    style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}
+                    {...testProps('learning-goal-completion')}
+                  >
+                    {t('completion.progress', {
+                      mature: goalCompletionState.mature,
+                      required: goalCompletionState.required,
+                    })}
+                    {goalCompletionState.daysToComplete !== null
+                      ? ' · ' + t('completion.eta', { count: goalCompletionState.daysToComplete })
+                      : ''}
+                  </Text>
+                )}
                 {progressDetail !== '' && (
                   <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>
                     {progressDetail}

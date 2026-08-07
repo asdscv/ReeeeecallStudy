@@ -233,5 +233,12 @@
     "detailWithinWindow": "{{count, number}} trong chu kỳ ôn tập",
     "detailWithinWindow_one": "{{count, number}} trong chu kỳ ôn tập",
     "detailWithinWindow_other": "{{count, number}} trong chu kỳ ôn tập"
+  },
+  "completion": {
+    "done": "Đã hoàn thành mục tiêu",
+    "progress": "{{mature, number}}/{{required, number}} thẻ đã ghi nhớ",
+    "eta": "còn khoảng {{count, number}} ngày",
+    "eta_one": "còn khoảng {{count, number}} ngày",
+    "eta_other": "còn khoảng {{count, number}} ngày"
   }
 }

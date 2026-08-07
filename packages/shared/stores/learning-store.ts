@@ -292,6 +292,20 @@ export interface GoalKnowledge {
   readonly unseen: number
   readonly known: number
   readonly unknown: number
+  /**
+   * Retained rather than being learned: interval >= 21 days (mig 192).
+   *
+   * Deliberately NOT filtered on whether the card is currently due — a mature card one day
+   * overdue has not stopped being mature, and tying completion to punctuality would let a
+   * finished goal un-finish itself overnight.
+   */
+  readonly mature: number
+  /** Studied, interval 0-2. Twelve days of waiting from mature. */
+  readonly rung1: number
+  /** interval 3-7. Eleven days. */
+  readonly rung3: number
+  /** interval 8-20. Its next review is the one that matures it. */
+  readonly rung8: number
 }
 
 export interface AttemptInput {
@@ -523,6 +537,8 @@ interface LearningState {
   recordAttempt: (input: AttemptInput, planDate: string) => Promise<boolean>
   fetchAttempts: (goalId: string) => Promise<void>
   fetchGoalKnowledge: (goalId: string, atISO: string) => Promise<void>
+  /** Stamp the goal completed if it has earned it. Returns whether this call changed it. */
+  completeGoalIfEarned: (goalId: string) => Promise<boolean>
   fetchInsights: (goalId: string) => Promise<void>
   fetchRecommendations: (goalId: string) => Promise<void>
   regenerateRecommendations: (goalId: string) => Promise<boolean>
@@ -1474,6 +1490,29 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     }
   },
 
+  /**
+   * Ask the server whether this goal has earned its completion stamp.
+   *
+   * Idempotent and server-judged (`complete_goal_if_earned`, mig 192): the client says which
+   * goal, never whether. Called after a rating rather than on every render — the ratio can only
+   * change when a card's interval does.
+   *
+   * A refusal is swallowed. Failing to stamp a milestone must never break the screen the
+   * learner is standing on, and the next rating will ask again.
+   */
+  completeGoalIfEarned: async (goalId) => {
+    try {
+      const { data, error } = await supabase.rpc('complete_goal_if_earned', { p_goal_id: goalId })
+      if (error) throw error
+      const changed = Boolean((data as { changed?: boolean } | null)?.changed)
+      if (changed) await get().fetchGoals()
+      return changed
+    } catch (e) {
+      console.error('[learning-store] complete_goal_if_earned failed:', e)
+      return false
+    }
+  },
+
   fetchGoalKnowledge: async (goalId, atISO) => {
     set({ knowledgeLoading: true })
     try {
@@ -1492,6 +1531,12 @@ export const useLearningStore = create<LearningState>((set, get) => ({
             unseen: Number(row.unseen ?? 0),
             known: Number(row.known ?? 0),
             unknown: Number(row.unknown ?? 0),
+            // Absent until mig 192 is deployed. Zero then, which reads as "no mastery yet"
+            // and simply shows no completion line — never as a wrong date.
+            mature: Number(row.mature ?? 0),
+            rung1: Number(row.rung1 ?? 0),
+            rung3: Number(row.rung3 ?? 0),
+            rung8: Number(row.rung8 ?? 0),
           },
         },
       }))

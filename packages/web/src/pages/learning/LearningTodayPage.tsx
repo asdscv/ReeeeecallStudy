@@ -11,6 +11,10 @@ import { planComposition } from '@reeeeecall/shared/lib/plan-composition'
 import { studyRecap } from '@reeeeecall/shared/lib/study-recap'
 import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
 import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
+import { goalCompletion } from '@reeeeecall/shared/lib/goal-completion'
+import {
+  parseNewCardsPerDay, DEFAULT_NEW_CARDS_PER_DAY,
+} from '@reeeeecall/shared/learning/application/cadence'
 import { useDeckStore } from '../../stores/deck-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
 
@@ -246,11 +250,20 @@ function LearningDiagnostics({ goalId }: { goalId: string }) {
  * overdue and 10 cards had never been opened — a sentence that sounds like near-total amnesia and
  * means nothing of the kind. The line under it carries what to do about it.
  */
-function GoalProgress({ knowledge }: { knowledge: GoalKnowledge | null }) {
+function GoalProgress({ knowledge, newCardsPerDay, adherence, done }: {
+  knowledge: GoalKnowledge | null
+  /** The goal's intake cap. Without it an unseen card has no honest start date. */
+  newCardsPerDay: number
+  /** Share of planned items actually completed, or null before there is any history. */
+  adherence: number | null
+  /** The goal is already STAMPED completed. A record, not a live reading of the ratio. */
+  done: boolean
+}) {
   const { t } = useTranslation('learning')
   if (!knowledge || knowledge.total === 0) return null
 
   const summary = goalKnowledgeSummary(knowledge)
+  const completion = goalCompletion(knowledge, { newCardsPerDay, adherence })
 
   /**
    * The headline changes with the state, because the useful sentence does.
@@ -301,6 +314,29 @@ function GoalProgress({ knowledge }: { knowledge: GoalKnowledge | null }) {
           {detail}
         </p>
       )}
+
+      {/* ── Where the finish line is ──────────────────────────────────────
+          A goal used to have none: the status value, the transition and the `target` column
+          all existed and nothing ever decided. Under SRS nothing decides itself either —
+          intervals grow and reviews never stop — so this is the product saying when it is
+          willing to call the work done. */}
+      {done ? (
+        <p className="mt-2 text-xs font-medium text-success" data-testid="goal-complete">
+          {t('completion.done')}
+        </p>
+      ) : (
+        <p className="mt-2 text-[11px] text-content-tertiary" data-testid="goal-completion">
+          {t('completion.progress', {
+            mature: completion.mature, required: completion.required,
+          })}
+          {/* No date when there is no honest one: uncapped intake has no "start them all at
+              once" day count, and a goal too small to reach the ratio has nothing to project.
+              A wrong date is acted on; a missing one is not. */}
+          {completion.daysToComplete !== null && (
+            <> · {t('completion.eta', { count: completion.daysToComplete })}</>
+          )}
+        </p>
+      )}
     </section>
   )
 }
@@ -313,7 +349,8 @@ export function LearningTodayPage() {
     planBlockedReason,
     fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
     extendPlan, planExtending, planExtension,
-    knowledge, fetchGoalKnowledge,
+    knowledge, fetchGoalKnowledge, completeGoalIfEarned,
+    insights, insightsGoalId,
   } = useLearningStore()
   const { decks, fetchDecks } = useDeckStore()
 
@@ -328,7 +365,10 @@ export function LearningTodayPage() {
   useEffect(() => { void fetchDecks() }, [fetchDecks])
 
   const plannableGoals = useMemo(
-    () => goals.filter((goal) => goal.status === 'active'),
+    // 'completed' belongs here too. Finishing a goal is a MILESTONE, not a stop: the cards
+    // keep coming due and `save_daily_plan` rejects only archived goals. Filtering it out
+    // would make a goal vanish from this screen at the exact moment it was achieved.
+    () => goals.filter((goal) => goal.status === 'active' || goal.status === 'completed'),
     [goals],
   )
 
@@ -366,8 +406,14 @@ export function LearningTodayPage() {
   // account that had studied 55 cards, because the projection assumes you stop today.
   const judgedAt = ctx.now
   useEffect(() => {
-    if (selectedGoalId) void fetchGoalKnowledge(selectedGoalId, judgedAt)
-  }, [selectedGoalId, judgedAt, fetchGoalKnowledge])
+    if (!selectedGoalId) return
+    void fetchGoalKnowledge(selectedGoalId, judgedAt)
+    // Ask whether the goal has earned its stamp, in the same breath as reading its progress.
+    // The ratio can only move when a card's interval does, and this screen is where the
+    // learner lands after studying — so the milestone is caught without polling anything.
+    // The server judges; a refusal is swallowed and the next visit asks again.
+    void completeGoalIfEarned(selectedGoalId)
+  }, [selectedGoalId, judgedAt, fetchGoalKnowledge, completeGoalIfEarned])
 
   /**
    * The day's work, split by deck, because a study session cannot span decks.
@@ -482,7 +528,12 @@ export function LearningTodayPage() {
       </div>
 
       {/* Where this goal stands overall. */}
-      <GoalProgress knowledge={knowledge[selectedGoalId] ?? null} />
+      <GoalProgress
+        knowledge={knowledge[selectedGoalId] ?? null}
+        newCardsPerDay={parseNewCardsPerDay(goal?.settings) ?? DEFAULT_NEW_CARDS_PER_DAY}
+        adherence={insightsGoalId === selectedGoalId ? insights?.overallAdherence ?? null : null}
+        done={goal?.status === 'completed'}
+      />
 
       {planError && (
         <div role="alert" className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
