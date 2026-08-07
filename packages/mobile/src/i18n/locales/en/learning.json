@@ -138,7 +138,14 @@
     "typicalTime": "Typical time",
     "weakEmpty": "Nothing is falling behind.",
     "weakHint": "Cards with at least two attempts averaging under 60%.",
-    "weakTitle": "Worth another look"
+    "weakTitle": "Worth another look",
+    "accuracyValue": "Accuracy {{pct, number}}%",
+    "typicalValue": "Typically {{seconds, decimal}}s",
+    "adherenceValue": "Plan {{pct, number}}% done",
+    "weakCount": "{{count, number}} cards",
+    "weakCount_one": "{{count, number}} card",
+    "weakCount_other": "{{count, number}} cards",
+    "weakStudy": "Study just these"
   },
   "recommend": {
     "accept": "Accept",

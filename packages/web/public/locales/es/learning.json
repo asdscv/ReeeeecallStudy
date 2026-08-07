@@ -189,7 +189,14 @@
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "scopeNote": "Basado en los intentos y planes de este objetivo. Las estadísticas SRS por mazo están en el Historial.",
     "attemptCount_one": "{{count, number}} intento",
-    "attemptCount_other": "{{count, number}} intentos"
+    "attemptCount_other": "{{count, number}} intentos",
+    "accuracyValue": "Acierto {{pct, number}}%",
+    "typicalValue": "Normalmente {{seconds, decimal}} s",
+    "adherenceValue": "Plan {{pct, number}}% completado",
+    "weakCount": "{{count, number}} tarjetas",
+    "weakCount_one": "{{count, number}} tarjeta",
+    "weakCount_other": "{{count, number}} tarjetas",
+    "weakStudy": "Estudiar solo estas"
   },
   "recommend": {
     "title": "Recomendaciones",

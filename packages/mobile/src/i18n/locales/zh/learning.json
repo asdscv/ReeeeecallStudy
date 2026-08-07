@@ -138,7 +138,14 @@
     "typicalTime": "通常用时",
     "weakEmpty": "没有落后的卡片。",
     "weakHint": "作答至少2次且平均低于60%的卡片。",
-    "weakTitle": "值得再看"
+    "weakTitle": "值得再看",
+    "accuracyValue": "正确率 {{pct, number}}%",
+    "typicalValue": "通常 {{seconds, decimal}} 秒",
+    "adherenceValue": "计划完成 {{pct, number}}%",
+    "weakCount": "{{count, number}} 张",
+    "weakCount_one": "{{count, number}} 张",
+    "weakCount_other": "{{count, number}} 张",
+    "weakStudy": "只学这些卡片"
   },
   "recommend": {
     "accept": "接受",

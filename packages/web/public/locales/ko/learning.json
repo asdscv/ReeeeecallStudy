@@ -189,7 +189,14 @@
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "scopeNote": "이 목표의 시도와 플랜을 기준으로 계산합니다. 덱 단위 SRS 통계는 학습 기록에 있습니다.",
     "attemptCount_one": "시도 {{count, number}}회",
-    "attemptCount_other": "시도 {{count, number}}회"
+    "attemptCount_other": "시도 {{count, number}}회",
+    "accuracyValue": "정답률 {{pct, number}}%",
+    "typicalValue": "보통 {{seconds, decimal}}초",
+    "adherenceValue": "플랜 {{pct, number}}% 이행",
+    "weakCount": "{{count, number}}장",
+    "weakCount_one": "{{count, number}}장",
+    "weakCount_other": "{{count, number}}장",
+    "weakStudy": "이 카드만 학습하기"
   },
   "recommend": {
     "title": "추천",

@@ -189,7 +189,14 @@
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "scopeNote": "この目標の試行とプランに基づく計算です。デッキ単位のSRS統計は学習履歴にあります。",
     "attemptCount_one": "{{count, number}} 回試行",
-    "attemptCount_other": "{{count, number}} 回試行"
+    "attemptCount_other": "{{count, number}} 回試行",
+    "accuracyValue": "正答率 {{pct, number}}%",
+    "typicalValue": "平均 {{seconds, decimal}}秒",
+    "adherenceValue": "プラン達成 {{pct, number}}%",
+    "weakCount": "{{count, number}}枚",
+    "weakCount_one": "{{count, number}}枚",
+    "weakCount_other": "{{count, number}}枚",
+    "weakStudy": "このカードだけ学習"
   },
   "recommend": {
     "title": "おすすめ",

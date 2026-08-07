@@ -138,7 +138,14 @@
     "typicalTime": "เวลาโดยทั่วไป",
     "weakEmpty": "ไม่มีการ์ดที่ตามไม่ทัน",
     "weakHint": "การ์ดที่ทำอย่างน้อย 2 ครั้ง โดยมีค่าเฉลี่ยต่ำกว่า 60%",
-    "weakTitle": "ควรดูอีกครั้ง"
+    "weakTitle": "ควรดูอีกครั้ง",
+    "accuracyValue": "ความแม่นยำ {{pct, number}}%",
+    "typicalValue": "ปกติ {{seconds, decimal}} วินาที",
+    "adherenceValue": "ทำตามแผน {{pct, number}}%",
+    "weakCount": "{{count, number}} ใบ",
+    "weakCount_one": "{{count, number}} ใบ",
+    "weakCount_other": "{{count, number}} ใบ",
+    "weakStudy": "เรียนเฉพาะใบเหล่านี้"
   },
   "recommend": {
     "accept": "ยอมรับ",

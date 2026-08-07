@@ -134,6 +134,107 @@ function AttemptHistory({ goalId, planDate }: { goalId: string; planDate: string
   )
 }
 
+
+/**
+ * What is working and what is not — over the last 30 days, not today.
+ *
+ * The engine behind this (`summarizeLearning`, shared/lib/learning-insights.ts) has existed the
+ * whole time, along with `fetchInsights` and the copy in all 16 locale files. Nothing rendered
+ * it, so the app could compute a learner's accuracy, their typical answer time, their plan
+ * adherence and the cards they keep failing — and showed them none of it.
+ *
+ * The weak cards are a COUNT and a BUTTON, never a list. A column of cards you got wrong, with
+ * nothing to do about it, is the exact shape this screen has already been cleaned of twice. The
+ * button starts a session over precisely those cards, which the ordinary SRS queue would never
+ * serve because a card you keep failing is usually not due.
+ *
+ * One button per deck: `finalize_study_session` takes one `p_deck_id` and refuses a session
+ * whose rating events span decks, so weak cards from two decks are two sessions.
+ */
+function LearningDiagnostics({ goalId }: { goalId: string }) {
+  const { t } = useTranslation('learning')
+  const { insights, weakCardDecks, insightsLoading, insightsGoalId, fetchInsights } = useLearningStore()
+  const { decks } = useDeckStore()
+
+  useEffect(() => { void fetchInsights(goalId) }, [goalId, fetchInsights])
+
+  /**
+   * Weak cards grouped by the deck that holds them, worst first.
+   *
+   * Read from the store's own answer, NOT recomputed: `insightsGoalId` is what stops the
+   * previous goal's weak cards being offered under this goal's heading for one round trip.
+   */
+  const weakByDeck = useMemo(() => {
+    if (!insights || insightsGoalId !== goalId) return []
+    const byDeck = new Map<string, string[]>()
+    for (const card of insights.weakCards) {
+      const deckId = weakCardDecks[card.cardId]
+      if (!deckId) continue
+      const bucket = byDeck.get(deckId)
+      if (bucket) bucket.push(card.cardId)
+      else byDeck.set(deckId, [card.cardId])
+    }
+    return [...byDeck.entries()].map(([deckId, cardIds]) => ({ deckId, cardIds }))
+  }, [insights, weakCardDecks, insightsGoalId, goalId])
+
+  // Nothing studied is not an empty state to decorate — there is simply nothing to diagnose.
+  if (insightsLoading && !insights) return null
+  if (!insights || insightsGoalId !== goalId || insights.attemptCount === 0) return null
+
+  const deckName = (deckId: string) =>
+    decks.find((deck) => deck.id === deckId)?.name ?? t('insights.cardFallback')
+
+  // Percent, not a ratio, and only when something was actually scored. `accuracy` is null when
+  // no attempt carried a score, which is a different statement from 0%.
+  const pct = (value: number | null) => (value === null ? null : Math.round(value * 100))
+  const accuracy = pct(insights.accuracy)
+  const adherence = pct(insights.overallAdherence)
+
+  const stats = [
+    accuracy === null
+      ? t('insights.notScoredYet')
+      : t('insights.accuracyValue', { pct: accuracy }),
+    insights.medianDurationMs === null
+      ? null
+      : t('insights.typicalValue', { seconds: Math.round(insights.medianDurationMs / 100) / 10 }),
+    adherence === null ? null : t('insights.adherenceValue', { pct: adherence }),
+  ].filter(Boolean).join(' · ')
+
+  return (
+    <section className="pt-2" aria-label={t('insights.title')}>
+      <h2 className="text-sm font-medium text-foreground">{t('insights.title')}</h2>
+
+      <div className="mt-2 rounded-xl border border-border bg-card p-3" data-testid="insights-stats">
+        <p className="text-sm text-foreground">{stats}</p>
+        <p className="mt-1 text-[11px] text-content-tertiary">{t('insights.scopeNote')}</p>
+      </div>
+
+      {weakByDeck.length > 0 && (
+        <div className="mt-2 space-y-2" data-testid="insights-weak">
+          {/* The count lives on the row, which is the thing you press. Saying it twice is the
+              noise this screen keeps being cleaned of. */}
+          <p className="text-xs text-muted-foreground">{t('insights.weakTitle')}</p>
+          {weakByDeck.map((group) => (
+            <Link
+              key={group.deckId}
+              to={`/decks/${group.deckId}/study?mode=srs&cards=${group.cardIds.join(',')}`}
+              className="flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-sm text-foreground no-underline transition-colors hover:bg-accent"
+            >
+              <span className="min-w-0 truncate">
+                {weakByDeck.length > 1 ? deckName(group.deckId) : t('insights.weakStudy')}
+              </span>
+              <span className="shrink-0 text-xs text-brand">
+                {t('insights.weakCount', { count: group.cardIds.length })}
+              </span>
+            </Link>
+          ))}
+          <p className="text-[11px] text-content-tertiary">{t('insights.weakHint')}</p>
+        </div>
+      )}
+    </section>
+  )
+}
+
 /**
  * Where a goal stands.
  *
@@ -508,6 +609,7 @@ export function LearningTodayPage() {
       )}
 
       <AttemptHistory goalId={selectedGoalId} planDate={ctx.planDate} />
+      <LearningDiagnostics goalId={selectedGoalId} />
     </div>
   )
 }

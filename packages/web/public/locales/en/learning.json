@@ -189,7 +189,14 @@
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "scopeNote": "Based on this goal’s attempts and plans. Deck-level SRS statistics live under History.",
     "attemptCount_one": "{{count, number}} attempt",
-    "attemptCount_other": "{{count, number}} attempts"
+    "attemptCount_other": "{{count, number}} attempts",
+    "accuracyValue": "Accuracy {{pct, number}}%",
+    "typicalValue": "Typically {{seconds, decimal}}s",
+    "adherenceValue": "Plan {{pct, number}}% done",
+    "weakCount": "{{count, number}} cards",
+    "weakCount_one": "{{count, number}} card",
+    "weakCount_other": "{{count, number}} cards",
+    "weakStudy": "Study just these"
   },
   "recommend": {
     "title": "Recommendations",

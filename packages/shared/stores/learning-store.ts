@@ -458,6 +458,14 @@ interface LearningState {
    */
   insightsGoalId: string | null
   /**
+   * Deck id per weak card, so the "다시 볼 카드" button can start a session.
+   *
+   * A study session takes ONE deck (`finalize_study_session` refuses events spanning decks),
+   * and `summarizeLearning` works from attempt rows which carry no deck. Empty when there are
+   * no weak cards, or when the diagnostics read failed.
+   */
+  weakCardDecks: Record<string, string>
+  /**
    * Diagnostics failures have their own channel. `planError` drives the today screen's
    * banner, so routing a diagnostics failure there would make an unrelated screen claim
    * the plan is broken.
@@ -880,6 +888,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   knowledge: {},
   knowledgeLoading: false,
   insights: null,
+  weakCardDecks: {},
   insightsLoading: false,
   insightsGoalId: null,
   insightsError: null,
@@ -1508,16 +1517,36 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       if (attemptsResult.error) throw attemptsResult.error
       if (plansResult.error) throw plansResult.error
 
-      set({
-        insights: summarizeLearning({
-          attempts: attemptsResult.data ?? [],
-          plans: plansResult.data ?? [],
-        }),
-        insightsGoalId: goalId,
+      const insights = summarizeLearning({
+        attempts: attemptsResult.data ?? [],
+        plans: plansResult.data ?? [],
       })
+
+      // Which deck each weak card lives in. `summarizeLearning` is pure and works from attempt
+      // rows, which carry no deck — but a study session takes ONE deck (`finalize_study_session`
+      // refuses a session whose rating events span decks), so the button cannot be offered
+      // without this. Read here rather than in the component: a component that fetches on render
+      // would re-fetch on every keystroke elsewhere on the page.
+      let weakCardDecks: Record<string, string> = {}
+      if (insights.weakCards.length > 0) {
+        const { data: deckRows } = await supabase
+          .from('cards')
+          .select('id, deck_id')
+          .in('id', insights.weakCards.map((card) => card.cardId))
+        if (seq !== insightsRequestSeq) return
+        weakCardDecks = Object.fromEntries(
+          ((deckRows ?? []) as Array<{ id: string; deck_id: string }>)
+            .map((row) => [row.id, row.deck_id]),
+        )
+      }
+
+      set({ insights, weakCardDecks, insightsGoalId: goalId })
     } catch (e) {
       if (seq !== insightsRequestSeq) return
-      set({ insightsError: toLearningError(e), insights: null, insightsGoalId: goalId })
+      set({
+        insightsError: toLearningError(e), insights: null, weakCardDecks: {},
+        insightsGoalId: goalId,
+      })
     } finally {
       if (seq === insightsRequestSeq) set({ insightsLoading: false })
     }
@@ -1657,7 +1686,8 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       planAbsentFor: null, autoPlanAttempted: {},
       planExtending: false, planExtension: null,
       recordingItemId: null, attempts: [], attemptsLoading: false,
-      insights: null, insightsLoading: false, insightsGoalId: null, insightsError: null,
+      insights: null, weakCardDecks: {}, insightsLoading: false, insightsGoalId: null,
+      insightsError: null,
       recommendations: [], recommendationsLoading: false, recommendationsGoalId: null,
       recommendationBusyId: null,
     })

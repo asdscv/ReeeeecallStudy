@@ -189,7 +189,14 @@
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "scopeNote": "基于此目标的作答和计划数据。牌组级 SRS 统计请查看学习历史。",
     "attemptCount_one": "{{count, number}} 次作答",
-    "attemptCount_other": "{{count, number}} 次作答"
+    "attemptCount_other": "{{count, number}} 次作答",
+    "accuracyValue": "正确率 {{pct, number}}%",
+    "typicalValue": "通常 {{seconds, decimal}} 秒",
+    "adherenceValue": "计划完成 {{pct, number}}%",
+    "weakCount": "{{count, number}} 张",
+    "weakCount_one": "{{count, number}} 张",
+    "weakCount_other": "{{count, number}} 张",
+    "weakStudy": "只学这些卡片"
   },
   "recommend": {
     "title": "推荐",

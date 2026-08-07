@@ -189,7 +189,14 @@
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "scopeNote": "Dựa trên các lần làm và kế hoạch của mục tiêu này. Thống kê SRS theo bộ thẻ nằm trong Lịch sử học tập.",
     "attemptCount_one": "{{count, number}} lần làm",
-    "attemptCount_other": "{{count, number}} lần làm"
+    "attemptCount_other": "{{count, number}} lần làm",
+    "accuracyValue": "Độ chính xác {{pct, number}}%",
+    "typicalValue": "Thường {{seconds, decimal}} giây",
+    "adherenceValue": "Hoàn thành kế hoạch {{pct, number}}%",
+    "weakCount": "{{count, number}} thẻ",
+    "weakCount_one": "{{count, number}} thẻ",
+    "weakCount_other": "{{count, number}} thẻ",
+    "weakStudy": "Chỉ học những thẻ này"
   },
   "recommend": {
     "title": "Gợi ý",

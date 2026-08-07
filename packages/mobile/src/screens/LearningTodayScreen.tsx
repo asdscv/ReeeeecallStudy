@@ -68,8 +68,9 @@ export function LearningTodayScreen() {
     extendPlan, planExtending, planExtension,
     attempts, attemptsLoading, fetchAttempts,
     knowledge, fetchGoalKnowledge,
+    insights, weakCardDecks, insightsGoalId, fetchInsights,
   } = useLearningStore()
-  const { startPlanSession } = useStudy()
+  const { startPlanSession, startCardSession } = useStudy()
   const { decks, fetchDecks } = useDeckStore()
 
   const [refreshing, setRefreshing] = useState(false)
@@ -199,6 +200,57 @@ export function LearningTodayScreen() {
   )
   /** How much, how long, how it went — shared with web so the two cannot disagree. */
   const recap = useMemo(() => studyRecap(todaysAttempts), [todaysAttempts])
+  useEffect(() => { if (goalId) void fetchInsights(goalId) }, [goalId, fetchInsights])
+
+  /**
+   * Weak cards grouped by the deck holding them. A session takes ONE deck
+   * (`finalize_study_session` refuses events spanning decks), and `summarizeLearning` works
+   * from attempt rows which carry no deck — hence `weakCardDecks` from the store.
+   */
+  const weakByDeck = useMemo(() => {
+    if (!insights || insightsGoalId !== goalId) return []
+    const byDeck = new Map<string, string[]>()
+    for (const card of insights.weakCards) {
+      const deckId = weakCardDecks[card.cardId]
+      if (!deckId) continue
+      const bucket = byDeck.get(deckId)
+      if (bucket) bucket.push(card.cardId)
+      else byDeck.set(deckId, [card.cardId])
+    }
+    return [...byDeck.entries()].map(([deckId, cardIds]) => ({ deckId, cardIds }))
+  }, [insights, weakCardDecks, insightsGoalId, goalId])
+
+  // `accuracy` is null when nothing carried a score, which is a different claim from 0%.
+  const insightStats = useMemo(() => {
+    if (!insights) return ''
+    const pct = (v: number | null) => (v === null ? null : Math.round(v * 100))
+    const accuracy = pct(insights.accuracy)
+    const adherence = pct(insights.overallAdherence)
+    return [
+      accuracy === null ? t('insights.notScoredYet') : t('insights.accuracyValue', { pct: accuracy }),
+      insights.medianDurationMs === null
+        ? null
+        : t('insights.typicalValue', { seconds: Math.round(insights.medianDurationMs / 100) / 10 }),
+      adherence === null ? null : t('insights.adherenceValue', { pct: adherence }),
+    ].filter(Boolean).join(' · ')
+  }, [insights, t])
+
+  const studyWeak = useCallback(async (group: { deckId: string; cardIds: string[] }) => {
+    setStarting(true)
+    try {
+      await startCardSession(group.deckId, group.cardIds)
+      // Cross-stack, same shape `startDeck` uses: `StudySession` lives in the Study tab's
+      // stack while this screen lives in Settings.
+      const tabNav = navigation.getParent() as unknown as
+        { navigate: (name: string, params?: unknown) => void } | undefined
+      tabNav?.navigate('StudyTab', { screen: 'StudySession' })
+    } catch {
+      Alert.alert(t('today.error.unknown'))
+    } finally {
+      setStarting(false)
+    }
+  }, [startCardSession, navigation, t])
+
   const recapBands = [
     recap.known > 0 ? t('history.band.known', { count: recap.known }) : null,
     recap.partial > 0 ? t('history.band.partial', { count: recap.partial }) : null,
@@ -706,6 +758,59 @@ export function LearningTodayScreen() {
 
               </View>
             ) : null}
+
+            {/* ── What is working and what is not, over 30 days ─────────────────
+                The engine (`summarizeLearning`) and the copy in all 16 locale files existed
+                the whole time with nothing rendering them. Weak cards are a COUNT and a
+                BUTTON, never a list: a column of cards you got wrong with nothing to do about
+                it is the shape this screen has already been cleaned of twice. One button per
+                deck, because `finalize_study_session` refuses a session spanning decks. */}
+            {insights && insightsGoalId === goalId && insights.attemptCount > 0 && (
+              <View style={styles.attemptSection} {...testProps('learning-insights', true)}>
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
+                  {t('insights.title')}
+                </Text>
+                <View style={[styles.card, {
+                  backgroundColor: theme.colors.surface, borderColor: theme.colors.border,
+                }]}>
+                  <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
+                    {insightStats}
+                  </Text>
+                  <Text style={[theme.typography.caption, {
+                    color: theme.colors.textTertiary, marginTop: 4,
+                  }]}>
+                    {t('insights.scopeNote')}
+                  </Text>
+                </View>
+
+                {weakByDeck.map((group, index) => (
+                  <TouchableOpacity
+                    key={group.deckId}
+                    disabled={starting}
+                    onPress={() => void studyWeak(group)}
+                    style={[
+                      styles.card,
+                      { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+                      starting && styles.disabled,
+                    ]}
+                    accessibilityRole="button"
+                    accessibilityState={{ disabled: starting }}
+                    {...testProps('learning-weak-study-' + index)}
+                  >
+                    <Text style={[theme.typography.bodySmall, { color: theme.colors.primary }]}>
+                      {weakByDeck.length > 1 ? deckName(group.deckId) : t('insights.weakStudy')}
+                      {' · '}
+                      {t('insights.weakCount', { count: group.cardIds.length })}
+                    </Text>
+                    <Text style={[theme.typography.caption, {
+                      color: theme.colors.textTertiary, marginTop: 2,
+                    }]}>
+                      {t('insights.weakHint')}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
           </>
         )}
       </ScrollView>

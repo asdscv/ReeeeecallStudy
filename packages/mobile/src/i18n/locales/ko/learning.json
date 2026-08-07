@@ -138,7 +138,14 @@
     "typicalTime": "보통 소요",
     "weakEmpty": "뒤처지는 카드가 없습니다.",
     "weakHint": "시도 2회 이상, 평균 60% 미만인 카드입니다.",
-    "weakTitle": "다시 볼 카드"
+    "weakTitle": "다시 볼 카드",
+    "accuracyValue": "정답률 {{pct, number}}%",
+    "typicalValue": "보통 {{seconds, decimal}}초",
+    "adherenceValue": "플랜 {{pct, number}}% 이행",
+    "weakCount": "{{count, number}}장",
+    "weakCount_one": "{{count, number}}장",
+    "weakCount_other": "{{count, number}}장",
+    "weakStudy": "이 카드만 학습하기"
   },
   "recommend": {
     "accept": "수락",

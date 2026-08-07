@@ -138,7 +138,14 @@
     "typicalTime": "Tiempo habitual",
     "weakEmpty": "Nada se está quedando atrás.",
     "weakHint": "Tarjetas con al menos dos intentos y promedio inferior al 60%.",
-    "weakTitle": "Vale otra mirada"
+    "weakTitle": "Vale otra mirada",
+    "accuracyValue": "Acierto {{pct, number}}%",
+    "typicalValue": "Normalmente {{seconds, decimal}} s",
+    "adherenceValue": "Plan {{pct, number}}% completado",
+    "weakCount": "{{count, number}} tarjetas",
+    "weakCount_one": "{{count, number}} tarjeta",
+    "weakCount_other": "{{count, number}} tarjetas",
+    "weakStudy": "Estudiar solo estas"
   },
   "recommend": {
     "accept": "Aceptar",

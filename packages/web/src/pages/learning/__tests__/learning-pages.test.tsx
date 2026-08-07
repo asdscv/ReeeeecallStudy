@@ -98,6 +98,13 @@ const baseState = (over: StoreState = {}): StoreState => ({
   // path that works in production.
   recordAttempt: vi.fn().mockResolvedValue(true),
   fetchAttempts: vi.fn(),
+  // The diagnostics panel. `insights: null` is the real store's initial state — the panel
+  // renders nothing until a read lands, which is what most of these tests exercise.
+  insights: null,
+  weakCardDecks: {},
+  insightsLoading: false,
+  insightsGoalId: null,
+  fetchInsights: vi.fn(),
   enrichment: null,
   enrichmentPendingCardId: null,
   enrichmentError: null,
@@ -457,6 +464,106 @@ describe('LearningTodayPage', () => {
     expect(screen.getByTestId('progress-headline')).toHaveTextContent('progress.notStarted')
     // The headline already gave the total, so there is nothing left for a detail line to add.
     expect(screen.queryByTestId('progress-detail')).not.toBeInTheDocument()
+  })
+})
+
+// ── the diagnostics panel ──────────────────────────────────────────────────
+//
+// "차라리 ai를 통해서 학습한 것들 전체적으로 분석해서 뭐가 잘되고 뭐가 잘 안되는지 확인한다든지
+// 이런게 낫지 않나 / 개별 카드 설명이 뭐가 도움이 되겠어" — right, and the engine for it
+// (`summarizeLearning`) had been in the repo the whole time with nothing rendering it.
+describe('learning diagnostics', () => {
+  const insightsOf = (over: Record<string, unknown> = {}) => ({
+    insightsGoalId: 'goal-1',
+    insights: {
+      attemptCount: 40, scoredCount: 38, accuracy: 0.75, medianDurationMs: 6200,
+      weakCards: [], adherence: [], overallAdherence: 0.9, ...over,
+    },
+  })
+
+  it('says nothing at all before anything has been studied', () => {
+    // Not an empty state to decorate. There is no diagnosis to give.
+    renderToday(insightsOf({ attemptCount: 0, scoredCount: 0, accuracy: null }))
+
+    expect(screen.queryByTestId('insights-stats')).not.toBeInTheDocument()
+  })
+
+  it('will not show one goal\'s diagnosis under another goal\'s heading', () => {
+    // `fetchInsights` leaves the previous goal's numbers in the store until the new read
+    // lands. Rendering them meanwhile would attribute one goal's accuracy to another.
+    renderToday({ ...insightsOf(), insightsGoalId: 'goal-OTHER' })
+
+    expect(screen.queryByTestId('insights-stats')).not.toBeInTheDocument()
+  })
+
+  it('reports accuracy, typical time and adherence in one line', () => {
+    renderToday(insightsOf())
+
+    const stats = screen.getByTestId('insights-stats')
+    expect(stats).toHaveTextContent('insights.accuracyValue')
+    expect(stats).toHaveTextContent('insights.typicalValue')
+    expect(stats).toHaveTextContent('insights.adherenceValue')
+  })
+
+  it('says "not scored yet" instead of claiming 0% accuracy', () => {
+    // `accuracy === null` means no attempt carried a score. That is a different statement
+    // from "you got everything wrong", and the second one would be a lie.
+    renderToday(insightsOf({ accuracy: null }))
+
+    expect(screen.getByTestId('insights-stats')).toHaveTextContent('insights.notScoredYet')
+  })
+
+  it('offers weak cards as a button, never as a list of words', () => {
+    // The failure mode this screen has been cleaned of twice: naming cards the learner got
+    // wrong with nothing to do about them. The link studies exactly those cards — the
+    // ordinary SRS queue would never serve them, because a card you keep failing is not due.
+    renderToday({
+      ...insightsOf({
+        weakCards: [
+          { cardId: 'card-1', attempts: 3, meanScore: 0.2 },
+          { cardId: 'card-2', attempts: 2, meanScore: 0.5 },
+        ],
+      }),
+      weakCardDecks: { 'card-1': 'deck-7', 'card-2': 'deck-7' },
+      planCards: { 'card-1': { id: 'card-1', deck_id: 'deck-7', field_values: { front: '猫' } } },
+    })
+
+    expect(screen.getByRole('link', { name: /insights\.weakStudy/ }))
+      .toHaveAttribute('href', '/decks/deck-7/study?mode=srs&cards=card-1,card-2')
+    // The card's own text never appears.
+    expect(screen.queryByText('猫')).not.toBeInTheDocument()
+  })
+
+  it('splits weak cards by deck, because a session cannot span decks', () => {
+    // `finalize_study_session` takes one p_deck_id and refuses events covering more.
+    renderToday({
+      ...insightsOf({
+        weakCards: [
+          { cardId: 'card-1', attempts: 3, meanScore: 0.2 },
+          { cardId: 'card-9', attempts: 3, meanScore: 0.3 },
+        ],
+      }),
+      weakCardDecks: { 'card-1': 'deck-7', 'card-9': 'deck-9' },
+    })
+
+    const links = screen.getAllByRole('link', { name: /insights\.weakCount/ })
+    expect(links.map((l) => l.getAttribute('href'))).toEqual([
+      '/decks/deck-7/study?mode=srs&cards=card-1',
+      '/decks/deck-9/study?mode=srs&cards=card-9',
+    ])
+  })
+
+  it('drops a weak card whose deck could not be resolved', () => {
+    // Deleted since the diagnostics were computed. A button that starts a session over a card
+    // the deck no longer has would open an empty queue.
+    renderToday({
+      ...insightsOf({ weakCards: [{ cardId: 'gone', attempts: 3, meanScore: 0.1 }] }),
+      weakCardDecks: {},
+    })
+
+    expect(screen.queryByTestId('insights-weak')).not.toBeInTheDocument()
+    // The stats line still renders — one unresolvable card is not a reason to hide everything.
+    expect(screen.getByTestId('insights-stats')).toBeInTheDocument()
   })
 })
 

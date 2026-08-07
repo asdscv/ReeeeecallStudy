@@ -189,7 +189,14 @@
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "scopeNote": "Berdasarkan percobaan dan rencana tujuan ini. Statistik SRS per dek ada di Riwayat Belajar.",
     "attemptCount_one": "{{count, number}} percobaan",
-    "attemptCount_other": "{{count, number}} percobaan"
+    "attemptCount_other": "{{count, number}} percobaan",
+    "accuracyValue": "Akurasi {{pct, number}}%",
+    "typicalValue": "Biasanya {{seconds, decimal}} detik",
+    "adherenceValue": "Rencana {{pct, number}}% selesai",
+    "weakCount": "{{count, number}} kartu",
+    "weakCount_one": "{{count, number}} kartu",
+    "weakCount_other": "{{count, number}} kartu",
+    "weakStudy": "Pelajari kartu ini saja"
   },
   "recommend": {
     "title": "Rekomendasi",

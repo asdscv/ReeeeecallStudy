@@ -138,7 +138,14 @@
     "typicalTime": "平均所要時間",
     "weakEmpty": "遅れているカードはありません。",
     "weakHint": "試行2回以上で平均60%未満のカードです。",
-    "weakTitle": "もう一度確認"
+    "weakTitle": "もう一度確認",
+    "accuracyValue": "正答率 {{pct, number}}%",
+    "typicalValue": "平均 {{seconds, decimal}}秒",
+    "adherenceValue": "プラン達成 {{pct, number}}%",
+    "weakCount": "{{count, number}}枚",
+    "weakCount_one": "{{count, number}}枚",
+    "weakCount_other": "{{count, number}}枚",
+    "weakStudy": "このカードだけ学習"
   },
   "recommend": {
     "accept": "受け入れる",

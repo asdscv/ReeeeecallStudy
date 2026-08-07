@@ -189,7 +189,14 @@
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "scopeNote": "อ้างอิงจากการทำและแผนของเป้าหมายนี้ สถิติ SRS ระดับสำรับอยู่ในประวัติการเรียน",
     "attemptCount_one": "{{count, number}} ครั้ง",
-    "attemptCount_other": "{{count, number}} ครั้ง"
+    "attemptCount_other": "{{count, number}} ครั้ง",
+    "accuracyValue": "ความแม่นยำ {{pct, number}}%",
+    "typicalValue": "ปกติ {{seconds, decimal}} วินาที",
+    "adherenceValue": "ทำตามแผน {{pct, number}}%",
+    "weakCount": "{{count, number}} ใบ",
+    "weakCount_one": "{{count, number}} ใบ",
+    "weakCount_other": "{{count, number}} ใบ",
+    "weakStudy": "เรียนเฉพาะใบเหล่านี้"
   },
   "recommend": {
     "title": "คำแนะนำ",

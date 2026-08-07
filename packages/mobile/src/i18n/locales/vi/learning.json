@@ -138,7 +138,14 @@
     "typicalTime": "Thời gian thường",
     "weakEmpty": "Không có thẻ nào tụt lại.",
     "weakHint": "Thẻ có ít nhất 2 lần làm với trung bình dưới 60%.",
-    "weakTitle": "Cần xem lại"
+    "weakTitle": "Cần xem lại",
+    "accuracyValue": "Độ chính xác {{pct, number}}%",
+    "typicalValue": "Thường {{seconds, decimal}} giây",
+    "adherenceValue": "Hoàn thành kế hoạch {{pct, number}}%",
+    "weakCount": "{{count, number}} thẻ",
+    "weakCount_one": "{{count, number}} thẻ",
+    "weakCount_other": "{{count, number}} thẻ",
+    "weakStudy": "Chỉ học những thẻ này"
   },
   "recommend": {
     "accept": "Chấp nhận",

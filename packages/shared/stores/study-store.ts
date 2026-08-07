@@ -63,6 +63,15 @@ interface StudyConfig {
    * back identical. `apply_plan_study_rating` refuses anything but the four SRS ratings.
    */
   planSelection?: PlanSelection
+  /**
+   * Study exactly these cards, in this order.
+   *
+   * The diagnostics panel's "다시 볼 카드" button. Unlike `planSelection` this completes no plan
+   * item — these cards were not on today's plan, which is rather the point: a card the learner
+   * keeps failing is usually not due, so the ordinary queue below would never serve it.
+   * Ratings take the normal `apply_study_rating` path and move the schedule like any other.
+   */
+  cardSelection?: string[]
 }
 
 /** PostgREST puts `.in()` values in the query string, so a 500-item plan would blow the URL. */
@@ -424,6 +433,45 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           // built) simply does not appear. Its plan item stays pending, which is the honest
           // record — better than a queue entry that cannot be rendered.
           cards = planCards.sort((a, b) => (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0))
+
+          if (cards.length > 0) {
+            const queueCards: QueueCard[] = cards.map(c => ({
+              id: c.id,
+              srs_status: c.srs_status,
+              ease_factor: c.ease_factor,
+              interval_days: c.interval_days,
+              repetitions: c.repetitions,
+            }))
+            srsQueueManager = new SrsQueueManager(queueCards, srsSettings ?? undefined)
+          }
+          break
+        }
+
+        // ── An explicit list of cards ─────────────────────────────────────────
+        // The diagnostics panel names cards the learner keeps failing. They are usually NOT
+        // due, so every due-date rule below would drop them — which is why this branch exists
+        // rather than a filter on the ordinary queue. Same fetch shape as the plan branch;
+        // the difference is downstream, where no plan item is completed.
+        if (config.cardSelection) {
+          const wanted = config.cardSelection
+          const rank = new Map(wanted.map((id, index) => [id, index]))
+          let picked: Card[]
+          if (mergedAll) {
+            picked = mergedAll.filter((card) => rank.has(card.id))
+          } else {
+            picked = []
+            for (let i = 0; i < wanted.length; i += PLAN_CARD_FETCH_CHUNK) {
+              const { data } = await supabase
+                .from('cards')
+                .select('*')
+                .eq('deck_id', config.deckId)
+                .in('id', wanted.slice(i, i + PLAN_CARD_FETCH_CHUNK))
+              picked.push(...((data ?? []) as Card[]))
+            }
+          }
+          // A card deleted since the diagnostics were computed simply does not appear, the
+          // same way a plan names cards the deck may no longer have.
+          cards = picked.sort((a, b) => (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0))
 
           if (cards.length > 0) {
             const queueCards: QueueCard[] = cards.map(c => ({
