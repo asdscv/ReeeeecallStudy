@@ -50,7 +50,10 @@
       "fresh": "새 카드 {{count, number}}장",
       "fresh_one": "새 카드 {{count, number}}장",
       "fresh_other": "새 카드 {{count, number}}장"
-    }
+    },
+    "deckListMore": "{{names}} 외 {{count, number}}개",
+    "deckListMore_one": "{{names}} 외 {{count, number}}개",
+    "deckListMore_other": "{{names}} 외 {{count, number}}개"
   },
   "goals": {
     "title": "학습 목표",
@@ -189,7 +192,14 @@
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "scopeNote": "이 목표의 시도와 플랜을 기준으로 계산합니다. 덱 단위 SRS 통계는 학습 기록에 있습니다.",
     "attemptCount_one": "시도 {{count, number}}회",
-    "attemptCount_other": "시도 {{count, number}}회"
+    "attemptCount_other": "시도 {{count, number}}회",
+    "accuracyValue": "정답률 {{pct, number}}%",
+    "typicalValue": "보통 {{seconds, decimal}}초",
+    "adherenceValue": "플랜 {{pct, number}}% 이행",
+    "weakCount": "{{count, number}}장",
+    "weakCount_one": "{{count, number}}장",
+    "weakCount_other": "{{count, number}}장",
+    "weakStudy": "이 카드만 학습하기"
   },
   "recommend": {
     "title": "추천",
@@ -209,13 +219,26 @@
     "daysLeft": "{{count, number}}일 남음",
     "daysLeft_one": "{{count, number}}일 남음",
     "daysLeft_other": "{{count, number}}일 남음",
-    "withinWindow": "배운 {{attempted, number}}장 중 {{known, number}}장이 복습 주기 안에 있어요",
     "notStarted": "아직 배운 카드가 없어요 · 전체 {{total, number}}장",
-    "overdue": "복습 밀림 {{count, number}}장",
-    "overdue_one": "복습 밀림 {{count, number}}장",
-    "overdue_other": "복습 밀림 {{count, number}}장",
     "unstudied": "아직 안 배움 {{count, number}}장",
     "unstudied_one": "아직 안 배움 {{count, number}}장",
-    "unstudied_other": "아직 안 배움 {{count, number}}장"
+    "unstudied_other": "아직 안 배움 {{count, number}}장",
+    "behind": "복습이 {{count, number}}장 밀렸어요",
+    "behind_one": "복습이 {{count, number}}장 밀렸어요",
+    "behind_other": "복습이 {{count, number}}장 밀렸어요",
+    "studied": "{{total, number}}장 중 {{attempted, number}}장 배움",
+    "detailStudied": "배운 {{count, number}}장",
+    "detailStudied_one": "배운 {{count, number}}장",
+    "detailStudied_other": "배운 {{count, number}}장",
+    "detailWithinWindow": "복습 주기 안 {{count, number}}장",
+    "detailWithinWindow_one": "복습 주기 안 {{count, number}}장",
+    "detailWithinWindow_other": "복습 주기 안 {{count, number}}장"
+  },
+  "completion": {
+    "done": "목표 달성",
+    "progress": "{{required, number}}장 중 {{mature, number}}장 정착",
+    "eta": "완료까지 약 {{count, number}}일",
+    "eta_one": "완료까지 약 {{count, number}}일",
+    "eta_other": "완료까지 약 {{count, number}}일"
   }
 }

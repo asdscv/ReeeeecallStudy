@@ -26,7 +26,7 @@ import {
 import type { UserCardProgress } from '../lib/srs-access'
 import {
   buildDailyPlan, DAILY_PLANNER_VERSION, retentionStabilityMultiplier, reviewsAddedTomorrow,
-  parseNewCardsPerDay,
+  parseNewCardsPerDay, DEFAULT_NEW_CARDS_PER_DAY,
 } from '../learning/application/index'
 import { activityMixForDomain, supportedActivityTypesForDomain } from '../learning/adapters/index'
 import type { LearningGoal } from '../learning/domain/index'
@@ -96,8 +96,13 @@ export interface DailyPlanItemRow {
    * `recall_probability` is the estimated chance the learner can recall the item right now
    * (`application/memory.ts`). ABSENT — not null — for a card with no forgetting curve yet,
    * so "we cannot say" and "we say 0%" stay different things all the way to the screen.
+   *
+   * `is_new` is whether the planner counted this row as INTAKE. Recorded because it cannot be
+   * re-derived from the row: a card mid-learning-step has no forgetting curve either, so
+   * "no recall estimate" does NOT mean "never studied". Absent on plans saved before this
+   * existed, which is why readers fall back rather than assume.
    */
-  payload?: { recall_probability?: number } | null
+  payload?: { recall_probability?: number; is_new?: boolean } | null
 }
 
 /**
@@ -287,6 +292,20 @@ export interface GoalKnowledge {
   readonly unseen: number
   readonly known: number
   readonly unknown: number
+  /**
+   * Retained rather than being learned: interval >= 21 days (mig 192).
+   *
+   * Deliberately NOT filtered on whether the card is currently due — a mature card one day
+   * overdue has not stopped being mature, and tying completion to punctuality would let a
+   * finished goal un-finish itself overnight.
+   */
+  readonly mature: number
+  /** Studied, interval 0-2. Twelve days of waiting from mature. */
+  readonly rung1: number
+  /** interval 3-7. Eleven days. */
+  readonly rung3: number
+  /** interval 8-20. Its next review is the one that matures it. */
+  readonly rung8: number
 }
 
 export interface AttemptInput {
@@ -453,6 +472,14 @@ interface LearningState {
    */
   insightsGoalId: string | null
   /**
+   * Deck id per weak card, so the "다시 볼 카드" button can start a session.
+   *
+   * A study session takes ONE deck (`finalize_study_session` refuses events spanning decks),
+   * and `summarizeLearning` works from attempt rows which carry no deck. Empty when there are
+   * no weak cards, or when the diagnostics read failed.
+   */
+  weakCardDecks: Record<string, string>
+  /**
    * Diagnostics failures have their own channel. `planError` drives the today screen's
    * banner, so routing a diagnostics failure there would make an unrelated screen claim
    * the plan is broken.
@@ -510,6 +537,8 @@ interface LearningState {
   recordAttempt: (input: AttemptInput, planDate: string) => Promise<boolean>
   fetchAttempts: (goalId: string) => Promise<void>
   fetchGoalKnowledge: (goalId: string, atISO: string) => Promise<void>
+  /** Stamp the goal completed if it has earned it. Returns whether this call changed it. */
+  completeGoalIfEarned: (goalId: string) => Promise<boolean>
   fetchInsights: (goalId: string) => Promise<void>
   fetchRecommendations: (goalId: string) => Promise<void>
   regenerateRecommendations: (goalId: string) => Promise<boolean>
@@ -550,6 +579,17 @@ function toPlanItemRows(
       .filter((candidate) => typeof candidate.retrievability === 'number')
       .map((candidate) => [candidate.candidateId, candidate.retrievability as number]),
   )
+  // Whether the planner treated this row as INTAKE, recorded rather than re-derived.
+  //
+  // The screens used to infer it from `recall_probability` being absent, which is wrong for
+  // exactly the cards a learner is working hardest on: a card mid-learning-step has no
+  // forgetting curve yet, so it carried no estimate and got labelled "새 카드" hours after
+  // being studied. The planner's own test is `!card.last_reviewed_at` (learning-candidates.ts),
+  // it spends intake and review budget on the two separately, and it is the only place that
+  // knows. So it says so here instead of leaving the UI to guess.
+  const isNewByCandidate = new Map(
+    candidates.map((candidate) => [candidate.candidateId, candidate.isNew === true]),
+  )
   return output.items.map((item) => {
     const card = item.cardId ? cardsById.get(item.cardId) : undefined
     const shape = card
@@ -573,9 +613,11 @@ function toPlanItemRows(
     // (mig 167), so neither record needs a migration. The key is omitted entirely when BOTH
     // are absent, so `save_daily_plan` keeps writing its `'{}'` default for every other item.
     const recall = recallByCandidate.get(item.candidateId)
+    const isNew = isNewByCandidate.get(item.candidateId)
     const payload = {
       ...(planItemAnswerPayload(shape) ?? {}),
       ...(recall === undefined ? {} : { recall_probability: recall }),
+      ...(isNew === undefined ? {} : { is_new: isNew }),
     }
     return {
       activity_id: item.activityId,
@@ -862,6 +904,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   knowledge: {},
   knowledgeLoading: false,
   insights: null,
+  weakCardDecks: {},
   insightsLoading: false,
   insightsGoalId: null,
   insightsError: null,
@@ -1211,10 +1254,26 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         goal: toDomainGoal(goal, userId),
         candidates,
         budgetMinutes: goal.daily_minutes,
-        // The intake throttle, read from the goal's settings. Absent means uncapped, which is
-        // how every goal saved before this behaved — so an existing goal plans exactly as it
-        // did until its owner chooses a number.
-        newCardsPerDay: parseNewCardsPerDay(goal.settings),
+        /**
+         * The intake throttle.
+         *
+         * Absent settings fall back to `DEFAULT_NEW_CARDS_PER_DAY`, NOT to uncapped. Uncapped
+         * was a deliberate compatibility choice — "an existing goal plans exactly as it did
+         * until its owner chooses a number" — and the behaviour it preserved turned out to be
+         * the entire deck on day one. A learner reported it: a 29-card goal whose first plan
+         * was all 29 cards, so from day two there were no new cards left and every plan was
+         * pure review. On a 4,000-card deck the same path commits a year of reviews in one
+         * sitting.
+         *
+         * It was also a lie about what the learner had been shown. `GoalFormModal` seeds the
+         * field with `parseNewCardsPerDay(settings) ?? DEFAULT_NEW_CARDS_PER_DAY`, so the form
+         * has always displayed 20 for a goal with no stored number while the planner used
+         * infinity. The two now agree.
+         *
+         * `extendPlan` still passes `undefined` on purpose and still means uncapped — see its
+         * own note. That is a button the learner pressed AFTER finishing the day's intake.
+         */
+        newCardsPerDay: parseNewCardsPerDay(goal.settings) ?? DEFAULT_NEW_CARDS_PER_DAY,
         activityMix: activityMixForDomain(goal.domain_id),
         now: ctx.now,
         timezone: ctx.timezone,
@@ -1431,6 +1490,29 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     }
   },
 
+  /**
+   * Ask the server whether this goal has earned its completion stamp.
+   *
+   * Idempotent and server-judged (`complete_goal_if_earned`, mig 192): the client says which
+   * goal, never whether. Called after a rating rather than on every render — the ratio can only
+   * change when a card's interval does.
+   *
+   * A refusal is swallowed. Failing to stamp a milestone must never break the screen the
+   * learner is standing on, and the next rating will ask again.
+   */
+  completeGoalIfEarned: async (goalId) => {
+    try {
+      const { data, error } = await supabase.rpc('complete_goal_if_earned', { p_goal_id: goalId })
+      if (error) throw error
+      const changed = Boolean((data as { changed?: boolean } | null)?.changed)
+      if (changed) await get().fetchGoals()
+      return changed
+    } catch (e) {
+      console.error('[learning-store] complete_goal_if_earned failed:', e)
+      return false
+    }
+  },
+
   fetchGoalKnowledge: async (goalId, atISO) => {
     set({ knowledgeLoading: true })
     try {
@@ -1449,6 +1531,12 @@ export const useLearningStore = create<LearningState>((set, get) => ({
             unseen: Number(row.unseen ?? 0),
             known: Number(row.known ?? 0),
             unknown: Number(row.unknown ?? 0),
+            // Absent until mig 192 is deployed. Zero then, which reads as "no mastery yet"
+            // and simply shows no completion line — never as a wrong date.
+            mature: Number(row.mature ?? 0),
+            rung1: Number(row.rung1 ?? 0),
+            rung3: Number(row.rung3 ?? 0),
+            rung8: Number(row.rung8 ?? 0),
           },
         },
       }))
@@ -1490,16 +1578,36 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       if (attemptsResult.error) throw attemptsResult.error
       if (plansResult.error) throw plansResult.error
 
-      set({
-        insights: summarizeLearning({
-          attempts: attemptsResult.data ?? [],
-          plans: plansResult.data ?? [],
-        }),
-        insightsGoalId: goalId,
+      const insights = summarizeLearning({
+        attempts: attemptsResult.data ?? [],
+        plans: plansResult.data ?? [],
       })
+
+      // Which deck each weak card lives in. `summarizeLearning` is pure and works from attempt
+      // rows, which carry no deck — but a study session takes ONE deck (`finalize_study_session`
+      // refuses a session whose rating events span decks), so the button cannot be offered
+      // without this. Read here rather than in the component: a component that fetches on render
+      // would re-fetch on every keystroke elsewhere on the page.
+      let weakCardDecks: Record<string, string> = {}
+      if (insights.weakCards.length > 0) {
+        const { data: deckRows } = await supabase
+          .from('cards')
+          .select('id, deck_id')
+          .in('id', insights.weakCards.map((card) => card.cardId))
+        if (seq !== insightsRequestSeq) return
+        weakCardDecks = Object.fromEntries(
+          ((deckRows ?? []) as Array<{ id: string; deck_id: string }>)
+            .map((row) => [row.id, row.deck_id]),
+        )
+      }
+
+      set({ insights, weakCardDecks, insightsGoalId: goalId })
     } catch (e) {
       if (seq !== insightsRequestSeq) return
-      set({ insightsError: toLearningError(e), insights: null, insightsGoalId: goalId })
+      set({
+        insightsError: toLearningError(e), insights: null, weakCardDecks: {},
+        insightsGoalId: goalId,
+      })
     } finally {
       if (seq === insightsRequestSeq) set({ insightsLoading: false })
     }
@@ -1639,7 +1747,8 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       planAbsentFor: null, autoPlanAttempted: {},
       planExtending: false, planExtension: null,
       recordingItemId: null, attempts: [], attemptsLoading: false,
-      insights: null, insightsLoading: false, insightsGoalId: null, insightsError: null,
+      insights: null, weakCardDecks: {}, insightsLoading: false, insightsGoalId: null,
+      insightsError: null,
       recommendations: [], recommendationsLoading: false, recommendationsGoalId: null,
       recommendationBusyId: null,
     })

@@ -7,16 +7,19 @@
  * day. The rest cover the states a user can actually get stuck in (no goal, no decks,
  * nothing due, quota spent) — each of which has to say something different.
  */
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
 type StoreState = Record<string, unknown>
 
-const { storeState, mockConfirm } = vi.hoisted(() => ({
+const { storeState, mockConfirm, deckState } = vi.hoisted(() => ({
   storeState: { current: {} as StoreState },
   mockConfirm: vi.fn(),
+  // Mutable so a test can hand the screen more decks than it will name. The goal-deck summary
+  // resolves names through this store, so a fixed list could not exercise the "+N more" path.
+  deckState: { decks: [{ id: 'deck-1', name: 'Deck one' }] as Array<{ id: string; name: string }> },
 }))
 
 vi.mock('../../../stores/learning-store', () => ({
@@ -32,7 +35,7 @@ vi.mock('../../../stores/deck-store', () => ({
   // preview from `get_deck_stats`, and an omitted field here is a mock defect, not a
   // component contract to code defensively around.
   useDeckStore: () => ({
-    decks: [{ id: 'deck-1', name: 'Deck one' }],
+    decks: deckState.decks,
     stats: [{ deck_id: 'deck-1', deck_name: 'Deck one', total_cards: 40, new_cards: 30, review_cards: 8, learning_cards: 2, last_studied: null }],
     fetchDecks: vi.fn(), fetchStats: vi.fn(),
   }),
@@ -55,6 +58,8 @@ const baseState = (over: StoreState = {}): StoreState => ({
   knowledge: {},
   knowledgeLoading: false,
   fetchGoalKnowledge: vi.fn(),
+  // Server-judged completion stamp. A no-op here; its own cases drive it directly.
+  completeGoalIfEarned: vi.fn().mockResolvedValue(false),
   goals: [goal],
   goalsLoading: false,
   goalsError: null,
@@ -98,6 +103,13 @@ const baseState = (over: StoreState = {}): StoreState => ({
   // path that works in production.
   recordAttempt: vi.fn().mockResolvedValue(true),
   fetchAttempts: vi.fn(),
+  // The diagnostics panel. `insights: null` is the real store's initial state — the panel
+  // renders nothing until a read lands, which is what most of these tests exercise.
+  insights: null,
+  weakCardDecks: {},
+  insightsLoading: false,
+  insightsGoalId: null,
+  fetchInsights: vi.fn(),
   enrichment: null,
   enrichmentPendingCardId: null,
   enrichmentError: null,
@@ -140,6 +152,7 @@ const renderGoals = (over: StoreState = {}) => {
 beforeEach(() => {
   vi.clearAllMocks()
   mockConfirm.mockResolvedValue(true)
+  deckState.decks = [{ id: 'deck-1', name: 'Deck one' }]
 })
 
 describe('LearningTodayPage', () => {
@@ -210,6 +223,43 @@ describe('LearningTodayPage', () => {
     renderToday({ planError: { code: 'LIMIT_EXCEEDED', message: 'limit' } })
 
     expect(screen.getByRole('alert')).toHaveTextContent('today.error.limitExceeded')
+  })
+
+  it('names the decks the plan draws from', () => {
+    // Asked for: "화면들어가면 어떤 덱 선택되어 있는지 표시". Read from `goal.decks` — the
+    // goal's own link table, i.e. what the PLANNER draws from — not from the decks that
+    // happen to appear in today's plan, which would hide one that contributed nothing today.
+    renderToday()
+
+    expect(screen.getByText('Deck one')).toBeInTheDocument()
+  })
+
+  it('counts the rest once there are too many to name', () => {
+    // "수십 개 선택할 수도 있으니까 적당히 잘 표시할 수 잇또록". Three names then a count,
+    // rather than a paragraph of deck names above the number the learner opened the screen for.
+    deckState.decks = Array.from({ length: 9 }, (_, i) => ({ id: `d${i}`, name: `Deck ${i}` }))
+    renderToday({
+      goals: [{
+        ...goal,
+        decks: deckState.decks.map((deck) => ({ deck_id: deck.id, importance: 0.5 })),
+      }],
+    })
+
+    expect(screen.getByText(/today\.deckListMore/)).toBeInTheDocument()
+  })
+
+  it('drops a deck it cannot name rather than printing an id', () => {
+    // A deck deleted or no longer visible. An id on screen is worse than a shorter list.
+    deckState.decks = [{ id: 'deck-1', name: 'Deck one' }]
+    renderToday({
+      goals: [{
+        ...goal,
+        decks: [{ deck_id: 'deck-1', importance: 0.5 }, { deck_id: 'GONE', importance: 0.5 }],
+      }],
+    })
+
+    expect(screen.getByText('Deck one')).toBeInTheDocument()
+    expect(screen.queryByText(/GONE/)).not.toBeInTheDocument()
   })
 
   it('sends the day into the real study session, carrying the plan with it', () => {
@@ -409,34 +459,221 @@ describe('LearningTodayPage', () => {
     knowledge: { 'goal-1': { total: known + unknown + unseen, known, unknown, unseen } },
   })
 
-  it('says what `known` measures instead of renaming it 확실', () => {
-    renderToday(knowledgeOf(1, 18, 10))
-
-    // The denominator is what has been STUDIED (19), not the whole goal (29).
-    expect(screen.getByText(/progress\.withinWindow/)).toBeInTheDocument()
-    expect(screen.queryByText(/progress\.knownNow/)).not.toBeInTheDocument()
-    expect(screen.queryByText(/progress\.breakdown/)).not.toBeInTheDocument()
+  // ── the finish line ───────────────────────────────────────────────────────
+  //
+  // "로직으로 저 학습플랜 완료하는건 언제야?" — there was no answer anywhere. The status value,
+  // the transition and the `target` column all existed; nothing ever decided.
+  const withMastery = (over: Record<string, number>) => ({
+    knowledge: {
+      'goal-1': {
+        total: 10, unseen: 0, known: 10, unknown: 0,
+        mature: 0, rung1: 0, rung3: 0, rung8: 0, ...over,
+      },
+    },
+    insightsGoalId: 'goal-1',
   })
 
-  it('puts the overdue work first and drops halves that are empty', () => {
-    renderToday(knowledgeOf(1, 18, 10))
-    expect(screen.getByTestId('progress-detail')).toHaveTextContent('progress.overdue')
+  it('asks the server whether the goal has earned its stamp', () => {
+    // The client says WHICH goal, never whether. `complete_goal_if_earned` re-checks — the
+    // rule lives in one place rather than in whichever client implemented it.
+    const state = renderToday()
 
-    cleanup()
-    // Caught up, with cards still to start: no "복습 밀림 0장", which is a sentence about nothing.
-    renderToday(knowledgeOf(19, 0, 10))
+    expect(state.completeGoalIfEarned).toHaveBeenCalledWith('goal-1')
+  })
+
+  it('says how far the goal is from its finish line, and when', () => {
+    // 10 cards, needs 8 mature, has 6, and two are one review from maturing.
+    renderToday(withMastery({ mature: 6, rung8: 2, rung1: 2 }))
+
+    const line = screen.getByTestId('goal-completion')
+    expect(line).toHaveTextContent('completion.progress')
+    expect(line).toHaveTextContent('completion.eta')
+  })
+
+  it('gives no date when there is no honest one', () => {
+    // Unseen cards with no intake cap: "start them all at once" has no day count. The line
+    // still says how far off the goal is — a missing date is not a missing sentence.
+    renderToday({
+      ...withMastery({ mature: 0, unseen: 10, known: 0 }),
+      goals: [{ ...goal, settings: {} }],
+    })
+
+    const line = screen.getByTestId('goal-completion')
+    expect(line).toHaveTextContent('completion.progress')
+  })
+
+  it('keeps a completed goal open rather than making it vanish', () => {
+    // Found while writing the test above: `plannableGoals` filtered on status === 'active', so
+    // stamping a goal completed removed it from this screen entirely — the learner would reach
+    // the milestone and be shown "no goal". `save_daily_plan` rejects only ARCHIVED goals, so
+    // the server was always willing; the client was not.
+    renderToday({ goals: [{ ...goal, status: 'completed' }] })
+
+    expect(screen.queryByText('today.empty.noGoal')).not.toBeInTheDocument()
+    expect(screen.getByText('JLPT N2')).toBeInTheDocument()
+  })
+
+  it('shows the stamp rather than recomputing the ratio', () => {
+    // Completion is a RECORD. `again_days = 0` drops a lapsed card out of mature, so a live
+    // reading would un-complete a finished goal on one wrong answer — 100% to 50% on a
+    // two-card goal. The goal below is stamped while its current ratio is 0%.
+    renderToday({
+      ...withMastery({ mature: 0, rung1: 10 }),
+      goals: [{ ...goal, status: 'completed' }],
+    })
+
+    expect(screen.getByTestId('goal-complete')).toHaveTextContent('completion.done')
+    expect(screen.queryByTestId('goal-completion')).not.toBeInTheDocument()
+  })
+
+  it('leads with the backlog when the learner is behind', () => {
+    renderToday(knowledgeOf(1, 18, 10))
+
+    expect(screen.getByTestId('progress-headline')).toHaveTextContent('progress.behind')
+    // And the reassurance the headline gave up moves to the line below.
+    expect(screen.getByTestId('progress-detail')).toHaveTextContent('progress.detailStudied')
+  })
+
+  it('names the goal total once nothing is overdue', () => {
+    // Reported as "17장은 뭐고 12장은 뭐야": with no backlog the old sentence became "17장 중
+    // 17장이 복습 주기 안에" — true, vacuous, and never naming the 29 cards those numbers are
+    // parts of, above a plan card offering the 12 it did not mention.
+    renderToday(knowledgeOf(17, 0, 12))
+
+    // This file's `t` mock echoes the KEY only, so which sentence rendered is what can be
+    // asserted here. The numbers inside it are pinned by goal-knowledge-summary.test.ts and by
+    // the bar below, which reads the same `percent`.
+    expect(screen.getByTestId('progress-headline')).toHaveTextContent('progress.studied')
+
     const detail = screen.getByTestId('progress-detail')
+    expect(detail).toHaveTextContent('progress.detailWithinWindow')
+    // The number that ties this card to the plan card below it: those 12 ARE today's work.
     expect(detail).toHaveTextContent('progress.unstudied')
-    expect(detail).not.toHaveTextContent('progress.overdue')
+  })
+
+  it('never fills the bar while a card has not been opened', () => {
+    // 17 studied of 29, nothing overdue. The old ratio was 17/17 and drew a COMPLETE bar over a
+    // goal 59% of the way through — the screen said "finished" about 12 untouched cards.
+    renderToday(knowledgeOf(17, 0, 12))
+
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '59')
+  })
+
+  it('drops a half of the detail line that has nothing in it', () => {
+    // Every card opened, nothing overdue: no "아직 안 배움 0장", which is a sentence about nothing.
+    renderToday(knowledgeOf(29, 0, 0))
+
+    const detail = screen.getByTestId('progress-detail')
+    expect(detail).toHaveTextContent('progress.detailWithinWindow')
+    expect(detail).not.toHaveTextContent('progress.unstudied')
   })
 
   it('reports "not started" rather than a confident 0%', () => {
     renderToday(knowledgeOf(0, 0, 29))
 
-    expect(screen.getByText(/progress\.notStarted/)).toBeInTheDocument()
-    // Nothing overdue and nothing studied — the detail line has nothing to say but the count of
-    // untouched cards, which the headline already gave.
-    expect(screen.getByTestId('progress-detail')).toHaveTextContent('progress.unstudied')
+    expect(screen.getByTestId('progress-headline')).toHaveTextContent('progress.notStarted')
+    // The headline already gave the total, so there is nothing left for a detail line to add.
+    expect(screen.queryByTestId('progress-detail')).not.toBeInTheDocument()
+  })
+})
+
+// ── the diagnostics panel ──────────────────────────────────────────────────
+//
+// "차라리 ai를 통해서 학습한 것들 전체적으로 분석해서 뭐가 잘되고 뭐가 잘 안되는지 확인한다든지
+// 이런게 낫지 않나 / 개별 카드 설명이 뭐가 도움이 되겠어" — right, and the engine for it
+// (`summarizeLearning`) had been in the repo the whole time with nothing rendering it.
+describe('learning diagnostics', () => {
+  const insightsOf = (over: Record<string, unknown> = {}) => ({
+    insightsGoalId: 'goal-1',
+    insights: {
+      attemptCount: 40, scoredCount: 38, accuracy: 0.75, medianDurationMs: 6200,
+      weakCards: [], adherence: [], overallAdherence: 0.9, ...over,
+    },
+  })
+
+  it('says nothing at all before anything has been studied', () => {
+    // Not an empty state to decorate. There is no diagnosis to give.
+    renderToday(insightsOf({ attemptCount: 0, scoredCount: 0, accuracy: null }))
+
+    expect(screen.queryByTestId('insights-stats')).not.toBeInTheDocument()
+  })
+
+  it('will not show one goal\'s diagnosis under another goal\'s heading', () => {
+    // `fetchInsights` leaves the previous goal's numbers in the store until the new read
+    // lands. Rendering them meanwhile would attribute one goal's accuracy to another.
+    renderToday({ ...insightsOf(), insightsGoalId: 'goal-OTHER' })
+
+    expect(screen.queryByTestId('insights-stats')).not.toBeInTheDocument()
+  })
+
+  it('reports accuracy, typical time and adherence in one line', () => {
+    renderToday(insightsOf())
+
+    const stats = screen.getByTestId('insights-stats')
+    expect(stats).toHaveTextContent('insights.accuracyValue')
+    expect(stats).toHaveTextContent('insights.typicalValue')
+    expect(stats).toHaveTextContent('insights.adherenceValue')
+  })
+
+  it('says "not scored yet" instead of claiming 0% accuracy', () => {
+    // `accuracy === null` means no attempt carried a score. That is a different statement
+    // from "you got everything wrong", and the second one would be a lie.
+    renderToday(insightsOf({ accuracy: null }))
+
+    expect(screen.getByTestId('insights-stats')).toHaveTextContent('insights.notScoredYet')
+  })
+
+  it('offers weak cards as a button, never as a list of words', () => {
+    // The failure mode this screen has been cleaned of twice: naming cards the learner got
+    // wrong with nothing to do about them. The link studies exactly those cards — the
+    // ordinary SRS queue would never serve them, because a card you keep failing is not due.
+    renderToday({
+      ...insightsOf({
+        weakCards: [
+          { cardId: 'card-1', attempts: 3, meanScore: 0.2 },
+          { cardId: 'card-2', attempts: 2, meanScore: 0.5 },
+        ],
+      }),
+      weakCardDecks: { 'card-1': 'deck-7', 'card-2': 'deck-7' },
+      planCards: { 'card-1': { id: 'card-1', deck_id: 'deck-7', field_values: { front: '猫' } } },
+    })
+
+    expect(screen.getByRole('link', { name: /insights\.weakStudy/ }))
+      .toHaveAttribute('href', '/decks/deck-7/study?mode=srs&cards=card-1,card-2')
+    // The card's own text never appears.
+    expect(screen.queryByText('猫')).not.toBeInTheDocument()
+  })
+
+  it('splits weak cards by deck, because a session cannot span decks', () => {
+    // `finalize_study_session` takes one p_deck_id and refuses events covering more.
+    renderToday({
+      ...insightsOf({
+        weakCards: [
+          { cardId: 'card-1', attempts: 3, meanScore: 0.2 },
+          { cardId: 'card-9', attempts: 3, meanScore: 0.3 },
+        ],
+      }),
+      weakCardDecks: { 'card-1': 'deck-7', 'card-9': 'deck-9' },
+    })
+
+    const links = screen.getAllByRole('link', { name: /insights\.weakCount/ })
+    expect(links.map((l) => l.getAttribute('href'))).toEqual([
+      '/decks/deck-7/study?mode=srs&cards=card-1',
+      '/decks/deck-9/study?mode=srs&cards=card-9',
+    ])
+  })
+
+  it('drops a weak card whose deck could not be resolved', () => {
+    // Deleted since the diagnostics were computed. A button that starts a session over a card
+    // the deck no longer has would open an empty queue.
+    renderToday({
+      ...insightsOf({ weakCards: [{ cardId: 'gone', attempts: 3, meanScore: 0.1 }] }),
+      weakCardDecks: {},
+    })
+
+    expect(screen.queryByTestId('insights-weak')).not.toBeInTheDocument()
+    // The stats line still renders — one unresolvable card is not a reason to hide everything.
+    expect(screen.getByTestId('insights-stats')).toBeInTheDocument()
   })
 })
 

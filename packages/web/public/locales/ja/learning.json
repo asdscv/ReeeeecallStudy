@@ -50,7 +50,10 @@
       "fresh": "新規 {{count, number}}枚",
       "fresh_one": "新規 {{count, number}}枚",
       "fresh_other": "新規 {{count, number}}枚"
-    }
+    },
+    "deckListMore": "{{names}} ほか{{count, number}}件",
+    "deckListMore_one": "{{names}} ほか{{count, number}}件",
+    "deckListMore_other": "{{names}} ほか{{count, number}}件"
   },
   "goals": {
     "title": "学習目標",
@@ -189,7 +192,14 @@
     "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "scopeNote": "この目標の試行とプランに基づく計算です。デッキ単位のSRS統計は学習履歴にあります。",
     "attemptCount_one": "{{count, number}} 回試行",
-    "attemptCount_other": "{{count, number}} 回試行"
+    "attemptCount_other": "{{count, number}} 回試行",
+    "accuracyValue": "正答率 {{pct, number}}%",
+    "typicalValue": "平均 {{seconds, decimal}}秒",
+    "adherenceValue": "プラン達成 {{pct, number}}%",
+    "weakCount": "{{count, number}}枚",
+    "weakCount_one": "{{count, number}}枚",
+    "weakCount_other": "{{count, number}}枚",
+    "weakStudy": "このカードだけ学習"
   },
   "recommend": {
     "title": "おすすめ",
@@ -209,13 +219,26 @@
     "daysLeft": "残り{{count, number}}日",
     "daysLeft_one": "残り{{count, number}}日",
     "daysLeft_other": "残り{{count, number}}日",
-    "withinWindow": "学習した{{attempted, number}}枚のうち{{known, number}}枚が復習期限内です",
     "notStarted": "まだ学習していません · 全{{total, number}}枚",
-    "overdue": "復習期限切れ {{count, number}}枚",
-    "overdue_one": "復習期限切れ {{count, number}}枚",
-    "overdue_other": "復習期限切れ {{count, number}}枚",
     "unstudied": "未学習 {{count, number}}枚",
     "unstudied_one": "未学習 {{count, number}}枚",
-    "unstudied_other": "未学習 {{count, number}}枚"
+    "unstudied_other": "未学習 {{count, number}}枚",
+    "behind": "復習が{{count, number}}枚たまっています",
+    "behind_one": "復習が{{count, number}}枚たまっています",
+    "behind_other": "復習が{{count, number}}枚たまっています",
+    "studied": "{{total, number}}枚中{{attempted, number}}枚を学習済み",
+    "detailStudied": "学習済み {{count, number}}枚",
+    "detailStudied_one": "学習済み {{count, number}}枚",
+    "detailStudied_other": "学習済み {{count, number}}枚",
+    "detailWithinWindow": "復習期限内 {{count, number}}枚",
+    "detailWithinWindow_one": "復習期限内 {{count, number}}枚",
+    "detailWithinWindow_other": "復習期限内 {{count, number}}枚"
+  },
+  "completion": {
+    "done": "目標達成",
+    "progress": "{{required, number}}枚中{{mature, number}}枚が定着",
+    "eta": "完了まで約{{count, number}}日",
+    "eta_one": "完了まで約{{count, number}}日",
+    "eta_other": "完了まで約{{count, number}}日"
   }
 }

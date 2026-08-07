@@ -11,6 +11,10 @@ import { planComposition } from '@reeeeecall/shared/lib/plan-composition'
 import { studyRecap } from '@reeeeecall/shared/lib/study-recap'
 import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
 import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
+import { goalCompletion } from '@reeeeecall/shared/lib/goal-completion'
+import {
+  parseNewCardsPerDay, DEFAULT_NEW_CARDS_PER_DAY,
+} from '@reeeeecall/shared/learning/application/cadence'
 import { useDeckStore } from '../../stores/deck-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
 
@@ -65,6 +69,9 @@ import { ListSkeleton } from '../../components/common/Skeleton'
  * next to the count it qualifies.
  */
 
+
+/** Deck names printed before the count takes over. Three fits one line on a narrow phone. */
+const DECK_NAMES_SHOWN = 3
 
 /**
  * How the day went.
@@ -134,6 +141,107 @@ function AttemptHistory({ goalId, planDate }: { goalId: string; planDate: string
   )
 }
 
+
+/**
+ * What is working and what is not — over the last 30 days, not today.
+ *
+ * The engine behind this (`summarizeLearning`, shared/lib/learning-insights.ts) has existed the
+ * whole time, along with `fetchInsights` and the copy in all 16 locale files. Nothing rendered
+ * it, so the app could compute a learner's accuracy, their typical answer time, their plan
+ * adherence and the cards they keep failing — and showed them none of it.
+ *
+ * The weak cards are a COUNT and a BUTTON, never a list. A column of cards you got wrong, with
+ * nothing to do about it, is the exact shape this screen has already been cleaned of twice. The
+ * button starts a session over precisely those cards, which the ordinary SRS queue would never
+ * serve because a card you keep failing is usually not due.
+ *
+ * One button per deck: `finalize_study_session` takes one `p_deck_id` and refuses a session
+ * whose rating events span decks, so weak cards from two decks are two sessions.
+ */
+function LearningDiagnostics({ goalId }: { goalId: string }) {
+  const { t } = useTranslation('learning')
+  const { insights, weakCardDecks, insightsLoading, insightsGoalId, fetchInsights } = useLearningStore()
+  const { decks } = useDeckStore()
+
+  useEffect(() => { void fetchInsights(goalId) }, [goalId, fetchInsights])
+
+  /**
+   * Weak cards grouped by the deck that holds them, worst first.
+   *
+   * Read from the store's own answer, NOT recomputed: `insightsGoalId` is what stops the
+   * previous goal's weak cards being offered under this goal's heading for one round trip.
+   */
+  const weakByDeck = useMemo(() => {
+    if (!insights || insightsGoalId !== goalId) return []
+    const byDeck = new Map<string, string[]>()
+    for (const card of insights.weakCards) {
+      const deckId = weakCardDecks[card.cardId]
+      if (!deckId) continue
+      const bucket = byDeck.get(deckId)
+      if (bucket) bucket.push(card.cardId)
+      else byDeck.set(deckId, [card.cardId])
+    }
+    return [...byDeck.entries()].map(([deckId, cardIds]) => ({ deckId, cardIds }))
+  }, [insights, weakCardDecks, insightsGoalId, goalId])
+
+  // Nothing studied is not an empty state to decorate — there is simply nothing to diagnose.
+  if (insightsLoading && !insights) return null
+  if (!insights || insightsGoalId !== goalId || insights.attemptCount === 0) return null
+
+  const deckName = (deckId: string) =>
+    decks.find((deck) => deck.id === deckId)?.name ?? t('insights.cardFallback')
+
+  // Percent, not a ratio, and only when something was actually scored. `accuracy` is null when
+  // no attempt carried a score, which is a different statement from 0%.
+  const pct = (value: number | null) => (value === null ? null : Math.round(value * 100))
+  const accuracy = pct(insights.accuracy)
+  const adherence = pct(insights.overallAdherence)
+
+  const stats = [
+    accuracy === null
+      ? t('insights.notScoredYet')
+      : t('insights.accuracyValue', { pct: accuracy }),
+    insights.medianDurationMs === null
+      ? null
+      : t('insights.typicalValue', { seconds: Math.round(insights.medianDurationMs / 100) / 10 }),
+    adherence === null ? null : t('insights.adherenceValue', { pct: adherence }),
+  ].filter(Boolean).join(' · ')
+
+  return (
+    <section className="pt-2" aria-label={t('insights.title')}>
+      <h2 className="text-sm font-medium text-foreground">{t('insights.title')}</h2>
+
+      <div className="mt-2 rounded-xl border border-border bg-card p-3" data-testid="insights-stats">
+        <p className="text-sm text-foreground">{stats}</p>
+        <p className="mt-1 text-[11px] text-content-tertiary">{t('insights.scopeNote')}</p>
+      </div>
+
+      {weakByDeck.length > 0 && (
+        <div className="mt-2 space-y-2" data-testid="insights-weak">
+          {/* The count lives on the row, which is the thing you press. Saying it twice is the
+              noise this screen keeps being cleaned of. */}
+          <p className="text-xs text-muted-foreground">{t('insights.weakTitle')}</p>
+          {weakByDeck.map((group) => (
+            <Link
+              key={group.deckId}
+              to={`/decks/${group.deckId}/study?mode=srs&cards=${group.cardIds.join(',')}`}
+              className="flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-sm text-foreground no-underline transition-colors hover:bg-accent"
+            >
+              <span className="min-w-0 truncate">
+                {weakByDeck.length > 1 ? deckName(group.deckId) : t('insights.weakStudy')}
+              </span>
+              <span className="shrink-0 text-xs text-brand">
+                {t('insights.weakCount', { count: group.cardIds.length })}
+              </span>
+            </Link>
+          ))}
+          <p className="text-[11px] text-content-tertiary">{t('insights.weakHint')}</p>
+        </div>
+      )}
+    </section>
+  )
+}
+
 /**
  * Where a goal stands.
  *
@@ -142,33 +250,91 @@ function AttemptHistory({ goalId, planDate }: { goalId: string; planDate: string
  * overdue and 10 cards had never been opened — a sentence that sounds like near-total amnesia and
  * means nothing of the kind. The line under it carries what to do about it.
  */
-function GoalProgress({ knowledge }: { knowledge: GoalKnowledge | null }) {
+function GoalProgress({ knowledge, newCardsPerDay, adherence, done }: {
+  knowledge: GoalKnowledge | null
+  /** The goal's intake cap. Without it an unseen card has no honest start date. */
+  newCardsPerDay: number
+  /** Share of planned items actually completed, or null before there is any history. */
+  adherence: number | null
+  /** The goal is already STAMPED completed. A record, not a live reading of the ratio. */
+  done: boolean
+}) {
   const { t } = useTranslation('learning')
   if (!knowledge || knowledge.total === 0) return null
 
   const summary = goalKnowledgeSummary(knowledge)
-  // Each half is dropped when empty rather than printed as a zero: "복습 밀림 0장" is a sentence
-  // about nothing, and a learner who is fully caught up should see that, not a row of noughts.
-  const detail = [
-    summary.overdue > 0 ? t('progress.overdue', { count: summary.overdue }) : null,
+  const completion = goalCompletion(knowledge, { newCardsPerDay, adherence })
+
+  /**
+   * The headline changes with the state, because the useful sentence does.
+   *
+   * A fixed "배운 N장 중 M장이 복습 주기 안에 있어요" degenerates the moment nothing is overdue:
+   * it becomes "17장 중 17장", which is true, vacuous, and sits above a plan card offering 12
+   * cards it never mentions. Behind on reviews is the one state with something to do today, so
+   * that leads; otherwise the sentence names where the goal stands, against its own total.
+   */
+  const headline = summary.notStarted
+    ? t('progress.notStarted', { total: summary.total })
+    : summary.behind
+      ? t('progress.behind', { count: summary.overdue })
+      : t('progress.studied', { total: summary.total, attempted: summary.attempted })
+
+  /**
+   * The line under it carries what the headline did not, and never a zero.
+   *
+   * When behind, "배운 N장" — the reassurance the headline just took away. Otherwise the split
+   * the headline's `attempted` is made of. `아직 안 배움` is the number that ties this card to
+   * the plan card below it: those cards ARE tomorrow's, and usually today's, work.
+   */
+  const detail = summary.notStarted ? '' : [
+    summary.behind
+      ? t('progress.detailStudied', { count: summary.attempted })
+      : t('progress.detailWithinWindow', { count: summary.withinWindow }),
     summary.unstudied > 0 ? t('progress.unstudied', { count: summary.unstudied }) : null,
   ].filter(Boolean).join(' · ')
 
   return (
     <section className="rounded-xl border border-border bg-card p-4" aria-label={t('progress.title')}>
-      <p className="text-sm text-foreground">
-        {summary.notStarted
-          ? t('progress.notStarted', { total: knowledge.total })
-          : t('progress.withinWindow', {
-            attempted: summary.attempted, known: summary.withinWindow,
-          })}
-      </p>
-      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-        <div className="h-full bg-brand" style={{ width: `${summary.percent}%` }} role="presentation" />
+      <p className="text-sm text-foreground" data-testid="progress-headline">{headline}</p>
+      {/* `attempted / total`. It may only fill when there is no card left to reach — the old
+          `known / attempted` hit 100% as soon as nothing was overdue, so a goal with 12 cards
+          never opened drew a complete bar. */}
+      <div
+        className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted"
+        role="progressbar"
+        aria-valuenow={summary.percent}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={t('progress.title')}
+      >
+        <div className="h-full bg-brand" style={{ width: `${summary.percent}%` }} />
       </div>
       {detail && (
         <p className="mt-1.5 text-[11px] text-content-tertiary" data-testid="progress-detail">
           {detail}
+        </p>
+      )}
+
+      {/* ── Where the finish line is ──────────────────────────────────────
+          A goal used to have none: the status value, the transition and the `target` column
+          all existed and nothing ever decided. Under SRS nothing decides itself either —
+          intervals grow and reviews never stop — so this is the product saying when it is
+          willing to call the work done. */}
+      {done ? (
+        <p className="mt-2 text-xs font-medium text-success" data-testid="goal-complete">
+          {t('completion.done')}
+        </p>
+      ) : (
+        <p className="mt-2 text-[11px] text-content-tertiary" data-testid="goal-completion">
+          {t('completion.progress', {
+            mature: completion.mature, required: completion.required,
+          })}
+          {/* No date when there is no honest one: uncapped intake has no "start them all at
+              once" day count, and a goal too small to reach the ratio has nothing to project.
+              A wrong date is acted on; a missing one is not. */}
+          {completion.daysToComplete !== null && (
+            <> · {t('completion.eta', { count: completion.daysToComplete })}</>
+          )}
         </p>
       )}
     </section>
@@ -183,7 +349,8 @@ export function LearningTodayPage() {
     planBlockedReason,
     fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
     extendPlan, planExtending, planExtension,
-    knowledge, fetchGoalKnowledge,
+    knowledge, fetchGoalKnowledge, completeGoalIfEarned,
+    insights, insightsGoalId,
   } = useLearningStore()
   const { decks, fetchDecks } = useDeckStore()
 
@@ -198,7 +365,10 @@ export function LearningTodayPage() {
   useEffect(() => { void fetchDecks() }, [fetchDecks])
 
   const plannableGoals = useMemo(
-    () => goals.filter((goal) => goal.status === 'active'),
+    // 'completed' belongs here too. Finishing a goal is a MILESTONE, not a stop: the cards
+    // keep coming due and `save_daily_plan` rejects only archived goals. Filtering it out
+    // would make a goal vanish from this screen at the exact moment it was achieved.
+    () => goals.filter((goal) => goal.status === 'active' || goal.status === 'completed'),
     [goals],
   )
 
@@ -236,8 +406,14 @@ export function LearningTodayPage() {
   // account that had studied 55 cards, because the projection assumes you stop today.
   const judgedAt = ctx.now
   useEffect(() => {
-    if (selectedGoalId) void fetchGoalKnowledge(selectedGoalId, judgedAt)
-  }, [selectedGoalId, judgedAt, fetchGoalKnowledge])
+    if (!selectedGoalId) return
+    void fetchGoalKnowledge(selectedGoalId, judgedAt)
+    // Ask whether the goal has earned its stamp, in the same breath as reading its progress.
+    // The ratio can only move when a card's interval does, and this screen is where the
+    // learner lands after studying — so the milestone is caught without polling anything.
+    // The server judges; a refusal is swallowed and the next visit asks again.
+    void completeGoalIfEarned(selectedGoalId)
+  }, [selectedGoalId, judgedAt, fetchGoalKnowledge, completeGoalIfEarned])
 
   /**
    * The day's work, split by deck, because a study session cannot span decks.
@@ -262,6 +438,35 @@ export function LearningTodayPage() {
 
   const deckName = (deckId: string) =>
     decks.find((deck) => deck.id === deckId)?.name ?? t('today.item.untitled')
+
+  /**
+   * The goal's decks, named.
+   *
+   * Resolved against the deck store rather than stored on the goal: a renamed deck should read
+   * as its new name here, and a deck the learner can no longer see should simply not appear
+   * rather than render an id. `goal.decks` is the goal's own link table, so this is the set the
+   * PLANNER draws from — not merely the decks that happened to appear in today's plan, which
+   * would hide a deck that contributed nothing today.
+   */
+  const deckNames = useMemo(() => {
+    if (!goal) return []
+    return goal.decks
+      .map((link) => decks.find((deck) => deck.id === link.deck_id)?.name)
+      .filter((name): name is string => !!name)
+  }, [goal, decks])
+
+  /**
+   * At most three names, then a count. Dozens of decks is a real case and the alternative is a
+   * paragraph of deck names sitting above the number the learner opened the screen for.
+   */
+  const deckSummary = useMemo(() => {
+    if (deckNames.length === 0) return ''
+    if (deckNames.length <= DECK_NAMES_SHOWN) return deckNames.join(', ')
+    return t('today.deckListMore', {
+      names: deckNames.slice(0, DECK_NAMES_SHOWN).join(', '),
+      count: deckNames.length - DECK_NAMES_SHOWN,
+    })
+  }, [deckNames, t])
 
   const studyHref = (deckId: string) =>
     `/decks/${deckId}/study?mode=srs&goalId=${selectedGoalId}&planDate=${ctx.planDate}`
@@ -307,14 +512,28 @@ export function LearningTodayPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-4 p-4">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="truncate text-lg font-medium text-foreground">{goal?.title ?? t('today.title')}</h1>
+        <div className="min-w-0">
+          <h1 className="truncate text-lg font-medium text-foreground">{goal?.title ?? t('today.title')}</h1>
+          {/* Which decks this plan draws from. A goal can hold dozens, so the line names a few
+              and counts the rest rather than wrapping to four lines above the day's numbers. */}
+          {deckSummary && (
+            <p className="mt-0.5 truncate text-xs text-content-tertiary" title={deckNames.join(', ')}>
+              {deckSummary}
+            </p>
+          )}
+        </div>
         <Link to="/learning" className="shrink-0 text-xs text-brand hover:underline">
           {t('today.backToPlans')}
         </Link>
       </div>
 
       {/* Where this goal stands overall. */}
-      <GoalProgress knowledge={knowledge[selectedGoalId] ?? null} />
+      <GoalProgress
+        knowledge={knowledge[selectedGoalId] ?? null}
+        newCardsPerDay={parseNewCardsPerDay(goal?.settings) ?? DEFAULT_NEW_CARDS_PER_DAY}
+        adherence={insightsGoalId === selectedGoalId ? insights?.overallAdherence ?? null : null}
+        done={goal?.status === 'completed'}
+      />
 
       {planError && (
         <div role="alert" className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
@@ -482,6 +701,7 @@ export function LearningTodayPage() {
       )}
 
       <AttemptHistory goalId={selectedGoalId} planDate={ctx.planDate} />
+      <LearningDiagnostics goalId={selectedGoalId} />
     </div>
   )
 }
