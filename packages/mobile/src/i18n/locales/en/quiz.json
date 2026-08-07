@@ -49,7 +49,8 @@
     "covered": "{{units, number}} units covered by your free allowance",
     "retakeFree": "Taking it again costs nothing.",
     "confirm": "Create quiz",
-    "generating": "Writing questions…"
+    "generating": "Writing questions…",
+    "difficulty": "Difficulty"
   },
   "run": {
     "loading": "Loading…",
@@ -129,5 +130,26 @@
   "span": {
     "learner": "In your answer",
     "reference": "In the card"
+  },
+  "difficulty": {
+    "1": "Easy",
+    "2": "Medium",
+    "3": "Hard",
+    "label": "Difficulty",
+    "generic": "Level {{level, number}}"
+  },
+  "difficultyHint": {
+    "1": "The wrong options come from somewhere else entirely — recognising the subject is enough.",
+    "2": "One of the three is a real trap; the other two are not close.",
+    "3": "Every wrong option is a near-miss. You have to know the answer."
+  },
+  "flaw": {
+    "opposite": "The opposite",
+    "adjacent_sense": "A close neighbour",
+    "right_category_wrong_item": "Right kind, wrong one",
+    "partial": "Only part of it",
+    "overgeneral": "Too broad",
+    "plausible_form": "Looks similar",
+    "unrelated": "Unrelated"
   }
 }

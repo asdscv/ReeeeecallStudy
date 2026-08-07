@@ -49,7 +49,8 @@
     "covered": "Phần miễn phí bù {{units, number}} đơn vị",
     "retakeFree": "Làm lại không tốn phí.",
     "confirm": "Tạo bài kiểm tra",
-    "generating": "Đang soạn câu hỏi…"
+    "generating": "Đang soạn câu hỏi…",
+    "difficulty": "Độ khó"
   },
   "run": {
     "loading": "Đang tải…",
@@ -129,5 +130,26 @@
   "span": {
     "learner": "Trong câu trả lời của bạn",
     "reference": "Trong thẻ"
+  },
+  "difficulty": {
+    "1": "Dễ",
+    "2": "Vừa",
+    "3": "Khó",
+    "label": "Độ khó",
+    "generic": "Cấp {{level, number}}"
+  },
+  "difficultyHint": {
+    "1": "Các phương án sai đến từ lĩnh vực hoàn toàn khác — nhận ra chủ đề là đủ.",
+    "2": "Chỉ một trong ba là bẫy thật, hai cái còn lại rất xa.",
+    "3": "Mọi phương án sai đều sát nút. Bạn phải thực sự biết đáp án."
+  },
+  "flaw": {
+    "opposite": "Ngược lại",
+    "adjacent_sense": "Nghĩa gần",
+    "right_category_wrong_item": "Đúng loại, sai cái",
+    "partial": "Chỉ một phần",
+    "overgeneral": "Quá rộng",
+    "plausible_form": "Trông giống",
+    "unrelated": "Không liên quan"
   }
 }

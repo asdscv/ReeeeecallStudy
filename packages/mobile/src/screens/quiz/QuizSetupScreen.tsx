@@ -5,7 +5,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
 import {
   useQuizStore, QuizError, QUIZ_GENERATE_ACTION,
-  type QuizQuestionType, type QuizQuote, type QuizzableCount,
+  type QuizQuestionType, type QuizQuote, type QuizzableCount, type QuizDifficultyBand,
 } from '@reeeeecall/shared/stores/quiz-store'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
@@ -31,7 +31,7 @@ export function QuizSetupScreen() {
   const { t, i18n } = useTranslation('quiz')
   const navigation = useNavigation<Nav>()
   const { decks, fetchDecks } = useDeckStore()
-  const { countQuizzable, quote, createAndGenerate, generating } = useQuizStore()
+  const { countQuizzable, quote, createAndGenerate, generating, difficultyLevels } = useQuizStore()
 
   const [deckId, setDeckId] = useState('')
   const [type, setType] = useState<QuizQuestionType>('mcq')
@@ -40,9 +40,14 @@ export function QuizSetupScreen() {
   // is a cascading render, and an unkeyed value would flash the previous deck's numbers.
   const [counts, setCounts] = useState<{ deckId: string; value: QuizzableCount } | null>(null)
   const [priced, setPriced] = useState<QuizQuote | null>(null)
+  // Listed from the server, never enumerated here: a band is a row, so a new one shows up
+  // without a deploy.
+  const [bands, setBands] = useState<QuizDifficultyBand[]>([])
+  const [difficulty, setDifficulty] = useState(3)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => { void fetchDecks() }, [fetchDecks])
+  useEffect(() => { void difficultyLevels().then(setBands).catch(() => setBands([])) }, [difficultyLevels])
 
   useEffect(() => {
     if (!deckId) return
@@ -81,6 +86,7 @@ export function QuizSetupScreen() {
         questionType: type,
         count: Math.min(count, eligible),
         locale: i18n.language.split('-')[0],
+        difficulty,
         maxPriceMicro: priced.price_micro,
       })
       navigation.navigate('QuizHome')
@@ -158,6 +164,27 @@ export function QuizSetupScreen() {
             </Pressable>
           ))}
         </View>
+
+        {/* Only multiple choice has distractors, so only multiple choice has a band. */}
+        {type === 'mcq' && bands.length > 0 && (
+          <>
+            <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+              {t('setup.difficulty')}
+            </Text>
+            <View style={styles.row}>
+              {bands.map((band) => (
+                <Pressable key={band.level} onPress={() => setDifficulty(band.level)} style={chip(difficulty === band.level)}>
+                  <Text style={[theme.typography.caption, { color: difficulty === band.level ? '#fff' : theme.colors.text }]}>
+                    {t(`difficulty.${band.level}`, { defaultValue: t('difficulty.generic', { level: band.level }) })}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+            <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+              {t(`difficultyHint.${difficulty}`, { defaultValue: '' })}
+            </Text>
+          </>
+        )}
 
         {tooFewForMcq && (
           <Text style={[theme.typography.caption, { color: theme.colors.error }]}>
