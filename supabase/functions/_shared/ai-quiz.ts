@@ -74,8 +74,53 @@ export const MCQ_DISTRACTOR_FLAWS = [
   'overgeneral',
   /** Resembles the answer in spelling or sound without being it. affect/effect, 待つ/持つ. */
   'plausible_form',
+  /**
+   * From a different subject area entirely — no relation to the answer beyond both being
+   * words. Exists so an EASY quiz is possible at all: a learner meeting a deck for the first
+   * time is served by "which of these four is even in the right area", and every other flaw
+   * here is a near-miss that assumes they are already past that.
+   */
+  'unrelated',
 ] as const
 export type McqDistractorFlaw = typeof MCQ_DISTRACTOR_FLAWS[number]
+
+/**
+ * How close to the answer each flaw sits.
+ *
+ * This is the axis difficulty moves along. A quiz is hard when the wrong options are near the
+ * answer and easy when they are far from it, so a level is expressed as HOW MANY of the three
+ * distractors must be near — not as a vague "hard" the model interprets for itself.
+ *
+ *   near — you have to know the answer to rule it out
+ *   far  — recognising the subject area is enough to rule it out
+ */
+export const NEAR_FLAWS: ReadonlySet<McqDistractorFlaw> = new Set([
+  'opposite', 'adjacent_sense', 'partial', 'plausible_form',
+])
+export const FAR_FLAWS: ReadonlySet<McqDistractorFlaw> = new Set([
+  'right_category_wrong_item', 'overgeneral', 'unrelated',
+])
+
+/**
+ * A difficulty band, as the server resolved it.
+ *
+ * `nearRequired` is the only knob today, and it is a NUMBER rather than a name so new bands
+ * need no code: a level is a row, and the row says how many of the three distractors must be
+ * near-misses. 0 is "all far" (easiest), 3 is "all near" (hardest).
+ */
+export interface QuizDifficulty {
+  readonly level: number
+  readonly nearRequired: number
+  /** How many options the question shows, 2..6. Distractors are one fewer. */
+  readonly optionCount: number
+  /** Restrict to these flaws. Empty means all of them. */
+  readonly allowedFlaws: readonly McqDistractorFlaw[]
+}
+
+/** Fallback when a caller does not resolve a band — the hardest, which is what shipped first. */
+export const DEFAULT_DIFFICULTY: QuizDifficulty = {
+  level: 3, nearRequired: 3, optionCount: 4, allowedFlaws: [],
+}
 
 /**
  * How a short-answer question may differ from the card's front.
@@ -226,6 +271,7 @@ export type GradeRefusal = typeof GRADE_REFUSALS[number]
  * to 20% does not buy that back. Fixed rather than configurable so the renderer is a fixed grid
  * and the validator is an equality check.
  */
+/** The band's default. A band may set 2..6; nothing below assumes this number. */
 export const MCQ_OPTION_COUNT = 4
 export const MCQ_DISTRACTOR_COUNT = MCQ_OPTION_COUNT - 1
 
@@ -443,8 +489,8 @@ function hash32(s: string): number {
  * it has to be reproducible in a test. A uuid is uniform, so `hash32 mod 4` is uniform, and the
  * model has no input to it whatsoever: position bias is not mitigated here, it is unreachable.
  */
-export function correctOptionIndex(itemId: string): number {
-  return hash32(itemId) % MCQ_OPTION_COUNT
+export function correctOptionIndex(itemId: string, optionCount = MCQ_OPTION_COUNT): number {
+  return hash32(itemId) % Math.max(2, optionCount)
 }
 
 // ─── Generation: what the server assembles, per card ────────────────────────
@@ -589,7 +635,7 @@ export const QUIZ_DROP_REASONS = [
   'unknown_card', 'duplicate_card', 'bad_shape', 'bad_enum', 'question_too_long',
   'answer_leaked_in_question', 'anchor_missing', 'too_few_distractors', 'distractor_equals_answer',
   'distractor_duplicated', 'distractor_contains_answer', 'partial_not_applicable',
-  'schema_word_leaked',
+  'schema_word_leaked', 'wrong_difficulty_mix',
   'length_cue', 'script_mismatch', 'bad_weights', 'bad_criteria', 'ungrounded_mention',
 ] as const
 export type QuizDropReason = typeof QUIZ_DROP_REASONS[number]
@@ -652,7 +698,15 @@ export function validateMultipleChoiceGeneration(
   raw: unknown,
   sources: readonly QuizCardSource[],
   makeItemId: ItemIdFactory,
+  difficulty: QuizDifficulty = DEFAULT_DIFFICULTY,
 ): QuizGenerationOutcome {
+  const optionCount = Math.min(6, Math.max(2, difficulty.optionCount || MCQ_OPTION_COUNT))
+  const distractorCount = optionCount - 1
+  // Empty means "any flaw"; a non-empty list restricts the band, and the near/far split
+  // still applies on top of it.
+  const allowed = difficulty.allowedFlaws?.length
+    ? new Set<McqDistractorFlaw>(difficulty.allowedFlaws) : null
+
   const byId = new Map(sources.map((s) => [s.cardId, s]))
   const used = new Set<string>()
   const items: QuizItemMultipleChoice[] = []
@@ -674,12 +728,13 @@ export function validateMultipleChoiceGeneration(
     const flaws: McqDistractorFlaw[] = []
 
     for (const d of entry.distractors) {
-      if (texts.length >= MCQ_DISTRACTOR_COUNT) break
+      if (texts.length >= distractorCount) break
       if (!isRecord(d)) { drop(cardId, 'bad_shape'); continue }
       const text = typeof d.text === 'string' ? d.text.trim() : ''
       const flaw = d.flaw
       if (text === '' || text.length > MAX_DISTRACTOR_CHARS) { drop(cardId, 'bad_shape'); continue }
       if (!isMcqDistractorFlaw(flaw)) { drop(cardId, 'bad_enum'); continue }
+      if (allowed && !allowed.has(flaw)) { drop(cardId, 'wrong_difficulty_mix'); continue }
 
       const norm = normalizeAnswer(text)
       if (norm === '') { drop(cardId, 'bad_shape'); continue }
@@ -702,19 +757,30 @@ export function validateMultipleChoiceGeneration(
       flaws.push(flaw)
     }
 
-    if (texts.length < MCQ_DISTRACTOR_COUNT) { drop(cardId, 'too_few_distractors'); continue }
+    if (texts.length < distractorCount) { drop(cardId, 'too_few_distractors'); continue }
+
 
     const meanDistractor = texts.reduce((sum, t) => sum + t.length, 0) / texts.length
     if (meanDistractor > 0 && card.answerText.length > meanDistractor * MCQ_MAX_LENGTH_CUE_RATIO) {
       drop(cardId, 'length_cue'); continue
     }
 
+    // The band, enforced rather than requested. A model told "make it easy" writes near-misses
+    // anyway — easy is the shape it has least practice at — so the count is checked. Exact, not
+    // a minimum: an "easy" item with two near-misses is not easy, and a "hard" one with a
+    // giveaway among the options is not hard.
+    //
+    // Checked AFTER length_cue so an item that is broken on its own terms reports that, rather
+    // than reporting a band mismatch the author cannot act on.
+    const near = flaws.filter((f) => NEAR_FLAWS.has(f)).length
+    if (near !== difficulty.nearRequired) { drop(cardId, 'wrong_difficulty_mix'); continue }
+
     const itemId = makeItemId(cardId, index)
-    const correctIndex = correctOptionIndex(itemId)
+    const correctIndex = correctOptionIndex(itemId, optionCount)
     const options: string[] = []
     const flawSlots: Array<McqDistractorFlaw | null> = []
     let next = 0
-    for (let slot = 0; slot < MCQ_OPTION_COUNT; slot++) {
+    for (let slot = 0; slot < optionCount; slot++) {
       if (slot === correctIndex) { options.push(card.answerText); flawSlots.push(null) }
       else { options.push(texts[next]); flawSlots.push(flaws[next]); next++ }
     }

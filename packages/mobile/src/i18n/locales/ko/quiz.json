@@ -49,7 +49,8 @@
     "covered": "무료 제공분으로 {{units, number}}유닛이 처리돼요",
     "retakeFree": "다시 풀 때는 비용이 들지 않아요.",
     "confirm": "퀴즈 만들기",
-    "generating": "문제를 만드는 중…"
+    "generating": "문제를 만드는 중…",
+    "difficulty": "난이도"
   },
   "run": {
     "loading": "불러오는 중…",
@@ -129,5 +130,26 @@
   "span": {
     "learner": "내 답에서",
     "reference": "카드에서"
+  },
+  "difficulty": {
+    "1": "쉬움",
+    "2": "보통",
+    "3": "어려움",
+    "label": "난이도",
+    "generic": "{{level, number}}단"
+  },
+  "difficultyHint": {
+    "1": "오답이 전혀 다른 분야에서 나와요. 주제만 알아봐도 맞힐 수 있어요.",
+    "2": "셋 중 하나만 진짜 함정이고 나머지 둘은 멀어요.",
+    "3": "오답이 전부 아슬아슬해요. 제대로 알아야 맞힙니다."
+  },
+  "flaw": {
+    "opposite": "반대",
+    "adjacent_sense": "비슷한 이웃말",
+    "right_category_wrong_item": "같은 종류, 다른 것",
+    "partial": "일부만",
+    "overgeneral": "너무 넓음",
+    "plausible_form": "모양이 비슷",
+    "unrelated": "무관"
   }
 }

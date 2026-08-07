@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
   useQuizStore, QuizError, QUIZ_GENERATE_ACTION,
-  type QuizQuestionType, type QuizQuote, type QuizzableCount,
+  type QuizQuestionType, type QuizQuote, type QuizzableCount, type QuizDifficultyBand,
 } from '@reeeeecall/shared/stores/quiz-store'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
@@ -27,7 +27,7 @@ export function QuizSetupPage() {
   const { t, i18n } = useTranslation('quiz')
   const navigate = useNavigate()
   const { decks, fetchDecks } = useDeckStore()
-  const { countQuizzable, quote, createAndGenerate, generating } = useQuizStore()
+  const { countQuizzable, quote, createAndGenerate, generating, difficultyLevels } = useQuizStore()
 
   const [deckId, setDeckId] = useState('')
   const [type, setType] = useState<QuizQuestionType>('mcq')
@@ -37,9 +37,14 @@ export function QuizSetupPage() {
   // deck's numbers over the newly chosen one.
   const [counts, setCounts] = useState<{ deckId: string; value: QuizzableCount } | null>(null)
   const [priced, setPriced] = useState<QuizQuote | null>(null)
+  // Listed from the server, never enumerated here: a band is a row, so a new one appears
+  // without a deploy. The default is the hardest, which is what the feature shipped as.
+  const [bands, setBands] = useState<QuizDifficultyBand[]>([])
+  const [difficulty, setDifficulty] = useState(3)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => { void fetchDecks() }, [fetchDecks])
+  useEffect(() => { void difficultyLevels().then(setBands).catch(() => setBands([])) }, [difficultyLevels])
 
   useEffect(() => {
     if (!deckId) return
@@ -80,6 +85,7 @@ export function QuizSetupPage() {
         questionType: type,
         count: Math.min(count, eligible),
         locale: i18n.language.split('-')[0],
+        difficulty,
         maxPriceMicro: priced.price_micro,
       })
       navigate(`/quiz?created=${setId}`)
@@ -172,6 +178,30 @@ export function QuizSetupPage() {
             ))}
           </div>
         </div>
+
+        {/* Only multiple choice has distractors, so only multiple choice has a band. */}
+        {type === 'mcq' && bands.length > 0 && (
+          <div>
+            <span className="text-xs text-content-tertiary">{t('setup.difficulty')}</span>
+            <div className="flex gap-2 mt-1">
+              {bands.map((band) => (
+                <button
+                  key={band.level}
+                  type="button"
+                  onClick={() => setDifficulty(band.level)}
+                  className={`px-3 py-1.5 text-sm rounded-lg border cursor-pointer transition-colors ${
+                    difficulty === band.level
+                      ? 'bg-brand text-white border-brand'
+                      : 'bg-background text-foreground border-border hover:border-brand/40'
+                  }`}
+                >
+                  {t(`difficulty.${band.level}`, { defaultValue: t('difficulty.generic', { level: band.level }) })}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-content-tertiary mt-1">{t(`difficultyHint.${difficulty}`, { defaultValue: '' })}</p>
+          </div>
+        )}
 
         {tooFewForMcq && (
           <p className="text-xs text-destructive">{t('setup.tooFewForMcq', { count: eligible })}</p>

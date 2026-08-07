@@ -49,7 +49,8 @@
     "covered": "Tu cuota gratuita cubre {{units, number}} unidades",
     "retakeFree": "Repetirlo no cuesta nada.",
     "confirm": "Crear cuestionario",
-    "generating": "Escribiendo preguntas…"
+    "generating": "Escribiendo preguntas…",
+    "difficulty": "Dificultad"
   },
   "run": {
     "loading": "Cargando…",
@@ -129,5 +130,26 @@
   "span": {
     "learner": "En tu respuesta",
     "reference": "En la tarjeta"
+  },
+  "difficulty": {
+    "1": "Fácil",
+    "2": "Media",
+    "3": "Difícil",
+    "label": "Dificultad",
+    "generic": "Nivel {{level, number}}"
+  },
+  "difficultyHint": {
+    "1": "Las opciones incorrectas vienen de otro campo por completo: basta con reconocer el tema.",
+    "2": "Solo una de las tres es una trampa de verdad; las otras dos quedan lejos.",
+    "3": "Todas las opciones incorrectas están al filo. Hay que saber la respuesta."
+  },
+  "flaw": {
+    "opposite": "Lo contrario",
+    "adjacent_sense": "Un sentido cercano",
+    "right_category_wrong_item": "Del tipo correcto, pero no es",
+    "partial": "Solo una parte",
+    "overgeneral": "Demasiado amplio",
+    "plausible_form": "Se parece",
+    "unrelated": "Sin relación"
   }
 }

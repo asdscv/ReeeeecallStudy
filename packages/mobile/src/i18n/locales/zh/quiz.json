@@ -49,7 +49,8 @@
     "covered": "免费额度可抵扣 {{units, number}} 个单位",
     "retakeFree": "重做不会产生费用。",
     "confirm": "创建测验",
-    "generating": "正在出题…"
+    "generating": "正在出题…",
+    "difficulty": "难度"
   },
   "run": {
     "loading": "加载中…",
@@ -129,5 +130,26 @@
   "span": {
     "learner": "你的答案中",
     "reference": "卡片中"
+  },
+  "difficulty": {
+    "1": "简单",
+    "2": "中等",
+    "3": "困难",
+    "label": "难度",
+    "generic": "第 {{level, number}} 级"
+  },
+  "difficultyHint": {
+    "1": "干扰项来自完全不同的领域，认出主题就能选对。",
+    "2": "三个里只有一个是真正的陷阱，另外两个相距很远。",
+    "3": "每个错误选项都很接近，必须真的知道答案。"
+  },
+  "flaw": {
+    "opposite": "相反",
+    "adjacent_sense": "意思相近",
+    "right_category_wrong_item": "同类但不是它",
+    "partial": "只是一部分",
+    "overgeneral": "过于宽泛",
+    "plausible_form": "形似",
+    "unrelated": "无关"
   }
 }
