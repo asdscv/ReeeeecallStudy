@@ -38,5 +38,12 @@
   "consent": {
     "creditPack": "Tôi đồng ý rằng tín dụng được cấp ngay lập tức, và khi đã dùng bất kỳ phần nào thì tôi mất quyền rút lui khỏi giao dịch này.",
     "policyLink": "Chính sách hoàn tiền"
+  },
+  "quiz": {
+    "title": "Hạn mức kiểm tra",
+    "freeCount": "Hôm nay {{used, number}} / {{limit, number}} đơn vị",
+    "trial_one": "Còn {{count, number}} đơn vị dùng thử",
+    "trial_other": "Còn {{count, number}} đơn vị dùng thử",
+    "note": "Trắc nghiệm chấm miễn phí. Chấm trả lời ngắn và tự luận dùng đơn vị."
   }
 }

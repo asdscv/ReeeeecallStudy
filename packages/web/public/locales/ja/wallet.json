@@ -27,5 +27,12 @@
     "spend_image": "AI画像",
     "admin_adjustment": "調整"
   },
-  "cardPlanHint": "カード上限プランは「カードストレージ」で管理します。"
+  "cardPlanHint": "カード上限プランは「カードストレージ」で管理します。",
+  "quiz": {
+    "title": "クイズの提供量",
+    "freeCount": "本日 {{used, number}} / {{limit, number}} ユニット",
+    "trial_one": "お試し残り{{count, number}}ユニット",
+    "trial_other": "お試し残り{{count, number}}ユニット",
+    "note": "選択式の採点は無料です。記述式の採点にユニットを使います。"
+  }
 }

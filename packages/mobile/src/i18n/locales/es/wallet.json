@@ -38,5 +38,12 @@
   "consent": {
     "creditPack": "Acepto que los créditos se entregan de inmediato y que, en cuanto use alguno, pierdo el derecho de desistimiento de esta compra.",
     "policyLink": "Política de reembolsos"
+  },
+  "quiz": {
+    "title": "Cuota de cuestionarios",
+    "freeCount": "Hoy {{used, number}} / {{limit, number}} unidades",
+    "trial_one": "Queda {{count, number}} unidad de prueba",
+    "trial_other": "Quedan {{count, number}} unidades de prueba",
+    "note": "La opción múltiple se corrige gratis. Corregir respuesta corta y ensayo gasta unidades."
   }
 }

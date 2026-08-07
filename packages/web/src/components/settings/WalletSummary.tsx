@@ -75,6 +75,29 @@ export function WalletSummary() {
         <p className="text-xs text-muted-foreground mt-2">{t('free.note')}</p>
       </div>
 
+      {/* Quiz allowance. Separate from the card numbers above because it is a separate
+          currency: quiz is metered in units, not cards, and the one-time trial is not a
+          daily reset. Hidden entirely when the owner has turned quiz free usage off, so
+          this never renders a row of zeroes at someone who cannot use it. */}
+      {(summary.quizFreeLimit > 0 || summary.quizTrialRemaining > 0) && (
+        <div className="pt-4 border-t border-border">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-sm font-semibold text-foreground">{t('quiz.title')}</p>
+            <span className="text-sm text-muted-foreground tabular-nums">
+              {t('quiz.freeCount', {
+                used: summary.quizFreeUsedToday, limit: summary.quizFreeLimit,
+              })}
+            </span>
+          </div>
+          {summary.quizTrialRemaining > 0 && (
+            <p className="text-xs text-brand">
+              {t('quiz.trial', { count: summary.quizTrialRemaining })}
+            </p>
+          )}
+          <p className="text-xs text-muted-foreground mt-1">{t('quiz.note')}</p>
+        </div>
+      )}
+
       {/* History — infinite scroll via get_ai_credit_ledger (mig 130); reloads page 1
           when the balance moves (a top-up/spend) so a new entry appears live. */}
       <CreditLedgerList refreshKey={summary.balanceMicroWon} />

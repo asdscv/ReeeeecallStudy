@@ -27,5 +27,12 @@
     "spend_image": "AI image",
     "admin_adjustment": "Adjustment"
   },
-  "cardPlanHint": "Card-limit plans are managed in Card storage."
+  "cardPlanHint": "Card-limit plans are managed in Card storage.",
+  "quiz": {
+    "title": "Quiz allowance",
+    "freeCount": "{{used, number}} / {{limit, number}} units today",
+    "trial_one": "{{count, number}} trial unit left",
+    "trial_other": "{{count, number}} trial units left",
+    "note": "Multiple choice is graded free. Short answer and essay grading use units."
+  }
 }

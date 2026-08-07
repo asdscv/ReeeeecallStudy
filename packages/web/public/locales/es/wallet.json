@@ -27,5 +27,12 @@
     "spend_image": "Imagen de IA",
     "admin_adjustment": "Ajuste"
   },
-  "cardPlanHint": "Los planes de límite de tarjetas se gestionan en Almacenamiento de tarjetas."
+  "cardPlanHint": "Los planes de límite de tarjetas se gestionan en Almacenamiento de tarjetas.",
+  "quiz": {
+    "title": "Cuota de cuestionarios",
+    "freeCount": "Hoy {{used, number}} / {{limit, number}} unidades",
+    "trial_one": "Queda {{count, number}} unidad de prueba",
+    "trial_other": "Quedan {{count, number}} unidades de prueba",
+    "note": "La opción múltiple se corrige gratis. Corregir respuesta corta y ensayo gasta unidades."
+  }
 }

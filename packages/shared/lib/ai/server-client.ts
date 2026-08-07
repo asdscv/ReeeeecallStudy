@@ -188,6 +188,16 @@ export interface AiWalletSummary {
   freeLimit: number
   freeUsedToday: number
   freeRemainingToday: number
+  /**
+   * Quiz runs on UNITS and a separate allowance, so it cannot be folded into the card
+   * numbers above. Without these the 60-unit trial exists only inside a quote on the quiz
+   * setup screen, where someone who has not opened quiz can never find out they have it.
+   */
+  quizUnitPriceMicro: number
+  quizFreeLimit: number
+  quizFreeUsedToday: number
+  quizFreeRemainingToday: number
+  quizTrialRemaining: number
   ledger: WalletLedgerEntry[]
 }
 
@@ -205,6 +215,11 @@ export async function getAiWalletSummary(): Promise<AiWalletSummary | null> {
     free_limit?: number
     free_used_today?: number
     free_remaining_today?: number
+    quiz_unit_price_micro?: number
+    quiz_free_limit?: number
+    quiz_free_used_today?: number
+    quiz_free_remaining_today?: number
+    quiz_trial_remaining?: number
     ledger?: Array<{ delta: number; reason: string; balance_after: number; created_at: string }>
   }
   return {
@@ -213,6 +228,11 @@ export async function getAiWalletSummary(): Promise<AiWalletSummary | null> {
     freeLimit: Number(d.free_limit ?? 10),
     freeUsedToday: Number(d.free_used_today ?? 0),
     freeRemainingToday: Number(d.free_remaining_today ?? 0),
+    quizUnitPriceMicro: Number(d.quiz_unit_price_micro ?? 0),
+    quizFreeLimit: Number(d.quiz_free_limit ?? 0),
+    quizFreeUsedToday: Number(d.quiz_free_used_today ?? 0),
+    quizFreeRemainingToday: Number(d.quiz_free_remaining_today ?? 0),
+    quizTrialRemaining: Number(d.quiz_trial_remaining ?? 0),
     ledger: (d.ledger ?? []).map((r) => ({
       delta: Number(r.delta),
       reason: String(r.reason),
