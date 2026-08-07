@@ -26,7 +26,7 @@ import {
 import type { UserCardProgress } from '../lib/srs-access'
 import {
   buildDailyPlan, DAILY_PLANNER_VERSION, retentionStabilityMultiplier, reviewsAddedTomorrow,
-  parseNewCardsPerDay,
+  parseNewCardsPerDay, DEFAULT_NEW_CARDS_PER_DAY,
 } from '../learning/application/index'
 import { activityMixForDomain, supportedActivityTypesForDomain } from '../learning/adapters/index'
 import type { LearningGoal } from '../learning/domain/index'
@@ -1238,10 +1238,26 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         goal: toDomainGoal(goal, userId),
         candidates,
         budgetMinutes: goal.daily_minutes,
-        // The intake throttle, read from the goal's settings. Absent means uncapped, which is
-        // how every goal saved before this behaved — so an existing goal plans exactly as it
-        // did until its owner chooses a number.
-        newCardsPerDay: parseNewCardsPerDay(goal.settings),
+        /**
+         * The intake throttle.
+         *
+         * Absent settings fall back to `DEFAULT_NEW_CARDS_PER_DAY`, NOT to uncapped. Uncapped
+         * was a deliberate compatibility choice — "an existing goal plans exactly as it did
+         * until its owner chooses a number" — and the behaviour it preserved turned out to be
+         * the entire deck on day one. A learner reported it: a 29-card goal whose first plan
+         * was all 29 cards, so from day two there were no new cards left and every plan was
+         * pure review. On a 4,000-card deck the same path commits a year of reviews in one
+         * sitting.
+         *
+         * It was also a lie about what the learner had been shown. `GoalFormModal` seeds the
+         * field with `parseNewCardsPerDay(settings) ?? DEFAULT_NEW_CARDS_PER_DAY`, so the form
+         * has always displayed 20 for a goal with no stored number while the planner used
+         * infinity. The two now agree.
+         *
+         * `extendPlan` still passes `undefined` on purpose and still means uncapped — see its
+         * own note. That is a button the learner pressed AFTER finishing the day's intake.
+         */
+        newCardsPerDay: parseNewCardsPerDay(goal.settings) ?? DEFAULT_NEW_CARDS_PER_DAY,
         activityMix: activityMixForDomain(goal.domain_id),
         now: ctx.now,
         timezone: ctx.timezone,
