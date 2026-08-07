@@ -94,7 +94,9 @@
     "QUIZ_ITEM_GONE": "Esta pregunta ya no existe.",
     "UNKNOWN": "Algo salió mal. Inténtalo de nuevo.",
     "QUIZ_CARDS_TOO_SHORT": "Estas tarjetas son demasiado breves para plantear ensayos: un ensayo se corrige con términos tomados de la propia tarjeta. Prueba respuesta corta u opción múltiple con este mazo.",
-    "AI_PROVIDER_ERROR": "El servicio de IA está saturado ahora mismo. No se te ha cobrado; inténtalo en un momento."
+    "AI_PROVIDER_ERROR": "El servicio de IA está saturado ahora mismo. No se te ha cobrado; inténtalo en un momento.",
+    "AI_PROVIDER_DAILY_LIMIT": "Se ha alcanzado el límite diario de IA de la aplicación. No se te ha cobrado; se restablece mañana.",
+    "AI_PROVIDER_BUSY": "El servicio de IA está ocupado. No se te ha cobrado; inténtalo en un momento."
   },
   "verdict": {
     "equivalent": "Correcto",

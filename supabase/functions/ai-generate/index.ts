@@ -54,7 +54,9 @@ const MAX_FIELD_STR = 200                  // cap field key/name/hint length (L2
 const MAX_EXISTING_CARDS_BYTES = 8000      // cap dedup payload size (L2)
 const PROVIDER_RETRY_DELAYS = [2000, 8000] // ms; per-minute provider rate limits
 const PROVIDER_TIMEOUT_MS = 30000          // abort a hung provider call (L1)
-const PROVIDER_MAX_BACKOFF_MS = 30000      // never wait longer than one provider timeout
+// A per-MINUTE limit clears inside this; a per-DAY one never will, and waiting the full hint
+// only burns the edge invocation before failing anyway.
+const PROVIDER_MAX_BACKOFF_MS = 12000
 const MAX_IMAGE_BYTES = 7_000_000          // ~5MB image as a base64 data URL (vision)
 const MAX_IMAGES = 8                        // cap images per generation (context + payload)
 
@@ -299,6 +301,18 @@ async function providerRequest(m: ResolvedModel, systemPrompt: string, userPromp
     }
 
     if (res.status === 401 || res.status === 403) throw new Error('PROVIDER_AUTH')
+    // A DAILY quota is not something a retry can outlast. Gemini names it in the violation
+    // (`GenerateRequestsPerDayPerProjectPerModel-FreeTier`), and its own "retry in 58s" hint is
+    // misleading there — waiting it out costs a minute of the caller's time and then fails.
+    // Free tier on gemini-2.5-flash-lite is 20 requests A DAY, so this is a real state, not a
+    // theoretical one, and the honest answer is to say so immediately.
+    const dailyExhausted = res.status === 429
+      && /PerDay|per day/i.test(await res.clone().text().catch(() => ''))
+    if (dailyExhausted) {
+      const body = await res.text().catch(() => '')
+      console.error(`[ai-generate] provider daily quota exhausted: ${body.slice(0, 200)}`)
+      throw new Error(`PROVIDER_LIMIT:${body.slice(0, 2000).replace(/\s+/g, ' ')}`)
+    }
     if ((res.status === 429 || res.status >= 500) && attempt < PROVIDER_RETRY_DELAYS.length) {
       // Wait as long as the PROVIDER says to, not as long as we guessed.
       //
@@ -322,7 +336,7 @@ async function providerRequest(m: ResolvedModel, systemPrompt: string, userPromp
       // with it so an operator can tell a per-minute rate limit from a daily quota without
       // reading edge logs — which the CLI cannot fetch.
       if (res.status === 429) {
-        throw new Error(`PROVIDER_LIMIT:${errBody.slice(0, 900).replace(/\s+/g, ' ')}`)
+        throw new Error(`PROVIDER_LIMIT:${errBody.slice(0, 2000).replace(/\s+/g, ' ')}`)
       }
       throw new Error(`PROVIDER_FAIL:${res.status} ${errBody.slice(0, 300).replace(/\s+/g, ' ')}`)
     }
@@ -884,7 +898,8 @@ Deno.serve(async (req) => {
         const code = message === 'QUIZ_NO_ELIGIBLE_CARDS' ? 'QUIZ_NOT_ENOUGH_CARDS'
           : message.startsWith('QUIZ_CARDS_TOO_SHORT') ? 'QUIZ_CARDS_TOO_SHORT'
           : message.startsWith('QUIZ_UNSERVABLE') ? 'AI_EMPTY_RESULT'
-          : message.startsWith('PROVIDER_LIMIT') ? 'AI_PROVIDER_BUSY'
+          : message.startsWith('PROVIDER_LIMIT')
+            ? (/PerDay|per day/i.test(message) ? 'AI_PROVIDER_DAILY_LIMIT' : 'AI_PROVIDER_BUSY')
           : message.startsWith('PROVIDER_FAIL') ? 'AI_PROVIDER_ERROR'
           : message.startsWith('CONTEXT_LOAD') ? 'AI_CONTEXT_ERROR'
           : message.startsWith('PERSISTENCE:') ? 'AI_PERSISTENCE_ERROR'
@@ -892,7 +907,7 @@ Deno.serve(async (req) => {
         const status = code === 'QUIZ_NOT_ENOUGH_CARDS' || code === 'QUIZ_CARDS_TOO_SHORT'
           || code === 'AI_EMPTY_RESULT' ? 422
           : code === 'AI_CONTEXT_ERROR' ? 400
-          : code === 'AI_PROVIDER_BUSY' ? 429 : 502
+          : code === 'AI_PROVIDER_BUSY' || code === 'AI_PROVIDER_DAILY_LIMIT' ? 429 : 502
         const marker = ['QUIZ_UNSERVABLE:', 'QUIZ_CARDS_TOO_SHORT:'].find((m) => message.startsWith(m))
         const dropped = marker ? JSON.parse(message.slice(marker.length)) : undefined
         // Operator-facing, and safe: it is the provider's own words about OUR key, with no

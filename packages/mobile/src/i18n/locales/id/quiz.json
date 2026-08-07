@@ -94,7 +94,9 @@
     "QUIZ_ITEM_GONE": "Soal ini sudah tidak ada.",
     "UNKNOWN": "Terjadi kesalahan. Silakan coba lagi.",
     "QUIZ_CARDS_TOO_SHORT": "Kartu-kartu ini terlalu pendek untuk soal esai — esai dinilai dari istilah yang diambil dari kartu itu sendiri. Coba jawaban singkat atau pilihan ganda untuk dek ini.",
-    "AI_PROVIDER_ERROR": "Layanan AI sedang sibuk. Anda tidak dikenakan biaya — coba lagi sebentar."
+    "AI_PROVIDER_ERROR": "Layanan AI sedang sibuk. Anda tidak dikenakan biaya — coba lagi sebentar.",
+    "AI_PROVIDER_DAILY_LIMIT": "Batas AI harian aplikasi ini sudah tercapai. Anda tidak dikenakan biaya — batas ini disetel ulang besok.",
+    "AI_PROVIDER_BUSY": "Layanan AI sedang sibuk. Anda tidak dikenakan biaya — coba lagi sebentar."
   },
   "verdict": {
     "equivalent": "Benar",
