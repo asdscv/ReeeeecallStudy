@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuizStore, type QuizRunItem } from '@reeeeecall/shared/stores/quiz-store'
+import { QuizFeedback } from './QuizFeedback'
 
 /**
  * What the sitting came to, and the one control that matters: the learner can overrule any
@@ -72,6 +73,16 @@ export function QuizResultPage() {
                 {item.score === null ? t('result.ungraded') : `${Math.round(item.score * 100)}%`}
               </span>
             </div>
+
+            {item.feedback && (
+              <div className="mt-2">
+                <QuizFeedback
+                  feedback={item.feedback}
+                  rubric={item.rubric}
+                  referenceText={item.reference_answer}
+                />
+              </div>
+            )}
 
             {item.score !== null && (
               <div className="flex gap-2 mt-2">

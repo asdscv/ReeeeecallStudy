@@ -7,6 +7,7 @@ import { useQuizStore, type QuizRunItem } from '@reeeeecall/shared/stores/quiz-s
 import { Screen, Button } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
+import { QuizFeedback } from './QuizFeedback'
 import type { QuizStackParamList } from '../../navigation/types'
 
 type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizResult'>
@@ -86,6 +87,14 @@ export function QuizResultScreen() {
                 {item.score === null ? t('result.ungraded') : `${Math.round(item.score * 100)}%`}
               </Text>
             </View>
+
+            {item.feedback && (
+              <QuizFeedback
+                feedback={item.feedback}
+                rubric={item.rubric}
+                referenceText={item.reference_answer}
+              />
+            )}
 
             {item.score !== null && (
               <View style={styles.overrides}>

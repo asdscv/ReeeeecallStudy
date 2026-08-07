@@ -6,6 +6,7 @@ import {
   type QuizRunItem, type QuizSubmitResult,
 } from '@reeeeecall/shared/stores/quiz-store'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
+import { QuizFeedback } from './QuizFeedback'
 
 /**
  * Taking the quiz. Outside the app Layout, like the study session, so nothing competes with
@@ -177,6 +178,15 @@ export function QuizRunPage() {
             </p>
           )}
         </div>
+      )}
+
+      {answered && item.feedback && (
+        <QuizFeedback
+          feedback={item.feedback}
+          rubric={item.rubric}
+          learnerText={text}
+          referenceText={item.reference_answer}
+        />
       )}
 
       {error && (

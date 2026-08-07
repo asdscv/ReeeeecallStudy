@@ -92,5 +92,40 @@
     "QUIZ_GRADE_REFUSED": "Grading did not work, and you were not charged. Try again.",
     "QUIZ_ITEM_GONE": "This question no longer exists.",
     "UNKNOWN": "Something went wrong. Please try again."
+  },
+  "verdict": {
+    "equivalent": "Correct",
+    "equivalent_with_error": "Correct, with a slip",
+    "partial": "Partly right",
+    "different": "Not this",
+    "empty": "Nothing to grade",
+    "unjudgeable": "Could not judge this"
+  },
+  "gap": {
+    "missing_part": "Missing a part",
+    "extra_claim": "Says more than the card",
+    "wrong_direction": "The other way round",
+    "too_vague": "Too vague",
+    "spelling": "Spelling",
+    "wrong_language": "Wrong language"
+  },
+  "level": {
+    "met": "Covered",
+    "partial": "Partly",
+    "not_met": "Not covered",
+    "unjudgeable": "Not judged",
+    "unjudgeableNote": "Some of this could not be judged, so it did not count against you."
+  },
+  "aspect": {
+    "covers_answer": "Covers the answer",
+    "uses_key_terms": "Uses the key terms",
+    "explains_why": "Explains why",
+    "gives_example": "Gives an example",
+    "states_limits": "States the limits",
+    "structure": "Structure"
+  },
+  "span": {
+    "learner": "In your answer",
+    "reference": "In the card"
   }
 }

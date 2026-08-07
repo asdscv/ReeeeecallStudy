@@ -12,6 +12,7 @@ import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { Screen, Button, EmptyState } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
+import { QuizFeedback } from './QuizFeedback'
 import type { QuizStackParamList } from '../../navigation/types'
 
 type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizRun'>
@@ -192,6 +193,15 @@ export function QuizRunScreen() {
                 </Text>
               )}
             </View>
+          )}
+
+          {answered && item.feedback && (
+            <QuizFeedback
+              feedback={item.feedback}
+              rubric={item.rubric}
+              learnerText={text}
+              referenceText={item.reference_answer}
+            />
           )}
 
           {error && <Text style={[theme.typography.caption, { color: theme.colors.error }]}>{error}</Text>}

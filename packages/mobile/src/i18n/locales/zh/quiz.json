@@ -92,5 +92,40 @@
     "QUIZ_GRADE_REFUSED": "批改失败，未向你扣费。请重试。",
     "QUIZ_ITEM_GONE": "这道题已不存在。",
     "UNKNOWN": "出了点问题，请重试。"
+  },
+  "verdict": {
+    "equivalent": "正确",
+    "equivalent_with_error": "正确，有小疏漏",
+    "partial": "部分正确",
+    "different": "不是这个",
+    "empty": "没有可批改的内容",
+    "unjudgeable": "无法判断"
+  },
+  "gap": {
+    "missing_part": "缺少一部分",
+    "extra_claim": "超出了卡片的内容",
+    "wrong_direction": "方向反了",
+    "too_vague": "太笼统",
+    "spelling": "拼写",
+    "wrong_language": "语言不对"
+  },
+  "level": {
+    "met": "已覆盖",
+    "partial": "部分",
+    "not_met": "未覆盖",
+    "unjudgeable": "未判断",
+    "unjudgeableNote": "有一部分无法判断，因此没有计入扣分。"
+  },
+  "aspect": {
+    "covers_answer": "覆盖要点",
+    "uses_key_terms": "使用关键术语",
+    "explains_why": "解释原因",
+    "gives_example": "举出例子",
+    "states_limits": "说明局限",
+    "structure": "结构"
+  },
+  "span": {
+    "learner": "你的答案中",
+    "reference": "卡片中"
   }
 }
