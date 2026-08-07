@@ -27,7 +27,7 @@ import { opsGate } from '../_shared/ops-gate.ts'
 import { buildRemediationPrompt, compareGroundingError, parseRemediationRefs, validateRemediationResult } from '../_shared/ai-remediation.ts'
 import { resolveCardAnswerFaces } from '../_shared/card-answer.ts'
 import {
-  quizPromptText, quizReferenceAnswer, quizContextLines,
+  quizPromptText, quizReferenceAnswer, quizContextFields,
 } from '../_shared/quiz-answer-field.ts'
 import {
   buildQuizCardSource,
@@ -721,11 +721,10 @@ Deno.serve(async (req) => {
           const prompt = quizPromptText(template, card)
           const answer = quizReferenceAnswer(template, card)
           if (!prompt || !answer) continue
-          const context = quizContextLines(template, card)
-          const source = buildQuizCardSource(
-            card.id, prompt, answer,
-            context.map((value, i) => ({ key: `ctx${i}`, label: `context${i}`, value })),
-          )
+          // The template's own field names travel with the values. Without them a
+          // `field_probe` question reads "what is the context0 of lend?" — the model can only
+          // ask about a field it can name.
+          const source = buildQuizCardSource(card.id, prompt, answer, quizContextFields(template, card))
           if (!source) continue
           sources.push(source)
           // Answers the question `content_version` was created for and never wired up:
@@ -760,7 +759,7 @@ Deno.serve(async (req) => {
             stem: item.question,
             source_fingerprint: fingerprints.get(item.cardId) ?? 'unknown',
             reference_context: sources.find((s) => s.cardId === item.cardId)?.extraFields
-              .map((f) => f.value).join(' / ') || null,
+              .map((f) => `${f.label}: ${f.value}`).join(' / ') || null,
           }
           if (item.type === 'multiple_choice') {
             return {
