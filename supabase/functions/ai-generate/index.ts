@@ -22,7 +22,7 @@ import {
   type FieldHint,
   type GeneratedTemplateField,
 } from '../_shared/ai-prompts.ts'
-import { resolveModel, type ResolvedModel } from '../_shared/ai-providers.ts'
+import { resolveModel, resolveModelChain, type ResolvedModel } from '../_shared/ai-providers.ts'
 import { opsGate } from '../_shared/ops-gate.ts'
 import { buildRemediationPrompt, compareGroundingError, parseRemediationRefs, validateRemediationResult } from '../_shared/ai-remediation.ts'
 import { resolveCardAnswerFaces } from '../_shared/card-answer.ts'
@@ -361,7 +361,7 @@ async function providerRequest(m: ResolvedModel, systemPrompt: string, userPromp
 
 // Returns parsed JSON + token usage; one stricter-prompt retry on unparseable
 // output (mirrors callAI). On retry we paid for BOTH calls → SUM the usage.
-async function generate(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrls?: string[]): Promise<{ json: Record<string, unknown>; usage: TokenUsage | null }> {
+async function generateWith(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrls?: string[]): Promise<{ json: Record<string, unknown>; usage: TokenUsage | null }> {
   const a = await providerRequest(m, systemPrompt, userPrompt, imageUrls)
   try {
     return { json: JSON.parse(stripMarkdownFences(a.content)), usage: a.usage }
@@ -371,6 +371,39 @@ async function generate(m: ResolvedModel, systemPrompt: string, userPrompt: stri
     const b = await providerRequest(m, strict, userPrompt, imageUrls)
     return { json: JSON.parse(stripMarkdownFences(b.content)), usage: sumUsage(a.usage, b.usage) }
   }
+}
+
+/**
+ * Generate, falling through to the next model when one is exhausted for the DAY.
+ *
+ * Free-tier quotas are per MODEL: `gemini-2.5-flash-lite` running out says nothing about
+ * `gemini-2.0-flash`. Without this, one model's daily cap takes every AI feature down until
+ * midnight — which is not a hypothetical, it is 20 requests a day on the current key.
+ *
+ * ONLY a daily quota falls through. A rate limit is already handled by the backoff inside
+ * `providerRequest`, and a genuine fault would just fail again on another model while
+ * spending its quota too.
+ *
+ * Returns the model that actually answered, because the cost ledger prices per model and
+ * recording the one we asked for first would misattribute the spend.
+ */
+async function generate(
+  chain: ResolvedModel[], systemPrompt: string, userPrompt: string, imageUrls?: string[],
+): Promise<{ json: Record<string, unknown>; usage: TokenUsage | null; model: ResolvedModel }> {
+  let lastError: unknown
+  for (const [i, m] of chain.entries()) {
+    try {
+      const out = await generateWith(m, systemPrompt, userPrompt, imageUrls)
+      if (i > 0) console.warn(`[ai-generate] fell back to ${m.model} after ${i} exhausted model(s)`)
+      return { ...out, model: m }
+    } catch (e) {
+      lastError = e
+      const msg = e instanceof Error ? e.message : ''
+      if (!msg.startsWith('PROVIDER_LIMIT') || !/PerDay|per day/i.test(msg)) throw e
+      // Exhausted for the day — try the next model in the chain.
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error('PROVIDER_ERROR')
 }
 
 // A generation result is USABLE only if it contains at least one non-empty list of items
@@ -512,7 +545,10 @@ Deno.serve(async (req) => {
     const uiLang = typeof body.uiLang === 'string' ? body.uiLang : 'en'
 
     // Resolve provider+model by purpose (vision for image kinds, text otherwise).
-    const model = resolveModel((kind === 'image' || kind === 'image_deck') ? 'vision' : 'text', ENV)
+    const purpose = (kind === 'image' || kind === 'image_deck') ? 'vision' : 'text'
+    // The chain, not a single model: one model's DAILY quota must not take the feature down.
+    const chain = resolveModelChain(purpose, ENV)
+    const model = chain[0] ?? resolveModel(purpose, ENV)
     if (!model) {
       console.error('[ai-generate] no provider configured (set AI_GENERATION_PROVIDER_KEY)')
       return json({ error: 'Server not configured', code: 'AI_NOT_CONFIGURED' }, 503, cors)
@@ -646,7 +682,7 @@ Deno.serve(async (req) => {
         const prompt = buildRemediationPrompt(refs, context)
         if (prompt.requireGrounding && sources.length === 0) throw new Error('GROUNDING_SOURCE_REQUIRED')
 
-        const generated = await generate(model, prompt.systemPrompt, prompt.userPrompt)
+        const generated = await generate(chain, prompt.systemPrompt, prompt.userPrompt)
         const validated = validateRemediationResult(generated.json, refs, sources.map((source) => source.id), prompt.requireGrounding)
         if (!validated.valid) throw new Error(`INVALID_REMEDIATION:${validated.reason}`)
 
@@ -669,7 +705,7 @@ Deno.serve(async (req) => {
         })
         if (persistenceError || typeof enrichmentId !== 'string') throw new Error(`PERSISTENCE:${persistenceError?.message ?? 'missing id'}`)
 
-        const charge = await chargeGeneration(userId, meter.job_ref, model, generated.usage)
+        const charge = await chargeGeneration(userId, meter.job_ref, generated.model, generated.usage)
         return json({ content: validated.content, enrichmentId, balance: charge?.balance ?? null }, 200, cors)
       } catch (error) {
         const message = error instanceof Error ? error.message : 'UNKNOWN'
@@ -727,6 +763,11 @@ Deno.serve(async (req) => {
         return json({ error: 'Question type does not match the set', code: 'BAD_REQUEST' }, 400, cors)
       }
 
+      // The FAR slots are filled from the learner's own deck; `create_quiz_set` supplies the
+      // pool from the same eligibility resolver everything else uses.
+      const fillers = Array.isArray(body.fillers)
+        ? body.fillers.filter((v: unknown): v is string => typeof v === 'string')
+        : []
       const cardIds = Array.isArray(body.cardIds)
         ? body.cardIds.filter((v: unknown): v is string => typeof v === 'string')
         : []
@@ -784,7 +825,8 @@ Deno.serve(async (req) => {
           // The template's own field names travel with the values. Without them a
           // `field_probe` question reads "what is the context0 of lend?" — the model can only
           // ask about a field it can name.
-          const source = buildQuizCardSource(card.id, prompt, answer, quizContextFields(template, card))
+          const source = buildQuizCardSource(
+            card.id, prompt, answer, quizContextFields(template, card), fillers)
           if (!source) continue
           sources.push(source)
           // Answers the question `content_version` was created for and never wired up:
@@ -798,15 +840,17 @@ Deno.serve(async (req) => {
         let difficulty: QuizDifficulty = DEFAULT_DIFFICULTY
         if (qType === 'mcq') {
           const bandResult = await service.from('quiz_difficulty_levels')
-            .select('level, near_required, option_count, allowed_flaws')
+            .select('level, near_required, near_max, option_count, allowed_flaws')
             .eq('level', quizSet.difficulty).maybeSingle()
           const band = bandResult.data as {
-            level: number; near_required: number; option_count: number; allowed_flaws: string[]
+            level: number; near_required: number; near_max: number
+            option_count: number; allowed_flaws: string[]
           } | null
           if (band) {
             difficulty = {
               level: band.level,
               nearRequired: band.near_required,
+              nearMax: band.near_max ?? band.near_required,
               optionCount: band.option_count,
               // Filtered against the contract rather than trusted: a name the validator does
               // not know would restrict the band to nothing and drop every item, which reads
@@ -819,7 +863,7 @@ Deno.serve(async (req) => {
         const prompt = qType === 'mcq' ? buildMcqGenerationPrompt(sources, difficulty)
           : qType === 'short' ? buildShortAnswerGenerationPrompt(sources)
           : buildEssayGenerationPrompt(sources)
-        const generated = await generate(model, prompt.systemPrompt, prompt.userPrompt)
+        const generated = await generate(chain, prompt.systemPrompt, prompt.userPrompt)
 
         const makeItemId = (cardId: string, index: number) => `${setId}:${cardId}:${index}`
         const outcome = qType === 'mcq'
@@ -886,7 +930,7 @@ Deno.serve(async (req) => {
         if (persistError) throw new Error(`PERSISTENCE:${persistError.message}`)
 
         // Charged for what shipped, not for what was asked for.
-        const settled = await settleQuiz(userId, meter.job_ref, questions.length, model, generated.usage)
+        const settled = await settleQuiz(userId, meter.job_ref, questions.length, generated.model, generated.usage)
         return json({
           setId, generated: questions.length, requested: cardIds.length,
           dropped: outcome.dropped.length, balance: settled?.balance ?? null,
@@ -1001,7 +1045,7 @@ Deno.serve(async (req) => {
         const prompt = quizType === 'essay'
           ? buildEssayGradePrompt(gradeInput, criteria)
           : buildShortAnswerGradePrompt(gradeInput)
-        const generated = await generate(model, prompt.systemPrompt, prompt.userPrompt)
+        const generated = await generate(chain, prompt.systemPrompt, prompt.userPrompt)
 
         const verdict = quizType === 'essay'
           ? validateEssayGrade(generated.json, criteria, gradeInput)
@@ -1027,7 +1071,7 @@ Deno.serve(async (req) => {
         })
         if (applyError) throw new Error(`PERSISTENCE:${applyError.message}`)
 
-        const settled = await settleQuiz(userId, meter.job_ref, 1, model, generated.usage)
+        const settled = await settleQuiz(userId, meter.job_ref, 1, generated.model, generated.usage)
         return json({ itemId, grade, balance: settled?.balance ?? null }, 200, cors)
       } catch (error) {
         const message = error instanceof Error ? error.message : 'UNKNOWN'
@@ -1074,14 +1118,14 @@ Deno.serve(async (req) => {
 
       const { systemPrompt: iSys, userPrompt: iUser } = buildImageCardsPrompt(fields, cardCount, uiLang)
       try {
-        const { json: content, usage } = await generate(model, iSys, iUser, images)
+        const { json: content, usage, model: usedModel } = await generate(chain, iSys, iUser, images)
         if (!resultHasItems(content)) {   // empty vision result → refund, don't charge
           console.error('[ai-generate] image empty result — releasing job', imgMeter.job_ref)
           await releaseJob(userId, imgMeter.job_ref)
           return json({ error: 'No cards recognized in the image', code: 'AI_EMPTY_RESULT' }, 502, cors)
         }
         // Post-gen CHARGE: deduct real token cost × markup from the wallet.
-        const charge = await chargeGeneration(userId, imgMeter.job_ref, model, usage)  // best-effort, never masks the 200
+        const charge = await chargeGeneration(userId, imgMeter.job_ref, usedModel, usage)  // best-effort, never masks the 200
         return json({ content, balance: charge?.balance ?? null }, 200, cors)
       } catch (e) {
         const msg = (e as Error).message
@@ -1122,13 +1166,13 @@ Deno.serve(async (req) => {
 
       const { systemPrompt: dSys, userPrompt: dUser } = buildImageDeckPrompt(uiLang)
       try {
-        const { json: content, usage } = await generate(model, dSys, dUser, images)
+        const { json: content, usage, model: usedModel } = await generate(chain, dSys, dUser, images)
         if (!resultHasItems(content)) {   // empty deck result → refund, don't charge
           console.error('[ai-generate] image_deck empty result — releasing job', idMeter.job_ref)
           await releaseJob(userId, idMeter.job_ref)
           return json({ error: 'No deck could be built from the image', code: 'AI_EMPTY_RESULT' }, 502, cors)
         }
-        const charge = await chargeGeneration(userId, idMeter.job_ref, model, usage)
+        const charge = await chargeGeneration(userId, idMeter.job_ref, usedModel, usage)
         return json({ content, balance: charge?.balance ?? null }, 200, cors)
       } catch (e) {
         const msg = (e as Error).message
@@ -1208,10 +1252,14 @@ Deno.serve(async (req) => {
     // Generate.
     let content: Record<string, unknown>
     let usage: TokenUsage | null
+  // The model that ANSWERED — a daily-quota fallback is a different model at a different
+  // rate, and charging the one we asked for first would misattribute the spend.
+  let usedModel: ResolvedModel = model
     try {
-      const gen = await generate(model, systemPrompt, userPrompt)
+      const gen = await generate(chain, systemPrompt, userPrompt)
       content = gen.json
       usage = gen.usage
+      usedModel = gen.model
     } catch (e) {
       const msg = (e as Error).message
       console.error('[ai-generate] provider failure:', msg)
@@ -1235,7 +1283,7 @@ Deno.serve(async (req) => {
     }
 
     // Post-gen CHARGE: deduct real token cost × markup (paid share) from the wallet.
-    await chargeGeneration(userId, meter.job_ref, model, usage)  // best-effort; never masks the 200
+    await chargeGeneration(userId, meter.job_ref, usedModel, usage)  // best-effort; never masks the 200
     return json({ content, remainingFree }, 200, cors)
   } catch (err) {
     console.error('[ai-generate] Error:', err)

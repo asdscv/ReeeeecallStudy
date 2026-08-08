@@ -110,7 +110,18 @@ export const FAR_FLAWS: ReadonlySet<McqDistractorFlaw> = new Set([
  */
 export interface QuizDifficulty {
   readonly level: number
+  /** MINIMUM near-miss distractors. Binding for a hard band. */
   readonly nearRequired: number
+  /**
+   * MAXIMUM near-miss distractors. Binding for an easy band.
+   *
+   * A RANGE, not an exact count. Exact was tried and dropped every item a real model
+   * produced — three coin flips per question, and losing means the learner paid for
+   * nothing. Only the binding side of each band is enforced, which is also all the band
+   * actually promises: "easy" claims no near-misses, "hard" claims it is not winnable by
+   * elimination, and neither cares about the other end.
+   */
+  readonly nearMax: number
   /** How many options the question shows, 2..6. Distractors are one fewer. */
   readonly optionCount: number
   /** Restrict to these flaws. Empty means all of them. */
@@ -119,7 +130,7 @@ export interface QuizDifficulty {
 
 /** Fallback when a caller does not resolve a band — the hardest, which is what shipped first. */
 export const DEFAULT_DIFFICULTY: QuizDifficulty = {
-  level: 3, nearRequired: 3, optionCount: 4, allowedFlaws: [],
+  level: 3, nearRequired: 2, nearMax: 3, optionCount: 4, allowedFlaws: [],
 }
 
 /**
@@ -521,6 +532,19 @@ export interface QuizCardSource {
    */
   readonly extraFields: ReadonlyArray<{ readonly key: string; readonly label: string; readonly value: string }>
   /**
+   * Other answers from the same deck, to fill the FAR slots a band leaves open.
+   *
+   * A model will not write a deliberately unrelated wrong answer — asked for wrong options
+   * for `lend → 빌려주다` it returns 빌리다, 갚다, 임대하다 at every phrasing of the
+   * instruction, because everything it knows pulls toward the prompt's neighbourhood.
+   * Fighting that cost three deploys and dropped every item on bands 1 and 2.
+   *
+   * So the model is only ever asked for the NEAR distractors it is good at, and the rest
+   * come from here: guaranteed wrong (they answer a different card), guaranteed in the
+   * answer's own language and script, and free.
+   */
+  readonly fillers: readonly string[]
+  /**
    * Prompt and answer are in different scripts — so producing the answer IN ITS OWN LANGUAGE is
    * plausibly the point of the card.
    *
@@ -535,6 +559,7 @@ export function buildQuizCardSource(
   promptText: string,
   answerText: string,
   extraFields: ReadonlyArray<{ key: string; label: string; value: string }> = [],
+  fillers: readonly string[] = [],
 ): QuizCardSource | null {
   const prompt = promptText.trim()
   const answer = answerText.trim()
@@ -544,6 +569,9 @@ export function buildQuizCardSource(
     promptText: prompt,
     answerText: answer,
     extraFields: extraFields.filter((f) => f.value.trim() !== ''),
+    // Never this card's own answer, never blank, never a duplicate.
+    fillers: [...new Set(fillers.map((f) => f.trim()).filter(
+      (f) => f !== '' && normalizeAnswer(f) !== normalizeAnswer(answer)))],
     crossLingual: !scriptCompatible(prompt, answer),
   }
 }
@@ -741,11 +769,25 @@ export function validateMultipleChoiceGeneration(
       if (norm === answerNorm) { drop(cardId, 'distractor_equals_answer'); continue }
       if (seen.has(norm)) { drop(cardId, 'distractor_duplicated'); continue }
 
+      let effectiveFlaw: McqDistractorFlaw = flaw
       if (flaw === 'partial') {
         // `partial` is legal only when it is exactly one declared part of a multi-part answer.
         // Anything looser makes "a substring of the answer" acceptable, which is the trap this
         // whole containment check exists to close.
-        if (!multiPart || !parts.includes(norm)) { drop(cardId, 'partial_not_applicable'); continue }
+        if (multiPart && parts.includes(norm)) {
+          // legitimate
+        } else if (answerNorm.includes(norm) || norm.includes(answerNorm)) {
+          // Claimed `partial` AND overlaps the answer, on a card that has no parts. That is
+          // the actual trap, and it stays a drop.
+          drop(cardId, 'partial_not_applicable'); continue
+        } else {
+          // Claimed `partial` on a single-part answer, but the text does not overlap the
+          // answer at all — so it is a perfectly good wrong option with the wrong LABEL.
+          // Dropping it cost the whole item on real single-part vocabulary decks, because
+          // losing one distractor of three fails `too_few_distractors`. The flaw is a
+          // rendering hint; relabelling is honest and keeps the question.
+          effectiveFlaw = 'adjacent_sense'
+        }
       } else if (answerNorm.includes(norm) || norm.includes(answerNorm)) {
         drop(cardId, 'distractor_contains_answer'); continue
       }
@@ -754,9 +796,27 @@ export function validateMultipleChoiceGeneration(
 
       seen.add(norm)
       texts.push(text)
-      flaws.push(flaw)
+      flaws.push(effectiveFlaw)
     }
 
+    // Fill the FAR slots the band left open from the deck, rather than from the model.
+    // The model was asked for `nearMax` near-misses and nothing else; everything below that
+    // count is a slot this card's neighbours fill better and for free.
+    if (texts.length < distractorCount) {
+      for (const filler of card.fillers) {
+        if (texts.length >= distractorCount) break
+        const norm = normalizeAnswer(filler)
+        if (norm === '' || norm === answerNorm || seen.has(norm)) continue
+        if (answerNorm.includes(norm) || norm.includes(answerNorm)) continue
+        if (!scriptCompatible(filler, card.answerText)) continue
+        seen.add(norm)
+        texts.push(filler)
+        // A deck-mate is wrong because it answers a DIFFERENT card, which is what
+        // `right_category_wrong_item` means. It is also a FAR flaw, which is what makes the
+        // band arithmetic come out right.
+        flaws.push('right_category_wrong_item')
+      }
+    }
     if (texts.length < distractorCount) { drop(cardId, 'too_few_distractors'); continue }
 
 
@@ -765,15 +825,21 @@ export function validateMultipleChoiceGeneration(
       drop(cardId, 'length_cue'); continue
     }
 
-    // The band, enforced rather than requested. A model told "make it easy" writes near-misses
-    // anyway — easy is the shape it has least practice at — so the count is checked. Exact, not
-    // a minimum: an "easy" item with two near-misses is not easy, and a "hard" one with a
-    // giveaway among the options is not hard.
+    // The band, enforced rather than requested — a model told "make it easy" writes
+    // near-misses anyway, because easy is the shape it has least practice at.
+    //
+    // A RANGE, though, not an exact count. Exact was what 197/198 asked for and it dropped
+    // EVERY item across all three bands on a real deck: three coin flips per question, and
+    // losing means the learner paid for nothing. Each band binds on one side only, which is
+    // also all it promises.
     //
     // Checked AFTER length_cue so an item that is broken on its own terms reports that, rather
     // than reporting a band mismatch the author cannot act on.
     const near = flaws.filter((f) => NEAR_FLAWS.has(f)).length
-    if (near !== difficulty.nearRequired) { drop(cardId, 'wrong_difficulty_mix'); continue }
+    const nearMax = difficulty.nearMax ?? difficulty.nearRequired
+    if (near < difficulty.nearRequired || near > nearMax) {
+      drop(cardId, 'wrong_difficulty_mix'); continue
+    }
 
     const itemId = makeItemId(cardId, index)
     const correctIndex = correctOptionIndex(itemId, optionCount)

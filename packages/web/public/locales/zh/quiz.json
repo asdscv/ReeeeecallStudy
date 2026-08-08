@@ -50,7 +50,8 @@
     "retakeFree": "重做不会产生费用。",
     "confirm": "创建测验",
     "generating": "正在出题…",
-    "difficulty": "难度"
+    "difficulty": "难度",
+    "easyBandFree": "这个难度直接从你的牌组生成——不使用 AI，也不扣费。"
   },
   "run": {
     "loading": "加载中…",

@@ -60,7 +60,20 @@ export interface QuizzableCount { total: number; eligible: number }
  * how many of the three wrong options are near-misses — 0 is "recognise the subject area",
  * 3 is "you must know the answer".
  */
-export interface QuizDifficultyBand { level: number; near_required: number }
+export interface QuizDifficultyBand {
+  level: number
+  near_required: number
+  /**
+   * Maximum near-miss distractors. `0` means the band rules them out entirely — and such a
+   * band is built from other answers in the same deck, with no model call and no charge.
+   * See `build_deck_mate_quiz`: producing a deliberately unrelated wrong answer is the one
+   * thing a model reliably will not do, and deck-mates are exactly that by construction.
+   */
+  near_max: number
+  option_count: number
+  allowed_flaws: string[]
+  is_default: boolean
+}
 
 export interface QuizSetRow {
   id: string
@@ -273,7 +286,28 @@ export const useQuizStore = create<QuizState>((set, get) => ({
           : createError.code === 'P0009' ? 'AI_REQUEST_TOO_LARGE'
           : createError.code === '42501' ? 'FORBIDDEN' : 'UNKNOWN')
       }
-      const result = created as { set_id: string; cards: Array<{ card_id: string }> }
+      const result = created as {
+        set_id: string
+        cards: Array<{ card_id: string }>
+        near_max?: number
+        /** Other answers from the deck, used to fill the FAR slots a band leaves open. */
+        fillers?: string[]
+      }
+
+      // An easy band needs no model and costs nothing: the wrong options are other answers
+      // from the same deck, which are guaranteed wrong, guaranteed in the right language, and
+      // free. The quote will already have said 0.
+      if (input.questionType === 'mcq' && result.near_max === 0) {
+        const { error: dmError } = await supabase.rpc('build_deck_mate_quiz', {
+          p_set_id: result.set_id,
+        })
+        if (dmError) {
+          throw new QuizError(dmError.code === 'P0010' ? 'QUIZ_NOT_ENOUGH_CARDS'
+            : dmError.code === '42501' ? 'FORBIDDEN' : 'UNKNOWN')
+        }
+        await get().fetchSets()
+        return result.set_id
+      }
 
       const { error: genError } = await supabase.functions.invoke('ai-generate', {
         body: {
@@ -281,6 +315,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
           setId: result.set_id,
           questionType: input.questionType,
           cardIds: result.cards.map((c) => c.card_id),
+          fillers: result.fillers ?? [],
           clientRef: newClientRef(),
           maxPriceMicro: input.maxPriceMicro,
         },
