@@ -70,10 +70,12 @@ export function QuizSetupScreen() {
 
   useEffect(() => refreshQuote(), [refreshQuote])
 
+  // An easy multiple-choice band is built from deck-mates: no model, no charge.
+  const freeBand = type === 'mcq' && bands.find((b) => b.level === difficulty)?.near_max === 0
   const eligible = shownCounts?.eligible ?? 0
   const tooFewForMcq = type === 'mcq' && eligible > 0 && eligible < 4
   const canSubmit = Boolean(deckId) && eligible > 0 && !tooFewForMcq && !generating
-    && priced !== null && priced.sufficient
+    && priced !== null && (freeBand || priced.sufficient)
 
   const submit = async () => {
     if (!priced || !deckId) return
@@ -197,12 +199,18 @@ export function QuizSetupScreen() {
             <View style={styles.priceRow}>
               <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('setup.price')}</Text>
               <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-                {priced.price_micro === 0 ? t('setup.free') : formatUsdMicro(priced.price_micro)}
+                {freeBand || priced.price_micro === 0
+                  ? t('setup.free') : formatUsdMicro(priced.price_micro)}
               </Text>
             </View>
             {(priced.trial_units > 0 || priced.free_units > 0) && (
               <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
                 {t('setup.covered', { units: priced.trial_units + priced.free_units })}
+              </Text>
+            )}
+            {freeBand && (
+              <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
+                {t('setup.easyBandFree')}
               </Text>
             )}
             <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>

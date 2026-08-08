@@ -46,6 +46,7 @@
  */
 
 import {
+  answerParts,
   DEFAULT_DIFFICULTY, type QuizDifficulty,
   ESSAY_ASPECTS, ESSAY_LENGTH_BANDS, ESSAY_MAX_CRITERIA, ESSAY_MENTIONS_PER_CRITERION,
   ESSAY_MIN_CRITERIA, ESSAY_WEIGHT_TOTAL, MAX_DISTRACTOR_CHARS, MAX_QUESTION_CHARS, MAX_SPAN_CHARS,
@@ -116,32 +117,42 @@ export function buildMcqGenerationPrompt(
 ) {
   const optionCount = Math.min(6, Math.max(2, difficulty.optionCount || 4))
   const distractorCount = optionCount - 1
-  const near = Math.min(difficulty.nearRequired, distractorCount)
-  const far = distractorCount - near
+  const nearMin = Math.min(difficulty.nearRequired, distractorCount)
+  const nearMax = Math.min(difficulty.nearMax ?? nearMin, distractorCount)
   const restricted = difficulty.allowedFlaws?.length
     ? `\nOnly these flaws may be used for this band: ${difficulty.allowedFlaws.join(', ')}.`
     : ''
+  // `partial` is only legal when the ANSWER has comma- or slash-separated parts, and the
+  // validator rejects it otherwise. Offering it to a batch of single-part answers is offering
+  // a tool that cannot be used: a weaker model reaches for it, every item loses a distractor,
+  // and the batch dies `partial_not_applicable` -> `too_few_distractors`. Observed on a
+  // fallback model against a plain vocabulary deck.
+  const anyMultiPart = sources.some((s) => answerParts(s.answerText).length > 1)
   const flaws = bullets([
     '"opposite" — reverses the answer\'s direction or polarity. [NEAR]',
     '"adjacent_sense" — a close neighbour in meaning that this card\'s answer excludes. [NEAR]',
     '"right_category_wrong_item" — the same kind of thing, but not this one. [FAR]',
-    '"partial" — EXACTLY one comma- or slash-separated part of the answer, verbatim. Only usable when the answer has such parts; otherwise it is rejected. [NEAR]',
+    ...(anyMultiPart
+      ? ['"partial" — EXACTLY one comma- or slash-separated part of the answer, verbatim. Only for the cards whose answer HAS such parts; rejected on any other card. [NEAR]']
+      : []),
     '"overgeneral" — true of a broader class, so not the answer to this prompt. [FAR]',
     '"plausible_form" — resembles the answer in spelling or sound without being it. [NEAR]',
-    '"unrelated" — from a different subject area entirely; no relation to the answer. [FAR]',
+    '"unrelated" — from a different subject area entirely; no relation to the answer. STILL WRITTEN IN THE ANSWER\'S OWN LANGUAGE AND SCRIPT — an option in another language is spotted without being read, and is rejected. [FAR]',
   ])
 
   // Stated as a count, not as an adjective. "Make it easy" is interpreted; "exactly one of the
   // three is a near-miss" is followed — and it is checked afterwards either way.
-  const mix = near === distractorCount
-    ? `ALL ${distractorCount} distractors must be NEAR flaws. This is the hardest band: a learner who half-knows the answer should get it wrong.`
-    : near === 0
-      ? `ALL ${distractorCount} distractors must be FAR flaws — mostly "unrelated". This is the easiest band: a learner who recognises the subject area should get it right, and no option may be a near-miss.`
-      : `EXACTLY ${near} distractor(s) must be NEAR flaws and EXACTLY ${far} must be FAR flaws. Do not exceed the near count — an extra near-miss makes this band harder than it is meant to be.`
+  // One-sided on purpose: each band binds on the end it actually promises. Asking for an
+  // exact split is a target a model misses often enough to drop every item.
+  // Only ever asks for NEAR distractors, and only as many as the band allows. The FAR slots
+  // are filled from the learner's own deck, because a model asked for a deliberately
+  // unrelated wrong answer returns another near-miss instead — at every phrasing tried.
+  const mix = `Every distractor you write must be a NEAR flaw: something a learner who half-knows the answer could believe. Write exactly ${nearMax}. Do not write far-fetched or unrelated options — those are not your job here.`
 
   const systemPrompt = `${GROUNDING}
 
-For each card, write exactly ${distractorCount} WRONG options (distractors) for a multiple-choice question.
+For each card, write exactly ${nearMax} WRONG option(s) (distractors) for a multiple-choice question.
+The question will have ${distractorCount} wrong options in total; the app fills the remaining ${distractorCount - nearMax} itself from the learner's other cards. Write ONLY the ones asked for here.
 You are NOT asked for the correct option and must not write it — the app inserts the card's own answer itself.
 
 Respond with a single JSON object:
@@ -154,7 +165,7 @@ DIFFICULTY: ${mix}${restricted}
 
 Rules:
 ${bullets([
-  `Exactly ${distractorCount} distractors per card. They may share a flaw label — three close neighbours of the answer is often the best set a card can have. What they must not share is substance: three ways of writing the same wrong idea is one distractor shown three times.`,
+  `Exactly ${nearMax} distractor(s) per card. They may share a flaw label — three close neighbours of the answer is often the best set a card can have. What they must not share is substance: three ways of writing the same wrong idea is one distractor shown three times.`,
   'A distractor must be UNAMBIGUOUSLY WRONG for this card. If you cannot say which flaw it has, it is probably also correct — do not write it.',
   'Never write a distractor that restates the answer, contains the whole answer, or is contained by it (except "partial", above).',
   'Write distractors in the same language and script as the `answer`. An option in another language is spotted without being read.',

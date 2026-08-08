@@ -28,6 +28,9 @@ const card = (over: Partial<QuizCardSource> = {}): QuizCardSource => ({
   promptText: 'osmosis',
   answerText: 'water moving across a semipermeable membrane',
   extraFields: [],
+  // No deck-mates by default, so a test that supplies too few distractors still fails on
+  // `too_few_distractors` rather than being quietly topped up.
+  fillers: [],
   crossLingual: false,
   ...over,
 })
@@ -130,7 +133,7 @@ const threeGood = [
 ]
 
 /** An EASY band: no near-misses at all, which is what makes a first-encounter quiz possible. */
-const EASY = { level: 1, nearRequired: 0, optionCount: 4, allowedFlaws: [] as const }
+const EASY = { level: 1, nearRequired: 0, nearMax: 0, optionCount: 4, allowedFlaws: [] as const }
 const threeFar = [
   { text: 'the boiling point of mercury', flaw: 'unrelated' },
   { text: 'a kind of sedimentary rock', flaw: 'unrelated' },
@@ -706,7 +709,7 @@ describe('difficulty bands', () => {
   it('builds as many options as the band asks for', () => {
     // The option count is a band property (2..6), not a constant. A six-option question needs
     // five distractors, and the correct answer still lands at a position the model cannot see.
-    const six = { level: 9, nearRequired: 5, optionCount: 6, allowedFlaws: [] as const }
+    const six = { level: 9, nearRequired: 5, nearMax: 5, optionCount: 6, allowedFlaws: [] as const }
     const five = [
       { text: 'water moving through an impermeable solid wall', flaw: 'adjacent_sense' },
       { text: 'a semipermeable membrane moving across water', flaw: 'opposite' },
@@ -727,11 +730,61 @@ describe('difficulty bands', () => {
 
   it('honours a band that restricts which flaws may be used', () => {
     const lookalikeOnly = {
-      level: 7, nearRequired: 3, optionCount: 4, allowedFlaws: ['plausible_form'] as const,
+      level: 7, nearRequired: 3, nearMax: 3, optionCount: 4, allowedFlaws: ['plausible_form'] as const,
     }
     const out = validateMultipleChoiceGeneration(mcq(threeGood), [card()], itemId, lookalikeOnly)
 
     expect(out.items).toEqual([])
     expect(out.dropped.map((d) => d.reason)).toContain('wrong_difficulty_mix')
+  })
+})
+
+describe('filling the FAR slots from the deck', () => {
+  // The model is asked only for the NEAR distractors it is good at. Asked for a deliberately
+  // unrelated wrong answer it returns another near-miss instead — at every phrasing tried,
+  // which dropped every item on bands 1 and 2 before this existed.
+  const MEDIUM = { level: 2, nearRequired: 0, nearMax: 1, optionCount: 4, allowedFlaws: [] as const }
+  const withDeck = (fillers: string[]) => card({ fillers })
+
+  it('tops a short batch up from the deck', () => {
+    const out = validateMultipleChoiceGeneration(
+      mcq([{ text: 'water through a solid wall of similar length here', flaw: 'adjacent_sense' }]),
+      [withDeck(['the boiling point of mercury at sea level', 'a kind of sedimentary rock formation'])],
+      itemId, MEDIUM,
+    )
+
+    expect(out.items).toHaveLength(1)
+    const item = out.items[0]
+    if (item.type !== 'multiple_choice') throw new Error('unreachable')
+    expect(item.options).toHaveLength(4)
+    // One near-miss from the model, two from the deck — which is what the band asked for.
+    expect(item.flaws.filter((f) => f === 'right_category_wrong_item')).toHaveLength(2)
+  })
+
+  it('never fills with the answer itself, or a duplicate', () => {
+    const answer = 'water moving across a semipermeable membrane'
+    const out = validateMultipleChoiceGeneration(
+      mcq([{ text: 'water through a solid wall of similar length here', flaw: 'adjacent_sense' }]),
+      [withDeck([answer, 'a kind of sedimentary rock formation',
+                 'a kind of sedimentary rock formation', 'the boiling point of mercury today'])],
+      itemId, MEDIUM,
+    )
+
+    const item = out.items[0]
+    if (item?.type !== 'multiple_choice') throw new Error('unreachable')
+    expect(new Set(item.options).size).toBe(4)
+    expect(item.options.filter((o) => o === answer)).toHaveLength(1)  // the correct one only
+  })
+
+  it('still drops the item when the deck cannot fill it either', () => {
+    // A two-card deck has nothing to spare, and a three-option question is not the question
+    // the learner was quoted for.
+    const out = validateMultipleChoiceGeneration(
+      mcq([{ text: 'water through a solid wall of similar length here', flaw: 'adjacent_sense' }]),
+      [withDeck([])], itemId, MEDIUM,
+    )
+
+    expect(out.items).toEqual([])
+    expect(out.dropped.map((d) => d.reason)).toContain('too_few_distractors')
   })
 })

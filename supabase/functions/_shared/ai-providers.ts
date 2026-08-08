@@ -12,12 +12,27 @@
 //   AI_GENERATION_BASE_URL      override baseUrl (e.g. a custom/self-hosted endpoint)
 //   AI_GENERATION_MODEL         text model    (default per provider below)
 //   AI_VISION_MODEL             vision model  (Phase 1; falls back to text model)
+//   AI_GENERATION_MODEL_FALLBACKS  comma-separated models to try when the primary is
+//                                  DAILY-exhausted (see resolveModelChain)
 
 export interface ProviderDef {
   baseUrl: string
   // Sensible default models for this provider (overridable via env).
   textModel: string
   visionModel: string
+  /**
+   * Models to fall back to when the primary is exhausted for the DAY.
+   *
+   * Free-tier quotas are per MODEL, not per project — `gemini-2.5-flash-lite` running out
+   * says nothing about `gemini-2.5-flash`. Without a chain, one model's daily cap takes
+   * every AI feature down until midnight; with it, the feature degrades to a different
+   * model instead of stopping.
+   *
+   * Ordered cheapest-first among the acceptable ones, because a fallback is charged at its
+   * own rate and the learner has already been quoted a price.
+   */
+  textFallbacks?: string[]
+  visionFallbacks?: string[]
 }
 
 // Add a provider = add one entry. All are OpenAI-compatible.
@@ -26,6 +41,8 @@ export const PROVIDERS: Record<string, ProviderDef> = {
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai',
     textModel: 'gemini-2.5-flash-lite',
     visionModel: 'gemini-2.5-flash',
+    textFallbacks: ['gemini-2.0-flash-lite', 'gemini-2.0-flash', 'gemini-2.5-flash'],
+    visionFallbacks: ['gemini-2.0-flash', 'gemini-2.5-flash-lite'],
   },
   xai: {
     baseUrl: 'https://api.x.ai/v1',
@@ -64,6 +81,37 @@ type EnvGetter = (key: string) => string | undefined
 
 // Pure resolver (env injected → unit-testable). Returns null when no usable
 // key/baseUrl, so the handler can answer 503 instead of calling a dead endpoint.
+/**
+ * The primary model, then the ones to try if it is exhausted for the day.
+ *
+ * Same key and base URL throughout — only the model name changes, because the quota that
+ * ran out is scoped to the model. `AI_GENERATION_MODEL_FALLBACKS` overrides the provider's
+ * defaults without a deploy; setting it empty disables the chain entirely.
+ *
+ * Duplicates are removed and the primary can never appear twice, so a misconfigured env
+ * cannot make the handler retry the exhausted model.
+ */
+export function resolveModelChain(purpose: Purpose, env: EnvGetter): ResolvedModel[] {
+  const head = resolveModel(purpose, env)
+  if (!head) return []
+
+  const provider = (env('AI_GENERATION_PROVIDER') || DEFAULT_PROVIDER).trim()
+  const def = PROVIDERS[provider]
+  const raw = env('AI_GENERATION_MODEL_FALLBACKS')
+  const configured = raw !== undefined
+    ? raw.split(',').map((m) => m.trim()).filter(Boolean)
+    : (purpose === 'vision' ? def?.visionFallbacks : def?.textFallbacks) ?? []
+
+  const seen = new Set([head.model])
+  const chain = [head]
+  for (const model of configured) {
+    if (seen.has(model)) continue
+    seen.add(model)
+    chain.push({ ...head, model })
+  }
+  return chain
+}
+
 export function resolveModel(purpose: Purpose, env: EnvGetter): ResolvedModel | null {
   const provider = (env('AI_GENERATION_PROVIDER') || DEFAULT_PROVIDER).trim()
   const def = PROVIDERS[provider]

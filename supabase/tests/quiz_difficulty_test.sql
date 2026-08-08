@@ -31,8 +31,8 @@ DECLARE
 BEGIN
   -- ── The ceiling is gone ───────────────────────────────────────────────────
   -- 197 shipped CHECK (level BETWEEN 1 AND 9). Ten was impossible; a hundred was absurd.
-  INSERT INTO quiz_difficulty_levels (level, near_required, option_count, sort_order)
-    VALUES (10, 2, 4, 10), (42, 0, 2, 42), (100, 5, 6, 100);
+  INSERT INTO quiz_difficulty_levels (level, near_required, near_max, option_count, sort_order)
+    VALUES (10, 2, 3, 4, 10), (42, 0, 1, 2, 42), (100, 5, 5, 6, 100);
 
   SELECT count(*) INTO v_n FROM quiz_difficulty_levels WHERE level > 9;
   IF v_n <> 3 THEN RAISE EXCEPTION 'FAIL: high band numbers were rejected (% inserted)', v_n; END IF;
@@ -40,7 +40,7 @@ BEGIN
   -- ── The axes are wide enough for them to differ ───────────────────────────
   -- With near_required alone there are only four distinguishable bands, so a hundred levels
   -- would be ninety-six duplicates. option_count and allowed_flaws are what make them real.
-  SELECT count(DISTINCT (near_required, option_count, allowed_flaws))
+  SELECT count(DISTINCT (near_required, near_max, option_count, allowed_flaws))
     INTO v_n FROM quiz_difficulty_levels;
   IF v_n < 5 THEN
     RAISE EXCEPTION 'FAIL: only % distinguishable band configurations exist', v_n;
@@ -48,9 +48,17 @@ BEGIN
 
   -- near_required cannot exceed the distractors the band actually has.
   BEGIN
-    INSERT INTO quiz_difficulty_levels (level, near_required, option_count, sort_order)
-      VALUES (11, 4, 4, 11);   -- 4 options = 3 distractors
+    INSERT INTO quiz_difficulty_levels (level, near_required, near_max, option_count, sort_order)
+      VALUES (11, 4, 4, 4, 11);   -- 4 options = 3 distractors
     RAISE EXCEPTION 'FAIL: a band demanded more near-misses than it has distractors';
+  EXCEPTION WHEN check_violation THEN NULL;
+  END;
+
+  -- A band whose minimum exceeds its maximum is not a band.
+  BEGIN
+    INSERT INTO quiz_difficulty_levels (level, near_required, near_max, option_count, sort_order)
+      VALUES (12, 3, 1, 4, 12);
+    RAISE EXCEPTION 'FAIL: a band with min > max was accepted';
   EXCEPTION WHEN check_violation THEN NULL;
   END;
 
@@ -110,7 +118,7 @@ BEGIN
 
   r := public.create_quiz_set(v_deck, 'high band', 'mcq', 3, 'en', 'deck', '{}', '{}', 100::smallint);
   IF (r->>'difficulty')::int <> 100 OR (r->>'option_count')::int <> 6
-     OR (r->>'near_required')::int <> 5 THEN
+     OR (r->>'near_required')::int <> 5 OR (r->>'near_max')::int <> 5 THEN
     RAISE EXCEPTION 'FAIL: band 100 did not travel into the set: %', r;
   END IF;
 
@@ -154,7 +162,38 @@ BEGIN
   r := public.submit_quiz_answer((q->'items'->0->>'item_id')::uuid, jsonb_build_object('choice', 5));
   IF (r->>'score') IS NULL THEN RAISE EXCEPTION 'FAIL: choice 5 was not gradeable'; END IF;
 
-  RAISE NOTICE 'quiz_difficulty_test: bands scale, retire, default from data, and run at 6 options';
+  -- ── The easy band builds itself, free, and only the easy band ────────────
+  -- A model will not write a deliberately unrelated wrong answer; other cards in the deck
+  -- are exactly that by construction, in the right language, at no cost.
+  r := public.create_quiz_set(v_deck, 'easy', 'mcq', 3, 'ko', 'deck', '{}', '{}', 1::smallint);
+  q := public.build_deck_mate_quiz((r->>'set_id')::uuid);
+  IF (q->>'persisted')::int <> 3 THEN
+    RAISE EXCEPTION 'FAIL: deck-mate build produced % questions', q->>'persisted';
+  END IF;
+  IF (q->>'price_micro')::int <> 0 THEN
+    RAISE EXCEPTION 'FAIL: the easy band was charged %', q->>'price_micro';
+  END IF;
+
+  -- Every option is a real answer from the deck, and the right one is among them.
+  v_run := (public.start_quiz_run((r->>'set_id')::uuid)->>'run_id')::uuid;
+  q := public.get_quiz_run_items(v_run);
+  IF jsonb_array_length(q->'items'->0->'options') <> 4 THEN
+    RAISE EXCEPTION 'FAIL: deck-mate question had % options', jsonb_array_length(q->'items'->0->'options');
+  END IF;
+  IF q::text LIKE '%correct_index%' THEN
+    RAISE EXCEPTION 'FAIL: deck-mate build leaked the answer key';
+  END IF;
+
+  -- A band that PERMITS near-misses must not be built this way — it would hand the learner
+  -- an easier quiz than the one they chose.
+  r := public.create_quiz_set(v_deck, 'hard', 'mcq', 3, 'ko', 'deck', '{}', '{}', 3::smallint);
+  BEGIN
+    PERFORM public.build_deck_mate_quiz((r->>'set_id')::uuid);
+    RAISE EXCEPTION 'FAIL: a near-miss band was built from deck-mates';
+  EXCEPTION WHEN invalid_parameter_value THEN NULL;
+  END;
+
+  RAISE NOTICE 'quiz_difficulty_test: bands scale, retire, default from data, run at 6 options, and the easy band builds itself free';
 END;
 $$;
 

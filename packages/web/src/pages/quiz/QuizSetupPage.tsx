@@ -67,12 +67,15 @@ export function QuizSetupPage() {
 
   useEffect(() => refreshQuote(), [refreshQuote])
 
+  // An easy multiple-choice band is built from deck-mates: no model, no charge. The screen
+  // must say so, or it quotes a price that is never taken.
+  const freeBand = type === 'mcq' && bands.find((b) => b.level === difficulty)?.near_max === 0
   const eligible = shownCounts?.eligible ?? 0
   // Multiple choice needs three other cards to draw plausible distractors from. Blocking here
   // is kinder than letting the server refuse after the learner has picked everything.
   const tooFewForMcq = type === 'mcq' && eligible > 0 && eligible < 4
   const canSubmit = Boolean(deckId) && eligible > 0 && !tooFewForMcq && !generating
-    && priced !== null && priced.sufficient
+    && priced !== null && (freeBand || priced.sufficient)
 
   const submit = async () => {
     if (!priced || !deckId) return
@@ -221,6 +224,7 @@ export function QuizSetupPage() {
               {t('setup.covered', { units: priced.trial_units + priced.free_units })}
             </p>
           )}
+          {freeBand && <p className="text-xs text-brand">{t('setup.easyBandFree')}</p>}
           <p className="text-xs text-content-tertiary">{t('setup.retakeFree')}</p>
           {!priced.sufficient && (
             <p className="text-xs text-destructive">{t('error.AI_INSUFFICIENT_CREDITS')}</p>
