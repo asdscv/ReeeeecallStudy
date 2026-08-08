@@ -50,7 +50,8 @@
     "retakeFree": "Repetirlo no cuesta nada.",
     "confirm": "Crear cuestionario",
     "generating": "Escribiendo preguntas…",
-    "difficulty": "Dificultad"
+    "difficulty": "Dificultad",
+    "easyBandFree": "Este nivel se construye con tu propio mazo: sin IA y sin coste."
   },
   "run": {
     "loading": "Cargando…",
