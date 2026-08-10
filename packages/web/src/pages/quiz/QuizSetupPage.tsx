@@ -40,7 +40,9 @@ export function QuizSetupPage() {
   // Listed from the server, never enumerated here: a band is a row, so a new one appears
   // without a deploy. The default is the hardest, which is what the feature shipped as.
   const [bands, setBands] = useState<QuizDifficultyBand[]>([])
-  const [difficulty, setDifficulty] = useState(3)
+  // No initial level. Until the learner picks one, the band is whichever row the server
+  // marked `is_default` — hardcoding 3 here overrode that silently on every fresh screen.
+  const [difficulty, setDifficulty] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => { void fetchDecks() }, [fetchDecks])
@@ -67,15 +69,22 @@ export function QuizSetupPage() {
 
   useEffect(() => refreshQuote(), [refreshQuote])
 
-  // An easy multiple-choice band is built from deck-mates: no model, no charge. The screen
-  // must say so, or it quotes a price that is never taken.
-  const freeBand = type === 'mcq' && bands.find((b) => b.level === difficulty)?.near_max === 0
+  // Only the bands that have guidance for the chosen type. A band without it is refused by
+  // `create_quiz_set` (P0013) rather than defaulted, so offering it would be offering a
+  // button that errors.
+  const usableBands = bands.filter((b) => !b.types || b.types.includes(type))
+  // Switching type can strip the chosen band. Derived rather than corrected in an effect —
+  // a setState inside an effect is a cascading render, and the fallback is the band the
+  // server marked default.
+  const activeBand = difficulty !== null && usableBands.some((b) => b.level === difficulty)
+    ? difficulty
+    : (usableBands.find((b) => b.is_default) ?? usableBands[0])?.level ?? null
   const eligible = shownCounts?.eligible ?? 0
   // Multiple choice needs three other cards to draw plausible distractors from. Blocking here
   // is kinder than letting the server refuse after the learner has picked everything.
   const tooFewForMcq = type === 'mcq' && eligible > 0 && eligible < 4
   const canSubmit = Boolean(deckId) && eligible > 0 && !tooFewForMcq && !generating
-    && priced !== null && (freeBand || priced.sufficient)
+    && priced !== null && priced.sufficient
 
   const submit = async () => {
     if (!priced || !deckId) return
@@ -88,7 +97,9 @@ export function QuizSetupPage() {
         questionType: type,
         count: Math.min(count, eligible),
         locale: i18n.language.split('-')[0],
-        difficulty,
+        // May be null before the band list has loaded; the server then applies its own
+        // default rather than being handed a guess.
+        difficulty: activeBand ?? undefined,
         maxPriceMicro: priced.price_micro,
       })
       navigate(`/quiz?created=${setId}`)
@@ -180,20 +191,29 @@ export function QuizSetupPage() {
               </button>
             ))}
           </div>
+          {/* The submit clamps to `eligible`, and on a deck smaller than the smallest chip every
+              chip is disabled — so the screen showed a count nobody could change and then quietly
+              made a different number. Say the real number instead. */}
+          {eligible > 0 && eligible < count && (
+            <p className="text-xs text-content-tertiary mt-1">
+              {t('setup.clampedCount', { count: eligible })}
+            </p>
+          )}
         </div>
 
-        {/* Only multiple choice has distractors, so only multiple choice has a band. */}
-        {type === 'mcq' && bands.length > 0 && (
+        {/* Every type has a band since mig 202: difficulty is an instruction the band
+            carries per question type, not a count of near-miss options. */}
+        {usableBands.length > 0 && (
           <div>
             <span className="text-xs text-content-tertiary">{t('setup.difficulty')}</span>
             <div className="flex gap-2 mt-1">
-              {bands.map((band) => (
+              {usableBands.map((band) => (
                 <button
                   key={band.level}
                   type="button"
                   onClick={() => setDifficulty(band.level)}
                   className={`px-3 py-1.5 text-sm rounded-lg border cursor-pointer transition-colors ${
-                    difficulty === band.level
+                    activeBand === band.level
                       ? 'bg-brand text-white border-brand'
                       : 'bg-background text-foreground border-border hover:border-brand/40'
                   }`}
@@ -202,7 +222,7 @@ export function QuizSetupPage() {
                 </button>
               ))}
             </div>
-            <p className="text-xs text-content-tertiary mt-1">{t(`difficultyHint.${difficulty}`, { defaultValue: '' })}</p>
+            <p className="text-xs text-content-tertiary mt-1">{t(`difficultyHint.${type}.${activeBand}`, { defaultValue: '' })}</p>
           </div>
         )}
 
@@ -224,7 +244,6 @@ export function QuizSetupPage() {
               {t('setup.covered', { units: priced.trial_units + priced.free_units })}
             </p>
           )}
-          {freeBand && <p className="text-xs text-brand">{t('setup.easyBandFree')}</p>}
           <p className="text-xs text-content-tertiary">{t('setup.retakeFree')}</p>
           {!priced.sufficient && (
             <p className="text-xs text-destructive">{t('error.AI_INSUFFICIENT_CREDITS')}</p>

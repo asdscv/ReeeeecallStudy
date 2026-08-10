@@ -837,14 +837,18 @@ Deno.serve(async (req) => {
 
         // Resolved from the band the SET recorded, never from the request body: the learner
         // picked it at creation time, and a later call must not be able to quietly change it.
+        // Every type, not just multiple choice. Difficulty used to mean "how many wrong
+        // options are near-misses", which short answer and essay do not have — so the two
+        // types we actually charge for had no difficulty at all.
         let difficulty: QuizDifficulty = DEFAULT_DIFFICULTY
-        if (qType === 'mcq') {
+        {
           const bandResult = await service.from('quiz_difficulty_levels')
-            .select('level, near_required, near_max, option_count, allowed_flaws')
+            .select('level, near_required, near_max, option_count, allowed_flaws, guidance')
             .eq('level', quizSet.difficulty).maybeSingle()
           const band = bandResult.data as {
             level: number; near_required: number; near_max: number
             option_count: number; allowed_flaws: string[]
+            guidance: Record<string, string> | null
           } | null
           if (band) {
             difficulty = {
@@ -856,13 +860,20 @@ Deno.serve(async (req) => {
               // not know would restrict the band to nothing and drop every item, which reads
               // as a model failure instead of a typo in a config row.
               allowedFlaws: (band.allowed_flaws ?? []).filter(isMcqDistractorFlaw),
+              // The band's instruction for THIS type. `create_quiz_set` already refused a
+              // type the band has no guidance for, so a missing one here is a config change
+              // mid-flight rather than a state a learner can reach.
+              guidance: band.guidance?.[qType],
             }
           }
         }
 
-        const prompt = qType === 'mcq' ? buildMcqGenerationPrompt(sources, difficulty)
-          : qType === 'short' ? buildShortAnswerGenerationPrompt(sources)
-          : buildEssayGenerationPrompt(sources)
+        // `content_locale` is the UI language at creation time. It settles ONE thing: which
+        // side of a cross-lingual card the question addresses the learner in.
+        const uiLocale = quizSet.content_locale
+        const prompt = qType === 'mcq' ? buildMcqGenerationPrompt(sources, difficulty, uiLocale)
+          : qType === 'short' ? buildShortAnswerGenerationPrompt(sources, difficulty, uiLocale)
+          : buildEssayGenerationPrompt(sources, difficulty, uiLocale)
         const generated = await generate(chain, prompt.systemPrompt, prompt.userPrompt)
 
         const makeItemId = (cardId: string, index: number) => `${setId}:${cardId}:${index}`
@@ -876,6 +887,12 @@ Deno.serve(async (req) => {
         // ever tell us a prompt change made distractors worse.
         if (outcome.dropped.length > 0) {
           console.warn('[ai-generate] quiz drops:', JSON.stringify(outcome.dropped))
+        }
+        // Advisory, never fatal. A band whose instruction has stopped working shows up here
+        // instead of only to someone reading the questions.
+        const offBand = outcome.items.filter((i) => 'offBand' in i && i.offBand).length
+        if (offBand > 0) {
+          console.warn(`[ai-generate] band ${difficulty.level}: ${offBand}/${outcome.items.length} items outside the advisory near range`)
         }
         // Fewer than half the requested items is not a quiz worth charging for.
         if (!outcome.servable) {

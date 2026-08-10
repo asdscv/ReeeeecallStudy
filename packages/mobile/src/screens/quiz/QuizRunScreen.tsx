@@ -7,6 +7,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
 import {
   useQuizStore, QuizError, QUIZ_GRADE_ACTION, type QuizSubmitResult,
+  optionFlaws,
 } from '@reeeeecall/shared/stores/quiz-store'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { Screen, Button, EmptyState } from '../../components/ui'
@@ -124,6 +125,7 @@ export function QuizRunScreen() {
   if (!item) return null
 
   const answered = item.answered || result !== null
+  const flaws = optionFlaws(item)
   const isLast = index === items.length - 1
 
   return (
@@ -149,9 +151,12 @@ export function QuizRunScreen() {
           {item.question_type === 'mcq' && item.options?.map((option, optionIndex) => {
             const isCorrect = answered && result?.correct_display_index === optionIndex
             const isPicked = choice === optionIndex
+            // Only after answering, and only a closed label the model chose from — never
+            // model prose. Aligned with the shuffle by `get_quiz_run_items` (mig 203).
+            const flaw = answered && !isCorrect ? flaws[optionIndex] : null
             return (
+              <View key={optionIndex}>
               <Pressable
-                key={optionIndex}
                 disabled={answered}
                 onPress={() => setChoice(optionIndex)}
                 style={[styles.option, {
@@ -162,6 +167,12 @@ export function QuizRunScreen() {
               >
                 <Text style={[theme.typography.body, { color: theme.colors.text }]}>{option}</Text>
               </Pressable>
+              {flaw ? (
+                <Text style={[theme.typography.caption, styles.flaw, { color: theme.colors.textSecondary }]}>
+                  {t(`flaw.${flaw}`, { defaultValue: '' })}
+                </Text>
+              ) : null}
+              </View>
             )
           })}
 
@@ -185,7 +196,9 @@ export function QuizRunScreen() {
           {answered && item.score !== null && (
             <View style={[styles.stem, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
               <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-                {t('run.scored', { score: Math.round((item.score ?? 0) * 100) })}
+                {/* Percent, matching the result screen — the same 0.1 read "10점" here and
+                    "10%" there. */}
+                {t('result.percent', { percent: Math.round((item.score ?? 0) * 100) })}
               </Text>
               {item.reference_answer && (
                 <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
@@ -215,20 +228,28 @@ export function QuizRunScreen() {
               disabled={item.question_type === 'mcq' ? choice === null : text.trim() === ''}
               {...testProps('quiz-submit')}
             />
-          ) : item.question_type !== 'mcq' && item.score === null ? (
-            // A separate, priced gesture. Submitting recorded the answer for free; paying to
-            // have it judged is the learner's call, and the price is on the button.
-            <Button
-              title={grading ? t('run.grading')
-                : t('run.gradeFor', { price: shownPrice === 0 ? t('setup.free') : formatUsdMicro(shownPrice ?? 0) })}
-              onPress={() => void requestGrade()}
-              disabled={grading || shownPrice === null}
-              {...testProps('quiz-grade')}
-            />
-          ) : isLast ? (
-            <Button title={t('run.finish')} onPress={() => void finish()} {...testProps('quiz-finish')} />
           ) : (
-            <Button title={t('run.next')} onPress={() => goTo(index + 1)} {...testProps('quiz-next')} />
+            <>
+              {/* Grading sits BESIDE moving on, never instead of it. It used to REPLACE them,
+                  so a learner who submitted a short answer had exactly two buttons — pay, or
+                  leave — and on the last item no way to finish the run at all. Charging is a
+                  choice we offer; it must never be the only exit. */}
+              {item.question_type !== 'mcq' && item.score === null && (
+                <Button
+                  title={grading ? t('run.grading')
+                    : t('run.gradeFor', { price: shownPrice === 0 ? t('setup.free') : formatUsdMicro(shownPrice ?? 0) })}
+                  onPress={() => void requestGrade()}
+                  disabled={grading || shownPrice === null}
+                  {...testProps('quiz-grade')}
+                />
+              )}
+              <Button
+                title={isLast ? t('run.finish') : t('run.next')}
+                variant={item.question_type !== 'mcq' && item.score === null ? 'secondary' : 'primary'}
+                onPress={() => (isLast ? void finish() : goTo(index + 1))}
+                {...testProps(isLast ? 'quiz-finish' : 'quiz-next')}
+              />
+            </>
           )}
         </View>
       </KeyboardAvoidingView>
@@ -242,6 +263,7 @@ const styles = StyleSheet.create({
   topBar: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12 },
   body: { paddingHorizontal: 16, gap: 10, paddingBottom: 24 },
   stem: { padding: 14, borderRadius: 12, borderWidth: 1, gap: 4 },
+  flaw: { marginTop: 4, marginLeft: 12, marginBottom: 4 },
   option: { padding: 12, borderRadius: 10, borderWidth: 1 },
   input: { padding: 12, borderRadius: 10, borderWidth: 1, textAlignVertical: 'top' },
   footer: { padding: 16 },
