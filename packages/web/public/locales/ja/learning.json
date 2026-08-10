@@ -240,5 +240,13 @@
     "eta": "完了まで約{{count, number}}日",
     "eta_one": "完了まで約{{count, number}}日",
     "eta_other": "完了まで約{{count, number}}日"
+  },
+  "check": {
+    "title_one": "今日の{{count, number}}枚、本当に覚えたか確認",
+    "title_other": "今日の{{count, number}}枚、本当に覚えたか確認",
+    "body": "答えを自分で入力します。答えは見られません。",
+    "start": "確認する（約2分）",
+    "starting": "準備中…",
+    "free": "正解は無料で採点されます。判定が必要な解答だけ費用がかかります。"
   }
 }

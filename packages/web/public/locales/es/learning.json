@@ -240,5 +240,13 @@
     "eta": "quedan unos {{count, number}} días",
     "eta_one": "queda 1 día",
     "eta_other": "quedan unos {{count, number}} días"
+  },
+  "check": {
+    "title_one": "{{count, number}} tarjeta de hoy: ¿de verdad la sabes?",
+    "title_other": "{{count, number}} tarjetas de hoy: ¿de verdad las sabes?",
+    "body": "Escribe la respuesta de memoria. Sin mirar.",
+    "start": "Comprobar (unos 2 min)",
+    "starting": "Preparando…",
+    "free": "Las respuestas correctas se corrigen gratis. Solo pagas las que hay que juzgar."
   }
 }

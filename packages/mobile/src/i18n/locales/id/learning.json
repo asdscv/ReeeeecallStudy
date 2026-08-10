@@ -241,5 +241,13 @@
     "eta": "sekitar {{count, number}} hari lagi",
     "eta_one": "sekitar {{count, number}} hari lagi",
     "eta_other": "sekitar {{count, number}} hari lagi"
+  },
+  "check": {
+    "title_one": "{{count, number}} kartu hari ini — benar-benar hafal?",
+    "title_other": "{{count, number}} kartu hari ini — benar-benar hafal?",
+    "body": "Ketik jawabannya dari ingatan. Tidak boleh mengintip.",
+    "start": "Periksa (sekitar 2 menit)",
+    "starting": "Menyiapkan…",
+    "free": "Jawaban benar dinilai gratis. Anda hanya membayar yang perlu dinilai."
   }
 }

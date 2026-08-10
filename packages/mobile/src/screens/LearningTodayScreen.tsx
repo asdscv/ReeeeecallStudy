@@ -21,6 +21,7 @@ import {
   parseNewCardsPerDay, DEFAULT_NEW_CARDS_PER_DAY,
 } from '@reeeeecall/shared/learning/application/cadence'
 import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
+import { useQuizStore } from '@reeeeecall/shared/stores/quiz-store'
 import { useStudy } from '../hooks/useStudy'
 import type { AIStackParamList } from '../navigation/types'
 
@@ -54,6 +55,91 @@ import type { AIStackParamList } from '../navigation/types'
  * And because a phone screen is usually resumed rather than opened, the plan date is kept
  * live instead of being frozen at mount — see `planDate` below.
  */
+
+/**
+ * 오늘의 확인 — the first thing in this app that asks whether the learner was RIGHT.
+ *
+ * Everything the plan records today is the learner grading themselves: every activity is
+ * `recall`/`self_rate`, so the plan's numbers describe confidence, not knowledge. This adds
+ * the missing measurement without adding a cost to studying — the question is the card's own
+ * prompt and the reference is its own declared answer field, so nothing is generated, and an
+ * answer that matches is graded free by string comparison. Only a genuinely ambiguous answer
+ * reaches the paid grader.
+ *
+ * Renders nothing when there is nothing to check. A disabled button here would advertise a
+ * feature the learner cannot reach and cannot fix from this screen.
+ */
+function DailyCheckCard({ goalId }: { goalId: string }) {
+  const { t } = useTranslation('learning')
+  const theme = useTheme()
+  const navigation = useNavigation<NavigationProp<SettingsStackParamList>>()
+  const { countDailyCheck, buildDailyCheck, startRun } = useQuizStore()
+  const [counts, setCounts] = useState<{ studiedToday: number; checkable: number } | null>(null)
+  const [busy, setBusy] = useState(false)
+  const timezone = currentPlanContext().timezone
+
+  useEffect(() => {
+    let cancelled = false
+    void countDailyCheck(timezone)
+      .then((value) => { if (!cancelled) setCounts(value) })
+      .catch(() => { if (!cancelled) setCounts(null) })
+    return () => { cancelled = true }
+  }, [countDailyCheck, timezone, goalId])
+
+  if (!counts || counts.checkable === 0) return null
+
+  const start = async () => {
+    setBusy(true)
+    try {
+      const setId = await buildDailyCheck({ goalId, timezone })
+      const runId = await startRun(setId)
+      // The check runs in the quiz stack — same runner, same screens. `getParent` is how a
+      // screen in one drawer stack hands off to another without importing its navigator.
+      // The check runs in the quiz stack — same runner, same screens. `getParent` is how a
+      // screen in one drawer stack hands off to another without importing its navigator.
+      // Cast once at the boundary: the drawer's param list is not visible from here, and
+      // spelling it out would mean importing the navigator this screen deliberately does not.
+      const parent = navigation.getParent() as unknown as
+        { navigate: (name: string, params?: unknown) => void } | undefined
+      parent?.navigate('QuizTab', { screen: 'QuizRun', params: { runId } })
+    } catch {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <View style={[styles.card, {
+      backgroundColor: theme.colors.surfaceElevated,
+      borderColor: theme.colors.primary,
+      marginTop: 12,
+    }]}>
+      <Text style={[theme.typography.label, { color: theme.colors.text }]}>
+        {t('check.title', { count: counts.checkable })}
+      </Text>
+      <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 2 }]}>
+        {t('check.body')}
+      </Text>
+      <TouchableOpacity
+        onPress={() => void start()}
+        disabled={busy}
+        style={[styles.checkButton, { backgroundColor: theme.colors.primary }, busy && styles.disabled]}
+        accessibilityRole="button"
+        {...testProps('daily-check-start')}
+      >
+        <Text style={[theme.typography.label, { color: '#fff' }]}>
+          {busy ? t('check.starting') : t('check.start')}
+        </Text>
+      </TouchableOpacity>
+      {/* The price rule, said before they start rather than after they are billed. */}
+      <Text style={[theme.typography.caption, {
+        color: theme.colors.textTertiary, marginTop: 6, textAlign: 'center',
+      }]}>
+        {t('check.free')}
+      </Text>
+    </View>
+  )
+}
+
 /** Deck names printed before the count takes over. Three fits one line on a narrow phone. */
 const DECK_NAMES_SHOWN = 3
 
@@ -570,6 +656,8 @@ export function LearningTodayScreen() {
                   {t('today.budget', { count: goal.daily_minutes })}
                   {plan ? ` · ${t('today.progress', { done: plan.completed_items, total: plan.total_items })}` : ''}
                 </Text>
+
+                <DailyCheckCard goalId={goal.id} />
               </View>
             )}
 
@@ -950,4 +1038,5 @@ const styles = StyleSheet.create({
   attemptSection: { gap: 6, marginTop: 6 },
   attemptHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   disabled: { opacity: 0.5 },
+  checkButton: { marginTop: 10, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
 })
