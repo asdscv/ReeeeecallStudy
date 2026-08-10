@@ -82,6 +82,14 @@ export function QuizHomeScreen() {
                 <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
                   {t(`type.${item.question_type}`)} · {t('home.questions', { count: item.generated_count })} · {t('home.retakeFree')}
                 </Text>
+                {/* Under-delivery, said out loud. Dropped items are never charged for, so asking
+                    for 6 and getting 4 is a normal outcome — but the set previously just read
+                    "4 questions", indistinguishable from having asked for 4. */}
+                {item.generated_count > 0 && item.generated_count < item.requested_count && (
+                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                    {t('home.fewerThanAsked', { requested: item.requested_count })}
+                  </Text>
+                )}
               </View>
               <Pressable
                 onPress={() => void take(item)}

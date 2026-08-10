@@ -22,7 +22,8 @@
       "title": "Belum ada kuis",
       "body": "Buat dari dek mana pun, hanya perlu beberapa detik."
     },
-    "pricingNote": "{{price}} per unit. Pilihan ganda selalu dinilai gratis."
+    "pricingNote": "{{price}} per unit. Pilihan ganda selalu dinilai gratis.",
+    "fewerThanAsked": "diminta {{requested, number}}"
   },
   "setup": {
     "title": "Kuis baru",
@@ -50,7 +51,9 @@
     "retakeFree": "Mengerjakan ulang tidak dikenakan biaya.",
     "confirm": "Buat kuis",
     "generating": "Menyusun soal…",
-    "difficulty": "Tingkat kesulitan"
+    "difficulty": "Tingkat kesulitan",
+    "clampedCount_one": "Dek ini menghasilkan {{count, number}} soal.",
+    "clampedCount_other": "Dek ini menghasilkan {{count, number}} soal."
   },
   "run": {
     "loading": "Memuat…",
@@ -67,7 +70,6 @@
     "finish": "Selesai",
     "grading": "Menilai…",
     "gradeFor": "Nilai jawaban ini · {{price}}",
-    "scored": "Nilai {{score, number}}%",
     "reference": "Jawaban: {{answer}}"
   },
   "result": {
@@ -79,7 +81,9 @@
     "ungraded": "Belum dinilai",
     "markCorrect": "Saya benar",
     "markWrong": "Saya salah",
-    "retake": "Kerjakan lagi"
+    "retake": "Kerjakan lagi",
+    "nothingGraded": "Belum dinilai",
+    "nothingGradedBody": "Belum ada jawaban yang dinilai di sesi ini."
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "Saldo tidak cukup. Isi ulang untuk melanjutkan.",
@@ -137,13 +141,24 @@
     "1": "Mudah",
     "2": "Sedang",
     "3": "Sulit",
-    "label": "Tingkat kesulitan",
-    "generic": "Level {{level, number}}"
+    "generic": "Tingkat {{level, number}}"
   },
   "difficultyHint": {
-    "1": "Pilihan salah datang dari bidang yang sama sekali lain — mengenali topiknya sudah cukup.",
-    "2": "Hanya satu dari tiga yang benar-benar menjebak; dua lainnya jauh.",
-    "3": "Setiap pilihan salah nyaris benar. Anda harus benar-benar tahu jawabannya."
+    "mcq": {
+      "1": "Pilihan salah datang dari bidang yang sama sekali lain — mengenali topiknya sudah cukup.",
+      "2": "Hanya satu dari tiga yang benar-benar menjebak; dua lainnya jauh.",
+      "3": "Setiap pilihan salah nyaris benar. Anda harus benar-benar tahu jawabannya."
+    },
+    "short": {
+      "1": "Pertanyaan memberi tahu jenis jawaban yang diminta.",
+      "2": "Tanpa petunjuk tentang bentuk jawabannya.",
+      "3": "Ditanya dari sudut lain; mengenali kartu saja tidak cukup."
+    },
+    "essay": {
+      "1": "Jelaskan satu hal, dalam satu kalimat.",
+      "2": "Poin utama, plus satu detail pendukung dari kartu.",
+      "3": "Jelaskan, dan sebutkan di mana ia tidak lagi berlaku."
+    }
   },
   "flaw": {
     "opposite": "Kebalikannya",

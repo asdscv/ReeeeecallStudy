@@ -114,6 +114,7 @@ const GROUNDING = [
 export function buildMcqGenerationPrompt(
   sources: readonly QuizCardSource[],
   difficulty: QuizDifficulty = DEFAULT_DIFFICULTY,
+  uiLocale?: string,
 ) {
   const optionCount = Math.min(6, Math.max(2, difficulty.optionCount || 4))
   const distractorCount = optionCount - 1
@@ -128,7 +129,15 @@ export function buildMcqGenerationPrompt(
   // and the batch dies `partial_not_applicable` -> `too_few_distractors`. Observed on a
   // fallback model against a plain vocabulary deck.
   const anyMultiPart = sources.some((s) => answerParts(s.answerText).length > 1)
-  const flaws = bullets([
+  // A band that restricts its flaws restricts what the model is OFFERED, not just what it is
+  // graded on. Listing all seven and then asking for far ones loses: the vocabulary itself
+  // pulls toward near-misses, so band 1 got three other hand tools for `wrench` at every
+  // phrasing. Removing the near labels from the menu is the instruction that lands.
+  const permitted = difficulty.allowedFlaws?.length
+    ? new Set<string>(difficulty.allowedFlaws) : null
+  const allow = (line: string) => !permitted
+    || [...permitted].some((f) => line.startsWith(`"${f}"`))
+  const flaws = bullets(([
     '"opposite" — reverses the answer\'s direction or polarity. [NEAR]',
     '"adjacent_sense" — a close neighbour in meaning that this card\'s answer excludes. [NEAR]',
     '"right_category_wrong_item" — the same kind of thing, but not this one. [FAR]',
@@ -138,7 +147,7 @@ export function buildMcqGenerationPrompt(
     '"overgeneral" — true of a broader class, so not the answer to this prompt. [FAR]',
     '"plausible_form" — resembles the answer in spelling or sound without being it. [NEAR]',
     '"unrelated" — from a different subject area entirely; no relation to the answer. STILL WRITTEN IN THE ANSWER\'S OWN LANGUAGE AND SCRIPT — an option in another language is spotted without being read, and is rejected. [FAR]',
-  ])
+  ] as string[]).filter(allow))
 
   // Stated as a count, not as an adjective. "Make it easy" is interpreted; "exactly one of the
   // three is a near-miss" is followed — and it is checked afterwards either way.
@@ -183,6 +192,7 @@ ${bullets([
 export function buildShortAnswerGenerationPrompt(
   sources: readonly QuizCardSource[],
   difficulty: QuizDifficulty = DEFAULT_DIFFICULTY,
+  uiLocale?: string,
 ) {
   const angles = bullets([
     '"reverse" — quote the ANSWER text and ask what it corresponds to on the front of the card, worded the way a learner would ask it. Expected answer: the card\'s prompt.',
@@ -213,6 +223,9 @@ ${bullets([
   'Write TO a learner, never ABOUT the data. The words "prompt", "answer field", "card", "field", "otherFields" and "cardId" are our internal names for this JSON — a question containing one of them shows the learner our schema. This is checked; such a question is discarded.',
   'For "reverse", "cloze" and "field_probe" the question MUST contain its source text verbatim (the answer, the prompt, and the prompt respectively). This is checked too.',
   'Write the question in the same language as the text it quotes.',
+  ...(uiLocale
+    ? [`When a card is CROSS-LINGUAL — its two sides are in different languages, so quoting cannot decide — write the question frame in "${uiLocale}". The card still decides the content; this only settles which side the learner is being addressed in. A Korean learner working an English deck was being asked "What is the Korean word for X?" in English.`]
+    : []),
   'Ask for something the card can settle. Never ask for an opinion, a comparison with material outside the card, or anything the card does not state.',
   `Vary the angle across the batch: use at least two different angles, and use "restate" for at most half the items.`,
   `Keep the question under ${MAX_QUESTION_CHARS} characters, and short enough to read on a phone.`,
@@ -226,6 +239,7 @@ ${bullets([
 export function buildEssayGenerationPrompt(
   sources: readonly QuizCardSource[],
   difficulty: QuizDifficulty = DEFAULT_DIFFICULTY,
+  uiLocale?: string,
 ) {
   const aspects = bullets([
     '"covers_answer" — states what the card\'s answer states. REQUIRED on every card, exactly once, and must carry the highest weight.',

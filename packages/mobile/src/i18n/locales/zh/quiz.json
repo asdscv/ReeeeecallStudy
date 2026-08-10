@@ -22,7 +22,8 @@
       "title": "还没有测验",
       "body": "从任意牌组创建，只需几秒。"
     },
-    "pricingNote": "每单位 {{price}}。选择题始终免费批改。"
+    "pricingNote": "每单位 {{price}}。选择题始终免费批改。",
+    "fewerThanAsked": "请求 {{requested, number}} 题"
   },
   "setup": {
     "title": "新建测验",
@@ -50,7 +51,9 @@
     "retakeFree": "重做不会产生费用。",
     "confirm": "创建测验",
     "generating": "正在出题…",
-    "difficulty": "难度"
+    "difficulty": "难度",
+    "clampedCount_one": "这个卡组会生成 {{count, number}} 道题。",
+    "clampedCount_other": "这个卡组会生成 {{count, number}} 道题。"
   },
   "run": {
     "loading": "加载中…",
@@ -67,7 +70,6 @@
     "finish": "完成",
     "grading": "批改中…",
     "gradeFor": "批改这个答案 · {{price}}",
-    "scored": "得分 {{score, number}}%",
     "reference": "答案：{{answer}}"
   },
   "result": {
@@ -79,7 +81,9 @@
     "ungraded": "未批改",
     "markCorrect": "我答对了",
     "markWrong": "我答错了",
-    "retake": "再做一次"
+    "retake": "再做一次",
+    "nothingGraded": "未评分",
+    "nothingGradedBody": "本次作答还没有评分的题目。"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "余额不足。充值后即可继续。",
@@ -137,13 +141,24 @@
     "1": "简单",
     "2": "中等",
     "3": "困难",
-    "label": "难度",
     "generic": "第 {{level, number}} 级"
   },
   "difficultyHint": {
-    "1": "干扰项来自完全不同的领域，认出主题就能选对。",
-    "2": "三个里只有一个是真正的陷阱，另外两个相距很远。",
-    "3": "每个错误选项都很接近，必须真的知道答案。"
+    "mcq": {
+      "1": "干扰项来自完全不同的领域，认出主题就能选对。",
+      "2": "三个里只有一个是真正的陷阱，另外两个相距很远。",
+      "3": "每个错误选项都很接近，必须真的知道答案。"
+    },
+    "short": {
+      "1": "题目会告诉你该给出哪一类答案。",
+      "2": "不提示答案的形式，直接发问。",
+      "3": "换个角度提问，认出卡片还不够。"
+    },
+    "essay": {
+      "1": "用一句话解释一件事。",
+      "2": "要点，外加卡片中的一个佐证。",
+      "3": "解释它，并说明在哪里不再适用。"
+    }
   },
   "flaw": {
     "opposite": "相反",

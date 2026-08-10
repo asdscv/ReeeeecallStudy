@@ -27,7 +27,7 @@ import { fileURLToPath } from 'node:url'
 import {
   QUIZ_VERDICTS, QUIZ_GAPS, QUIZ_LEVELS, QUIZ_ASPECTS, QUIZ_FLAWS,
 } from '@reeeeecall/shared/lib/quiz-feedback'
-import { QUIZ_ERROR_CODES } from '@reeeeecall/shared/stores/quiz-store'
+import { QUIZ_ERROR_CODES, QUIZ_GENERATE_ACTION } from '@reeeeecall/shared/stores/quiz-store'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../../../..')
 const LOCALES = ['en', 'ko', 'ja', 'zh', 'vi', 'th', 'id', 'es'] as const
@@ -95,7 +95,18 @@ describe('every quiz grade label is translated', () => {
         // The seeded bands are the ones we chose to name; a new one may rely on the fallback.
         for (const lvl of SEEDED_LEVELS) {
           if (typeof data.difficulty?.[lvl] !== 'string') missing.push(`difficulty.${lvl}`)
-          if (typeof data.difficultyHint?.[lvl] !== 'string') missing.push(`difficultyHint.${lvl}`)
+          // The HINT is per question type, not per band: since mig 202 a band carries separate
+          // guidance for mcq / short / essay, and "the wrong options come from somewhere else"
+          // is meaningless on an essay. The screens render `difficultyHint.<type>.<level>`.
+          // The type list comes from the map the setup screen itself indexes, so a fourth
+          // question type cannot be added without this failing.
+          for (const type of Object.keys(QUIZ_GENERATE_ACTION)) {
+            const hint = (data.difficultyHint as unknown as
+              Record<string, Record<string, string>> | undefined)?.[type]?.[lvl]
+            if (typeof hint !== 'string' || hint.trim() === '') {
+              missing.push(`difficultyHint.${type}.${lvl}`)
+            }
+          }
         }
 
         expect(missing, `${platform.name}/${locale}/quiz.json is missing computed-key strings`)

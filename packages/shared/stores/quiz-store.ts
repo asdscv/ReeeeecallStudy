@@ -16,6 +16,7 @@
 //      reservation if the price moved (P0008). No spending happens without a gesture.
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
+import { newPersistenceId } from '../lib/persistence-id'
 
 export type QuizQuestionType = 'mcq' | 'short' | 'essay'
 export type QuizScopeKind = 'deck' | 'tags' | 'cards'
@@ -169,10 +170,19 @@ export class QuizError extends Error {
   }
 }
 
-/** A gesture id. One per user action, so a retried request reserves nothing new. */
-function newClientRef(): string {
-  return crypto.randomUUID()
-}
+/**
+ * A gesture id. One per user action, so a retried request reserves nothing new.
+ *
+ * `newPersistenceId`, NOT `crypto.randomUUID` — there is no global `crypto` in React
+ * Native/Hermes and this app ships no polyfill, so the direct call threw a raw
+ * ReferenceError. It was not even reported as one: the throw is not a `QuizError`, so the
+ * catch fell through to the generic "something went wrong", and BOTH generation and grading
+ * were dead on mobile while the web path worked perfectly. Found on a simulator, not by any
+ * test — every automated check runs where `crypto` exists.
+ *
+ * The helper existed for exactly this, and says so in its own header.
+ */
+const newClientRef = newPersistenceId
 
 interface QuizState {
   sets: QuizSetRow[]
@@ -276,7 +286,10 @@ export const useQuizStore = create<QuizState>((set, get) => ({
         p_scope_kind: input.scope ?? 'deck',
         p_tags: input.tags ?? [],
         p_card_ids: input.cardIds ?? [],
-        p_difficulty: input.difficulty ?? 3,
+        // NULL, not 3. `create_quiz_set` reads `is_default` from `quiz_difficulty_levels`
+        // when this is null — hardcoding a level here meant an admin moving the default
+        // band did nothing, and a deploy where band 3 is retired would 400.
+        p_difficulty: input.difficulty ?? null,
       })
       if (createError) {
         throw new QuizError(createError.code === 'P0010' ? 'QUIZ_NOT_ENOUGH_CARDS'
@@ -374,3 +387,17 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     await get().loadRun(runId)
   },
 }))
+
+/**
+ * Why each wrong option is wrong, in the order the options were served.
+ *
+ * The model labels every distractor with a closed flaw name (never prose — see the
+ * generation contract), and `get_quiz_run_items` permutes those labels through the same
+ * shuffle as the options and withholds them until the learner has answered. `null` marks
+ * the correct option. Anything that is not a string is dropped rather than rendered.
+ */
+export function optionFlaws(item: QuizRunItem): (string | null)[] {
+  const raw = item.meta?.flaws
+  if (!Array.isArray(raw)) return []
+  return raw.map((f) => (typeof f === 'string' ? f : null))
+}

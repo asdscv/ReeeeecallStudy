@@ -779,7 +779,6 @@ export function validateMultipleChoiceGeneration(
       const flaw = d.flaw
       if (text === '' || text.length > MAX_DISTRACTOR_CHARS) { drop(cardId, 'bad_shape'); continue }
       if (!isMcqDistractorFlaw(flaw)) { drop(cardId, 'bad_enum'); continue }
-      if (allowed && !allowed.has(flaw)) { drop(cardId, 'wrong_difficulty_mix'); continue }
 
       const norm = normalizeAnswer(text)
       if (norm === '') { drop(cardId, 'bad_shape'); continue }
@@ -863,7 +862,11 @@ export function validateMultipleChoiceGeneration(
     // is visible in the logs rather than only to a reader.
     const near = flaws.filter((f) => NEAR_FLAWS.has(f)).length
     const nearMax = difficulty.nearMax ?? difficulty.nearRequired
+    // `allowed` is enforced in the PROMPT — the model is only offered the flaws the band
+    // permits — and merely recorded here. Dropping on it is the same mistake the near-count
+    // gate was: it punishes the learner for a model that ignored an instruction.
     const offBand = near < difficulty.nearRequired || near > nearMax
+      || (allowed !== null && flaws.some((f) => !allowed.has(f)))
 
     const itemId = makeItemId(cardId, index)
     const correctIndex = correctOptionIndex(itemId, optionCount)
@@ -1005,7 +1008,18 @@ export function validateEssayGeneration(
     )
     if (declaredTotal !== ESSAY_WEIGHT_TOTAL) { drop(cardId, 'bad_weights'); continue }
 
-    const grounded = `${card.promptText} ${card.answerText}`
+    // EVERYTHING the model was shown for this card, not just two of its fields.
+  //
+  // This was `promptText + answerText`, while the prompt hands the model `otherFields` too —
+  // the pronunciation, the example sentence. So a criterion quoting the card's own example was
+  // rejected as ungrounded, and the RICHER the card the more likely that was. Measured on a
+  // ten-card deck with full example sentences: zero essay items survived at any band, every one
+  // dropped `ungrounded_mention`.
+  //
+  // "Grounded in the card's own text" has to mean the card, or the check is testing something
+  // nobody claimed.
+  const grounded = [card.promptText, card.answerText, ...card.extraFields.map((f) => f.value)]
+    .join(' ')
     const aspectsUsed = new Set<EssayAspect>()
     const kept: Array<{ aspect: EssayAspect; weight: number; mustMention: string[] }> = []
     let ungrounded = false

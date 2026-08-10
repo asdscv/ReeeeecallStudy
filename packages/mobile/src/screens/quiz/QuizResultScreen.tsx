@@ -48,6 +48,9 @@ export function QuizResultScreen() {
     return <Screen><Text style={[theme.typography.body, styles.center, { color: theme.colors.textSecondary }]}>{t('run.loading')}</Text></Screen>
   }
 
+  // Over what was GRADED, not over what was asked — see the web screen. A run where the
+  // learner declined to pay for any grade was reading as a 0%.
+  const graded = run.items.filter((i) => i.score !== null).length
   const percent = run.score_max > 0 ? Math.round((run.score_raw / run.score_max) * 100) : 0
 
   return (
@@ -55,12 +58,14 @@ export function QuizResultScreen() {
       <ScrollView contentContainerStyle={styles.body}>
         <View style={[styles.score, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
           <Text style={[theme.typography.h1, { color: theme.colors.text }]}>
-            {t('result.percent', { percent })}
+            {graded === 0 ? t('result.nothingGraded') : t('result.percent', { percent })}
           </Text>
           <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
             {/* Whole questions: partial credit exists on essays, but "4.3 of 6" reads as a
                 rounding artefact rather than as a score. */}
-            {t('result.of', { raw: Math.round(run.score_raw), max: run.score_max })}
+            {graded === 0
+              ? t('result.nothingGradedBody')
+              : t('result.of', { raw: Math.round(run.score_raw), max: run.score_max })}
           </Text>
           <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
             {t('result.attempt', { count: run.attempt_no })}
@@ -96,20 +101,23 @@ export function QuizResultScreen() {
               />
             )}
 
-            {item.score !== null && (
+            {/* `answered`, not `score !== null`: an ungraded answer is precisely when the
+                learner needs to mark it themselves. `override_quiz_grade` already accepts a
+                null previous score. */}
+            {item.answered && (
               <View style={styles.overrides}>
                 <Pressable
-                  disabled={busy === item.item_id || item.score >= 1}
+                  disabled={busy === item.item_id || item.score === 1}
                   onPress={() => void flip(item, 1)}
-                  style={[styles.chip, { borderColor: theme.colors.border, opacity: item.score >= 1 ? 0.4 : 1 }]}
+                  style={[styles.chip, { borderColor: theme.colors.border, opacity: item.score === 1 ? 0.4 : 1 }]}
                   {...testProps(`quiz-mark-correct-${i}`)}
                 >
                   <Text style={[theme.typography.caption, { color: theme.colors.text }]}>{t('result.markCorrect')}</Text>
                 </Pressable>
                 <Pressable
-                  disabled={busy === item.item_id || item.score <= 0}
+                  disabled={busy === item.item_id || item.score === 0}
                   onPress={() => void flip(item, 0)}
-                  style={[styles.chip, { borderColor: theme.colors.border, opacity: item.score <= 0 ? 0.4 : 1 }]}
+                  style={[styles.chip, { borderColor: theme.colors.border, opacity: item.score === 0 ? 0.4 : 1 }]}
                   {...testProps(`quiz-mark-wrong-${i}`)}
                 >
                   <Text style={[theme.typography.caption, { color: theme.colors.text }]}>{t('result.markWrong')}</Text>

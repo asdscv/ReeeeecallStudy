@@ -84,6 +84,15 @@ export function QuizHomePage() {
                     </span>
                     {/* Retaking is free, and saying so is the point: the set is the asset. */}
                     <span className="text-xs text-content-tertiary">{t('home.retakeFree')}</span>
+                    {/* Under-delivery, said out loud. Items that fail validation are dropped and
+                        never charged for, so asking for 6 and getting 4 is a normal outcome —
+                        but until now the set just quietly said "4 questions" and the learner had
+                        no way to tell it apart from having asked for 4. */}
+                    {setRow.generated_count > 0 && setRow.generated_count < setRow.requested_count && (
+                      <span className="text-xs text-content-tertiary">
+                        {t('home.fewerThanAsked', { requested: setRow.requested_count })}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <button

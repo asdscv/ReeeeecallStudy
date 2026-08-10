@@ -43,7 +43,9 @@ export function QuizSetupScreen() {
   // Listed from the server, never enumerated here: a band is a row, so a new one shows up
   // without a deploy.
   const [bands, setBands] = useState<QuizDifficultyBand[]>([])
-  const [difficulty, setDifficulty] = useState(3)
+  // No initial level. Until the learner picks one, the band is whichever row the server
+  // marked `is_default` — hardcoding 3 here overrode that silently on every fresh screen.
+  const [difficulty, setDifficulty] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => { void fetchDecks() }, [fetchDecks])
@@ -74,9 +76,9 @@ export function QuizSetupScreen() {
   // Switching type can strip the chosen band. Derived rather than corrected in an effect —
   // a setState inside an effect is a cascading render, and the fallback is the band the
   // server marked default.
-  const activeBand = usableBands.some((b) => b.level === difficulty)
+  const activeBand = difficulty !== null && usableBands.some((b) => b.level === difficulty)
     ? difficulty
-    : (usableBands.find((b) => b.is_default) ?? usableBands[0])?.level ?? difficulty
+    : (usableBands.find((b) => b.is_default) ?? usableBands[0])?.level ?? null
   const eligible = shownCounts?.eligible ?? 0
   const tooFewForMcq = type === 'mcq' && eligible > 0 && eligible < 4
   const canSubmit = Boolean(deckId) && eligible > 0 && !tooFewForMcq && !generating
@@ -93,7 +95,9 @@ export function QuizSetupScreen() {
         questionType: type,
         count: Math.min(count, eligible),
         locale: i18n.language.split('-')[0],
-        difficulty: activeBand,
+        // May be null before the band list has loaded; the server then applies its own
+        // default rather than being handed a guess.
+        difficulty: activeBand ?? undefined,
         maxPriceMicro: priced.price_micro,
       })
       navigation.navigate('QuizHome')
@@ -171,6 +175,14 @@ export function QuizSetupScreen() {
             </Pressable>
           ))}
         </View>
+        {/* The submit clamps to `eligible`, and on a deck smaller than the smallest chip every
+            chip is disabled — so the screen showed a count nobody could change and then quietly
+            made a different number. Say the real number instead. */}
+        {eligible > 0 && eligible < count && (
+          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+            {t('setup.clampedCount', { count: eligible })}
+          </Text>
+        )}
 
         {/* Every type has a band since mig 202: difficulty is an instruction the band
             carries per question type, not a count of near-miss options. */}
@@ -189,7 +201,7 @@ export function QuizSetupScreen() {
               ))}
             </View>
             <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-              {t(`difficultyHint.${activeBand}`, { defaultValue: '' })}
+              {t(`difficultyHint.${type}.${activeBand}`, { defaultValue: '' })}
             </Text>
           </>
         )}

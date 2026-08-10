@@ -748,14 +748,42 @@ describe('difficulty bands', () => {
     expect(item.options[item.correctIndex]).toBe(card().answerText)
   })
 
-  it('honours a band that restricts which flaws may be used', () => {
+  it('marks an item that breaks the band restriction, and still delivers it', () => {
+    // Band conformance is ADVISORY, not a gate. Dropping off-band items is what produced runs
+    // of zero questions on bands 1 and 2 — the learner paid, got nothing, and the reason
+    // ("the model would not write an unrelated distractor") was not their problem to solve.
+    // A slightly-too-hard question a learner can answer beats no question at all, so the item
+    // ships carrying `offBand` and the band is retuned from that signal instead.
     const lookalikeOnly = {
       level: 7, nearRequired: 3, nearMax: 3, optionCount: 4, allowedFlaws: ['plausible_form'] as const,
     }
     const out = validateMultipleChoiceGeneration(mcq(threeGood), [card()], itemId, lookalikeOnly)
 
-    expect(out.items).toEqual([])
-    expect(out.dropped.map((d) => d.reason)).toContain('wrong_difficulty_mix')
+    expect(out.items).toHaveLength(1)
+    const item = out.items[0]
+    if (item.type !== 'multiple_choice') throw new Error('unreachable')
+    expect(item.offBand).toBe(true)
+    // Used a flaw the band forbids — which is exactly what `offBand` is recording.
+    expect(item.flaws.some((f) => f !== null && f !== 'plausible_form')).toBe(true)
+    expect(out.dropped).toEqual([])
+  })
+
+  it('does not mark an item that stays inside the band restriction', () => {
+    // The other half of the claim: `offBand` has to be able to be false, or it is not a signal.
+    const lookalikeOnly = {
+      level: 7, nearRequired: 3, nearMax: 3, optionCount: 4, allowedFlaws: ['plausible_form'] as const,
+    }
+    const allLookalike = [
+      { text: 'water moving across a semipermeable membraine', flaw: 'plausible_form' },
+      { text: 'water moving accross a semipermeable membrane', flaw: 'plausible_form' },
+      { text: 'water moving across a semi-permeable membrain', flaw: 'plausible_form' },
+    ]
+    const out = validateMultipleChoiceGeneration(mcq(allLookalike), [card()], itemId, lookalikeOnly)
+
+    expect(out.items).toHaveLength(1)
+    const item = out.items[0]
+    if (item.type !== 'multiple_choice') throw new Error('unreachable')
+    expect(item.offBand).toBe(false)
   })
 })
 

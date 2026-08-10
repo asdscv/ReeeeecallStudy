@@ -868,9 +868,12 @@ Deno.serve(async (req) => {
           }
         }
 
-        const prompt = qType === 'mcq' ? buildMcqGenerationPrompt(sources, difficulty)
-          : qType === 'short' ? buildShortAnswerGenerationPrompt(sources, difficulty)
-          : buildEssayGenerationPrompt(sources, difficulty)
+        // `content_locale` is the UI language at creation time. It settles ONE thing: which
+        // side of a cross-lingual card the question addresses the learner in.
+        const uiLocale = quizSet.content_locale
+        const prompt = qType === 'mcq' ? buildMcqGenerationPrompt(sources, difficulty, uiLocale)
+          : qType === 'short' ? buildShortAnswerGenerationPrompt(sources, difficulty, uiLocale)
+          : buildEssayGenerationPrompt(sources, difficulty, uiLocale)
         const generated = await generate(chain, prompt.systemPrompt, prompt.userPrompt)
 
         const makeItemId = (cardId: string, index: number) => `${setId}:${cardId}:${index}`

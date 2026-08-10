@@ -22,7 +22,8 @@
       "title": "Chưa có bài kiểm tra nào",
       "body": "Tạo từ bất kỳ bộ thẻ nào, chỉ mất vài giây."
     },
-    "pricingNote": "{{price}} mỗi đơn vị. Trắc nghiệm luôn được chấm miễn phí."
+    "pricingNote": "{{price}} mỗi đơn vị. Trắc nghiệm luôn được chấm miễn phí.",
+    "fewerThanAsked": "đã yêu cầu {{requested, number}}"
   },
   "setup": {
     "title": "Bài kiểm tra mới",
@@ -50,7 +51,9 @@
     "retakeFree": "Làm lại không tốn phí.",
     "confirm": "Tạo bài kiểm tra",
     "generating": "Đang soạn câu hỏi…",
-    "difficulty": "Độ khó"
+    "difficulty": "Độ khó",
+    "clampedCount_one": "Bộ thẻ này tạo được {{count, number}} câu hỏi.",
+    "clampedCount_other": "Bộ thẻ này tạo được {{count, number}} câu hỏi."
   },
   "run": {
     "loading": "Đang tải…",
@@ -67,7 +70,6 @@
     "finish": "Kết thúc",
     "grading": "Đang chấm…",
     "gradeFor": "Chấm câu này · {{price}}",
-    "scored": "Được {{score, number}}%",
     "reference": "Đáp án: {{answer}}"
   },
   "result": {
@@ -79,7 +81,9 @@
     "ungraded": "Chưa chấm",
     "markCorrect": "Tôi đúng",
     "markWrong": "Tôi sai",
-    "retake": "Làm lại"
+    "retake": "Làm lại",
+    "nothingGraded": "Chưa chấm",
+    "nothingGradedBody": "Bạn chưa chấm câu trả lời nào trong lượt này."
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "Không đủ số dư. Hãy nạp thêm để tiếp tục.",
@@ -137,13 +141,24 @@
     "1": "Dễ",
     "2": "Vừa",
     "3": "Khó",
-    "label": "Độ khó",
     "generic": "Cấp {{level, number}}"
   },
   "difficultyHint": {
-    "1": "Các phương án sai đến từ lĩnh vực hoàn toàn khác — nhận ra chủ đề là đủ.",
-    "2": "Chỉ một trong ba là bẫy thật, hai cái còn lại rất xa.",
-    "3": "Mọi phương án sai đều sát nút. Bạn phải thực sự biết đáp án."
+    "mcq": {
+      "1": "Các phương án sai đến từ lĩnh vực hoàn toàn khác — nhận ra chủ đề là đủ.",
+      "2": "Chỉ một trong ba là bẫy thật, hai cái còn lại rất xa.",
+      "3": "Mọi phương án sai đều sát nút. Bạn phải thực sự biết đáp án."
+    },
+    "short": {
+      "1": "Câu hỏi cho biết cần trả lời loại gì.",
+      "2": "Không gợi ý gì về hình thức đáp án.",
+      "3": "Hỏi từ góc khác, nhận ra thẻ là chưa đủ."
+    },
+    "essay": {
+      "1": "Giải thích một điều, trong một câu.",
+      "2": "Ý chính, cộng một chi tiết hỗ trợ có trong thẻ.",
+      "3": "Giải thích và nêu nơi nó không còn đúng."
+    }
   },
   "flaw": {
     "opposite": "Ngược lại",
