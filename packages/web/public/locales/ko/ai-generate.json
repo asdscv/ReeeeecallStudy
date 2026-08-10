@@ -171,5 +171,27 @@
     "speedDesc": "1분 내에 10~50장의 고품질 카드를 만듭니다.",
     "freeTitle": "무료로 시작",
     "freeDesc": "매일 무료 카드를 제공해요. 바로 시작하세요."
+  },
+  "hub": {
+    "title": "AI 학습",
+    "subtitle": "계획하고, 만들고, 풀어보세요",
+    "entries": {
+      "learningPlan": {
+        "title": "학습 플랜",
+        "desc": "오늘 복습할 분량을 계산해 하루치로 짜줍니다"
+      },
+      "quiz": {
+        "title": "퀴즈",
+        "desc": "덱에서 문제를 만들고 답안을 채점합니다"
+      },
+      "generate": {
+        "title": "덱·카드 생성",
+        "desc": "주제나 사진에서 덱과 카드를 만듭니다"
+      }
+    },
+    "badge": {
+      "ai": "AI"
+    },
+    "openAction": "열기"
   }
 }

@@ -9,7 +9,7 @@ import { DeckCard } from '../components/deck/DeckCard'
 import { DeckFormModal } from '../components/deck/DeckFormModal'
 import { QuickCreateModal } from '../components/deck/QuickCreateModal'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
-import { AIGenerateModal } from '../components/ai-generate/AIGenerateModal'
+import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import { CardGridSkeleton } from '../components/common/Skeleton'
 import { Button } from '../components/ui/button'
@@ -23,7 +23,6 @@ export function DecksPage() {
 
   const [showCreate, setShowCreate] = useState(false)
   const [showQuickCreate, setShowQuickCreate] = useState(false)
-  const [showAIGenerate, setShowAIGenerate] = useState(false)
   const [deletingDeck, setDeletingDeck] = useState<Deck | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [unsubscribingDeck, setUnsubscribingDeck] = useState<Deck | null>(null)
@@ -35,6 +34,11 @@ export function DecksPage() {
     fetchTemplates()
     if (user) fetchStats(user.id)
   }, [fetchDecks, fetchStats, fetchTemplates, user])
+
+  const handleAIGenerate = () => {
+    aiHubBus.emit({ type: 'ai_hub.generate_requested', mode: 'full', source: 'deck_list' })
+    navigate('/ai-generate?mode=full')
+  }
 
   const handleDelete = async () => {
     if (!deletingDeck) return
@@ -100,7 +104,7 @@ export function DecksPage() {
         </div>
         <div className="flex gap-2 flex-wrap">
           <button
-            onClick={() => setShowAIGenerate(true)}
+            onClick={handleAIGenerate}
             className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-purple-700 active:scale-[0.98] transition cursor-pointer"
           >
             {t('ai-generate:button.aiGenerate')}
@@ -142,13 +146,6 @@ export function DecksPage() {
           ))}
         </div>
       )}
-
-      {/* AI Generate Modal */}
-      <AIGenerateModal
-        open={showAIGenerate}
-        onClose={() => { setShowAIGenerate(false); fetchDecks(); if (user) fetchStats(user.id) }}
-        initialMode="full"
-      />
 
       {/* Create Modal (advanced) */}
       <DeckFormModal

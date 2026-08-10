@@ -9,6 +9,7 @@ import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
 import { useCardStore } from '@reeeeecall/shared/stores/card-store'
 import { useTemplateStore } from '@reeeeecall/shared/stores/template-store'
 import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
+import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
 import { CardLimitNotice } from '../components/CardLimitNotice'
 import {
   QUICK_PRESETS,
@@ -344,6 +345,19 @@ export function QuickCreateScreen() {
           title={t('decks:quickCreate.cancel')}
           variant="outline"
           onPress={handleCancel}
+        />
+
+        {/* The other place a deck is born. Ghost, and last, so the type-it-in flow this screen
+            exists for keeps every bit of its speed. */}
+        <Button
+          testID="quick-create-ai-generate"
+          title={`🤖 ${t('decks:aiGenerate')}`}
+          variant="ghost"
+          onPress={() => {
+            aiHubBus.emit({ type: 'ai_hub.generate_requested', mode: 'full', source: 'quick_create' })
+            const tabNav = navigation.getParent()
+            if (tabNav) tabNav.navigate('AITab', { screen: 'AIGenerate', params: { mode: 'full' } })
+          }}
         />
       </View>
     </Screen>

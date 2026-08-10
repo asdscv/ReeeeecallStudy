@@ -20,6 +20,7 @@ import { PlanSelector } from '../components/billing/PlanSelector'
 import { isUnlimitedCardLimit } from '../lib/card-limit'
 import { CardUsagePanel } from '../components/billing/CardUsagePanel'
 import { registerCardUsageDetailInterest, releaseCardUsageDetailInterest } from '@reeeeecall/shared/stores/deck-store'
+import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
 import {
   loadSettings,
   saveSettings,
@@ -254,6 +255,11 @@ export function SettingsPage() {
   const srsChanged = dailyNewLimit !== savedDailyNewLimit
   const userInitial = (displayName || user?.email || '?')[0].toUpperCase()
 
+  const handleOpenAiHub = () => {
+    aiHubBus.emit({ type: 'ai_hub.opened', source: 'settings' })
+    navigate('/ai')
+  }
+
   return (
     <div className="max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold text-foreground mb-1">{t('title')}</h1>
@@ -272,11 +278,11 @@ export function SettingsPage() {
               <span className="text-sm font-semibold text-orange-700 dark:text-orange-300">{t('quickActions.quickStudy', 'Quick Study')}</span>
             </button>
             <button
-              onClick={() => navigate('/ai-generate')}
+              onClick={handleOpenAiHub}
               className="bg-purple-50 border border-purple-200 dark:bg-purple-500/15 dark:border-purple-500/30 rounded-xl p-4 flex flex-col items-center gap-2 hover:bg-purple-100 dark:hover:bg-purple-500/25 transition cursor-pointer text-center"
             >
               <Bot className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-              <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">{t('quickActions.aiGenerate', 'AI Generate')}</span>
+              <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">{t('nav.aiHub', { ns: 'common' })}</span>
             </button>
             <button
               onClick={() => navigate('/guide')}

@@ -24,11 +24,23 @@ export type QuizStackParamList = {
   QuizResult: { runId: string }
 }
 
+// AI 학습 stack — the hub and the three surfaces it groups. See AIStack.tsx.
+export type AIStackParamList = {
+  AIHub: undefined
+  // Params preselect the mode so "AI로 만들기" inside deck/card creation lands on the
+  // right form instead of the hub index.
+  AIGenerate: { mode?: 'full' | 'cards_only'; deckId?: string; templateId?: string } | undefined
+  LearningGoals: undefined
+  /** The plan detail. Addressed by goal, mirroring web's /learning/:goalId. */
+  LearningToday: { goalId: string }
+}
+
 // Main tabs (로그인 후)
 export type MainTabParamList = {
   HomeTab: undefined
   DecksTab: undefined
   StudyTab: undefined
+  AITab: undefined
   QuizTab: undefined
   MarketplaceTab: undefined
   SettingsTab: undefined
@@ -73,10 +85,7 @@ export type MarketplaceStackParamList = {
 // Settings stack
 export type SettingsStackParamList = {
   SettingsHome: undefined
-  AIGenerate: undefined
-  /** The plan detail. Addressed by goal, mirroring web's /learning/:goalId. */
-  LearningToday: { goalId: string }
-  LearningGoals: undefined
+  // AIGenerate / LearningGoals / LearningToday 는 AIStackParamList 로 이동함.
   // Paywall 화면은 SUBSCRIPTION_UI_ENABLED 게이트로 비활성(꺼지면 빈 화면 렌더)
   Paywall: undefined
   Guide: undefined

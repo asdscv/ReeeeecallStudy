@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
 import { useTheme, palette } from '../theme'
 import { getMobileSupabase } from '../adapters'
+import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
 import type { DecksStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<DecksStackParamList, 'DecksList'>
@@ -140,8 +141,9 @@ export function DecksListScreen() {
               <TouchableOpacity
                 testID="decks-ai-generate"
                 onPress={() => {
+                  aiHubBus.emit({ type: 'ai_hub.generate_requested', mode: 'full', source: 'deck_list' })
                   const tabNav = navigation.getParent()
-                  if (tabNav) tabNav.navigate('SettingsTab', { screen: 'AIGenerate' })
+                  if (tabNav) tabNav.navigate('AITab', { screen: 'AIGenerate', params: { mode: 'full' } })
                 }}
                 style={[styles.headerBtn, { backgroundColor: palette.purple[700] }]}
               >
