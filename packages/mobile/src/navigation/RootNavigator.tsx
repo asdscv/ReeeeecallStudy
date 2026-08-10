@@ -107,7 +107,21 @@ export function RootNavigator() {
     prefetch.reset()
     await clearNavState()
     const { getSupabase } = await import('@reeeeecall/shared/lib/supabase')
-    await getSupabase().auth.signOut()
+    const auth = getSupabase().auth
+    // A global sign-out asks the server to revoke the session, and that call can fail — an
+    // expired refresh token, no network, or a user row that no longer exists. This is the
+    // single-device screen's ONLY escape: there is no drawer, no tab bar and no back gesture
+    // behind it, so a failed sign-out leaves the app permanently on it and deleting the app
+    // is the only way out. Observed on a simulator holding a session for a deleted account.
+    //
+    // `scope: 'local'` needs no server and always clears the stored session, which is what
+    // makes `user` null and lets the navigator move on.
+    try {
+      const { error } = await auth.signOut()
+      if (error) throw error
+    } catch {
+      await auth.signOut({ scope: 'local' }).catch(() => {})
+    }
   }, [])
 
   // Hard version gate takes priority over everything — a build below the

@@ -8,6 +8,7 @@ const DRAWER_TEST_IDS: Record<string, string> = {
   Dashboard: 'drawer-dashboard',
   Study: 'drawer-study-group',
   // Nested under the Study group, same as the AI/Decks/Cards entries below.
+  Quiz: 'drawer-quiz',
   'Learning Plan': 'drawer-learning-plan',
   'AI Generate': 'drawer-ai-generate',
   Decks: 'drawer-decks',
@@ -19,9 +20,46 @@ const DRAWER_TEST_IDS: Record<string, string> = {
 }
 
 /**
+ * iOS offers to save the password after a login and the sheet sits above everything,
+ * swallowing the first taps of whatever spec runs next. Dismissing it is not optional.
+ */
+async function dismissIosSystemSheets() {
+  // A brand-new account gets a six-step onboarding modal on first launch. It covers the whole
+  // screen, so the header hamburger reports visible="false" and every drawer navigation fails
+  // with "Could not find hamburger button" — which reads like a selector problem and is not.
+  const skip = $('~onboarding-skip')
+  if (await skip.isDisplayed().catch(() => false)) {
+    await skip.click().catch(() => {})
+    await browser.pause(1200)
+  }
+
+  if (!driver.isIOS) return
+  for (const label of ['지금 안 함', 'Not Now', 'Cancel', '취소']) {
+    const btn = $(`-ios predicate string:label == "${label}"`)
+    if (await btn.isDisplayed().catch(() => false)) {
+      await btn.click().catch(() => {})
+      await browser.pause(600)
+    }
+  }
+}
+
+/**
  * Open the drawer by tapping the hamburger (☰) button.
  */
 export async function openDrawer() {
+  await dismissIosSystemSheets()
+
+  // The real id, from the rendered tree. The `Open menu` selectors below it are historical:
+  // the header renders `testID="screen-header-menu"` with a TRANSLATED accessibility label
+  // ("메뉴 열기" in Korean), so matching on the English label found nothing and every drawer
+  // navigation failed with "Could not find hamburger button".
+  const headerMenu = $('~screen-header-menu')
+  if (await headerMenu.isDisplayed().catch(() => false)) {
+    await headerMenu.click()
+    await browser.pause(900)
+    return true
+  }
+
   // Try accessibility label
   const menuBtn = $('~Open menu')
   if (await menuBtn.isDisplayed().catch(() => false)) {
@@ -67,7 +105,7 @@ export async function openDrawer() {
  * Navigate to a screen via the drawer menu using testIDs (language-independent).
  */
 export async function navigateToDrawerItem(itemName: string) {
-  const studyGroupItems = ['Learning Plan', 'AI Generate', 'Decks', 'Cards', 'Marketplace', 'History']
+  const studyGroupItems = ['Quiz', 'Learning Plan', 'AI Generate', 'Decks', 'Cards', 'Marketplace', 'History']
   const needsStudyGroup = studyGroupItems.includes(itemName)
 
   const opened = await openDrawer()
