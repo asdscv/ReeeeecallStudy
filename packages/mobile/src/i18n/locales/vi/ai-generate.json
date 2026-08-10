@@ -101,5 +101,27 @@
       "full": "Bộ thẻ mới",
       "cards_only": "Thêm vào bộ thẻ"
     }
+  },
+  "hub": {
+    "title": "Học với AI",
+    "subtitle": "Lên kế hoạch, tạo và luyện tập",
+    "entries": {
+      "learningPlan": {
+        "title": "Kế hoạch học",
+        "desc": "Tính lượng cần ôn hôm nay và sắp thành phần việc của một ngày"
+      },
+      "quiz": {
+        "title": "Kiểm tra",
+        "desc": "Tạo câu hỏi từ bộ thẻ và chấm điểm câu trả lời"
+      },
+      "generate": {
+        "title": "Tạo bộ thẻ và thẻ",
+        "desc": "Tạo bộ thẻ và thẻ từ một chủ đề hoặc ảnh chụp"
+      }
+    },
+    "badge": {
+      "ai": "AI"
+    },
+    "openAction": "Mở"
   }
 }

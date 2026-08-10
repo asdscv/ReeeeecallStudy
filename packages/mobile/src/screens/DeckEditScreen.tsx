@@ -9,6 +9,7 @@ import { useDecks } from '../hooks/useDecks'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
 import { ratingColors } from '@reeeeecall/shared/design-tokens/colors'
+import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
 import { getMobileSupabase } from '../adapters'
 import { calculateDeckStats } from '@reeeeecall/shared/lib/stats'
 import { LEARNING_LANGUAGES, NATIVE_LANGUAGES, STUDY_LEVELS } from '@reeeeecall/shared/lib/marketplace'
@@ -480,6 +481,23 @@ export function DeckEditScreen() {
           loading={saving}
           disabled={!name.trim()}
         />
+
+        {/* The other way a deck gets made. Create mode only, and ghost so it never competes
+            with the save above — someone who came here to type a deck must not be slowed
+            down by it. Keyed on the route param, not `isEditing`: the deck row arrives a
+            beat after mount, and this must not flash on an edit. */}
+        {!deckId && (
+          <Button
+            testID="deck-edit-ai-generate"
+            title={`🤖 ${t('aiGenerate')}`}
+            variant="ghost"
+            onPress={() => {
+              aiHubBus.emit({ type: 'ai_hub.generate_requested', mode: 'full', source: 'deck_create' })
+              const tabNav = navigation.getParent()
+              if (tabNav) tabNav.navigate('AITab', { screen: 'AIGenerate', params: { mode: 'full' } })
+            }}
+          />
+        )}
       </View>
     </Screen>
   )

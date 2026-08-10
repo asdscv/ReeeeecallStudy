@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import {
   Dialog,
   DialogContent,
@@ -7,6 +8,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '../ui/dialog'
+import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
 import { useDeckStore } from '../../stores/deck-store'
 import { DEFAULT_SRS_SETTINGS } from '../../types/database'
 import type { Deck } from '../../types/database'
@@ -21,6 +23,7 @@ interface DeckFormModalProps {
 
 export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
   const { t } = useTranslation('decks')
+  const navigate = useNavigate()
   const { createDeck, updateDeck, templates } = useDeckStore()
 
   const [formValues, setFormValues] = useState<DeckSettingsFormValues>({
@@ -67,6 +70,14 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
         srsSettings: { ...DEFAULT_SRS_SETTINGS },
       })
     }
+  }
+
+  // Hands the half-filled form over to the AI wizard rather than trying to carry its values
+  // across: the wizard asks for a topic, not a name/colour/icon, so nothing here transfers.
+  const handleAIGenerate = () => {
+    aiHubBus.emit({ type: 'ai_hub.generate_requested', mode: 'full', source: 'deck_create' })
+    onClose()
+    navigate('/ai-generate?mode=full')
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -137,6 +148,18 @@ export function DeckFormModal({ open, onClose, editDeck }: DeckFormModalProps) {
             </button>
           </DialogFooter>
         </form>
+
+        {!editDeck && (
+          <div className="mt-3 pt-3 border-t border-border text-center">
+            <button
+              type="button"
+              onClick={handleAIGenerate}
+              className="text-xs text-purple-600 dark:text-purple-400 hover:underline cursor-pointer"
+            >
+              {t('button.aiGenerate', { ns: 'ai-generate' })}
+            </button>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   )

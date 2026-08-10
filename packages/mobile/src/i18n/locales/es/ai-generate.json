@@ -101,5 +101,27 @@
       "full": "Mazo nuevo",
       "cards_only": "Añadir a un mazo"
     }
+  },
+  "hub": {
+    "title": "Aprendizaje con IA",
+    "subtitle": "Planifica, crea y practica",
+    "entries": {
+      "learningPlan": {
+        "title": "Plan de estudio",
+        "desc": "Calcula lo que toca repasar hoy y lo organiza en una jornada"
+      },
+      "quiz": {
+        "title": "Cuestionario",
+        "desc": "Crea preguntas a partir de un mazo y califica tus respuestas"
+      },
+      "generate": {
+        "title": "Generar mazos y tarjetas",
+        "desc": "Crea mazos y tarjetas a partir de un tema o una foto"
+      }
+    },
+    "badge": {
+      "ai": "IA"
+    },
+    "openAction": "Abrir"
   }
 }
