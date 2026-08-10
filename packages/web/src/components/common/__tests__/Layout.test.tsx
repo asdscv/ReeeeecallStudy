@@ -79,7 +79,7 @@ describe('데스크톱 드롭다운', () => {
       expect(within(nav).getByText(section), section).toBeInTheDocument()
     }
     for (const child of [
-      'nav.decks', 'nav.cardTemplates', 'nav.marketplace', 'nav.publisher',
+      'nav.decks', 'nav.cardTemplates', 'nav.marketplace', 'nav.publisher', 'nav.myShares',
       'nav.studyHistory', 'nav.achievements',
     ]) {
       expect(within(nav).getByText(child), child).toBeInTheDocument()

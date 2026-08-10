@@ -138,7 +138,9 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
               onPress={() => go('MarketplaceTab', undefined, 'MarketplaceTab')} testID="drawer-marketplace" />
             <MenuItem icon="📊" label={t('nav.publisherStats', { defaultValue: 'Publisher Stats' })} indent indentLevel={2} active={isActive('PublisherStats')} theme={theme}
               onPress={() => go('SettingsTab', 'PublisherStats')} testID="drawer-publisher-stats" />
-            <MenuItem icon="🔗" label={t('shares.title', { ns: 'settings', defaultValue: 'My Shares' })} indent indentLevel={2} active={isActive('MyShares')} theme={theme}
+            {/* `nav.myShares`, not `settings:shares.title`: web needed the same row and had no
+                such key, and one menu label living in two namespaces drifts. */}
+            <MenuItem icon="🔗" label={t('nav.myShares')} indent indentLevel={2} active={isActive('MyShares')} theme={theme}
               onPress={() => go('SettingsTab', 'MyShares')} testID="drawer-my-shares" />
 
             {/* 업적 was a top-level row while 기록 sat in here, splitting one question across two

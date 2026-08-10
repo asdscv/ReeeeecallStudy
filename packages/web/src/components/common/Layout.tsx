@@ -68,6 +68,9 @@ export function Layout() {
       { kind: 'group', label: t('nav.explore'), icon: '🧭', children: [
         { kind: 'link', path: '/marketplace', label: t('nav.marketplace'), icon: '🏪' },
         { kind: 'link', path: '/publisher', label: t('nav.publisher'), icon: '📈' },
+        // `/my-shares` has existed and been routable on web all along with nothing linking to
+        // it — the drawer had the row, the web nav never did.
+        { kind: 'link', path: '/my-shares', label: t('nav.myShares'), icon: '🔗' },
       ]},
       // 업적 was a top-level link while 기록 sat in here, so "how much have I done" was split
       // across two menus. Same question, one place.
