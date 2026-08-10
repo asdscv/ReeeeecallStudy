@@ -70,12 +70,17 @@ export function QuizSetupScreen() {
 
   useEffect(() => refreshQuote(), [refreshQuote])
 
-  // An easy multiple-choice band is built from deck-mates: no model, no charge.
-  const freeBand = type === 'mcq' && bands.find((b) => b.level === difficulty)?.near_max === 0
+  const usableBands = bands.filter((b) => !b.types || b.types.includes(type))
+  // Switching type can strip the chosen band. Derived rather than corrected in an effect —
+  // a setState inside an effect is a cascading render, and the fallback is the band the
+  // server marked default.
+  const activeBand = usableBands.some((b) => b.level === difficulty)
+    ? difficulty
+    : (usableBands.find((b) => b.is_default) ?? usableBands[0])?.level ?? difficulty
   const eligible = shownCounts?.eligible ?? 0
   const tooFewForMcq = type === 'mcq' && eligible > 0 && eligible < 4
   const canSubmit = Boolean(deckId) && eligible > 0 && !tooFewForMcq && !generating
-    && priced !== null && (freeBand || priced.sufficient)
+    && priced !== null && priced.sufficient
 
   const submit = async () => {
     if (!priced || !deckId) return
@@ -88,7 +93,7 @@ export function QuizSetupScreen() {
         questionType: type,
         count: Math.min(count, eligible),
         locale: i18n.language.split('-')[0],
-        difficulty,
+        difficulty: activeBand,
         maxPriceMicro: priced.price_micro,
       })
       navigation.navigate('QuizHome')
@@ -167,23 +172,24 @@ export function QuizSetupScreen() {
           ))}
         </View>
 
-        {/* Only multiple choice has distractors, so only multiple choice has a band. */}
-        {type === 'mcq' && bands.length > 0 && (
+        {/* Every type has a band since mig 202: difficulty is an instruction the band
+            carries per question type, not a count of near-miss options. */}
+        {usableBands.length > 0 && (
           <>
             <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
               {t('setup.difficulty')}
             </Text>
             <View style={styles.row}>
-              {bands.map((band) => (
-                <Pressable key={band.level} onPress={() => setDifficulty(band.level)} style={chip(difficulty === band.level)}>
-                  <Text style={[theme.typography.caption, { color: difficulty === band.level ? '#fff' : theme.colors.text }]}>
+              {usableBands.map((band) => (
+                <Pressable key={band.level} onPress={() => setDifficulty(band.level)} style={chip(activeBand === band.level)}>
+                  <Text style={[theme.typography.caption, { color: activeBand === band.level ? '#fff' : theme.colors.text }]}>
                     {t(`difficulty.${band.level}`, { defaultValue: t('difficulty.generic', { level: band.level }) })}
                   </Text>
                 </Pressable>
               ))}
             </View>
             <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-              {t(`difficultyHint.${difficulty}`, { defaultValue: '' })}
+              {t(`difficultyHint.${activeBand}`, { defaultValue: '' })}
             </Text>
           </>
         )}
@@ -199,18 +205,12 @@ export function QuizSetupScreen() {
             <View style={styles.priceRow}>
               <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('setup.price')}</Text>
               <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-                {freeBand || priced.price_micro === 0
-                  ? t('setup.free') : formatUsdMicro(priced.price_micro)}
+                {priced.price_micro === 0 ? t('setup.free') : formatUsdMicro(priced.price_micro)}
               </Text>
             </View>
             {(priced.trial_units > 0 || priced.free_units > 0) && (
               <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
                 {t('setup.covered', { units: priced.trial_units + priced.free_units })}
-              </Text>
-            )}
-            {freeBand && (
-              <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
-                {t('setup.easyBandFree')}
               </Text>
             )}
             <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>

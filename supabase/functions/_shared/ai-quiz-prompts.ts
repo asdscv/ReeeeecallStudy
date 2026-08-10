@@ -144,15 +144,16 @@ export function buildMcqGenerationPrompt(
   // three is a near-miss" is followed — and it is checked afterwards either way.
   // One-sided on purpose: each band binds on the end it actually promises. Asking for an
   // exact split is a target a model misses often enough to drop every item.
-  // Only ever asks for NEAR distractors, and only as many as the band allows. The FAR slots
-  // are filled from the learner's own deck, because a model asked for a deliberately
-  // unrelated wrong answer returns another near-miss instead — at every phrasing tried.
-  const mix = `Every distractor you write must be a NEAR flaw: something a learner who half-knows the answer could believe. Write exactly ${nearMax}. Do not write far-fetched or unrelated options — those are not your job here.`
+  // The band's own words, from `quiz_difficulty_levels.guidance`. Difficulty stopped being a
+  // number the code phrases and became an instruction the band carries, because "be
+  // unrelated" names no target and "use a concrete object where the answer is an action"
+  // does. The fallback keeps a bandless call working rather than silently unlabelled.
+  const mix = difficulty.guidance
+    ?? `Write distractors a learner who half-knows the answer could believe.`
 
   const systemPrompt = `${GROUNDING}
 
-For each card, write exactly ${nearMax} WRONG option(s) (distractors) for a multiple-choice question.
-The question will have ${distractorCount} wrong options in total; the app fills the remaining ${distractorCount - nearMax} itself from the learner's other cards. Write ONLY the ones asked for here.
+For each card, write exactly ${distractorCount} WRONG options (distractors) for a multiple-choice question.
 You are NOT asked for the correct option and must not write it — the app inserts the card's own answer itself.
 
 Respond with a single JSON object:
@@ -165,7 +166,7 @@ DIFFICULTY: ${mix}${restricted}
 
 Rules:
 ${bullets([
-  `Exactly ${nearMax} distractor(s) per card. They may share a flaw label — three close neighbours of the answer is often the best set a card can have. What they must not share is substance: three ways of writing the same wrong idea is one distractor shown three times.`,
+  `Exactly ${distractorCount} distractors per card. They may share a flaw label — three close neighbours of the answer is often the best set a card can have. What they must not share is substance: three ways of writing the same wrong idea is one distractor shown three times.`,
   'A distractor must be UNAMBIGUOUSLY WRONG for this card. If you cannot say which flaw it has, it is probably also correct — do not write it.',
   'Never write a distractor that restates the answer, contains the whole answer, or is contained by it (except "partial", above).',
   'Write distractors in the same language and script as the `answer`. An option in another language is spotted without being read.',
@@ -179,7 +180,10 @@ ${bullets([
   return { systemPrompt, userPrompt: `Cards:\n${cardPayload(sources)}` }
 }
 
-export function buildShortAnswerGenerationPrompt(sources: readonly QuizCardSource[]) {
+export function buildShortAnswerGenerationPrompt(
+  sources: readonly QuizCardSource[],
+  difficulty: QuizDifficulty = DEFAULT_DIFFICULTY,
+) {
   const angles = bullets([
     '"reverse" — quote the ANSWER text and ask what it corresponds to on the front of the card, worded the way a learner would ask it. Expected answer: the card\'s prompt.',
     '"cloze" — write one sentence containing the card\'s PROMPT text verbatim, with the answer replaced by "____". Expected answer: the card\'s answer.',
@@ -200,6 +204,8 @@ Respond with a single JSON object:
 Angles — each one fixes where the expected answer comes from:
 ${angles}
 
+DIFFICULTY: ${difficulty.guidance ?? ''}
+
 Rules:
 ${bullets([
   'The question must NEVER contain the expected answer, in any spelling, spacing, or script. This is checked; a leaked question is discarded.',
@@ -217,7 +223,10 @@ ${bullets([
   return { systemPrompt, userPrompt: `Cards:\n${cardPayload(sources)}` }
 }
 
-export function buildEssayGenerationPrompt(sources: readonly QuizCardSource[]) {
+export function buildEssayGenerationPrompt(
+  sources: readonly QuizCardSource[],
+  difficulty: QuizDifficulty = DEFAULT_DIFFICULTY,
+) {
   const aspects = bullets([
     '"covers_answer" — states what the card\'s answer states. REQUIRED on every card, exactly once, and must carry the highest weight.',
     '"uses_key_terms" — uses the card\'s own terms rather than talking around them.',
@@ -244,6 +253,8 @@ Respond with a single JSON object:
 
 Aspects — a closed list; anything else is discarded:
 ${aspects}
+
+DIFFICULTY: ${difficulty.guidance ?? ''}
 
 Rules:
 ${bullets([

@@ -689,21 +689,41 @@ describe('inline markup in a model-authored question', () => {
 describe('difficulty bands', () => {
   // The band is ENFORCED, not requested. A model told "make it easy" writes near-misses anyway,
   // because easy is the shape it has least practice at.
-  it('accepts an all-far batch at the easy band and refuses it at the default', () => {
+  it('SHIPS an off-band batch, and marks it', () => {
+    // The band stopped being a gate in mig 202. Enforcing an exact near-count dropped every
+    // item on the easy bands across three deploys, it cannot be evaluated for short answer or
+    // essay at all, and "did the model follow the instruction" is not mechanically checkable.
+    // A question outside the band is easier or harder than asked for — not BROKEN — and the
+    // learner paid for it.
     const easy = validateMultipleChoiceGeneration(mcq(threeFar), [card()], itemId, EASY)
     expect(easy.items).toHaveLength(1)
+    const onBand = easy.items[0]
+    if (onBand.type !== 'multiple_choice') throw new Error('unreachable')
+    expect(onBand.offBand).toBe(false)
 
     const hard = validateMultipleChoiceGeneration(mcq(threeFar), [card()], itemId)
-    expect(hard.items).toEqual([])
-    expect(hard.dropped.map((d) => d.reason)).toContain('wrong_difficulty_mix')
+    expect(hard.items).toHaveLength(1)
+    const drifted = hard.items[0]
+    if (drifted.type !== 'multiple_choice') throw new Error('unreachable')
+    // Recorded so a band whose instruction has stopped working is visible in the logs.
+    expect(drifted.offBand).toBe(true)
   })
 
-  it('refuses a near-miss slipped into an easy band', () => {
-    const sneaky = [...threeFar.slice(0, 2), { text: 'water crossing a membrane', flaw: 'adjacent_sense' }]
-    const out = validateMultipleChoiceGeneration(mcq(sneaky), [card()], itemId, EASY)
-
-    expect(out.items).toEqual([])
-    expect(out.dropped.map((d) => d.reason)).toContain('wrong_difficulty_mix')
+  it('still refuses what is actually broken', () => {
+    // The structural checks are unchanged, because those ARE checkable and they are what
+    // makes an item unusable rather than merely off-band.
+    const brokenSet = [
+      { list: [...threeGood.slice(0, 2), { text: card().answerText, flaw: 'adjacent_sense' }],
+        reason: 'distractor_equals_answer' },
+      { list: [...threeGood.slice(0, 2), { text: 'water', flaw: 'unrelated' }],
+        reason: 'distractor_contains_answer' },
+      { list: [...threeGood.slice(0, 2), { text: threeGood[0].text, flaw: 'opposite' }],
+        reason: 'distractor_duplicated' },
+    ]
+    for (const { list, reason } of brokenSet) {
+      const out = validateMultipleChoiceGeneration(mcq(list), [card()], itemId)
+      expect(out.dropped.map((d) => d.reason), reason).toContain(reason)
+    }
   })
 
   it('builds as many options as the band asks for', () => {

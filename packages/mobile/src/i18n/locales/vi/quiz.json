@@ -50,8 +50,7 @@
     "retakeFree": "Làm lại không tốn phí.",
     "confirm": "Tạo bài kiểm tra",
     "generating": "Đang soạn câu hỏi…",
-    "difficulty": "Độ khó",
-    "easyBandFree": "Cấp độ này được tạo từ chính bộ thẻ của bạn — không dùng AI, không mất phí."
+    "difficulty": "Độ khó"
   },
   "run": {
     "loading": "Đang tải…",

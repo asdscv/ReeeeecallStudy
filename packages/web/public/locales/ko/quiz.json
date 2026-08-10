@@ -50,8 +50,7 @@
     "retakeFree": "다시 풀 때는 비용이 들지 않아요.",
     "confirm": "퀴즈 만들기",
     "generating": "문제를 만드는 중…",
-    "difficulty": "난이도",
-    "easyBandFree": "이 난이도는 내 덱에서 직접 만들어요. AI를 쓰지 않고, 요금도 없어요."
+    "difficulty": "난이도"
   },
   "run": {
     "loading": "불러오는 중…",

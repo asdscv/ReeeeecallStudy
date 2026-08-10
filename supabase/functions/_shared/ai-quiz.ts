@@ -126,6 +126,15 @@ export interface QuizDifficulty {
   readonly optionCount: number
   /** Restrict to these flaws. Empty means all of them. */
   readonly allowedFlaws: readonly McqDistractorFlaw[]
+  /**
+   * The band's instruction for THIS question type, inserted into the prompt verbatim.
+   *
+   * This is where difficulty lives now. "Be unrelated" fails at every phrasing because it
+   * names no target; "use a concrete object where the answer is an action" succeeds because
+   * it names one. And because it is text, short answer and essay get a difficulty too —
+   * which a near-miss count could never give them.
+   */
+  readonly guidance?: string
 }
 
 /** Fallback when a caller does not resolve a band — the hardest, which is what shipped first. */
@@ -589,6 +598,14 @@ export interface QuizItemMultipleChoice {
   readonly correctIndex: number
   /** Parallel to `options`; null at `correctIndex`. Renders the post-answer explanation. */
   readonly flaws: ReadonlyArray<McqDistractorFlaw | null>
+  /**
+   * The near-miss count fell outside the band's advisory range.
+   *
+   * Recorded, not enforced — enforcing it dropped every item on the easy bands. It exists so
+   * a band whose instruction has stopped working shows up in the logs rather than only to
+   * someone reading the questions.
+   */
+  readonly offBand?: boolean
 }
 
 export interface QuizItemShortAnswer {
@@ -835,11 +852,18 @@ export function validateMultipleChoiceGeneration(
     //
     // Checked AFTER length_cue so an item that is broken on its own terms reports that, rather
     // than reporting a band mismatch the author cannot act on.
+    // Difficulty is NOT enforced here any more, and the reason is that it could not be.
+    // The mechanical near-count gate dropped every item on bands 1 and 2 across three
+    // deploys, it cannot be evaluated for short answer or essay at all, and "did the model
+    // follow the instruction" is not a mechanically checkable property.
+    //
+    // What survives above IS checkable, and is what makes an item BROKEN rather than merely
+    // easier than asked: the answer never appears among the wrong options, no duplicates, no
+    // script mismatch, no length giveaway. The count is recorded so a drift in band quality
+    // is visible in the logs rather than only to a reader.
     const near = flaws.filter((f) => NEAR_FLAWS.has(f)).length
     const nearMax = difficulty.nearMax ?? difficulty.nearRequired
-    if (near < difficulty.nearRequired || near > nearMax) {
-      drop(cardId, 'wrong_difficulty_mix'); continue
-    }
+    const offBand = near < difficulty.nearRequired || near > nearMax
 
     const itemId = makeItemId(cardId, index)
     const correctIndex = correctOptionIndex(itemId, optionCount)
@@ -854,7 +878,7 @@ export function validateMultipleChoiceGeneration(
     used.add(cardId)
     items.push({
       type: 'multiple_choice', itemId, cardId,
-      question: card.promptText, options, correctIndex, flaws: flawSlots,
+      question: card.promptText, options, correctIndex, flaws: flawSlots, offBand,
     })
   }
 

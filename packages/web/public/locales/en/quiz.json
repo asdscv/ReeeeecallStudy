@@ -50,8 +50,7 @@
     "retakeFree": "Taking it again costs nothing.",
     "confirm": "Create quiz",
     "generating": "Writing questions…",
-    "difficulty": "Difficulty",
-    "easyBandFree": "This level is built from your own deck — no AI, no charge."
+    "difficulty": "Difficulty"
   },
   "run": {
     "loading": "Loading…",

@@ -50,8 +50,7 @@
     "retakeFree": "もう一度解いても費用はかかりません。",
     "confirm": "クイズを作る",
     "generating": "問題を作成中…",
-    "difficulty": "難易度",
-    "easyBandFree": "この難易度は自分のデッキから作ります。AIを使わず、料金もかかりません。"
+    "difficulty": "難易度"
   },
   "run": {
     "loading": "読み込み中…",

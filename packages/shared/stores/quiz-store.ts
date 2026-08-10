@@ -63,13 +63,10 @@ export interface QuizzableCount { total: number; eligible: number }
 export interface QuizDifficultyBand {
   level: number
   near_required: number
-  /**
-   * Maximum near-miss distractors. `0` means the band rules them out entirely — and such a
-   * band is built from other answers in the same deck, with no model call and no charge.
-   * See `build_deck_mate_quiz`: producing a deliberately unrelated wrong answer is the one
-   * thing a model reliably will not do, and deck-mates are exactly that by construction.
-   */
+  /** Advisory only since mig 202 — the band's real content is its prompt guidance. */
   near_max: number
+  /** Which question types this band has guidance for; it is not offered for the others. */
+  types?: string[]
   option_count: number
   allowed_flaws: string[]
   is_default: boolean
@@ -292,21 +289,6 @@ export const useQuizStore = create<QuizState>((set, get) => ({
         near_max?: number
         /** Other answers from the deck, used to fill the FAR slots a band leaves open. */
         fillers?: string[]
-      }
-
-      // An easy band needs no model and costs nothing: the wrong options are other answers
-      // from the same deck, which are guaranteed wrong, guaranteed in the right language, and
-      // free. The quote will already have said 0.
-      if (input.questionType === 'mcq' && result.near_max === 0) {
-        const { error: dmError } = await supabase.rpc('build_deck_mate_quiz', {
-          p_set_id: result.set_id,
-        })
-        if (dmError) {
-          throw new QuizError(dmError.code === 'P0010' ? 'QUIZ_NOT_ENOUGH_CARDS'
-            : dmError.code === '42501' ? 'FORBIDDEN' : 'UNKNOWN')
-        }
-        await get().fetchSets()
-        return result.set_id
       }
 
       const { error: genError } = await supabase.functions.invoke('ai-generate', {

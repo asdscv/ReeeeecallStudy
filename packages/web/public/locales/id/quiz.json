@@ -50,8 +50,7 @@
     "retakeFree": "Mengerjakan ulang tidak dikenakan biaya.",
     "confirm": "Buat kuis",
     "generating": "Menyusun soal…",
-    "difficulty": "Tingkat kesulitan",
-    "easyBandFree": "Level ini dibuat dari dek Anda sendiri — tanpa AI, tanpa biaya."
+    "difficulty": "Tingkat kesulitan"
   },
   "run": {
     "loading": "Memuat…",
