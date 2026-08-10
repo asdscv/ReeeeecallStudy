@@ -72,7 +72,7 @@ import type { AIStackParamList } from '../navigation/types'
 function DailyCheckCard({ goalId }: { goalId: string }) {
   const { t } = useTranslation('learning')
   const theme = useTheme()
-  const navigation = useNavigation<NavigationProp<SettingsStackParamList>>()
+  const navigation = useNavigation<NavigationProp<AIStackParamList>>()
   const { countDailyCheck, buildDailyCheck, startRun } = useQuizStore()
   const [counts, setCounts] = useState<{ studiedToday: number; checkable: number } | null>(null)
   const [busy, setBusy] = useState(false)
