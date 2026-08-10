@@ -29,13 +29,16 @@ import {
   buildShortAnswerGenerationPrompt,
   buildEssayGenerationPrompt,
 } from '../../../../../supabase/functions/_shared/ai-quiz-prompts.ts'
+import type { QuizCardSource } from '../../../../../supabase/functions/_shared/ai-quiz.ts'
 
-const CARD = {
-  itemId: 'set:card:0',
+const CARD: QuizCardSource = {
   cardId: 'card',
   promptText: 'lend',
   answerText: '빌려주다',
-  extraFields: [] as { key: string; name: string; value: string }[],
+  extraFields: [],
+  fillers: [],
+  // The whole point: two sides in two languages, so "the language it quotes" has no answer.
+  crossLingual: true,
 }
 
 /** Every builder that writes a question. Grading prompts judge text the learner wrote. */

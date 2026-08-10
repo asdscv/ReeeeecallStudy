@@ -50,7 +50,7 @@ import {
   DEFAULT_DIFFICULTY, type QuizDifficulty,
   ESSAY_ASPECTS, ESSAY_LENGTH_BANDS, ESSAY_MAX_CRITERIA, ESSAY_MENTIONS_PER_CRITERION,
   ESSAY_MIN_CRITERIA, ESSAY_WEIGHT_TOTAL, MAX_DISTRACTOR_CHARS, MAX_QUESTION_CHARS, MAX_SPAN_CHARS,
-  MCQ_DISTRACTOR_COUNT, MCQ_DISTRACTOR_FLAWS, MAX_GAPS_PER_GRADE, SHORT_ANSWER_ANGLES,
+  MCQ_DISTRACTOR_FLAWS, MAX_GAPS_PER_GRADE, SHORT_ANSWER_ANGLES,
   SHORT_ANSWER_BANDS, SHORT_ANSWER_GAPS, SHORT_ANSWER_VERDICTS, ESSAY_LEVELS,
   type EssayCriterion, type QuizCardSource, type QuizGradeInput,
 } from './ai-quiz.ts'
@@ -181,8 +181,6 @@ export function buildMcqGenerationPrompt(
 ) {
   const optionCount = Math.min(6, Math.max(2, difficulty.optionCount || 4))
   const distractorCount = optionCount - 1
-  const nearMin = Math.min(difficulty.nearRequired, distractorCount)
-  const nearMax = Math.min(difficulty.nearMax ?? nearMin, distractorCount)
   const restricted = difficulty.allowedFlaws?.length
     ? `\nOnly these flaws may be used for this band: ${difficulty.allowedFlaws.join(', ')}.`
     : ''
