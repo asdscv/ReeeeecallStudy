@@ -656,10 +656,14 @@ export function LearningTodayScreen() {
                   {t('today.budget', { count: goal.daily_minutes })}
                   {plan ? ` · ${t('today.progress', { done: plan.completed_items, total: plan.total_items })}` : ''}
                 </Text>
-
-                <DailyCheckCard goalId={goal.id} />
               </View>
             )}
+
+            {/* A SIBLING of the goal header, not a child of it. Nested inside, it rendered as
+                a bordered card inside a card — which read as a detail OF the goal rather than
+                as its own action, and did not match the web layout where it sits beside the
+                plan. Seen on the simulator; the tree alone does not show it. */}
+            {goal && <DailyCheckCard goalId={goal.id} />}
 
             {planError && (
               <View
