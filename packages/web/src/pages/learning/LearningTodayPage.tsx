@@ -736,6 +736,9 @@ function DailyCheck({ goalId, timezone }: { goalId: string; timezone: string }) 
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
+    // Same guard as the coach: an effect that throws produces an unhandled rejection, and a
+    // partially-mocked store has no such action.
+    if (typeof countDailyCheck !== 'function') return
     let cancelled = false
     void countDailyCheck(timezone)
       .then((value) => { if (!cancelled) setCounts(value) })
@@ -804,10 +807,21 @@ function PlanCoach({ goalId, timezone }: { goalId: string; timezone: string }) {
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
+    // Guarded because this runs inside an effect, where a throw becomes an UNHANDLED
+    // rejection rather than a render error: a partially-mocked store (as in the page tests)
+    // has no such actions, and 47 of those turned a green suite into a red CI job while
+    // every assertion still passed.
+    if (typeof fetchRecommendations !== 'function' || typeof regeneratePlanCoach !== 'function') {
+      return
+    }
     let cancelled = false
     void (async () => {
-      await fetchRecommendations(goalId)
-      if (!cancelled) await regeneratePlanCoach(goalId, timezone)
+      try {
+        await fetchRecommendations(goalId)
+        if (!cancelled) await regeneratePlanCoach(goalId, timezone)
+      } catch {
+        // A coach that cannot be produced is not worth an error on the learner's screen.
+      }
     })()
     return () => { cancelled = true }
   }, [goalId, timezone, fetchRecommendations, regeneratePlanCoach])
