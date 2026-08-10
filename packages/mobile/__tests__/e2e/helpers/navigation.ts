@@ -7,9 +7,12 @@ const DRAWER_TEST_IDS: Record<string, string> = {
   'Quick Study': 'drawer-quick-study',
   Dashboard: 'drawer-dashboard',
   Study: 'drawer-study-group',
-  // Nested under the Study group, same as the AI/Decks/Cards entries below.
-  Quiz: 'drawer-quiz',
-  'Learning Plan': 'drawer-learning-plan',
+  // Nested under the Study group. The AI entries are GENERATED from the AI-hub catalog
+  // (`drawer-ai-${entry.id}` in MainDrawer), so their ids move when the catalog does —
+  // which is why `drawer-learning-plan` and `drawer-quiz` stopped resolving.
+  'AI Hub': 'drawer-ai-hub',
+  Quiz: 'drawer-ai-quiz',
+  'Learning Plan': 'drawer-ai-learning_plan',
   'AI Generate': 'drawer-ai-generate',
   Decks: 'drawer-decks',
   Cards: 'drawer-cards',
@@ -105,7 +108,8 @@ export async function openDrawer() {
  * Navigate to a screen via the drawer menu using testIDs (language-independent).
  */
 export async function navigateToDrawerItem(itemName: string) {
-  const studyGroupItems = ['Quiz', 'Learning Plan', 'AI Generate', 'Decks', 'Cards', 'Marketplace', 'History']
+  const studyGroupItems = ['AI Hub', 'Quiz', 'Learning Plan', 'AI Generate',
+                           'Decks', 'Cards', 'Marketplace', 'History', 'Achievements']
   const needsStudyGroup = studyGroupItems.includes(itemName)
 
   const opened = await openDrawer()
@@ -114,20 +118,34 @@ export async function navigateToDrawerItem(itemName: string) {
     return false
   }
 
-  // If item is inside Study group, expand it first
+  // If the item is inside the Study group, expand it first.
+  //
+  // POLLED, not slept. The group starts collapsed on every mount and the expansion is an
+  // animation plus a re-render, so a fixed 1500ms wait is a coin flip on a loaded simulator
+  // — and when it lost, the failure surfaced as "the item is missing", which reads like the
+  // feature is broken rather than the drawer being shut. Three taps, each polled for two
+  // seconds, and a report when it truly did not open.
   if (needsStudyGroup) {
-    await tapDrawerTestID('drawer-study-group')
-    await browser.pause(1500) // Wait for group expansion animation + re-render
-
-    // Verify the group expanded — retry once if needed
     const testID = DRAWER_TEST_IDS[itemName]
-    if (testID) {
-      const targetEl = $(`~${testID}`)
-      if (!await targetEl.isExisting().catch(() => false)) {
-        // Group might not have expanded — try tapping again
-        await tapDrawerTestID('drawer-study-group')
-        await browser.pause(1500)
+    const visible = async () =>
+      !testID || await $(`~${testID}`).isDisplayed().catch(() => false)
+
+    // LOOK FIRST. The group header is a TOGGLE and `appium:noReset` keeps the drawer's
+    // state between runs, so tapping unconditionally closes a group that was already open
+    // — and an odd number of retries then leaves it closed, which surfaces as "the item
+    // does not exist" and reads like the feature is missing.
+    let expanded = await visible()
+    for (let attempt = 0; attempt < 3 && !expanded; attempt++) {
+      await tapDrawerTestID('drawer-study-group')
+      // Polled, not slept: expansion is an animation plus a re-render, so a fixed wait is
+      // a coin flip on a loaded simulator.
+      for (let waited = 0; waited < 2500 && !expanded; waited += 250) {
+        await browser.pause(250)
+        expanded = await visible()
       }
+    }
+    if (!expanded) {
+      console.log(`[nav] WARNING: study group never revealed ${itemName} (${testID})`)
     }
   }
 

@@ -242,8 +242,8 @@
     "eta_other": "완료까지 약 {{count, number}}일"
   },
   "check": {
-    "title_one": "오늘 배운 {{count, number}}장, 진짜 아는지 확인해요",
-    "title_other": "오늘 배운 {{count, number}}장, 진짜 아는지 확인해요",
+    "title_one": "오늘 공부한 {{count, number}}장, 진짜 아는지 확인해요",
+    "title_other": "오늘 공부한 {{count, number}}장, 진짜 아는지 확인해요",
     "body": "정답을 직접 입력해요. 정답 보기는 없어요.",
     "start": "확인하기 (약 2분)",
     "starting": "준비하는 중…",
