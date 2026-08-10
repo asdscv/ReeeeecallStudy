@@ -249,5 +249,29 @@
     "start": "Kiểm tra (khoảng 2 phút)",
     "starting": "Đang chuẩn bị…",
     "free": "Câu đúng được chấm miễn phí. Bạn chỉ trả cho những câu cần phân xử."
+  },
+  "coach": {
+    "apply": "Áp dụng",
+    "keep": "Giữ nguyên",
+    "lower_intake": {
+      "title": "Giảm còn {{value, number}} thẻ mới mỗi ngày?",
+      "body": "Gần đây bạn thường không xong nổi một nửa. Ít thẻ mới hơn giúp ngày mai nhẹ đi mà không bỏ dở thứ đã bắt đầu."
+    },
+    "raise_intake": {
+      "title": "Có thể tăng lên {{value, number}} thẻ mới mỗi ngày",
+      "body": "Tuần này bạn hoàn thành mọi ngày. Tăng lên sẽ rút ngắn ngày về đích."
+    },
+    "shorten_session": {
+      "title": "Giảm còn {{value, number}} phút mỗi ngày?",
+      "body": "Bạn bắt đầu nhưng hay dừng giữa chừng. Một ngày có thể hoàn thành mới thành thói quen."
+    },
+    "catch_up_week": {
+      "title": "Bạn đã trở lại đúng nhịp",
+      "body": "Phần tồn đọng đang tự vơi đi. Không cần thay đổi gì."
+    },
+    "add_study_day": {
+      "title": "Thêm một ngày mỗi tuần sẽ giúp nhất",
+      "body": "Kế hoạch không quá nhiều — chỉ là nhiều ngày không mở. Đều đặn quan trọng hơn khối lượng."
+    }
   }
 }

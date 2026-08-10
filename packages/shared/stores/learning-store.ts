@@ -11,6 +11,10 @@
 // with `save_daily_plan`, and then RE-READS the saved plan so the UI renders the
 // database's version of the plan rather than a local object that might differ.
 import { create } from 'zustand'
+import {
+  planCoach,
+  type CoachSuggestion, type PlanDigest, type PlanLever,
+} from '../learning/application/plan-coach'
 import type { TemplateFieldOrder } from '../lib/card-prompt'
 import { supabase } from '../lib/supabase'
 import {
@@ -341,6 +345,12 @@ export interface RecommendationRow {
   algorithm_version: string | null
   status: 'pending' | 'accepted' | 'dismissed' | 'expired'
   created_at: string
+  /**
+   * Producer-defined. For a plan-level suggestion this carries the already-clamped value and
+   * the evidence that produced it, so accepting one does not re-derive a number the chooser
+   * has already reasoned about.
+   */
+  payload: Record<string, unknown> | null
 }
 
 /** The deterministic producer's version, recorded on every row it writes. */
@@ -372,6 +382,20 @@ export interface CreateGoalInput {
    */
   settings?: Record<string, unknown>
 }
+
+/**
+ * Which setting each lever turns. Mirrors `learning_plan_levers.dial` (mig 206) — the levers
+ * that map to nothing are encouragement, not configuration, and accepting one changes only
+ * the recommendation's status.
+ */
+const PLAN_LEVER_DIAL: Partial<Record<PlanLever, 'daily_minutes' | 'new_cards_per_day'>> = {
+  lower_intake: 'new_cards_per_day',
+  raise_intake: 'new_cards_per_day',
+  shorten_session: 'daily_minutes',
+}
+
+/** Stored on every row, so one producer's quality can be compared with another's later. */
+const PLAN_COACH_VERSION = 'plan-coach-v1'
 
 export interface UpdateGoalInput {
   goalId: string
@@ -543,6 +567,23 @@ interface LearningState {
   fetchRecommendations: (goalId: string) => Promise<void>
   regenerateRecommendations: (goalId: string) => Promise<boolean>
   resolveRecommendation: (id: string, status: 'accepted' | 'dismissed') => Promise<boolean>
+
+  /**
+   * Produce this week's plan suggestion, if there is one worth making.
+   *
+   * Deterministic and versioned, exactly like the weak-card producer beside it, and written
+   * through the same `set_study_recommendations` — so when a model takes over the choosing
+   * it writes the same rows under a different `provider` and nothing else moves.
+   */
+  regeneratePlanCoach: (goalId: string, timezone: string) => Promise<boolean>
+  /**
+   * Apply an accepted plan suggestion.
+   *
+   * The NUMBER comes from the stored row, not from the screen: the chooser already clamped
+   * it to the range `update_learning_goal` accepts, and re-deriving it in the UI would be a
+   * second implementation free to disagree.
+   */
+  applyPlanCoach: (recommendationId: string) => Promise<boolean>
   reset: () => void
 }
 
@@ -1620,7 +1661,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     try {
       const { data, error } = await supabase
         .from('study_recommendations')
-        .select('id, goal_id, card_id, concept_id, activity_id, action_type, provider, reason, algorithm_version, status, created_at')
+        .select('id, goal_id, card_id, concept_id, activity_id, action_type, provider, reason, payload, algorithm_version, status, created_at')
         .eq('goal_id', goalId)
         .order('created_at', { ascending: false })
         .limit(50)
@@ -1694,6 +1735,61 @@ export const useLearningStore = create<LearningState>((set, get) => ({
    * while this one asked to dismiss it. So P0007 re-reads the goal's rows and adopts the
    * server's truth instead of rendering a state the server does not hold.
    */
+  regeneratePlanCoach: async (goalId, timezone) => {
+    set({ planError: null })
+    try {
+      const { data, error } = await supabase.rpc('get_plan_digest', {
+        p_goal_id: goalId, p_timezone: timezone, p_days: 7,
+      })
+      if (error) throw error
+
+      const suggestion: CoachSuggestion | null = planCoach(data as PlanDigest)
+      // `null` means the window is too short to judge. Writing an empty set would clear a
+      // suggestion the learner has not answered yet, for no reason.
+      if (!suggestion) return false
+
+      const { error: writeError } = await supabase.rpc('set_study_recommendations', {
+        p_goal_id: goalId,
+        p_items: [{
+          action_type: suggestion.lever,
+          // The evidence travels with the suggestion so the UI can say WHY without
+          // recomputing it, and a stored row stays explainable months later.
+          reason: `${suggestion.evidence.finishedDays}/${suggestion.evidence.windowDays} finished`,
+          payload: { value: suggestion.value, evidence: suggestion.evidence },
+        }],
+        p_provider: 'algorithm',
+        p_algorithm_version: PLAN_COACH_VERSION,
+      })
+      if (writeError) throw writeError
+      await get().fetchRecommendations(goalId)
+      return true
+    } catch (e) {
+      set({ planError: toLearningError(e) })
+      return false
+    }
+  },
+
+  applyPlanCoach: async (recommendationId) => {
+    const row = get().recommendations.find((r) => r.id === recommendationId)
+    if (!row?.goal_id) return false
+
+    const value = (row.payload as { value?: number | null } | null)?.value
+    const dial = PLAN_LEVER_DIAL[row.action_type as PlanLever]
+
+    // A lever that changes no setting is encouragement, not configuration — accepting it
+    // records the learner's answer and touches nothing else.
+    if (dial && typeof value === 'number') {
+      const ok = dial === 'daily_minutes'
+        ? await get().updateGoal({ goalId: row.goal_id, dailyMinutes: value })
+        : await get().updateGoal({
+          goalId: row.goal_id,
+          settings: { new_cards_per_day: value },
+        })
+      if (!ok) return false
+    }
+    return get().resolveRecommendation(recommendationId, 'accepted')
+  },
+
   resolveRecommendation: async (id, status) => {
     if (get().recommendationBusyId) return false
     const target = get().recommendations.find((rec) => rec.id === id)
