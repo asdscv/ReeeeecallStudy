@@ -249,5 +249,29 @@
     "start": "Periksa (sekitar 2 menit)",
     "starting": "Menyiapkan…",
     "free": "Jawaban benar dinilai gratis. Anda hanya membayar yang perlu dinilai."
+  },
+  "coach": {
+    "apply": "Terapkan",
+    "keep": "Biarkan saja",
+    "lower_intake": {
+      "title": "Kurangi jadi {{value, number}} kartu baru per hari?",
+      "body": "Belakangan sebagian besar hari tidak selesai separuh pun. Lebih sedikit kartu baru membuat besok lebih ringan tanpa meninggalkan yang sudah dimulai."
+    },
+    "raise_intake": {
+      "title": "Bisa naik ke {{value, number}} kartu baru per hari",
+      "body": "Minggu ini Anda menyelesaikan setiap hari. Menaikkannya mempercepat tanggal selesai."
+    },
+    "shorten_session": {
+      "title": "Kurangi jadi {{value, number}} menit per hari?",
+      "body": "Anda mulai tapi sering berhenti di tengah. Hari yang bisa diselesaikan itulah yang jadi kebiasaan."
+    },
+    "catch_up_week": {
+      "title": "Anda sudah kembali ke jalur",
+      "body": "Tumpukan dari masa rehat berkurang dengan sendirinya. Tidak ada yang perlu diubah."
+    },
+    "add_study_day": {
+      "title": "Satu hari tambahan seminggu paling membantu",
+      "body": "Bukan rencananya yang terlalu banyak — harinya yang tidak dibuka. Konsistensi lebih penting daripada volume."
+    }
   }
 }

@@ -248,5 +248,29 @@
     "start": "Comprobar (unos 2 min)",
     "starting": "Preparando…",
     "free": "Las respuestas correctas se corrigen gratis. Solo pagas las que hay que juzgar."
+  },
+  "coach": {
+    "apply": "Aplicar",
+    "keep": "Dejarlo así",
+    "lower_intake": {
+      "title": "¿Bajar a {{value, number}} tarjetas nuevas al día?",
+      "body": "Últimamente no llegas ni a la mitad la mayoría de los días. Menos tarjetas nuevas aligera mañana sin abandonar lo empezado."
+    },
+    "raise_intake": {
+      "title": "Puedes subir a {{value, number}} tarjetas nuevas al día",
+      "body": "Esta semana terminaste todos los días. Subirlo acerca tu fecha de finalización."
+    },
+    "shorten_session": {
+      "title": "¿Bajar a {{value, number}} minutos al día?",
+      "body": "Empiezas casi todos los días pero paras a medias. Un día que puedes terminar es el que se convierte en hábito."
+    },
+    "catch_up_week": {
+      "title": "Has vuelto al ritmo",
+      "body": "El atraso de tu ausencia se está reduciendo solo. No hace falta cambiar nada."
+    },
+    "add_study_day": {
+      "title": "Un día más por semana es lo que más ayuda",
+      "body": "El plan no es demasiado: son los días sin abrirlo. La constancia importa más que el volumen."
+    }
   }
 }
