@@ -129,7 +129,31 @@ async function isLoginScreenVisible(): Promise<boolean> {
  * and a run that starts there used to sit on it until the timeout and then fail every
  * assertion with "screen not found".
  */
+/**
+ * The single-device screen ("다른 기기에서 로그인됨") is a dead end for the harness.
+ *
+ * One account, one session: signing in anywhere else — including from a seeding script or a
+ * browser run — kicks the simulator, and the app then shows a screen with no tabs and no
+ * hamburger. `loginIfNeeded` used to poll for 20s, find neither a login screen nor a main
+ * screen, and give up, so every spec in the file failed on a stale session rather than on
+ * anything it was testing.
+ *
+ * Log OUT rather than reclaim: reclaiming keeps whoever was signed in before, which is not
+ * necessarily the account whose data the spec seeded.
+ */
+async function clearSessionKickedIfShown(): Promise<boolean> {
+  const logout = $('~session-kicked-logout')
+  if (await logout.isDisplayed().catch(() => false)) {
+    console.log('[auth] Single-device screen shown — logging out to reach the login form')
+    await logout.click().catch(() => {})
+    await browser.pause(2500)
+    return true
+  }
+  return false
+}
+
 async function passAuthGuardIfShown(): Promise<boolean> {
+  if (await clearSessionKickedIfShown()) return true
   for (const id of ['auth-guard-login', 'auth-guard-get-started']) {
     const el = $(`~${id}`)
     if (await el.isDisplayed().catch(() => false)) {

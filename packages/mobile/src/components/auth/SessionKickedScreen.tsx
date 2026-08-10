@@ -133,6 +133,7 @@ export function SessionKickedScreen({ onReclaim, onLogout }: Props) {
           accessibilityRole="button"
           accessibilityLabel={t('sessionKicked.reclaim')}
           accessibilityState={{ disabled: reclaiming, busy: reclaiming }}
+          testID="session-kicked-reclaim"
         >
           <Text style={s.reclaimText}>
             {reclaiming ? t('sessionKicked.reclaiming') : t('sessionKicked.reclaim')}
@@ -140,7 +141,7 @@ export function SessionKickedScreen({ onReclaim, onLogout }: Props) {
         </TouchableOpacity>
 
         {/* Logout button */}
-        <TouchableOpacity style={s.logoutBtn} onPress={onLogout} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={t('sessionKicked.logout')}>
+        <TouchableOpacity style={s.logoutBtn} onPress={onLogout} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel={t('sessionKicked.logout')} testID="session-kicked-logout">
           <Text style={s.logoutText}>→ {t('sessionKicked.logout')}</Text>
         </TouchableOpacity>
 

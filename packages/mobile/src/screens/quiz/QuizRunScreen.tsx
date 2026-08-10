@@ -168,7 +168,10 @@ export function QuizRunScreen() {
                 <Text style={[theme.typography.body, { color: theme.colors.text }]}>{option}</Text>
               </Pressable>
               {flaw ? (
-                <Text style={[theme.typography.caption, styles.flaw, { color: theme.colors.textSecondary }]}>
+                <Text
+                  style={[theme.typography.caption, styles.flaw, { color: theme.colors.textSecondary }]}
+                  {...testProps(`quiz-flaw-${optionIndex}`)}
+                >
                   {t(`flaw.${flaw}`, { defaultValue: '' })}
                 </Text>
               ) : null}
@@ -195,7 +198,10 @@ export function QuizRunScreen() {
 
           {answered && item.score !== null && (
             <View style={[styles.stem, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>
+              <Text
+                style={[theme.typography.label, { color: theme.colors.text }]}
+                {...testProps('quiz-score')}
+              >
                 {/* Percent, matching the result screen — the same 0.1 read "10점" here and
                     "10%" there. */}
                 {t('result.percent', { percent: Math.round((item.score ?? 0) * 100) })}
