@@ -140,6 +140,80 @@ function DailyCheckCard({ goalId }: { goalId: string }) {
   )
 }
 
+
+/**
+ * 주간 플랜 코치 — the one setting worth changing this week, if any.
+ *
+ * Every knob on a goal is write-once in practice, and on mobile there is no goal editor at
+ * all — so a plan that was too ambitious on day one has, until now, had no way to become
+ * less so from a phone. This is that way.
+ *
+ * The suggestion is deterministic and free (`plan-coach.ts`); the number is derived and
+ * clamped by the chooser and travels in the stored row, so this renders it rather than
+ * re-deriving it. `그대로 둘게요` is dismissal, recorded — a suggestion the learner has
+ * answered must not return next week as if they had not.
+ */
+function PlanCoachCard({ goalId }: { goalId: string }) {
+  const { t } = useTranslation('learning')
+  const theme = useTheme()
+  const {
+    recommendations, fetchRecommendations, regeneratePlanCoach, applyPlanCoach,
+    resolveRecommendation,
+  } = useLearningStore()
+  const [busy, setBusy] = useState(false)
+  const timezone = currentPlanContext().timezone
+
+  useEffect(() => {
+    let cancelled = false
+    void (async () => {
+      await fetchRecommendations(goalId)
+      if (!cancelled) await regeneratePlanCoach(goalId, timezone)
+    })()
+    return () => { cancelled = true }
+  }, [goalId, timezone, fetchRecommendations, regeneratePlanCoach])
+
+  const suggestion = (recommendations ?? []).find(
+    (r) => r.goal_id === goalId && r.status === 'pending' && r.card_id === null,
+  )
+  // `hold` means nothing is wrong. It is stored so producers can be compared, never shown.
+  if (!suggestion || suggestion.action_type === 'hold') return null
+
+  const value = (suggestion.payload as { value?: number | null } | null)?.value ?? null
+
+  return (
+    <View style={[styles.card, {
+      backgroundColor: theme.colors.surface, borderColor: theme.colors.border, marginTop: 12,
+    }]}>
+      <Text style={[theme.typography.label, { color: theme.colors.text }]}>
+        {t(`coach.${suggestion.action_type}.title`, { value, defaultValue: '' })}
+      </Text>
+      <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 2 }]}>
+        {t(`coach.${suggestion.action_type}.body`, { defaultValue: '' })}
+      </Text>
+      <View style={styles.coachRow}>
+        <TouchableOpacity
+          onPress={() => { setBusy(true); void applyPlanCoach(suggestion.id).finally(() => setBusy(false)) }}
+          disabled={busy}
+          style={[styles.coachApply, { backgroundColor: theme.colors.primary }, busy && styles.disabled]}
+          accessibilityRole="button"
+          {...testProps('plan-coach-apply')}
+        >
+          <Text style={[theme.typography.label, { color: '#fff' }]}>{t('coach.apply')}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => { setBusy(true); void resolveRecommendation(suggestion.id, 'dismissed').finally(() => setBusy(false)) }}
+          disabled={busy}
+          style={[styles.coachKeep, { borderColor: theme.colors.border }, busy && styles.disabled]}
+          accessibilityRole="button"
+          {...testProps('plan-coach-keep')}
+        >
+          <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('coach.keep')}</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  )
+}
+
 /** Deck names printed before the count takes over. Three fits one line on a narrow phone. */
 const DECK_NAMES_SHOWN = 3
 
@@ -663,6 +737,7 @@ export function LearningTodayScreen() {
                 a bordered card inside a card — which read as a detail OF the goal rather than
                 as its own action, and did not match the web layout where it sits beside the
                 plan. Seen on the simulator; the tree alone does not show it. */}
+            {goal && <PlanCoachCard goalId={goal.id} />}
             {goal && <DailyCheckCard goalId={goal.id} />}
 
             {planError && (
@@ -1043,4 +1118,7 @@ const styles = StyleSheet.create({
   attemptHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   disabled: { opacity: 0.5 },
   checkButton: { marginTop: 10, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
+  coachRow: { flexDirection: 'row', gap: 8, marginTop: 10 },
+  coachApply: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
+  coachKeep: { paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10, borderWidth: 1, alignItems: 'center' },
 })

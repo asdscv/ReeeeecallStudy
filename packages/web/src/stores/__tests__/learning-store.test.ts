@@ -667,7 +667,7 @@ describe('recommendations', () => {
       recommendations: [{
         id: 'rec-1', goal_id: 'goal-1', card_id: 'card-1', concept_id: null, activity_id: null,
         action_type: 'review_card', provider: 'algorithm', reason: null,
-        algorithm_version: 'weak-card-v1', status: 'pending', created_at: '2026-07-31T00:00:00Z',
+        algorithm_version: 'weak-card-v1', payload: null, status: 'pending', created_at: '2026-07-31T00:00:00Z',
       }],
     })
     mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
@@ -687,7 +687,7 @@ describe('recommendations', () => {
       recommendations: [{
         id: 'rec-1', goal_id: 'goal-1', card_id: 'card-1', concept_id: null, activity_id: null,
         action_type: 'review_card', provider: 'algorithm', reason: null,
-        algorithm_version: 'weak-card-v1', status: 'pending', created_at: '2026-07-31T00:00:00Z',
+        algorithm_version: 'weak-card-v1', payload: null, status: 'pending', created_at: '2026-07-31T00:00:00Z',
       }],
     })
     // Both closed states are terminal server-side; a stale tab must not trap the user.
@@ -706,7 +706,7 @@ describe('recommendations', () => {
       recommendations: [{
         id: 'rec-1', goal_id: 'goal-1', card_id: 'card-1', concept_id: null, activity_id: null,
         action_type: 'review_card', provider: 'algorithm', reason: null,
-        algorithm_version: 'weak-card-v1', status: 'pending', created_at: '2026-07-31T00:00:00Z',
+        algorithm_version: 'weak-card-v1', payload: null, status: 'pending', created_at: '2026-07-31T00:00:00Z',
       }],
     })
     // The row was ACCEPTED elsewhere; this tab asks to dismiss it and gets P0007.
@@ -717,7 +717,7 @@ describe('recommendations', () => {
       data: [{
         id: 'rec-1', goal_id: 'goal-1', card_id: 'card-1', concept_id: null, activity_id: null,
         action_type: 'review_card', provider: 'algorithm', reason: null,
-        algorithm_version: 'weak-card-v1', status: 'accepted', created_at: '2026-07-31T00:00:00Z',
+        algorithm_version: 'weak-card-v1', payload: null, status: 'accepted', created_at: '2026-07-31T00:00:00Z',
       }],
       error: null,
     })

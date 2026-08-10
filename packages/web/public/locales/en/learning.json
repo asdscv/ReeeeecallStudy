@@ -248,5 +248,29 @@
     "start": "Check (about 2 min)",
     "starting": "Preparing…",
     "free": "Answers you get right are graded free. You only pay for the ones we have to judge."
+  },
+  "coach": {
+    "apply": "Apply",
+    "keep": "Leave it",
+    "lower_intake": {
+      "title": "Try {{value, number}} new cards a day instead",
+      "body": "You have been finishing less than half of most days. Fewer new cards shrinks tomorrow without abandoning anything you have started."
+    },
+    "raise_intake": {
+      "title": "Room for {{value, number}} new cards a day",
+      "body": "You finished every day this week. More new cards brings your finish date closer."
+    },
+    "shorten_session": {
+      "title": "Try {{value, number}} minutes a day instead",
+      "body": "You start most days but stop partway. A day you can finish is the one that becomes a habit."
+    },
+    "catch_up_week": {
+      "title": "You're back on track",
+      "body": "The backlog from your time away is draining on its own. Nothing needs changing."
+    },
+    "add_study_day": {
+      "title": "One more day a week would help most",
+      "body": "The plan is not too big — it just has not been opened. Consistency matters more than volume here."
+    }
   }
 }

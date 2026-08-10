@@ -704,6 +704,8 @@ export function LearningTodayPage() {
         </button>
       )}
 
+      <PlanCoach goalId={selectedGoalId} timezone={ctx.timezone} />
+
       <DailyCheck goalId={selectedGoalId} timezone={ctx.timezone} />
 
       <AttemptHistory goalId={selectedGoalId} planDate={ctx.planDate} />
@@ -773,6 +775,80 @@ function DailyCheck({ goalId, timezone }: { goalId: string; timezone: string }) 
       </button>
       {/* The price rule, said before they start rather than after they are billed. */}
       <p className="mt-2 text-center text-xs text-content-tertiary">{t('check.free')}</p>
+    </section>
+  )
+}
+
+
+/**
+ * 주간 플랜 코치 — the one setting worth changing this week, if any.
+ *
+ * Every knob on a goal is write-once in practice: chosen in the create form and never
+ * revisited. So a plan that was too ambitious on day one stays too ambitious for its whole
+ * life, and the learner's only lever is to stop opening the app.
+ *
+ * The suggestion is deterministic and free (see `plan-coach.ts`). The number is derived and
+ * clamped by the chooser and travels in the stored row, so this screen renders it rather
+ * than re-deriving it — a second implementation would be free to disagree with the first.
+ *
+ * `그대로 둘게요` is not a cancel. It is dismissal, recorded, and it survives every
+ * regeneration — a suggestion the learner has already answered must not come back next week
+ * as if they had not.
+ */
+function PlanCoach({ goalId, timezone }: { goalId: string; timezone: string }) {
+  const { t } = useTranslation('learning')
+  const {
+    recommendations, fetchRecommendations, regeneratePlanCoach, applyPlanCoach,
+    resolveRecommendation,
+  } = useLearningStore()
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    void (async () => {
+      await fetchRecommendations(goalId)
+      if (!cancelled) await regeneratePlanCoach(goalId, timezone)
+    })()
+    return () => { cancelled = true }
+  }, [goalId, timezone, fetchRecommendations, regeneratePlanCoach])
+
+  // Defensive: a partially-mocked store (and the very first render, before the fetch
+  // resolves) has no list yet.
+  const suggestion = (recommendations ?? []).find(
+    (r) => r.goal_id === goalId && r.status === 'pending' && r.card_id === null,
+  )
+  // `hold` is a real answer — it means nothing is wrong — and it is stored so the producer's
+  // output can be compared later. It is not something to put on a learner's screen.
+  if (!suggestion || suggestion.action_type === 'hold') return null
+
+  const value = (suggestion.payload as { value?: number | null } | null)?.value ?? null
+
+  return (
+    <section className="rounded-xl border border-border bg-card p-4">
+      <p className="text-sm font-medium text-foreground">
+        {t(`coach.${suggestion.action_type}.title`, { value, defaultValue: '' })}
+      </p>
+      <p className="mt-0.5 text-xs text-content-tertiary">
+        {t(`coach.${suggestion.action_type}.body`, { defaultValue: '' })}
+      </p>
+      <div className="mt-3 flex gap-2">
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => { setBusy(true); void applyPlanCoach(suggestion.id).finally(() => setBusy(false)) }}
+          className="flex-1 cursor-pointer rounded-lg bg-brand px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
+        >
+          {t('coach.apply')}
+        </button>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => { setBusy(true); void resolveRecommendation(suggestion.id, 'dismissed').finally(() => setBusy(false)) }}
+          className="cursor-pointer rounded-lg border border-border px-3 py-2 text-sm text-foreground hover:border-brand/40 disabled:opacity-50"
+        >
+          {t('coach.keep')}
+        </button>
+      </div>
     </section>
   )
 }
