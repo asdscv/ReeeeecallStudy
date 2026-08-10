@@ -240,5 +240,13 @@
     "eta": "완료까지 약 {{count, number}}일",
     "eta_one": "완료까지 약 {{count, number}}일",
     "eta_other": "완료까지 약 {{count, number}}일"
+  },
+  "check": {
+    "title_one": "오늘 배운 {{count, number}}장, 진짜 아는지 확인해요",
+    "title_other": "오늘 배운 {{count, number}}장, 진짜 아는지 확인해요",
+    "body": "정답을 직접 입력해요. 정답 보기는 없어요.",
+    "start": "확인하기 (약 2분)",
+    "starting": "준비하는 중…",
+    "free": "맞힌 답은 무료로 채점돼요. 애매한 답만 비용이 들어요."
   }
 }

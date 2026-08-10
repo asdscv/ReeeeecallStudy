@@ -240,5 +240,13 @@
     "eta": "距完成约 {{count, number}} 天",
     "eta_one": "距完成约 {{count, number}} 天",
     "eta_other": "距完成约 {{count, number}} 天"
+  },
+  "check": {
+    "title_one": "今天学的 {{count, number}} 张，真的记住了吗？",
+    "title_other": "今天学的 {{count, number}} 张，真的记住了吗？",
+    "body": "凭记忆输入答案，不能查看答案。",
+    "start": "检查（约 2 分钟）",
+    "starting": "准备中…",
+    "free": "答对的免费评分，只有需要判断的答案才收费。"
   }
 }

@@ -335,6 +335,11 @@ jobs:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/mastery_definition_test.sql
 
+      - name: SQL — daily check builds free and grades right answers free (mig 205)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/daily_check_test.sql
+
       - name: SQL — plan completes from any study path (mig 204)
         env:
           PGPASSWORD: postgres
