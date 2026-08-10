@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { useQuizStore, type QuizSetRow } from '@reeeeecall/shared/stores/quiz-store'
-import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { ListSkeleton } from '../../components/common/Skeleton'
 
 /**
@@ -109,9 +108,6 @@ export function QuizHomePage() {
         </ul>
       )}
 
-      <p className="text-xs text-content-tertiary text-center">
-        {t('home.pricingNote', { price: formatUsdMicro(5000) })}
-      </p>
     </div>
   )
 }

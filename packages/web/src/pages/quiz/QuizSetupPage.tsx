@@ -9,7 +9,11 @@ import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
 
 const TYPES: QuizQuestionType[] = ['mcq', 'short', 'essay']
-const COUNTS = [4, 6, 8, 10, 12]
+// The ceiling is the schema's (`quiz_sets.item_count <= 20`, mig 205) and the meter's
+// (`quiz_max_units_per_call = 60` = 20 essays at 3 units). Wider steps than the old
+// 4/6/8/10/12, because the difference between 4 and 6 questions is not a decision
+// anyone was making.
+const COUNTS = [5, 10, 15, 20]
 
 /**
  * Pick a scope and a type, see what it costs, confirm.
@@ -31,7 +35,7 @@ export function QuizSetupPage() {
 
   const [deckId, setDeckId] = useState('')
   const [type, setType] = useState<QuizQuestionType>('mcq')
-  const [count, setCount] = useState(6)
+  const [count, setCount] = useState(10)   // must be one of COUNTS, or no chip reads as chosen
   // Keyed by deck, not cleared in an effect. Clearing synchronously would be a setState
   // inside an effect (a cascading render), and leaving it unkeyed would flash the previous
   // deck's numbers over the newly chosen one.

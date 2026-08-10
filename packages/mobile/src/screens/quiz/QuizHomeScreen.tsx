@@ -4,7 +4,6 @@ import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
 import { useQuizStore, type QuizSetRow } from '@reeeeecall/shared/stores/quiz-store'
-import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { Screen, Button, EmptyState, ListSkeleton, ScreenHeader } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
@@ -106,9 +105,6 @@ export function QuizHomeScreen() {
         />
       )}
 
-      <Text style={[theme.typography.caption, styles.note, { color: theme.colors.textSecondary }]}>
-        {t('home.pricingNote', { price: formatUsdMicro(5000) })}
-      </Text>
     </Screen>
   )
 }

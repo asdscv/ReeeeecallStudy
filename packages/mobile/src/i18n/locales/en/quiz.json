@@ -22,7 +22,6 @@
       "title": "No quizzes yet",
       "body": "Make one from any deck. It takes a few seconds."
     },
-    "pricingNote": "{{price}} per unit. Multiple choice is graded free, every time.",
     "fewerThanAsked": "{{requested, number}} requested"
   },
   "setup": {
@@ -145,19 +144,19 @@
   },
   "difficultyHint": {
     "mcq": {
-      "1": "The wrong options come from somewhere else entirely — recognising the subject is enough.",
-      "2": "One of the three is a real trap; the other two are not close.",
-      "3": "Every wrong option is a near-miss. You have to know the answer."
+      "1": "Every wrong option comes from a different category. Knowing roughly what it is about is enough.",
+      "2": "One tempting option; the rest are clearly off.",
+      "3": "All the options are plausible. You have to actually know it."
     },
     "short": {
-      "1": "The question tells you what kind of answer to give.",
-      "2": "No hint about the answer's form — just the question.",
-      "3": "Asked from a different angle, so recognising the card is not enough."
+      "1": "You get a cue — the first letter, the length, or the category.",
+      "2": "Asked plainly, with no hint about the answer’s shape.",
+      "3": "Asked from a different angle. Recognising the card’s front is not enough."
     },
     "essay": {
-      "1": "One thing to explain, in a sentence.",
-      "2": "The main point, plus one supporting detail from the card.",
-      "3": "Explain it and say where it stops applying."
+      "1": "One thing, in one sentence.",
+      "2": "The main point plus one reason or example from the card.",
+      "3": "Explain it, and say where it stops applying."
     }
   },
   "flaw": {

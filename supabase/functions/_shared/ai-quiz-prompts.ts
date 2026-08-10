@@ -67,6 +67,13 @@ import {
 export const MAX_QUIZ_PAYLOAD_BYTES = 16 * 1024
 
 /** Most cards per generation call. Beyond this the output token count, not the input, binds. */
+/**
+ * Longest quiz the product offers, and the same number as `quiz_sets.requested_count`'s CHECK
+ * (mig 205). Distinct from `MAX_QUIZ_BATCH`: this bounds the SET, that bounds one model call,
+ * and the generator batches from one to the other.
+ */
+export const QUIZ_MAX_ITEMS = 20
+
 export const MAX_QUIZ_BATCH: Readonly<Record<'multiple_choice' | 'short_answer' | 'essay', number>> = {
   multiple_choice: 10,
   short_answer: 10,

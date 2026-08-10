@@ -22,7 +22,6 @@
       "title": "Belum ada kuis",
       "body": "Buat dari dek mana pun, hanya perlu beberapa detik."
     },
-    "pricingNote": "{{price}} per unit. Pilihan ganda selalu dinilai gratis.",
     "fewerThanAsked": "diminta {{requested, number}}"
   },
   "setup": {
@@ -145,19 +144,19 @@
   },
   "difficultyHint": {
     "mcq": {
-      "1": "Pilihan salah datang dari bidang yang sama sekali lain — mengenali topiknya sudah cukup.",
-      "2": "Hanya satu dari tiga yang benar-benar menjebak; dua lainnya jauh.",
-      "3": "Setiap pilihan salah nyaris benar. Anda harus benar-benar tahu jawabannya."
+      "1": "Semua pilihan salah berasal dari kategori yang berbeda. Cukup tahu topiknya.",
+      "2": "Hanya satu pilihan yang membingungkan; sisanya jelas berbeda.",
+      "3": "Semua pilihan masuk akal. Harus benar-benar paham."
     },
     "short": {
-      "1": "Pertanyaan memberi tahu jenis jawaban yang diminta.",
-      "2": "Tanpa petunjuk tentang bentuk jawabannya.",
-      "3": "Ditanya dari sudut lain; mengenali kartu saja tidak cukup."
+      "1": "Ada petunjuk: huruf pertama, panjang, atau kategorinya.",
+      "2": "Ditanya langsung, tanpa petunjuk bentuk jawabannya.",
+      "3": "Ditanya dari sudut lain. Mengenali sisi depan kartu saja tidak cukup."
     },
     "essay": {
-      "1": "Jelaskan satu hal, dalam satu kalimat.",
-      "2": "Poin utama, plus satu detail pendukung dari kartu.",
-      "3": "Jelaskan, dan sebutkan di mana ia tidak lagi berlaku."
+      "1": "Satu hal saja, dalam satu kalimat.",
+      "2": "Inti ditambah satu alasan atau contoh dari kartu.",
+      "3": "Jelaskan, dan sebutkan sampai mana berlakunya."
     }
   },
   "flaw": {

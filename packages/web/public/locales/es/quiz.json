@@ -22,7 +22,6 @@
       "title": "Aún no hay cuestionarios",
       "body": "Créalo desde cualquier mazo; tarda unos segundos."
     },
-    "pricingNote": "{{price}} por unidad. La opción múltiple siempre se corrige gratis.",
     "fewerThanAsked": "{{requested, number}} solicitadas"
   },
   "setup": {
@@ -145,19 +144,19 @@
   },
   "difficultyHint": {
     "mcq": {
-      "1": "Las opciones incorrectas vienen de otro campo por completo: basta con reconocer el tema.",
-      "2": "Solo una de las tres es una trampa de verdad; las otras dos quedan lejos.",
-      "3": "Todas las opciones incorrectas están al filo. Hay que saber la respuesta."
+      "1": "Las opciones incorrectas son de otra categoría. Basta con saber de qué trata.",
+      "2": "Solo una opción confunde; las demás son claramente distintas.",
+      "3": "Todas las opciones son verosímiles. Hay que saberlo de verdad."
     },
     "short": {
-      "1": "La pregunta te dice qué tipo de respuesta dar.",
-      "2": "Sin pistas sobre la forma de la respuesta.",
-      "3": "Se pregunta desde otro ángulo: reconocer la tarjeta no basta."
+      "1": "Incluye una pista: la primera letra, la longitud o la categoría.",
+      "2": "Se pregunta sin pistas sobre la forma de la respuesta.",
+      "3": "Se pregunta desde otro ángulo. Reconocer el anverso no basta."
     },
     "essay": {
-      "1": "Explica una sola cosa, en una frase.",
-      "2": "La idea central, más un detalle de apoyo que esté en la tarjeta.",
-      "3": "Explícalo y di dónde deja de aplicarse."
+      "1": "Una sola cosa, en una frase.",
+      "2": "La idea central más una razón o un ejemplo de la tarjeta.",
+      "3": "Explícalo y di hasta dónde se aplica."
     }
   },
   "flaw": {

@@ -33,12 +33,13 @@ import {
   buildQuizCardSource,
   validateMultipleChoiceGeneration, validateShortAnswerGeneration, validateEssayGeneration,
   gradeGate, validateShortAnswerGrade, validateEssayGrade,
-  DEFAULT_DIFFICULTY, isMcqDistractorFlaw,
+  DEFAULT_DIFFICULTY, isMcqDistractorFlaw, QUIZ_MIN_SERVED_FRACTION,
   type QuizCardSource, type QuizItem, type EssayCriterion, type QuizDifficulty,
+  type QuizDropReason,
 } from '../_shared/ai-quiz.ts'
 import {
   buildMcqGenerationPrompt, buildShortAnswerGenerationPrompt, buildEssayGenerationPrompt,
-  buildShortAnswerGradePrompt, buildEssayGradePrompt, MAX_QUIZ_BATCH,
+  buildShortAnswerGradePrompt, buildEssayGradePrompt, MAX_QUIZ_BATCH, QUIZ_MAX_ITEMS,
 } from '../_shared/ai-quiz-prompts.ts'
 
 // Provider + model are resolved per request from the registry (env-driven) —
@@ -774,7 +775,9 @@ Deno.serve(async (req) => {
       const batchCap = MAX_QUIZ_BATCH[
         qType === 'mcq' ? 'multiple_choice' : qType === 'short' ? 'short_answer' : 'essay'
       ]
-      if (cardIds.length === 0 || cardIds.length > batchCap) {
+      // `batchCap` bounds ONE model call, not the length of a quiz — see the batching loop
+      // below. The set's own size is already bounded by `quiz_sets.requested_count <= 20`.
+      if (cardIds.length === 0 || cardIds.length > QUIZ_MAX_ITEMS) {
         return json({ error: 'Request too large', code: 'AI_REQUEST_TOO_LARGE' }, 400, cors)
       }
 
@@ -871,17 +874,55 @@ Deno.serve(async (req) => {
         // `content_locale` is the UI language at creation time. It settles ONE thing: which
         // side of a cross-lingual card the question addresses the learner in.
         const uiLocale = quizSet.content_locale
-        const prompt = qType === 'mcq' ? buildMcqGenerationPrompt(sources, difficulty, uiLocale)
-          : qType === 'short' ? buildShortAnswerGenerationPrompt(sources, difficulty, uiLocale)
-          : buildEssayGenerationPrompt(sources, difficulty, uiLocale)
-        const generated = await generate(chain, prompt.systemPrompt, prompt.userPrompt)
-
         const makeItemId = (cardId: string, index: number) => `${setId}:${cardId}:${index}`
-        const outcome = qType === 'mcq'
-          ? validateMultipleChoiceGeneration(generated.json, sources, makeItemId, difficulty)
-          : qType === 'short'
-            ? validateShortAnswerGeneration(generated.json, sources, makeItemId)
-            : validateEssayGeneration(generated.json, sources, makeItemId)
+
+        // One model call per `batchCap` cards, rather than one per quiz.
+        //
+        // The cap bounds what a single prompt can carry: 10 cards for choice and short answer,
+        // 3 for essay, where the rubric triples the output tokens per item. It was being
+        // enforced as a bound on the QUIZ, and the arithmetic never worked — the smallest count
+        // the setup screen offered was 4, already above the essay cap of 3, so an essay set
+        // could not be generated at all, and a 12-question choice set was refused too. The 400
+        // landed after `create_quiz_set` had inserted the row and before `reserve_ai_quiz`, so
+        // nobody was charged and nobody was told: the set simply appeared in the list with
+        // 0 questions and a dead Take button.
+        //
+        // The money model is unchanged. The reservation already covers the whole set, and
+        // `settle_ai_quiz` charges for delivered questions only, so a batch that returns
+        // nothing usable costs the learner nothing.
+        const batches: QuizCardSource[][] = []
+        for (let i = 0; i < sources.length; i += batchCap) {
+          batches.push(sources.slice(i, i + batchCap))
+        }
+
+        const items: QuizItem[] = []
+        const drops: Array<{ cardId: string | null; reason: QuizDropReason }> = []
+        let model: ResolvedModel | null = null
+        let usage: TokenUsage | null = null
+        for (const batch of batches) {
+          const prompt = qType === 'mcq' ? buildMcqGenerationPrompt(batch, difficulty, uiLocale)
+            : qType === 'short' ? buildShortAnswerGenerationPrompt(batch, difficulty, uiLocale)
+            : buildEssayGenerationPrompt(batch, difficulty, uiLocale)
+          const generated = await generate(chain, prompt.systemPrompt, prompt.userPrompt)
+          const batchOutcome = qType === 'mcq'
+            ? validateMultipleChoiceGeneration(generated.json, batch, makeItemId, difficulty)
+            : qType === 'short'
+              ? validateShortAnswerGeneration(generated.json, batch, makeItemId)
+              : validateEssayGeneration(generated.json, batch, makeItemId)
+          items.push(...batchOutcome.items)
+          drops.push(...batchOutcome.dropped)
+          model = generated.model
+          usage = sumUsage(usage, generated.usage)
+        }
+
+        // Servability is judged over the whole set. Per batch it would pass a set where one
+        // batch of ten came back perfect and the other returned nothing — half a quiz, charged
+        // for in full.
+        const outcome = {
+          items,
+          dropped: drops,
+          servable: items.length >= Math.ceil(sources.length * QUIZ_MIN_SERVED_FRACTION),
+        }
 
         // The drop reasons ARE the prompt's report card; they are the only signal that would
         // ever tell us a prompt change made distractors worse.
@@ -947,7 +988,10 @@ Deno.serve(async (req) => {
         if (persistError) throw new Error(`PERSISTENCE:${persistError.message}`)
 
         // Charged for what shipped, not for what was asked for.
-        const settled = await settleQuiz(userId, meter.job_ref, questions.length, generated.model, generated.usage)
+        // `model` is set because `sources.length > 0` guarantees at least one batch ran.
+        const settled = model
+          ? await settleQuiz(userId, meter.job_ref, questions.length, model, usage)
+          : null
         return json({
           setId, generated: questions.length, requested: cardIds.length,
           dropped: outcome.dropped.length, balance: settled?.balance ?? null,

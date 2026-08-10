@@ -22,7 +22,6 @@
       "title": "Chưa có bài kiểm tra nào",
       "body": "Tạo từ bất kỳ bộ thẻ nào, chỉ mất vài giây."
     },
-    "pricingNote": "{{price}} mỗi đơn vị. Trắc nghiệm luôn được chấm miễn phí.",
     "fewerThanAsked": "đã yêu cầu {{requested, number}}"
   },
   "setup": {
@@ -145,19 +144,19 @@
   },
   "difficultyHint": {
     "mcq": {
-      "1": "Các phương án sai đến từ lĩnh vực hoàn toàn khác — nhận ra chủ đề là đủ.",
-      "2": "Chỉ một trong ba là bẫy thật, hai cái còn lại rất xa.",
-      "3": "Mọi phương án sai đều sát nút. Bạn phải thực sự biết đáp án."
+      "1": "Các phương án sai đến từ nhóm hoàn toàn khác. Biết đại khái là chọn được.",
+      "2": "Chỉ một phương án gây nhầm, số còn lại khác hẳn.",
+      "3": "Mọi phương án đều hợp lý. Phải nắm chắc mới chọn đúng."
     },
     "short": {
-      "1": "Câu hỏi cho biết cần trả lời loại gì.",
-      "2": "Không gợi ý gì về hình thức đáp án.",
-      "3": "Hỏi từ góc khác, nhận ra thẻ là chưa đủ."
+      "1": "Có gợi ý: chữ cái đầu, độ dài hoặc nhóm nghĩa.",
+      "2": "Hỏi thẳng, không gợi ý về dạng câu trả lời.",
+      "3": "Hỏi từ góc khác. Nhớ mặt trước của thẻ là chưa đủ."
     },
     "essay": {
-      "1": "Giải thích một điều, trong một câu.",
-      "2": "Ý chính, cộng một chi tiết hỗ trợ có trong thẻ.",
-      "3": "Giải thích và nêu nơi nó không còn đúng."
+      "1": "Chỉ một ý, viết trong một câu.",
+      "2": "Ý chính cộng một lý do hoặc ví dụ có trong thẻ.",
+      "3": "Giải thích và nêu rõ giới hạn áp dụng."
     }
   },
   "flaw": {
