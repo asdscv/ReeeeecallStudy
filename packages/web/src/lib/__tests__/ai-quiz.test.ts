@@ -748,6 +748,46 @@ describe('difficulty bands', () => {
     expect(item.options[item.correctIndex]).toBe(card().answerText)
   })
 
+  it('keeps a distractor that CONTAINS the answer, and drops one that is PART of it', () => {
+    // Two directions that used to be one check, and are not the same thing.
+    //
+    // A distractor inside the answer ("발효" against 발효시키다) is not wrong, it is
+    // incomplete — marking a learner down for it is indefensible, so it stays a drop.
+    //
+    // A distractor that contains the answer is a different word sharing a stem: 빙하 →
+    // 빙하기, rent → rented. That is what a near-miss IS. Dropping it killed band 3 — the
+    // DEFAULT band — outright on a Korean noun deck: every item lost distractors, then lost
+    // itself to `too_few_distractors`, and the learner got AI_EMPTY_RESULT.
+    const glacier = card({ promptText: 'glacier', answerText: '빙하' })
+    // 빙하기 is what `plausible_form` is for — the answer's own shape, meaning something else.
+    const out = validateMultipleChoiceGeneration(
+      mcq([
+        { text: '빙하기', flaw: 'plausible_form' },   // contains the answer — a real word
+        { text: '화산', flaw: 'adjacent_sense' },
+        { text: '산맥', flaw: 'adjacent_sense' },
+      ]),
+      [glacier], itemId,
+    )
+    expect(out.dropped).toEqual([])
+    const item = out.items[0]
+    if (item.type !== 'multiple_choice') throw new Error('unreachable')
+    expect(item.options).toContain('빙하기')
+    expect(item.options).toContain('빙하')
+  })
+
+  it('still drops a distractor that is part of the answer', () => {
+    const ferment = card({ promptText: 'ferment', answerText: '발효시키다' })
+    const out = validateMultipleChoiceGeneration(
+      mcq([
+        { text: '발효', flaw: 'adjacent_sense' },     // a substring of the answer
+        { text: '냉동시키다', flaw: 'adjacent_sense' },
+        { text: '건조시키다', flaw: 'adjacent_sense' },
+      ]),
+      [ferment], itemId,
+    )
+    expect(out.dropped.map((d) => d.reason)).toContain('distractor_contains_answer')
+  })
+
   it('marks an item that breaks the band restriction, and still delivers it', () => {
     // Band conformance is ADVISORY, not a gate. Dropping off-band items is what produced runs
     // of zero questions on bands 1 and 2 — the learner paid, got nothing, and the reason

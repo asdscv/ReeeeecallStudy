@@ -804,9 +804,28 @@ export function validateMultipleChoiceGeneration(
           // rendering hint; relabelling is honest and keeps the question.
           effectiveFlaw = 'adjacent_sense'
         }
-      } else if (answerNorm.includes(norm) || norm.includes(answerNorm)) {
+      } else if (answerNorm.includes(norm)) {
+        // The distractor is PART OF the answer — "발효" against 발효시키다. That is the trap
+        // this check exists to close: the option is not wrong, it is incomplete, and a
+        // learner who picks it has not made a mistake we can defend marking.
         drop(cardId, 'distractor_contains_answer'); continue
       }
+      // Deliberately NOT dropped: the reverse direction, where the distractor CONTAINS the
+      // answer. 빙하 (glacier) → 빙하기 (ice age); rent → rented; 항구 → 항구도시. These are
+      // different words that happen to share a stem, which is the definition of a near-miss
+      // — the `plausible_form` and `same_root` flaws exist to label exactly this.
+      //
+      // Both directions used to drop, and on a Korean noun deck that killed band 3 (the
+      // DEFAULT band) outright: every item lost distractors to `distractor_contains_answer`
+      // and then the item itself to `too_few_distractors`, so the whole generation returned
+      // AI_EMPTY_RESULT. Korean compounds share morphemes by construction; so do English
+      // inflections. Asking for near-misses and then rejecting shared stems asks for
+      // something the language does not offer.
+      //
+      // The cosmetic case this used to guard — the answer with decoration bolted on — cannot
+      // reach here: `normalizeAnswer` strips punctuation, spacing and case, so "빙하." and
+      // "빙하" normalise to the same string and are caught above as `distractor_equals_answer`.
+      // Surviving containment therefore means genuinely different letters.
 
       if (!scriptCompatible(text, card.answerText)) { drop(cardId, 'script_mismatch'); continue }
 

@@ -109,6 +109,69 @@ const GROUNDING = [
   'Never mention a fact, term, person, statute, dosage, or figure that does not appear in the card you were given.',
 ].join('\n')
 
+/**
+ * The eight interface languages, by NAME.
+ *
+ * A BCP-47 tag is not an instruction. Told to write the question in `"ko"` the model
+ * carried on writing English; told to write it in Korean it complies. The tag is what the
+ * database stores, so the translation happens here, once.
+ */
+const LANGUAGE_NAMES: Record<string, string> = {
+  en: 'English', ko: 'Korean', ja: 'Japanese', zh: 'Chinese',
+  vi: 'Vietnamese', th: 'Thai', id: 'Indonesian', es: 'Spanish',
+}
+
+/**
+ * ## Eight languages, and why this is the only place the UI locale is allowed to matter
+ *
+ * The question's language is fixed by the CARD, not by the interface — a French deck asks
+ * French questions to a learner reading the app in Thai, because the card is the material.
+ * `Write the question in the same language as the text it quotes` settles that, and it
+ * settles it for every monolingual card.
+ *
+ * It settles NOTHING for a cross-lingual card. `lend / 빌려주다` quotes both languages, so
+ * "the language it quotes" has two answers, and the model picked whichever it felt like —
+ * a Korean learner was served `What is the English word for 갚다?` alongside
+ * `What is the Korean word for "to let someone off the hook"?` in the same batch.
+ *
+ * The interface language is the only evidence available about which side the learner reads
+ * from. So it breaks THAT tie, and no other: it never overrides a monolingual card, and it
+ * never translates the card's content.
+ *
+ * ## How hard this may be pushed — measured, not guessed
+ *
+ * It is a tie-breaker and must stay one. A stronger version was written and deployed —
+ * adding "the quoted term stays as the card writes it, and the sentence around it is
+ * ${name}" — and it was strictly worse on a live run against an English→Korean deck:
+ *
+ *   * ESSAY lost EVERY item to `answer_leaked_in_question`. The essay question must quote
+ *     the English prompt and must not contain the Korean answer; write the whole sentence
+ *     in Korean about a Korean meaning and the answer word turns up in it almost by
+ *     construction. An English frame is the safe construction there, not a defect.
+ *   * SHORT drifted off the card — one question asked how "lease" is PRONOUNCED, which no
+ *     card states, because the pressure to produce a Korean sentence outweighed grounding.
+ *
+ * The wording below is the one that measured well. On a Korean learner's English deck it
+ * produced natural Korean throughout and dropped nothing:
+ *
+ *   SHORT  '빚지다'는 상태를 나타내는 영어 동사는 무엇인가요?
+ *   ESSAY  'lease'는 무엇을 의미하며, 이 단어가 사용되는 일반적인 상황과 예시를 들어 설명하시오.
+ *
+ * The lesson is not "say less". It is that this must stay a TIE-BREAKER: it says which
+ * language to address the learner in, and stops there. The version that failed went on to
+ * legislate the sentence around the quoted term, and that is the clause that collided with
+ * "must not contain the answer". If you are about to strengthen this, run
+ * `quiz_prod_e2e.ts` first and compare DROPS, not phrasing.
+ */
+function languageRule(uiLocale?: string): string {
+  const name = uiLocale ? LANGUAGE_NAMES[uiLocale.split('-')[0]] : undefined
+  if (!name) return ''
+  return `\nLANGUAGE: this learner reads the app in ${name}. Write the question in the same`
+    + ` language as the text it quotes. When a card is cross-lingual — its two sides are in`
+    + ` different languages, so quoting cannot decide — write the question itself in ${name},`
+    + ` quoting the card's text unchanged. Never translate the card's own words.\n`
+}
+
 // ─── Generation ─────────────────────────────────────────────────────────────
 
 export function buildMcqGenerationPrompt(
@@ -172,6 +235,7 @@ Every distractor names the ONE way it is wrong:
 ${flaws}
 
 DIFFICULTY: ${mix}${restricted}
+${languageRule(uiLocale)}
 
 Rules:
 ${bullets([
@@ -215,6 +279,7 @@ Angles — each one fixes where the expected answer comes from:
 ${angles}
 
 DIFFICULTY: ${difficulty.guidance ?? ''}
+${languageRule(uiLocale)}
 
 Rules:
 ${bullets([
@@ -223,9 +288,6 @@ ${bullets([
   'Write TO a learner, never ABOUT the data. The words "prompt", "answer field", "card", "field", "otherFields" and "cardId" are our internal names for this JSON — a question containing one of them shows the learner our schema. This is checked; such a question is discarded.',
   'For "reverse", "cloze" and "field_probe" the question MUST contain its source text verbatim (the answer, the prompt, and the prompt respectively). This is checked too.',
   'Write the question in the same language as the text it quotes.',
-  ...(uiLocale
-    ? [`When a card is CROSS-LINGUAL — its two sides are in different languages, so quoting cannot decide — write the question frame in "${uiLocale}". The card still decides the content; this only settles which side the learner is being addressed in. A Korean learner working an English deck was being asked "What is the Korean word for X?" in English.`]
-    : []),
   'Ask for something the card can settle. Never ask for an opinion, a comparison with material outside the card, or anything the card does not state.',
   `Vary the angle across the batch: use at least two different angles, and use "restate" for at most half the items.`,
   `Keep the question under ${MAX_QUESTION_CHARS} characters, and short enough to read on a phone.`,
@@ -269,6 +331,7 @@ Aspects — a closed list; anything else is discarded:
 ${aspects}
 
 DIFFICULTY: ${difficulty.guidance ?? ''}
+${languageRule(uiLocale)}
 
 Rules:
 ${bullets([
