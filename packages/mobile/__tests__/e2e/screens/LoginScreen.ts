@@ -6,24 +6,48 @@
  * both with the same testID. The ~ selector matches the wrapper (not the EditText).
  * For setValue, we need the actual EditText element.
  */
+/**
+ * On Android, address elements by RESOURCE-ID.
+ *
+ * `testProps` writes both `testID` and `accessibilityLabel`, so a bare View exposes the id as
+ * content-desc too and `~id` happens to work. Anything with its own accessible text does not:
+ * a TextInput's placeholder and a button's label OVERWRITE content-desc, so
+ *
+ *   <EditText resource-id="login-email-input"  content-desc="you@example.com">
+ *   <Button   resource-id="login-submit-button" content-desc="Sign In">
+ *
+ * and `~login-submit-button` finds nothing. The resource-id is the only stable handle, and it
+ * is locale-independent — content-desc here is a translated string.
+ */
+const byId = (id: string) =>
+  driver.isIOS ? $(`~${id}`) : $(`android=new UiSelector().resourceId("${id}")`)
+
 class LoginScreenPO {
   // ── Selectors ──
-  get screen() { return $('~login-screen') }
+  get screen() { return byId('login-screen') }
   get emailInput() {
     if (driver.isIOS) return $('~login-email-input')
-    // Android: use UiSelector to find the EditText by content-desc (more reliable than XPath)
-    return $('android=new UiSelector().className("android.widget.EditText").description("login-email-input")')
+    // Android: match on RESOURCE-ID, not content-desc.
+    //
+    // `testProps` sets both `testID` and `accessibilityLabel`, so a plain View exposes the id
+    // in both places — but a TextInput's PLACEHOLDER overwrites content-desc:
+    //
+    //   <EditText resource-id="login-email-input" content-desc="you@example.com" …>
+    //
+    // so `.description("login-email-input")` matched nothing and every Android run died in
+    // the `before` hook, before a single assertion.
+    return $('android=new UiSelector().className("android.widget.EditText").resourceId("login-email-input")')
   }
   get passwordInput() {
     if (driver.isIOS) return $('~login-password-input')
-    return $('android=new UiSelector().className("android.widget.EditText").description("login-password-input")')
+    return $('android=new UiSelector().className("android.widget.EditText").resourceId("login-password-input")')
   }
-  get submitButton() { return $('~login-submit-button') }
-  get errorText() { return $('~login-error-text') }
-  get forgotPasswordLink() { return $('~login-forgot-password') }
-  get signUpLink() { return $('~login-signup-link') }
-  get googleButton() { return $('~login-google-button') }
-  get appleButton() { return $('~login-apple-button') }
+  get submitButton() { return byId('login-submit-button') }
+  get errorText() { return byId('login-error-text') }
+  get forgotPasswordLink() { return byId('login-forgot-password') }
+  get signUpLink() { return byId('login-signup-link') }
+  get googleButton() { return byId('login-google-button') }
+  get appleButton() { return byId('login-apple-button') }
 
   // ── Actions ──
   async waitForScreen() {
@@ -31,7 +55,7 @@ class LoginScreenPO {
       await this.screen.waitForDisplayed({ timeout: 10000 })
     } catch {
       // Android fallback: check for any login element
-      await $('~login-submit-button').waitForDisplayed({ timeout: 5000 })
+      await byId('login-submit-button').waitForDisplayed({ timeout: 5000 })
     }
   }
 
