@@ -241,5 +241,13 @@
     "eta": "còn khoảng {{count, number}} ngày",
     "eta_one": "còn khoảng {{count, number}} ngày",
     "eta_other": "còn khoảng {{count, number}} ngày"
+  },
+  "check": {
+    "title_one": "{{count, number}} thẻ hôm nay — bạn thực sự nhớ chứ?",
+    "title_other": "{{count, number}} thẻ hôm nay — bạn thực sự nhớ chứ?",
+    "body": "Tự gõ đáp án. Không xem trước.",
+    "start": "Kiểm tra (khoảng 2 phút)",
+    "starting": "Đang chuẩn bị…",
+    "free": "Câu đúng được chấm miễn phí. Bạn chỉ trả cho những câu cần phân xử."
   }
 }

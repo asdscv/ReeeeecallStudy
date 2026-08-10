@@ -210,6 +210,22 @@ interface QuizState {
     maxPriceMicro: number
   }) => Promise<string>
 
+  /**
+   * Today's check: how many of the cards studied today can be checked.
+   *
+   * Separate from building it so a screen can decide whether to offer the button, and
+   * say a real number, without creating a set the learner may never open.
+   */
+  countDailyCheck: (timezone: string) => Promise<{ studiedToday: number; checkable: number }>
+  /**
+   * Build (or reuse) today's check and return its set id.
+   *
+   * Costs nothing: the question is the card's own prompt and the reference is its own
+   * declared answer field, so no model is called. The learner is charged only later, and
+   * only for answers a string comparison could not settle.
+   */
+  buildDailyCheck: (input: { goalId?: string; timezone: string; limit?: number }) => Promise<string>
+
   startRun: (setId: string) => Promise<string>
   loadRun: (runId: string) => Promise<void>
   submit: (itemId: string, response: Record<string, unknown>, durationMs?: number) => Promise<QuizSubmitResult>
@@ -322,6 +338,28 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     } finally {
       set({ generating: false })
     }
+  },
+
+  countDailyCheck: async (timezone) => {
+    const { data, error } = await supabase.rpc('count_daily_check_cards', { p_timezone: timezone })
+    if (error) throw error
+    const row = data as { studied_today: number; checkable: number }
+    return { studiedToday: row.studied_today, checkable: row.checkable }
+  },
+
+  buildDailyCheck: async ({ goalId, timezone, limit }) => {
+    const { data, error } = await supabase.rpc('build_daily_check', {
+      p_goal_id: goalId ?? null,
+      p_timezone: timezone,
+      p_limit: limit ?? 8,
+    })
+    // P0010 is the only outcome a screen has to phrase: nothing was studied today, so
+    // there is nothing to check. Everything else is a real fault.
+    if (error) {
+      throw new QuizError((error as { code?: string }).code === 'P0010'
+        ? 'QUIZ_NOT_ENOUGH_CARDS' : 'UNKNOWN')
+    }
+    return (data as { set_id: string }).set_id
   },
 
   startRun: async (setId) => {

@@ -1,6 +1,6 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Play, Check } from 'lucide-react'
 import {
   useLearningStore,
@@ -15,6 +15,7 @@ import { goalCompletion } from '@reeeeecall/shared/lib/goal-completion'
 import {
   parseNewCardsPerDay, DEFAULT_NEW_CARDS_PER_DAY,
 } from '@reeeeecall/shared/learning/application/cadence'
+import { useQuizStore } from '@reeeeecall/shared/stores/quiz-store'
 import { useDeckStore } from '../../stores/deck-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
 
@@ -279,7 +280,10 @@ function GoalProgress({ knowledge, newCardsPerDay, adherence, done }: {
       ? t('progress.behind', { count: summary.overdue })
       : t('progress.studied', { total: summary.total, attempted: summary.attempted })
 
-  /**
+  
+
+
+/**
    * The line under it carries what the headline did not, and never a zero.
    *
    * When behind, "배운 N장" — the reassurance the headline just took away. Otherwise the split
@@ -700,8 +704,75 @@ export function LearningTodayPage() {
         </button>
       )}
 
+      <DailyCheck goalId={selectedGoalId} timezone={ctx.timezone} />
+
       <AttemptHistory goalId={selectedGoalId} planDate={ctx.planDate} />
       <LearningDiagnostics goalId={selectedGoalId} />
     </div>
+  )
+}
+
+/**
+ * 오늘의 확인 — the first thing in this app that asks whether the learner was RIGHT.
+ *
+ * Everything the plan has ever recorded is the learner grading themselves: every activity
+ * is `recall`/`self_rate`, and the planner's own `practice`/`produce` budget has no
+ * candidates to fill it. So the plan's numbers describe how confident someone felt, and
+ * any coach built on them is reasoning about confidence rather than knowledge.
+ *
+ * This is deliberately small. It appears only when there is something to check, it never
+ * blocks finishing the day, and it costs nothing to open: the question is the card's own
+ * prompt and the reference is its own declared answer field, so no model is called to make
+ * it. The learner is charged later, and only for answers a string comparison could not
+ * settle — a day they knew is free.
+ */
+function DailyCheck({ goalId, timezone }: { goalId: string; timezone: string }) {
+  const { t } = useTranslation('learning')
+  const navigate = useNavigate()
+  const { countDailyCheck, buildDailyCheck, startRun } = useQuizStore()
+  const [counts, setCounts] = useState<{ studiedToday: number; checkable: number } | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    void countDailyCheck(timezone)
+      .then((value) => { if (!cancelled) setCounts(value) })
+      .catch(() => { if (!cancelled) setCounts(null) })
+    return () => { cancelled = true }
+  }, [countDailyCheck, timezone, goalId])
+
+  // Nothing studied yet today, or nothing whose template says which field is the answer.
+  // Showing a disabled button would be worse than showing nothing: it advertises a feature
+  // the learner cannot reach and cannot fix from here.
+  if (!counts || counts.checkable === 0) return null
+
+  const start = async () => {
+    setBusy(true)
+    try {
+      const setId = await buildDailyCheck({ goalId, timezone })
+      const runId = await startRun(setId)
+      navigate(`/quiz/${runId}/run`)
+    } catch {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <section className="rounded-xl border border-brand/30 bg-brand/5 p-4">
+      <p className="text-sm font-medium text-foreground">
+        {t('check.title', { count: counts.checkable })}
+      </p>
+      <p className="mt-0.5 text-xs text-content-tertiary">{t('check.body')}</p>
+      <button
+        type="button"
+        onClick={() => void start()}
+        disabled={busy}
+        className="mt-3 w-full cursor-pointer rounded-lg bg-brand px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
+      >
+        {busy ? t('check.starting') : t('check.start')}
+      </button>
+      {/* The price rule, said before they start rather than after they are billed. */}
+      <p className="mt-2 text-center text-xs text-content-tertiary">{t('check.free')}</p>
+    </section>
   )
 }

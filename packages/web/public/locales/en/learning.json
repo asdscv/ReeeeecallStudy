@@ -240,5 +240,13 @@
     "eta": "about {{count, number}} days to go",
     "eta_one": "about {{count, number}} day to go",
     "eta_other": "about {{count, number}} days to go"
+  },
+  "check": {
+    "title_one": "{{count, number}} card from today — do you really know it?",
+    "title_other": "{{count, number}} cards from today — do you really know them?",
+    "body": "Type the answer from memory. No peeking.",
+    "start": "Check (about 2 min)",
+    "starting": "Preparing…",
+    "free": "Answers you get right are graded free. You only pay for the ones we have to judge."
   }
 }
