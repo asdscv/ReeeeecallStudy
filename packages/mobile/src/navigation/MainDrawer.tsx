@@ -124,29 +124,32 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
                 indent indentLevel={2} active={isActive(entry.mobileScreen)} theme={theme}
                 onPress={() => go(entry.mobileStack, entry.mobileScreen)} testID={`drawer-ai-${entry.id}`} />
             ))}
-            <MenuItem icon="📚" label={t('nav.decks')} indent active={isActive('DecksTab')} theme={theme}
+            {/* `nav.cards` pointed at TemplatesList, whose own screen is titled 카드 템플릿, and
+                there is no card list on mobile either — cards live inside a deck. Renamed, and
+                paired with 덱 rather than standing beside it as if it were the other half. */}
+            <SectionLabel label={t('nav.deckAndCards')} icon="🗃️" theme={theme} />
+            <MenuItem icon="📚" label={t('nav.decks')} indent indentLevel={2} active={isActive('DecksTab')} theme={theme}
               onPress={() => go('DecksTab', undefined, 'DecksTab')} testID="drawer-decks" />
-            <MenuItem icon="📋" label={t('nav.cards')} indent active={isActive('TemplatesList')} theme={theme}
+            <MenuItem icon="📋" label={t('nav.cardTemplates')} indent indentLevel={2} active={isActive('TemplatesList')} theme={theme}
               onPress={() => go('SettingsTab', 'TemplatesList')} testID="drawer-cards" />
-            <MenuItem icon="🏪" label={t('nav.marketplace')} indent active={isActive('MarketplaceTab')} theme={theme}
+
+            <SectionLabel label={t('nav.explore')} icon="🧭" theme={theme} />
+            <MenuItem icon="🏪" label={t('nav.marketplace')} indent indentLevel={2} active={isActive('MarketplaceTab')} theme={theme}
               onPress={() => go('MarketplaceTab', undefined, 'MarketplaceTab')} testID="drawer-marketplace" />
-            <MenuItem icon="📊" label={t('nav.publisherStats', { defaultValue: 'Publisher Stats' })} indent active={isActive('PublisherStats')} theme={theme}
+            <MenuItem icon="📊" label={t('nav.publisherStats', { defaultValue: 'Publisher Stats' })} indent indentLevel={2} active={isActive('PublisherStats')} theme={theme}
               onPress={() => go('SettingsTab', 'PublisherStats')} testID="drawer-publisher-stats" />
-            <MenuItem icon="🔗" label={t('shares.title', { ns: 'settings', defaultValue: 'My Shares' })} indent active={isActive('MyShares')} theme={theme}
+            <MenuItem icon="🔗" label={t('shares.title', { ns: 'settings', defaultValue: 'My Shares' })} indent indentLevel={2} active={isActive('MyShares')} theme={theme}
               onPress={() => go('SettingsTab', 'MyShares')} testID="drawer-my-shares" />
-            <MenuItem icon="📝" label={t('nav.studyHistory')} indent active={isActive('StudyHistory')} theme={theme}
+
+            {/* 업적 was a top-level row while 기록 sat in here, splitting one question across two
+                menus. Same move as web. */}
+            <SectionLabel label={t('nav.myRecords')} icon="📜" theme={theme} />
+            <MenuItem icon="📝" label={t('nav.studyHistory')} indent indentLevel={2} active={isActive('StudyHistory')} theme={theme}
               onPress={() => go('HomeTab', 'StudyHistory')} testID="drawer-history" />
+            <MenuItem icon="🏆" label={t('nav.achievements', { defaultValue: 'Achievements' })} indent indentLevel={2} active={isActive('Achievements')} theme={theme}
+              onPress={() => go('SettingsTab', 'Achievements')} testID="drawer-achievements" />
           </View>
         )}
-
-        {/* Achievements */}
-        <MenuItem
-          icon="🏆" label={t('nav.achievements', { defaultValue: 'Achievements' })}
-          active={isActive('Achievements')}
-          theme={theme}
-          onPress={() => go('SettingsTab', 'Achievements')}
-          testID="drawer-achievements"
-        />
 
         {/* Settings */}
         <MenuItem
@@ -183,6 +186,24 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
       {/* Quick Tips — always visible at bottom */}
       <QuickTips theme={theme} />
     </SafeAreaView>
+  )
+}
+
+/**
+ * A non-tappable heading inside the 학습 group.
+ *
+ * 덱·카드, 탐색 and 내 기록 name a set; none of them has a landing screen to open, so they must
+ * not look tappable. AI 학습 stays a `MenuItem` because it does have one — the hub. Web draws
+ * the same distinction: a `<Link>` when the section has a path, a `<p>` when it does not.
+ */
+function SectionLabel({ label, icon, theme }: {
+  label: string; icon: string; theme: ReturnType<typeof useTheme>
+}) {
+  return (
+    <View style={styles.sectionLabel}>
+      <Text style={styles.sectionIcon}>{icon}</Text>
+      <Text style={[styles.sectionText, { color: theme.colors.textTertiary }]}>{label}</Text>
+    </View>
   )
 }
 
@@ -290,6 +311,12 @@ const styles = StyleSheet.create({
   },
   menuItemIndent: { paddingLeft: 48, paddingVertical: 10 },
   menuItemIndent2: { paddingLeft: 68, paddingVertical: 10 },
+  sectionLabel: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    paddingLeft: 48, paddingRight: 16, paddingTop: 14, paddingBottom: 4, marginHorizontal: 8,
+  },
+  sectionIcon: { fontSize: 13 },
+  sectionText: { fontSize: 12, fontWeight: '600', letterSpacing: 0.3 },
   menuIcon: { fontSize: 18 },
   menuLabel: { fontSize: 15 },
   chevron: { fontSize: 18, fontWeight: '300' },

@@ -57,13 +57,25 @@ export function Layout() {
         label: t(entry.titleKey, { ns: 'ai-generate' }),
         icon: entry.icon,
       })) },
-      { kind: 'link', path: '/decks', label: t('nav.decks'), icon: '📚' },
-      { kind: 'link', path: '/templates', label: t('nav.cards'), icon: '📋' },
-      { kind: 'link', path: '/marketplace', label: t('nav.marketplace'), icon: '🏪' },
-      { kind: 'link', path: '/publisher', label: t('nav.publisher'), icon: '📈' },
-      { kind: 'link', path: '/history', label: t('nav.studyHistory'), icon: '📝' },
+      // `/templates` was labelled "카드" while its own page is titled "카드 템플릿", and there is
+      // no card list anywhere — cards live inside a deck. Sitting next to 덱 it read as
+      // "덱 = 묶음, 카드 = 낱장", so the name is corrected and the two are one section.
+      { kind: 'group', label: t('nav.deckAndCards'), icon: '🗃️', children: [
+        { kind: 'link', path: '/decks', label: t('nav.decks'), icon: '📚' },
+        { kind: 'link', path: '/templates', label: t('nav.cardTemplates'), icon: '📋' },
+      ]},
+      // Finding and selling decks is not studying. Grouping them says so without hiding them.
+      { kind: 'group', label: t('nav.explore'), icon: '🧭', children: [
+        { kind: 'link', path: '/marketplace', label: t('nav.marketplace'), icon: '🏪' },
+        { kind: 'link', path: '/publisher', label: t('nav.publisher'), icon: '📈' },
+      ]},
+      // 업적 was a top-level link while 기록 sat in here, so "how much have I done" was split
+      // across two menus. Same question, one place.
+      { kind: 'group', label: t('nav.myRecords'), icon: '📜', children: [
+        { kind: 'link', path: '/history', label: t('nav.studyHistory'), icon: '📝' },
+        { kind: 'link', path: '/achievements', label: t('nav.achievements'), icon: '🏆' },
+      ]},
     ]},
-    { kind: 'link', path: '/achievements', label: t('nav.achievements'), icon: '🏆' },
     { kind: 'link', path: '/settings', label: t('nav.settings'), icon: '⚙️' },
     ...(role === 'admin' ? [{ kind: 'link' as const, path: '/admin', label: t('nav.admin'), icon: '🛡️' }] : []),
   ]

@@ -77,3 +77,4 @@ export type AiHubSource =
   | 'deck_create'
   | 'card_create'
   | 'quick_create'
+  | 'template_list'

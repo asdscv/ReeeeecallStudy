@@ -56,9 +56,11 @@ test.describe('AI hub — screenshot audit', () => {
   // The menu itself only exists once opened, so it needs its own shot.
   test('nav: study group expanded', async ({ page }) => {
     await page.goto('/dashboard')
-    await page.waitForTimeout(2000)
+    // The level-up celebration fires on arrival and draws over the header; without waiting it
+    // out, the one shot whose whole subject is the menu is a picture of confetti.
+    await page.waitForTimeout(7000)
     await page.getByRole('button', { name: /학습|Study/ }).first().click()
-    await page.waitForTimeout(500)
+    await page.waitForTimeout(600)
     await page.screenshot({ path: 'e2e/screenshots/ai-hub/nav-study-open.png' })
   })
 })
@@ -122,5 +124,18 @@ test.describe('AI hub — creation entry points', () => {
     expect(params.get('mode')).toBe('cards_only')
     expect(params.get('deckId')).toBeTruthy()
     await page.screenshot({ path: 'e2e/screenshots/ai-hub/entry-card-create-landed.png', fullPage: true })
+  })
+
+  test('card-templates page offers AI 생성 and lands in the menu', async ({ page }) => {
+    // 카드 템플릿 sits in the 덱·카드 section beside 덱, and the wizard's first step is a
+    // generated template — so the route in has to exist here too, not just on the deck list.
+    await page.goto('/templates')
+    await page.waitForTimeout(2500)
+    await page.screenshot({ path: 'e2e/screenshots/ai-hub/entry-templates.png' })
+
+    await page.getByRole('button', { name: /AI Generate|AI로 만들기/ }).first().click()
+    await page.waitForURL(/\/ai-generate/)
+    await page.waitForTimeout(1500)
+    expect(new URL(page.url()).searchParams.get('mode')).toBe('full')
   })
 })
