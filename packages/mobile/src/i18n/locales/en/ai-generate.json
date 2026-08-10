@@ -101,5 +101,27 @@
       "full": "New deck",
       "cards_only": "Add to a deck"
     }
+  },
+  "hub": {
+    "title": "AI Learning",
+    "subtitle": "Plan it, build it, practice it",
+    "entries": {
+      "learningPlan": {
+        "title": "Learning plan",
+        "desc": "Counts what is due today and lays it out as one day's workload"
+      },
+      "quiz": {
+        "title": "Quiz",
+        "desc": "Builds questions from a deck and grades your answers"
+      },
+      "generate": {
+        "title": "Deck & card generation",
+        "desc": "Makes decks and cards from a topic or a photo"
+      }
+    },
+    "badge": {
+      "ai": "AI"
+    },
+    "openAction": "Open"
   }
 }

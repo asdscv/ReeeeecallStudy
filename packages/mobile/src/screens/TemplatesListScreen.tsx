@@ -6,6 +6,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
 import { useTemplateStore } from '@reeeeecall/shared/stores/template-store'
+import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
 import type { CardTemplate } from '@reeeeecall/shared/types/database'
 import type { SettingsStackParamList } from '../navigation/types'
 
@@ -32,6 +33,12 @@ export function TemplatesListScreen() {
 
   const handleEdit = (template: CardTemplate) => {
     navigation.navigate('TemplateEdit', { templateId: template.id })
+  }
+
+  const handleAIGenerate = () => {
+    aiHubBus.emit({ type: 'ai_hub.generate_requested', mode: 'full', source: 'template_list' })
+    // Cross-stack: templates render inside SettingsStack, the wizard lives in AITab.
+    navigation.getParent()?.navigate('AITab', { screen: 'AIGenerate', params: { mode: 'full' } })
   }
 
   const handleNew = () => {
@@ -160,6 +167,17 @@ export function TemplatesListScreen() {
                   {t('template.subtitle')}
                 </Text>
               </View>
+              {/* Same route in as the deck list has. The wizard's first step is a generated
+                  template, so this screen having no way into it made the AI menu look like it
+                  only knew about decks. */}
+              <Button
+                testID="templates-ai-generate"
+                title={`🤖 ${t('aiGenerate')}`}
+                variant="ghost"
+                size="sm"
+                fullWidth={false}
+                onPress={handleAIGenerate}
+              />
               <Button
                 testID="templates-create-new"
                 title={t('template.newBtn')}

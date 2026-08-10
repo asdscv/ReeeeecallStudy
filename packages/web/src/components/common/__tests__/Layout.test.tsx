@@ -66,17 +66,32 @@ describe('기본 렌더링', () => {
 
 // ─── Cycle 2: 데스크톱 드롭다운 열기/닫기 ─────────────────────
 describe('데스크톱 드롭다운', () => {
-  it('학습 그룹 클릭 시 4개 자식이 모두 표시된다', async () => {
+  it('학습 그룹 클릭 시 네 섹션과 그 자식이 모두 표시된다', async () => {
     const user = userEvent.setup()
     renderLayout()
     const nav = screen.getAllByRole('navigation')[0]
 
     await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
 
-    expect(within(nav).getByText('nav.decks')).toBeInTheDocument()
-    expect(within(nav).getByText('nav.cards')).toBeInTheDocument()
-    expect(within(nav).getByText('nav.marketplace')).toBeInTheDocument()
-    expect(within(nav).getByText('nav.studyHistory')).toBeInTheDocument()
+    // The four sections the 학습 menu is now made of. AI 학습 is asserted by its own tests;
+    // these three are the ones this restructure created.
+    for (const section of ['nav.deckAndCards', 'nav.explore', 'nav.myRecords']) {
+      expect(within(nav).getByText(section), section).toBeInTheDocument()
+    }
+    for (const child of [
+      'nav.decks', 'nav.cardTemplates', 'nav.marketplace', 'nav.publisher', 'nav.myShares',
+      'nav.studyHistory', 'nav.achievements',
+    ]) {
+      expect(within(nav).getByText(child), child).toBeInTheDocument()
+    }
+  })
+
+  it('업적은 더 이상 탑레벨이 아니다 — 기록과 같은 섹션에 있다', () => {
+    // It used to be a top-level link while 기록 sat inside 학습, so "how much have I done"
+    // was answered from two different menus.
+    renderLayout()
+    const nav = screen.getAllByRole('navigation')[0]
+    expect(within(nav).queryByText('nav.achievements')).not.toBeInTheDocument()
   })
 
   it('같은 그룹 재클릭 시 닫힌다', async () => {
@@ -192,9 +207,10 @@ describe('모바일 아코디언', () => {
     await user.click(within(mobileNav).getByRole('button', { name: /nav\.study/ }))
 
     expect(within(mobileNav).getByText('nav.decks')).toBeInTheDocument()
-    expect(within(mobileNav).getByText('nav.cards')).toBeInTheDocument()
+    expect(within(mobileNav).getByText('nav.cardTemplates')).toBeInTheDocument()
     expect(within(mobileNav).getByText('nav.marketplace')).toBeInTheDocument()
     expect(within(mobileNav).getByText('nav.studyHistory')).toBeInTheDocument()
+    expect(within(mobileNav).getByText('nav.achievements')).toBeInTheDocument()
   })
 
   it('모바일 그룹 재클릭 시 자식이 축소된다', async () => {
@@ -234,7 +250,10 @@ describe('링크 정확성', () => {
 
     await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
     expect(within(nav).getByText('nav.decks').closest('a')).toHaveAttribute('href', '/decks')
-    expect(within(nav).getByText('nav.cards').closest('a')).toHaveAttribute('href', '/templates')
+    // The label must say what the page is: `/templates` is titled 카드 템플릿, and calling it
+    // "카드" next to 덱 promised a card list that does not exist anywhere in the app.
+    expect(within(nav).getByText('nav.cardTemplates').closest('a')).toHaveAttribute('href', '/templates')
+    expect(within(nav).getByText('nav.achievements').closest('a')).toHaveAttribute('href', '/achievements')
     expect(within(nav).getByText('nav.marketplace').closest('a')).toHaveAttribute('href', '/marketplace')
     expect(within(nav).getByText('nav.studyHistory').closest('a')).toHaveAttribute('href', '/history')
   })

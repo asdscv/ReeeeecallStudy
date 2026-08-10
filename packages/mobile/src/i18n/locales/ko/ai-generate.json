@@ -101,5 +101,27 @@
       "full": "새 덱",
       "cards_only": "덱에 추가"
     }
+  },
+  "hub": {
+    "title": "AI 학습",
+    "subtitle": "계획하고, 만들고, 풀어보세요",
+    "entries": {
+      "learningPlan": {
+        "title": "학습 플랜",
+        "desc": "오늘 복습할 분량을 계산해 하루치로 짜줍니다"
+      },
+      "quiz": {
+        "title": "퀴즈",
+        "desc": "덱에서 문제를 만들고 답안을 채점합니다"
+      },
+      "generate": {
+        "title": "덱·카드 생성",
+        "desc": "주제나 사진에서 덱과 카드를 만듭니다"
+      }
+    },
+    "badge": {
+      "ai": "AI"
+    },
+    "openAction": "열기"
   }
 }

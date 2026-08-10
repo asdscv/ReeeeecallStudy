@@ -7,3 +7,7 @@ playwright.local.config.ts
 # Playwright screenshot artifacts — the specs that write them are committed,
 # the images are per-run output and change on every execution.
 playwright/
+
+# AI-hub screenshot audit output — same rule as `playwright/` above: the spec that
+# writes them is committed, the images are per-run and change on every execution.
+e2e/screenshots/

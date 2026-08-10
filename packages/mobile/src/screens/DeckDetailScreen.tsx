@@ -12,6 +12,7 @@ import { useCards } from '../hooks/useCards'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
 import { useSyncStore } from '@reeeeecall/shared/stores/sync-store'
+import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
 import type { DeckShare } from '@reeeeecall/shared/types/database'
 import { getMobileSupabase } from '../adapters'
 import type { DecksStackParamList } from '../navigation/types'
@@ -549,18 +550,32 @@ export function DeckDetailScreen() {
           >
             <Text style={[theme.typography.caption, { color: theme.colors.text }]}>{t('detail.addCard')}</Text>
           </TouchableOpacity>
+          {/* Offered only where cards can actually land. A read-only deck — a subscribed or
+              official one — cannot receive generated cards: the AI screen drops the deck the
+              moment its owned-and-editable list loads, and the wizard silently reopens on
+              "전체 생성". Verified on a simulator against an official deck, where the button
+              looked like it worked and quietly asked for the wrong thing. */}
+          {!deck.is_readonly && (
           <TouchableOpacity
             style={[styles.actionPill, { borderColor: theme.colors.border }]}
             onPress={() => {
+              aiHubBus.emit({ type: 'ai_hub.generate_requested', mode: 'cards_only', source: 'deck_detail', deckId })
               const tabNav = navigation.getParent()
               if (tabNav) {
-                tabNav.navigate('SettingsTab', { screen: 'AIGenerate' })
+                // The deck is the whole point of this button — hand it over, plus the template
+                // the generated cards must match, so the wizard opens on THIS deck instead of
+                // making the user pick it again.
+                tabNav.navigate('AITab', {
+                  screen: 'AIGenerate',
+                  params: { deckId, mode: 'cards_only', templateId: deck.default_template_id ?? undefined },
+                })
               }
             }}
             testID="deck-detail-ai-cards"
           >
             <Text style={[theme.typography.caption, { color: theme.colors.text }]}>{t('detail.aiCards')}</Text>
           </TouchableOpacity>
+          )}
           <TouchableOpacity
             style={[styles.actionPill, { borderColor: theme.colors.border }]}
             onPress={() => navigation.navigate('ImportExport', { deckId })}

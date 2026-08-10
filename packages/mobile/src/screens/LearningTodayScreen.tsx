@@ -22,7 +22,7 @@ import {
 } from '@reeeeecall/shared/learning/application/cadence'
 import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
 import { useStudy } from '../hooks/useStudy'
-import type { SettingsStackParamList } from '../navigation/types'
+import type { AIStackParamList } from '../navigation/types'
 
 /**
  * Today's plan — mobile parity with the web `/learning` screen.
@@ -65,8 +65,8 @@ export function LearningTodayScreen() {
   const { t: tCommon } = useTranslation('common')
   const theme = useTheme()
   const insets = useSafeAreaInsets()
-  const navigation = useNavigation<NavigationProp<SettingsStackParamList>>()
-  const route = useRoute<RouteProp<SettingsStackParamList, 'LearningToday'>>()
+  const navigation = useNavigation<NavigationProp<AIStackParamList>>()
+  const route = useRoute<RouteProp<AIStackParamList, 'LearningToday'>>()
   const {
     goals, goalsLoading, fetchGoals,
     plan, planItems, planCards, planLoading, planGenerating, planError,

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import {
   Dialog,
   DialogContent,
@@ -8,6 +9,7 @@ import {
   DialogFooter,
 } from '../ui/dialog'
 import { useCardStore } from '../../stores/card-store'
+import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
 import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
 import { CardLimitBlock } from './CardLimitBlock'
 import { useAuthStore } from '../../stores/auth-store'
@@ -25,6 +27,7 @@ interface CardFormModalProps {
 
 export function CardFormModal({ open, onClose, deckId, template, editCard }: CardFormModalProps) {
   const { t } = useTranslation('cards')
+  const navigate = useNavigate()
   const { createCard, updateCard } = useCardStore()
   const limit = useCardLimit()
   const user = useAuthStore((s) => s.user)
@@ -229,6 +232,16 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
     await submitCard(false)
   }
 
+  // Whatever is typed in the form is abandoned on purpose — the wizard generates from a topic,
+  // and half a card is not a prompt.
+  const handleAICards = () => {
+    aiHubBus.emit({ type: 'ai_hub.generate_requested', mode: 'cards_only', source: 'card_create', deckId })
+    onClose()
+    const params = new URLSearchParams({ mode: 'cards_only', deckId })
+    if (template) params.set('templateId', template.id)
+    navigate(`/ai-generate?${params.toString()}`)
+  }
+
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) onClose() }}>
       <DialogContent className="sm:max-w-lg">
@@ -385,6 +398,20 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
                 className="w-full px-4 py-2.5 rounded-lg border border-border focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none text-foreground"
               />
             </div>
+
+            {/* Optional hand-off to the AI wizard — deliberately a link, not a button, so it
+                never reads as an alternative to saving the card being typed. */}
+            {!editCard && (
+              <div className="pt-3 border-t border-border text-center">
+                <button
+                  type="button"
+                  onClick={handleAICards}
+                  className="text-xs text-purple-600 dark:text-purple-400 hover:underline cursor-pointer"
+                >
+                  {t('button.aiCards', { ns: 'ai-generate' })}
+                </button>
+              </div>
+            )}
 
             {/* Buttons */}
             <DialogFooter>

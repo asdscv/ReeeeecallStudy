@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigation, type NavigationProp } from '@react-navigation/native'
 import { Screen, ScreenHeader } from '../components/ui'
 import { useTheme } from '../theme'
-import type { SettingsStackParamList } from '../navigation/types'
+import type { AIStackParamList } from '../navigation/types'
 import { testProps } from '../utils/testProps'
 import {
   availableDomainIds, projectWorkload, daysForDailyBudget, studyDaysBetween,
@@ -56,7 +56,7 @@ const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 } as const
 export function LearningGoalsScreen() {
   const { t } = useTranslation('learning')
   const theme = useTheme()
-  const navigation = useNavigation<NavigationProp<SettingsStackParamList>>()
+  const navigation = useNavigation<NavigationProp<AIStackParamList>>()
   const {
     goals, goalsLoading, goalsError, fetchGoals, createGoal, archiveGoal, deleteGoal,
     archivedGoals, archivedGoalsLoading, fetchArchivedGoals, restoreGoal,

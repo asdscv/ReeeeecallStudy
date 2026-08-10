@@ -10,6 +10,7 @@ import { useTheme } from '../theme'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
 import { useCardStore } from '@reeeeecall/shared/stores/card-store'
 import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
+import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
 import type { CardTemplate } from '@reeeeecall/shared/types/database'
 import { getMobileSupabase } from '../adapters'
 import type { DecksStackParamList } from '../navigation/types'
@@ -300,6 +301,32 @@ export function CardEditScreen() {
             }}
             loading={saving}
             disabled={!hasContent}
+          />
+        )}
+
+        {/* Create mode only: the same cards, generated into THIS deck. Ghost so it stays behind
+            both save buttons — typing a card by hand must stay the fastest path. Keyed on the
+            route param, not `isEditing`: the card row arrives a beat after mount, and this must
+            not flash while editing one. */}
+        {/* `!deck?.is_readonly` and not just `!cardId`: a read-only deck cannot receive generated
+            cards, and the AI screen drops the deck as soon as its owned-and-editable list loads —
+            so on a subscribed deck this button would quietly reopen the wizard on 전체 생성. Seen
+            on a simulator against an official deck. */}
+        {!cardId && !deck?.is_readonly && (
+          <Button
+            testID="card-edit-ai-cards"
+            title={`🤖 ${t('detail.aiCards')}`}
+            variant="ghost"
+            onPress={() => {
+              aiHubBus.emit({ type: 'ai_hub.generate_requested', mode: 'cards_only', source: 'card_create', deckId })
+              const tabNav = navigation.getParent()
+              if (tabNav) {
+                tabNav.navigate('AITab', {
+                  screen: 'AIGenerate',
+                  params: { deckId, mode: 'cards_only', templateId: deck?.default_template_id ?? undefined },
+                })
+              }
+            }}
           />
         )}
       </View>

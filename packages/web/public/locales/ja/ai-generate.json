@@ -171,5 +171,27 @@
     "speedDesc": "Create 10-50 high-quality cards in under a minute.",
     "freeTitle": "無料で開始",
     "freeDesc": "毎日無料カードを提供。すぐに始められます。"
+  },
+  "hub": {
+    "title": "AI学習",
+    "subtitle": "計画して、作って、解いてみましょう",
+    "entries": {
+      "learningPlan": {
+        "title": "学習プラン",
+        "desc": "今日復習する分量を計算して1日分に組み立てます"
+      },
+      "quiz": {
+        "title": "クイズ",
+        "desc": "デッキから問題を作り、解答を採点します"
+      },
+      "generate": {
+        "title": "デッキ・カード生成",
+        "desc": "トピックや写真からデッキとカードを作ります"
+      }
+    },
+    "badge": {
+      "ai": "AI"
+    },
+    "openAction": "開く"
   }
 }

@@ -171,5 +171,27 @@
     "speedDesc": "Create 10-50 high-quality cards in under a minute.",
     "freeTitle": "Mulai gratis",
     "freeDesc": "Kartu gratis setiap hari — langsung mulai."
+  },
+  "hub": {
+    "title": "Belajar dengan AI",
+    "subtitle": "Rencanakan, buat, lalu latih",
+    "entries": {
+      "learningPlan": {
+        "title": "Rencana belajar",
+        "desc": "Menghitung yang jatuh tempo hari ini dan menyusunnya jadi porsi satu hari"
+      },
+      "quiz": {
+        "title": "Kuis",
+        "desc": "Membuat soal dari dek dan menilai jawabanmu"
+      },
+      "generate": {
+        "title": "Buat dek & kartu",
+        "desc": "Membuat dek dan kartu dari topik atau foto"
+      }
+    },
+    "badge": {
+      "ai": "AI"
+    },
+    "openAction": "Buka"
   }
 }

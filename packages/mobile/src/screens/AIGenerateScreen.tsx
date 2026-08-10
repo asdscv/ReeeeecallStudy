@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, 
 import * as ImagePicker from 'expo-image-picker'
 import * as ImageManipulator from 'expo-image-manipulator'
 import { useTranslation } from 'react-i18next'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import { Screen, TextInput, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { useAIGenerateStore } from '@reeeeecall/shared/stores/ai-generate-store'
 import { getAffordableCards, formatUsdMicro, formatCount, type Affordable } from '@reeeeecall/shared/lib/ai/server-client'
@@ -11,6 +11,7 @@ import { defaultCardCount, MAX_CARD_COUNT } from '@reeeeecall/shared/lib/ai/card
 import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
 import { useDecks, useAuthState } from '../hooks'
 import { useTheme, palette } from '../theme'
+import type { AIStackParamList } from '../navigation/types'
 
 // AI generation runs on our server key (metered free tier) — no provider/API
 // key selection on the client.
@@ -184,6 +185,7 @@ export function AIGenerateScreen() {
   const { t: tLimit } = useTranslation(['errors', 'settings'])
   const theme = useTheme()
   const navigation = useNavigation()
+  const route = useRoute<RouteProp<AIStackParamList, 'AIGenerate'>>()
   const store = useAIGenerateStore()
   const { decks } = useDecks()
   const { user } = useAuthState()
@@ -204,7 +206,14 @@ export function AIGenerateScreen() {
   const [topic, setTopic] = useState('')
   const [cardCount, setCardCount] = useState('10')
   const [contentLang, setContentLang] = useState('en-US')
-  const [selectedDeckId, setSelectedDeckId] = useState('')
+  // Entry points outside the hub (deck list, deck detail, deck/card creation) arrive with the
+  // surface already chosen. A selected deck IS cards_only mode on this screen — the same rule
+  // the two mode cards below toggle — so `mode: 'full'` means "start with no deck", and a
+  // `deckId` is what selects cards_only. Opened with no params the wizard starts blank, exactly
+  // as it did before.
+  const [selectedDeckId, setSelectedDeckId] = useState(
+    route.params?.mode === 'full' ? '' : route.params?.deckId ?? '',
+  )
   const [showLangPicker, setShowLangPicker] = useState(false)
   const [showDeckPicker, setShowDeckPicker] = useState(false)
 
@@ -223,7 +232,34 @@ export function AIGenerateScreen() {
   // own template — never an arbitrary global templates[0], whose fields wouldn't
   // match the deck. A deck with no default_template_id can't accept AI cards yet.
   const selectedDeck = targetDecks.find((d) => d.id === selectedDeckId)
-  const cardsOnlyNeedsTemplate = !!selectedDeckId && !selectedDeck?.default_template_id
+  // `route.params.templateId` is the same id the caller read off that deck, and it stands in
+  // ONLY while `useDecks()` is still loading the deck itself — otherwise arriving with a
+  // preselected deck renders the `alert.deckNoTemplate` block and a disabled generate button
+  // until the list lands. Once the deck row is here, its own default_template_id is the only
+  // answer: a template whose fields don't match the deck is what this path must never use.
+  const deckTemplateId = selectedDeck
+    ? selectedDeck.default_template_id ?? null
+    : route.params?.templateId ?? null
+  const cardsOnlyNeedsTemplate = !!selectedDeckId && !deckTemplateId
+
+  // Re-seed when a NEW navigation arrives with different params.
+  //
+  // `useState(initial)` runs once. This screen lives in a stack, so the second entry point a
+  // user presses navigates to the instance that is already mounted: React Navigation swaps
+  // `route.params` and re-renders, and the initialiser above never runs again. Pressing
+  // "AI로 만들기" in deck creation and then "AI 카드" in card creation left the wizard on 전체 생성
+  // with no deck — the mode the FIRST press asked for. Caught on a simulator; a mounted-once
+  // screen looks correct in every single-navigation test.
+  //
+  // Keyed on the param values rather than the params object: React Navigation hands out a new
+  // object per navigate, so keying on identity would re-seed on a bare re-entry and discard a
+  // deck the user had picked by hand.
+  const paramMode = route.params?.mode
+  const paramDeckId = route.params?.deckId
+  useEffect(() => {
+    if (!paramMode && !paramDeckId) return
+    setSelectedDeckId(paramMode === 'full' ? '' : paramDeckId ?? '')
+  }, [paramMode, paramDeckId])
 
   // Clear a selection that isn't an owned+editable deck once the deck list has loaded,
   // so a target the save path would reject can never stay selected.
@@ -344,7 +380,7 @@ export function AIGenerateScreen() {
     try {
       // cards_only: use the deck's OWN template (guaranteed present by the guard
       // above). No templates[0] fallback — its fields wouldn't match the deck.
-      const templateId = selectedDeck?.default_template_id ?? null
+      const templateId = deckTemplateId
 
       store.setConfig({
         mode: selectedDeckId ? 'cards_only' : 'full',

@@ -171,5 +171,27 @@
     "speedDesc": "Create 10-50 high-quality cards in under a minute.",
     "freeTitle": "免费开始",
     "freeDesc": "每天提供免费卡片，立即开始。"
+  },
+  "hub": {
+    "title": "AI 学习",
+    "subtitle": "规划、生成、练习",
+    "entries": {
+      "learningPlan": {
+        "title": "学习计划",
+        "desc": "计算今天该复习的数量，安排成一天的份量"
+      },
+      "quiz": {
+        "title": "测验",
+        "desc": "从牌组生成题目并批改你的答案"
+      },
+      "generate": {
+        "title": "牌组与卡片生成",
+        "desc": "根据主题或照片生成牌组和卡片"
+      }
+    },
+    "badge": {
+      "ai": "AI"
+    },
+    "openAction": "打开"
   }
 }

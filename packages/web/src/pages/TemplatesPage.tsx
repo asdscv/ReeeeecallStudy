@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { toIntlLocale } from '../lib/locale-utils'
 import { toast } from 'sonner'
+import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
 import { useTemplateStore } from '../stores/template-store'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
 import { formatLocalDate } from '../lib/date-utils'
@@ -26,6 +27,11 @@ export function TemplatesPage() {
 
   const handleEdit = (tmpl: CardTemplate) => {
     navigate(`/templates/${tmpl.id}/edit`)
+  }
+
+  const handleAIGenerate = () => {
+    aiHubBus.emit({ type: 'ai_hub.generate_requested', mode: 'full', source: 'template_list' })
+    navigate('/ai-generate?mode=full')
   }
 
   const handleNew = () => {
@@ -93,12 +99,23 @@ export function TemplatesPage() {
             {t('subtitle')}
           </p>
         </div>
-        <button
-          onClick={handleNew}
-          className="px-3 sm:px-4 py-2 bg-brand text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-brand-hover transition cursor-pointer shrink-0"
-        >
-          {t('createNew')}
-        </button>
+        <div className="flex gap-2 shrink-0">
+          {/* Templates sit in the 덱·카드 section next to 덱, and 덱 has had an AI route in for a
+              while — the wizard's first step IS a generated template, so leaving this screen
+              without one made the AI menu look like it only knew about decks. */}
+          <button
+            onClick={handleAIGenerate}
+            className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-purple-700 active:scale-[0.98] transition cursor-pointer"
+          >
+            {t('ai-generate:button.aiGenerate')}
+          </button>
+          <button
+            onClick={handleNew}
+            className="px-3 sm:px-4 py-2 bg-brand text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
+          >
+            {t('createNew')}
+          </button>
+        </div>
       </div>
 
       {error && (

@@ -18,7 +18,7 @@ import { ImportModal } from '../components/import-export/ImportModal'
 import { ExportModal } from '../components/import-export/ExportModal'
 import { UploadDateTab } from '../components/deck/UploadDateTab'
 import { DeckStatsTab } from '../components/deck/DeckStatsTab'
-import { AIGenerateModal } from '../components/ai-generate/AIGenerateModal'
+import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import { DetailSkeleton } from '../components/common/Skeleton'
 import { VersionHistorySection } from '../components/deck/VersionHistorySection'
@@ -64,9 +64,6 @@ export function DeckDetailPage() {
   // Import/Export
   const [showImport, setShowImport] = useState(false)
   const [showExport, setShowExport] = useState(false)
-
-  // AI Generate
-  const [showAIGenerate, setShowAIGenerate] = useState(false)
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1)
@@ -285,6 +282,21 @@ export function DeckDetailPage() {
     // createCards already calls fetchCards internally, no need to refetch
   }
 
+  const handleAICards = () => {
+    if (!deckId) return
+    aiHubBus.emit({
+      type: 'ai_hub.generate_requested',
+      mode: 'cards_only',
+      source: 'deck_detail',
+      deckId,
+    })
+    const params = new URLSearchParams({ mode: 'cards_only', deckId })
+    // A deck may still have no default template; omit the param rather than send the
+    // string "null", which the page would then look up as a real template id.
+    if (deck.default_template_id) params.set('templateId', deck.default_template_id)
+    navigate(`/ai-generate?${params.toString()}`)
+  }
+
   const handleSync = async () => {
     if (!deckId) return
     setSyncMessage(null)
@@ -418,7 +430,7 @@ export function DeckDetailPage() {
           )}
           {!deck.is_readonly && (
             <button
-              onClick={() => setShowAIGenerate(true)}
+              onClick={handleAICards}
               className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-purple-50 border border-purple-300 text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-100 transition cursor-pointer"
             >
               <Sparkles className="w-4 h-4" />
@@ -802,15 +814,6 @@ export function DeckDetailPage() {
           isOwner={!deck.is_readonly}
         />
       )}
-
-      {/* AI Generate Modal */}
-      <AIGenerateModal
-        open={showAIGenerate}
-        onClose={() => { setShowAIGenerate(false); if (deckId) fetchCards(deckId) }}
-        initialMode="cards_only"
-        existingDeckId={deckId}
-        existingTemplateId={deck.default_template_id}
-      />
 
       {/* Card Form Modal */}
       <CardFormModal

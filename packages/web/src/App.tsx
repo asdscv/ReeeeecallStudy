@@ -73,6 +73,11 @@ const AIGeneratePage = lazy(() =>
   import('./pages/AIGeneratePage').then(m => ({ default: m.AIGeneratePage }))
 )
 
+// AI 학습 hub — the menu landing that lists every registered AI feature
+const AIHubPage = lazy(() =>
+  import('./pages/ai/AIHubPage').then(m => ({ default: m.AIHubPage }))
+)
+
 // Deck Edit
 const DeckEditPage = lazy(() =>
   import('./pages/DeckEditPage').then(m => ({ default: m.DeckEditPage }))
@@ -297,6 +302,9 @@ function App() {
               <Route path="/quiz/:runId/result" element={<QuizResultPage />} />
               <Route path="/history" element={<StudyHistoryPage />} />
               <Route path="/history/detail" element={<SessionDetailPage />} />
+              {/* The AI 학습 menu landing. The features keep their own URLs — this is the
+                  index over them, not a prefix they moved under. */}
+              <Route path="/ai" element={<AIHubPage />} />
               <Route path="/ai-generate" element={<AIGeneratePage />} />
               <Route path="/decks" element={<DecksPage />} />
               <Route path="/decks/:deckId" element={<DeckDetailPage />} />

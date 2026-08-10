@@ -3,14 +3,17 @@ import { View, Text, Image, TouchableOpacity, ScrollView, StyleSheet } from 'rea
 import { createDrawerNavigator, type DrawerContentComponentProps } from '@react-navigation/drawer'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
+import { aiHubEntries } from '@reeeeecall/shared/lib/ai/hub/catalog'
 import { useTheme, palette } from '../theme'
 import { useAuthState } from '../hooks'
+import { useAiHubEventBridge } from '../hooks/useAiHubEventBridge'
 import { getMobileSupabase } from '../adapters'
 
 // Stacks
 import { HomeStack } from './HomeStack'
 import { DecksStack } from './DecksStack'
 import { StudyStack } from './StudyStack'
+import { AIStack } from './AIStack'
 import { QuizStack } from './QuizStack'
 import { MarketplaceStack } from './MarketplaceStack'
 import { SettingsStack } from './SettingsStack'
@@ -25,6 +28,7 @@ const Drawer = createDrawerNavigator<MainTabParamList>()
  * 1. Quick Study
  * 2. Dashboard
  * 3. Study (group)
+ *    └ AI 학습 (sub-group, always expanded — see the comment at its call site)
  * 4. Settings
  * 5. Admin (conditional)
  * ---
@@ -109,35 +113,45 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
 
         {studyGroupOpen && (
           <View>
-            <MenuItem icon="🎯" label={t('nav.learningPlan')} indent active={isActive('LearningGoals')} theme={theme}
-              onPress={() => go('SettingsTab', 'LearningGoals')} testID="drawer-learning-plan" />
-            <MenuItem icon="❓" label={t('nav.quiz')} indent active={isActive('QuizHome')} theme={theme}
-              onPress={() => go('QuizTab', 'QuizHome', 'QuizTab')} testID="drawer-quiz" />
-            <MenuItem icon="🤖" label={t('nav.aiGenerate')} indent active={isActive('AIGenerate')} theme={theme}
-              onPress={() => go('SettingsTab', 'AIGenerate')} testID="drawer-ai-generate" />
-            <MenuItem icon="📚" label={t('nav.decks')} indent active={isActive('DecksTab')} theme={theme}
+            {/* AI 학습 — header opens the hub, its three features sit one level deeper.
+                Always expanded rather than a second collapse: the parent 학습 group already
+                starts closed on every mount, and nesting another toggle would put the newest
+                menu three taps from the drawer opening. */}
+            <SectionLabel label={t('nav.aiHub')} icon="🤖" theme={theme} active={isActive('AIHub')}
+              onPress={() => go('AITab', 'AIHub')} testID="drawer-ai-hub" />
+            {aiHubEntries().map((entry) => (
+              <MenuItem key={entry.id} icon={entry.icon} label={t(entry.titleKey, { ns: 'ai-generate' })}
+                indent indentLevel={2} active={isActive(entry.mobileScreen)} theme={theme}
+                onPress={() => go(entry.mobileStack, entry.mobileScreen)} testID={`drawer-ai-${entry.id}`} />
+            ))}
+            {/* `nav.cards` pointed at TemplatesList, whose own screen is titled 카드 템플릿, and
+                there is no card list on mobile either — cards live inside a deck. Renamed, and
+                paired with 덱 rather than standing beside it as if it were the other half. */}
+            <SectionLabel label={t('nav.deckAndCards')} icon="🗃️" theme={theme} />
+            <MenuItem icon="📚" label={t('nav.decks')} indent indentLevel={2} active={isActive('DecksTab')} theme={theme}
               onPress={() => go('DecksTab', undefined, 'DecksTab')} testID="drawer-decks" />
-            <MenuItem icon="📋" label={t('nav.cards')} indent active={isActive('TemplatesList')} theme={theme}
+            <MenuItem icon="📋" label={t('nav.cardTemplates')} indent indentLevel={2} active={isActive('TemplatesList')} theme={theme}
               onPress={() => go('SettingsTab', 'TemplatesList')} testID="drawer-cards" />
-            <MenuItem icon="🏪" label={t('nav.marketplace')} indent active={isActive('MarketplaceTab')} theme={theme}
+
+            <SectionLabel label={t('nav.explore')} icon="🧭" theme={theme} />
+            <MenuItem icon="🏪" label={t('nav.marketplace')} indent indentLevel={2} active={isActive('MarketplaceTab')} theme={theme}
               onPress={() => go('MarketplaceTab', undefined, 'MarketplaceTab')} testID="drawer-marketplace" />
-            <MenuItem icon="📊" label={t('nav.publisherStats', { defaultValue: 'Publisher Stats' })} indent active={isActive('PublisherStats')} theme={theme}
+            <MenuItem icon="📊" label={t('nav.publisherStats', { defaultValue: 'Publisher Stats' })} indent indentLevel={2} active={isActive('PublisherStats')} theme={theme}
               onPress={() => go('SettingsTab', 'PublisherStats')} testID="drawer-publisher-stats" />
-            <MenuItem icon="🔗" label={t('shares.title', { ns: 'settings', defaultValue: 'My Shares' })} indent active={isActive('MyShares')} theme={theme}
+            {/* `nav.myShares`, not `settings:shares.title`: web needed the same row and had no
+                such key, and one menu label living in two namespaces drifts. */}
+            <MenuItem icon="🔗" label={t('nav.myShares')} indent indentLevel={2} active={isActive('MyShares')} theme={theme}
               onPress={() => go('SettingsTab', 'MyShares')} testID="drawer-my-shares" />
-            <MenuItem icon="📝" label={t('nav.studyHistory')} indent active={isActive('StudyHistory')} theme={theme}
+
+            {/* 업적 was a top-level row while 기록 sat in here, splitting one question across two
+                menus. Same move as web. */}
+            <SectionLabel label={t('nav.myRecords')} icon="📜" theme={theme} />
+            <MenuItem icon="📝" label={t('nav.studyHistory')} indent indentLevel={2} active={isActive('StudyHistory')} theme={theme}
               onPress={() => go('HomeTab', 'StudyHistory')} testID="drawer-history" />
+            <MenuItem icon="🏆" label={t('nav.achievements', { defaultValue: 'Achievements' })} indent indentLevel={2} active={isActive('Achievements')} theme={theme}
+              onPress={() => go('SettingsTab', 'Achievements')} testID="drawer-achievements" />
           </View>
         )}
-
-        {/* Achievements */}
-        <MenuItem
-          icon="🏆" label={t('nav.achievements', { defaultValue: 'Achievements' })}
-          active={isActive('Achievements')}
-          theme={theme}
-          onPress={() => go('SettingsTab', 'Achievements')}
-          testID="drawer-achievements"
-        />
 
         {/* Settings */}
         <MenuItem
@@ -177,9 +191,46 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
   )
 }
 
-function MenuItem({ icon, label, active, theme, onPress, indent, testID }: {
+/**
+ * A heading inside the 학습 group — one per section, all four drawn the same.
+ *
+ * `onPress` is what separates them: AI 학습 has a screen behind it (the hub) and opens; 덱·카드,
+ * 탐색 and 내 기록 only name a set, so they render as plain text and cannot be tapped. Web makes
+ * the identical distinction — a `<Link>` when the section has a path, a `<p>` when it does not —
+ * and the two platforms have to agree, or the same menu teaches two different things about what
+ * a heading does.
+ */
+function SectionLabel({ label, icon, theme, onPress, active, testID }: {
+  label: string; icon: string; theme: ReturnType<typeof useTheme>
+  onPress?: () => void; active?: boolean; testID?: string
+}) {
+  const color = active
+    ? (theme.isDark ? palette.blue[400] : palette.blue[700])
+    : theme.colors.textTertiary
+  const content = (
+    <>
+      <Text style={styles.sectionIcon}>{icon}</Text>
+      <Text style={[styles.sectionText, { color }]}>{label}</Text>
+    </>
+  )
+  if (!onPress) return <View style={styles.sectionLabel}>{content}</View>
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.7}
+      testID={testID}
+      accessibilityLabel={testID}
+      style={styles.sectionLabel}
+    >
+      {content}
+    </TouchableOpacity>
+  )
+}
+
+function MenuItem({ icon, label, active, theme, onPress, indent, indentLevel = 1, testID }: {
   icon: string; label: string; active: boolean
-  theme: ReturnType<typeof useTheme>; onPress: () => void; indent?: boolean; testID?: string
+  theme: ReturnType<typeof useTheme>; onPress: () => void
+  indent?: boolean; indentLevel?: 1 | 2; testID?: string
 }) {
   return (
     <TouchableOpacity
@@ -189,7 +240,7 @@ function MenuItem({ icon, label, active, theme, onPress, indent, testID }: {
       accessibilityLabel={testID}
       style={[
         styles.menuItem,
-        indent && styles.menuItemIndent,
+        indent && (indentLevel === 2 ? styles.menuItemIndent2 : styles.menuItemIndent),
         active && { backgroundColor: theme.isDark ? 'rgba(59,130,246,0.15)' : palette.blue[50] },
       ]}
     >
@@ -238,6 +289,10 @@ function QuickTips({ theme }: { theme: ReturnType<typeof useTheme> }) {
 // Drawer Navigator
 export function MainDrawer() {
   const theme = useTheme()
+  // Mounted here rather than in RootNavigator because this is the narrowest component that wraps
+  // every authenticated screen: the bus only carries AI 학습 events, all of which are behind auth,
+  // and a subscription above the auth branch would outlive a sign-out.
+  useAiHubEventBridge()
 
   return (
     <Drawer.Navigator
@@ -256,6 +311,7 @@ export function MainDrawer() {
       <Drawer.Screen name="HomeTab" component={HomeStack} />
       <Drawer.Screen name="DecksTab" component={DecksStack} />
       <Drawer.Screen name="StudyTab" component={StudyStack} />
+      <Drawer.Screen name="AITab" component={AIStack} />
       <Drawer.Screen name="QuizTab" component={QuizStack} />
       <Drawer.Screen name="MarketplaceTab" component={MarketplaceStack} />
       <Drawer.Screen name="SettingsTab" component={SettingsStack} />
@@ -274,6 +330,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, paddingVertical: 14, marginHorizontal: 8, borderRadius: 10,
   },
   menuItemIndent: { paddingLeft: 48, paddingVertical: 10 },
+  menuItemIndent2: { paddingLeft: 68, paddingVertical: 10 },
+  sectionLabel: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    paddingLeft: 48, paddingRight: 16, paddingTop: 14, paddingBottom: 4, marginHorizontal: 8,
+  },
+  sectionIcon: { fontSize: 13 },
+  sectionText: { fontSize: 12, fontWeight: '600', letterSpacing: 0.3 },
   menuIcon: { fontSize: 18 },
   menuLabel: { fontSize: 15 },
   chevron: { fontSize: 18, fontWeight: '300' },
