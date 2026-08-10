@@ -18,6 +18,35 @@ lists the same three as cards and shows the AI wallet balance and today's remain
 No feature URL or route name changed. The three surfaces are exactly where they were; what is new
 is that there is one place that names them.
 
+## The four sections of 학습
+
+Gathering the AI features left everything else flat beneath them, doing four different jobs at
+once. The whole menu is now named groups:
+
+| section | contents | header opens |
+| --- | --- | --- |
+| AI 학습 | 학습 플랜 · 퀴즈 · 덱·카드 생성 | the hub |
+| 덱·카드 | 덱 · 카드 템플릿 | — |
+| 탐색 | 마켓 · 퍼블리셔 통계 ( · 내 공유, mobile only) | — |
+| 내 기록 | 학습 기록 · 업적 | — |
+
+Only AI 학습 has a screen behind its heading, so only it is tappable: web renders a `<Link>` when
+the section has a `path` and a `<p>` when it does not, and mobile's `SectionLabel` takes an
+optional `onPress` for exactly the same reason. Keep those in step — a heading that opens
+something on one platform and not the other teaches two different things about the same menu.
+
+Two renames came with it, and neither is cosmetic:
+
+- **카드 → 카드 템플릿.** The item linked to `/templates`, whose own page title is 카드 템플릿, while
+  sitting directly beside 덱 — so it read as "덱 = 묶음, 카드 = 낱장" and promised a card list that
+  exists nowhere in the app. Cards only ever live inside a deck. `Layout.test.tsx` now pins the
+  label to the href.
+- **업적 moved off the top level** into 내 기록 beside 학습 기록. Both answer "how much have I
+  done", and they were being answered from two different menus.
+
+`nav.cards` is left in the locale files, unused. Nothing reads it and no test flags an orphan;
+delete it the next time these files are open for another reason.
+
 ## Adding a fourth AI feature
 
 One registration, in `packages/shared/lib/ai/hub/catalog.ts`:
@@ -98,8 +127,11 @@ either.
 
 ## Entry points
 
-"AI로 만들기" in deck creation and "AI 카드" in card creation navigate into the menu's generate
-surface with the mode already chosen — `?mode=full` and `?mode=cards_only&deckId=…&templateId=…` on
+Every screen in the 덱·카드 section has a route into the menu's generate surface, with the mode
+already chosen: the deck list, a deck's detail, new-deck and new-card, quick create, and the card
+templates list (`'template_list'` source — the wizard's first step *is* a generated template, so a
+templates screen with no way in made the AI menu look like it only knew about decks). All of them
+navigate — `?mode=full` and `?mode=cards_only&deckId=…&templateId=…` on
 web, the equivalent route params on mobile. Both are ghost/secondary actions placed after the
 primary save: typing a deck or a card by hand stays the fastest path.
 

@@ -117,7 +117,7 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
                 Always expanded rather than a second collapse: the parent 학습 group already
                 starts closed on every mount, and nesting another toggle would put the newest
                 menu three taps from the drawer opening. */}
-            <MenuItem icon="🤖" label={t('nav.aiHub')} indent active={isActive('AIHub')} theme={theme}
+            <SectionLabel label={t('nav.aiHub')} icon="🤖" theme={theme} active={isActive('AIHub')}
               onPress={() => go('AITab', 'AIHub')} testID="drawer-ai-hub" />
             {aiHubEntries().map((entry) => (
               <MenuItem key={entry.id} icon={entry.icon} label={t(entry.titleKey, { ns: 'ai-generate' })}
@@ -190,20 +190,38 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
 }
 
 /**
- * A non-tappable heading inside the 학습 group.
+ * A heading inside the 학습 group — one per section, all four drawn the same.
  *
- * 덱·카드, 탐색 and 내 기록 name a set; none of them has a landing screen to open, so they must
- * not look tappable. AI 학습 stays a `MenuItem` because it does have one — the hub. Web draws
- * the same distinction: a `<Link>` when the section has a path, a `<p>` when it does not.
+ * `onPress` is what separates them: AI 학습 has a screen behind it (the hub) and opens; 덱·카드,
+ * 탐색 and 내 기록 only name a set, so they render as plain text and cannot be tapped. Web makes
+ * the identical distinction — a `<Link>` when the section has a path, a `<p>` when it does not —
+ * and the two platforms have to agree, or the same menu teaches two different things about what
+ * a heading does.
  */
-function SectionLabel({ label, icon, theme }: {
+function SectionLabel({ label, icon, theme, onPress, active, testID }: {
   label: string; icon: string; theme: ReturnType<typeof useTheme>
+  onPress?: () => void; active?: boolean; testID?: string
 }) {
-  return (
-    <View style={styles.sectionLabel}>
+  const color = active
+    ? (theme.isDark ? palette.blue[400] : palette.blue[700])
+    : theme.colors.textTertiary
+  const content = (
+    <>
       <Text style={styles.sectionIcon}>{icon}</Text>
-      <Text style={[styles.sectionText, { color: theme.colors.textTertiary }]}>{label}</Text>
-    </View>
+      <Text style={[styles.sectionText, { color }]}>{label}</Text>
+    </>
+  )
+  if (!onPress) return <View style={styles.sectionLabel}>{content}</View>
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.7}
+      testID={testID}
+      accessibilityLabel={testID}
+      style={styles.sectionLabel}
+    >
+      {content}
+    </TouchableOpacity>
   )
 }
 
