@@ -50,7 +50,7 @@ import {
   DEFAULT_DIFFICULTY, type QuizDifficulty,
   ESSAY_ASPECTS, ESSAY_LENGTH_BANDS, ESSAY_MAX_CRITERIA, ESSAY_MENTIONS_PER_CRITERION,
   ESSAY_MIN_CRITERIA, ESSAY_WEIGHT_TOTAL, MAX_DISTRACTOR_CHARS, MAX_QUESTION_CHARS, MAX_SPAN_CHARS,
-  MCQ_DISTRACTOR_COUNT, MCQ_DISTRACTOR_FLAWS, MAX_GAPS_PER_GRADE, SHORT_ANSWER_ANGLES,
+  MCQ_DISTRACTOR_FLAWS, MAX_GAPS_PER_GRADE, SHORT_ANSWER_ANGLES,
   SHORT_ANSWER_BANDS, SHORT_ANSWER_GAPS, SHORT_ANSWER_VERDICTS, ESSAY_LEVELS,
   type EssayCriterion, type QuizCardSource, type QuizGradeInput,
 } from './ai-quiz.ts'
@@ -109,16 +109,78 @@ const GROUNDING = [
   'Never mention a fact, term, person, statute, dosage, or figure that does not appear in the card you were given.',
 ].join('\n')
 
+/**
+ * The eight interface languages, by NAME.
+ *
+ * A BCP-47 tag is not an instruction. Told to write the question in `"ko"` the model
+ * carried on writing English; told to write it in Korean it complies. The tag is what the
+ * database stores, so the translation happens here, once.
+ */
+const LANGUAGE_NAMES: Record<string, string> = {
+  en: 'English', ko: 'Korean', ja: 'Japanese', zh: 'Chinese',
+  vi: 'Vietnamese', th: 'Thai', id: 'Indonesian', es: 'Spanish',
+}
+
+/**
+ * ## Eight languages, and why this is the only place the UI locale is allowed to matter
+ *
+ * The question's language is fixed by the CARD, not by the interface — a French deck asks
+ * French questions to a learner reading the app in Thai, because the card is the material.
+ * `Write the question in the same language as the text it quotes` settles that, and it
+ * settles it for every monolingual card.
+ *
+ * It settles NOTHING for a cross-lingual card. `lend / 빌려주다` quotes both languages, so
+ * "the language it quotes" has two answers, and the model picked whichever it felt like —
+ * a Korean learner was served `What is the English word for 갚다?` alongside
+ * `What is the Korean word for "to let someone off the hook"?` in the same batch.
+ *
+ * The interface language is the only evidence available about which side the learner reads
+ * from. So it breaks THAT tie, and no other: it never overrides a monolingual card, and it
+ * never translates the card's content.
+ *
+ * ## How hard this may be pushed — measured, not guessed
+ *
+ * It is a tie-breaker and must stay one. A stronger version was written and deployed —
+ * adding "the quoted term stays as the card writes it, and the sentence around it is
+ * ${name}" — and it was strictly worse on a live run against an English→Korean deck:
+ *
+ *   * ESSAY lost EVERY item to `answer_leaked_in_question`. The essay question must quote
+ *     the English prompt and must not contain the Korean answer; write the whole sentence
+ *     in Korean about a Korean meaning and the answer word turns up in it almost by
+ *     construction. An English frame is the safe construction there, not a defect.
+ *   * SHORT drifted off the card — one question asked how "lease" is PRONOUNCED, which no
+ *     card states, because the pressure to produce a Korean sentence outweighed grounding.
+ *
+ * The wording below is the one that measured well. On a Korean learner's English deck it
+ * produced natural Korean throughout and dropped nothing:
+ *
+ *   SHORT  '빚지다'는 상태를 나타내는 영어 동사는 무엇인가요?
+ *   ESSAY  'lease'는 무엇을 의미하며, 이 단어가 사용되는 일반적인 상황과 예시를 들어 설명하시오.
+ *
+ * The lesson is not "say less". It is that this must stay a TIE-BREAKER: it says which
+ * language to address the learner in, and stops there. The version that failed went on to
+ * legislate the sentence around the quoted term, and that is the clause that collided with
+ * "must not contain the answer". If you are about to strengthen this, run
+ * `quiz_prod_e2e.ts` first and compare DROPS, not phrasing.
+ */
+function languageRule(uiLocale?: string): string {
+  const name = uiLocale ? LANGUAGE_NAMES[uiLocale.split('-')[0]] : undefined
+  if (!name) return ''
+  return `\nLANGUAGE: this learner reads the app in ${name}. Write the question in the same`
+    + ` language as the text it quotes. When a card is cross-lingual — its two sides are in`
+    + ` different languages, so quoting cannot decide — write the question itself in ${name},`
+    + ` quoting the card's text unchanged. Never translate the card's own words.\n`
+}
+
 // ─── Generation ─────────────────────────────────────────────────────────────
 
 export function buildMcqGenerationPrompt(
   sources: readonly QuizCardSource[],
   difficulty: QuizDifficulty = DEFAULT_DIFFICULTY,
+  uiLocale?: string,
 ) {
   const optionCount = Math.min(6, Math.max(2, difficulty.optionCount || 4))
   const distractorCount = optionCount - 1
-  const nearMin = Math.min(difficulty.nearRequired, distractorCount)
-  const nearMax = Math.min(difficulty.nearMax ?? nearMin, distractorCount)
   const restricted = difficulty.allowedFlaws?.length
     ? `\nOnly these flaws may be used for this band: ${difficulty.allowedFlaws.join(', ')}.`
     : ''
@@ -128,7 +190,15 @@ export function buildMcqGenerationPrompt(
   // and the batch dies `partial_not_applicable` -> `too_few_distractors`. Observed on a
   // fallback model against a plain vocabulary deck.
   const anyMultiPart = sources.some((s) => answerParts(s.answerText).length > 1)
-  const flaws = bullets([
+  // A band that restricts its flaws restricts what the model is OFFERED, not just what it is
+  // graded on. Listing all seven and then asking for far ones loses: the vocabulary itself
+  // pulls toward near-misses, so band 1 got three other hand tools for `wrench` at every
+  // phrasing. Removing the near labels from the menu is the instruction that lands.
+  const permitted = difficulty.allowedFlaws?.length
+    ? new Set<string>(difficulty.allowedFlaws) : null
+  const allow = (line: string) => !permitted
+    || [...permitted].some((f) => line.startsWith(`"${f}"`))
+  const flaws = bullets(([
     '"opposite" — reverses the answer\'s direction or polarity. [NEAR]',
     '"adjacent_sense" — a close neighbour in meaning that this card\'s answer excludes. [NEAR]',
     '"right_category_wrong_item" — the same kind of thing, but not this one. [FAR]',
@@ -138,21 +208,22 @@ export function buildMcqGenerationPrompt(
     '"overgeneral" — true of a broader class, so not the answer to this prompt. [FAR]',
     '"plausible_form" — resembles the answer in spelling or sound without being it. [NEAR]',
     '"unrelated" — from a different subject area entirely; no relation to the answer. STILL WRITTEN IN THE ANSWER\'S OWN LANGUAGE AND SCRIPT — an option in another language is spotted without being read, and is rejected. [FAR]',
-  ])
+  ] as string[]).filter(allow))
 
   // Stated as a count, not as an adjective. "Make it easy" is interpreted; "exactly one of the
   // three is a near-miss" is followed — and it is checked afterwards either way.
   // One-sided on purpose: each band binds on the end it actually promises. Asking for an
   // exact split is a target a model misses often enough to drop every item.
-  // Only ever asks for NEAR distractors, and only as many as the band allows. The FAR slots
-  // are filled from the learner's own deck, because a model asked for a deliberately
-  // unrelated wrong answer returns another near-miss instead — at every phrasing tried.
-  const mix = `Every distractor you write must be a NEAR flaw: something a learner who half-knows the answer could believe. Write exactly ${nearMax}. Do not write far-fetched or unrelated options — those are not your job here.`
+  // The band's own words, from `quiz_difficulty_levels.guidance`. Difficulty stopped being a
+  // number the code phrases and became an instruction the band carries, because "be
+  // unrelated" names no target and "use a concrete object where the answer is an action"
+  // does. The fallback keeps a bandless call working rather than silently unlabelled.
+  const mix = difficulty.guidance
+    ?? `Write distractors a learner who half-knows the answer could believe.`
 
   const systemPrompt = `${GROUNDING}
 
-For each card, write exactly ${nearMax} WRONG option(s) (distractors) for a multiple-choice question.
-The question will have ${distractorCount} wrong options in total; the app fills the remaining ${distractorCount - nearMax} itself from the learner's other cards. Write ONLY the ones asked for here.
+For each card, write exactly ${distractorCount} WRONG options (distractors) for a multiple-choice question.
 You are NOT asked for the correct option and must not write it — the app inserts the card's own answer itself.
 
 Respond with a single JSON object:
@@ -162,10 +233,11 @@ Every distractor names the ONE way it is wrong:
 ${flaws}
 
 DIFFICULTY: ${mix}${restricted}
+${languageRule(uiLocale)}
 
 Rules:
 ${bullets([
-  `Exactly ${nearMax} distractor(s) per card. They may share a flaw label — three close neighbours of the answer is often the best set a card can have. What they must not share is substance: three ways of writing the same wrong idea is one distractor shown three times.`,
+  `Exactly ${distractorCount} distractors per card. They may share a flaw label — three close neighbours of the answer is often the best set a card can have. What they must not share is substance: three ways of writing the same wrong idea is one distractor shown three times.`,
   'A distractor must be UNAMBIGUOUSLY WRONG for this card. If you cannot say which flaw it has, it is probably also correct — do not write it.',
   'Never write a distractor that restates the answer, contains the whole answer, or is contained by it (except "partial", above).',
   'Write distractors in the same language and script as the `answer`. An option in another language is spotted without being read.',
@@ -179,7 +251,11 @@ ${bullets([
   return { systemPrompt, userPrompt: `Cards:\n${cardPayload(sources)}` }
 }
 
-export function buildShortAnswerGenerationPrompt(sources: readonly QuizCardSource[]) {
+export function buildShortAnswerGenerationPrompt(
+  sources: readonly QuizCardSource[],
+  difficulty: QuizDifficulty = DEFAULT_DIFFICULTY,
+  uiLocale?: string,
+) {
   const angles = bullets([
     '"reverse" — quote the ANSWER text and ask what it corresponds to on the front of the card, worded the way a learner would ask it. Expected answer: the card\'s prompt.',
     '"cloze" — write one sentence containing the card\'s PROMPT text verbatim, with the answer replaced by "____". Expected answer: the card\'s answer.',
@@ -200,6 +276,9 @@ Respond with a single JSON object:
 Angles — each one fixes where the expected answer comes from:
 ${angles}
 
+DIFFICULTY: ${difficulty.guidance ?? ''}
+${languageRule(uiLocale)}
+
 Rules:
 ${bullets([
   'The question must NEVER contain the expected answer, in any spelling, spacing, or script. This is checked; a leaked question is discarded.',
@@ -217,7 +296,11 @@ ${bullets([
   return { systemPrompt, userPrompt: `Cards:\n${cardPayload(sources)}` }
 }
 
-export function buildEssayGenerationPrompt(sources: readonly QuizCardSource[]) {
+export function buildEssayGenerationPrompt(
+  sources: readonly QuizCardSource[],
+  difficulty: QuizDifficulty = DEFAULT_DIFFICULTY,
+  uiLocale?: string,
+) {
   const aspects = bullets([
     '"covers_answer" — states what the card\'s answer states. REQUIRED on every card, exactly once, and must carry the highest weight.',
     '"uses_key_terms" — uses the card\'s own terms rather than talking around them.',
@@ -244,6 +327,9 @@ Respond with a single JSON object:
 
 Aspects — a closed list; anything else is discarded:
 ${aspects}
+
+DIFFICULTY: ${difficulty.guidance ?? ''}
+${languageRule(uiLocale)}
 
 Rules:
 ${bullets([

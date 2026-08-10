@@ -126,6 +126,15 @@ export interface QuizDifficulty {
   readonly optionCount: number
   /** Restrict to these flaws. Empty means all of them. */
   readonly allowedFlaws: readonly McqDistractorFlaw[]
+  /**
+   * The band's instruction for THIS question type, inserted into the prompt verbatim.
+   *
+   * This is where difficulty lives now. "Be unrelated" fails at every phrasing because it
+   * names no target; "use a concrete object where the answer is an action" succeeds because
+   * it names one. And because it is text, short answer and essay get a difficulty too —
+   * which a near-miss count could never give them.
+   */
+  readonly guidance?: string
 }
 
 /** Fallback when a caller does not resolve a band — the hardest, which is what shipped first. */
@@ -589,6 +598,14 @@ export interface QuizItemMultipleChoice {
   readonly correctIndex: number
   /** Parallel to `options`; null at `correctIndex`. Renders the post-answer explanation. */
   readonly flaws: ReadonlyArray<McqDistractorFlaw | null>
+  /**
+   * The near-miss count fell outside the band's advisory range.
+   *
+   * Recorded, not enforced — enforcing it dropped every item on the easy bands. It exists so
+   * a band whose instruction has stopped working shows up in the logs rather than only to
+   * someone reading the questions.
+   */
+  readonly offBand?: boolean
 }
 
 export interface QuizItemShortAnswer {
@@ -762,7 +779,6 @@ export function validateMultipleChoiceGeneration(
       const flaw = d.flaw
       if (text === '' || text.length > MAX_DISTRACTOR_CHARS) { drop(cardId, 'bad_shape'); continue }
       if (!isMcqDistractorFlaw(flaw)) { drop(cardId, 'bad_enum'); continue }
-      if (allowed && !allowed.has(flaw)) { drop(cardId, 'wrong_difficulty_mix'); continue }
 
       const norm = normalizeAnswer(text)
       if (norm === '') { drop(cardId, 'bad_shape'); continue }
@@ -788,9 +804,28 @@ export function validateMultipleChoiceGeneration(
           // rendering hint; relabelling is honest and keeps the question.
           effectiveFlaw = 'adjacent_sense'
         }
-      } else if (answerNorm.includes(norm) || norm.includes(answerNorm)) {
+      } else if (answerNorm.includes(norm)) {
+        // The distractor is PART OF the answer — "발효" against 발효시키다. That is the trap
+        // this check exists to close: the option is not wrong, it is incomplete, and a
+        // learner who picks it has not made a mistake we can defend marking.
         drop(cardId, 'distractor_contains_answer'); continue
       }
+      // Deliberately NOT dropped: the reverse direction, where the distractor CONTAINS the
+      // answer. 빙하 (glacier) → 빙하기 (ice age); rent → rented; 항구 → 항구도시. These are
+      // different words that happen to share a stem, which is the definition of a near-miss
+      // — the `plausible_form` and `same_root` flaws exist to label exactly this.
+      //
+      // Both directions used to drop, and on a Korean noun deck that killed band 3 (the
+      // DEFAULT band) outright: every item lost distractors to `distractor_contains_answer`
+      // and then the item itself to `too_few_distractors`, so the whole generation returned
+      // AI_EMPTY_RESULT. Korean compounds share morphemes by construction; so do English
+      // inflections. Asking for near-misses and then rejecting shared stems asks for
+      // something the language does not offer.
+      //
+      // The cosmetic case this used to guard — the answer with decoration bolted on — cannot
+      // reach here: `normalizeAnswer` strips punctuation, spacing and case, so "빙하." and
+      // "빙하" normalise to the same string and are caught above as `distractor_equals_answer`.
+      // Surviving containment therefore means genuinely different letters.
 
       if (!scriptCompatible(text, card.answerText)) { drop(cardId, 'script_mismatch'); continue }
 
@@ -835,11 +870,22 @@ export function validateMultipleChoiceGeneration(
     //
     // Checked AFTER length_cue so an item that is broken on its own terms reports that, rather
     // than reporting a band mismatch the author cannot act on.
+    // Difficulty is NOT enforced here any more, and the reason is that it could not be.
+    // The mechanical near-count gate dropped every item on bands 1 and 2 across three
+    // deploys, it cannot be evaluated for short answer or essay at all, and "did the model
+    // follow the instruction" is not a mechanically checkable property.
+    //
+    // What survives above IS checkable, and is what makes an item BROKEN rather than merely
+    // easier than asked: the answer never appears among the wrong options, no duplicates, no
+    // script mismatch, no length giveaway. The count is recorded so a drift in band quality
+    // is visible in the logs rather than only to a reader.
     const near = flaws.filter((f) => NEAR_FLAWS.has(f)).length
     const nearMax = difficulty.nearMax ?? difficulty.nearRequired
-    if (near < difficulty.nearRequired || near > nearMax) {
-      drop(cardId, 'wrong_difficulty_mix'); continue
-    }
+    // `allowed` is enforced in the PROMPT — the model is only offered the flaws the band
+    // permits — and merely recorded here. Dropping on it is the same mistake the near-count
+    // gate was: it punishes the learner for a model that ignored an instruction.
+    const offBand = near < difficulty.nearRequired || near > nearMax
+      || (allowed !== null && flaws.some((f) => !allowed.has(f)))
 
     const itemId = makeItemId(cardId, index)
     const correctIndex = correctOptionIndex(itemId, optionCount)
@@ -854,7 +900,7 @@ export function validateMultipleChoiceGeneration(
     used.add(cardId)
     items.push({
       type: 'multiple_choice', itemId, cardId,
-      question: card.promptText, options, correctIndex, flaws: flawSlots,
+      question: card.promptText, options, correctIndex, flaws: flawSlots, offBand,
     })
   }
 
@@ -981,7 +1027,18 @@ export function validateEssayGeneration(
     )
     if (declaredTotal !== ESSAY_WEIGHT_TOTAL) { drop(cardId, 'bad_weights'); continue }
 
-    const grounded = `${card.promptText} ${card.answerText}`
+    // EVERYTHING the model was shown for this card, not just two of its fields.
+  //
+  // This was `promptText + answerText`, while the prompt hands the model `otherFields` too —
+  // the pronunciation, the example sentence. So a criterion quoting the card's own example was
+  // rejected as ungrounded, and the RICHER the card the more likely that was. Measured on a
+  // ten-card deck with full example sentences: zero essay items survived at any band, every one
+  // dropped `ungrounded_mention`.
+  //
+  // "Grounded in the card's own text" has to mean the card, or the check is testing something
+  // nobody claimed.
+  const grounded = [card.promptText, card.answerText, ...card.extraFields.map((f) => f.value)]
+    .join(' ')
     const aspectsUsed = new Set<EssayAspect>()
     const kept: Array<{ aspect: EssayAspect; weight: number; mustMention: string[] }> = []
     let ungrounded = false

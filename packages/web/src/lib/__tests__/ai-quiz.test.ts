@@ -689,21 +689,41 @@ describe('inline markup in a model-authored question', () => {
 describe('difficulty bands', () => {
   // The band is ENFORCED, not requested. A model told "make it easy" writes near-misses anyway,
   // because easy is the shape it has least practice at.
-  it('accepts an all-far batch at the easy band and refuses it at the default', () => {
+  it('SHIPS an off-band batch, and marks it', () => {
+    // The band stopped being a gate in mig 202. Enforcing an exact near-count dropped every
+    // item on the easy bands across three deploys, it cannot be evaluated for short answer or
+    // essay at all, and "did the model follow the instruction" is not mechanically checkable.
+    // A question outside the band is easier or harder than asked for — not BROKEN — and the
+    // learner paid for it.
     const easy = validateMultipleChoiceGeneration(mcq(threeFar), [card()], itemId, EASY)
     expect(easy.items).toHaveLength(1)
+    const onBand = easy.items[0]
+    if (onBand.type !== 'multiple_choice') throw new Error('unreachable')
+    expect(onBand.offBand).toBe(false)
 
     const hard = validateMultipleChoiceGeneration(mcq(threeFar), [card()], itemId)
-    expect(hard.items).toEqual([])
-    expect(hard.dropped.map((d) => d.reason)).toContain('wrong_difficulty_mix')
+    expect(hard.items).toHaveLength(1)
+    const drifted = hard.items[0]
+    if (drifted.type !== 'multiple_choice') throw new Error('unreachable')
+    // Recorded so a band whose instruction has stopped working is visible in the logs.
+    expect(drifted.offBand).toBe(true)
   })
 
-  it('refuses a near-miss slipped into an easy band', () => {
-    const sneaky = [...threeFar.slice(0, 2), { text: 'water crossing a membrane', flaw: 'adjacent_sense' }]
-    const out = validateMultipleChoiceGeneration(mcq(sneaky), [card()], itemId, EASY)
-
-    expect(out.items).toEqual([])
-    expect(out.dropped.map((d) => d.reason)).toContain('wrong_difficulty_mix')
+  it('still refuses what is actually broken', () => {
+    // The structural checks are unchanged, because those ARE checkable and they are what
+    // makes an item unusable rather than merely off-band.
+    const brokenSet = [
+      { list: [...threeGood.slice(0, 2), { text: card().answerText, flaw: 'adjacent_sense' }],
+        reason: 'distractor_equals_answer' },
+      { list: [...threeGood.slice(0, 2), { text: 'water', flaw: 'unrelated' }],
+        reason: 'distractor_contains_answer' },
+      { list: [...threeGood.slice(0, 2), { text: threeGood[0].text, flaw: 'opposite' }],
+        reason: 'distractor_duplicated' },
+    ]
+    for (const { list, reason } of brokenSet) {
+      const out = validateMultipleChoiceGeneration(mcq(list), [card()], itemId)
+      expect(out.dropped.map((d) => d.reason), reason).toContain(reason)
+    }
   })
 
   it('builds as many options as the band asks for', () => {
@@ -728,14 +748,82 @@ describe('difficulty bands', () => {
     expect(item.options[item.correctIndex]).toBe(card().answerText)
   })
 
-  it('honours a band that restricts which flaws may be used', () => {
+  it('keeps a distractor that CONTAINS the answer, and drops one that is PART of it', () => {
+    // Two directions that used to be one check, and are not the same thing.
+    //
+    // A distractor inside the answer ("발효" against 발효시키다) is not wrong, it is
+    // incomplete — marking a learner down for it is indefensible, so it stays a drop.
+    //
+    // A distractor that contains the answer is a different word sharing a stem: 빙하 →
+    // 빙하기, rent → rented. That is what a near-miss IS. Dropping it killed band 3 — the
+    // DEFAULT band — outright on a Korean noun deck: every item lost distractors, then lost
+    // itself to `too_few_distractors`, and the learner got AI_EMPTY_RESULT.
+    const glacier = card({ promptText: 'glacier', answerText: '빙하' })
+    // 빙하기 is what `plausible_form` is for — the answer's own shape, meaning something else.
+    const out = validateMultipleChoiceGeneration(
+      mcq([
+        { text: '빙하기', flaw: 'plausible_form' },   // contains the answer — a real word
+        { text: '화산', flaw: 'adjacent_sense' },
+        { text: '산맥', flaw: 'adjacent_sense' },
+      ]),
+      [glacier], itemId,
+    )
+    expect(out.dropped).toEqual([])
+    const item = out.items[0]
+    if (item.type !== 'multiple_choice') throw new Error('unreachable')
+    expect(item.options).toContain('빙하기')
+    expect(item.options).toContain('빙하')
+  })
+
+  it('still drops a distractor that is part of the answer', () => {
+    const ferment = card({ promptText: 'ferment', answerText: '발효시키다' })
+    const out = validateMultipleChoiceGeneration(
+      mcq([
+        { text: '발효', flaw: 'adjacent_sense' },     // a substring of the answer
+        { text: '냉동시키다', flaw: 'adjacent_sense' },
+        { text: '건조시키다', flaw: 'adjacent_sense' },
+      ]),
+      [ferment], itemId,
+    )
+    expect(out.dropped.map((d) => d.reason)).toContain('distractor_contains_answer')
+  })
+
+  it('marks an item that breaks the band restriction, and still delivers it', () => {
+    // Band conformance is ADVISORY, not a gate. Dropping off-band items is what produced runs
+    // of zero questions on bands 1 and 2 — the learner paid, got nothing, and the reason
+    // ("the model would not write an unrelated distractor") was not their problem to solve.
+    // A slightly-too-hard question a learner can answer beats no question at all, so the item
+    // ships carrying `offBand` and the band is retuned from that signal instead.
     const lookalikeOnly = {
       level: 7, nearRequired: 3, nearMax: 3, optionCount: 4, allowedFlaws: ['plausible_form'] as const,
     }
     const out = validateMultipleChoiceGeneration(mcq(threeGood), [card()], itemId, lookalikeOnly)
 
-    expect(out.items).toEqual([])
-    expect(out.dropped.map((d) => d.reason)).toContain('wrong_difficulty_mix')
+    expect(out.items).toHaveLength(1)
+    const item = out.items[0]
+    if (item.type !== 'multiple_choice') throw new Error('unreachable')
+    expect(item.offBand).toBe(true)
+    // Used a flaw the band forbids — which is exactly what `offBand` is recording.
+    expect(item.flaws.some((f) => f !== null && f !== 'plausible_form')).toBe(true)
+    expect(out.dropped).toEqual([])
+  })
+
+  it('does not mark an item that stays inside the band restriction', () => {
+    // The other half of the claim: `offBand` has to be able to be false, or it is not a signal.
+    const lookalikeOnly = {
+      level: 7, nearRequired: 3, nearMax: 3, optionCount: 4, allowedFlaws: ['plausible_form'] as const,
+    }
+    const allLookalike = [
+      { text: 'water moving across a semipermeable membraine', flaw: 'plausible_form' },
+      { text: 'water moving accross a semipermeable membrane', flaw: 'plausible_form' },
+      { text: 'water moving across a semi-permeable membrain', flaw: 'plausible_form' },
+    ]
+    const out = validateMultipleChoiceGeneration(mcq(allLookalike), [card()], itemId, lookalikeOnly)
+
+    expect(out.items).toHaveLength(1)
+    const item = out.items[0]
+    if (item.type !== 'multiple_choice') throw new Error('unreachable')
+    expect(item.offBand).toBe(false)
   })
 })
 

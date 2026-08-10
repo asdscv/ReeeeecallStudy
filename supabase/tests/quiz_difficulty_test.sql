@@ -31,8 +31,11 @@ DECLARE
 BEGIN
   -- ── The ceiling is gone ───────────────────────────────────────────────────
   -- 197 shipped CHECK (level BETWEEN 1 AND 9). Ten was impossible; a hundred was absurd.
-  INSERT INTO quiz_difficulty_levels (level, near_required, near_max, option_count, sort_order)
-    VALUES (10, 2, 3, 4, 10), (42, 0, 1, 2, 42), (100, 5, 5, 6, 100);
+  -- Guidance included, because a band without it cannot say what it means and is refused.
+  INSERT INTO quiz_difficulty_levels (level, near_required, near_max, option_count, sort_order, guidance)
+    VALUES (10, 2, 3, 4, 10, '{"mcq":"g10","short":"g10s","essay":"g10e"}'::jsonb),
+           (42, 0, 1, 2, 42, '{"mcq":"g42"}'::jsonb),
+           (100, 5, 5, 6, 100, '{"mcq":"g100","short":"g100s","essay":"g100e"}'::jsonb);
 
   SELECT count(*) INTO v_n FROM quiz_difficulty_levels WHERE level > 9;
   IF v_n <> 3 THEN RAISE EXCEPTION 'FAIL: high band numbers were rejected (% inserted)', v_n; END IF;
@@ -48,16 +51,16 @@ BEGIN
 
   -- near_required cannot exceed the distractors the band actually has.
   BEGIN
-    INSERT INTO quiz_difficulty_levels (level, near_required, near_max, option_count, sort_order)
-      VALUES (11, 4, 4, 4, 11);   -- 4 options = 3 distractors
+    INSERT INTO quiz_difficulty_levels (level, near_required, near_max, option_count, sort_order, guidance)
+      VALUES (11, 4, 4, 4, 11, '{"mcq":"g"}'::jsonb);   -- 4 options = 3 distractors
     RAISE EXCEPTION 'FAIL: a band demanded more near-misses than it has distractors';
   EXCEPTION WHEN check_violation THEN NULL;
   END;
 
   -- A band whose minimum exceeds its maximum is not a band.
   BEGIN
-    INSERT INTO quiz_difficulty_levels (level, near_required, near_max, option_count, sort_order)
-      VALUES (12, 3, 1, 4, 12);
+    INSERT INTO quiz_difficulty_levels (level, near_required, near_max, option_count, sort_order, guidance)
+      VALUES (12, 3, 1, 4, 12, '{"mcq":"g"}'::jsonb);
     RAISE EXCEPTION 'FAIL: a band with min > max was accepted';
   EXCEPTION WHEN check_violation THEN NULL;
   END;
@@ -162,9 +165,42 @@ BEGIN
   r := public.submit_quiz_answer((q->'items'->0->>'item_id')::uuid, jsonb_build_object('choice', 5));
   IF (r->>'score') IS NULL THEN RAISE EXCEPTION 'FAIL: choice 5 was not gradeable'; END IF;
 
-  -- ── The easy band builds itself, free, and only the easy band ────────────
-  -- A model will not write a deliberately unrelated wrong answer; other cards in the deck
-  -- are exactly that by construction, in the right language, at no cost.
+  -- ── A band is only offered for the types it has guidance for ─────────────
+  -- A band with mcq guidance and nothing else. Generating an essay at it would produce a
+  -- question at a difficulty nobody chose, so it is refused rather than defaulted.
+  INSERT INTO quiz_difficulty_levels (level, near_required, near_max, option_count, sort_order, guidance)
+    VALUES (44, 0, 1, 4, 44, '{"mcq":"mcq only"}'::jsonb);
+  BEGIN
+    PERFORM public.create_quiz_set(v_deck, 'x', 'essay', 2, 'en', 'deck', '{}', '{}', 44::smallint);
+    RAISE EXCEPTION 'FAIL: a band with no essay guidance produced an essay set';
+  EXCEPTION WHEN sqlstate 'P0013' THEN NULL;
+  END;
+
+  -- Guidance must be a string keyed by a real question type; a typo would silently take the
+  -- band offline for that type.
+  BEGIN
+    INSERT INTO quiz_difficulty_levels (level, near_required, near_max, option_count, sort_order, guidance)
+      VALUES (13, 0, 1, 4, 13, '{"mcqq":"typo"}'::jsonb);
+    RAISE EXCEPTION 'FAIL: guidance accepted an unknown question type';
+  EXCEPTION WHEN check_violation THEN NULL;
+  END;
+
+  -- Retuning one type must not blank the others.
+  PERFORM set_config('request.jwt.claim.role', 'service_role', true);
+  UPDATE quiz_difficulty_levels
+     SET guidance = guidance || '{"essay":"retuned"}'::jsonb WHERE level = 10;
+  PERFORM set_config('request.jwt.claim.role', 'authenticated', true);
+  IF (SELECT guidance ->> 'mcq' FROM quiz_difficulty_levels WHERE level = 10) IS NULL THEN
+    RAISE EXCEPTION 'FAIL: retuning essay guidance blanked mcq';
+  END IF;
+
+  -- ── The deck-mate builder still works, and still refuses the wrong bands ──
+  -- No client routes to it since mig 202 — every band is AI-generated now, because
+  -- deck-mates are a multiple-choice-only trick and short answer and essay need a
+  -- difficulty too. It is kept as a working escape hatch (a provider outage, or a future
+  -- band that wants zero cost), so its guard is still worth pinning: it must never build a
+  -- band that permits near-misses, which would hand the learner an easier quiz than they
+  -- chose.
   r := public.create_quiz_set(v_deck, 'easy', 'mcq', 3, 'ko', 'deck', '{}', '{}', 1::smallint);
   q := public.build_deck_mate_quiz((r->>'set_id')::uuid);
   IF (q->>'persisted')::int <> 3 THEN
@@ -193,7 +229,7 @@ BEGIN
   EXCEPTION WHEN invalid_parameter_value THEN NULL;
   END;
 
-  RAISE NOTICE 'quiz_difficulty_test: bands scale, retire, default from data, run at 6 options, and the easy band builds itself free';
+  RAISE NOTICE 'quiz_difficulty_test: bands scale, retire, default from data, carry per-type guidance, run at 6 options';
 END;
 $$;
 

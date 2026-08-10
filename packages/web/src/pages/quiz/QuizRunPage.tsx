@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   useQuizStore, QuizError, QUIZ_GRADE_ACTION,
+  optionFlaws,
   type QuizRunItem, type QuizSubmitResult,
 } from '@reeeeecall/shared/stores/quiz-store'
 import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
@@ -110,6 +111,7 @@ export function QuizRunPage() {
   if (!item) return null
 
   const answered = item.answered || result !== null
+  const flaws = optionFlaws(item)
   const isLast = index === items.length - 1
 
   return (
@@ -136,6 +138,10 @@ export function QuizRunPage() {
           {item.options.map((option, optionIndex) => {
             const isCorrect = answered && result?.correct_display_index === optionIndex
             const isPicked = choice === optionIndex
+            // Only after answering, and only from a closed label set the model chose from —
+            // never model prose. Aligned with the shuffle by `get_quiz_run_items` (mig 203);
+            // before that fix these would have named the wrong option.
+            const flaw = answered && !isCorrect ? flaws[optionIndex] : null
             return (
               <li key={optionIndex}>
                 <button
@@ -150,6 +156,11 @@ export function QuizRunPage() {
                 >
                   {option}
                 </button>
+                {flaw && (
+                  <p className="text-xs text-content-tertiary mt-1 ml-3">
+                    {t(`flaw.${flaw}`, { defaultValue: '' })}
+                  </p>
+                )}
               </li>
             )
           })}
@@ -170,7 +181,9 @@ export function QuizRunPage() {
       {answered && item.score !== null && (
         <div className="p-3 bg-card rounded-lg border border-border">
           <p className="text-sm text-foreground">
-            {t('run.scored', { score: Math.round((item.score ?? 0) * 100) })}
+            {/* Percent, matching the result screen. This is a normalised 0–1 score shown
+                ×100; calling it "점" made the same 0.1 read as "10점" here and "10%" there. */}
+            {t('result.percent', { percent: Math.round((item.score ?? 0) * 100) })}
           </p>
           {item.reference_answer && (
             <p className="text-xs text-content-tertiary mt-1">
@@ -205,34 +218,36 @@ export function QuizRunPage() {
           >
             {t('run.submit')}
           </button>
-        ) : item.question_type !== 'mcq' && item.score === null ? (
-          // Grading is a separate, priced gesture. Submitting recorded the answer for free;
-          // paying to have it judged is the learner's call, and the price is on the button.
-          <button
-            type="button"
-            onClick={() => void requestGrade()}
-            disabled={grading || shownPrice === null}
-            className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50"
-          >
-            {grading ? t('run.grading')
-              : t('run.gradeFor', { price: shownPrice === 0 ? t('setup.free') : formatUsdMicro(shownPrice ?? 0) })}
-          </button>
-        ) : isLast ? (
-          <button
-            type="button"
-            onClick={() => void finish()}
-            className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover"
-          >
-            {t('run.finish')}
-          </button>
         ) : (
-          <button
-            type="button"
-            onClick={() => goTo(index + 1)}
-            className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover"
-          >
-            {t('run.next')}
-          </button>
+          <>
+            {/* Grading sits BESIDE moving on, never instead of it.
+                It used to replace them, which meant a learner who submitted a short answer
+                had exactly two buttons — pay, or leave. There was no 다음 and, on the last
+                item, no 마치기, so a run could not be completed without paying to grade every
+                single answer. Charging is a choice we offer; it must never be the only exit. */}
+            {item.question_type !== 'mcq' && item.score === null && (
+              <button
+                type="button"
+                onClick={() => void requestGrade()}
+                disabled={grading || shownPrice === null}
+                className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50"
+              >
+                {grading ? t('run.grading')
+                  : t('run.gradeFor', { price: shownPrice === 0 ? t('setup.free') : formatUsdMicro(shownPrice ?? 0) })}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => (isLast ? void finish() : goTo(index + 1))}
+              className={`px-3 py-2 text-sm font-medium rounded-lg cursor-pointer transition-colors ${
+                item.question_type !== 'mcq' && item.score === null
+                  ? 'flex-1 border border-border text-foreground hover:border-brand/40'
+                  : 'flex-1 bg-brand text-white hover:bg-brand-hover'
+              }`}
+            >
+              {isLast ? t('run.finish') : t('run.next')}
+            </button>
+          </>
         )}
       </div>
     </div>

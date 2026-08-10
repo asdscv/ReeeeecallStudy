@@ -28,6 +28,8 @@ DECLARE
   items   jsonb;
   it      jsonb;
   v_run   uuid;
+  v_set2  uuid;
+  v_run2  uuid;
   v_item  uuid;
   v_n     integer;
   v_correct smallint;
@@ -258,6 +260,62 @@ BEGIN
   EXCEPTION WHEN insufficient_privilege THEN NULL;
   END;
   PERFORM set_config('request.jwt.claim.sub', v_uid::text, true);
+
+  -- ── 8.5) `meta.flaws` is served in the SAME ORDER as the options ────────
+  --
+  -- Options are stored canonically and permuted per sitting through `option_order`;
+  -- `meta.flaws` is parallel to the STORED array, null at the correct slot. Returning it
+  -- unpermuted made the payload name a different correct answer than `options` did, so
+  -- every "why this option is wrong" line would attach to the wrong option.
+  --
+  -- The assertion is order-independent by construction: each flaw is tagged with the text
+  -- of the option it belongs to, so the check is "the flaw beside option X is X's flaw",
+  -- which cannot pass by luck the way an index comparison can.
+  r := public.create_quiz_set(v_deck, 'Flaws', 'mcq', 4, 'ko');
+  v_set2 := (r->>'set_id')::uuid;
+  PERFORM set_config('request.jwt.claim.role', 'service_role', true);
+  r := public.persist_quiz_questions(v_set2, jsonb_build_array(
+    jsonb_build_object('card_id', v_card, 'stem', 'Which one?',
+      'options', jsonb_build_array('opt0', 'opt1', 'opt2', 'opt3'),
+      'correct_index', 2, 'reference_answer', 'opt2', 'source_fingerprint', 'fp-flaws',
+      -- Position 2 is the answer, so its flaw is null. The others name themselves.
+      'meta', jsonb_build_object('flaws', jsonb_build_array(
+        'flaw-of-opt0', 'flaw-of-opt1', null, 'flaw-of-opt3')))));
+  PERFORM set_config('request.jwt.claim.role', 'authenticated', true);
+
+  r := public.start_quiz_run(v_set2);
+  v_run2 := (r->>'run_id')::uuid;
+  items := public.get_quiz_run_items(v_run2);
+  it := items->'items'->0;
+
+  -- Still withheld before answering: a named flaw per option is an answer key.
+  IF it->'meta' IS NOT NULL AND it->'meta' <> 'null'::jsonb THEN
+    RAISE EXCEPTION 'FAIL: flaws served before the item was answered: %', it->'meta';
+  END IF;
+
+  v_item := (it->>'item_id')::uuid;
+  PERFORM public.submit_quiz_answer(v_item, jsonb_build_object('choice', 0));
+  items := public.get_quiz_run_items(v_run2);
+  it := items->'items'->0;
+
+  IF jsonb_array_length(it->'meta'->'flaws') <> 4 THEN
+    RAISE EXCEPTION 'FAIL: flaws array is % long: %',
+      jsonb_array_length(it->'meta'->'flaws'), it->'meta';
+  END IF;
+
+  FOR i IN 0..3 LOOP
+    -- The one null must sit exactly where the correct answer was served...
+    IF (it->'options'->>i) = 'opt2' THEN
+      IF jsonb_typeof(it->'meta'->'flaws'->i) <> 'null' THEN
+        RAISE EXCEPTION 'FAIL: the correct option at % carries flaw %',
+          i, it->'meta'->'flaws'->i;
+      END IF;
+    -- ...and every other flaw must name the option it is beside.
+    ELSIF (it->'meta'->'flaws'->>i) IS DISTINCT FROM 'flaw-of-' || (it->'options'->>i) THEN
+      RAISE EXCEPTION 'FAIL: option % (%) was given flaw % — misaligned. served: % / %',
+        i, it->'options'->>i, it->'meta'->'flaws'->>i, it->'options', it->'meta'->'flaws';
+    END IF;
+  END LOOP;
 
   -- ── 9) A deleted card voids its item and cannot be answered ─────────────
   r := public.start_quiz_run(v_set);
