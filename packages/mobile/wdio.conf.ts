@@ -27,6 +27,7 @@ export const config: WebdriverIO.Config = {
     './__tests__/e2e/specs/decks.spec.ts',
     './__tests__/e2e/specs/features.spec.ts',
     './__tests__/e2e/specs/quiz.spec.ts',
+    './__tests__/e2e/specs/daily-check.spec.ts',
     './__tests__/e2e/specs/monetization.spec.ts',
     './__tests__/e2e/specs/remaining-features.spec.ts',
     './__tests__/e2e/specs/learning.spec.ts',
