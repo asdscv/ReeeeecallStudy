@@ -17,7 +17,9 @@ import type { QuizStackParamList } from '../../navigation/types'
 type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizSetup'>
 
 const TYPES: QuizQuestionType[] = ['mcq', 'short', 'essay']
-const COUNTS = [4, 6, 8, 10, 12]
+// Same presets as web. Mobile has no free-entry field: a numeric keyboard for a value that
+// is almost always one of these is worse than one more chip.
+const COUNTS = [4, 6, 8, 10, 12, 20, 30, 50]
 
 /**
  * Scope, type, count, price, confirm.

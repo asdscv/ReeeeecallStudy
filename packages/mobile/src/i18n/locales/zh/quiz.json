@@ -53,7 +53,8 @@
     "generating": "正在出题…",
     "difficulty": "难度",
     "clampedCount_one": "这个卡组会生成 {{count, number}} 道题。",
-    "clampedCount_other": "这个卡组会生成 {{count, number}} 道题。"
+    "clampedCount_other": "这个卡组会生成 {{count, number}} 道题。",
+    "generatingBatch": "生成中… ({{done, number}}/{{total, number}})"
   },
   "run": {
     "loading": "加载中…",

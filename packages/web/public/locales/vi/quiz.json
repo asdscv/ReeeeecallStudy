@@ -53,7 +53,8 @@
     "generating": "Đang soạn câu hỏi…",
     "difficulty": "Độ khó",
     "clampedCount_one": "Bộ thẻ này tạo được {{count, number}} câu hỏi.",
-    "clampedCount_other": "Bộ thẻ này tạo được {{count, number}} câu hỏi."
+    "clampedCount_other": "Bộ thẻ này tạo được {{count, number}} câu hỏi.",
+    "generatingBatch": "Đang tạo… ({{done, number}}/{{total, number}})"
   },
   "run": {
     "loading": "Đang tải…",

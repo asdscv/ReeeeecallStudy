@@ -53,7 +53,8 @@
     "generating": "問題を作成中…",
     "difficulty": "難易度",
     "clampedCount_one": "このデッキでは{{count, number}}問作成されます。",
-    "clampedCount_other": "このデッキでは{{count, number}}問作成されます。"
+    "clampedCount_other": "このデッキでは{{count, number}}問作成されます。",
+    "generatingBatch": "作成中… ({{done, number}}/{{total, number}})"
   },
   "run": {
     "loading": "読み込み中…",

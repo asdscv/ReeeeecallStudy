@@ -53,7 +53,8 @@
     "generating": "Menyusun soal…",
     "difficulty": "Tingkat kesulitan",
     "clampedCount_one": "Dek ini menghasilkan {{count, number}} soal.",
-    "clampedCount_other": "Dek ini menghasilkan {{count, number}} soal."
+    "clampedCount_other": "Dek ini menghasilkan {{count, number}} soal.",
+    "generatingBatch": "Membuat… ({{done, number}}/{{total, number}})"
   },
   "run": {
     "loading": "Memuat…",

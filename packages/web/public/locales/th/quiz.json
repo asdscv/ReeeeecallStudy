@@ -53,7 +53,8 @@
     "generating": "กำลังเขียนคำถาม…",
     "difficulty": "ระดับความยาก",
     "clampedCount_one": "เด็คนี้สร้างได้ {{count, number}} ข้อ",
-    "clampedCount_other": "เด็คนี้สร้างได้ {{count, number}} ข้อ"
+    "clampedCount_other": "เด็คนี้สร้างได้ {{count, number}} ข้อ",
+    "generatingBatch": "กำลังสร้าง… ({{done, number}}/{{total, number}})"
   },
   "run": {
     "loading": "กำลังโหลด…",

@@ -9,7 +9,10 @@ import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
 
 const TYPES: QuizQuestionType[] = ['mcq', 'short', 'essay']
-const COUNTS = [4, 6, 8, 10, 12]
+// Presets plus a free field up to MAX_COUNT. The presets stop where a learner's idea of "a
+// quiz" usually stops; anything past that is deliberate and is typed.
+const COUNTS = [4, 6, 8, 10, 12, 20, 30, 50]
+const MAX_COUNT = 50
 
 /**
  * Pick a scope and a type, see what it costs, confirm.
@@ -27,7 +30,9 @@ export function QuizSetupPage() {
   const { t, i18n } = useTranslation('quiz')
   const navigate = useNavigate()
   const { decks, fetchDecks } = useDeckStore()
-  const { countQuizzable, quote, createAndGenerate, generating, difficultyLevels } = useQuizStore()
+  const {
+    countQuizzable, quote, createAndGenerate, generating, generateProgress, difficultyLevels,
+  } = useQuizStore()
 
   const [deckId, setDeckId] = useState('')
   const [type, setType] = useState<QuizQuestionType>('mcq')
@@ -190,6 +195,18 @@ export function QuizSetupPage() {
                 {option}
               </button>
             ))}
+            <input
+              type="number"
+              min={1}
+              max={MAX_COUNT}
+              value={count}
+              onChange={(e) => {
+                const n = Number(e.target.value)
+                if (Number.isFinite(n)) setCount(Math.min(MAX_COUNT, Math.max(1, Math.round(n))))
+              }}
+              aria-label={t('setup.count')}
+              className="w-16 rounded-lg border border-border bg-background px-2 py-1.5 text-center text-sm text-foreground"
+            />
           </div>
           {/* The submit clamps to `eligible`, and on a deck smaller than the smallest chip every
               chip is disabled — so the screen showed a count nobody could change and then quietly
@@ -263,7 +280,15 @@ export function QuizSetupPage() {
         disabled={!canSubmit}
         className="w-full px-3 py-2 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50"
       >
-        {generating ? t('setup.generating') : t('setup.confirm')}
+        {generating
+          // A 50-question quiz is several model calls and can take over a minute. A button
+          // stuck on "만드는 중…" for that long reads as a hang.
+          ? (generateProgress && generateProgress.total > 1
+            ? t('setup.generatingBatch', {
+              done: generateProgress.done, total: generateProgress.total,
+            })
+            : t('setup.generating'))
+          : t('setup.confirm')}
       </button>
     </div>
   )

@@ -53,7 +53,8 @@
     "generating": "Writing questions…",
     "difficulty": "Difficulty",
     "clampedCount_one": "This deck makes {{count, number}} question.",
-    "clampedCount_other": "This deck makes {{count, number}} questions."
+    "clampedCount_other": "This deck makes {{count, number}} questions.",
+    "generatingBatch": "Writing… ({{done, number}}/{{total, number}})"
   },
   "run": {
     "loading": "Loading…",
