@@ -219,7 +219,9 @@
     "backSoonNote_other": "Hôm nay xong rồi. Những thẻ bạn vừa trả lời sẽ quay lại sau khoảng {{count, number}} phút.",
     "extendAhead": "Đã lấy trước {{count, number}} thẻ chưa đến lượt.",
     "extendAhead_one": "Đã lấy trước {{count, number}} thẻ chưa đến lượt.",
-    "extendAhead_other": "Đã lấy trước {{count, number}} thẻ chưa đến lượt."
+    "extendAhead_other": "Đã lấy trước {{count, number}} thẻ chưa đến lượt.",
+    "studyAhead": "Học trước",
+    "studyAheadNote": "Hôm nay không có thẻ đến hạn. Thao tác này lấy trước những thẻ chưa đến lượt."
   },
   "progress": {
     "title": "Tiến độ",

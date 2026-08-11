@@ -70,7 +70,9 @@
     "backSoonNote_other": "Today is done. The cards you just answered come back in about {{count, number}} minutes.",
     "extendAhead": "Pulled {{count, number}} cards forward — their turn had not come yet.",
     "extendAhead_one": "Pulled {{count, number}} cards forward — their turn had not come yet.",
-    "extendAhead_other": "Pulled {{count, number}} cards forward — their turn had not come yet."
+    "extendAhead_other": "Pulled {{count, number}} cards forward — their turn had not come yet.",
+    "studyAhead": "Study ahead",
+    "studyAheadNote": "Nothing is due today. This builds a session from cards whose turn has not come yet."
   },
   "goals": {
     "title": "Learning goals",

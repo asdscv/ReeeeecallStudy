@@ -70,7 +70,9 @@
     "backSoonNote_other": "今日の分は終わりました。さっき答えたカードが約{{count, number}}分後にまた出ます。",
     "extendAhead": "まだ順番でないカード{{count, number}}枚を先に持ってきました。",
     "extendAhead_one": "まだ順番でないカード{{count, number}}枚を先に持ってきました。",
-    "extendAhead_other": "まだ順番でないカード{{count, number}}枚を先に持ってきました。"
+    "extendAhead_other": "まだ順番でないカード{{count, number}}枚を先に持ってきました。",
+    "studyAhead": "先に学習する",
+    "studyAheadNote": "今日の分はありません。まだ順番でないカードを前倒しして今日の分を作ります。"
   },
   "goals": {
     "title": "学習目標",

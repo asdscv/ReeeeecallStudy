@@ -82,6 +82,7 @@ const baseState = (over: StoreState = {}): StoreState => ({
   goals: [goal], goalsLoading: false, goalsError: null,
   plan: finishedPlan, planItems: finishedItems, planCards, planTemplateFields: {},
   planErrorFrom: null, attemptsError: null, coachError: null,
+  generateAheadPlan: vi.fn().mockResolvedValue(true),
   planLoading: false, planGenerating: false, planError: null, planBlockedReason: null,
   fetchGoals: vi.fn(), createGoal: vi.fn(), updateGoal: vi.fn(), archiveGoal: vi.fn(),
   deleteGoal: vi.fn(), archivedGoals: null, archivedGoalsLoading: false,
@@ -135,6 +136,60 @@ beforeEach(() => {
  * did not: the totals were summed from a grouping that could silently shrink, and the
  * finished-day note promised "내일 또 만나요" while the cards were coming back in minutes.
  */
+/**
+ * 매일 공부할 수 있는 구조인가.
+ *
+ * The goal form lets a learner say they study seven days a week, and `settings.cadence` stores
+ * it — but nothing in the planning path had ever read it, and the planner's only rule was "what
+ * is due today". On a 29-card deck that is six days out of twenty-nine; the other twenty-three
+ * showed "오늘 몫은 끝났어요" and offered nothing at all, because `더 하기` lives inside the plan
+ * branch and on those days there IS no plan.
+ */
+describe('a day with nothing due', () => {
+  const caughtUp = {
+    plan: null, planItems: [], planBlockedReason: 'no_candidates',
+    knowledge: {
+      'goal-1': {
+        total: 29, known: 29, unknown: 0, unseen: 0, overdue: 0, dueNow: 0,
+        mature: 14, rung1: 12, rung3: 0, rung8: 3,
+        nextDueAt: new Date(Date.now() + 3 * 86400_000).toISOString(),
+      },
+    },
+  }
+
+  it('offers a way to study anyway', () => {
+    // The whole gap: this button did not exist, so a seven-day-a-week goal had nothing to
+    // press on most days.
+    renderToday(caughtUp)
+    expect(screen.getByTestId('study-ahead')).toBeInTheDocument()
+  })
+
+  it('says what pressing it does', () => {
+    // Pulling cards forward changes the schedule. It is offered, and then said out loud.
+    renderToday(caughtUp)
+    expect(screen.getByText('today.studyAheadNote')).toBeInTheDocument()
+  })
+
+  it('builds the day from cards whose turn has not come', async () => {
+    const state = renderToday(caughtUp)
+    await userEvent.click(screen.getByTestId('study-ahead'))
+    await waitFor(() => expect(state.generateAheadPlan).toHaveBeenCalled())
+  })
+
+  it('does not offer it when the goal has genuinely run out of cards', () => {
+    // `nextDueAt: null` — nothing scheduled at all. There is nothing to pull forward, and a
+    // button that cannot work is worse than none.
+    renderToday({
+      ...caughtUp,
+      knowledge: {
+        'goal-1': { ...caughtUp.knowledge['goal-1'], nextDueAt: null },
+      },
+    })
+    expect(screen.queryByTestId('study-ahead')).not.toBeInTheDocument()
+    expect(screen.getByText('today.empty.nothingScheduled')).toBeInTheDocument()
+  })
+})
+
 describe('a day that was interrupted partway', () => {
   const halfDone = {
     plan: { ...finishedPlan, completed_items: 5 },
