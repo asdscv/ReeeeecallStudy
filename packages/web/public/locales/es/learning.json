@@ -72,7 +72,8 @@
     "extendAhead_one": "Se adelantaron {{count, number}} tarjetas: aún no era su turno.",
     "extendAhead_other": "Se adelantaron {{count, number}} tarjetas: aún no era su turno.",
     "studyAhead": "Estudiar por adelantado",
-    "studyAheadNote": "Hoy no vence nada. Esto arma una sesión con tarjetas cuyo turno aún no ha llegado."
+    "studyAheadNote": "Hoy no vence nada. Esto arma una sesión con tarjetas cuyo turno aún no ha llegado.",
+    "retry": "Volver a cargar"
   },
   "goals": {
     "title": "Objetivos de aprendizaje",
@@ -317,6 +318,8 @@
     "note": "Basado en tu intento más reciente con esta tarjeta. Usa créditos.",
     "dismiss": "Cerrar",
     "needsCredits": "No quedan créditos, así que no se pudo escribir la explicación.",
-    "failed": "No se pudo escribir la explicación. Inténtalo de nuevo."
+    "failed": "No se pudo escribir la explicación. Inténtalo de nuevo.",
+    "reopen": "Ver la explicación otra vez",
+    "inFlight": "Estamos preparando tu explicación, un momento."
   }
 }

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
+import { toIntlLocale } from '@reeeeecall/shared/lib/locale-utils'
 import { Screen, Badge, ScreenHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
 import { ratingColors } from '@reeeeecall/shared/design-tokens/colors'
@@ -38,7 +39,7 @@ const RATING_BAR_COLORS: Record<string, string> = {
 
 export function SessionDetailScreen() {
   const theme = useTheme()
-  const { t } = useTranslation('history')
+  const { t, i18n } = useTranslation('history')
   const navigation = useNavigation()
   const route = useRoute<Route>()
   const { session, deckName, deckIcon } = route.params
@@ -99,7 +100,11 @@ export function SessionDetailScreen() {
   const totalRatings = ratingEntries.reduce((s, [, c]) => s + c, 0)
 
   const completedAt = new Date(session.completed_at)
-  const dateStr = completedAt.toLocaleString('en-US', {
+  // The learner's language, not en-US. This rendered "8/12/2026, 09:30 PM" on an otherwise
+  // fully-Korean screen — the only date in the app that did, because every sibling
+  // (PaymentHistory, WalletSummary, StudyHistoryScreen) already passes the app language
+  // through `toIntlLocale`. A hardcoded locale is not a default; it is another language.
+  const dateStr = completedAt.toLocaleString(toIntlLocale(i18n.language), {
     year: 'numeric',
     month: 'numeric',
     day: 'numeric',

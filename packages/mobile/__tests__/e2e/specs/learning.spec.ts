@@ -14,8 +14,30 @@
  *   3. the primary actions are actually big enough to hit. Measured on the device, in the
  *      device's own units — 44pt is the iOS HIG minimum, 48dp Material's.
  */
+import { readFileSync } from 'fs'
+import path from 'path'
 import { navigateToDrawerItem } from '../helpers/navigation'
 import { LearningToday, LearningGoals, measuredHeight } from '../screens/LearningScreens'
+
+/**
+ * The learning namespace's own top-level roots, read from the bundle rather than listed here.
+ *
+ * The list used to be hand-written, and it rotted exactly the way hand-written lists do: it
+ * still named `enrichment`, a feature deleted some releases ago, while `check`, `coach`,
+ * `completion`, `explain`, `history`, `progress` and `week` — which is to say nearly
+ * everything added since — were invisible to the detector below. A raw `explain.ask` on the
+ * screen would have rendered as literal text and passed.
+ *
+ * Deriving them means a new section is covered the moment its strings exist.
+ */
+const NAMESPACE_ROOTS: string[] = Object.entries(
+  // Read, not imported: this file is outside the app's tsconfig `include`, and `wdio.conf.ts`
+  // already proves `__dirname` + `path.resolve` work in this runner. A JSON module import here
+  // would depend on compiler options nothing in the e2e tree currently sets.
+  JSON.parse(readFileSync(
+    path.resolve(__dirname, '../../../src/i18n/locales/en/learning.json'), 'utf8',
+  )) as Record<string, unknown>,
+).filter(([, value]) => value !== null && typeof value === 'object').map(([key]) => key)
 
 /**
  * Any `namespace.key.path` that leaked into rendered text.
@@ -24,7 +46,8 @@ import { LearningToday, LearningGoals, measuredHeight } from '../screens/Learnin
  * tree cannot fail the test. i18next renders a missing key by echoing it verbatim, which is
  * exactly the shape this matches.
  */
-const RAW_KEY = /\b(today|goals|form|insights|recommend|enrichment)\.[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z0-9_]+)*\b/g
+const RAW_KEY = new RegExp(
+  `\\b(${NAMESPACE_ROOTS.join('|')})\\.[a-zA-Z][a-zA-Z0-9_]*(\\.[a-zA-Z0-9_]+)*\\b`, 'g')
 
 /**
  * testIDs are themselves dotted-free, but Android exposes them as content-desc, and the
@@ -128,6 +151,37 @@ describe('Learning engine screens', () => {
       await browser.saveScreenshot('./test-results/learning-plan-raw-keys.png')
     }
     expect(leaked).toEqual([])
+  })
+
+  /**
+   * The paid explanation, on the platform it was missing from.
+   *
+   * It shipped web-only: a browser-only AI feature on a product whose plan is checked on a
+   * phone. What a device can prove that a unit test cannot is that the block MOUNTS on this
+   * runtime — the shared selector, the store action and the Korean copy all resolve — and that
+   * the price note travels with the button.
+   *
+   * Never tapped. A press spends real credits against whatever account the device is signed
+   * into, and a test suite is not a thing that should be able to bill a learner.
+   */
+  it('offers the paid explanation only with a miss behind it, and never silently', async () => {
+    if (!await LearningToday.ensureVisible()) return
+
+    const [container, ask] = await Promise.all([
+      LearningToday.hasExplain(), LearningToday.hasExplainAsk(),
+    ])
+    // The premise, in both directions: no button without the block that carries the price note,
+    // and no block without something in it. A bare button would be a charge with no warning.
+    expect(ask && !container).toBe(false)
+
+    if (container) {
+      const source = await LearningToday.pageSource()
+      // The note is the only thing standing between a tap and a surprise charge, so its
+      // absence matters more than its wording — which is why this checks for a rendered
+      // string rather than an id, and why `rawKeysInText` below catches an untranslated one.
+      expect(rawKeysInText(source).filter((key) => key.startsWith('explain.'))).toEqual([])
+      await browser.saveScreenshot('./test-results/learning-weak-explain.png')
+    }
   })
 
   it('sizes the primary action to the platform minimum', async () => {

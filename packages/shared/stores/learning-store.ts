@@ -504,6 +504,24 @@ interface LearningState {
     blocks: Array<{ type: string; content: unknown }>
     warnings: string[]
   } | null
+  /**
+   * Explanations this learner has ALREADY PAID FOR, by attempt id.
+   *
+   * `remediation` is what is on screen; this is what has been bought. They were the same field
+   * once, and that is how 닫기 — a button that says "close" — destroyed an artifact the learner
+   * had been charged for, leaving the paid button as the only way back to it. Every press of
+   * that button was a second charge for a re-worded answer to an identical question.
+   *
+   * Filled from the wallet-free read of `user_enrichments` as well as from a purchase, so a
+   * reload restores it too.
+   */
+  remediationOwned: Record<string, {
+    attemptId: string
+    action: RemediationAction
+    summary: string
+    blocks: Array<{ type: string; content: unknown }>
+    warnings: string[]
+  }>
   /** The attempt a paid request is in flight for, so only that row shows a spinner. */
   remediationBusyAttemptId: string | null
   /**
@@ -717,7 +735,25 @@ interface LearningState {
     cardId: string | null
     uiLang: string
   }) => Promise<boolean>
-  /** Drop the explanation on screen. Not a refund — it has been paid for and persisted. */
+  /**
+   * Fetch an explanation this learner has already bought for `attemptId`. Free.
+   *
+   * Reads `user_enrichments` directly — the table has had an owner-read RLS policy and a
+   * SELECT grant to `authenticated` since it was created, and nothing in either app had ever
+   * used them, so every paid answer became unreachable the moment it left memory.
+   *
+   * Populates `remediationOwned` only. Whether to SHOW it is the screen's decision.
+   */
+  loadRemediation: (input: { attemptId: string; action: RemediationAction }) => Promise<boolean>
+  /**
+   * Put a bought explanation back on screen. No network, no charge.
+   *
+   * Returns false when nothing is owned for that attempt, so a caller cannot mistake "nothing
+   * to show" for "shown".
+   */
+  showOwnedRemediation: (attemptId: string) => boolean
+  /** Drop the explanation on screen. Not a refund, and no longer a loss — it stays in
+   *  `remediationOwned` and can be reopened for free. */
   dismissRemediation: () => void
 
   reset: () => void
@@ -1159,6 +1195,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   attemptsError: null,
   coachError: null,
   remediation: null,
+  remediationOwned: {},
   remediationBusyAttemptId: null,
   remediationError: null,
   planWeek: null,
@@ -2233,12 +2270,33 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     // A lever that changes no setting is encouragement, not configuration — accepting it
     // records the learner's answer and touches nothing else.
     if (dial && typeof value === 'number') {
-      const ok = dial === 'daily_minutes'
-        ? await get().updateGoal({ goalId: row.goal_id, dailyMinutes: value })
-        : await get().updateGoal({
-          goalId: row.goal_id,
-          settings: { new_cards_per_day: value },
-        })
+      let ok: boolean
+      if (dial === 'daily_minutes') {
+        ok = await get().updateGoal({ goalId: row.goal_id, dailyMinutes: value })
+      } else {
+        /**
+         * MERGED, and in the key the rest of the app actually uses.
+         *
+         * Two faults met here. `update_learning_goal` does `settings = COALESCE(p_settings,
+         * settings)` — a whole-object REPLACE — so posting one key deleted every other one.
+         * The one that mattered is `cadence`: accepting a coach suggestion silently reset the
+         * learner's 주7일 schedule to the default, which is the setting that decides whether
+         * they get a plan every day at all.
+         *
+         * And the key was `new_cards_per_day`, while `parseNewCardsPerDay` and both goal forms
+         * use `newCardsPerDay`. So the lever wrote somewhere nothing reads: the learner
+         * accepted "fewer new cards a day", lost their schedule, and their intake did not
+         * change.
+         */
+        const current = get().goals.find((g) => g.id === row.goal_id)?.settings
+        const settings = (current && typeof current === 'object' ? { ...current } : {}) as
+          Record<string, unknown>
+        settings.newCardsPerDay = value
+        // Any legacy snake_case value would otherwise sit alongside the new one and win in
+        // whichever reader still looks for it.
+        delete settings.new_cards_per_day
+        ok = await get().updateGoal({ goalId: row.goal_id, settings })
+      }
       if (!ok) return false
     }
     return get().resolveRecommendation(recommendationId, 'accepted')
@@ -2311,17 +2369,18 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         : []
       if (summary === '' && blocks.length === 0) throw { code: 'AI_INVALID_RESULT' }
 
-      set({
-        remediation: {
-          attemptId,
-          action,
-          summary,
-          blocks,
-          warnings: Array.isArray(content.warnings)
-            ? (content.warnings as unknown[]).filter((w): w is string => typeof w === 'string')
-            : [],
-        },
-      })
+      const view = {
+        attemptId,
+        action,
+        summary,
+        blocks,
+        warnings: Array.isArray(content.warnings)
+          ? (content.warnings as unknown[]).filter((w): w is string => typeof w === 'string')
+          : [],
+      }
+      // Shown AND kept. The second half is what makes 닫기 survivable: the artifact is paid
+      // for, so losing it to a button labelled "close" was a charge with nothing behind it.
+      set({ remediation: view, remediationOwned: { ...get().remediationOwned, [attemptId]: view } })
       return true
     } catch (e) {
       // `callServerAI` throws `new Error(<code>)`, so the code is the MESSAGE. Anything else
@@ -2336,6 +2395,67 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     }
   },
 
+  loadRemediation: async ({ attemptId, action }) => {
+    // Already known — including from this session's own purchase. A read per render would be a
+    // request per keystroke on a screen that re-renders on every store write.
+    if (get().remediationOwned[attemptId]) return true
+    try {
+      const { data, error } = await supabase
+        .from('user_enrichments')
+        .select('content')
+        .eq('attempt_id', attemptId)
+        .eq('action', action)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      // RLS scopes this to the owner; `user_id` is not filtered here because doing so would
+      // imply the policy is optional.
+      if (error || !data) return false
+
+      const content = (data.content ?? {}) as {
+        summary?: unknown
+        blocks?: unknown
+        warnings?: unknown
+      }
+      const summary = typeof content.summary === 'string' ? content.summary.trim() : ''
+      const blocks = Array.isArray(content.blocks)
+        ? (content.blocks as Array<{ type?: unknown; content?: unknown }>)
+          .filter((b) => b && typeof b.type === 'string')
+          .map((b) => ({ type: String(b.type), content: b.content }))
+        : []
+      // A row that renders to nothing is not something to offer as "already bought"; leaving
+      // it out means the learner sees the normal paid button rather than an empty panel.
+      if (summary === '' && blocks.length === 0) return false
+
+      set({
+        remediationOwned: {
+          ...get().remediationOwned,
+          [attemptId]: {
+            attemptId,
+            action,
+            summary,
+            blocks,
+            warnings: Array.isArray(content.warnings)
+              ? (content.warnings as unknown[]).filter((w): w is string => typeof w === 'string')
+              : [],
+          },
+        },
+      })
+      return true
+    } catch {
+      // A failed read is not a failed purchase. Staying quiet leaves the paid button, which
+      // the server now answers from storage anyway (mig 212) rather than charging again.
+      return false
+    }
+  },
+
+  showOwnedRemediation: (attemptId) => {
+    const owned = get().remediationOwned[attemptId]
+    if (!owned) return false
+    set({ remediation: owned, remediationError: null })
+    return true
+  },
+
   dismissRemediation: () => set({ remediation: null, remediationError: null }),
 
   reset: () => {
@@ -2348,7 +2468,8 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       plan: null, planItems: [], planCards: {}, planTemplateFields: {},
       planLoading: false, planGenerating: false,
       planError: null, planErrorFrom: null, attemptsError: null, coachError: null,
-      remediation: null, remediationBusyAttemptId: null, remediationError: null,
+      remediation: null, remediationOwned: {},
+      remediationBusyAttemptId: null, remediationError: null,
       planBlockedReason: null,
       // Both must go with the plan they describe. A surviving `planAbsentFor` would assert
       // "there is no plan today" about the account that just signed OUT, and a surviving

@@ -72,7 +72,8 @@
     "extendAhead_one": "Mengambil {{count, number}} kartu lebih awal — belum gilirannya.",
     "extendAhead_other": "Mengambil {{count, number}} kartu lebih awal — belum gilirannya.",
     "studyAhead": "Belajar lebih awal",
-    "studyAheadNote": "Tidak ada yang jatuh tempo hari ini. Ini menyusun sesi dari kartu yang belum gilirannya."
+    "studyAheadNote": "Tidak ada yang jatuh tempo hari ini. Ini menyusun sesi dari kartu yang belum gilirannya.",
+    "retry": "Muat ulang"
   },
   "goals": {
     "title": "Tujuan belajar",
@@ -317,6 +318,8 @@
     "note": "Berdasarkan percobaan terakhirmu pada kartu ini. Memakai kredit.",
     "dismiss": "Tutup",
     "needsCredits": "Kredit habis, jadi penjelasan tidak bisa dibuat.",
-    "failed": "Gagal membuat penjelasan. Coba lagi."
+    "failed": "Gagal membuat penjelasan. Coba lagi.",
+    "reopen": "Lihat lagi penjelasannya",
+    "inFlight": "Penjelasan sedang dibuat, mohon tunggu sebentar."
   }
 }

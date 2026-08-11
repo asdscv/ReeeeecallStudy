@@ -72,7 +72,8 @@
     "extendAhead_one": "提前取了 {{count, number}} 张还没轮到的卡片。",
     "extendAhead_other": "提前取了 {{count, number}} 张还没轮到的卡片。",
     "studyAhead": "提前学习",
-    "studyAheadNote": "今天没有到期的卡片。这会提前取用还没轮到的卡片来组成今天的份量。"
+    "studyAheadNote": "今天没有到期的卡片。这会提前取用还没轮到的卡片来组成今天的份量。",
+    "retry": "重新加载"
   },
   "goals": {
     "title": "学习目标",
@@ -317,6 +318,8 @@
     "note": "以你最近一次作答为依据进行解释。会消耗点数。",
     "dismiss": "关闭",
     "needsCredits": "点数不足，无法生成解释。",
-    "failed": "没能生成解释，请重试。"
+    "failed": "没能生成解释，请重试。",
+    "reopen": "再次查看解释",
+    "inFlight": "正在生成解释，请稍候。"
   }
 }

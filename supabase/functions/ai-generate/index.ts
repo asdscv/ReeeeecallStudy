@@ -590,11 +590,32 @@ Deno.serve(async (req) => {
       if (reserveError) {
         if (reserveError.code === 'P0002') return json({ error: 'Insufficient AI balance', code: 'AI_INSUFFICIENT_CREDITS' }, 402, cors)
         if (reserveError.code === '23514') return json({ error: 'Too many requests today', code: 'AI_RATE_CAP' }, 429, cors)
+        // A press whose model call is still outstanding (mig 212). Not an error the learner
+        // caused and not a reason to charge twice — the first request is still coming.
+        if (reserveError.code === '55006') return json({ error: 'Remediation already in flight', code: 'AI_REMEDIATION_IN_FLIGHT' }, 409, cors)
         if (reserveError.code === '42501') return json({ error: 'Learning reference not accessible', code: 'FORBIDDEN' }, 403, cors)
         console.error('[ai-generate] remediation reserve error:', reserveError.message)
         return json({ error: 'Metering error', code: 'AI_METER_ERROR' }, 500, cors)
       }
-      const meter = (reserveRaw ?? {}) as { job_ref?: string }
+      const meter = (reserveRaw ?? {}) as {
+        job_ref?: string
+        replay?: boolean
+        enrichment_id?: string
+        content?: Record<string, unknown>
+      }
+
+      // Already bought (mig 212). The grounding is one immutable attempt, so a second
+      // generation could only reword an answer to an identical question — at full price. No
+      // job was reserved, nothing is charged, and `balance: null` says "unchanged" rather than
+      // inventing a figure the wallet would disagree with.
+      if (meter.replay === true && meter.content) {
+        return json({
+          content: meter.content,
+          enrichmentId: meter.enrichment_id ?? null,
+          balance: null,
+          replayed: true,
+        }, 200, cors)
+      }
       const service = sbServiceRole()
 
       try {

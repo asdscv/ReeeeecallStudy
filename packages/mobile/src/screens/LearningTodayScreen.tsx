@@ -19,6 +19,9 @@ import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summ
 import { goalCompletion } from '@reeeeecall/shared/lib/goal-completion'
 import { caughtUp } from '@reeeeecall/shared/lib/caught-up'
 import {
+  latestAttemptForCard, attemptNeedsRemediation,
+} from '@reeeeecall/shared/lib/learning-attempt-selection'
+import {
   parseNewCardsPerDay, DEFAULT_NEW_CARDS_PER_DAY,
 } from '@reeeeecall/shared/learning/application/cadence'
 import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
@@ -360,6 +363,210 @@ function PlanWeekStrip({ week }: { week: PlanWeek }) {
   )
 }
 
+/**
+ * "왜 자꾸 틀리는지" — the learning plan's one paid model call, on the phone.
+ *
+ * The web half shipped first and this did not, which made the app's first real AI feature
+ * reachable only from a browser — on a product where the plan is checked on a phone. Same
+ * rule, same shared selector, same wording, so the two screens cannot drift into offering the
+ * learner different things.
+ *
+ * Grounded, or not offered. `learning-attempt-selection.ts` picks the attempt — the most recent
+ * one on the card — and the button appears only when that attempt was actually a MISS
+ * (`normalized_score < 0.75`). Selling an explanation of something the learner just said they
+ * knew would be selling a premise that does not exist.
+ */
+function WeakCardExplain({ goalId, cardIds }: { goalId: string; cardIds: readonly string[] }) {
+  const { t, i18n } = useTranslation('learning')
+  // The 충전 link's wording, shared with `AiCreditNotice` so the two cannot drift into
+  // offering the same action under two different names.
+  const { t: tAi } = useTranslation('ai-generate')
+  const theme = useTheme()
+  const navigation = useNavigation<NavigationProp<Record<string, object | undefined>>>()
+  const {
+    attempts, requestRemediation, dismissRemediation,
+    loadRemediation, showOwnedRemediation, remediationOwned,
+    remediation, remediationBusyAttemptId, remediationError,
+  } = useLearningStore()
+
+  /**
+   * The weakest card that has an attempt worth explaining.
+   *
+   * One button, not one per card. A column of paid buttons is a shop; the learner asked which
+   * card they keep missing, and the list above already answers that.
+   */
+  const target = useMemo(() => {
+    const found = cardIds
+      .map((cardId) => ({ cardId, attempt: latestAttemptForCard(attempts, cardId) }))
+      .find((candidate) => attemptNeedsRemediation(candidate.attempt))
+    return found?.attempt ? { cardId: found.cardId, attempt: found.attempt } : null
+  }, [attempts, cardIds])
+
+  const targetAttemptId = target?.attempt.id ?? null
+
+  /**
+   * Was this already bought?
+   *
+   * A free read of `user_enrichments`, whose owner-read policy has existed since the table did
+   * and which nothing had ever used. Without it the answer lived only in memory, so killing
+   * the app — or 닫기, a button that says "close" — left the paid button as the only way back
+   * to a paragraph the learner had already been charged for.
+   */
+  useEffect(() => {
+    if (!targetAttemptId || typeof loadRemediation !== 'function') return
+    void loadRemediation({ attemptId: targetAttemptId, action: 'explain' })
+  }, [targetAttemptId, loadRemediation])
+
+  // Guarded like the coach actions above: a partially-mocked store in a screen test has no
+  // such action, and a paid button is not worth crashing a screen over.
+  if (!target || !targetAttemptId || typeof requestRemediation !== 'function') return null
+
+  const shown = remediation?.attemptId === targetAttemptId ? remediation : null
+  const owned = remediationOwned?.[targetAttemptId] ?? null
+  const busy = remediationBusyAttemptId === targetAttemptId
+
+  return (
+    <View
+      style={[styles.card, {
+        backgroundColor: theme.colors.surfaceElevated,
+        borderColor: theme.colors.primary,
+        marginTop: 8,
+      }]}
+      {...testProps('weak-explain', true)}
+    >
+      {shown ? (
+        <>
+          <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
+            {shown.summary}
+          </Text>
+          {shown.blocks.map((block, index) => (
+            typeof block.content === 'string' && block.content.trim() !== '' ? (
+              <Text
+                key={index}
+                style={[theme.typography.caption, {
+                  color: theme.colors.textSecondary, marginTop: 6,
+                }]}
+              >
+                {block.content}
+              </Text>
+            ) : null
+          ))}
+          {/* The model's own reservations, when it had any. Dropping them would present a
+              hedged answer as a confident one. */}
+          {shown.warnings.map((warning, index) => (
+            <Text
+              key={`w${index}`}
+              style={[theme.typography.caption, { color: theme.colors.warning, marginTop: 6 }]}
+            >
+              {warning}
+            </Text>
+          ))}
+          <TouchableOpacity
+            onPress={dismissRemediation}
+            accessibilityRole="button"
+            style={{ minHeight: MIN_TOUCH, justifyContent: 'flex-end' }}
+            {...testProps('weak-explain-dismiss')}
+          >
+            <Text style={[theme.typography.caption, {
+              color: theme.colors.primary, fontWeight: '600',
+            }]}>
+              {t('explain.dismiss')}
+            </Text>
+          </TouchableOpacity>
+        </>
+      ) : owned ? (
+        /* Bought, and closed. Reopening is free and must not look like the paid button —
+           offering the 크레딧 note over something already paid for is how a learner buys the
+           same paragraph twice. */
+        <TouchableOpacity
+          onPress={() => { showOwnedRemediation(targetAttemptId) }}
+          accessibilityRole="button"
+          style={{
+            minHeight: MIN_TOUCH, justifyContent: 'center',
+            borderWidth: 1, borderColor: theme.colors.primary,
+            borderRadius: 10, paddingHorizontal: 12,
+          }}
+          {...testProps('weak-explain-reopen')}
+        >
+          <Text style={[theme.typography.bodySmall, {
+            color: theme.colors.primary, fontWeight: '600', textAlign: 'center',
+          }]}>
+            {t('explain.reopen')}
+          </Text>
+        </TouchableOpacity>
+      ) : (
+        <>
+          <TouchableOpacity
+            disabled={busy}
+            onPress={() => {
+              void requestRemediation({
+                action: 'explain',
+                goalId,
+                attemptId: targetAttemptId,
+                cardId: target.cardId,
+                uiLang: i18n.language,
+              })
+            }}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: busy }}
+            style={[{
+              minHeight: MIN_TOUCH, justifyContent: 'center',
+              backgroundColor: theme.colors.primary,
+              borderRadius: 10, paddingHorizontal: 12,
+            }, busy && styles.disabled]}
+            {...testProps('weak-explain-ask')}
+          >
+            {/* '#fff' rather than a token, as every other primary button on this screen does —
+                the palette has no on-primary colour and inventing one here would make this the
+                only button that changes with the theme. */}
+            <Text style={[theme.typography.bodySmall, {
+              color: '#fff', fontWeight: '600', textAlign: 'center',
+            }]}>
+              {busy ? t('explain.asking') : t('explain.ask')}
+            </Text>
+          </TouchableOpacity>
+          <Text style={[theme.typography.caption, {
+            color: theme.colors.textTertiary, marginTop: 8,
+          }]}>
+            {t('explain.note')}
+          </Text>
+        </>
+      )}
+      {remediationError && (
+        <Text
+          accessibilityRole="alert"
+          style={[theme.typography.caption, { color: theme.colors.error, marginTop: 8 }]}
+          {...testProps('weak-explain-error')}
+        >
+          {t(remediationError.code === 'AI_INSUFFICIENT_CREDITS' ? 'explain.needsCredits'
+            // A press whose first request is still running (mig 212). Telling the learner it
+            // failed would be false, and it is the one "error" whose answer is "wait".
+            : remediationError.code === 'AI_REMEDIATION_IN_FLIGHT' ? 'explain.inFlight'
+              : 'explain.failed')}
+        </Text>
+      )}
+      {/* The one failure the learner can act on. `AiCreditNotice` carries the 충전 link on
+          every other AI screen, but it is placed by feature id and the learning plan is
+          registered `poweredBy: 'device'` — so the app's newest paid button was the only one
+          that could say "you have no credits" with no way to add any. */}
+      {remediationError?.code === 'AI_INSUFFICIENT_CREDITS' && (
+        <TouchableOpacity
+          onPress={() => navigation.navigate('SettingsTab' as never)}
+          accessibilityRole="button"
+          style={{ minHeight: MIN_TOUCH, justifyContent: 'center' }}
+          {...testProps('weak-explain-topup')}
+        >
+          <Text style={[theme.typography.caption, {
+            color: theme.colors.primary, fontWeight: '600',
+          }]}>
+            {tAi('wallet.topUp')}
+          </Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  )
+}
+
 /** Deck names printed before the count takes over. Three fits one line on a narrow phone. */
 const DECK_NAMES_SHOWN = 3
 
@@ -656,6 +863,11 @@ export function LearningTodayScreen() {
   const regenerate = useCallback(() => {
     if (goal) void generatePlan(goal, currentPlanContext())
   }, [goal, generatePlan])
+
+  /** Read again. The answer to a failed read — and the one thing that touches nothing. */
+  const retryRead = useCallback(() => {
+    if (goal) void fetchPlan(goal.id, planDate)
+  }, [goal, fetchPlan, planDate])
 
   // A fresh context, like `regenerate` — the screen stays mounted across midnight, so a value
   // captured at mount would append to yesterday.
@@ -1213,6 +1425,29 @@ export function LearningTodayScreen() {
               >
                 {t('today.generating')}
               </Text>
+            ) : planErrorFrom === 'read' ? (
+              /* The READ failed, so we do not know whether a plan exists — `fetchPlan`'s catch
+                 says so by leaving `planAbsentFor` null. This used to fall through to the
+                 button below, which is not a retry: it BUILDS a plan, replacing whatever was
+                 there and taking `completed_items` back to zero. A learner who finished nine
+                 of twelve cards and hit a flaky connection was one tap from losing the record
+                 of it. A read that failed is answered by reading again. */
+              <TouchableOpacity
+                disabled={!goal || planLoading}
+                onPress={retryRead}
+                style={[
+                  styles.primaryBtn,
+                  { backgroundColor: 'transparent', borderWidth: 1, borderColor: theme.colors.border },
+                  (!goal || planLoading) && styles.disabled,
+                ]}
+                accessibilityRole="button"
+                accessibilityState={{ disabled: !goal || planLoading }}
+                {...testProps('learning-plan-retry')}
+              >
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
+                  {t('today.retry')}
+                </Text>
+              </TouchableOpacity>
             ) : !planBlockedReason ? (
               // Only reachable once automation has had its turn and produced no plan — a failed
               // save, or a goal already regenerated today. The button is the way back.
@@ -1328,6 +1563,11 @@ export function LearningTodayScreen() {
                     </Text>
                   </TouchableOpacity>
                 ))}
+
+                <WeakCardExplain
+                  goalId={goalId}
+                  cardIds={weakByDeck.flatMap((group) => group.cardIds)}
+                />
               </View>
             )}
           </>
