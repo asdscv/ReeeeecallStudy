@@ -4,7 +4,6 @@ import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
 import { useQuizStore, type QuizSetRow } from '@reeeeecall/shared/stores/quiz-store'
-import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { Screen, Button, EmptyState, ListSkeleton, ScreenHeader } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
@@ -47,15 +46,6 @@ export function QuizHomeScreen() {
     <Screen>
       <ScreenHeader title={t('home.title')} mode="drawer" />
 
-      {trialUnits > 0 && (
-        <View style={[styles.banner, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-          <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('home.trial.title')}</Text>
-          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-            {t('home.trial.body', { count: trialUnits })}
-          </Text>
-        </View>
-      )}
-
       <View style={styles.actions}>
         <Button
           title={t('home.create')}
@@ -80,7 +70,7 @@ export function QuizHomeScreen() {
                   {item.title}
                 </Text>
                 <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                  {t(`type.${item.question_type}`)} · {t('home.questions', { count: item.generated_count })} · {t('home.retakeFree')}
+                  {t(`type.${item.question_type}`)} · {t('home.questions', { count: item.generated_count })}
                 </Text>
                 {/* Under-delivery, said out loud. Dropped items are never charged for, so asking
                     for 6 and getting 4 is a normal outcome — but the set previously just read
@@ -106,19 +96,14 @@ export function QuizHomeScreen() {
         />
       )}
 
-      <Text style={[theme.typography.caption, styles.note, { color: theme.colors.textSecondary }]}>
-        {t('home.pricingNote', { price: formatUsdMicro(5000) })}
-      </Text>
     </Screen>
   )
 }
 
 const styles = StyleSheet.create({
-  banner: { padding: 12, borderRadius: 12, borderWidth: 1, marginHorizontal: 16, marginBottom: 12, gap: 2 },
   actions: { paddingHorizontal: 16, marginBottom: 12 },
   list: { paddingHorizontal: 16, gap: 8, paddingBottom: 16 },
   card: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 12, borderWidth: 1 },
   cardBody: { flex: 1, gap: 2 },
   take: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
-  note: { textAlign: 'center', paddingHorizontal: 16, paddingBottom: 12 },
 })

@@ -10,19 +10,12 @@
     "create": "Tạo bài mới",
     "take": "Làm bài",
     "starting": "Đang bắt đầu…",
-    "retakeFree": "Làm lại miễn phí",
     "questions_one": "{{count, number}} câu",
     "questions_other": "{{count, number}} câu",
-    "trial": {
-      "title": "Bạn đã có phần dùng thử",
-      "body_one": "{{count, number}} đơn vị dùng thử — đủ để hoàn thành trọn một bài.",
-      "body_other": "{{count, number}} đơn vị dùng thử — đủ để hoàn thành trọn một bài."
-    },
     "empty": {
       "title": "Chưa có bài kiểm tra nào",
       "body": "Tạo từ bất kỳ bộ thẻ nào, chỉ mất vài giây."
     },
-    "pricingNote": "{{price}} mỗi đơn vị. Trắc nghiệm luôn được chấm miễn phí.",
     "fewerThanAsked": "đã yêu cầu {{requested, number}}"
   },
   "setup": {
@@ -45,10 +38,6 @@
     },
     "tooFewForMcq_one": "Trắc nghiệm lấy phương án sai từ các thẻ khác nên cần ít nhất 4 thẻ. Bộ này có {{count, number}} thẻ.",
     "tooFewForMcq_other": "Trắc nghiệm lấy phương án sai từ các thẻ khác nên cần ít nhất 4 thẻ. Bộ này có {{count, number}} thẻ.",
-    "price": "Giá",
-    "free": "Miễn phí",
-    "covered": "Phần miễn phí bù {{units, number}} đơn vị",
-    "retakeFree": "Làm lại không tốn phí.",
     "confirm": "Tạo bài kiểm tra",
     "generating": "Đang soạn câu hỏi…",
     "difficulty": "Độ khó",
@@ -70,8 +59,8 @@
     "next": "Tiếp",
     "finish": "Kết thúc",
     "grading": "Đang chấm…",
-    "gradeFor": "Chấm câu này · {{price}}",
-    "reference": "Đáp án: {{answer}}"
+    "reference": "Đáp án: {{answer}}",
+    "grade": "Chấm câu này"
   },
   "result": {
     "percent": "{{percent, number}}%",

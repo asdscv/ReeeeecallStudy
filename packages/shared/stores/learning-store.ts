@@ -15,6 +15,7 @@ import {
   planCoach,
   type CoachSuggestion, type PlanDigest, type PlanLever,
 } from '../learning/application/plan-coach'
+import { planWeek as derivePlanWeek, type PlanWeek, type WeekDigest } from '../learning/application/plan-week'
 import type { TemplateFieldOrder } from '../lib/card-prompt'
 import { supabase } from '../lib/supabase'
 import {
@@ -437,6 +438,17 @@ interface LearningState {
   planLoading: boolean
   planGenerating: boolean
   planError: LearningError | null
+  /**
+   * The last seven days, as the strip renders them, for the goal named by `planWeekGoalId`.
+   *
+   * Kept because the coach's own fetch already pays for it: `regeneratePlanCoach` reads the
+   * digest to DECIDE, and used to throw it away. The screen showing the week and the coach
+   * judging the week must never be able to disagree about which week it was, so they come
+   * from one round trip.
+   */
+  planWeek: PlanWeek | null
+  /** Which goal `planWeek` describes — the same guard `insightsGoalId` exists for. */
+  planWeekGoalId: string | null
   /**
    * `goalId|planDate` for which a read COMPLETED and found no plan. Null otherwise.
    *
@@ -934,6 +946,8 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   planLoading: false,
   planGenerating: false,
   planError: null,
+  planWeek: null,
+  planWeekGoalId: null,
   planAbsentFor: null,
   autoPlanAttempted: {},
   planExtending: false,
@@ -1742,6 +1756,11 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         p_goal_id: goalId, p_timezone: timezone, p_days: 7,
       })
       if (error) throw error
+
+      // The week goes into state BEFORE the coach decides anything, and independently of
+      // what it decides. The coach is allowed to have nothing to say — that is its normal
+      // answer — and the strip must not vanish along with it.
+      set({ planWeek: derivePlanWeek(data as WeekDigest), planWeekGoalId: goalId })
 
       const suggestion: CoachSuggestion | null = planCoach(data as PlanDigest)
       // `null` means the window is too short to judge. Writing an empty set would clear a

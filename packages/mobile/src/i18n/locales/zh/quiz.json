@@ -10,19 +10,12 @@
     "create": "新建测验",
     "take": "开始",
     "starting": "正在开始…",
-    "retakeFree": "重做免费",
     "questions_one": "{{count, number}} 题",
     "questions_other": "{{count, number}} 题",
-    "trial": {
-      "title": "试用额度已就绪",
-      "body_one": "赠送 {{count, number}} 个单位，足够完整做完一套。",
-      "body_other": "赠送 {{count, number}} 个单位，足够完整做完一套。"
-    },
     "empty": {
       "title": "还没有测验",
       "body": "从任意牌组创建，只需几秒。"
     },
-    "pricingNote": "每单位 {{price}}。选择题始终免费批改。",
     "fewerThanAsked": "请求 {{requested, number}} 题"
   },
   "setup": {
@@ -45,10 +38,6 @@
     },
     "tooFewForMcq_one": "选择题的干扰项来自其他卡片，因此至少需要 4 张。这个牌组只有 {{count, number}} 张。",
     "tooFewForMcq_other": "选择题的干扰项来自其他卡片，因此至少需要 4 张。这个牌组只有 {{count, number}} 张。",
-    "price": "价格",
-    "free": "免费",
-    "covered": "免费额度可抵扣 {{units, number}} 个单位",
-    "retakeFree": "重做不会产生费用。",
     "confirm": "创建测验",
     "generating": "正在出题…",
     "difficulty": "难度",
@@ -70,8 +59,8 @@
     "next": "下一题",
     "finish": "完成",
     "grading": "批改中…",
-    "gradeFor": "批改这个答案 · {{price}}",
-    "reference": "答案：{{answer}}"
+    "reference": "答案：{{answer}}",
+    "grade": "批改这个答案"
   },
   "result": {
     "percent": "{{percent, number}}%",

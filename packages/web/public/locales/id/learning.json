@@ -247,7 +247,14 @@
     "body": "Ketik jawabannya dari ingatan. Tidak boleh mengintip.",
     "start": "Periksa (sekitar 2 menit)",
     "starting": "Menyiapkan…",
-    "free": "Jawaban benar dinilai gratis. Anda hanya membayar yang perlu dinilai."
+    "recentTitle_one": "Masih ingat {{count, number}} kartu yang baru kamu pelajari?",
+    "recentTitle_other": "Masih ingat {{count, number}} kartu yang baru kamu pelajari?",
+    "recentBody": "Belum belajar hari ini, jadi ini dari hari-hari terakhir. Ketik jawabannya sendiri.",
+    "blockedTitle": "Ada kartu yang tidak bisa dijadikan soal pemeriksaan",
+    "blockedBody_one": "Templat \"{{name}}\" menandai lebih dari satu kolom jawaban di sisi belakang, jadi tidak bisa diketahui mana jawabannya. {{count, number}} kartu yang memakainya dilewati.",
+    "blockedBody_other": "Templat \"{{name}}\" menandai lebih dari satu kolom jawaban di sisi belakang, jadi tidak bisa diketahui mana jawabannya. {{count, number}} kartu yang memakainya dilewati.",
+    "blockedAction": "Tandai satu kolom jawaban saja",
+    "blockedWeb": "Buka templat di web dan sisakan satu kolom belakang saja sebagai primary."
   },
   "coach": {
     "apply": "Terapkan",
@@ -272,5 +279,31 @@
       "title": "Satu hari tambahan seminggu paling membantu",
       "body": "Bukan rencananya yang terlalu banyak — harinya yang tidak dibuka. Konsistensi lebih penting daripada volume."
     }
+  },
+  "week": {
+    "title": "Minggu ini",
+    "activeDays_one": "Belajar {{count, number}} hari",
+    "activeDays_other": "Belajar {{count, number}} hari",
+    "streak_one": "{{count, number}} hari berturut-turut",
+    "streak_other": "{{count, number}} hari berturut-turut",
+    "streakNone": "Belum ada catatan minggu ini",
+    "completion": "{{pct, number}}% dari yang direncanakan",
+    "dow": {
+      "0": "M",
+      "1": "S",
+      "2": "S",
+      "3": "R",
+      "4": "K",
+      "5": "J",
+      "6": "S"
+    },
+    "legend": {
+      "done": "Selesai",
+      "partial": "Mulai tapi belum selesai",
+      "extra": "Belajar tanpa rencana",
+      "untouched": "Tidak dibuka",
+      "none": "Tidak ada rencana"
+    },
+    "streakBroken": "Rentetanmu terputus. Hari ini bisa mulai lagi"
   }
 }

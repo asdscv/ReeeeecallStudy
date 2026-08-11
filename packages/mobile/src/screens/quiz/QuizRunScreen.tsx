@@ -9,7 +9,6 @@ import {
   useQuizStore, QuizError, QUIZ_GRADE_ACTION, type QuizSubmitResult,
   optionFlaws,
 } from '@reeeeecall/shared/stores/quiz-store'
-import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { Screen, Button, EmptyState } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
@@ -259,7 +258,7 @@ export function QuizRunScreen() {
               {item.question_type !== 'mcq' && item.score === null && (
                 <Button
                   title={grading ? t('run.grading')
-                    : t('run.gradeFor', { price: shownPrice === 0 ? t('setup.free') : formatUsdMicro(shownPrice ?? 0) })}
+                    : t('run.grade')}
                   onPress={() => void requestGrade()}
                   disabled={grading || shownPrice === null}
                   {...testProps('quiz-grade')}

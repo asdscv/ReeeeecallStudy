@@ -7,7 +7,9 @@ import { navigateToDrawerItem } from '../helpers/navigation'
  * button's label, a field's placeholder — so `~id` silently matches nothing there.
  */
 const byId = (id: string) =>
-  driver.isIOS ? byId(id) : $(`android=new UiSelector().resourceId("${id}")`)
+  // `$(\`~${id}\`)`, NOT `byId(id)` — which is what this said, and which recurses until the
+  // stack goes on iOS. Every iOS lookup in this file was a crash, not a miss.
+  driver.isIOS ? $(`~${id}`) : $(`android=new UiSelector().resourceId("${id}")`)
 
 const SHOT = process.env.SHOT_DIR ?? '/tmp'
 const P = process.env.PLAT ?? 'ios'

@@ -6,7 +6,6 @@ import {
   optionFlaws,
   type QuizRunItem, type QuizSubmitResult,
 } from '@reeeeecall/shared/stores/quiz-store'
-import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { QuizFeedback } from './QuizFeedback'
 
 /**
@@ -248,8 +247,10 @@ export function QuizRunPage() {
                 disabled={grading || shownPrice === null}
                 className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50"
               >
-                {grading ? t('run.grading')
-                  : t('run.gradeFor', { price: shownPrice === 0 ? t('setup.free') : formatUsdMicro(shownPrice ?? 0) })}
+                {/* The price is no longer on the button. The QUOTE still runs and still
+                    authorises the spend through `maxPriceMicro`; only the announcement is
+                    gone. */}
+                {grading ? t('run.grading') : t('run.grade')}
               </button>
             )}
             <button
