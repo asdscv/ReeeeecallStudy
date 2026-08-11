@@ -36,7 +36,9 @@ export function QuizRunScreen() {
   const { t } = useTranslation('quiz')
   const navigation = useNavigation<Nav>()
   const { runId } = useRoute<Rt>().params
-  const { run, loading, loadRun, submit, gradeWithAi, quote, grading, finishRun } = useQuizStore()
+  const {
+    run, loading, loadRun, refreshRun, submit, gradeWithAi, quote, grading, finishRun,
+  } = useQuizStore()
 
   const [index, setIndex] = useState(0)
   const [choice, setChoice] = useState<number | null>(null)
@@ -50,6 +52,20 @@ export function QuizRunScreen() {
   const startedAt = useRef(Date.now())
 
   useEffect(() => { void loadRun(runId) }, [runId, loadRun])
+
+  /**
+   * A long quiz is still being written while its first questions are answered.
+   *
+   * `start_quiz_run` snapshots, so the run holds only what existed when it opened. Polled
+   * while the set is short of what was asked for, and stopped the moment it is complete —
+   * an idle timer on a finished quiz is pure battery.
+   */
+  const stillGrowing = !!run && run.item_count < (run.requested_count ?? run.item_count)
+  useEffect(() => {
+    if (!stillGrowing) return
+    const id = setInterval(() => { void refreshRun(runId) }, 4000)
+    return () => clearInterval(id)
+  }, [runId, stillGrowing, refreshRun])
 
   const items = useMemo(() => run?.items ?? [], [run])
   const item = items[index]
