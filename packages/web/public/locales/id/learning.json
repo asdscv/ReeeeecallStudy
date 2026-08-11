@@ -37,7 +37,7 @@
     "extendAdded_other": "Menambahkan {{count, number}} item lagi.",
     "extendTomorrow_one": "{{count, number}} di antaranya kartu baru, jadi ulasan besok bertambah sebanyak itu.",
     "extendTomorrow_other": "{{count, number}} di antaranya kartu baru, jadi ulasan besok bertambah sebanyak itu.",
-    "extendNothing": "Tidak ada lagi yang bisa ditambahkan sekarang.",
+    "extendNothing": "Tidak ada kartu lain di target ini untuk ditambahkan.",
     "remaining": "Sisa {{count, number}} hari ini",
     "remaining_one": "Sisa {{count, number}} hari ini",
     "remaining_other": "Sisa {{count, number}} hari ini",
@@ -61,7 +61,13 @@
     "deckListMore_other": "{{names}} +{{count, number}} lainnya",
     "itemsUnavailable": "{{count, number}} kartu dalam rencana ini tidak bisa dibuka sekarang. Mungkin sudah dihapus.",
     "itemsUnavailable_one": "{{count, number}} kartu dalam rencana ini tidak bisa dibuka sekarang. Mungkin sudah dihapus.",
-    "itemsUnavailable_other": "{{count, number}} kartu dalam rencana ini tidak bisa dibuka sekarang. Mungkin sudah dihapus."
+    "itemsUnavailable_other": "{{count, number}} kartu dalam rencana ini tidak bisa dibuka sekarang. Mungkin sudah dihapus.",
+    "backSoonNote": "Hari ini selesai. Kartu yang baru kamu jawab kembali sekitar {{count, number}} menit lagi.",
+    "backSoonNote_one": "Hari ini selesai. Kartu yang baru kamu jawab kembali sekitar {{count, number}} menit lagi.",
+    "backSoonNote_other": "Hari ini selesai. Kartu yang baru kamu jawab kembali sekitar {{count, number}} menit lagi.",
+    "extendAhead": "Mengambil {{count, number}} kartu lebih awal — belum gilirannya.",
+    "extendAhead_one": "Mengambil {{count, number}} kartu lebih awal — belum gilirannya.",
+    "extendAhead_other": "Mengambil {{count, number}} kartu lebih awal — belum gilirannya."
   },
   "goals": {
     "title": "Tujuan belajar",

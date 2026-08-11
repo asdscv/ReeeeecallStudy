@@ -1097,7 +1097,7 @@ describe('extendPlan', () => {
     // blocked; there was simply nothing left to add.
     expect(useLearningStore.getState().planBlockedReason).toBeNull()
     expect(useLearningStore.getState().planExtension)
-      .toEqual({ appended: 0, newCards: 0, reviewsTomorrow: 0 })
+      .toEqual({ appended: 0, newCards: 0, reviewsTomorrow: 0, aheadOfSchedule: false })
   })
 
   it('states how much tomorrow grows, counted from the plan the server returned', async () => {
@@ -1112,7 +1112,7 @@ describe('extendPlan', () => {
     await useLearningStore.getState().extendPlan(goalWithDecks(DECKS), CTX)
 
     expect(useLearningStore.getState().planExtension)
-      .toEqual({ appended: 1, newCards: 1, reviewsTomorrow: 1 })
+      .toEqual({ appended: 1, newCards: 1, reviewsTomorrow: 1, aheadOfSchedule: false })
   })
 
   it('counts no new intake when the extra work is all review', async () => {
@@ -1126,7 +1126,7 @@ describe('extendPlan', () => {
     await useLearningStore.getState().extendPlan(goalWithDecks(DECKS), CTX)
 
     expect(useLearningStore.getState().planExtension)
-      .toEqual({ appended: 1, newCards: 0, reviewsTomorrow: 0 })
+      .toEqual({ appended: 1, newCards: 0, reviewsTomorrow: 0, aheadOfSchedule: false })
   })
 
   it('reports what the server accepted, not what was sent', async () => {
@@ -1156,7 +1156,7 @@ describe('extendPlan', () => {
 
   it('clears the last result before starting, so a failure cannot show a stale success', async () => {
     withPlan()
-    useLearningStore.setState({ planExtension: { appended: 9, newCards: 9, reviewsTomorrow: 9 } })
+    useLearningStore.setState({ planExtension: { appended: 9, newCards: 9, reviewsTomorrow: 9, aheadOfSchedule: false } })
     queue('cards', { data: [], error: null })
 
     await useLearningStore.getState().extendPlan(goalWithDecks(DECKS), CTX)
@@ -1165,7 +1165,75 @@ describe('extendPlan', () => {
     // explicit zero rather than left null: the screen has a line for "nothing to add", and a
     // null would render no answer at all to a button the learner just pressed.
     expect(useLearningStore.getState().planExtension)
-      .toEqual({ appended: 0, newCards: 0, reviewsTomorrow: 0 })
+      .toEqual({ appended: 0, newCards: 0, reviewsTomorrow: 0, aheadOfSchedule: false })
+  })
+
+  it('pulls upcoming cards forward when nothing is owed', async () => {
+    // THE point of the button, reported directly: "더할 것이 없는게 뭔데 … 이거는 하루치
+    // 이상을 하겠다고 하는건데".
+    //
+    // 더 하기 means "I want to do more than today's share". The fetch answered "nothing is
+    // due" — which on a finished day is always true, because the day was built from exactly
+    // the cards that were due — and the screen reported it as "더 넣을 것이 없습니다" while
+    // twenty-three cards sat in the deck waiting for their turn.
+    //
+    // First pass: nothing owed. Second pass: the due CUTOFF is dropped, and a card scheduled
+    // for next week is offered.
+    withPlan()
+    // Pass 1 bails before it reads templates or logs — an empty candidate set is decided as
+    // soon as the two card queries come back, so only those two are consumed here. The second
+    // pass re-reads `decks`, and `beforeEach` queues exactly one row.
+    queue('decks', { data: [deckRow()], error: null })
+    queue('cards', { data: [], error: null })                       // pass 1 — due
+    queue('cards', { data: [], error: null })                       // pass 1 — intake
+    queue('cards', { data: [cardRow('card-2', {                     // pass 2 — looks ahead
+      next_review_at: '2026-08-07T00:00:00.000Z',                   // a week out
+      last_reviewed_at: '2026-07-30T00:00:00.000Z',
+    })], error: null })
+    queue('cards', { data: [], error: null })
+    queue('study_logs', { data: [], error: null })
+    mockRpc.mockResolvedValue({ data: { ok: true, appended: 1, skipped: 0 }, error: null })
+    queueReread([itemRow('item-1', 'card-1', 0), itemRow('item-2', 'card-2', 1)])
+
+    const ok = await useLearningStore.getState().extendPlan(goalWithDecks(DECKS), CTX)
+    expect(ok).toBe(true)
+    expect(mockRpc.mock.calls.map(([name]) => name)).toContain('append_daily_plan_items')
+    // And it says the block was pulled forward, so the screen can too. Studying early has a
+    // real cost and is not something to do to someone silently.
+    expect(useLearningStore.getState().planExtension?.aheadOfSchedule).toBe(true)
+  })
+
+  it('only says there is nothing left when even looking ahead finds nothing', async () => {
+    // The sentence is now true exactly when the goal is out of cards — which is what the
+    // learner expected it to mean all along.
+    withPlan()
+    queue('decks', { data: [deckRow()], error: null })   // the second pass re-reads it
+    for (let pass = 0; pass < 2; pass += 1) {
+      queue('cards', { data: [], error: null })
+      queue('cards', { data: [], error: null })
+    }
+
+    const ok = await useLearningStore.getState().extendPlan(goalWithDecks(DECKS), CTX)
+
+    expect(ok).toBe(false)
+    expect(useLearningStore.getState().planExtension)
+      .toEqual({ appended: 0, newCards: 0, reviewsTomorrow: 0, aheadOfSchedule: false })
+    expect(useLearningStore.getState().planBlockedReason).toBeNull()
+  })
+
+  it('does NOT look ahead when something is owed', async () => {
+    // Study-ahead is the fallback, never the default. A card due today must be preferred over
+    // one due next week, and the second pass must not run at all when the first succeeds.
+    withPlan()
+    queue('cards', { data: [cardRow('card-2', { next_review_at: '2026-07-30T00:00:00.000Z' })], error: null })
+    queue('cards', { data: [], error: null })
+    queue('study_logs', { data: [], error: null })
+    mockRpc.mockResolvedValue({ data: { ok: true, appended: 1, skipped: 0 }, error: null })
+    queueReread([itemRow('item-1', 'card-1', 0), itemRow('item-2', 'card-2', 1)])
+
+    await useLearningStore.getState().extendPlan(goalWithDecks(DECKS), CTX)
+
+    expect(useLearningStore.getState().planExtension?.aheadOfSchedule).toBe(false)
   })
 
   it('never reports an extension as a blocked plan, whatever went missing', async () => {

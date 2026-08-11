@@ -37,7 +37,7 @@
     "extendAdded_other": "Đã thêm {{count, number}} mục nữa.",
     "extendTomorrow_one": "Trong đó có {{count, number}} thẻ mới, nên ngày mai sẽ có thêm bấy nhiêu lượt ôn.",
     "extendTomorrow_other": "Trong đó có {{count, number}} thẻ mới, nên ngày mai sẽ có thêm bấy nhiêu lượt ôn.",
-    "extendNothing": "Hiện không còn gì để thêm.",
+    "extendNothing": "Không còn thẻ nào trong mục tiêu này để thêm.",
     "remaining": "Còn {{count, number}} thẻ hôm nay",
     "remaining_one": "Còn {{count, number}} thẻ hôm nay",
     "remaining_other": "Còn {{count, number}} thẻ hôm nay",
@@ -61,7 +61,13 @@
     "deckListMore_other": "{{names}} và {{count, number}} bộ khác",
     "itemsUnavailable": "Hiện không mở được {{count, number}} thẻ trong kế hoạch này. Có thể chúng đã bị xoá.",
     "itemsUnavailable_one": "Hiện không mở được {{count, number}} thẻ trong kế hoạch này. Có thể chúng đã bị xoá.",
-    "itemsUnavailable_other": "Hiện không mở được {{count, number}} thẻ trong kế hoạch này. Có thể chúng đã bị xoá."
+    "itemsUnavailable_other": "Hiện không mở được {{count, number}} thẻ trong kế hoạch này. Có thể chúng đã bị xoá.",
+    "backSoonNote": "Hôm nay xong rồi. Những thẻ bạn vừa trả lời sẽ quay lại sau khoảng {{count, number}} phút.",
+    "backSoonNote_one": "Hôm nay xong rồi. Những thẻ bạn vừa trả lời sẽ quay lại sau khoảng {{count, number}} phút.",
+    "backSoonNote_other": "Hôm nay xong rồi. Những thẻ bạn vừa trả lời sẽ quay lại sau khoảng {{count, number}} phút.",
+    "extendAhead": "Đã lấy trước {{count, number}} thẻ chưa đến lượt.",
+    "extendAhead_one": "Đã lấy trước {{count, number}} thẻ chưa đến lượt.",
+    "extendAhead_other": "Đã lấy trước {{count, number}} thẻ chưa đến lượt."
   },
   "goals": {
     "title": "Mục tiêu học tập",
