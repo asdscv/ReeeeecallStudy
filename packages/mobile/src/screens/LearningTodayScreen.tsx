@@ -21,7 +21,8 @@ import {
   parseNewCardsPerDay, DEFAULT_NEW_CARDS_PER_DAY,
 } from '@reeeeecall/shared/learning/application/cadence'
 import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
-import { useQuizStore } from '@reeeeecall/shared/stores/quiz-store'
+import { useQuizStore, type DailyCheckCount } from '@reeeeecall/shared/stores/quiz-store'
+import type { PlanWeek, DayState } from '@reeeeecall/shared/learning/application/plan-week'
 import { useStudy } from '../hooks/useStudy'
 import type { AIStackParamList } from '../navigation/types'
 
@@ -74,7 +75,7 @@ function DailyCheckCard({ goalId }: { goalId: string }) {
   const theme = useTheme()
   const navigation = useNavigation<NavigationProp<AIStackParamList>>()
   const { countDailyCheck, buildDailyCheck, startRun } = useQuizStore()
-  const [counts, setCounts] = useState<{ studiedToday: number; checkable: number } | null>(null)
+  const [counts, setCounts] = useState<DailyCheckCount | null>(null)
   const [busy, setBusy] = useState(false)
   const timezone = currentPlanContext().timezone
 
@@ -83,18 +84,50 @@ function DailyCheckCard({ goalId }: { goalId: string }) {
     // partially-mocked store has no such action.
     if (typeof countDailyCheck !== 'function') return
     let cancelled = false
-    void countDailyCheck(timezone)
+    // Today first — the server widens only when today has nothing. Without this the card was
+    // invisible until the learner had already studied, which is when they are leaving.
+    void countDailyCheck(timezone, CHECK_LOOKBACK_DAYS)
       .then((value) => { if (!cancelled) setCounts(value) })
       .catch(() => { if (!cancelled) setCounts(null) })
     return () => { cancelled = true }
   }, [countDailyCheck, timezone, goalId])
 
-  if (!counts || counts.checkable === 0) return null
+  if (!counts) return null
+
+  // Studied plenty, none of it resolvable. On a real deck this is the COMMON way the check
+  // fails: a template with two `primary` back fields cannot say which one is the answer, so
+  // every card of it is refused — and on the deck this was measured against, one of those two
+  // is the learner's own wrong expression. Refusing is right; refusing invisibly is what made
+  // the card look like it did not exist.
+  //
+  // No link: the template editor is web-only, so mobile names the fix rather than pretending
+  // to offer it. A dead button would be worse than a sentence.
+  if (counts.checkable === 0) {
+    const blocker = counts.blocked?.[0]
+    if (!blocker || counts.studiedToday === 0) return null
+    return (
+      <View style={[styles.card, {
+        backgroundColor: theme.colors.surface, borderColor: theme.colors.border, marginTop: 12,
+      }]} {...testProps('check-blocked')}>
+        <Text style={[theme.typography.label, { color: theme.colors.text }]}>
+          {t('check.blockedTitle')}
+        </Text>
+        <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 2 }]}>
+          {t('check.blockedBody', { name: blocker.name, count: blocker.cards })}
+        </Text>
+        <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 6 }]}>
+          {t('check.blockedWeb')}
+        </Text>
+      </View>
+    )
+  }
 
   const start = async () => {
     setBusy(true)
     try {
-      const setId = await buildDailyCheck({ goalId, timezone })
+      // The SAME window the count was taken with, or the server refuses a check this card
+      // has already offered.
+      const setId = await buildDailyCheck({ goalId, timezone, lookback: CHECK_LOOKBACK_DAYS })
       const runId = await startRun(setId)
       // The check runs in the quiz stack — same runner, same screens. `getParent` is how a
       // screen in one drawer stack hands off to another without importing its navigator.
@@ -116,11 +149,16 @@ function DailyCheckCard({ goalId }: { goalId: string }) {
       borderColor: theme.colors.primary,
       marginTop: 12,
     }]}>
+      {/* Named for the window it actually drew from. Being told these are today's cards on
+          a day you did not study is the kind of small lie that costs a feature its
+          credibility the first time a learner notices. */}
       <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-        {t('check.title', { count: counts.checkable })}
+        {counts.windowDays > 1
+          ? t('check.recentTitle', { count: counts.checkable })
+          : t('check.title', { count: counts.checkable })}
       </Text>
       <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 2 }]}>
-        {t('check.body')}
+        {counts.windowDays > 1 ? t('check.recentBody') : t('check.body')}
       </Text>
       <TouchableOpacity
         onPress={() => void start()}
@@ -133,35 +171,37 @@ function DailyCheckCard({ goalId }: { goalId: string }) {
           {busy ? t('check.starting') : t('check.start')}
         </Text>
       </TouchableOpacity>
-      {/* The price rule, said before they start rather than after they are billed. */}
-      <Text style={[theme.typography.caption, {
-        color: theme.colors.textTertiary, marginTop: 6, textAlign: 'center',
-      }]}>
-        {t('check.free')}
-      </Text>
     </View>
   )
 }
 
 
 /**
- * 주간 플랜 코치 — the one setting worth changing this week, if any.
+ * 이번 주 — the card that is allowed to be boring.
  *
- * Every knob on a goal is write-once in practice, and on mobile there is no goal editor at
- * all — so a plan that was too ambitious on day one has, until now, had no way to become
- * less so from a phone. This is that way.
+ * Every other section of this screen may render nothing, and each of those guards is right
+ * on its own: none of them has anything TRUE to say in the state it hides in. Together they
+ * meant the screen was one card and a button for a learner who had not studied yet today —
+ * which is every learner at the moment they open the app to decide whether to study.
  *
- * The suggestion is deterministic and free (`plan-coach.ts`); the number is derived and
- * clamped by the chooser and travels in the stored row, so this renders it rather than
- * re-deriving it. `그대로 둘게요` is dismissal, recorded — a suggestion the learner has
- * answered must not return next week as if they had not.
+ * So this one never hides. The last seven days happened; saying so needs no model, no
+ * minimum history and no judgement.
+ *
+ * 주간 플랜 코치 lives inside it now rather than beside it. The coach is deterministic and
+ * free (`plan-coach.ts`) but silent by design — it holds for a short week and holds again
+ * whenever nothing is wrong, which is most weeks. As its own card that was a card-shaped
+ * hole; as a row under a strip that is always there, its silence just means the week needs
+ * no comment. And on mobile this is still the only way to change a goal's settings at all.
+ *
+ * `그대로 둘게요` is dismissal, recorded — a suggestion the learner has answered must not
+ * return next week as if they had not.
  */
-function PlanCoachCard({ goalId }: { goalId: string }) {
+function PlanWeekCard({ goalId }: { goalId: string }) {
   const { t } = useTranslation('learning')
   const theme = useTheme()
   const {
     recommendations, fetchRecommendations, regeneratePlanCoach, applyPlanCoach,
-    resolveRecommendation,
+    resolveRecommendation, planWeek, planWeekGoalId,
   } = useLearningStore()
   const [busy, setBusy] = useState(false)
   const timezone = currentPlanContext().timezone
@@ -190,46 +230,146 @@ function PlanCoachCard({ goalId }: { goalId: string }) {
     (r) => r.goal_id === goalId && r.status === 'pending' && r.card_id === null,
   )
   // `hold` means nothing is wrong. It is stored so producers can be compared, never shown.
-  if (!suggestion || suggestion.action_type === 'hold') return null
+  const advice = suggestion && suggestion.action_type !== 'hold' ? suggestion : null
+  const value = (advice?.payload as { value?: number | null } | null)?.value ?? null
 
-  const value = (suggestion.payload as { value?: number | null } | null)?.value ?? null
+  // The guard is on the DATA, not on whether it is interesting: an older server (or a
+  // rollback of 209) sends no `by_day`, and an empty strip would read as a week in which the
+  // learner did nothing.
+  const week = planWeekGoalId === goalId ? planWeek : null
+  if (!week) return null
 
   return (
     <View style={[styles.card, {
       backgroundColor: theme.colors.surface, borderColor: theme.colors.border, marginTop: 12,
-    }]}>
-      <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-        {t(`coach.${suggestion.action_type}.title`, { value, defaultValue: '' })}
-      </Text>
-      <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 2 }]}>
-        {t(`coach.${suggestion.action_type}.body`, { defaultValue: '' })}
-      </Text>
-      <View style={styles.coachRow}>
-        <TouchableOpacity
-          onPress={() => { setBusy(true); void applyPlanCoach(suggestion.id).finally(() => setBusy(false)) }}
-          disabled={busy}
-          style={[styles.coachApply, { backgroundColor: theme.colors.primary }, busy && styles.disabled]}
-          accessibilityRole="button"
-          {...testProps('plan-coach-apply')}
-        >
-          <Text style={[theme.typography.label, { color: '#fff' }]}>{t('coach.apply')}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => { setBusy(true); void resolveRecommendation(suggestion.id, 'dismissed').finally(() => setBusy(false)) }}
-          disabled={busy}
-          style={[styles.coachKeep, { borderColor: theme.colors.border }, busy && styles.disabled]}
-          accessibilityRole="button"
-          {...testProps('plan-coach-keep')}
-        >
-          <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('coach.keep')}</Text>
-        </TouchableOpacity>
+    }]} {...testProps('plan-week')}>
+      <View style={styles.weekHead}>
+        <Text style={[theme.typography.label, { color: theme.colors.text }]}>
+          {t('week.title')}
+        </Text>
+        <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+          {t('week.activeDays', { count: week.activeDays })}
+        </Text>
       </View>
+
+      <PlanWeekStrip week={week} />
+
+      <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 8 }]}>
+        {week.streak > 0
+          ? t('week.streak', { count: week.streak })
+          // Measured on the live account: 1 active day, streak 0. "이번 주는 아직 기록이
+          // 없어요" beside "1일 학습" is the screen contradicting itself in two lines.
+          : week.activeDays > 0 ? t('week.streakBroken') : t('week.streakNone')}
+        {/* Only alongside a real plan. A percentage of nothing is not 0%, it is a question
+            nobody asked, and it reads as a grade for a test the learner never sat. */}
+        {week.completion !== null
+          && ` · ${t('week.completion', { pct: Math.round(week.completion * 100) })}`}
+      </Text>
+
+      {advice && (
+        <View style={[styles.coachDivider, { borderTopColor: theme.colors.border }]}>
+          <Text style={[theme.typography.label, { color: theme.colors.text }]}>
+            {t(`coach.${advice.action_type}.title`, { value, defaultValue: '' })}
+          </Text>
+          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 2 }]}>
+            {t(`coach.${advice.action_type}.body`, { defaultValue: '' })}
+          </Text>
+          <View style={styles.coachRow}>
+            <TouchableOpacity
+              onPress={() => { setBusy(true); void applyPlanCoach(advice.id).finally(() => setBusy(false)) }}
+              disabled={busy}
+              style={[styles.coachApply, { backgroundColor: theme.colors.primary }, busy && styles.disabled]}
+              accessibilityRole="button"
+              {...testProps('plan-coach-apply')}
+            >
+              <Text style={[theme.typography.label, { color: '#fff' }]}>{t('coach.apply')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => { setBusy(true); void resolveRecommendation(advice.id, 'dismissed').finally(() => setBusy(false)) }}
+              disabled={busy}
+              style={[styles.coachKeep, { borderColor: theme.colors.border }, busy && styles.disabled]}
+              accessibilityRole="button"
+              {...testProps('plan-coach-keep')}
+            >
+              <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('coach.keep')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+    </View>
+  )
+}
+
+/**
+ * Seven cells, one per day, oldest first.
+ *
+ * Colour is not the only channel: every cell carries its state in its accessibility label,
+ * because "which of these greys means I studied" is not a question a learner should have to
+ * answer, and for a colour-blind one it is not answerable at all.
+ *
+ * The weekday letters come from the locale files, not from `Intl` — Hermes ships without
+ * ICU, so `toLocaleDateString` would return the same English on every device.
+ */
+function PlanWeekStrip({ week }: { week: PlanWeek }) {
+  const { t } = useTranslation('learning')
+  const theme = useTheme()
+
+  const fill = (state: DayState): { backgroundColor: string; borderColor: string } => {
+    switch (state) {
+      case 'done':      return { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary }
+      case 'partial':   return { backgroundColor: theme.colors.primary + '40', borderColor: theme.colors.primary + '66' }
+      case 'extra':     return { backgroundColor: theme.colors.success + '33', borderColor: theme.colors.success + '66' }
+      case 'untouched': return { backgroundColor: 'transparent', borderColor: theme.colors.border }
+      // A day where nothing happened is the QUIETEST cell, not the loudest. This was
+      // `surfaceElevated`, which on the light theme is white — against a grey card that made
+      // four empty days the brightest thing in the strip, louder than the day that had a plan
+      // and was skipped. Photographed on an iPhone; it does not show up in a typecheck.
+      default:          return { backgroundColor: 'transparent', borderColor: 'transparent' }
+    }
+  }
+
+  return (
+    <View style={styles.weekStrip}>
+      {week.days.map((day, i) => (
+        <View key={day.date} style={styles.weekCol}>
+          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, fontSize: 10 }]}>
+            {t(`week.dow.${day.weekday}`)}
+          </Text>
+          <View
+            accessible
+            accessibilityLabel={`${day.date} · ${t(`week.legend.${day.state}`)}`}
+            style={[
+              styles.weekCell,
+              fill(day.state),
+              i === week.days.length - 1 && { borderWidth: 2, borderColor: theme.colors.primary },
+            ]}
+          >
+            {/* The number is what was DONE. A cell showing the plan's SIZE on a day nobody
+                opened would put the largest number on the emptiest day. */}
+            <Text style={[theme.typography.caption, {
+              fontSize: 10,
+              color: day.state === 'done' ? '#fff' : theme.colors.textSecondary,
+            }]}>
+              {day.done > 0 ? String(day.done) : day.studied > 0 ? String(day.studied) : ''}
+            </Text>
+          </View>
+        </View>
+      ))}
     </View>
   )
 }
 
 /** Deck names printed before the count takes over. Three fits one line on a narrow phone. */
 const DECK_NAMES_SHOWN = 3
+
+/**
+ * How far back 오늘의 확인 may reach when today has nothing.
+ *
+ * Today always wins — the server widens only when today is empty. A week is the window the
+ * rest of this screen already talks in, so a learner is never offered a card from a stretch
+ * they have stopped thinking of as recent.
+ */
+const CHECK_LOOKBACK_DAYS = 7
 
 const MIN_TOUCH = 44
 const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 } as const
@@ -747,13 +887,6 @@ export function LearningTodayScreen() {
               </View>
             )}
 
-            {/* A SIBLING of the goal header, not a child of it. Nested inside, it rendered as
-                a bordered card inside a card — which read as a detail OF the goal rather than
-                as its own action, and did not match the web layout where it sits beside the
-                plan. Seen on the simulator; the tree alone does not show it. */}
-            {goal && <PlanCoachCard goalId={goal.id} />}
-            {goal && <DailyCheckCard goalId={goal.id} />}
-
             {planError && (
               <View
                 style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.error }]}
@@ -987,6 +1120,16 @@ export function LearningTodayScreen() {
               </TouchableOpacity>
             ) : null}
 
+            {/* AFTER the plan, not before it. These sat above the today card, which put "이번
+                주" and 오늘의 확인 ahead of 학습 시작 — the one thing the learner opened the
+                screen to press. Photographed on an iPhone; the tree alone does not show it.
+
+                Siblings of the goal header, not children: nested inside, each rendered as a
+                bordered card inside a card, reading as a detail OF the goal rather than as its
+                own section. */}
+            {goal && <PlanWeekCard goalId={goal.id} />}
+            {goal && <DailyCheckCard goalId={goal.id} />}
+
             {/* Recent attempts — the review surface, and the only place a paid request can be
                 grounded in a specific miss rather than in the card alone.
 
@@ -1132,6 +1275,12 @@ const styles = StyleSheet.create({
   attemptHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   disabled: { opacity: 0.5 },
   checkButton: { marginTop: 10, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
+  weekHead:     { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
+  weekStrip:    { flexDirection: 'row', gap: 6, marginTop: 10 },
+  weekCol:      { flex: 1, alignItems: 'center', gap: 4 },
+  weekCell:     { height: 32, width: '100%', borderRadius: 8, borderWidth: 1,
+                  alignItems: 'center', justifyContent: 'center' },
+  coachDivider: { marginTop: 12, paddingTop: 12, borderTopWidth: 1 },
   coachRow: { flexDirection: 'row', gap: 8, marginTop: 10 },
   coachApply: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
   coachKeep: { paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10, borderWidth: 1, alignItems: 'center' },

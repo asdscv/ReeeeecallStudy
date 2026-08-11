@@ -247,7 +247,14 @@
     "body": "凭记忆输入答案，不能查看答案。",
     "start": "检查（约 2 分钟）",
     "starting": "准备中…",
-    "free": "答对的免费评分，只有需要判断的答案才收费。"
+    "recentTitle_one": "最近学的 {{count, number}} 张，还记得吗",
+    "recentTitle_other": "最近学的 {{count, number}} 张，还记得吗",
+    "recentBody": "今天还没有学习，所以用了最近几天的内容。请自己输入答案。",
+    "blockedTitle": "有些卡片无法生成检查题",
+    "blockedBody_one": "“{{name}}”模板背面标了不止一个答案栏，无法判断哪个才是答案。使用它的 {{count, number}} 张卡片被排除了。",
+    "blockedBody_other": "“{{name}}”模板背面标了不止一个答案栏，无法判断哪个才是答案。使用它的 {{count, number}} 张卡片被排除了。",
+    "blockedAction": "只指定一个答案栏",
+    "blockedWeb": "在网页端打开模板，把背面只保留一个 primary 字段即可。"
   },
   "coach": {
     "apply": "应用",
@@ -272,5 +279,31 @@
       "title": "每周多打开一天最有帮助",
       "body": "不是计划太多，而是没打开的日子太多。坚持比量更重要。"
     }
+  },
+  "week": {
+    "title": "本周",
+    "activeDays_one": "学习 {{count, number}} 天",
+    "activeDays_other": "学习 {{count, number}} 天",
+    "streak_one": "连续 {{count, number}} 天",
+    "streak_other": "连续 {{count, number}} 天",
+    "streakNone": "本周还没有记录",
+    "completion": "完成计划的 {{pct, number}}%",
+    "dow": {
+      "0": "日",
+      "1": "一",
+      "2": "二",
+      "3": "三",
+      "4": "四",
+      "5": "五",
+      "6": "六"
+    },
+    "legend": {
+      "done": "全部完成",
+      "partial": "做了一半",
+      "extra": "计划外的学习",
+      "untouched": "没有打开",
+      "none": "没有计划"
+    },
+    "streakBroken": "连续记录中断了。今天可以重新开始"
   }
 }

@@ -10,19 +10,12 @@
     "create": "New quiz",
     "take": "Take",
     "starting": "Starting…",
-    "retakeFree": "Retakes are free",
     "questions_one": "{{count, number}} question",
     "questions_other": "{{count, number}} questions",
-    "trial": {
-      "title": "Your quiz credit is ready",
-      "body_one": "{{count, number}} unit to try, on us — enough for a whole set.",
-      "body_other": "{{count, number}} units to try, on us — enough for a whole set."
-    },
     "empty": {
       "title": "No quizzes yet",
       "body": "Make one from any deck. It takes a few seconds."
     },
-    "pricingNote": "{{price}} per unit. Multiple choice is graded free, every time.",
     "fewerThanAsked": "{{requested, number}} requested"
   },
   "setup": {
@@ -45,10 +38,6 @@
     },
     "tooFewForMcq_one": "Multiple choice draws its wrong options from other cards, so it needs at least four. This deck has {{count, number}}.",
     "tooFewForMcq_other": "Multiple choice draws its wrong options from other cards, so it needs at least four. This deck has {{count, number}}.",
-    "price": "Price",
-    "free": "Free",
-    "covered": "{{units, number}} units covered by your free allowance",
-    "retakeFree": "Taking it again costs nothing.",
     "confirm": "Create quiz",
     "generating": "Writing questions…",
     "difficulty": "Difficulty",
@@ -70,8 +59,8 @@
     "next": "Next",
     "finish": "Finish",
     "grading": "Grading…",
-    "gradeFor": "Grade this answer · {{price}}",
-    "reference": "Answer: {{answer}}"
+    "reference": "Answer: {{answer}}",
+    "grade": "Grade this answer"
   },
   "result": {
     "percent": "{{percent, number}}%",

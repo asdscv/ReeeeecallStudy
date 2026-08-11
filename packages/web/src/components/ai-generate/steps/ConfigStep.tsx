@@ -451,7 +451,6 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
               </div>
             )}
             <p className="text-[11px] text-content-tertiary mt-1.5">{t('config.imageUploadHint')}</p>
-            <p className="text-[11px] text-amber-600 mt-0.5">{t('config.imagePaidNotice')}</p>
           </div>
         )}
 

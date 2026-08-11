@@ -248,7 +248,14 @@
     "body": "答えを自分で入力します。答えは見られません。",
     "start": "確認する（約2分）",
     "starting": "準備中…",
-    "free": "正解は無料で採点されます。判定が必要な解答だけ費用がかかります。"
+    "recentTitle_one": "最近学んだ{{count, number}}枚、まだ覚えているか確認しましょう",
+    "recentTitle_other": "最近学んだ{{count, number}}枚、まだ覚えているか確認しましょう",
+    "recentBody": "今日の学習がないので、最近のものを用意しました。答えは自分で入力します。",
+    "blockedTitle": "確認問題にできないカードがあります",
+    "blockedBody_one": "「{{name}}」テンプレートは裏面の正解欄が複数あり、どれが正解か判断できません。このテンプレートのカード{{count, number}}枚が確認から外れました。",
+    "blockedBody_other": "「{{name}}」テンプレートは裏面の正解欄が複数あり、どれが正解か判断できません。このテンプレートのカード{{count, number}}枚が確認から外れました。",
+    "blockedAction": "正解欄をひとつだけ指定する",
+    "blockedWeb": "ウェブでテンプレートを開き、裏面のプライマリをひとつだけにしてください。"
   },
   "coach": {
     "apply": "適用",
@@ -273,5 +280,31 @@
       "title": "週にもう1日開けると効きます",
       "body": "量が多いのではなく、開かない日が多いのです。量より継続です。"
     }
+  },
+  "week": {
+    "title": "今週",
+    "activeDays_one": "{{count, number}}日学習",
+    "activeDays_other": "{{count, number}}日学習",
+    "streak_one": "{{count, number}}日連続",
+    "streak_other": "{{count, number}}日連続",
+    "streakNone": "今週はまだ記録がありません",
+    "completion": "予定のうち{{pct, number}}%完了",
+    "dow": {
+      "0": "日",
+      "1": "月",
+      "2": "火",
+      "3": "水",
+      "4": "木",
+      "5": "金",
+      "6": "土"
+    },
+    "legend": {
+      "done": "やり切った日",
+      "partial": "途中まで",
+      "extra": "プランなしで学習",
+      "untouched": "開かなかった日",
+      "none": "プランなし"
+    },
+    "streakBroken": "連続記録が途切れました。今日からまた始められます"
   }
 }

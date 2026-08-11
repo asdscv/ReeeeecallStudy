@@ -44,7 +44,6 @@
     "imageUpload": "Subir imagen",
     "imageChange": "Cambiar imagen",
     "imageUploadHint": "Elige una foto de una lista de palabras, una página de libro de texto o apuntes: la IA la convierte en tarjetas.",
-    "imagePaidNotice": "La generación con imágenes usa créditos (sin nivel gratuito).",
     "cardLimitExceeds": "Puedes añadir como máximo {{available}} tarjeta(s) más — reduce la cantidad o suscríbete.",
     "imageAddMore": "Añadir más ({{count, number}}/{{max}})",
     "imageRemove": "Quitar imagen",

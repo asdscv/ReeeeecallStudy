@@ -10,19 +10,12 @@
     "create": "สร้างใหม่",
     "take": "เริ่มทำ",
     "starting": "กำลังเริ่ม…",
-    "retakeFree": "ทำซ้ำฟรี",
     "questions_one": "{{count, number}} ข้อ",
     "questions_other": "{{count, number}} ข้อ",
-    "trial": {
-      "title": "เครดิตทดลองพร้อมแล้ว",
-      "body_one": "ทดลอง {{count, number}} หน่วย เพียงพอสำหรับหนึ่งชุดเต็ม",
-      "body_other": "ทดลอง {{count, number}} หน่วย เพียงพอสำหรับหนึ่งชุดเต็ม"
-    },
     "empty": {
       "title": "ยังไม่มีแบบทดสอบ",
       "body": "สร้างจากเด็คใดก็ได้ ใช้เวลาไม่กี่วินาที"
     },
-    "pricingNote": "หน่วยละ {{price}} ปรนัยตรวจให้ฟรีเสมอ",
     "fewerThanAsked": "ขอไว้ {{requested, number}} ข้อ"
   },
   "setup": {
@@ -45,10 +38,6 @@
     },
     "tooFewForMcq_one": "ปรนัยดึงตัวเลือกลวงจากการ์ดใบอื่น จึงต้องมีอย่างน้อย 4 ใบ เด็คนี้มี {{count, number}} ใบ",
     "tooFewForMcq_other": "ปรนัยดึงตัวเลือกลวงจากการ์ดใบอื่น จึงต้องมีอย่างน้อย 4 ใบ เด็คนี้มี {{count, number}} ใบ",
-    "price": "ราคา",
-    "free": "ฟรี",
-    "covered": "สิทธิ์ฟรีครอบคลุม {{units, number}} หน่วย",
-    "retakeFree": "ทำซ้ำไม่มีค่าใช้จ่าย",
     "confirm": "สร้างแบบทดสอบ",
     "generating": "กำลังเขียนคำถาม…",
     "difficulty": "ระดับความยาก",
@@ -70,8 +59,8 @@
     "next": "ถัดไป",
     "finish": "จบ",
     "grading": "กำลังตรวจ…",
-    "gradeFor": "ตรวจคำตอบนี้ · {{price}}",
-    "reference": "คำตอบ: {{answer}}"
+    "reference": "คำตอบ: {{answer}}",
+    "grade": "ตรวจคำตอบนี้"
   },
   "result": {
     "percent": "{{percent, number}}%",

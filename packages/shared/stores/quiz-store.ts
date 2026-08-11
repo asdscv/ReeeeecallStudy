@@ -73,6 +73,27 @@ export interface QuizQuote {
 export interface QuizzableCount { total: number; eligible: number }
 
 /**
+ * What 오늘의 확인 found, and — when it found nothing usable — why.
+ *
+ * `blocked` exists because the check's most common outcome on a real deck is not "nothing
+ * studied" but "studied plenty, none of it resolvable": a template that names two primary
+ * back fields cannot say which one is the answer, so every card of it is refused. Refusing is
+ * correct; refusing invisibly is what made the section look like it did not exist.
+ *
+ * Only meaningful together with `studiedToday > 0 && checkable === 0`. A template that blocks
+ * some cards while others work is not a thing to interrupt a learner about.
+ */
+export interface DailyCheckCount {
+  /** Cards in the window that were studied. Named for 205's key; see `windowDays`. */
+  studiedToday: number
+  /** Of those, how many have a resolvable answer field. */
+  checkable: number
+  /** 1 = today. Larger means the server widened, and the copy must stop saying "today". */
+  windowDays: number
+  blocked: Array<{ template_id: string; name: string; cards: number }>
+}
+
+/**
  * A difficulty band, as the server lists them.
  *
  * Deliberately NOT an enum. The bands are rows in `quiz_difficulty_levels`, so adding or
@@ -238,20 +259,29 @@ interface QuizState {
   }) => Promise<string>
 
   /**
-   * Today's check: how many of the cards studied today can be checked.
+   * Today's check: how many of the studied cards can be checked.
    *
    * Separate from building it so a screen can decide whether to offer the button, and
    * say a real number, without creating a set the learner may never open.
+   *
+   * `lookback` widens the window when today has nothing — today always wins, and the
+   * returned `windowDays` says which window the answer came from so the copy can stop
+   * claiming "today" on a day the learner did not study. 1 keeps the 205 behaviour.
    */
-  countDailyCheck: (timezone: string) => Promise<{ studiedToday: number; checkable: number }>
+  countDailyCheck: (timezone: string, lookback?: number) => Promise<DailyCheckCount>
   /**
-   * Build (or reuse) today's check and return its set id.
+   * Build (or reuse) the check and return its set id.
    *
    * Costs nothing: the question is the card's own prompt and the reference is its own
    * declared answer field, so no model is called. The learner is charged only later, and
    * only for answers a string comparison could not settle.
+   *
+   * `lookback` MUST match what `countDailyCheck` was asked, or the screen offers a check
+   * the server then refuses.
    */
-  buildDailyCheck: (input: { goalId?: string; timezone: string; limit?: number }) => Promise<string>
+  buildDailyCheck: (input: {
+    goalId?: string; timezone: string; limit?: number; lookback?: number
+  }) => Promise<string>
 
   startRun: (setId: string) => Promise<string>
   /**
@@ -436,18 +466,33 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     }
   },
 
-  countDailyCheck: async (timezone) => {
-    const { data, error } = await supabase.rpc('count_daily_check_cards', { p_timezone: timezone })
+  countDailyCheck: async (timezone, lookback) => {
+    const { data, error } = await supabase.rpc('count_daily_check_cards', {
+      p_timezone: timezone,
+      p_lookback: lookback ?? 1,
+    })
     if (error) throw error
-    const row = data as { studied_today: number; checkable: number }
-    return { studiedToday: row.studied_today, checkable: row.checkable }
+    const row = data as {
+      studied_today: number; checkable: number
+      window_days?: number
+      blocked?: Array<{ template_id: string; name: string; cards: number }>
+    }
+    return {
+      studiedToday: row.studied_today,
+      checkable: row.checkable,
+      // A server on 205 does not send it. Absent means today, which is what 205 did.
+      windowDays: row.window_days ?? 1,
+      // Absent on 205/209. An empty list is also the normal answer whenever the check works.
+      blocked: row.blocked ?? [],
+    }
   },
 
-  buildDailyCheck: async ({ goalId, timezone, limit }) => {
+  buildDailyCheck: async ({ goalId, timezone, limit, lookback }) => {
     const { data, error } = await supabase.rpc('build_daily_check', {
       p_goal_id: goalId ?? null,
       p_timezone: timezone,
       p_limit: limit ?? 8,
+      p_lookback: lookback ?? 1,
     })
     // P0010 is the only outcome a screen has to phrase: nothing was studied today, so
     // there is nothing to check. Everything else is a real fault.
