@@ -310,5 +310,13 @@
       "none": "Tidak ada rencana"
     },
     "streakBroken": "Rentetanmu terputus. Hari ini bisa mulai lagi"
+  },
+  "explain": {
+    "ask": "Jelaskan kenapa aku terus salah",
+    "asking": "Menulis penjelasan…",
+    "note": "Berdasarkan percobaan terakhirmu pada kartu ini. Memakai kredit.",
+    "dismiss": "Tutup",
+    "needsCredits": "Kredit habis, jadi penjelasan tidak bisa dibuat.",
+    "failed": "Gagal membuat penjelasan. Coba lagi."
   }
 }

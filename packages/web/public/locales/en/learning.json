@@ -310,5 +310,13 @@
       "none": "No plan"
     },
     "streakBroken": "Your streak broke. Today can start a new one"
+  },
+  "explain": {
+    "ask": "Explain why I keep missing this",
+    "asking": "Writing the explanation…",
+    "note": "Grounded in your most recent attempt on this card. Uses credits.",
+    "dismiss": "Close",
+    "needsCredits": "No credits left, so the explanation could not be written.",
+    "failed": "Could not write the explanation. Please try again."
   }
 }

@@ -311,5 +311,13 @@
       "none": "Sin plan"
     },
     "streakBroken": "Se cortó tu racha. Hoy puede empezar otra"
+  },
+  "explain": {
+    "ask": "Explícame por qué la fallo siempre",
+    "asking": "Escribiendo la explicación…",
+    "note": "Basado en tu intento más reciente con esta tarjeta. Usa créditos.",
+    "dismiss": "Cerrar",
+    "needsCredits": "No quedan créditos, así que no se pudo escribir la explicación.",
+    "failed": "No se pudo escribir la explicación. Inténtalo de nuevo."
   }
 }

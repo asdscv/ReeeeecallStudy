@@ -169,4 +169,54 @@ describe('AI remediation contracts', () => {
     const valid = validateRemediationResult({ ...base, citations: [{ sourceId: id, locator: '§1' }] }, refs, [id], true)
     expect(valid.valid).toBe(true)
   })
+
+  /**
+   * The trap this feature would have shipped with.
+   *
+   * `requireGrounding` is `context.sources.length > 0`, and sources come from
+   * `content_sources` — whose only writers (`create_private_source` and friends) have no
+   * TypeScript caller at all. So on every real request the list is EMPTY, and the schema line
+   * in the prompt still names a `citations` field. A model that helpfully filled it in cited
+   * an id that could not exist, the validator rejected the whole result, and a paid request
+   * came back as a 502. The learner is not charged — the job is released — but the provider
+   * tokens are spent and the feature simply does not work.
+   */
+  describe('when no sources were supplied', () => {
+    const refs = parseRemediationRefs({ action: 'explain', goalId: id })!
+    const base = {
+      action: 'explain', summary: 'Summary',
+      blocks: [{ type: 'text', content: 'Ungrounded but useful' }], warnings: [],
+    }
+
+    it('tells the model to send no citations at all', () => {
+      const prompt = buildRemediationPrompt(refs, {
+        goal: {}, activity: null, attempt: {}, cards: [], concepts: [], sources: [],
+      })
+      expect(prompt.requireGrounding).toBe(false)
+      expect(prompt.systemPrompt).toMatch(/citations MUST be an empty array/i)
+    })
+
+    it('survives a model that volunteers one anyway', () => {
+      // Dropped, not fatal. The citation points at nothing renderable, and failing a paid
+      // request over a field the learner never sees is worse than ignoring it.
+      const out = validateRemediationResult(
+        { ...base, citations: [{ sourceId: '22222222-2222-4222-8222-222222222222' }] },
+        refs, [], false)
+      expect(out.valid).toBe(true)
+      if (out.valid) expect(out.sourceIds).toEqual([])
+    })
+
+    it('still refuses an invented citation when grounding WAS required', () => {
+      // The case the validator exists for must keep working: sources were supplied and the
+      // model cited one it was not given.
+      expect(validateRemediationResult(
+        { ...base, citations: [{ sourceId: '22222222-2222-4222-8222-222222222222' }] },
+        refs, [id], true).valid).toBe(false)
+    })
+
+    it('still refuses a citation that is not even an object', () => {
+      expect(validateRemediationResult(
+        { ...base, citations: ['nope'] }, refs, [], false).valid).toBe(false)
+    })
+  })
 })

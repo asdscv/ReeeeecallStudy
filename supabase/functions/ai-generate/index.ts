@@ -37,6 +37,7 @@ import {
   type QuizCardSource, type QuizItem, type EssayCriterion, type QuizDifficulty,
 } from '../_shared/ai-quiz.ts'
 import {
+  QUIZ_TEMPERATURE,
   buildMcqGenerationPrompt, buildShortAnswerGenerationPrompt, buildEssayGenerationPrompt,
   buildShortAnswerGradePrompt, buildEssayGradePrompt, MAX_QUIZ_BATCH,
 } from '../_shared/ai-quiz-prompts.ts'
@@ -260,7 +261,18 @@ function retryAfterMs(res: Response, body: string): number | null {
   return null
 }
 
-async function providerRequest(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrls?: string[]): Promise<ProviderResult> {
+/**
+ * The temperature every call used to share.
+ *
+ * Right for generation — variety IS the product when writing cards — and wrong for grading,
+ * which `ai-quiz-prompts.ts` has said in a docblock since it exported `QUIZ_TEMPERATURE`
+ * ({ generate: 0.7, grade: 0 }). Nothing ever imported that constant, so a learner who
+ * resubmitted an identical short answer could get a different verdict and a different
+ * `normalized_score` — which then feeds the planner, the insights and the weak-card list.
+ */
+const DEFAULT_TEMPERATURE = 0.8
+
+async function providerRequest(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrls?: string[], temperature = DEFAULT_TEMPERATURE): Promise<ProviderResult> {
   // Vision: the OpenAI-compatible shape carries the image(s) in the user message
   // as a content array — one text part plus one image_url part per image (the API
   // accepts multiple images in a single message). Plain text uses a string.
@@ -277,7 +289,7 @@ async function providerRequest(m: ResolvedModel, systemPrompt: string, userPromp
       { role: 'user', content: userContent },
     ],
     response_format: { type: 'json_object' },
-    temperature: 0.8,
+    temperature,
     max_tokens: 16384,
   }
 
@@ -361,14 +373,14 @@ async function providerRequest(m: ResolvedModel, systemPrompt: string, userPromp
 
 // Returns parsed JSON + token usage; one stricter-prompt retry on unparseable
 // output (mirrors callAI). On retry we paid for BOTH calls → SUM the usage.
-async function generateWith(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrls?: string[]): Promise<{ json: Record<string, unknown>; usage: TokenUsage | null }> {
-  const a = await providerRequest(m, systemPrompt, userPrompt, imageUrls)
+async function generateWith(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrls?: string[], temperature = DEFAULT_TEMPERATURE): Promise<{ json: Record<string, unknown>; usage: TokenUsage | null }> {
+  const a = await providerRequest(m, systemPrompt, userPrompt, imageUrls, temperature)
   try {
     return { json: JSON.parse(stripMarkdownFences(a.content)), usage: a.usage }
   } catch {
     const strict = systemPrompt +
       '\n\nIMPORTANT: You MUST respond with valid JSON only. No markdown, no explanation, just pure JSON.'
-    const b = await providerRequest(m, strict, userPrompt, imageUrls)
+    const b = await providerRequest(m, strict, userPrompt, imageUrls, temperature)
     return { json: JSON.parse(stripMarkdownFences(b.content)), usage: sumUsage(a.usage, b.usage) }
   }
 }
@@ -389,11 +401,12 @@ async function generateWith(m: ResolvedModel, systemPrompt: string, userPrompt: 
  */
 async function generate(
   chain: ResolvedModel[], systemPrompt: string, userPrompt: string, imageUrls?: string[],
+  temperature = DEFAULT_TEMPERATURE,
 ): Promise<{ json: Record<string, unknown>; usage: TokenUsage | null; model: ResolvedModel }> {
   let lastError: unknown
   for (const [i, m] of chain.entries()) {
     try {
-      const out = await generateWith(m, systemPrompt, userPrompt, imageUrls)
+      const out = await generateWith(m, systemPrompt, userPrompt, imageUrls, temperature)
       if (i > 0) console.warn(`[ai-generate] fell back to ${m.model} after ${i} exhausted model(s)`)
       return { ...out, model: m }
     } catch (e) {
@@ -1062,7 +1075,12 @@ Deno.serve(async (req) => {
         const prompt = quizType === 'essay'
           ? buildEssayGradePrompt(gradeInput, criteria)
           : buildShortAnswerGradePrompt(gradeInput)
-        const generated = await generate(chain, prompt.systemPrompt, prompt.userPrompt)
+        // Grading is the one call where variety is a defect: the same answer submitted twice
+        // must get the same mark, because `normalized_score` is written to the attempt and
+        // then read by the planner, the insights and the weak-card list. `QUIZ_TEMPERATURE`
+        // has said so since it was written and had no importer until now.
+        const generated = await generate(
+          chain, prompt.systemPrompt, prompt.userPrompt, undefined, QUIZ_TEMPERATURE.grade)
 
         const verdict = quizType === 'essay'
           ? validateEssayGrade(generated.json, criteria, gradeInput)
