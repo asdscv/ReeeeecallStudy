@@ -213,6 +213,44 @@ describe('LearningTodayPage', () => {
     expect(screen.getByText('today.empty.noDecks')).toBeInTheDocument()
   })
 
+  it('does not promise tomorrow when the cards come back in minutes', () => {
+    // Photographed on production saying "오늘 할 건 다 했어요. 내일 또 만나요." with the next
+    // review SEVEN MINUTES away. After a session that is the normal case, not an edge one:
+    // anything rated 몰랐음 returns in one to ten minutes.
+    renderToday({
+      plan: { id: 'p1', goal_id: 'goal-1', plan_date: currentPlanContext().planDate,
+        total_items: 6, completed_items: 6 },
+      planItems: [],
+      knowledge: {
+        'goal-1': {
+          total: 6, known: 0, unknown: 6, unseen: 0, overdue: 0, dueNow: 0,
+          mature: 0, rung1: 6, rung3: 0, rung8: 0,
+          nextDueAt: new Date(Date.now() + 7 * 60_000).toISOString(),
+        },
+      },
+    })
+
+    expect(screen.getByText(/today\.backSoonNote/)).toBeInTheDocument()
+    expect(screen.queryByText('today.allDoneNote')).not.toBeInTheDocument()
+  })
+
+  it('does promise tomorrow when tomorrow is when they come back', () => {
+    renderToday({
+      plan: { id: 'p1', goal_id: 'goal-1', plan_date: currentPlanContext().planDate,
+        total_items: 6, completed_items: 6 },
+      planItems: [],
+      knowledge: {
+        'goal-1': {
+          total: 6, known: 6, unknown: 0, unseen: 0, overdue: 0, dueNow: 0,
+          mature: 0, rung1: 0, rung3: 6, rung8: 0,
+          nextDueAt: new Date(Date.now() + 20 * 3600_000).toISOString(),
+        },
+      },
+    })
+
+    expect(screen.getByText('today.allDoneNote')).toBeInTheDocument()
+  })
+
   describe('nothing due', () => {
     // "오늘 이 덱들에서 복습할 카드가 없습니다" read as a failure — as though the cards had gone
     // somewhere. In the reported state the opposite was true: the learner had just finished
@@ -622,6 +660,22 @@ describe('LearningTodayPage', () => {
     })
 
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '25')
+  })
+
+  it('drops the review half when every card is mid-learning-step', () => {
+    // A learner who just answered everything has `known: 0` — every card is in a 1- or
+    // 10-minute step. "복습 주기 안 0장" is a sentence about nothing, and this is the ordinary
+    // state right after a session, not an edge case. Found on a live account.
+    renderToday(knowledgeOf(0, 6, 0, 0))
+
+    // Both halves are empty, so the line does not render at all — rather than rendering as
+    // "복습 주기 안 0장".
+    expect(screen.queryByTestId('progress-detail')).not.toBeInTheDocument()
+  })
+
+  it('still names the review half when there is one', () => {
+    renderToday(knowledgeOf(17, 12, 0, 0))
+    expect(screen.getByTestId('progress-detail')).toHaveTextContent('detailWithinWindow')
   })
 
   it('drops a half of the detail line that has nothing in it', () => {

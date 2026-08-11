@@ -37,7 +37,7 @@
     "extendAdded_other": "เพิ่มอีก {{count, number}} รายการแล้ว",
     "extendTomorrow_one": "ในจำนวนนี้เป็นการ์ดใหม่ {{count, number}} ใบ พรุ่งนี้จึงมีทบทวนเพิ่มเท่านั้น",
     "extendTomorrow_other": "ในจำนวนนี้เป็นการ์ดใหม่ {{count, number}} ใบ พรุ่งนี้จึงมีทบทวนเพิ่มเท่านั้น",
-    "extendNothing": "ตอนนี้ไม่มีอะไรให้เพิ่มแล้ว",
+    "extendNothing": "ไม่มีการ์ดในเป้าหมายนี้ให้เพิ่มอีกแล้ว",
     "remaining": "เหลืออีก {{count, number}} ใบวันนี้",
     "remaining_one": "เหลืออีก {{count, number}} ใบวันนี้",
     "remaining_other": "เหลืออีก {{count, number}} ใบวันนี้",
@@ -61,7 +61,13 @@
     "deckListMore_other": "{{names}} และอีก {{count, number}} ชุด",
     "itemsUnavailable": "ตอนนี้เปิดการ์ด {{count, number}} ใบในแผนนี้ไม่ได้ อาจถูกลบไปแล้ว",
     "itemsUnavailable_one": "ตอนนี้เปิดการ์ด {{count, number}} ใบในแผนนี้ไม่ได้ อาจถูกลบไปแล้ว",
-    "itemsUnavailable_other": "ตอนนี้เปิดการ์ด {{count, number}} ใบในแผนนี้ไม่ได้ อาจถูกลบไปแล้ว"
+    "itemsUnavailable_other": "ตอนนี้เปิดการ์ด {{count, number}} ใบในแผนนี้ไม่ได้ อาจถูกลบไปแล้ว",
+    "backSoonNote": "วันนี้เสร็จแล้ว การ์ดที่เพิ่งตอบจะกลับมาในอีกประมาณ {{count, number}} นาที",
+    "backSoonNote_one": "วันนี้เสร็จแล้ว การ์ดที่เพิ่งตอบจะกลับมาในอีกประมาณ {{count, number}} นาที",
+    "backSoonNote_other": "วันนี้เสร็จแล้ว การ์ดที่เพิ่งตอบจะกลับมาในอีกประมาณ {{count, number}} นาที",
+    "extendAhead": "ดึงการ์ดที่ยังไม่ถึงคิวมา {{count, number}} ใบ",
+    "extendAhead_one": "ดึงการ์ดที่ยังไม่ถึงคิวมา {{count, number}} ใบ",
+    "extendAhead_other": "ดึงการ์ดที่ยังไม่ถึงคิวมา {{count, number}} ใบ"
   },
   "goals": {
     "title": "เป้าหมายการเรียนรู้",

@@ -325,7 +325,12 @@ function GoalProgress({ knowledge, newCardsPerDay, done }: {
    * the plan card below it: those cards ARE tomorrow's, and usually today's, work.
    */
   const detail = summary.notStarted ? '' : [
-    t('progress.detailWithinWindow', { count: summary.withinWindow }),
+    // Each half omitted when it is empty. "복습 주기 안 0장" is a sentence about nothing, and
+    // it appears for real: a learner who has just answered every card has them all in learning
+    // steps, so `known` is 0 while `attempted` is the whole deck. Seen on a live account while
+    // verifying this very card.
+    summary.withinWindow > 0
+      ? t('progress.detailWithinWindow', { count: summary.withinWindow }) : null,
     summary.unstudied > 0 ? t('progress.unstudied', { count: summary.unstudied }) : null,
   ].filter(Boolean).join(' · ')
 
@@ -710,8 +715,14 @@ export function LearningTodayPage() {
                 {t('today.itemsUnavailable', { count: unreachable || pendingTotal })}
               </p>
             ) : (
+              /* "내일 또 만나요" is wrong whenever the cards come back sooner than that — and
+                 after a session they usually do, because anything rated 몰랐음 returns in one
+                 to ten minutes. Photographed saying it with the next review seven minutes
+                 away. Same reading as the empty state; see `caught-up.ts`. */
               <p className="mt-4 rounded-xl bg-success/10 px-4 py-3 text-center text-sm font-medium text-success">
-                {t('today.allDoneNote')}
+                {caughtUpState.kind === 'soon'
+                  ? t('today.backSoonNote', { count: caughtUpState.minutes ?? 1 })
+                  : t('today.allDoneNote')}
               </p>
             )}
           </section>
@@ -775,6 +786,11 @@ export function LearningTodayPage() {
                   : (
                     <>
                       {t('today.extendAdded', { count: planExtension.appended })}
+                      {/* Studying early has a real cost — the interval is set from THIS
+                          answer, not from the one the scheduler was waiting for — so it is
+                          offered and then said out loud, never done silently. */}
+                      {planExtension.aheadOfSchedule
+                        && ` ${t('today.extendAhead', { count: planExtension.appended })}`}
                       {/* The cost, said out loud. Every card started today comes back tomorrow,
                           and a button that grows tomorrow's list in silence is how a learner
                           ends up abandoning a goal they were doing well at. */}

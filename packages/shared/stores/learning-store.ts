@@ -498,7 +498,21 @@ interface LearningState {
    * tomorrow — and a button that silently grows tomorrow's list is how a learner ends up
    * abandoning a goal they were doing well at.
    */
-  planExtension: { appended: number; newCards: number; reviewsTomorrow: number } | null
+  planExtension: {
+    appended: number
+    newCards: number
+    reviewsTomorrow: number
+    /**
+     * The block was pulled FORWARD — nothing was owed, so cards whose turn had not come yet
+     * were taken instead.
+     *
+     * 더 하기 means "I want to do more than today's share", and answering it with "nothing is
+     * due" told a learner their goal was exhausted while twenty-three cards sat in the deck
+     * waiting. Studying early is a real choice with a real cost, so it is offered and then
+     * said out loud rather than done silently.
+     */
+    aheadOfSchedule: boolean
+  } | null
   /**
    * Goal+date keys already attempted automatically, so a failure is never retried in a loop.
    *
@@ -747,15 +761,25 @@ type PlanInputs =
  * starve another — and every one of those is a bug that was found and fixed here. A second
  * copy would not inherit the next fix.
  *
- * `excludeCardIds` is the only behavioural difference between the two callers: extending must
- * not re-offer what is already on today's list.
+ * `excludeCardIds` is one of the two behavioural differences between the callers: extending
+ * must not re-offer what is already on today's list.
+ *
+ * `aheadOfSchedule` is the other, and it exists because of what 더 하기 MEANS. The button says
+ * "I want to do more than today's share", and the fetch answered it with "nothing is due" —
+ * so a learner who had finished their twelve items was told there was nothing to add while
+ * twenty-three cards sat in the deck waiting for their turn. Under this option the review
+ * fetch keeps its nearest-first ordering and drops the due CUTOFF, so cards can be pulled
+ * forward. Due cards still come first: the ordering is by `next_review_at`, and everything
+ * already owed sorts ahead of everything merely upcoming.
  */
 async function collectPlanInputs(
   goal: LearningGoalWithDecks,
   ctx: PlanContext,
   userId: string,
   excludeCardIds: ReadonlySet<string>,
+  opts: { aheadOfSchedule?: boolean } = {},
 ): Promise<PlanInputs> {
+  const ahead = opts.aheadOfSchedule === true
   const deckIds = goal.decks.map((link) => link.deck_id)
   if (deckIds.length === 0) {
     // Nothing to plan over. Reported rather than thrown: sending an empty item list would
@@ -801,12 +825,16 @@ async function collectPlanInputs(
     // whatever falls past the limit is strictly less urgent than what was taken, instead of
     // being whichever rows the database happened to return.
     const embeddedDue = embeddedDeckIds.length === 0 ? [] : await (async () => {
-      const { data, error } = await supabase
+      const query = supabase
         .from('cards')
         .select(CARD_COLUMNS)
         .in('deck_id', embeddedDeckIds)
         .not('next_review_at', 'is', null)
-        .lte('next_review_at', ctx.now)
+      // The CUTOFF is what `aheadOfSchedule` removes — never the ordering. Sorting by
+      // `next_review_at` ascending puts everything owed ahead of everything upcoming, so a
+      // widened fetch still serves the backlog first and only then pulls the nearest card
+      // forward.
+      const { data, error } = await (ahead ? query : query.lte('next_review_at', ctx.now))
         .order('next_review_at', { ascending: true })
         .limit(fetchLimit)
         .returns<Card[]>()
@@ -843,12 +871,14 @@ async function collectPlanInputs(
     // instead — `idx_ucp_user_review` covers exactly this predicate — then read the cards
     // those rows point at, so the limit is spent on cards that are actually due.
     const progressCards = progressDeckIds.length === 0 ? [] : await (async () => {
-      const { data: progressRows, error: progressErr } = await supabase
+      const progressQuery = supabase
         .from('user_card_progress')
         .select('id, user_id, card_id, deck_id, srs_status, ease_factor, interval_days, repetitions, next_review_at, last_reviewed_at, srs_revision, created_at, updated_at')
         .eq('user_id', userId)
         .in('deck_id', progressDeckIds)
-        .or(`next_review_at.is.null,next_review_at.lte.${ctx.now}`)
+      const { data: progressRows, error: progressErr } = await (ahead
+        ? progressQuery
+        : progressQuery.or(`next_review_at.is.null,next_review_at.lte.${ctx.now}`))
         .order('next_review_at', { ascending: true, nullsFirst: false })
         .limit(fetchLimit)
         .returns<UserCardProgress[]>()
@@ -863,8 +893,10 @@ async function collectPlanInputs(
       if (cardsErr) throw cardsErr
       // Re-checked in memory: a progress row can be seeded with a due date the query matched
       // on, and `attachProgressToCards` is what puts that date on the card the planner sees.
-      return attachProgressToCards(cardData ?? [], rows)
-        .filter((card) => isDueAt(card.next_review_at, ctx.now))
+      const attached = attachProgressToCards(cardData ?? [], rows)
+      // Re-checked in memory because a progress row can be seeded with a due date the query
+      // matched on — except when the caller asked to look ahead, where not-yet-due IS the point.
+      return ahead ? attached : attached.filter((card) => isDueAt(card.next_review_at, ctx.now))
     })()
 
     // No slice. Each source is already bounded by what the budget can hold, and cutting the
@@ -1375,9 +1407,9 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         supportedActivityTypes: supportedActivityTypesForDomain(goal.domain_id),
       })
       if (output.items.length === 0) {
-        // The ordinary outcome of pressing 더 하기 on a finished day: everything due is
-        // already in the plan. A result, not a blocked plan — see the note above.
-        set({ planExtension: { appended: 0, newCards: 0, reviewsTomorrow: 0 } })
+        // The planner had candidates and took none of them. For GENERATION that is a day with
+        // nothing in it, which is exactly what `planBlockedReason` is for.
+        set({ planBlockedReason: 'no_candidates' })
         return false
       }
 
@@ -1437,7 +1469,59 @@ export const useLearningStore = create<LearningState>((set, get) => ({
        */
       const at: PlanContext = { ...ctx, now: new Date().toISOString() }
 
-      const inputs = await collectPlanInputs(goal, at, userId, already)
+      /**
+       * Two passes, because of what the button MEANS.
+       *
+       * 더 하기 is "I want to do more than today's share". The first pass asks the ordinary
+       * question — what is owed — and on a finished day the answer is nothing, because the day
+       * was built from exactly those cards. Reporting that as "더 넣을 것이 없습니다" told a
+       * learner their goal was exhausted while twenty-three cards sat in the deck waiting for
+       * their turn. It was answering "is anything due?" to someone who asked "can I do more?".
+       *
+       * So the second pass drops the due cutoff and pulls the NEAREST upcoming cards forward.
+       * Only when that also comes back empty is there genuinely nothing left to add — which is
+       * the only state the "nothing to add" sentence was ever true for.
+       */
+      const planFor = async (aheadOfSchedule: boolean) => {
+        const collected = await collectPlanInputs(goal, at, userId, already, { aheadOfSchedule })
+        if (collected.blocked) return { collected, output: null }
+        return {
+          collected,
+          output: buildDailyPlan({
+            goal: toDomainGoal(goal, userId),
+            candidates: collected.candidates,
+            // A fixed small block, not another full day. "더 하기" is meant to be pressed again
+            // if it was not enough, and each press should be a decision the learner can stop
+            // making — whereas one press that silently doubles a 60-minute goal is not.
+            budgetMinutes: EXTRA_BLOCK_MINUTES,
+            // Deliberately uncapped, unlike the daily plan. The learner has already met the
+            // intake they set for today; refusing to start anything new would make this button
+            // do nothing on the very day it is most wanted — the day they finished early. The
+            // cost is stated instead, in `planExtension`.
+            newCardsPerDay: undefined,
+            activityMix: activityMixForDomain(goal.domain_id),
+            now: at.now,
+            timezone: at.timezone,
+            algorithmVersion: DAILY_PLANNER_VERSION,
+          }, {
+            supportedActivityTypes: supportedActivityTypesForDomain(goal.domain_id),
+          }),
+        }
+      }
+
+      // Owed work first. Only if there is none — either no candidates at all, or none the
+      // planner would take — does the second pass pull upcoming cards forward.
+      let aheadOfSchedule = false
+      let attempt = await planFor(false)
+      if (attempt.collected.blocked === 'no_candidates' || attempt.output?.items.length === 0) {
+        const wider = await planFor(true)
+        if (!wider.collected.blocked && (wider.output?.items.length ?? 0) > 0) {
+          aheadOfSchedule = true
+          attempt = wider
+        }
+      }
+
+      const inputs = attempt.collected
       if (inputs.blocked) {
         // NOT `planBlockedReason`. That state belongs to plan GENERATION — "this goal has
         // nothing to build a day out of" — and the screen renders it INSTEAD of the plan.
@@ -1448,34 +1532,15 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         //
         // "Nothing more to add" is an extension RESULT, and the screen already has a line
         // for it that sits under the button and leaves the plan alone.
-        set({ planExtension: { appended: 0, newCards: 0, reviewsTomorrow: 0 } })
+        set({ planExtension: { appended: 0, newCards: 0, reviewsTomorrow: 0, aheadOfSchedule: false } })
         return false
       }
       const { cards, templatesById, candidates } = inputs
-
-      const output = buildDailyPlan({
-        goal: toDomainGoal(goal, userId),
-        candidates,
-        // A fixed small block, not another full day. "더 하기" is meant to be pressed again if
-        // it was not enough, and each press should be a decision the learner can stop making —
-        // whereas one press that silently doubles a 60-minute goal is not.
-        budgetMinutes: EXTRA_BLOCK_MINUTES,
-        // Deliberately uncapped, unlike the daily plan. The learner has already met the intake
-        // they set for today; refusing to start anything new would make this button do nothing
-        // on the very day it is most wanted — the day they finished early. The cost is stated
-        // instead, in `planExtension`.
-        newCardsPerDay: undefined,
-        activityMix: activityMixForDomain(goal.domain_id),
-        now: at.now,
-        timezone: at.timezone,
-        algorithmVersion: DAILY_PLANNER_VERSION,
-      }, {
-        supportedActivityTypes: supportedActivityTypesForDomain(goal.domain_id),
-      })
+      const output = attempt.output!
       if (output.items.length === 0) {
-        // The ordinary outcome of pressing 더 하기 on a finished day: everything due is
-        // already in the plan. A result, not a blocked plan — see the note above.
-        set({ planExtension: { appended: 0, newCards: 0, reviewsTomorrow: 0 } })
+        // Genuinely nothing left: nothing owed, and nothing upcoming the planner would pull
+        // forward either. This is the ONLY state the "nothing to add" sentence is true for.
+        set({ planExtension: { appended: 0, newCards: 0, reviewsTomorrow: 0, aheadOfSchedule: false } })
         return false
       }
 
@@ -1507,6 +1572,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
 
       set({
         planExtension: {
+          aheadOfSchedule,
           appended,
           newCards,
           reviewsTomorrow: reviewsAddedTomorrow(newCards),

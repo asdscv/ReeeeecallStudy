@@ -186,7 +186,7 @@
     "extendAdded_other": "已添加 {{count, number}} 项。",
     "extendTomorrow_one": "其中 {{count, number}} 张是新卡，明天的复习会相应增加。",
     "extendTomorrow_other": "其中 {{count, number}} 张是新卡，明天的复习会相应增加。",
-    "extendNothing": "目前没有可添加的内容。",
+    "extendNothing": "这个目标里没有更多可以添加的卡片了。",
     "remaining": "还剩 {{count, number}} 张",
     "remaining_one": "还剩 {{count, number}} 张",
     "remaining_other": "还剩 {{count, number}} 张",
@@ -210,7 +210,13 @@
     "deckListMore_other": "{{names}} 等 {{count, number}} 个",
     "itemsUnavailable": "这个计划中有 {{count, number}} 张卡片现在打不开，可能已被删除。",
     "itemsUnavailable_one": "这个计划中有 {{count, number}} 张卡片现在打不开，可能已被删除。",
-    "itemsUnavailable_other": "这个计划中有 {{count, number}} 张卡片现在打不开，可能已被删除。"
+    "itemsUnavailable_other": "这个计划中有 {{count, number}} 张卡片现在打不开，可能已被删除。",
+    "backSoonNote": "今天的都做完了。刚回答的卡片大约 {{count, number}} 分钟后会再出现。",
+    "backSoonNote_one": "今天的都做完了。刚回答的卡片大约 {{count, number}} 分钟后会再出现。",
+    "backSoonNote_other": "今天的都做完了。刚回答的卡片大约 {{count, number}} 分钟后会再出现。",
+    "extendAhead": "提前取了 {{count, number}} 张还没轮到的卡片。",
+    "extendAhead_one": "提前取了 {{count, number}} 张还没轮到的卡片。",
+    "extendAhead_other": "提前取了 {{count, number}} 张还没轮到的卡片。"
   },
   "progress": {
     "title": "进度",
