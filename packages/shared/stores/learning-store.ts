@@ -31,7 +31,7 @@ import {
 import type { UserCardProgress } from '../lib/srs-access'
 import {
   buildDailyPlan, DAILY_PLANNER_VERSION, retentionStabilityMultiplier, reviewsAddedTomorrow,
-  parseNewCardsPerDay, DEFAULT_NEW_CARDS_PER_DAY,
+  parseNewCardsPerDay, DEFAULT_NEW_CARDS_PER_DAY, parseCadence, type StudyCadence,
 } from '../learning/application/index'
 import { activityMixForDomain, supportedActivityTypesForDomain } from '../learning/adapters/index'
 import type { LearningGoal } from '../learning/domain/index'
@@ -777,13 +777,25 @@ const EXTRA_BLOCK_MINUTES = 10
 const AHEAD_BLOCK_MINUTES = 3
 
 /**
- * How far ahead the DAILY plan may reach to fill a short session, in days.
+ * How far ahead the DAILY plan may reach to fill a short session, in days — from the cadence.
  *
- * Small on purpose. This runs automatically, so it has to be a reach nobody would object to:
- * a card due tomorrow answered today is a few hours early, not a rescheduling. Anything
- * further is a decision, and decisions live behind a press.
+ * This is the line where "주 7일" stops being decoration. The setting was written by the goal
+ * form, stored on the goal, and read by nothing that plans; the planner asked only "what is due
+ * today", so a goal set to seven days a week produced a plan on six days out of twenty-nine.
+ *
+ * Someone who saved "every day" has already said they intend to study every day. Reaching a
+ * week ahead to give them one is honouring that, not overriding it. Someone who saved three
+ * days a week has said the opposite, so the reach stays short and the unbounded version stays
+ * behind a press.
+ *
+ * Bounded at both ends: never less than a day (a reach of zero cannot fill anything), never
+ * more than a week (beyond that the card was not "nearly due" by any reading).
  */
-const AUTO_AHEAD_DAYS = 3
+export function autoAheadDays(cadence: StudyCadence): number {
+  const ratio = cadence.studyDays / cadence.cycleDays
+  // 7/7 → 7 days. 3/7 → 3. 1/7 → 1.
+  return Math.max(1, Math.min(7, Math.round(ratio * 7)))
+}
 
 /** Nothing to exclude — `generatePlan` builds the whole day from scratch. */
 const EMPTY_EXCLUSIONS: ReadonlySet<string> = new Set()
@@ -1488,7 +1500,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       let items = toPlanItemRows(output, cards, templatesById, candidates)
 
       /**
-       * Fill the session the learner asked for.
+       * Fill the session the learner asked for, as often as they said they study.
        *
        * `daily_minutes` is what they said they do IN A SESSION — `GoalFormModal` divides by
        * `perStudyDayMultiplier` precisely because of that. The planner had no obligation to
@@ -1497,11 +1509,16 @@ export const useLearningStore = create<LearningState>((set, get) => ({
        * days out of twenty-nine and an empty screen on the rest. The setting promised daily
        * study and nothing in the planning path had ever read it.
        *
-       * So a short day is topped up from cards whose turn is NEARLY here — bounded by
-       * {@link AUTO_AHEAD_DAYS}, because that bound is what makes doing this automatically
-       * defensible. Pulling a card due tomorrow forward by a day costs almost nothing. Reaching
-       * three weeks out to manufacture a session would compress a schedule the learner never
-       * asked to compress, so that reach stays behind an explicit press (`generateAheadPlan`).
+       * So a short day is topped up from cards whose turn is nearly here — and HOW FAR is
+       * decided by the cadence the learner saved, which is the whole point:
+       *
+       *   주 7일  every day is a study day, so the plan reaches far enough to actually make one
+       *   주 N일  fewer sessions carry more each, so a shorter reach still fills them
+       *
+       * A learner who said "seven days a week" has already consented to studying every day;
+       * making them press a button to get a day is the app not believing its own settings.
+       * A learner who said three days a week has not, so the reach stays small and the
+       * unbounded version stays behind an explicit press (`generateAheadPlan`).
        */
       const plannedMinutes = output.items.reduce((sum, i) => sum + i.estimatedMinutes, 0)
       const shortBy = goal.daily_minutes - plannedMinutes
@@ -1521,7 +1538,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       if (poolExhausted && shortBy >= RECALL_MINUTES * 2) {
         const already = new Set(items.map((i) => i.card_id).filter((id): id is string => !!id))
         const near = await collectPlanInputs(goal, ctx, userId, already, {
-          aheadOfSchedule: true, aheadWithinDays: AUTO_AHEAD_DAYS,
+          aheadOfSchedule: true, aheadWithinDays: autoAheadDays(parseCadence(goal.settings)),
         })
         if (!near.blocked) {
           const topUp = buildDailyPlan({
