@@ -60,7 +60,9 @@
     "balance": "余额 {{amount}}",
     "imagePaid": "图片生成为付费功能 — 请充值后继续。",
     "cardLimit": "卡片额度 剩余 {{available}}/{{limit}}",
-    "cardLimitUnlimited": "无卡片数量上限（管理员）"
+    "cardLimitUnlimited": "无卡片数量上限（管理员）",
+    "needsCredits": "AI 功能需要点数，你已经没有余额了。",
+    "topUp": "去充值"
   },
   "wizard": {
     "setup": "Setup",

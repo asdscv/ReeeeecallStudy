@@ -69,7 +69,9 @@
     "unknown": "Saldo tidak tersedia",
     "balance": "Saldo {{amount}}",
     "freeOnly": "{{free}} kartu gratis tersisa hari ini",
-    "imagePaid": "Pembuatan dari gambar berbayar — isi ulang saldo untuk melanjutkan."
+    "imagePaid": "Pembuatan dari gambar berbayar — isi ulang saldo untuk melanjutkan.",
+    "needsCredits": "Fitur AI butuh kredit, dan kredit kamu habis.",
+    "topUp": "Isi ulang"
   },
   "alert": {
     "errorTitle": "Kesalahan",

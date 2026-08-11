@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { AI_HUB_QUIZ } from '@reeeeecall/shared/lib/ai/hub/catalog'
+import { AiCreditNotice } from '../../components/ai/AiCreditNotice'
 import { useNavigate } from 'react-router-dom'
 import {
   useQuizStore, QuizError, QUIZ_GENERATE_ACTION,
@@ -122,6 +124,10 @@ export function QuizSetupPage() {
         <h1 className="text-lg font-medium text-foreground">{t('setup.title')}</h1>
         <p className="text-xs text-content-tertiary mt-0.5">{t('setup.subtitle')}</p>
       </div>
+
+      {/* The screen the paid action is started from. Placed by feature id so it follows the
+          catalog rather than this file. */}
+      <AiCreditNotice featureId={AI_HUB_QUIZ} />
 
       <div className="p-3 bg-card rounded-lg border border-border space-y-3">
         <label className="block">

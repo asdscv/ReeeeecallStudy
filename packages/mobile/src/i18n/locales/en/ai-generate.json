@@ -40,7 +40,9 @@
     "unknown": "Balance unavailable",
     "balance": "{{amount}} balance",
     "freeOnly": "{{free}} free cards left today",
-    "imagePaid": "Image generation is paid — top up your balance to continue."
+    "imagePaid": "Image generation is paid — top up your balance to continue.",
+    "needsCredits": "AI features need credits, and you have none left.",
+    "topUp": "Top up"
   },
   "deck": {
     "section": "SELECT DECK",

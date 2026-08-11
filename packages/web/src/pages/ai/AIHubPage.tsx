@@ -1,14 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { aiHubEntries } from '@reeeeecall/shared/lib/ai/hub/catalog'
 import { isAiBadgeEligible } from '@reeeeecall/shared/lib/ai/hub/types'
+import { AI_HUB_GENERATE } from '@reeeeecall/shared/lib/ai/hub/catalog'
+import { AiCreditNotice } from '../../components/ai/AiCreditNotice'
 import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
-import {
-  getAiWalletSummary,
-  formatUsdMicro,
-  type AiWalletSummary,
-} from '@reeeeecall/shared/lib/ai/server-client'
 
 /**
  * The AI 학습 landing: every registered AI feature, and what the user has left to spend.
@@ -20,9 +17,6 @@ import {
  */
 export function AIHubPage() {
   const { t } = useTranslation('ai-generate')
-  // `undefined` = still loading, `null` = the read failed. A menu is not a billing page, so a
-  // failure shows nothing at all rather than an error banner the user cannot act on.
-  const [wallet, setWallet] = useState<AiWalletSummary | null | undefined>(undefined)
   const entries = aiHubEntries()
   // One open per visit. StrictMode runs mount effects twice in dev, and a funnel that counts
   // the same arrival twice locally is a funnel nobody trusts.
@@ -34,32 +28,7 @@ export function AIHubPage() {
     aiHubBus.emit({ type: 'ai_hub.opened', source: 'nav' })
   }, [])
 
-  useEffect(() => {
-    let cancelled = false
-    void getAiWalletSummary()
-      .then((summary) => {
-        if (!cancelled) setWallet(summary)
-      })
-      .catch(() => {
-        if (!cancelled) setWallet(null)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
 
-  // Same wording as the generate screen's wallet line, and the same rule: the balance is
-  // shown, never a "≈ N cards" estimate, because pricing is metered. The free limit comes
-  // from the response — it is server config, not a constant.
-  const walletText = !wallet
-    ? null
-    : wallet.freeRemainingToday > 0 && wallet.balanceMicroWon > 0
-      ? `${t('wallet.freeOnly', { free: wallet.freeRemainingToday })} · ${t('wallet.balance', { amount: formatUsdMicro(wallet.balanceMicroWon) })}`
-      : wallet.freeRemainingToday > 0
-        ? t('wallet.freeOnly', { free: wallet.freeRemainingToday })
-        : wallet.balanceMicroWon > 0
-          ? t('wallet.balance', { amount: formatUsdMicro(wallet.balanceMicroWon) })
-          : t('wallet.empty')
 
   return (
     <div className="max-w-4xl mx-auto space-y-4">
@@ -68,13 +37,10 @@ export function AIHubPage() {
         <p className="text-xs text-content-tertiary mt-0.5">{t('hub.subtitle')}</p>
       </div>
 
-      {wallet === undefined ? (
-        <div className="h-10 rounded-lg bg-card border border-border animate-pulse" />
-      ) : walletText ? (
-        <p className="px-3 py-2.5 rounded-lg bg-card border border-border text-sm text-muted-foreground tabular-nums">
-          {walletText}
-        </p>
-      ) : null}
+      {/* The same notice every AI screen shows, from one rule. This page used to build the
+          line inline and the generate screen built it again with a comment saying "same
+          wording" — which is how two copies of a sentence stop being the same sentence. */}
+      <AiCreditNotice featureId={AI_HUB_GENERATE} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {entries.map((entry) => (

@@ -69,7 +69,9 @@
     "unknown": "Saldo no disponible",
     "balance": "Saldo {{amount}}",
     "freeOnly": "Quedan {{free}} tarjetas gratuitas hoy",
-    "imagePaid": "La generación con imagen es de pago — recarga tu saldo para continuar."
+    "imagePaid": "La generación con imagen es de pago — recarga tu saldo para continuar.",
+    "needsCredits": "Las funciones de IA necesitan créditos y no te queda ninguno.",
+    "topUp": "Recargar"
   },
   "alert": {
     "errorTitle": "Error",

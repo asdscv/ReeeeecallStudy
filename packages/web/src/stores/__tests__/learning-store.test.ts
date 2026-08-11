@@ -1236,6 +1236,39 @@ describe('extendPlan', () => {
     expect(useLearningStore.getState().planExtension?.aheadOfSchedule).toBe(false)
   })
 
+  it('adds a SMALLER block when it has to pull cards forward', async () => {
+    // Reported by pressing it: seventeen cards came forward in one tap — most of a 29-card
+    // deck, its whole schedule compressed by a press the learner could not have predicted.
+    //
+    // Catching up on owed reviews is work the schedule already asked for; pulling cards
+    // forward is a change TO the schedule, because each card's next interval is then set from
+    // an answer given days early. The two get different budgets.
+    withPlan()
+    queue('decks', { data: [deckRow()], error: null })
+    queue('cards', { data: [], error: null })                       // pass 1 — nothing owed
+    queue('cards', { data: [], error: null })
+    queue('cards', {                                                // pass 2 — twenty upcoming
+      data: Array.from({ length: 20 }, (_, i) => cardRow(`ahead-${i}`, {
+        next_review_at: '2026-08-07T00:00:00.000Z',
+        last_reviewed_at: '2026-07-30T00:00:00.000Z',
+      })),
+      error: null,
+    })
+    queue('cards', { data: [], error: null })
+    queue('study_logs', { data: [], error: null })
+    mockRpc.mockResolvedValue({ data: { ok: true, appended: 6, skipped: 0 }, error: null })
+    queueReread([itemRow('item-1', 'card-1', 0)])
+
+    await useLearningStore.getState().extendPlan(goalWithDecks(DECKS), CTX)
+
+    const [, args] = mockRpc.mock.calls.find(([name]) => name === 'append_daily_plan_items')!
+    const sent = (args as { p_items: unknown[] }).p_items
+    // Three minutes at RECALL_MINUTES, not ten. The exact count is the planner's business;
+    // what must hold is that a forward pull is a fraction of a catch-up block.
+    expect(sent.length).toBeGreaterThan(0)
+    expect(sent.length, 'a forward pull took a full catch-up block').toBeLessThanOrEqual(8)
+  })
+
   it('never reports an extension as a blocked plan, whatever went missing', async () => {
     // Both refusal paths at once. `collectPlanInputs` can bail before the builder runs (no
     // decks, no candidates) and the builder can return nothing after it — and BOTH used to

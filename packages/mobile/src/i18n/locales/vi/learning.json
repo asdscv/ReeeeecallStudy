@@ -169,7 +169,10 @@
       "goalGone": "Mục tiêu đó không còn khả dụng.",
       "invalidInput": "Không thể lưu kế hoạch vì một số giá trị ngoài phạm vi.",
       "limitExceeded": "Bạn đã dùng hết số lần tạo lại kế hoạch hôm nay. Hãy thử lại vào ngày mai.",
-      "unknown": "Không thể tạo kế hoạch. Vui lòng thử lại."
+      "unknown": "Không thể tạo kế hoạch. Vui lòng thử lại.",
+      "extendFailed": "Không thêm được. Kế hoạch hôm nay giữ nguyên.",
+      "recordFailed": "Không lưu được. Vui lòng thử lại.",
+      "readFailed": "Không tải được kế hoạch hôm nay. Vui lòng thử lại."
     },
     "generate": "Tạo kế hoạch hôm nay",
     "generating": "Đang tạo…",
