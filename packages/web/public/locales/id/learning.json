@@ -28,7 +28,10 @@
       "invalidInput": "Rencana tidak bisa disimpan karena beberapa nilai di luar jangkauan.",
       "authRequired": "Silakan masuk lagi.",
       "forbidden": "Anda tidak memiliki akses.",
-      "unknown": "Rencana tidak bisa dibuat. Silakan coba lagi."
+      "unknown": "Rencana tidak bisa dibuat. Silakan coba lagi.",
+      "extendFailed": "Gagal menambah. Rencana hari ini tidak berubah.",
+      "recordFailed": "Gagal menyimpan. Coba lagi.",
+      "readFailed": "Gagal memuat rencana hari ini. Coba lagi."
     },
     "backToPlans": "Semua rencana",
     "extend": "Belajar lagi",

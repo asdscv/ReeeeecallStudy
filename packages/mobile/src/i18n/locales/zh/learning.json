@@ -169,7 +169,10 @@
       "goalGone": "该目标已不可用。",
       "invalidInput": "部分数值超出范围，计划未能保存。",
       "limitExceeded": "今天的计划重建次数已用完，请明天再试。",
-      "unknown": "计划生成失败，请重试。"
+      "unknown": "计划生成失败，请重试。",
+      "extendFailed": "没能添加。今天的计划没有变化。",
+      "recordFailed": "没能保存，请重试。",
+      "readFailed": "没能加载今天的计划，请重试。"
     },
     "generate": "生成今日计划",
     "generating": "生成中…",

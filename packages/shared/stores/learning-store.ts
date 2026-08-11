@@ -465,6 +465,24 @@ interface LearningState {
   planGenerating: boolean
   planError: LearningError | null
   /**
+   * WHICH action produced `planError`.
+   *
+   * Six actions used to write that one field and the screen rendered every one of them as
+   * "플랜을 만들지 못했습니다. 다시 시도해 주세요." A learner photographed that sentence sitting
+   * directly above a plan of 29 items that had just been extended successfully — the plan had
+   * been built, something else had failed, and the banner named the one thing that had not
+   * gone wrong.
+   *
+   * Actions that are not ABOUT the plan no longer write here at all (see `fetchAttempts` and
+   * `regeneratePlanCoach`). The ones that remain say which they were, so the sentence can be
+   * true.
+   */
+  planErrorFrom: 'read' | 'generate' | 'extend' | 'record' | null
+  /** A failed history read. Its own field so it cannot be mistaken for a failed plan. */
+  attemptsError: LearningError | null
+  /** A coach that could not be produced. Never shown; kept so a failure is not swallowed. */
+  coachError: LearningError | null
+  /**
    * The last seven days, as the strip renders them, for the goal named by `planWeekGoalId`.
    *
    * Kept because the coach's own fetch already pays for it: `regeneratePlanCoach` reads the
@@ -736,6 +754,20 @@ function toPlanItemRows(
  * on one tap is a decision the learner did not get to make twice.
  */
 const EXTRA_BLOCK_MINUTES = 10
+
+/**
+ * How much one press adds when there is nothing owed and cards have to be pulled FORWARD.
+ *
+ * Much smaller than `EXTRA_BLOCK_MINUTES`, and for a different reason. Catching up on owed
+ * reviews is work the schedule already asked for; pulling cards forward is a change TO the
+ * schedule, because each one's next interval is then set from an answer given days early.
+ *
+ * At `RECALL_MINUTES` a ten-minute block is twenty cards. The first learner to press it on a
+ * caught-up day was handed seventeen — most of a 29-card deck, its whole schedule compressed
+ * in one tap they could not have predicted. Three minutes is about six cards: enough to be
+ * worth pressing, small enough that pressing it again is a decision rather than a discovery.
+ */
+const AHEAD_BLOCK_MINUTES = 3
 
 /** Nothing to exclude — `generatePlan` builds the whole day from scratch. */
 const EMPTY_EXCLUSIONS: ReadonlySet<string> = new Set()
@@ -1016,6 +1048,9 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   planLoading: false,
   planGenerating: false,
   planError: null,
+  planErrorFrom: null,
+  attemptsError: null,
+  coachError: null,
   planWeek: null,
   planWeekGoalId: null,
   planAbsentFor: null,
@@ -1231,7 +1266,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   },
 
   fetchPlan: async (goalId, planDate) => {
-    set({ planLoading: true, planError: null, planBlockedReason: null, planAbsentFor: null })
+    set({ planLoading: true, planError: null, planErrorFrom: null, planBlockedReason: null, planAbsentFor: null })
     try {
       const { data: planRow, error: planErr } = await supabase
         .from('daily_plans')
@@ -1295,7 +1330,8 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       set({ plan: planRow as DailyPlanRow, planItems: items, planCards, planTemplateFields })
     } catch (e) {
       set({
-        planError: toLearningError(e), plan: null, planItems: [], planCards: {},
+        planError: toLearningError(e), planErrorFrom: 'read',
+        plan: null, planItems: [], planCards: {},
         planTemplateFields: {},
         // Explicitly NOT absent: a failed read tells us nothing about whether a plan exists.
         planAbsentFor: null,
@@ -1355,7 +1391,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
    */
   generatePlan: async (goal, ctx) => {
     if (get().planGenerating) return false
-    set({ planGenerating: true, planError: null, planBlockedReason: null })
+    set({ planGenerating: true, planError: null, planErrorFrom: null, planBlockedReason: null })
     try {
       const { data: userData } = await supabase.auth.getUser()
       const userId = userData?.user?.id
@@ -1431,7 +1467,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       await get().fetchPlan(goal.id, ctx.planDate)
       return true
     } catch (e) {
-      set({ planError: toLearningError(e) })
+      set({ planError: toLearningError(e), planErrorFrom: 'generate' })
       return false
     } finally {
       set({ planGenerating: false })
@@ -1444,7 +1480,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
     // caller asked to extend a plan that does not exist — which is a bug, not a user error.
     if (!plan || planExtending || planGenerating) return false
 
-    set({ planExtending: true, planError: null, planBlockedReason: null, planExtension: null })
+    set({ planExtending: true, planError: null, planErrorFrom: null, planBlockedReason: null, planExtension: null })
     try {
       const { data: userData } = await supabase.auth.getUser()
       const userId = userData?.user?.id
@@ -1493,7 +1529,10 @@ export const useLearningStore = create<LearningState>((set, get) => ({
             // A fixed small block, not another full day. "더 하기" is meant to be pressed again
             // if it was not enough, and each press should be a decision the learner can stop
             // making — whereas one press that silently doubles a 60-minute goal is not.
-            budgetMinutes: EXTRA_BLOCK_MINUTES,
+            //
+            // Smaller still when the block is pulled FORWARD: that is a change to the
+            // schedule rather than work it already asked for. See `AHEAD_BLOCK_MINUTES`.
+            budgetMinutes: aheadOfSchedule ? AHEAD_BLOCK_MINUTES : EXTRA_BLOCK_MINUTES,
             // Deliberately uncapped, unlike the daily plan. The learner has already met the
             // intake they set for today; refusing to start anything new would make this button
             // do nothing on the very day it is most wanted — the day they finished early. The
@@ -1580,7 +1619,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       })
       return appended > 0
     } catch (e) {
-      set({ planError: toLearningError(e) })
+      set({ planError: toLearningError(e), planErrorFrom: 'extend' })
       return false
     } finally {
       set({ planExtending: false })
@@ -1607,7 +1646,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   recordAttempt: async (input, planDate) => {
     if (get().recordingItemId) return false
     const item = input.planItem
-    set({ recordingItemId: item.id, planError: null })
+    set({ recordingItemId: item.id, planError: null, planErrorFrom: null })
     try {
       const score = Math.min(1, Math.max(0, input.score))
       // The typed answer, if this item asks for one.
@@ -1649,7 +1688,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       await get().fetchPlan(input.goalId, planDate)
       return true
     } catch (e) {
-      set({ planError: toLearningError(e) })
+      set({ planError: toLearningError(e), planErrorFrom: 'record' })
       return false
     } finally {
       set({ recordingItemId: null })
@@ -1672,7 +1711,10 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       if (error) throw error
       set({ attempts: (data ?? []) as AttemptRow[] })
     } catch (e) {
-      set({ planError: toLearningError(e) })
+      // NOT `planError`. A history read that fails says nothing about whether the plan was
+      // built, and routing it here put "플랜을 만들지 못했습니다" over a plan that existed.
+      // The recap simply does not render; there is nothing for the learner to do about it.
+      set({ attemptsError: toLearningError(e) })
     } finally {
       set({ attemptsLoading: false })
     }
@@ -1877,7 +1919,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       await get().fetchRecommendations(goalId)
       return true
     } catch (e) {
-      set({ planError: toLearningError(e) })
+      set({ insightsError: toLearningError(e) })
       return false
     }
   },
@@ -1929,7 +1971,10 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       await get().fetchRecommendations(goalId)
       return true
     } catch (e) {
-      set({ planError: toLearningError(e) })
+      // Silent, as this action's own docblock has always said: "A coach that cannot be
+      // produced is not worth an error on the learner's screen." It wrote to `planError`
+      // anyway, so a failed coach claimed the PLAN had failed.
+      set({ coachError: toLearningError(e) })
       return false
     }
   },
@@ -2001,7 +2046,8 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       goals: [], goalsLoading: false, goalsError: null,
       plan: null, planItems: [], planCards: {}, planTemplateFields: {},
       planLoading: false, planGenerating: false,
-      planError: null, planBlockedReason: null,
+      planError: null, planErrorFrom: null, attemptsError: null, coachError: null,
+      planBlockedReason: null,
       // Both must go with the plan they describe. A surviving `planAbsentFor` would assert
       // "there is no plan today" about the account that just signed OUT, and a surviving
       // `autoPlanAttempted` would refuse to build one for the account that signed in.

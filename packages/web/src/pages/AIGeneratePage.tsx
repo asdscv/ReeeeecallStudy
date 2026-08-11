@@ -1,5 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { AI_HUB_GENERATE } from '@reeeeecall/shared/lib/ai/hub/catalog'
+import { AiCreditNotice } from '../components/ai/AiCreditNotice'
 import { useSearchParams } from 'react-router-dom'
 import { useAIGenerateStore } from '../stores/ai-generate-store'
 import { useTemplateStore } from '../stores/template-store'
@@ -166,6 +168,10 @@ export function AIGeneratePage() {
         </div>
         <p className="text-sm text-muted-foreground mt-1">{t('page.subtitle')}</p>
       </div>
+
+      {/* The same notice every AI screen shows. `ConfigStep` still renders the affordability
+          line it needs for its own gate; this one is about the wallet, not the request. */}
+      <AiCreditNotice featureId={AI_HUB_GENERATE} className="mb-6" />
 
       {/* ── Wizard Stepper ── */}
       <div className="mb-6">

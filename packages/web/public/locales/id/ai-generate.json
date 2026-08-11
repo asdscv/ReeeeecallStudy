@@ -60,7 +60,9 @@
     "balance": "Saldo {{amount}}",
     "imagePaid": "Pembuatan dari gambar berbayar — isi ulang saldo untuk melanjutkan.",
     "cardLimit": "{{available}} dari {{limit}} kartu tersisa",
-    "cardLimitUnlimited": "Tanpa batas kartu (admin)"
+    "cardLimitUnlimited": "Tanpa batas kartu (admin)",
+    "needsCredits": "Fitur AI butuh kredit, dan kredit kamu habis.",
+    "topUp": "Isi ulang"
   },
   "wizard": {
     "setup": "Setup",

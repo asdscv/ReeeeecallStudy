@@ -60,7 +60,9 @@
     "balance": "{{amount}} balance",
     "imagePaid": "Image generation is paid — top up your balance to continue.",
     "cardLimit": "{{available}} of {{limit}} cards left",
-    "cardLimitUnlimited": "No card limit (admin)"
+    "cardLimitUnlimited": "No card limit (admin)",
+    "needsCredits": "AI features need credits, and you have none left.",
+    "topUp": "Top up"
   },
   "wizard": {
     "setup": "Setup",

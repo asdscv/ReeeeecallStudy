@@ -28,7 +28,10 @@
       "invalidInput": "The plan couldn't be saved because some values were out of range.",
       "authRequired": "Please sign in again.",
       "forbidden": "You don't have access to that.",
-      "unknown": "The plan couldn't be built. Please try again."
+      "unknown": "The plan couldn't be built. Please try again.",
+      "extendFailed": "Could not add more. Today’s plan is unchanged.",
+      "recordFailed": "Could not save that. Please try again.",
+      "readFailed": "Could not load today’s plan. Please try again."
     },
     "backToPlans": "All plans",
     "extend": "Study more",

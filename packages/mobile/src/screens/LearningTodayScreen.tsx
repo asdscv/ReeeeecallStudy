@@ -384,7 +384,7 @@ export function LearningTodayScreen() {
   const route = useRoute<RouteProp<AIStackParamList, 'LearningToday'>>()
   const {
     goals, goalsLoading, fetchGoals,
-    plan, planItems, planCards, planLoading, planGenerating, planError,
+    plan, planItems, planCards, planLoading, planGenerating, planError, planErrorFrom,
     planBlockedReason,
     fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
     extendPlan, planExtending, planExtension,
@@ -777,6 +777,11 @@ export function LearningTodayScreen() {
     }
   }, [goalId, starting, startPlanSession, navigation, t])
 
+  /**
+   * The sentence has to be about what actually failed — see the web note. Six store actions
+   * wrote one `planError`, and every failure on this screen read "플랜을 만들지 못했습니다"
+   * even when the plan was on screen and correct.
+   */
   const errorKey = (code: string): string => {
     switch (code) {
       case 'LIMIT_EXCEEDED': return 'today.error.limitExceeded'
@@ -785,7 +790,11 @@ export function LearningTodayScreen() {
       case 'INVALID_INPUT': return 'today.error.invalidInput'
       case 'AUTH_REQUIRED': return 'today.error.authRequired'
       case 'FORBIDDEN': return 'today.error.forbidden'
-      default: return 'today.error.unknown'
+      default:
+        return planErrorFrom === 'extend' ? 'today.error.extendFailed'
+          : planErrorFrom === 'record' ? 'today.error.recordFailed'
+            : planErrorFrom === 'read' ? 'today.error.readFailed'
+              : 'today.error.unknown'
     }
   }
 

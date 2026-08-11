@@ -60,7 +60,9 @@
     "balance": "Saldo {{amount}}",
     "imagePaid": "La generación con imagen es de pago — recarga tu saldo para continuar.",
     "cardLimit": "{{available}} de {{limit}} tarjetas disponibles",
-    "cardLimitUnlimited": "Sin límite de tarjetas (admin)"
+    "cardLimitUnlimited": "Sin límite de tarjetas (admin)",
+    "needsCredits": "Las funciones de IA necesitan créditos y no te queda ninguno.",
+    "topUp": "Recargar"
   },
   "wizard": {
     "setup": "Setup",

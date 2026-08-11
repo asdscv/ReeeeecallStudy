@@ -7,6 +7,7 @@
  * survive — which is where the design was decided.
  */
 import { describe, it, expect } from 'vitest'
+import { calculateSRS } from '@reeeeecall/shared/lib/srs'
 import {
   goalCompletion, COMPLETION_RATIO, MATURE_INTERVAL_DAYS,
   DAYS_FROM_RUNG_1, DAYS_FROM_RUNG_3, DAYS_FROM_RUNG_8,
@@ -15,14 +16,9 @@ import {
 const counts = (over: Partial<Parameters<typeof goalCompletion>[0]> = {}) =>
   ({ total: 0, mature: 0, unseen: 0, rung1: 0, rung3: 0, rung8: 0, ...over })
 
-describe('the ladder constants', () => {
-  it('reads the waiting time off the scheduler own ladder', () => {
-    // [1, 3, 8, 21, ...]. A card at rung 8 waits 8 days and THAT review sets 21, so the
-    // remaining time is the rungs it still sits through, not the rungs it still climbs.
+describe('the maturity line', () => {
+  it('is 21 days, the same line the rest of the app draws', () => {
     expect(MATURE_INTERVAL_DAYS).toBe(21)
-    expect(DAYS_FROM_RUNG_8).toBe(8)
-    expect(DAYS_FROM_RUNG_3).toBe(11)
-    expect(DAYS_FROM_RUNG_1).toBe(12)
   })
 })
 
@@ -52,6 +48,60 @@ describe('goalCompletion — the rule', () => {
     expect(out.earned).toBe(false)
     expect(out.percent).toBe(0)
     expect(out.daysToComplete).toBeNull()
+  })
+})
+
+describe('the rung costs come from the scheduler', () => {
+  // These were constants summed off `INTERVALS_DAYS`, and the scheduler does not use that
+  // ladder to decide WHEN a card is answered next — it grants `interval × ease` with a growth
+  // cap. Every constant was one rung too long, because summing from the card's current rung
+  // counts the interval it is already sitting in as time it still has to wait. A card the
+  // planner is offering is due NOW.
+  it('prices a card at interval 8 as one answer away, not eight days', () => {
+    // The one that decided the estimate: `goalCompletion` spends the cheapest cards first, so
+    // it was reaching past the rung that is actually free.
+    expect(DAYS_FROM_RUNG_8).toBe(0)
+  })
+
+  it('prices the rungs below it by what the scheduler actually grants', () => {
+    expect(DAYS_FROM_RUNG_3).toBe(8)
+    expect(DAYS_FROM_RUNG_1).toBe(11)
+  })
+
+  it('agrees with a card walked through the scheduler from new', () => {
+    // The whole point of deriving rather than declaring: if `calculateSRS` changes, this test
+    // and the constants move together, and neither can quietly disagree with the other.
+    let card = {
+      srs_status: 'new' as const, interval_days: 0, ease_factor: 2.5, repetitions: 0,
+    }
+    let days = 0
+    const reached: Record<string, number> = {}
+    let matureAt = -1
+    for (let i = 0; i < 40; i += 1) {
+      const iv = card.interval_days
+      if (iv >= 1 && iv < 3 && reached.r1 === undefined) reached.r1 = days
+      if (iv >= 3 && iv < 8 && reached.r3 === undefined) reached.r3 = days
+      if (iv >= 8 && iv < 21 && reached.r8 === undefined) reached.r8 = days
+      if (iv >= 21) { matureAt = days; break }
+      const n = calculateSRS(card, 'good')
+      card = {
+        srs_status: n.srs_status as typeof card.srs_status,
+        interval_days: n.interval_days, ease_factor: n.ease_factor, repetitions: n.repetitions,
+      }
+      if (card.interval_days < 21) days += card.interval_days
+    }
+
+    expect(matureAt, 'a correct card never matured').toBeGreaterThanOrEqual(0)
+    expect(DAYS_FROM_RUNG_1).toBe(matureAt - reached.r1)
+    expect(DAYS_FROM_RUNG_3).toBe(matureAt - reached.r3)
+    expect(DAYS_FROM_RUNG_8).toBe(matureAt - reached.r8)
+  })
+
+  it('a card answered correctly from new matures in under a fortnight', () => {
+    // The sentence the screen makes — "다 맞히면 빨라야 N일" — has to be a number the
+    // scheduler can actually produce.
+    expect(DAYS_FROM_RUNG_1).toBeGreaterThan(0)
+    expect(DAYS_FROM_RUNG_1).toBeLessThan(14)
   })
 })
 

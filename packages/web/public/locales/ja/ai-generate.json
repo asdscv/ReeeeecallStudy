@@ -60,7 +60,9 @@
     "balance": "残高 {{amount}}",
     "imagePaid": "画像生成は有料です — 続けるにはチャージしてください。",
     "cardLimit": "カード枠 残り {{available}}/{{limit}}",
-    "cardLimitUnlimited": "カード枚数の上限なし（管理者）"
+    "cardLimitUnlimited": "カード枚数の上限なし（管理者）",
+    "needsCredits": "AI機能はクレジットが必要です。残高がありません。",
+    "topUp": "チャージする"
   },
   "wizard": {
     "setup": "Setup",

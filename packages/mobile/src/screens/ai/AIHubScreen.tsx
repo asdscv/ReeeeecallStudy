@@ -2,6 +2,8 @@ import { useCallback, useEffect } from 'react'
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
+import { AI_HUB_GENERATE } from '@reeeeecall/shared/lib/ai/hub/catalog'
+import { AiCreditNotice } from '../../components/ai/AiCreditNotice'
 import { aiHubEntries } from '@reeeeecall/shared/lib/ai/hub/catalog'
 import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
 import { isAiBadgeEligible, type AiHubEntry } from '@reeeeecall/shared/lib/ai/hub/types'
@@ -41,6 +43,9 @@ export function AIHubScreen() {
       {/* AIHub is the AITab landing, so there is no pushed screen to pop. The drawer control is
           the way out, matching QuizHomeScreen and every other stack root. */}
       <ScreenHeader title={t('hub.title')} mode="drawer" />
+      {/* The same notice every AI screen shows, from one rule. Placed by feature id so it
+          follows `hub/catalog.ts` rather than this file. */}
+      <AiCreditNotice featureId={AI_HUB_GENERATE} style={{ marginHorizontal: 16, marginBottom: 12 }} />
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Text style={[theme.typography.bodySmall, styles.subtitle, { color: theme.colors.textSecondary }]}>

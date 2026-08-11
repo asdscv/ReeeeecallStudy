@@ -28,7 +28,10 @@
       "invalidInput": "部分数值超出范围，计划未能保存。",
       "authRequired": "请重新登录。",
       "forbidden": "您没有访问权限。",
-      "unknown": "计划生成失败，请重试。"
+      "unknown": "计划生成失败，请重试。",
+      "extendFailed": "没能添加。今天的计划没有变化。",
+      "recordFailed": "没能保存，请重试。",
+      "readFailed": "没能加载今天的计划，请重试。"
     },
     "backToPlans": "计划列表",
     "extend": "再学一些",

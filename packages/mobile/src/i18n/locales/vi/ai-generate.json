@@ -69,7 +69,9 @@
     "unknown": "Không thể hiển thị số dư",
     "balance": "Số dư {{amount}}",
     "freeOnly": "Hôm nay còn {{free}} thẻ miễn phí",
-    "imagePaid": "Tạo từ ảnh là tính năng trả phí — nạp thêm để tiếp tục."
+    "imagePaid": "Tạo từ ảnh là tính năng trả phí — nạp thêm để tiếp tục.",
+    "needsCredits": "Tính năng AI cần tín dụng, và bạn đã hết.",
+    "topUp": "Nạp thêm"
   },
   "alert": {
     "errorTitle": "Lỗi",

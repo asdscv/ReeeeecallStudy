@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { AI_HUB_QUIZ } from '@reeeeecall/shared/lib/ai/hub/catalog'
+import { AiCreditNotice } from '../../components/ai/AiCreditNotice'
 import { Link, useNavigate } from 'react-router-dom'
 import { useQuizStore, type QuizSetRow } from '@reeeeecall/shared/stores/quiz-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
@@ -52,6 +54,11 @@ export function QuizHomePage() {
           {t('home.create')}
         </Link>
       </div>
+
+      {/* Quiz spends the same wallet as card generation and had never said so — a learner
+          could reach a paid action from a screen that never mentioned credits. Placed by
+          feature id, so it follows the catalog rather than this file. */}
+      <AiCreditNotice featureId={AI_HUB_QUIZ} />
 
       {loading && sets.length === 0 ? (
         <ListSkeleton />

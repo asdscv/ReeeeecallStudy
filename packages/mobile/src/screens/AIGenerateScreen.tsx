@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, FlatList, 
 import * as ImagePicker from 'expo-image-picker'
 import * as ImageManipulator from 'expo-image-manipulator'
 import { useTranslation } from 'react-i18next'
+import { AI_HUB_GENERATE } from '@reeeeecall/shared/lib/ai/hub/catalog'
+import { AiCreditNotice } from '../components/ai/AiCreditNotice'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import { Screen, TextInput, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { useAIGenerateStore } from '@reeeeecall/shared/stores/ai-generate-store'
@@ -454,6 +456,9 @@ export function AIGenerateScreen() {
     return (
       <Screen safeArea padding={false} keyboard testID="ai-generate-screen">
         <ScreenHeader title={t('title')} mode="drawer" />
+        {/* The same notice every AI screen shows, from one rule. Placed by feature id so it
+            follows `hub/catalog.ts` rather than this file. */}
+        <AiCreditNotice featureId={AI_HUB_GENERATE} style={{ marginHorizontal: 16, marginBottom: 12 }} />
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
 
           <StepIndicator step={step} isCardsOnly={!!selectedDeckId} />

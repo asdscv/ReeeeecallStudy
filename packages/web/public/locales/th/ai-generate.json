@@ -60,7 +60,9 @@
     "balance": "ยอดคงเหลือ {{amount}}",
     "imagePaid": "การสร้างจากรูปภาพเป็นแบบเสียเงิน — เติมเงินเพื่อดำเนินการต่อ",
     "cardLimit": "เหลือ {{available}} จาก {{limit}} การ์ด",
-    "cardLimitUnlimited": "ไม่จำกัดจำนวนการ์ด (ผู้ดูแล)"
+    "cardLimitUnlimited": "ไม่จำกัดจำนวนการ์ด (ผู้ดูแล)",
+    "needsCredits": "ฟีเจอร์ AI ต้องใช้เครดิต และคุณไม่เหลือแล้ว",
+    "topUp": "เติมเครดิต"
   },
   "wizard": {
     "setup": "Setup",
