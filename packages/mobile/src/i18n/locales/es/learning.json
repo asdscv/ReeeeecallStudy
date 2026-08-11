@@ -103,9 +103,6 @@
     "title": "Estudio reciente",
     "title_one": "Intento reciente ({{count, number}})",
     "title_other": "Intentos recientes ({{count, number}})",
-    "recap": "{{count, number}} tarjetas · {{minutes, number}} min · {{seconds, number}} s por tarjeta de media",
-    "recap_one": "{{count, number}} tarjeta · {{minutes, number}} min · {{seconds, number}} s por tarjeta de media",
-    "recap_other": "{{count, number}} tarjetas · {{minutes, number}} min · {{seconds, number}} s por tarjeta de media",
     "band": {
       "known": "{{count, number}} acertadas",
       "known_one": "{{count, number}} acertada",
@@ -116,32 +113,24 @@
       "missed": "{{count, number}} falladas",
       "missed_one": "{{count, number}} fallada",
       "missed_other": "{{count, number}} falladas"
-    }
+    },
+    "recapCount": "{{count, number}} respuestas hoy",
+    "recapCount_one": "{{count, number}} respuestas hoy",
+    "recapCount_other": "{{count, number}} respuestas hoy"
   },
   "insights": {
     "accuracy": "Precisión",
-    "adherence": "Cumplimiento del plan (14 días)",
-    "adherenceEmpty": "No hay planes en este período.",
-    "adherenceTitle": "Planes diarios (14 días)",
     "attemptCount": "{{count, number}} intentos",
     "attemptCount_one": "{{count, number}} intento",
     "attemptCount_other": "{{count, number}} intentos",
-    "attempts": "Intentos (30 días)",
     "cardFallback": "(tarjeta no incluida en el plan de hoy)",
-    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "noData": "Sin datos aún",
-    "noPlanItems": "Nada planificado",
     "notScoredYet": "Nada puntuado aún",
-    "scopeNote": "Basado en los intentos y planes de este objetivo. Las estadísticas SRS por mazo están en el Historial.",
-    "seconds": "{{count, decimal}}s",
     "title": "Diagnóstico de aprendizaje",
-    "typicalTime": "Tiempo habitual",
     "weakEmpty": "Nada se está quedando atrás.",
-    "weakHint": "Tarjetas con al menos dos intentos y promedio inferior al 60%.",
+    "weakHint": "Tarjetas que has visto al menos dos veces y fallado más de la mitad.",
     "weakTitle": "Vale otra mirada",
-    "accuracyValue": "Acierto {{pct, number}}%",
-    "typicalValue": "Normalmente {{seconds, decimal}} s",
-    "adherenceValue": "Plan {{pct, number}}% completado",
+    "accuracyValue": "{{known, number}} aciertos de {{scored, number}} en los últimos 30 días ({{pct, number}}%)",
     "weakCount": "{{count, number}} tarjetas",
     "weakCount_one": "{{count, number}} tarjeta",
     "weakCount_other": "{{count, number}} tarjetas",
@@ -166,7 +155,12 @@
       "createGoal": "Crear un objetivo",
       "noDecks": "Este objetivo no tiene mazos asociados, así que no hay nada que planificar.",
       "noGoal": "Aún no tienes un objetivo de aprendizaje activo. Un objetivo establece tus minutos diarios y los mazos para planificar.",
-      "nothingDue": "Hoy no hay tarjetas pendientes en estos mazos."
+      "allCaughtUp": "Por hoy has terminado.",
+      "backSoon": "Las tarjetas que acabas de responder vuelven en unos {{count, number}} minutos.",
+      "backSoon_one": "Las tarjetas que acabas de responder vuelven en unos {{count, number}} minutos.",
+      "backSoon_other": "Las tarjetas que acabas de responder vuelven en unos {{count, number}} minutos.",
+      "nextReview": "Próximo repaso: {{when}}.",
+      "nothingScheduled": "No hay repasos programados para esta meta. Prueba a añadir más tarjetas a sus mazos."
     },
     "error": {
       "authRequired": "Inicia sesión de nuevo.",
@@ -213,7 +207,10 @@
     },
     "deckListMore": "{{names}} +{{count, number}} más",
     "deckListMore_one": "{{names}} +{{count, number}} más",
-    "deckListMore_other": "{{names}} +{{count, number}} más"
+    "deckListMore_other": "{{names}} +{{count, number}} más",
+    "itemsUnavailable": "{{count, number}} tarjetas de este plan no se pueden abrir ahora. Puede que se hayan borrado.",
+    "itemsUnavailable_one": "{{count, number}} tarjetas de este plan no se pueden abrir ahora. Puede que se hayan borrado.",
+    "itemsUnavailable_other": "{{count, number}} tarjetas de este plan no se pueden abrir ahora. Puede que se hayan borrado."
   },
   "progress": {
     "title": "Progreso",
@@ -224,23 +221,20 @@
     "unstudied": "{{count, number}} sin estudiar",
     "unstudied_one": "{{count, number}} sin estudiar",
     "unstudied_other": "{{count, number}} sin estudiar",
-    "behind": "{{count, number}} repasos vencidos",
-    "behind_one": "{{count, number}} repaso vencido",
-    "behind_other": "{{count, number}} repasos vencidos",
+    "behind": "Hay {{count, number}} repasos con más de un día de retraso",
+    "behind_one": "Hay {{count, number}} repasos con más de un día de retraso",
+    "behind_other": "Hay {{count, number}} repasos con más de un día de retraso",
     "studied": "{{attempted, number}} de {{total, number}} tarjetas estudiadas",
-    "detailStudied": "{{count, number}} estudiadas",
-    "detailStudied_one": "{{count, number}} estudiada",
-    "detailStudied_other": "{{count, number}} estudiadas",
     "detailWithinWindow": "{{count, number}} dentro de su ciclo de repaso",
     "detailWithinWindow_one": "{{count, number}} dentro de su ciclo de repaso",
     "detailWithinWindow_other": "{{count, number}} dentro de su ciclo de repaso"
   },
   "completion": {
     "done": "Objetivo completado",
-    "progress": "{{mature, number}} de {{required, number}} tarjetas consolidadas",
-    "eta": "quedan unos {{count, number}} días",
-    "eta_one": "queda 1 día",
-    "eta_other": "quedan unos {{count, number}} días"
+    "progress": "{{mature, number}} tarjetas que puedes dejar 3 semanas · meta {{required, number}} (80% de las {{total, number}})",
+    "etaIfDaily": "Las {{remaining, number}} restantes deben pasar un repaso a 1 día, luego a 3 y luego a 8. {{count, number}} días como mínimo, y solo si aciertas todo.",
+    "etaIfDaily_one": "Las {{remaining, number}} restantes deben pasar un repaso a 1 día, luego a 3 y luego a 8. {{count, number}} días como mínimo, y solo si aciertas todo.",
+    "etaIfDaily_other": "Las {{remaining, number}} restantes deben pasar un repaso a 1 día, luego a 3 y luego a 8. {{count, number}} días como mínimo, y solo si aciertas todo."
   },
   "check": {
     "title_one": "{{count, number}} tarjeta de hoy: ¿de verdad la sabes?",

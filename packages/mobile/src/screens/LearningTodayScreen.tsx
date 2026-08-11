@@ -17,6 +17,7 @@ import { planComposition } from '@reeeeecall/shared/lib/plan-composition'
 import { studyRecap } from '@reeeeecall/shared/lib/study-recap'
 import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
 import { goalCompletion } from '@reeeeecall/shared/lib/goal-completion'
+import { caughtUp } from '@reeeeecall/shared/lib/caught-up'
 import {
   parseNewCardsPerDay, DEFAULT_NEW_CARDS_PER_DAY,
 } from '@reeeeecall/shared/learning/application/cadence'
@@ -553,18 +554,21 @@ export function LearningTodayScreen() {
   }, [insights, weakCardDecks, insightsGoalId, goalId])
 
   // `accuracy` is null when nothing carried a score, which is a different claim from 0%.
+  /**
+   * One number, and it says what window it is over. See the web note for why the other two
+   * went: "정답률 78% · 보통 1초 · 플랜 49% 이행" spanned two unprinted windows, and the
+   * middle number measured how fast the learner tapped after the answer was already showing.
+   */
   const insightStats = useMemo(() => {
     if (!insights) return ''
-    const pct = (v: number | null) => (v === null ? null : Math.round(v * 100))
-    const accuracy = pct(insights.accuracy)
-    const adherence = pct(insights.overallAdherence)
-    return [
-      accuracy === null ? t('insights.notScoredYet') : t('insights.accuracyValue', { pct: accuracy }),
-      insights.medianDurationMs === null
-        ? null
-        : t('insights.typicalValue', { seconds: Math.round(insights.medianDurationMs / 100) / 10 }),
-      adherence === null ? null : t('insights.adherenceValue', { pct: adherence }),
-    ].filter(Boolean).join(' · ')
+    const accuracy = insights.accuracy === null ? null : Math.round(insights.accuracy * 100)
+    return accuracy === null
+      ? t('insights.notScoredYet')
+      : t('insights.accuracyValue', {
+        pct: accuracy,
+        scored: insights.scoredCount,
+        known: Math.round((insights.accuracy ?? 0) * insights.scoredCount),
+      })
   }, [insights, t])
 
   const studyWeak = useCallback(async (group: { deckId: string; cardIds: string[] }) => {
@@ -608,13 +612,37 @@ export function LearningTodayScreen() {
   const goalCompletionState = useMemo(() => {
     const k = goalId ? knowledge[goalId] : null
     if (!k || k.total === 0) return null
-    return goalCompletion(k, {
+    // `total` travels with it so the completion sentence can name the population its target is
+    // 80% OF. Printing "목표 24장" beside "배운 29장" made the deck look like it shrank.
+    return { ...goalCompletion(k, {
       newCardsPerDay: parseNewCardsPerDay(goal?.settings) ?? DEFAULT_NEW_CARDS_PER_DAY,
-      adherence: insightsGoalId === goalId ? insights?.overallAdherence ?? null : null,
-    })
-  }, [goalId, knowledge, goal, insights, insightsGoalId])
+    }), total: k.total }
+  }, [goalId, knowledge, goal])
   /** Already STAMPED. A record of having earned it, not a live reading of the ratio. */
   const goalDone = goal?.status === 'completed'
+
+  /**
+   * Which kind of "nothing due" this is — see `caught-up.ts`. Read against a FRESH instant:
+   * the empty state is looked at after a session, and "5분 뒤" measured from when the screen
+   * was opened is the wrong five minutes.
+   */
+  const caughtUpState = useMemo(
+    () => caughtUp(goalId ? knowledge[goalId]?.nextDueAt ?? null : null, new Date().toISOString()),
+    [goalId, knowledge],
+  )
+
+  /**
+   * A wall-clock time the learner can compare to their own clock.
+   *
+   * Hand-formatted, NOT `toLocaleString`: Hermes ships without ICU, so every locale option is
+   * ignored and every device would render the same English regardless of the app's language.
+   */
+  const formatWhen = useCallback((iso: string | null) => {
+    if (!iso) return ''
+    const at = new Date(iso)
+    const pad = (n: number) => String(n).padStart(2, '0')
+    return `${at.getMonth() + 1}/${at.getDate()} ${pad(at.getHours())}:${pad(at.getMinutes())}`
+  }, [])
 
   const recapBands = [
     recap.known > 0 ? t('history.band.known', { count: recap.known }) : null,
@@ -673,8 +701,19 @@ export function LearningTodayScreen() {
     return [...byDeck.values()].sort((a, b) => a.first - b.first)
   }, [planItems, planCards])
 
-  const pendingTotal = deckGroups.reduce((sum, group) => sum + group.pending, 0)
-  const doneTotal = deckGroups.reduce((sum, group) => sum + group.done, 0)
+  /**
+   * The day's totals come from the PLAN, not from the per-deck grouping.
+   *
+   * `deckGroups` drops any item whose card it cannot resolve, so summing it meant a plan of
+   * twelve untouched items could report zero pending and put "오늘 끝!" over its own
+   * "12개 중 0개 완료". `total_items`/`completed_items` are maintained server-side on every
+   * rating and cannot shrink because a client-side lookup missed.
+   */
+  const doneTotal = plan?.completed_items ?? 0
+  const pendingTotal = Math.max(0, (plan?.total_items ?? 0) - doneTotal)
+  /** Work the plan claims but no deck can be reached for. Normally zero. */
+  const unreachableTotal = Math.max(
+    0, pendingTotal - deckGroups.reduce((sum, group) => sum + group.pending, 0))
   const nextDeck = deckGroups.find((group) => group.pending > 0) ?? null
 
   /** What is LEFT today. Shared with web so the two screens cannot disagree about it. */
@@ -695,10 +734,11 @@ export function LearningTodayScreen() {
   )
   // Each half dropped when empty — "복습 밀림 0장" is a sentence about nothing, and a learner who
   // is caught up should see that rather than a row of noughts.
+  // The detail line no longer swaps populations with the headline. It used to print a bare
+  // "배운 29장" whenever the headline was about a backlog — a count with no denominator, one
+  // line under a different count with a different one.
   const progressDetail = goalSummary.notStarted ? '' : [
-    goalSummary.behind
-      ? t('progress.detailStudied', { count: goalSummary.attempted })
-      : t('progress.detailWithinWindow', { count: goalSummary.withinWindow }),
+    t('progress.detailWithinWindow', { count: goalSummary.withinWindow }),
     goalSummary.unstudied > 0 ? t('progress.unstudied', { count: goalSummary.unstudied }) : null,
   ].filter(Boolean).join(' · ')
 
@@ -852,9 +892,16 @@ export function LearningTodayScreen() {
                     {t('completion.progress', {
                       mature: goalCompletionState.mature,
                       required: goalCompletionState.required,
+                      total: goalCompletionState.total,
                     })}
+                    {/* One number, and the sentence says what it assumes. It used to be
+                        `12 / adherence` — a ladder constant divided by a percentage shown in a
+                        different section under a different name. */}
                     {goalCompletionState.daysToComplete !== null
-                      ? ' · ' + t('completion.eta', { count: goalCompletionState.daysToComplete })
+                      ? ' · ' + t('completion.etaIfDaily', {
+                        count: goalCompletionState.daysToComplete,
+                        remaining: goalCompletionState.remaining,
+                      })
                       : ''}
                   </Text>
                 )}
@@ -918,10 +965,24 @@ export function LearningTodayScreen() {
                 {t('today.empty.noDecks')}
               </Text>
             )}
+            {/* "복습할 카드가 없습니다" read as a failure — the learner's cards had gone
+                somewhere. The truth in the reported state was the opposite: they had just
+                finished, and twelve cards were coming back inside ten minutes. */}
             {planBlockedReason === 'no_candidates' && (
-              <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}>
-                {t('today.empty.nothingDue')}
-              </Text>
+              <View>
+                <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
+                  {t('today.empty.allCaughtUp')}
+                </Text>
+                <Text style={[theme.typography.caption, {
+                  color: theme.colors.textSecondary, marginTop: 2,
+                }]}>
+                  {caughtUpState.kind === 'soon'
+                    ? t('today.empty.backSoon', { count: caughtUpState.minutes ?? 1 })
+                    : caughtUpState.kind === 'later'
+                      ? t('today.empty.nextReview', { when: formatWhen(caughtUpState.atISO) })
+                      : t('today.empty.nothingScheduled')}
+                </Text>
+              </View>
             )}
 
             {planLoading ? (
@@ -997,6 +1058,14 @@ export function LearningTodayScreen() {
                         {t('today.studyNote')}
                       </Text>
                     </>
+                  ) : pendingTotal > 0 ? (
+                    /* The plan says there is work and no deck can be reached for it. "다
+                       했어요" here is the lie the totals used to tell. */
+                    <Text style={[theme.typography.bodySmall, {
+                      color: theme.colors.textSecondary, marginTop: 12, textAlign: 'center',
+                    }]} {...testProps('learning-items-unavailable')}>
+                      {t('today.itemsUnavailable', { count: unreachableTotal || pendingTotal })}
+                    </Text>
                   ) : (
                     <Text style={[theme.typography.bodySmall, {
                       color: theme.colors.success, marginTop: 12, textAlign: 'center',
@@ -1152,11 +1221,10 @@ export function LearningTodayScreen() {
                   {...testProps('learning-study-recap', true)}
                 >
                   <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
-                    {t('history.recap', {
-                      count: recap.count,
-                      minutes: Math.round(recap.totalMs / 60000),
-                      seconds: Math.round(recap.avgMs / 1000),
-                    })}
+                    {/* The count, and nothing else — see the web note. "12장 · 0분 · 카드당
+                        평균 1초" measured whole-card dwell including reading the answer, and
+                        was zero on every attempt written without a duration. */}
+                    {t('history.recapCount', { count: recap.count })}
                   </Text>
                   {/* A band with nothing in it is left out — "몰랐음 0" is a sentence about
                       nothing, and a perfect session should read as three words. */}
@@ -1186,11 +1254,6 @@ export function LearningTodayScreen() {
                 }]}>
                   <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
                     {insightStats}
-                  </Text>
-                  <Text style={[theme.typography.caption, {
-                    color: theme.colors.textTertiary, marginTop: 4,
-                  }]}>
-                    {t('insights.scopeNote')}
                   </Text>
                 </View>
 

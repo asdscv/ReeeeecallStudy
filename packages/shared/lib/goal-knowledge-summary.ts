@@ -39,8 +39,16 @@
 export interface GoalKnowledgeCounts {
   total: number
   known: number
+  /**
+   * `total - unseen - known`, a residual and not a measurement — see the note below on why
+   * nothing may call this 밀림.
+   */
   unknown: number
   unseen: number
+  /** Studied and `next_review_at <= now`. Optional so a caller on an older payload still works. */
+  dueNow?: number
+  /** Studied and late by MORE THAN A DAY. The only number that may be called 밀림. */
+  overdue?: number
 }
 
 export interface GoalKnowledgeSummary {
@@ -50,8 +58,23 @@ export interface GoalKnowledgeSummary {
   attempted: number
   /** Of `attempted`, how many are still inside their review window. */
   withinWindow: number
-  /** Studied and past due — the work the learner is behind on. */
+  /**
+   * Reviews late by more than a day — the work the learner is genuinely behind on.
+   *
+   * This used to be `counts.unknown`, and that is the bug a learner reported as
+   * "복습 12장 밀린 건 뭐야". `unknown` is the residual `total - unseen - known`, and `known`
+   * requires `interval_days > 0` — so every card sitting in a 1- or 10-minute learning step
+   * lands in it. The learner had just finished all twelve of today's items; twelve of their
+   * cards were consequently in learning steps due minutes later; the card told them they were
+   * twelve reviews behind. The count went UP as they studied.
+   *
+   * Migration 191 already computes the honest number and says why it exists in its own
+   * comment — "Late by more than a day. Separated from `due_now` so 'behind' is a fact with a
+   * size" — and no client had ever read it.
+   */
   overdue: number
+  /** Reviews owed right now, late or not. The plan card owns this; the headline does not. */
+  dueNow: number
   /** Never studied. */
   unstudied: number
   /**
@@ -79,14 +102,19 @@ export interface GoalKnowledgeSummary {
 
 export function goalKnowledgeSummary(counts: GoalKnowledgeCounts): GoalKnowledgeSummary {
   const attempted = counts.known + counts.unknown
+  // Absent on a payload from before these were read. Falling back to the residual would
+  // reinstate the exact bug, so absence means "no backlog claim", not "guess one".
+  const overdue = Math.max(0, Number(counts.overdue ?? 0))
+  const dueNow = Math.max(0, Number(counts.dueNow ?? 0))
   return {
     total: counts.total,
     attempted,
     withinWindow: counts.known,
-    overdue: counts.unknown,
+    overdue,
+    dueNow,
     unstudied: counts.unseen,
     percent: counts.total > 0 ? Math.round((attempted / counts.total) * 100) : 0,
-    behind: counts.unknown > 0,
+    behind: overdue > 0,
     notStarted: attempted === 0,
   }
 }

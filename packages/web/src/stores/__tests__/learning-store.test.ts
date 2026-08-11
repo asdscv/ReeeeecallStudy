@@ -1085,8 +1085,19 @@ describe('extendPlan', () => {
     const ok = await useLearningStore.getState().extendPlan(goalWithDecks(DECKS), CTX)
 
     expect(ok).toBe(false)
-    expect(useLearningStore.getState().planBlockedReason).toBe('no_candidates')
     expect(mockRpc).not.toHaveBeenCalled()
+
+    // Reported as an EXTENSION RESULT, never as a blocked plan.
+    //
+    // This assertion is the reverse of what it used to be, and the reversal is the fix. A
+    // learner finished today's twelve items, pressed 더 하기, and `planBlockedReason` —
+    // which the screen renders INSTEAD of the plan — replaced their completed day with
+    // "오늘 이 덱들에서 복습할 카드가 없습니다". The day's work vanished, and the sentence
+    // was false besides: six cards had been due and they had done all six. Nothing was
+    // blocked; there was simply nothing left to add.
+    expect(useLearningStore.getState().planBlockedReason).toBeNull()
+    expect(useLearningStore.getState().planExtension)
+      .toEqual({ appended: 0, newCards: 0, reviewsTomorrow: 0 })
   })
 
   it('states how much tomorrow grows, counted from the plan the server returned', async () => {
@@ -1150,7 +1161,28 @@ describe('extendPlan', () => {
 
     await useLearningStore.getState().extendPlan(goalWithDecks(DECKS), CTX)
 
-    expect(useLearningStore.getState().planExtension).toBeNull()
+    // `9 added` must not survive a press that added nothing. It is now overwritten with an
+    // explicit zero rather than left null: the screen has a line for "nothing to add", and a
+    // null would render no answer at all to a button the learner just pressed.
+    expect(useLearningStore.getState().planExtension)
+      .toEqual({ appended: 0, newCards: 0, reviewsTomorrow: 0 })
+  })
+
+  it('never reports an extension as a blocked plan, whatever went missing', async () => {
+    // Both refusal paths at once. `collectPlanInputs` can bail before the builder runs (no
+    // decks, no candidates) and the builder can return nothing after it — and BOTH used to
+    // set `planBlockedReason`, so either one erased the finished day.
+    for (const cards of [[], [cardRow('card-1')]]) {
+      useLearningStore.setState({ planBlockedReason: null, planExtension: null })
+      withPlan()
+      queue('cards', { data: cards, error: null })
+      queue('study_logs', { data: [], error: null })
+
+      await useLearningStore.getState().extendPlan(goalWithDecks(DECKS), CTX)
+
+      expect(useLearningStore.getState().planBlockedReason).toBeNull()
+      expect(useLearningStore.getState().planExtension?.appended).toBe(0)
+    }
   })
 })
 

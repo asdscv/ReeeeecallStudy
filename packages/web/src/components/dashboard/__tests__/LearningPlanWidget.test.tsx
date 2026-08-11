@@ -42,7 +42,9 @@ const fetchGoalKnowledge = vi.fn()
 const renderWidget = (over: Record<string, unknown> = {}) => {
   mockState.current = {
     goals: [goal()],
-    knowledge: { 'goal-1': { total: 120, known: 55, unknown: 20, unseen: 45 } },
+    // `overdue` is its own field now, not `unknown`: cards in a learning step land in
+    // `unknown` and are not late. Twenty here are genuinely late.
+    knowledge: { 'goal-1': { total: 120, known: 55, unknown: 20, unseen: 45, overdue: 20, dueNow: 20 } },
     fetchGoals: vi.fn(),
     fetchGoalKnowledge,
     ...over,
@@ -85,7 +87,7 @@ describe('LearningPlanWidget — the number and the sentence agree', () => {
   it('names the goal total once nothing is overdue', () => {
     // Without a backlog the old sentence degenerated to "55 of 55 are within their window" —
     // true, vacuous, and silent about the 45 cards never opened.
-    renderWidget({ knowledge: { 'goal-1': { total: 120, known: 75, unknown: 0, unseen: 45 } } })
+    renderWidget({ knowledge: { 'goal-1': { total: 120, known: 75, unknown: 0, unseen: 45, overdue: 0, dueNow: 0 } } })
 
     const line = screen.getByText(/progress\.studied/)
     expect(line).toHaveTextContent('"total":120')
@@ -133,7 +135,7 @@ describe('LearningPlanWidget — the number and the sentence agree', () => {
   })
 
   it('does not fill the bar for a goal with untouched cards', () => {
-    renderWidget({ knowledge: { 'goal-1': { total: 120, known: 75, unknown: 0, unseen: 45 } } })
+    renderWidget({ knowledge: { 'goal-1': { total: 120, known: 75, unknown: 0, unseen: 45, overdue: 0, dueNow: 0 } } })
 
     const bar = screen.getByRole('progressbar')
     expect(bar).toHaveAttribute('aria-valuenow', '63')

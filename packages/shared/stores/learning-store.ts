@@ -296,7 +296,25 @@ export interface GoalKnowledge {
   /** Never reviewed. Kept out of both known and unknown — no evidence is not "forgotten". */
   readonly unseen: number
   readonly known: number
+  /**
+   * The residual `total - unseen - known`, NOT a measurement.
+   *
+   * `known` requires `interval_days > 0`, so every card sitting in a 1- or 10-minute learning
+   * step falls in here — which is why nothing on a screen may call this "밀림". A card the
+   * learner answered ninety seconds ago is in this bucket by construction.
+   */
   readonly unknown: number
+  /**
+   * Reviews owed right now: studied, and `next_review_at <= now`. The real "today's work".
+   */
+  readonly dueNow: number
+  /**
+   * Late by MORE THAN A DAY. Migration 191 separated this from `dueNow` in so many words —
+   * "so 'behind' is a fact with a size" — and then no client read it, so the screen said
+   * 밀렸어요 from `unknown` instead and told learners they were behind on cards they had just
+   * finished. This is the only number that may be called 밀림.
+   */
+  readonly overdue: number
   /**
    * Retained rather than being learned: interval >= 21 days (mig 192).
    *
@@ -311,6 +329,14 @@ export interface GoalKnowledge {
   readonly rung3: number
   /** interval 8-20. Its next review is the one that matures it. */
   readonly rung8: number
+  /**
+   * The soonest review still AHEAD, ISO, or null when nothing is scheduled at all (mig 211).
+   *
+   * The difference between "you are done for now" and "this goal has nothing left in it", and
+   * the screen could not tell them apart: it printed 「오늘 이 덱들에서 복습할 카드가 없습니다」
+   * to a learner whose twelve cards were coming back in ten minutes.
+   */
+  readonly nextDueAt: string | null
 }
 
 export interface AttemptInput {
@@ -757,7 +783,19 @@ async function collectPlanInputs(
     // Owned decks: the DUE filter goes in the query. A plan is today's work, and this keeps a
     // large account from turning generation into a full-table read. `next_review_at IS NULL`
     // is a new card, which the mapper scores as maximally due.
-    const fetchLimit = candidateFetchLimit(goal.daily_minutes)
+    /**
+     * The bound has to clear the exclusions, not just the day.
+     *
+     * The LIMIT runs in the query and `excludeCardIds` is subtracted afterwards, so a fetch
+     * sized for one day returns rows that are then all thrown away. 더 하기 is the case that
+     * exposes it: it excludes every card already on today's plan — which the day was BUILT
+     * from the top of this very ordering — so the top `fetchLimit` rows are exactly the ones
+     * that get removed, and a learner with a real backlog is told nothing is due.
+     *
+     * Widening by the exclusion count restores the invariant the bound was written for: the
+     * fetch returns at least a day's worth of rows the caller can actually use.
+     */
+    const fetchLimit = candidateFetchLimit(goal.daily_minutes) + excludeCardIds.size
 
     // Owed reviews, MOST OVERDUE FIRST. The ordering is what makes a bounded fetch honest:
     // whatever falls past the limit is strictly less urgent than what was taken, instead of
@@ -1337,7 +1375,9 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         supportedActivityTypes: supportedActivityTypesForDomain(goal.domain_id),
       })
       if (output.items.length === 0) {
-        set({ planBlockedReason: 'no_candidates' })
+        // The ordinary outcome of pressing 더 하기 on a finished day: everything due is
+        // already in the plan. A result, not a blocked plan — see the note above.
+        set({ planExtension: { appended: 0, newCards: 0, reviewsTomorrow: 0 } })
         return false
       }
 
@@ -1381,9 +1421,34 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       const already = new Set(
         planItems.map((item) => item.card_id).filter((id): id is string => !!id),
       )
-      const inputs = await collectPlanInputs(goal, ctx, userId, already)
+
+      /**
+       * A FRESH instant, and the plan date the caller opened.
+       *
+       * Both screens build their context once at mount (`useMemo(() => currentPlanContext(),
+       * [])`) so the plan they render cannot shift under them. That is right for rendering and
+       * wrong here: `ctx.now` is the due cutoff, so a card whose 10-minute learning step
+       * elapsed while the learner sat on the page was invisible to 더 하기 until a full
+       * reload. The learner finishes the day, waits, presses the button, and is told nothing
+       * is due — dated to when they arrived rather than to when they asked.
+       *
+       * `planDate` is deliberately NOT refreshed: this appends to the plan on screen, and a
+       * page left open across midnight must not silently write into tomorrow.
+       */
+      const at: PlanContext = { ...ctx, now: new Date().toISOString() }
+
+      const inputs = await collectPlanInputs(goal, at, userId, already)
       if (inputs.blocked) {
-        set({ planBlockedReason: inputs.blocked })
+        // NOT `planBlockedReason`. That state belongs to plan GENERATION — "this goal has
+        // nothing to build a day out of" — and the screen renders it INSTEAD of the plan.
+        // Setting it here meant pressing 더 하기 on a day the learner had just finished
+        // replaced their completed plan with "오늘 이 덱들에서 복습할 카드가 없습니다": the
+        // day's work vanished, and the message was false besides — six cards had been due
+        // today and they had done all six.
+        //
+        // "Nothing more to add" is an extension RESULT, and the screen already has a line
+        // for it that sits under the button and leaves the plan alone.
+        set({ planExtension: { appended: 0, newCards: 0, reviewsTomorrow: 0 } })
         return false
       }
       const { cards, templatesById, candidates } = inputs
@@ -1401,14 +1466,16 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         // instead, in `planExtension`.
         newCardsPerDay: undefined,
         activityMix: activityMixForDomain(goal.domain_id),
-        now: ctx.now,
-        timezone: ctx.timezone,
+        now: at.now,
+        timezone: at.timezone,
         algorithmVersion: DAILY_PLANNER_VERSION,
       }, {
         supportedActivityTypes: supportedActivityTypesForDomain(goal.domain_id),
       })
       if (output.items.length === 0) {
-        set({ planBlockedReason: 'no_candidates' })
+        // The ordinary outcome of pressing 더 하기 on a finished day: everything due is
+        // already in the plan. A result, not a blocked plan — see the note above.
+        set({ planExtension: { appended: 0, newCards: 0, reviewsTomorrow: 0 } })
         return false
       }
 
@@ -1577,7 +1644,14 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         p_stability_multiplier: retentionStabilityMultiplier(),
       })
       if (error) throw error
-      const row = (data ?? {}) as Partial<GoalKnowledge>
+      // The RPC's jsonb is snake_case and two of its keys do not match the camelCase names
+      // this store exposes, so the wire shape is spelt out rather than asserted to be the
+      // domain type.
+      const row = (data ?? {}) as Partial<GoalKnowledge> & {
+        due_now?: number
+        overdue?: number
+        next_due_at?: string | null
+      }
       set((state) => ({
         knowledge: {
           ...state.knowledge,
@@ -1586,12 +1660,18 @@ export const useLearningStore = create<LearningState>((set, get) => ({
             unseen: Number(row.unseen ?? 0),
             known: Number(row.known ?? 0),
             unknown: Number(row.unknown ?? 0),
+            // The two the RPC has always returned and no client ever read.
+            dueNow: Number(row.due_now ?? 0),
+            overdue: Number(row.overdue ?? 0),
             // Absent until mig 192 is deployed. Zero then, which reads as "no mastery yet"
             // and simply shows no completion line — never as a wrong date.
             mature: Number(row.mature ?? 0),
             rung1: Number(row.rung1 ?? 0),
             rung3: Number(row.rung3 ?? 0),
             rung8: Number(row.rung8 ?? 0),
+            // Absent before mig 211. Null then, which shows the plain empty state — never a
+            // wrong time.
+            nextDueAt: row.next_due_at ?? null,
           },
         },
       }))
@@ -1861,6 +1941,11 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       // `autoPlanAttempted` would refuse to build one for the account that signed in.
       planAbsentFor: null, autoPlanAttempted: {},
       planExtending: false, planExtension: null,
+      // The week strip describes ONE account's seven days. Left behind, it would survive a
+      // logout in memory and draw the previous learner's week under the next one's goal —
+      // masked in practice only by the `planWeekGoalId === goalId` guard, which is a
+      // coincidence rather than a defence.
+      planWeek: null, planWeekGoalId: null,
       recordingItemId: null, attempts: [], attemptsLoading: false,
       insights: null, weakCardDecks: {}, insightsLoading: false, insightsGoalId: null,
       insightsError: null,
