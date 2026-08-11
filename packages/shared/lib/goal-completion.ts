@@ -23,6 +23,8 @@
  * learned.
  */
 import { INTERVALS_DAYS } from '../learning/application/workload'
+import { calculateSRS } from './srs'
+import type { SrsCardData } from './srs'
 
 /**
  * An interval at or above this counts as retained. Fourth rung of INTERVALS_DAYS.
@@ -41,28 +43,71 @@ export const COMPLETION_RATIO = 0.8
 /**
  * Days from a rung to maturity, if every answer from here is correct.
  *
- * Read off the ladder rather than written as constants: a card sitting at rung 8 waits 8 days
- * for its next review, and THAT review is the one that sets 21. So the remaining time is the
- * sum of the rungs it still has to sit through, not the rungs it still has to climb.
+ * Derived by walking ONE card from new through `calculateSRS`, so the numbers cannot drift
+ * from the scheduler, and reading off how far each rung is from the day it matures. The walk
+ * is what makes it honest: a card sitting at interval 8 GOT there by being answered correctly,
+ * so its ease has grown, and `round(8 × 2.59) = 21` — one answer away. Instantiating a card at
+ * interval 8 with a fresh 2.5 ease instead gives `round(8 × 2.55) = 20`, one day short of
+ * mature, and a projection twenty days too long.
  *
- * A card in a learning step (interval 0) graduates to rung 1 the same day, so it costs the same
- * as one already at rung 1 — no extra calendar day.
+ * `calculateSRS` takes no clock — it reads `new Date()` itself — so elapsed time is
+ * accumulated from the intervals it grants. A wait IS the interval the previous answer gave.
+ *
+ * This replaces a sum over `INTERVALS_DAYS` from the card's current rung, which counted the
+ * interval a card is already sitting in as time it still had to wait. A card the planner is
+ * offering is due now; the answer it is about to get is the one that promotes it. Every
+ * constant was one rung too long, and worst where it decides the most:
+ *
+ *     interval 1   was 12   is 11
+ *     interval 3   was 11   is  8
+ *     interval 8   was  8   is  0   ← one answer away, and it was priced as eight days
+ *
+ * `goalCompletion` spends the cheapest cards first, so mispricing the cheapest rung is what
+ * decided the whole estimate.
  */
-function daysFromRung(rungIndex: number): number {
-  let days = 0
-  for (let i = rungIndex; i < INTERVALS_DAYS.length; i += 1) {
-    if (INTERVALS_DAYS[i] >= MATURE_INTERVAL_DAYS) break
-    days += INTERVALS_DAYS[i]
+function rungCosts(): { rung1: number; rung3: number; rung8: number } {
+  let card: SrsCardData = {
+    srs_status: 'new',
+    interval_days: 0,
+    ease_factor: 2.5,
+    repetitions: 0,
   }
-  return days
+  let days = 0
+  const reached: Record<string, number> = {}
+  for (let step = 0; step < 40; step += 1) {
+    const iv = card.interval_days
+    if (iv >= 1 && iv < 3 && reached.rung1 === undefined) reached.rung1 = days
+    if (iv >= 3 && iv < 8 && reached.rung3 === undefined) reached.rung3 = days
+    if (iv >= 8 && iv < MATURE_INTERVAL_DAYS && reached.rung8 === undefined) reached.rung8 = days
+    if (iv >= MATURE_INTERVAL_DAYS) {
+      return {
+        rung1: days - (reached.rung1 ?? 0),
+        rung3: days - (reached.rung3 ?? 0),
+        rung8: days - (reached.rung8 ?? 0),
+      }
+    }
+    const next = calculateSRS(card, 'good')
+    card = {
+      srs_status: next.srs_status,
+      interval_days: next.interval_days,
+      ease_factor: next.ease_factor,
+      repetitions: next.repetitions,
+    }
+    // A learning step is minutes away: it costs an answer and no calendar day.
+    if (card.interval_days < MATURE_INTERVAL_DAYS) days += card.interval_days
+  }
+  // Unreachable by correct answers. A projection is better absent than invented.
+  return { rung1: Infinity, rung3: Infinity, rung8: Infinity }
 }
 
-/** interval 0-2 (learning, or just graduated): 1 + 3 + 8 = 12 days of waiting. */
-export const DAYS_FROM_RUNG_1 = daysFromRung(0)
-/** interval 3-7: 3 + 8 = 11. */
-export const DAYS_FROM_RUNG_3 = daysFromRung(1)
-/** interval 8-20: the next review is the one that matures it. */
-export const DAYS_FROM_RUNG_8 = daysFromRung(2)
+const RUNG_COSTS = rungCosts()
+
+/** interval 0-2 (learning, or just graduated). */
+export const DAYS_FROM_RUNG_1 = RUNG_COSTS.rung1
+/** interval 3-7. */
+export const DAYS_FROM_RUNG_3 = RUNG_COSTS.rung3
+/** interval 8-20 — one correct answer away, which is why it is spent first. */
+export const DAYS_FROM_RUNG_8 = RUNG_COSTS.rung8
 
 /** The card-state counts {@link goalCompletion} needs, as `get_goal_knowledge` returns them. */
 export interface GoalCompletionCounts {

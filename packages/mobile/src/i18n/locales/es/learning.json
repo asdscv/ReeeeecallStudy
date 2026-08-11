@@ -169,7 +169,10 @@
       "goalGone": "Ese objetivo ya no está disponible.",
       "invalidInput": "No se pudo guardar el plan porque algunos valores estaban fuera de rango.",
       "limitExceeded": "Has alcanzado el límite de reconstrucciones de hoy. Inténtalo mañana.",
-      "unknown": "No se pudo crear el plan. Inténtalo de nuevo."
+      "unknown": "No se pudo crear el plan. Inténtalo de nuevo.",
+      "extendFailed": "No se pudo añadir más. El plan de hoy sigue igual.",
+      "recordFailed": "No se pudo guardar. Inténtalo de nuevo.",
+      "readFailed": "No se pudo cargar el plan de hoy. Inténtalo de nuevo."
     },
     "generate": "Crear plan de hoy",
     "generating": "Creando…",

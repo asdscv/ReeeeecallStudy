@@ -81,6 +81,7 @@ const baseState = (over: StoreState = {}): StoreState => ({
   completeGoalIfEarned: vi.fn().mockResolvedValue(false),
   goals: [goal], goalsLoading: false, goalsError: null,
   plan: finishedPlan, planItems: finishedItems, planCards, planTemplateFields: {},
+  planErrorFrom: null, attemptsError: null, coachError: null,
   planLoading: false, planGenerating: false, planError: null, planBlockedReason: null,
   fetchGoals: vi.fn(), createGoal: vi.fn(), updateGoal: vi.fn(), archiveGoal: vi.fn(),
   deleteGoal: vi.fn(), archivedGoals: null, archivedGoalsLoading: false,
@@ -217,6 +218,26 @@ describe('더 하기 on a finished day', () => {
     expect(screen.getByText(/today\.remaining/)).toBeInTheDocument()
     // And it says WHY there is nothing to press, rather than implying the work is done.
     expect(screen.getByText(/today\.itemsUnavailable/)).toBeInTheDocument()
+  })
+
+  it('never says the PLAN failed when something else did', () => {
+    // Photographed: "플랜을 만들지 못했습니다. 다시 시도해 주세요." in red, directly above a
+    // plan of 29 items that had just been extended successfully. Six store actions wrote one
+    // `planError`, and the screen rendered every one of them as a failure to build the plan.
+    renderToday({
+      planError: { code: 'UNKNOWN', message: 'boom' },
+      planErrorFrom: 'extend',
+    })
+
+    expect(screen.getByRole('alert')).toHaveTextContent('today.error.extendFailed')
+    expect(screen.getByRole('alert')).not.toHaveTextContent('today.error.unknown')
+    // And the plan it did not break is still on screen.
+    expect(screen.getByText('today.allDone')).toBeInTheDocument()
+  })
+
+  it('still says the plan failed when the PLAN is what failed', () => {
+    renderToday({ planError: { code: 'UNKNOWN', message: 'boom' }, planErrorFrom: null })
+    expect(screen.getByRole('alert')).toHaveTextContent('today.error.unknown')
   })
 
   it('the store never reports an extension as a blocked plan', () => {

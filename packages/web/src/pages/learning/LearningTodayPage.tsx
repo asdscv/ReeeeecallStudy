@@ -406,6 +406,7 @@ export function LearningTodayPage() {
     fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
     extendPlan, planExtending, planExtension,
     knowledge, fetchGoalKnowledge, completeGoalIfEarned,
+    planErrorFrom,
   } = useLearningStore()
   const { decks, fetchDecks } = useDeckStore()
 
@@ -591,7 +592,19 @@ export function LearningTodayPage() {
     )
   }
 
-  const errorMessageKey = (code: string): string => {
+  /**
+   * The sentence has to be about what actually failed.
+   *
+   * The default used to be "플랜을 만들지 못했습니다. 다시 시도해 주세요." for every failure on
+   * this screen, because six store actions wrote one `planError`. A learner photographed that
+   * banner sitting directly above a plan of 29 items that had just been extended successfully:
+   * the plan HAD been built, something else had failed, and the message named the one thing
+   * that had not gone wrong.
+   *
+   * The actions that are not about the plan no longer write here at all. The ones that remain
+   * say which they were, and only the generic code falls back to a per-action sentence.
+   */
+  const errorMessageKey = (code: string, from: typeof planErrorFrom): string => {
     switch (code) {
       case 'LIMIT_EXCEEDED': return 'today.error.limitExceeded'
       case 'CONFLICT': return 'today.error.completedPlan'
@@ -599,7 +612,11 @@ export function LearningTodayPage() {
       case 'INVALID_INPUT': return 'today.error.invalidInput'
       case 'AUTH_REQUIRED': return 'today.error.authRequired'
       case 'FORBIDDEN': return 'today.error.forbidden'
-      default: return 'today.error.unknown'
+      default:
+        return from === 'extend' ? 'today.error.extendFailed'
+          : from === 'record' ? 'today.error.recordFailed'
+            : from === 'read' ? 'today.error.readFailed'
+              : 'today.error.unknown'
     }
   }
 
@@ -630,7 +647,7 @@ export function LearningTodayPage() {
 
       {planError && (
         <div role="alert" className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
-          {t(errorMessageKey(planError.code))}
+          {t(errorMessageKey(planError.code, planErrorFrom))}
         </div>
       )}
 

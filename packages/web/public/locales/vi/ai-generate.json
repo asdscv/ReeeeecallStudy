@@ -60,7 +60,9 @@
     "balance": "Số dư {{amount}}",
     "imagePaid": "Tạo từ ảnh là tính năng trả phí — nạp thêm để tiếp tục.",
     "cardLimit": "Còn {{available}}/{{limit}} thẻ",
-    "cardLimitUnlimited": "Không giới hạn số thẻ (quản trị)"
+    "cardLimitUnlimited": "Không giới hạn số thẻ (quản trị)",
+    "needsCredits": "Tính năng AI cần tín dụng, và bạn đã hết.",
+    "topUp": "Nạp thêm"
   },
   "wizard": {
     "setup": "Setup",

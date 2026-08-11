@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
+import { AI_HUB_QUIZ } from '@reeeeecall/shared/lib/ai/hub/catalog'
+import { AiCreditNotice } from '../../components/ai/AiCreditNotice'
 import {
   useQuizStore, QuizError, QUIZ_GENERATE_ACTION,
   type QuizQuestionType, type QuizQuote, type QuizzableCount, type QuizDifficultyBand,
@@ -118,6 +120,9 @@ export function QuizSetupScreen() {
   return (
     <Screen>
       <ScreenHeader title={t('setup.title')} mode="back" onBack={() => navigation.goBack()} />
+      {/* The same notice every AI screen shows, from one rule. Placed by feature id so it
+          follows `hub/catalog.ts` rather than this file. */}
+      <AiCreditNotice featureId={AI_HUB_QUIZ} style={{ marginHorizontal: 16, marginBottom: 12 }} />
       <ScrollView contentContainerStyle={styles.body}>
         <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('setup.deck')}</Text>
         <View style={styles.row}>

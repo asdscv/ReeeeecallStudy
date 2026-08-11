@@ -28,7 +28,10 @@
       "invalidInput": "No se pudo guardar el plan porque algunos valores estaban fuera de rango.",
       "authRequired": "Inicia sesión de nuevo.",
       "forbidden": "No tienes acceso a eso.",
-      "unknown": "No se pudo crear el plan. Inténtalo de nuevo."
+      "unknown": "No se pudo crear el plan. Inténtalo de nuevo.",
+      "extendFailed": "No se pudo añadir más. El plan de hoy sigue igual.",
+      "recordFailed": "No se pudo guardar. Inténtalo de nuevo.",
+      "readFailed": "No se pudo cargar el plan de hoy. Inténtalo de nuevo."
     },
     "backToPlans": "Todos los planes",
     "extend": "Estudiar más",

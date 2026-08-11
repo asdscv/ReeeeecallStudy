@@ -28,7 +28,10 @@
       "invalidInput": "Không thể lưu kế hoạch vì một số giá trị ngoài phạm vi.",
       "authRequired": "Vui lòng đăng nhập lại.",
       "forbidden": "Bạn không có quyền truy cập.",
-      "unknown": "Không thể tạo kế hoạch. Vui lòng thử lại."
+      "unknown": "Không thể tạo kế hoạch. Vui lòng thử lại.",
+      "extendFailed": "Không thêm được. Kế hoạch hôm nay giữ nguyên.",
+      "recordFailed": "Không lưu được. Vui lòng thử lại.",
+      "readFailed": "Không tải được kế hoạch hôm nay. Vui lòng thử lại."
     },
     "backToPlans": "Tất cả kế hoạch",
     "extend": "Học thêm",

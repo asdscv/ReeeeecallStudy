@@ -69,7 +69,9 @@
     "unknown": "余额不可用",
     "balance": "余额 {{amount}}",
     "freeOnly": "今日剩余 {{free}} 张免费卡片",
-    "imagePaid": "图片生成为付费功能 — 请充值后继续。"
+    "imagePaid": "图片生成为付费功能 — 请充值后继续。",
+    "needsCredits": "AI 功能需要点数，你已经没有余额了。",
+    "topUp": "去充值"
   },
   "alert": {
     "errorTitle": "错误",
