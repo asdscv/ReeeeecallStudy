@@ -248,7 +248,14 @@
     "body": "Escribe la respuesta de memoria. Sin mirar.",
     "start": "Comprobar (unos 2 min)",
     "starting": "Preparando…",
-    "free": "Las respuestas correctas se corrigen gratis. Solo pagas las que hay que juzgar."
+    "recentTitle_one": "¿Recuerdas la {{count, number}} tarjeta que estudiaste hace poco?",
+    "recentTitle_other": "¿Recuerdas las {{count, number}} tarjetas que estudiaste hace poco?",
+    "recentBody": "Hoy no estudiaste nada, así que estas son de días recientes. Escribe la respuesta tú.",
+    "blockedTitle": "Hay tarjetas que no se pueden convertir en preguntas",
+    "blockedBody_one": "La plantilla \"{{name}}\" marca más de un campo del reverso como respuesta, así que no hay forma de saber cuál lo es. Se dejó fuera {{count, number}} tarjeta que la usa.",
+    "blockedBody_other": "La plantilla \"{{name}}\" marca más de un campo del reverso como respuesta, así que no hay forma de saber cuál lo es. Se dejaron fuera {{count, number}} tarjetas que la usan.",
+    "blockedAction": "Marcar un solo campo de respuesta",
+    "blockedWeb": "Abre la plantilla en la web y deja solo un campo del reverso como primary."
   },
   "coach": {
     "apply": "Aplicar",
@@ -273,5 +280,31 @@
       "title": "Un día más por semana es lo que más ayuda",
       "body": "El plan no es demasiado: son los días sin abrirlo. La constancia importa más que el volumen."
     }
+  },
+  "week": {
+    "title": "Esta semana",
+    "activeDays_one": "{{count, number}} día estudiado",
+    "activeDays_other": "{{count, number}} días estudiados",
+    "streak_one": "{{count, number}} día seguido",
+    "streak_other": "{{count, number}} días seguidos",
+    "streakNone": "Aún no hay registro esta semana",
+    "completion": "{{pct, number}}% de lo planeado",
+    "dow": {
+      "0": "D",
+      "1": "L",
+      "2": "M",
+      "3": "X",
+      "4": "J",
+      "5": "V",
+      "6": "S"
+    },
+    "legend": {
+      "done": "Terminado",
+      "partial": "Empezado",
+      "extra": "Estudio sin plan",
+      "untouched": "Sin abrir",
+      "none": "Sin plan"
+    },
+    "streakBroken": "Se cortó tu racha. Hoy puede empezar otra"
   }
 }

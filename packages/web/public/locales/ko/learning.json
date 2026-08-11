@@ -247,7 +247,14 @@
     "body": "정답을 직접 입력해요. 정답 보기는 없어요.",
     "start": "확인하기 (약 2분)",
     "starting": "준비하는 중…",
-    "free": "맞힌 답은 무료로 채점돼요. 애매한 답만 비용이 들어요."
+    "recentTitle_one": "최근 공부한 {{count, number}}장, 아직 기억나는지 볼까요",
+    "recentTitle_other": "최근 공부한 {{count, number}}장, 아직 기억나는지 볼까요",
+    "recentBody": "오늘 공부한 게 없어서 최근 것으로 준비했어요. 정답을 직접 입력해요.",
+    "blockedTitle": "확인 문제를 만들 수 없는 카드가 있어요",
+    "blockedBody_one": "\"{{name}}\" 템플릿은 뒷면에 정답 칸이 둘 이상이라 어느 쪽이 정답인지 알 수 없어요. 이 템플릿의 카드 {{count, number}}장이 확인에서 빠졌어요.",
+    "blockedBody_other": "\"{{name}}\" 템플릿은 뒷면에 정답 칸이 둘 이상이라 어느 쪽이 정답인지 알 수 없어요. 이 템플릿의 카드 {{count, number}}장이 확인에서 빠졌어요.",
+    "blockedAction": "정답 칸 하나만 지정하기",
+    "blockedWeb": "웹에서 템플릿을 열어 정답 칸을 하나만 기본(primary)으로 두면 돼요."
   },
   "coach": {
     "apply": "적용",
@@ -272,5 +279,31 @@
       "title": "일주일에 하루만 더 열어봐요",
       "body": "플랜이 많아서가 아니라 열지 않은 날이 많았어요. 분량보다 꾸준함이 중요해요."
     }
+  },
+  "week": {
+    "title": "이번 주",
+    "activeDays_one": "{{count, number}}일 학습",
+    "activeDays_other": "{{count, number}}일 학습",
+    "streak_one": "{{count, number}}일 연속",
+    "streak_other": "{{count, number}}일 연속",
+    "streakNone": "이번 주는 아직 기록이 없어요",
+    "completion": "계획한 것 중 {{pct, number}}% 완료",
+    "dow": {
+      "0": "일",
+      "1": "월",
+      "2": "화",
+      "3": "수",
+      "4": "목",
+      "5": "금",
+      "6": "토"
+    },
+    "legend": {
+      "done": "다 끝낸 날",
+      "partial": "하다 만 날",
+      "extra": "플랜 없이 공부한 날",
+      "untouched": "열지 않은 날",
+      "none": "플랜이 없던 날"
+    },
+    "streakBroken": "연속 기록이 끊겼어요. 오늘 다시 시작할 수 있어요"
   }
 }

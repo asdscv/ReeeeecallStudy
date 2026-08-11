@@ -5,7 +5,6 @@ import {
   useQuizStore, QuizError, QUIZ_GENERATE_ACTION,
   type QuizQuestionType, type QuizQuote, type QuizzableCount, type QuizDifficultyBand,
 } from '@reeeeecall/shared/stores/quiz-store'
-import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
 
 const TYPES: QuizQuestionType[] = ['mcq', 'short', 'essay']
@@ -248,23 +247,14 @@ export function QuizSetupPage() {
         )}
       </div>
 
-      {priced && (
-        <div className="p-3 bg-card rounded-lg border border-border space-y-1">
-          <div className="flex items-baseline justify-between">
-            <span className="text-sm text-foreground">{t('setup.price')}</span>
-            <span className="text-sm font-medium text-foreground">
-              {priced.price_micro === 0 ? t('setup.free') : formatUsdMicro(priced.price_micro)}
-            </span>
-          </div>
-          {(priced.trial_units > 0 || priced.free_units > 0) && (
-            <p className="text-xs text-content-tertiary">
-              {t('setup.covered', { units: priced.trial_units + priced.free_units })}
-            </p>
-          )}
-          <p className="text-xs text-content-tertiary">{t('setup.retakeFree')}</p>
-          {!priced.sufficient && (
-            <p className="text-xs text-destructive">{t('error.AI_INSUFFICIENT_CREDITS')}</p>
-          )}
+      {/* The amount is no longer announced in the flow — a product decision, not a
+          rendering one. The QUOTE is still fetched and still gates the button: it is what
+          `maxPriceMicro` authorises, and without it a price that moved between choosing and
+          reserving would be spent silently. What remains on screen is the one thing a
+          learner cannot act on without: that they have nothing left to spend. */}
+      {priced && !priced.sufficient && (
+        <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
+          <p className="text-xs text-destructive">{t('error.AI_INSUFFICIENT_CREDITS')}</p>
         </div>
       )}
 

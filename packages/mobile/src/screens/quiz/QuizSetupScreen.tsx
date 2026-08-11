@@ -7,7 +7,6 @@ import {
   useQuizStore, QuizError, QUIZ_GENERATE_ACTION,
   type QuizQuestionType, type QuizQuote, type QuizzableCount, type QuizDifficultyBand,
 } from '@reeeeecall/shared/stores/quiz-store'
-import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
 import { Screen, Button, ScreenHeader } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
@@ -214,27 +213,14 @@ export function QuizSetupScreen() {
           </Text>
         )}
 
-        {priced && (
+        {/* The amount is no longer announced in the flow. The QUOTE still runs — it is what
+            `maxPriceMicro` authorises — and the one thing left on screen is the one thing a
+            learner cannot act around: an empty wallet. */}
+        {priced && !priced.sufficient && (
           <View style={[styles.priceBox, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <View style={styles.priceRow}>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t('setup.price')}</Text>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-                {priced.price_micro === 0 ? t('setup.free') : formatUsdMicro(priced.price_micro)}
-              </Text>
-            </View>
-            {(priced.trial_units > 0 || priced.free_units > 0) && (
-              <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                {t('setup.covered', { units: priced.trial_units + priced.free_units })}
-              </Text>
-            )}
-            <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-              {t('setup.retakeFree')}
+            <Text style={[theme.typography.caption, { color: theme.colors.error }]}>
+              {t('error.AI_INSUFFICIENT_CREDITS')}
             </Text>
-            {!priced.sufficient && (
-              <Text style={[theme.typography.caption, { color: theme.colors.error }]}>
-                {t('error.AI_INSUFFICIENT_CREDITS')}
-              </Text>
-            )}
           </View>
         )}
 
@@ -258,5 +244,4 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   warn: { padding: 12, borderRadius: 12, borderWidth: 1, gap: 2 },
   priceBox: { padding: 12, borderRadius: 12, borderWidth: 1, gap: 4 },
-  priceRow: { flexDirection: 'row', justifyContent: 'space-between' },
 })

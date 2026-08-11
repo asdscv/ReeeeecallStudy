@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { useQuizStore, type QuizSetRow } from '@reeeeecall/shared/stores/quiz-store'
-import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
 import { ListSkeleton } from '../../components/common/Skeleton'
 
 /**
@@ -16,7 +15,9 @@ export function QuizHomePage() {
   const { t } = useTranslation('quiz')
   const navigate = useNavigate()
   const { sets, loading, fetchSets, grantTrial, startRun } = useQuizStore()
-  const [trialUnits, setTrialUnits] = useState<number | null>(null)
+  // The trial is still GRANTED — it is what makes a new account's first quizzes free — but
+  // the amount is no longer announced. Nothing renders it, so nothing holds it.
+  const [, setTrialUnits] = useState<number | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
 
   useEffect(() => {
@@ -52,15 +53,6 @@ export function QuizHomePage() {
         </Link>
       </div>
 
-      {trialUnits !== null && trialUnits > 0 && (
-        <div className="p-3 bg-brand/10 border border-brand/30 rounded-lg">
-          <p className="text-sm text-foreground">{t('home.trial.title')}</p>
-          <p className="text-xs text-content-tertiary mt-0.5">
-            {t('home.trial.body', { count: trialUnits })}
-          </p>
-        </div>
-      )}
-
       {loading && sets.length === 0 ? (
         <ListSkeleton />
       ) : sets.length === 0 ? (
@@ -82,8 +74,6 @@ export function QuizHomePage() {
                     <span className="text-xs text-content-tertiary">
                       {t('home.questions', { count: setRow.generated_count })}
                     </span>
-                    {/* Retaking is free, and saying so is the point: the set is the asset. */}
-                    <span className="text-xs text-content-tertiary">{t('home.retakeFree')}</span>
                     {/* Under-delivery, said out loud. Items that fail validation are dropped and
                         never charged for, so asking for 6 and getting 4 is a normal outcome —
                         but until now the set just quietly said "4 questions" and the learner had
@@ -110,7 +100,6 @@ export function QuizHomePage() {
       )}
 
       <p className="text-xs text-content-tertiary text-center">
-        {t('home.pricingNote', { price: formatUsdMicro(5000) })}
       </p>
     </div>
   )

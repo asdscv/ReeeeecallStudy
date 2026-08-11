@@ -44,7 +44,6 @@
     "imageUpload": "Tải hình ảnh lên",
     "imageChange": "Đổi hình ảnh",
     "imageUploadHint": "Chọn ảnh chụp danh sách từ vựng, trang sách giáo khoa hoặc ghi chú — AI sẽ chuyển thành thẻ.",
-    "imagePaidNotice": "Tạo từ hình ảnh sử dụng tín dụng (không có gói miễn phí).",
     "cardLimitExceeds": "Bạn có thể thêm tối đa {{available}} thẻ nữa — giảm số lượng hoặc đăng ký.",
     "imageAddMore": "Thêm nữa ({{count, number}}/{{max}})",
     "imageRemove": "Xóa ảnh",

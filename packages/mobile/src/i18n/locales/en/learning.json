@@ -248,7 +248,14 @@
     "body": "Type the answer from memory. No peeking.",
     "start": "Check (about 2 min)",
     "starting": "Preparing…",
-    "free": "Answers you get right are graded free. You only pay for the ones we have to judge."
+    "recentTitle_one": "Still remember the {{count, number}} card you studied recently?",
+    "recentTitle_other": "Still remember the {{count, number}} cards you studied recently?",
+    "recentBody": "Nothing studied today, so these are from your recent days. Type the answer yourself.",
+    "blockedTitle": "Some cards can’t be turned into check questions",
+    "blockedBody_one": "The \"{{name}}\" template marks more than one back field as the answer, so there is no way to tell which one is. {{count, number}} card using it was left out.",
+    "blockedBody_other": "The \"{{name}}\" template marks more than one back field as the answer, so there is no way to tell which one is. {{count, number}} cards using it were left out.",
+    "blockedAction": "Mark just one answer field",
+    "blockedWeb": "Open the template on the web and leave only one back field set to primary."
   },
   "coach": {
     "apply": "Apply",
@@ -273,5 +280,31 @@
       "title": "One more day a week would help most",
       "body": "The plan is not too big — it just has not been opened. Consistency matters more than volume here."
     }
+  },
+  "week": {
+    "title": "This week",
+    "activeDays_one": "{{count, number}} day studied",
+    "activeDays_other": "{{count, number}} days studied",
+    "streak_one": "{{count, number}} day in a row",
+    "streak_other": "{{count, number}} days in a row",
+    "streakNone": "Nothing recorded this week yet",
+    "completion": "{{pct, number}}% of what was planned",
+    "dow": {
+      "0": "S",
+      "1": "M",
+      "2": "T",
+      "3": "W",
+      "4": "T",
+      "5": "F",
+      "6": "S"
+    },
+    "legend": {
+      "done": "Finished",
+      "partial": "Started",
+      "extra": "Studied without a plan",
+      "untouched": "Not opened",
+      "none": "No plan"
+    },
+    "streakBroken": "Your streak broke. Today can start a new one"
   }
 }

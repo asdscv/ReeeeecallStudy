@@ -10,19 +10,12 @@
     "create": "新しいクイズ",
     "take": "解く",
     "starting": "開始中…",
-    "retakeFree": "再挑戦は無料",
     "questions_one": "{{count, number}}問",
     "questions_other": "{{count, number}}問",
-    "trial": {
-      "title": "クイズのお試し分をご用意しました",
-      "body_one": "お試し{{count, number}}ユニット。1セットを最後まで解けます。",
-      "body_other": "お試し{{count, number}}ユニット。1セットを最後まで解けます。"
-    },
     "empty": {
       "title": "まだクイズがありません",
       "body": "どのデッキからでも数秒で作れます。"
     },
-    "pricingNote": "1ユニット{{price}}。選択式の採点はいつでも無料です。",
     "fewerThanAsked": "リクエスト{{requested, number}}問"
   },
   "setup": {
@@ -45,10 +38,6 @@
     },
     "tooFewForMcq_one": "選択式は誤答を他のカードから作るため、最低4枚必要です。このデッキは{{count, number}}枚です。",
     "tooFewForMcq_other": "選択式は誤答を他のカードから作るため、最低4枚必要です。このデッキは{{count, number}}枚です。",
-    "price": "価格",
-    "free": "無料",
-    "covered": "無料分で{{units, number}}ユニットをまかないます",
-    "retakeFree": "もう一度解いても費用はかかりません。",
     "confirm": "クイズを作る",
     "generating": "問題を作成中…",
     "difficulty": "難易度",
@@ -70,8 +59,8 @@
     "next": "次へ",
     "finish": "終わる",
     "grading": "採点中…",
-    "gradeFor": "この解答を採点 · {{price}}",
-    "reference": "答え: {{answer}}"
+    "reference": "答え: {{answer}}",
+    "grade": "この解答を採点"
   },
   "result": {
     "percent": "{{percent, number}}%",

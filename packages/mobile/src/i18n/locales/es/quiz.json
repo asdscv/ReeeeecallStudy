@@ -10,19 +10,12 @@
     "create": "Nuevo cuestionario",
     "take": "Empezar",
     "starting": "Empezando…",
-    "retakeFree": "Repetir es gratis",
     "questions_one": "{{count, number}} pregunta",
     "questions_other": "{{count, number}} preguntas",
-    "trial": {
-      "title": "Tu crédito de prueba está listo",
-      "body_one": "{{count, number}} unidad de prueba: suficiente para una tanda entera.",
-      "body_other": "{{count, number}} unidades de prueba: suficiente para una tanda entera."
-    },
     "empty": {
       "title": "Aún no hay cuestionarios",
       "body": "Créalo desde cualquier mazo; tarda unos segundos."
     },
-    "pricingNote": "{{price}} por unidad. La opción múltiple siempre se corrige gratis.",
     "fewerThanAsked": "{{requested, number}} solicitadas"
   },
   "setup": {
@@ -45,10 +38,6 @@
     },
     "tooFewForMcq_one": "La opción múltiple saca los distractores de otras tarjetas, así que necesita al menos cuatro. Este mazo tiene {{count, number}}.",
     "tooFewForMcq_other": "La opción múltiple saca los distractores de otras tarjetas, así que necesita al menos cuatro. Este mazo tiene {{count, number}}.",
-    "price": "Precio",
-    "free": "Gratis",
-    "covered": "Tu cuota gratuita cubre {{units, number}} unidades",
-    "retakeFree": "Repetirlo no cuesta nada.",
     "confirm": "Crear cuestionario",
     "generating": "Escribiendo preguntas…",
     "difficulty": "Dificultad",
@@ -70,8 +59,8 @@
     "next": "Siguiente",
     "finish": "Terminar",
     "grading": "Corrigiendo…",
-    "gradeFor": "Corregir esta respuesta · {{price}}",
-    "reference": "Respuesta: {{answer}}"
+    "reference": "Respuesta: {{answer}}",
+    "grade": "Corregir esta respuesta"
   },
   "result": {
     "percent": "{{percent, number}}%",

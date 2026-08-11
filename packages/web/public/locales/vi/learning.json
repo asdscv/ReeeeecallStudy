@@ -247,7 +247,14 @@
     "body": "Tự gõ đáp án. Không xem trước.",
     "start": "Kiểm tra (khoảng 2 phút)",
     "starting": "Đang chuẩn bị…",
-    "free": "Câu đúng được chấm miễn phí. Bạn chỉ trả cho những câu cần phân xử."
+    "recentTitle_one": "Còn nhớ {{count, number}} thẻ bạn học gần đây không?",
+    "recentTitle_other": "Còn nhớ {{count, number}} thẻ bạn học gần đây không?",
+    "recentBody": "Hôm nay chưa học nên đây là thẻ của những ngày gần đây. Bạn tự gõ đáp án.",
+    "blockedTitle": "Một số thẻ không tạo được câu hỏi kiểm tra",
+    "blockedBody_one": "Mẫu \"{{name}}\" đánh dấu nhiều hơn một ô đáp án ở mặt sau nên không biết ô nào mới là đáp án. {{count, number}} thẻ dùng mẫu này đã bị bỏ qua.",
+    "blockedBody_other": "Mẫu \"{{name}}\" đánh dấu nhiều hơn một ô đáp án ở mặt sau nên không biết ô nào mới là đáp án. {{count, number}} thẻ dùng mẫu này đã bị bỏ qua.",
+    "blockedAction": "Chỉ chọn một ô đáp án",
+    "blockedWeb": "Mở mẫu trên web và chỉ để lại một trường mặt sau là primary."
   },
   "coach": {
     "apply": "Áp dụng",
@@ -272,5 +279,31 @@
       "title": "Thêm một ngày mỗi tuần sẽ giúp nhất",
       "body": "Kế hoạch không quá nhiều — chỉ là nhiều ngày không mở. Đều đặn quan trọng hơn khối lượng."
     }
+  },
+  "week": {
+    "title": "Tuần này",
+    "activeDays_one": "Học {{count, number}} ngày",
+    "activeDays_other": "Học {{count, number}} ngày",
+    "streak_one": "{{count, number}} ngày liên tiếp",
+    "streak_other": "{{count, number}} ngày liên tiếp",
+    "streakNone": "Tuần này chưa có ghi nhận nào",
+    "completion": "Hoàn thành {{pct, number}}% kế hoạch",
+    "dow": {
+      "0": "CN",
+      "1": "T2",
+      "2": "T3",
+      "3": "T4",
+      "4": "T5",
+      "5": "T6",
+      "6": "T7"
+    },
+    "legend": {
+      "done": "Xong cả ngày",
+      "partial": "Làm dở",
+      "extra": "Học ngoài kế hoạch",
+      "untouched": "Không mở",
+      "none": "Không có kế hoạch"
+    },
+    "streakBroken": "Chuỗi ngày đã đứt. Hôm nay có thể bắt đầu lại"
   }
 }

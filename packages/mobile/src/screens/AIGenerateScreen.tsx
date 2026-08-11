@@ -585,7 +585,6 @@ export function AIGenerateScreen() {
                   </View>
                 )}
                 <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, marginTop: 4 }]}>{t('content.imageHint')}</Text>
-                <Text style={[theme.typography.caption, { color: palette.yellow[700] }]}>{t('content.imagePaidNotice')}</Text>
               </View>
             )}
 

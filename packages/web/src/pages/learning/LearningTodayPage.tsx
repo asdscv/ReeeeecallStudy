@@ -15,7 +15,8 @@ import { goalCompletion } from '@reeeeecall/shared/lib/goal-completion'
 import {
   parseNewCardsPerDay, DEFAULT_NEW_CARDS_PER_DAY,
 } from '@reeeeecall/shared/learning/application/cadence'
-import { useQuizStore } from '@reeeeecall/shared/stores/quiz-store'
+import { useQuizStore, type DailyCheckCount } from '@reeeeecall/shared/stores/quiz-store'
+import type { PlanWeek, DayState } from '@reeeeecall/shared/learning/application/plan-week'
 import { useDeckStore } from '../../stores/deck-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
 
@@ -73,6 +74,15 @@ import { ListSkeleton } from '../../components/common/Skeleton'
 
 /** Deck names printed before the count takes over. Three fits one line on a narrow phone. */
 const DECK_NAMES_SHOWN = 3
+
+/**
+ * How far back 오늘의 확인 may reach when today has nothing.
+ *
+ * Today always wins — the server only widens when today is empty. A week is the window the
+ * rest of this screen already talks in, so a learner is never offered a card from a stretch
+ * they have stopped thinking of as recent.
+ */
+const CHECK_LOOKBACK_DAYS = 7
 
 /**
  * How the day went.
@@ -704,7 +714,7 @@ export function LearningTodayPage() {
         </button>
       )}
 
-      <PlanCoach goalId={selectedGoalId} timezone={ctx.timezone} />
+      <PlanWeekSection goalId={selectedGoalId} timezone={ctx.timezone} />
 
       <DailyCheck goalId={selectedGoalId} timezone={ctx.timezone} />
 
@@ -732,7 +742,7 @@ function DailyCheck({ goalId, timezone }: { goalId: string; timezone: string }) 
   const { t } = useTranslation('learning')
   const navigate = useNavigate()
   const { countDailyCheck, buildDailyCheck, startRun } = useQuizStore()
-  const [counts, setCounts] = useState<{ studiedToday: number; checkable: number } | null>(null)
+  const [counts, setCounts] = useState<DailyCheckCount | null>(null)
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
@@ -740,21 +750,48 @@ function DailyCheck({ goalId, timezone }: { goalId: string; timezone: string }) 
     // partially-mocked store has no such action.
     if (typeof countDailyCheck !== 'function') return
     let cancelled = false
-    void countDailyCheck(timezone)
+    // Today first — the server only widens when today has nothing. Without this the section
+    // was invisible until the learner had already studied, which is when they are leaving.
+    void countDailyCheck(timezone, CHECK_LOOKBACK_DAYS)
       .then((value) => { if (!cancelled) setCounts(value) })
       .catch(() => { if (!cancelled) setCounts(null) })
     return () => { cancelled = true }
   }, [countDailyCheck, timezone, goalId])
 
-  // Nothing studied yet today, or nothing whose template says which field is the answer.
-  // Showing a disabled button would be worse than showing nothing: it advertises a feature
-  // the learner cannot reach and cannot fix from here.
-  if (!counts || counts.checkable === 0) return null
+  if (!counts) return null
+
+  // Studied plenty, none of it resolvable. On a real deck this is the COMMON way the check
+  // fails, not an edge: a template with two `primary` back fields cannot say which one is the
+  // answer, so every card of it is refused — and on the deck this was measured against, one
+  // of those two fields is the learner's own wrong expression. Refusing is right. Refusing
+  // invisibly is what made the section look like it did not exist.
+  //
+  // So it says so, and links to the one setting that fixes it.
+  if (counts.checkable === 0) {
+    const blocker = counts.blocked?.[0]
+    if (!blocker || counts.studiedToday === 0) return null
+    return (
+      <section className="rounded-xl border border-border bg-card p-4" data-testid="check-blocked">
+        <p className="text-sm font-medium text-foreground">{t('check.blockedTitle')}</p>
+        <p className="mt-0.5 text-xs text-content-tertiary">
+          {t('check.blockedBody', { name: blocker.name, count: blocker.cards })}
+        </p>
+        <Link
+          to={`/templates/${blocker.template_id}/edit`}
+          className="mt-3 inline-flex rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground no-underline transition-colors hover:bg-accent"
+        >
+          {t('check.blockedAction')}
+        </Link>
+      </section>
+    )
+  }
 
   const start = async () => {
     setBusy(true)
     try {
-      const setId = await buildDailyCheck({ goalId, timezone })
+      // The SAME window the count was taken with, or the server refuses a check this
+      // screen has already offered.
+      const setId = await buildDailyCheck({ goalId, timezone, lookback: CHECK_LOOKBACK_DAYS })
       const runId = await startRun(setId)
       navigate(`/quiz/${runId}/run`)
     } catch {
@@ -764,10 +801,17 @@ function DailyCheck({ goalId, timezone }: { goalId: string; timezone: string }) 
 
   return (
     <section className="rounded-xl border border-brand/30 bg-brand/5 p-4">
+      {/* Named for the window it actually drew from. Being told these are today's cards on
+          a day you did not study is the kind of small lie that costs a feature its
+          credibility the first time a learner notices. */}
       <p className="text-sm font-medium text-foreground">
-        {t('check.title', { count: counts.checkable })}
+        {counts.windowDays > 1
+          ? t('check.recentTitle', { count: counts.checkable })
+          : t('check.title', { count: counts.checkable })}
       </p>
-      <p className="mt-0.5 text-xs text-content-tertiary">{t('check.body')}</p>
+      <p className="mt-0.5 text-xs text-content-tertiary">
+        {counts.windowDays > 1 ? t('check.recentBody') : t('check.body')}
+      </p>
       <button
         type="button"
         onClick={() => void start()}
@@ -776,33 +820,39 @@ function DailyCheck({ goalId, timezone }: { goalId: string; timezone: string }) 
       >
         {busy ? t('check.starting') : t('check.start')}
       </button>
-      {/* The price rule, said before they start rather than after they are billed. */}
-      <p className="mt-2 text-center text-xs text-content-tertiary">{t('check.free')}</p>
     </section>
   )
 }
 
 
 /**
- * 주간 플랜 코치 — the one setting worth changing this week, if any.
+ * 이번 주 — the section that is allowed to be boring.
  *
- * Every knob on a goal is write-once in practice: chosen in the create form and never
- * revisited. So a plan that was too ambitious on day one stays too ambitious for its whole
- * life, and the learner's only lever is to stop opening the app.
+ * The plan screen had five sections and every one of them could render nothing. Each guard
+ * was individually right: none of those sections has anything TRUE to say in the state it
+ * hides in. Together they meant the screen was one card and a button for a learner who had
+ * not studied yet today — which is every learner at the moment they open the app to decide
+ * whether to study. That is the 그대로네? in the report.
  *
- * The suggestion is deterministic and free (see `plan-coach.ts`). The number is derived and
- * clamped by the chooser and travels in the stored row, so this screen renders it rather
- * than re-deriving it — a second implementation would be free to disagree with the first.
+ * So this one never hides. The last seven days happened; saying so needs no model, no
+ * minimum history and no judgement, and a learner on their first day has a week with one day
+ * in it, which is a legitimate thing to show them.
+ *
+ * The coach lives INSIDE it now rather than beside it. 주간 플랜 코치 is deterministic and
+ * free (see `plan-coach.ts`) but it is silent by design — it holds for a short week and
+ * holds again whenever nothing is wrong, which is most weeks. As its own section that made
+ * it a section-shaped hole; as a row under a strip that is always there, its silence just
+ * means the week needs no comment.
  *
  * `그대로 둘게요` is not a cancel. It is dismissal, recorded, and it survives every
  * regeneration — a suggestion the learner has already answered must not come back next week
  * as if they had not.
  */
-function PlanCoach({ goalId, timezone }: { goalId: string; timezone: string }) {
+function PlanWeekSection({ goalId, timezone }: { goalId: string; timezone: string }) {
   const { t } = useTranslation('learning')
   const {
     recommendations, fetchRecommendations, regeneratePlanCoach, applyPlanCoach,
-    resolveRecommendation,
+    resolveRecommendation, planWeek, planWeekGoalId,
   } = useLearningStore()
   const [busy, setBusy] = useState(false)
 
@@ -833,36 +883,119 @@ function PlanCoach({ goalId, timezone }: { goalId: string; timezone: string }) {
   )
   // `hold` is a real answer — it means nothing is wrong — and it is stored so the producer's
   // output can be compared later. It is not something to put on a learner's screen.
-  if (!suggestion || suggestion.action_type === 'hold') return null
+  const advice = suggestion && suggestion.action_type !== 'hold' ? suggestion : null
+  const value = (advice?.payload as { value?: number | null } | null)?.value ?? null
 
-  const value = (suggestion.payload as { value?: number | null } | null)?.value ?? null
+  // The guard is on the DATA, not on whether it is interesting: an older server (or a
+  // rollback of 209) sends no `by_day`, and an empty strip would read as a week in which the
+  // learner did nothing.
+  const week = planWeekGoalId === goalId ? planWeek : null
+  if (!week) return null
 
   return (
     <section className="rounded-xl border border-border bg-card p-4">
-      <p className="text-sm font-medium text-foreground">
-        {t(`coach.${suggestion.action_type}.title`, { value, defaultValue: '' })}
-      </p>
-      <p className="mt-0.5 text-xs text-content-tertiary">
-        {t(`coach.${suggestion.action_type}.body`, { defaultValue: '' })}
-      </p>
-      <div className="mt-3 flex gap-2">
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => { setBusy(true); void applyPlanCoach(suggestion.id).finally(() => setBusy(false)) }}
-          className="flex-1 cursor-pointer rounded-lg bg-brand px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
-        >
-          {t('coach.apply')}
-        </button>
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => { setBusy(true); void resolveRecommendation(suggestion.id, 'dismissed').finally(() => setBusy(false)) }}
-          className="cursor-pointer rounded-lg border border-border px-3 py-2 text-sm text-foreground hover:border-brand/40 disabled:opacity-50"
-        >
-          {t('coach.keep')}
-        </button>
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 className="text-sm font-medium text-foreground">{t('week.title')}</h2>
+        <p className="shrink-0 text-xs text-content-tertiary">
+          {t('week.activeDays', { count: week.activeDays })}
+        </p>
       </div>
+
+      <PlanWeekStrip week={week} />
+
+      <p className="mt-2 text-xs text-content-tertiary" data-testid="plan-week-summary">
+        {week.streak > 0
+          ? t('week.streak', { count: week.streak })
+          // Measured on the live account: 1 active day, streak 0. "이번 주는 아직 기록이
+          // 없어요" beside "1일 학습" is the screen contradicting itself in two lines.
+          : week.activeDays > 0
+            ? t('week.streakBroken')
+            : t('week.streakNone')}
+        {/* Only alongside a real plan. A percentage of nothing is not 0%, it is a question
+            nobody asked, and it reads as a grade for a test the learner never sat. */}
+        {week.completion !== null
+          && ` · ${t('week.completion', { pct: Math.round(week.completion * 100) })}`}
+      </p>
+
+      {advice && (
+        <div className="mt-3 border-t border-border pt-3" data-testid="plan-coach-advice">
+          <p className="text-sm font-medium text-foreground">
+            {t(`coach.${advice.action_type}.title`, { value, defaultValue: '' })}
+          </p>
+          <p className="mt-0.5 text-xs text-content-tertiary">
+            {t(`coach.${advice.action_type}.body`, { defaultValue: '' })}
+          </p>
+          <div className="mt-3 flex gap-2">
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => { setBusy(true); void applyPlanCoach(advice.id).finally(() => setBusy(false)) }}
+              className="flex-1 cursor-pointer rounded-lg bg-brand px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
+            >
+              {t('coach.apply')}
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => { setBusy(true); void resolveRecommendation(advice.id, 'dismissed').finally(() => setBusy(false)) }}
+              className="cursor-pointer rounded-lg border border-border px-3 py-2 text-sm text-foreground hover:border-brand/40 disabled:opacity-50"
+            >
+              {t('coach.keep')}
+            </button>
+          </div>
+        </div>
+      )}
     </section>
+  )
+}
+
+/**
+ * Seven cells, one per day, oldest first.
+ *
+ * Colour is not the only channel: each cell carries its own state in `title`/`aria-label`,
+ * because "which of these greys means I studied" is not a question a learner should have to
+ * answer, and for a colour-blind one it is not answerable at all.
+ *
+ * The weekday letters come from the locale files rather than `Intl`, which Hermes does not
+ * carry on mobile — the same component ships to both.
+ */
+function PlanWeekStrip({ week }: { week: PlanWeek }) {
+  const { t } = useTranslation('learning')
+
+  const fill: Record<DayState, string> = {
+    done:      'bg-brand text-white border-brand',
+    partial:   'bg-brand/25 text-foreground border-brand/40',
+    extra:     'bg-success/20 text-foreground border-success/40',
+    untouched: 'bg-transparent text-content-tertiary border-border',
+    none:      'bg-muted/40 text-content-tertiary border-transparent',
+  }
+
+  return (
+    <div className="mt-3 grid grid-cols-7 gap-1.5" data-testid="plan-week-strip">
+      {week.days.map((day, i) => (
+        <div
+          key={day.date}
+          className="flex flex-col items-center gap-1"
+          data-testid={`plan-week-day-${day.state}`}
+        >
+          <span className="text-[10px] text-content-tertiary">
+            {t(`week.dow.${day.weekday}`)}
+          </span>
+          <span
+            title={`${day.date} · ${t(`week.legend.${day.state}`)}`}
+            aria-label={`${day.date} · ${t(`week.legend.${day.state}`)}`}
+            // Capped, not stretched: on a wide screen a `w-full` cell becomes a long pill and
+            // the strip stops reading as seven days.
+            className={`flex h-9 w-full max-w-[3rem] items-center justify-center rounded-md border text-[11px] tabular-nums ${fill[day.state]} ${
+              i === week.days.length - 1 ? 'ring-1 ring-brand/40 ring-offset-1 ring-offset-card' : ''
+            }`}
+          >
+            {/* The number is what was DONE. A cell that shows the plan's size on a day
+                nobody opened would put the largest number on the emptiest day. */}
+            {day.done > 0 ? day.done : day.studied > 0 ? day.studied : ''}
+          </span>
+        </div>
+      ))}
+    </div>
   )
 }

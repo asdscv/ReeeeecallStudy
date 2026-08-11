@@ -10,19 +10,12 @@
     "create": "Kuis baru",
     "take": "Kerjakan",
     "starting": "Memulai…",
-    "retakeFree": "Mengulang gratis",
     "questions_one": "{{count, number}} soal",
     "questions_other": "{{count, number}} soal",
-    "trial": {
-      "title": "Kredit percobaan Anda siap",
-      "body_one": "{{count, number}} unit percobaan — cukup untuk satu set penuh.",
-      "body_other": "{{count, number}} unit percobaan — cukup untuk satu set penuh."
-    },
     "empty": {
       "title": "Belum ada kuis",
       "body": "Buat dari dek mana pun, hanya perlu beberapa detik."
     },
-    "pricingNote": "{{price}} per unit. Pilihan ganda selalu dinilai gratis.",
     "fewerThanAsked": "diminta {{requested, number}}"
   },
   "setup": {
@@ -45,10 +38,6 @@
     },
     "tooFewForMcq_one": "Pilihan ganda mengambil pengecoh dari kartu lain, jadi perlu minimal 4. Dek ini punya {{count, number}}.",
     "tooFewForMcq_other": "Pilihan ganda mengambil pengecoh dari kartu lain, jadi perlu minimal 4. Dek ini punya {{count, number}}.",
-    "price": "Harga",
-    "free": "Gratis",
-    "covered": "Jatah gratis menutup {{units, number}} unit",
-    "retakeFree": "Mengerjakan ulang tidak dikenakan biaya.",
     "confirm": "Buat kuis",
     "generating": "Menyusun soal…",
     "difficulty": "Tingkat kesulitan",
@@ -70,8 +59,8 @@
     "next": "Berikutnya",
     "finish": "Selesai",
     "grading": "Menilai…",
-    "gradeFor": "Nilai jawaban ini · {{price}}",
-    "reference": "Jawaban: {{answer}}"
+    "reference": "Jawaban: {{answer}}",
+    "grade": "Nilai jawaban ini"
   },
   "result": {
     "percent": "{{percent, number}}%",
