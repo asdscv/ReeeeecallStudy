@@ -124,6 +124,11 @@ export interface QuizRunItem {
 export interface QuizRun {
   run_id: string
   set_id: string
+  /**
+   * What the SET is aiming for, which may exceed `item_count` while a long quiz is still
+   * being generated. Without it a screen cannot tell "8 questions" from "8 so far".
+   */
+  requested_count?: number
   status: 'in_progress' | 'completed' | 'abandoned'
   attempt_no: number
   item_count: number
@@ -249,6 +254,13 @@ interface QuizState {
   buildDailyCheck: (input: { goalId?: string; timezone: string; limit?: number }) => Promise<string>
 
   startRun: (setId: string) => Promise<string>
+  /**
+   * Pull in questions written since this run opened, then reload it.
+   *
+   * A long quiz is still being generated while the learner answers the first batch, so the
+   * run has to be able to grow. Idempotent — safe to call on every load and every advance.
+   */
+  refreshRun: (runId: string) => Promise<void>
   loadRun: (runId: string) => Promise<void>
   submit: (itemId: string, response: Record<string, unknown>, durationMs?: number) => Promise<QuizSubmitResult>
   gradeWithAi: (itemId: string, answer: string, maxPriceMicro: number) => Promise<void>
@@ -362,7 +374,15 @@ export const useQuizStore = create<QuizState>((set, get) => ({
       let firstError: unknown = null
       let delivered = 0
 
-      for (const [index, cardIds] of batches.entries()) {
+      // The FIRST batch is awaited; the rest are not.
+      //
+      // Fifty multiple-choice questions is seven calls at roughly fifteen seconds each, so
+      // waiting for all of them means about a hundred seconds of staring at a button. Worse,
+      // it bills for questions nobody has seen yet: a learner who stops at question ten has
+      // paid for fifty. Returning after the first batch lets the quiz be opened immediately
+      // and lets the rest arrive while it is being answered — and a learner who abandons
+      // early simply never requests the batches they would not have reached.
+      const runBatch = async (cardIds: string[], index: number) => {
         const { error: genError } = await supabase.functions.invoke('ai-generate', {
           body: {
             kind: 'quiz_generate',
@@ -387,10 +407,26 @@ export const useQuizStore = create<QuizState>((set, get) => ({
         set({ generateProgress: { done: index + 1, total: batches.length } })
       }
 
-      // Only a total failure is an error. Anything else is under-delivery, which the set
-      // list already discloses ("asked for N").
+      await runBatch(batches[0], 0)
+
+      // Only a total failure is an error, and only the FIRST batch can produce one: if
+      // nothing at all was written there is no quiz to open. Anything later is
+      // under-delivery, which the set list already discloses.
       if (delivered === 0 && firstError !== null) {
         throw new QuizError(await quizErrorCode(firstError))
+      }
+
+      if (batches.length > 1) {
+        // Deliberately not awaited. The caller navigates now; these land behind it and are
+        // picked up by `refreshRun`. Errors are swallowed for the same reason a later batch
+        // failing is not fatal.
+        void (async () => {
+          for (let i = 1; i < batches.length; i++) {
+            try { await runBatch(batches[i], i) } catch { /* under-delivery, not failure */ }
+          }
+          set({ generateProgress: null })
+          await get().fetchSets().catch(() => {})
+        })()
       }
 
       await get().fetchSets()
@@ -426,6 +462,13 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     const { data, error } = await supabase.rpc('start_quiz_run', { p_set_id: setId })
     if (error) throw error
     return (data as { run_id: string }).run_id
+  },
+
+  refreshRun: async (runId) => {
+    // Failure here is not worth surfacing: the learner still has the questions they have,
+    // and the next advance tries again.
+    const { data } = await supabase.rpc('append_quiz_run_items', { p_run_id: runId })
+    if ((data as { added?: number } | null)?.added) await get().loadRun(runId)
   },
 
   loadRun: async (runId) => {

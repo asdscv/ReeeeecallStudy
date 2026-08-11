@@ -21,7 +21,9 @@ export function QuizRunPage() {
   const { t } = useTranslation('quiz')
   const { runId } = useParams<{ runId: string }>()
   const navigate = useNavigate()
-  const { run, loading, loadRun, submit, gradeWithAi, quote, grading, finishRun } = useQuizStore()
+  const {
+    run, loading, loadRun, refreshRun, submit, gradeWithAi, quote, grading, finishRun,
+  } = useQuizStore()
 
   const [index, setIndex] = useState(0)
   const [choice, setChoice] = useState<number | null>(null)
@@ -35,6 +37,20 @@ export function QuizRunPage() {
   const [startedAt, setStartedAt] = useState(() => Date.now())
 
   useEffect(() => { if (runId) void loadRun(runId) }, [runId, loadRun])
+
+  /**
+   * A long quiz is still being written while its first questions are being answered.
+   *
+   * `start_quiz_run` snapshots, so the run only holds what existed when it opened; this pulls
+   * in whatever has landed since. Polled while the set is still short of what was asked for,
+   * and stopped as soon as it is complete — an idle poll on a finished quiz is pure noise.
+   */
+  const stillGrowing = !!run && run.item_count < (run.requested_count ?? run.item_count)
+  useEffect(() => {
+    if (!runId || !stillGrowing) return
+    const id = setInterval(() => { void refreshRun(runId) }, 4000)
+    return () => clearInterval(id)
+  }, [runId, stillGrowing, refreshRun])
 
   const items = useMemo(() => run?.items ?? [], [run])
   const item: QuizRunItem | undefined = items[index]

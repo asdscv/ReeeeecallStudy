@@ -335,6 +335,11 @@ jobs:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/mastery_definition_test.sql
 
+      - name: SQL — a run can grow while it is answered (mig 208)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/quiz_progressive_run_test.sql
+
       - name: SQL — plan coach digest and the lever relaxation (mig 206)
         env:
           PGPASSWORD: postgres
