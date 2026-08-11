@@ -12,6 +12,7 @@ import { studyRecap } from '@reeeeecall/shared/lib/study-recap'
 import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
 import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
 import { goalCompletion } from '@reeeeecall/shared/lib/goal-completion'
+import { caughtUp } from '@reeeeecall/shared/lib/caught-up'
 import {
   parseNewCardsPerDay, DEFAULT_NEW_CARDS_PER_DAY,
 } from '@reeeeecall/shared/learning/application/cadence'
@@ -139,12 +140,15 @@ function AttemptHistory({ goalId, planDate }: { goalId: string; planDate: string
     <section className="pt-2">
       <h2 className="text-sm font-medium text-foreground">{t('history.title')}</h2>
       <div className="mt-2 rounded-xl border border-border bg-card p-3" data-testid="study-recap">
+        {/* The count, and nothing else.
+            This read "12장 · 0분 · 카드당 평균 1초" on a real account. The 0분 and the 1초 are
+            the same defect twice: the duration is whole-card dwell — it starts when the card
+            appears and ends when the learner taps a rating, so it includes reading the answer
+            and is zero on every attempt written without one. A "카드당 평균 1초" tells a
+            learner they are rushing when what it measured was how fast they tap a button that
+            was already showing them the answer. */}
         <p className="text-sm text-foreground">
-          {t('history.recap', {
-            count: recap.count,
-            minutes: Math.round(recap.totalMs / 60000),
-            seconds: Math.round(recap.avgMs / 1000),
-          })}
+          {t('history.recapCount', { count: recap.count })}
         </p>
         {bands && <p className="mt-1 text-xs text-content-tertiary">{bands}</p>}
       </div>
@@ -206,17 +210,31 @@ function LearningDiagnostics({ goalId }: { goalId: string }) {
   // no attempt carried a score, which is a different statement from 0%.
   const pct = (value: number | null) => (value === null ? null : Math.round(value * 100))
   const accuracy = pct(insights.accuracy)
-  const adherence = pct(insights.overallAdherence)
 
-  const stats = [
-    accuracy === null
-      ? t('insights.notScoredYet')
-      : t('insights.accuracyValue', { pct: accuracy }),
-    insights.medianDurationMs === null
-      ? null
-      : t('insights.typicalValue', { seconds: Math.round(insights.medianDurationMs / 100) / 10 }),
-    adherence === null ? null : t('insights.adherenceValue', { pct: adherence }),
-  ].filter(Boolean).join(' · ')
+  /**
+   * One number, and it says what window it is over.
+   *
+   * This line read "정답률 78% · 보통 1초 · 플랜 49% 이행" and a learner asked, verbatim,
+   * "플랜 49% 이행은 뭐야? 유저가 알기가 너무 힘들다". They were right on every count:
+   *
+   *   - the three numbers spanned TWO windows (30 days for accuracy, 14 for adherence) and
+   *     neither was printed, while "알았음 6 · 몰랐음 6" — 50%, today — sat two inches above;
+   *   - 보통 1초 was the median dwell on a card INCLUDING reading the answer, which is a
+   *     measurement of how fast you tap, not of how fast you recall;
+   *   - 플랜 이행 named no window, no numerator and no denominator, and there was nothing a
+   *     learner could do on seeing it that they would not have done anyway.
+   *
+   * Adherence has not been deleted — it still stretches the completion estimate, where it is
+   * now labelled — and the week strip above shows the same thing as seven days a learner can
+   * count. Typical time is gone outright: nothing on this screen can act on it.
+   */
+  const stats = accuracy === null
+    ? t('insights.notScoredYet')
+    : t('insights.accuracyValue', {
+      pct: accuracy,
+      scored: insights.scoredCount,
+      known: Math.round((insights.accuracy ?? 0) * insights.scoredCount),
+    })
 
   return (
     <section className="pt-2" aria-label={t('insights.title')}>
@@ -224,7 +242,6 @@ function LearningDiagnostics({ goalId }: { goalId: string }) {
 
       <div className="mt-2 rounded-xl border border-border bg-card p-3" data-testid="insights-stats">
         <p className="text-sm text-foreground">{stats}</p>
-        <p className="mt-1 text-[11px] text-content-tertiary">{t('insights.scopeNote')}</p>
       </div>
 
       {weakByDeck.length > 0 && (
@@ -261,12 +278,10 @@ function LearningDiagnostics({ goalId }: { goalId: string }) {
  * overdue and 10 cards had never been opened — a sentence that sounds like near-total amnesia and
  * means nothing of the kind. The line under it carries what to do about it.
  */
-function GoalProgress({ knowledge, newCardsPerDay, adherence, done }: {
+function GoalProgress({ knowledge, newCardsPerDay, done }: {
   knowledge: GoalKnowledge | null
   /** The goal's intake cap. Without it an unseen card has no honest start date. */
   newCardsPerDay: number
-  /** Share of planned items actually completed, or null before there is any history. */
-  adherence: number | null
   /** The goal is already STAMPED completed. A record, not a live reading of the ratio. */
   done: boolean
 }) {
@@ -274,7 +289,12 @@ function GoalProgress({ knowledge, newCardsPerDay, adherence, done }: {
   if (!knowledge || knowledge.total === 0) return null
 
   const summary = goalKnowledgeSummary(knowledge)
-  const completion = goalCompletion(knowledge, { newCardsPerDay, adherence })
+  const completion = goalCompletion(knowledge, { newCardsPerDay })
+  // Progress toward the finish line this card names, so the bar cannot disagree with the
+  // sentence beneath it.
+  const maturePercent = completion.required > 0
+    ? Math.min(100, Math.round((completion.mature / completion.required) * 100))
+    : 0
 
   /**
    * The headline changes with the state, because the useful sentence does.
@@ -289,6 +309,10 @@ function GoalProgress({ knowledge, newCardsPerDay, adherence, done }: {
     : summary.behind
       ? t('progress.behind', { count: summary.overdue })
       : t('progress.studied', { total: summary.total, attempted: summary.attempted })
+  // The detail line no longer swaps with the headline. It used to print a bare "배운 29장"
+  // whenever the headline was about a backlog — a count with no denominator, one line under a
+  // different count with a different one. Every number on this card is now a named part of
+  // `total`, and nothing on it changes population depending on the state.
 
   
 
@@ -301,27 +325,27 @@ function GoalProgress({ knowledge, newCardsPerDay, adherence, done }: {
    * the plan card below it: those cards ARE tomorrow's, and usually today's, work.
    */
   const detail = summary.notStarted ? '' : [
-    summary.behind
-      ? t('progress.detailStudied', { count: summary.attempted })
-      : t('progress.detailWithinWindow', { count: summary.withinWindow }),
+    t('progress.detailWithinWindow', { count: summary.withinWindow }),
     summary.unstudied > 0 ? t('progress.unstudied', { count: summary.unstudied }) : null,
   ].filter(Boolean).join(' · ')
 
   return (
     <section className="rounded-xl border border-border bg-card p-4" aria-label={t('progress.title')}>
       <p className="text-sm text-foreground" data-testid="progress-headline">{headline}</p>
-      {/* `attempted / total`. It may only fill when there is no card left to reach — the old
-          `known / attempted` hit 100% as soon as nothing was overdue, so a goal with 12 cards
-          never opened drew a complete bar. */}
+      {/* The bar and the line under it are now the SAME statement: 정착한 카드 / 필요한 수.
+          It used to draw `attempted / total` — cards opened at least once — which fills the
+          moment every card has been seen. A learner saw a 100% bar directly above "복습이 12장
+          밀렸어요" and "완료까지 약 25일", because those three lines answered three different
+          questions and only one of them was named. */}
       <div
         className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted"
         role="progressbar"
-        aria-valuenow={summary.percent}
+        aria-valuenow={maturePercent}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-label={t('progress.title')}
       >
-        <div className="h-full bg-brand" style={{ width: `${summary.percent}%` }} />
+        <div className="h-full bg-brand" style={{ width: `${maturePercent}%` }} />
       </div>
       {detail && (
         <p className="mt-1.5 text-[11px] text-content-tertiary" data-testid="progress-detail">
@@ -340,14 +364,27 @@ function GoalProgress({ knowledge, newCardsPerDay, adherence, done }: {
         </p>
       ) : (
         <p className="mt-2 text-[11px] text-content-tertiary" data-testid="goal-completion">
+          {/* The population is named in the same sentence as the target. "24장 중 14장 정착"
+              one line under "배운 29장" made the deck look like it had shrunk from 29 to 24 —
+              24 is not a set of cards, it is 80% of 29 rounded up. */}
           {t('completion.progress', {
-            mature: completion.mature, required: completion.required,
+            mature: completion.mature,
+            required: completion.required,
+            total: summary.total,
           })}
           {/* No date when there is no honest one: uncapped intake has no "start them all at
               once" day count, and a goal too small to reach the ratio has nothing to project.
-              A wrong date is acted on; a missing one is not. */}
+              A wrong date is acted on; a missing one is not.
+
+              Two numbers, because the single one was unreadable. "완료까지 약 25일" was
+              `12 / 0.49` — twelve being what the cards themselves need, and 0.49 being the
+              learner's plan adherence, which appeared nowhere near it. Saying both makes the
+              gap the learner's to close instead of a number only the code understands. */}
           {completion.daysToComplete !== null && (
-            <> · {t('completion.eta', { count: completion.daysToComplete })}</>
+            <> · {t('completion.etaIfDaily', {
+              count: completion.daysToComplete,
+              remaining: completion.remaining,
+            })}</>
           )}
         </p>
       )}
@@ -364,7 +401,6 @@ export function LearningTodayPage() {
     fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
     extendPlan, planExtending, planExtension,
     knowledge, fetchGoalKnowledge, completeGoalIfEarned,
-    insights, insightsGoalId,
   } = useLearningStore()
   const { decks, fetchDecks } = useDeckStore()
 
@@ -419,6 +455,29 @@ export function LearningTodayPage() {
   // Judged at NOW, not the target date. At the deadline this reported "0 of 120 known" for an
   // account that had studied 55 cards, because the projection assumes you stop today.
   const judgedAt = ctx.now
+
+  /**
+   * Which kind of "nothing due" this is — see `caught-up.ts`.
+   *
+   * Read against a FRESH instant rather than `ctx.now`: the empty state is looked at after a
+   * session, and "5분 뒤" measured from when the page was opened is the wrong five minutes.
+   */
+  const caughtUpState = useMemo(
+    () => caughtUp(
+      selectedGoalId ? knowledge[selectedGoalId]?.nextDueAt ?? null : null,
+      new Date().toISOString(),
+    ),
+    [knowledge, selectedGoalId],
+  )
+
+  /** A wall-clock time the learner can compare to their own clock. `Intl` is fine on web. */
+  const formatWhen = (iso: string | null) => {
+    if (!iso) return ''
+    const at = new Date(iso)
+    return at.toLocaleString(undefined, {
+      month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit',
+    })
+  }
   useEffect(() => {
     if (!selectedGoalId) return
     void fetchGoalKnowledge(selectedGoalId, judgedAt)
@@ -486,8 +545,24 @@ export function LearningTodayPage() {
     `/decks/${deckId}/study?mode=srs&goalId=${selectedGoalId}&planDate=${ctx.planDate}`
 
   const nextDeck = deckGroups.find((group) => group.pending > 0) ?? null
-  const pendingTotal = deckGroups.reduce((sum, group) => sum + group.pending, 0)
-  const doneTotal = deckGroups.reduce((sum, group) => sum + group.done, 0)
+
+  /**
+   * The day's totals come from the PLAN, not from the per-deck grouping.
+   *
+   * `deckGroups` drops any item whose card it cannot resolve (`if (!deckId) continue` above) —
+   * a card deleted after the plan was written, or a `planCards` read that has not landed. Summing
+   * it meant a plan of twelve untouched items could report `pending: 0` and put "오늘 끝!" over
+   * its own "12개 중 0개 완료". That is the same defect as everything else on this screen: a
+   * headline and a number underneath it counted from two different populations.
+   *
+   * `total_items` and `completed_items` are maintained by the server on every rating, so they
+   * cannot shrink because a client-side lookup missed.
+   */
+  const doneTotal = plan?.completed_items ?? 0
+  const pendingTotal = Math.max(0, (plan?.total_items ?? 0) - doneTotal)
+  /** Work the plan claims but no deck can be reached for — see above. Normally zero. */
+  const unreachable = Math.max(
+    0, pendingTotal - deckGroups.reduce((sum, group) => sum + group.pending, 0))
 
   /** What is LEFT today. Shared with mobile so the two screens cannot disagree about it. */
   const composition = useMemo(() => planComposition(planItems), [planItems])
@@ -545,7 +620,6 @@ export function LearningTodayPage() {
       <GoalProgress
         knowledge={knowledge[selectedGoalId] ?? null}
         newCardsPerDay={parseNewCardsPerDay(goal?.settings) ?? DEFAULT_NEW_CARDS_PER_DAY}
-        adherence={insightsGoalId === selectedGoalId ? insights?.overallAdherence ?? null : null}
         done={goal?.status === 'completed'}
       />
 
@@ -563,8 +637,19 @@ export function LearningTodayPage() {
           </Link>
         </div>
       ) : planBlockedReason === 'no_candidates' ? (
+        /* "오늘 이 덱들에서 복습할 카드가 없습니다" read as a failure — the learner's cards had
+           gone somewhere. The truth in the photographed state was the opposite: they had just
+           finished, and twelve cards were coming back inside ten minutes. Nothing due is three
+           situations, and only the last of them is bad news. */
         <div className="rounded-xl border border-border bg-card p-4 text-center">
-          <p className="text-sm text-muted-foreground">{t('today.empty.nothingDue')}</p>
+          <p className="text-sm font-medium text-foreground">{t('today.empty.allCaughtUp')}</p>
+          <p className="mt-1 text-xs text-content-tertiary">
+            {caughtUpState.kind === 'soon'
+              ? t('today.empty.backSoon', { count: caughtUpState.minutes ?? 1 })
+              : caughtUpState.kind === 'later'
+                ? t('today.empty.nextReview', { when: formatWhen(caughtUpState.atISO) })
+                : t('today.empty.nothingScheduled')}
+          </p>
         </div>
       ) : planLoading ? (
         <ListSkeleton />
@@ -617,6 +702,13 @@ export function LearningTodayPage() {
                   {t('today.studyNote')}
                 </p>
               </>
+            ) : pendingTotal > 0 ? (
+              /* The plan says there is work and no deck can be reached for it. Saying "다
+                 했어요" here is the lie the totals used to tell; naming it is the only honest
+                 move, because there is nothing on this screen the learner can press. */
+              <p className="mt-4 rounded-xl bg-muted px-4 py-3 text-center text-sm text-muted-foreground">
+                {t('today.itemsUnavailable', { count: unreachable || pendingTotal })}
+              </p>
             ) : (
               <p className="mt-4 rounded-xl bg-success/10 px-4 py-3 text-center text-sm font-medium text-success">
                 {t('today.allDoneNote')}

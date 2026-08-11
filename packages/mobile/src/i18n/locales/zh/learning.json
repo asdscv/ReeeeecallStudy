@@ -103,9 +103,6 @@
     "title": "最近学习",
     "title_one": "最近作答 ({{count, number}})",
     "title_other": "最近作答 ({{count, number}})",
-    "recap": "{{count, number}} 张 · {{minutes, number}} 分钟 · 每张平均 {{seconds, number}} 秒",
-    "recap_one": "{{count, number}} 张 · {{minutes, number}} 分钟 · 每张平均 {{seconds, number}} 秒",
-    "recap_other": "{{count, number}} 张 · {{minutes, number}} 分钟 · 每张平均 {{seconds, number}} 秒",
     "band": {
       "known": "记住 {{count, number}}",
       "known_one": "记住 {{count, number}}",
@@ -116,32 +113,24 @@
       "missed": "没记住 {{count, number}}",
       "missed_one": "没记住 {{count, number}}",
       "missed_other": "没记住 {{count, number}}"
-    }
+    },
+    "recapCount": "今天回答了 {{count, number}} 次",
+    "recapCount_one": "今天回答了 {{count, number}} 次",
+    "recapCount_other": "今天回答了 {{count, number}} 次"
   },
   "insights": {
     "accuracy": "正确率",
-    "adherence": "计划执行率 (14天)",
-    "adherenceEmpty": "此时间段内没有计划。",
-    "adherenceTitle": "每日计划 (14天)",
     "attemptCount": "{{count, number}} 次作答",
     "attemptCount_one": "{{count, number}} 次作答",
     "attemptCount_other": "{{count, number}} 次作答",
-    "attempts": "作答次数 (30天)",
     "cardFallback": "（不在今日计划中）",
-    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "noData": "暂无数据",
-    "noPlanItems": "无计划项目",
     "notScoredYet": "尚无评分记录",
-    "scopeNote": "基于此目标的作答和计划数据。牌组级 SRS 统计请查看学习历史。",
-    "seconds": "{{count, decimal}}秒",
     "title": "学习诊断",
-    "typicalTime": "通常用时",
     "weakEmpty": "没有落后的卡片。",
-    "weakHint": "作答至少2次且平均低于60%的卡片。",
+    "weakHint": "看过至少两次、错超过一半的卡片。",
     "weakTitle": "值得再看",
-    "accuracyValue": "正确率 {{pct, number}}%",
-    "typicalValue": "通常 {{seconds, decimal}} 秒",
-    "adherenceValue": "计划完成 {{pct, number}}%",
+    "accuracyValue": "最近 30 天 {{scored, number}} 次中答对 {{known, number}} 次（{{pct, number}}%）",
     "weakCount": "{{count, number}} 张",
     "weakCount_one": "{{count, number}} 张",
     "weakCount_other": "{{count, number}} 张",
@@ -166,7 +155,12 @@
       "createGoal": "创建目标",
       "noDecks": "此目标没有关联的牌组，无法生成计划。",
       "noGoal": "您还没有进行中的学习目标。目标用于设定每日学习时间和计划所用的牌组。",
-      "nothingDue": "今天这些牌组中没有需要复习的内容。"
+      "allCaughtUp": "今天的份量做完了。",
+      "backSoon": "刚回答的卡片大约 {{count, number}} 分钟后会再出现。",
+      "backSoon_one": "刚回答的卡片大约 {{count, number}} 分钟后会再出现。",
+      "backSoon_other": "刚回答的卡片大约 {{count, number}} 分钟后会再出现。",
+      "nextReview": "下次复习：{{when}}。",
+      "nothingScheduled": "这个目标没有安排复习。可以往卡组里再加些卡片。"
     },
     "error": {
       "authRequired": "请重新登录。",
@@ -213,7 +207,10 @@
     },
     "deckListMore": "{{names}} 等 {{count, number}} 个",
     "deckListMore_one": "{{names}} 等 {{count, number}} 个",
-    "deckListMore_other": "{{names}} 等 {{count, number}} 个"
+    "deckListMore_other": "{{names}} 等 {{count, number}} 个",
+    "itemsUnavailable": "这个计划中有 {{count, number}} 张卡片现在打不开，可能已被删除。",
+    "itemsUnavailable_one": "这个计划中有 {{count, number}} 张卡片现在打不开，可能已被删除。",
+    "itemsUnavailable_other": "这个计划中有 {{count, number}} 张卡片现在打不开，可能已被删除。"
   },
   "progress": {
     "title": "进度",
@@ -224,23 +221,20 @@
     "unstudied": "尚未学习 {{count, number}} 张",
     "unstudied_one": "尚未学习 {{count, number}} 张",
     "unstudied_other": "尚未学习 {{count, number}} 张",
-    "behind": "有 {{count, number}} 张复习逾期",
-    "behind_one": "有 {{count, number}} 张复习逾期",
-    "behind_other": "有 {{count, number}} 张复习逾期",
+    "behind": "有 {{count, number}} 张复习已经过期超过一天",
+    "behind_one": "有 {{count, number}} 张复习已经过期超过一天",
+    "behind_other": "有 {{count, number}} 张复习已经过期超过一天",
     "studied": "{{total, number}} 张中已学 {{attempted, number}} 张",
-    "detailStudied": "已学 {{count, number}} 张",
-    "detailStudied_one": "已学 {{count, number}} 张",
-    "detailStudied_other": "已学 {{count, number}} 张",
     "detailWithinWindow": "复习周期内 {{count, number}} 张",
     "detailWithinWindow_one": "复习周期内 {{count, number}} 张",
     "detailWithinWindow_other": "复习周期内 {{count, number}} 张"
   },
   "completion": {
     "done": "目标达成",
-    "progress": "{{required, number}} 张中 {{mature, number}} 张已巩固",
-    "eta": "距完成约 {{count, number}} 天",
-    "eta_one": "距完成约 {{count, number}} 天",
-    "eta_other": "距完成约 {{count, number}} 天"
+    "progress": "可以放 3 周再看的卡片 {{mature, number}} 张 · 目标 {{required, number}} 张（全部 {{total, number}} 张的 80%）",
+    "etaIfDaily": "剩下 {{remaining, number}} 张要依次通过 1 天 → 3 天 → 8 天的复习。全部答对最快也要 {{count, number}} 天。",
+    "etaIfDaily_one": "剩下 {{remaining, number}} 张要依次通过 1 天 → 3 天 → 8 天的复习。全部答对最快也要 {{count, number}} 天。",
+    "etaIfDaily_other": "剩下 {{remaining, number}} 张要依次通过 1 天 → 3 天 → 8 天的复习。全部答对最快也要 {{count, number}} 天。"
   },
   "check": {
     "title_one": "今天学的 {{count, number}} 张，真的记住了吗？",

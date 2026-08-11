@@ -103,9 +103,6 @@
     "title": "Belajar terbaru",
     "title_one": "Percobaan terbaru ({{count, number}})",
     "title_other": "Percobaan terbaru ({{count, number}})",
-    "recap": "{{count, number}} kartu · {{minutes, number}} menit · rata-rata {{seconds, number}} detik per kartu",
-    "recap_one": "{{count, number}} kartu · {{minutes, number}} menit · rata-rata {{seconds, number}} detik per kartu",
-    "recap_other": "{{count, number}} kartu · {{minutes, number}} menit · rata-rata {{seconds, number}} detik per kartu",
     "band": {
       "known": "Tahu {{count, number}}",
       "known_one": "Tahu {{count, number}}",
@@ -116,32 +113,24 @@
       "missed": "Lupa {{count, number}}",
       "missed_one": "Lupa {{count, number}}",
       "missed_other": "Lupa {{count, number}}"
-    }
+    },
+    "recapCount": "{{count, number}} jawaban hari ini",
+    "recapCount_one": "{{count, number}} jawaban hari ini",
+    "recapCount_other": "{{count, number}} jawaban hari ini"
   },
   "insights": {
     "accuracy": "Akurasi",
-    "adherence": "Kepatuhan rencana (14 hari)",
-    "adherenceEmpty": "Tidak ada rencana dalam periode ini.",
-    "adherenceTitle": "Rencana harian (14 hari)",
     "attemptCount": "{{count, number}} percobaan",
     "attemptCount_one": "{{count, number}} percobaan",
     "attemptCount_other": "{{count, number}} percobaan",
-    "attempts": "Percobaan (30 hari)",
     "cardFallback": "(kartu tidak ada di rencana hari ini)",
-    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "noData": "Belum ada data",
-    "noPlanItems": "Tidak ada yang direncanakan",
     "notScoredYet": "Belum ada yang dinilai",
-    "scopeNote": "Berdasarkan percobaan dan rencana tujuan ini. Statistik SRS per dek ada di Riwayat Belajar.",
-    "seconds": "{{count, decimal}}d",
     "title": "Analisis pembelajaran",
-    "typicalTime": "Waktu biasa",
     "weakEmpty": "Tidak ada yang tertinggal.",
-    "weakHint": "Kartu dengan minimal dua percobaan dan rata-rata di bawah 60%.",
+    "weakHint": "Kartu yang sudah kamu lihat minimal dua kali dan lebih dari separuh salah.",
     "weakTitle": "Perlu dilihat lagi",
-    "accuracyValue": "Akurasi {{pct, number}}%",
-    "typicalValue": "Biasanya {{seconds, decimal}} detik",
-    "adherenceValue": "Rencana {{pct, number}}% selesai",
+    "accuracyValue": "{{known, number}} benar dari {{scored, number}} dalam 30 hari terakhir ({{pct, number}}%)",
     "weakCount": "{{count, number}} kartu",
     "weakCount_one": "{{count, number}} kartu",
     "weakCount_other": "{{count, number}} kartu",
@@ -166,7 +155,12 @@
       "createGoal": "Buat tujuan",
       "noDecks": "Tujuan ini tidak memiliki dek, jadi tidak ada yang bisa direncanakan.",
       "noGoal": "Anda belum memiliki tujuan belajar yang aktif. Tujuan menentukan menit harian dan dek yang digunakan untuk perencanaan.",
-      "nothingDue": "Tidak ada kartu yang perlu diulas hari ini di dek-dek ini."
+      "allCaughtUp": "Bagian hari ini sudah selesai.",
+      "backSoon": "Kartu yang baru kamu jawab akan kembali sekitar {{count, number}} menit lagi.",
+      "backSoon_one": "Kartu yang baru kamu jawab akan kembali sekitar {{count, number}} menit lagi.",
+      "backSoon_other": "Kartu yang baru kamu jawab akan kembali sekitar {{count, number}} menit lagi.",
+      "nextReview": "Ulasan berikutnya: {{when}}.",
+      "nothingScheduled": "Tidak ada ulasan terjadwal untuk target ini. Coba tambahkan kartu ke deknya."
     },
     "error": {
       "authRequired": "Silakan masuk lagi.",
@@ -213,7 +207,10 @@
     },
     "deckListMore": "{{names}} +{{count, number}} lainnya",
     "deckListMore_one": "{{names}} +{{count, number}} lainnya",
-    "deckListMore_other": "{{names}} +{{count, number}} lainnya"
+    "deckListMore_other": "{{names}} +{{count, number}} lainnya",
+    "itemsUnavailable": "{{count, number}} kartu dalam rencana ini tidak bisa dibuka sekarang. Mungkin sudah dihapus.",
+    "itemsUnavailable_one": "{{count, number}} kartu dalam rencana ini tidak bisa dibuka sekarang. Mungkin sudah dihapus.",
+    "itemsUnavailable_other": "{{count, number}} kartu dalam rencana ini tidak bisa dibuka sekarang. Mungkin sudah dihapus."
   },
   "progress": {
     "title": "Kemajuan",
@@ -224,23 +221,20 @@
     "unstudied": "{{count, number}} belum dipelajari",
     "unstudied_one": "{{count, number}} belum dipelajari",
     "unstudied_other": "{{count, number}} belum dipelajari",
-    "behind": "{{count, number}} ulasan terlambat",
-    "behind_one": "{{count, number}} ulasan terlambat",
-    "behind_other": "{{count, number}} ulasan terlambat",
+    "behind": "Ada {{count, number}} ulasan yang lewat lebih dari sehari",
+    "behind_one": "Ada {{count, number}} ulasan yang lewat lebih dari sehari",
+    "behind_other": "Ada {{count, number}} ulasan yang lewat lebih dari sehari",
     "studied": "{{attempted, number}} dari {{total, number}} kartu dipelajari",
-    "detailStudied": "{{count, number}} dipelajari",
-    "detailStudied_one": "{{count, number}} dipelajari",
-    "detailStudied_other": "{{count, number}} dipelajari",
     "detailWithinWindow": "{{count, number}} dalam jadwal ulasan",
     "detailWithinWindow_one": "{{count, number}} dalam jadwal ulasan",
     "detailWithinWindow_other": "{{count, number}} dalam jadwal ulasan"
   },
   "completion": {
     "done": "Target tercapai",
-    "progress": "{{mature, number}} dari {{required, number}} kartu melekat",
-    "eta": "sekitar {{count, number}} hari lagi",
-    "eta_one": "sekitar {{count, number}} hari lagi",
-    "eta_other": "sekitar {{count, number}} hari lagi"
+    "progress": "{{mature, number}} kartu yang bisa ditinggal 3 minggu · target {{required, number}} (80% dari {{total, number}})",
+    "etaIfDaily": "Sisa {{remaining, number}} kartu harus melewati ulasan 1 hari → 3 hari → 8 hari berurutan. Paling cepat {{count, number}} hari, itu pun kalau semua benar.",
+    "etaIfDaily_one": "Sisa {{remaining, number}} kartu harus melewati ulasan 1 hari → 3 hari → 8 hari berurutan. Paling cepat {{count, number}} hari, itu pun kalau semua benar.",
+    "etaIfDaily_other": "Sisa {{remaining, number}} kartu harus melewati ulasan 1 hari → 3 hari → 8 hari berurutan. Paling cepat {{count, number}} hari, itu pun kalau semua benar."
   },
   "check": {
     "title_one": "{{count, number}} kartu hari ini — benar-benar hafal?",

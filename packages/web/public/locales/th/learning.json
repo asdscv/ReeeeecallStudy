@@ -10,7 +10,12 @@
       "createGoal": "สร้างเป้าหมาย",
       "noDecks": "เป้าหมายนี้ไม่มีสำรับที่ผูกไว้ จึงไม่มีอะไรให้วางแผน",
       "attachDecks": "ผูกสำรับ",
-      "nothingDue": "วันนี้ไม่มีการ์ดที่ต้องทบทวนในสำรับเหล่านี้"
+      "allCaughtUp": "ส่วนของวันนี้เสร็จแล้ว",
+      "backSoon": "การ์ดที่เพิ่งตอบจะกลับมาในอีกประมาณ {{count, number}} นาที",
+      "backSoon_one": "การ์ดที่เพิ่งตอบจะกลับมาในอีกประมาณ {{count, number}} นาที",
+      "backSoon_other": "การ์ดที่เพิ่งตอบจะกลับมาในอีกประมาณ {{count, number}} นาที",
+      "nextReview": "ทบทวนครั้งถัดไป: {{when}}",
+      "nothingScheduled": "เป้าหมายนี้ยังไม่มีการทบทวนที่กำหนดไว้ ลองเพิ่มการ์ดในชุด"
     },
     "item": {
       "study": "เรียน",
@@ -53,7 +58,10 @@
     },
     "deckListMore": "{{names}} และอีก {{count, number}} ชุด",
     "deckListMore_one": "{{names}} และอีก {{count, number}} ชุด",
-    "deckListMore_other": "{{names}} และอีก {{count, number}} ชุด"
+    "deckListMore_other": "{{names}} และอีก {{count, number}} ชุด",
+    "itemsUnavailable": "ตอนนี้เปิดการ์ด {{count, number}} ใบในแผนนี้ไม่ได้ อาจถูกลบไปแล้ว",
+    "itemsUnavailable_one": "ตอนนี้เปิดการ์ด {{count, number}} ใบในแผนนี้ไม่ได้ อาจถูกลบไปแล้ว",
+    "itemsUnavailable_other": "ตอนนี้เปิดการ์ด {{count, number}} ใบในแผนนี้ไม่ได้ อาจถูกลบไปแล้ว"
   },
   "goals": {
     "title": "เป้าหมายการเรียนรู้",
@@ -157,9 +165,6 @@
   },
   "history": {
     "title": "การเรียนล่าสุด",
-    "recap": "{{count, number}} ใบ · {{minutes, number}} นาที · เฉลี่ย {{seconds, number}} วินาทีต่อใบ",
-    "recap_one": "{{count, number}} ใบ · {{minutes, number}} นาที · เฉลี่ย {{seconds, number}} วินาทีต่อใบ",
-    "recap_other": "{{count, number}} ใบ · {{minutes, number}} นาที · เฉลี่ย {{seconds, number}} วินาทีต่อใบ",
     "band": {
       "known": "จำได้ {{count, number}}",
       "known_one": "จำได้ {{count, number}}",
@@ -170,32 +175,24 @@
       "missed": "จำไม่ได้ {{count, number}}",
       "missed_one": "จำไม่ได้ {{count, number}}",
       "missed_other": "จำไม่ได้ {{count, number}}"
-    }
+    },
+    "recapCount": "วันนี้ตอบไป {{count, number}} ครั้ง",
+    "recapCount_one": "วันนี้ตอบไป {{count, number}} ครั้ง",
+    "recapCount_other": "วันนี้ตอบไป {{count, number}} ครั้ง"
   },
   "insights": {
     "title": "วิเคราะห์การเรียน",
     "noData": "ยังไม่มีข้อมูล",
-    "attempts": "จำนวนการทำ (30 วัน)",
     "accuracy": "ความถูกต้อง",
     "notScoredYet": "ยังไม่มีการทำที่ถูกให้คะแนน",
-    "typicalTime": "เวลาโดยทั่วไป",
-    "seconds": "{{count, decimal}} วินาที",
-    "adherence": "อัตราทำตามแผน (14 วัน)",
     "weakTitle": "ควรดูอีกครั้ง",
-    "weakHint": "การ์ดที่ทำอย่างน้อย 2 ครั้ง โดยมีค่าเฉลี่ยต่ำกว่า 60%",
+    "weakHint": "การ์ดที่ดูอย่างน้อยสองครั้งแล้วผิดเกินครึ่ง",
     "weakEmpty": "ไม่มีการ์ดที่ตามไม่ทัน",
     "cardFallback": "(การ์ดไม่อยู่ในแผนวันนี้)",
     "attemptCount": "{{count, number}} ครั้ง",
-    "adherenceTitle": "แผนรายวัน (14 วัน)",
-    "adherenceEmpty": "ไม่มีแผนในช่วงเวลานี้",
-    "noPlanItems": "ไม่มีรายการที่วางแผนไว้",
-    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
-    "scopeNote": "อ้างอิงจากการทำและแผนของเป้าหมายนี้ สถิติ SRS ระดับสำรับอยู่ในประวัติการเรียน",
     "attemptCount_one": "{{count, number}} ครั้ง",
     "attemptCount_other": "{{count, number}} ครั้ง",
-    "accuracyValue": "ความแม่นยำ {{pct, number}}%",
-    "typicalValue": "ปกติ {{seconds, decimal}} วินาที",
-    "adherenceValue": "ทำตามแผน {{pct, number}}%",
+    "accuracyValue": "30 วันล่าสุด ถูก {{known, number}} จาก {{scored, number}} ครั้ง ({{pct, number}}%)",
     "weakCount": "{{count, number}} ใบ",
     "weakCount_one": "{{count, number}} ใบ",
     "weakCount_other": "{{count, number}} ใบ",
@@ -223,23 +220,20 @@
     "unstudied": "ยังไม่ได้เรียน {{count, number}} ใบ",
     "unstudied_one": "ยังไม่ได้เรียน {{count, number}} ใบ",
     "unstudied_other": "ยังไม่ได้เรียน {{count, number}} ใบ",
-    "behind": "มี {{count, number}} ใบเลยกำหนดทบทวน",
-    "behind_one": "มี {{count, number}} ใบเลยกำหนดทบทวน",
-    "behind_other": "มี {{count, number}} ใบเลยกำหนดทบทวน",
+    "behind": "มีการทบทวนเลยกำหนดเกินหนึ่งวัน {{count, number}} ใบ",
+    "behind_one": "มีการทบทวนเลยกำหนดเกินหนึ่งวัน {{count, number}} ใบ",
+    "behind_other": "มีการทบทวนเลยกำหนดเกินหนึ่งวัน {{count, number}} ใบ",
     "studied": "เรียนแล้ว {{attempted, number}} จาก {{total, number}} ใบ",
-    "detailStudied": "เรียนแล้ว {{count, number}} ใบ",
-    "detailStudied_one": "เรียนแล้ว {{count, number}} ใบ",
-    "detailStudied_other": "เรียนแล้ว {{count, number}} ใบ",
     "detailWithinWindow": "อยู่ในรอบทบทวน {{count, number}} ใบ",
     "detailWithinWindow_one": "อยู่ในรอบทบทวน {{count, number}} ใบ",
     "detailWithinWindow_other": "อยู่ในรอบทบทวน {{count, number}} ใบ"
   },
   "completion": {
     "done": "บรรลุเป้าหมายแล้ว",
-    "progress": "จำได้แล้ว {{mature, number}} จาก {{required, number}} ใบ",
-    "eta": "อีกประมาณ {{count, number}} วัน",
-    "eta_one": "อีกประมาณ {{count, number}} วัน",
-    "eta_other": "อีกประมาณ {{count, number}} วัน"
+    "progress": "การ์ดที่เว้นได้ 3 สัปดาห์ {{mature, number}} ใบ · เป้าหมาย {{required, number}} ใบ (80% ของทั้งหมด {{total, number}} ใบ)",
+    "etaIfDaily": "อีก {{remaining, number}} ใบต้องผ่านการทบทวน 1 วัน → 3 วัน → 8 วัน ตามลำดับ เร็วที่สุด {{count, number}} วัน และต้องถูกทุกครั้ง",
+    "etaIfDaily_one": "อีก {{remaining, number}} ใบต้องผ่านการทบทวน 1 วัน → 3 วัน → 8 วัน ตามลำดับ เร็วที่สุด {{count, number}} วัน และต้องถูกทุกครั้ง",
+    "etaIfDaily_other": "อีก {{remaining, number}} ใบต้องผ่านการทบทวน 1 วัน → 3 วัน → 8 วัน ตามลำดับ เร็วที่สุด {{count, number}} วัน และต้องถูกทุกครั้ง"
   },
   "check": {
     "title_one": "{{count, number}} การ์ดวันนี้ — จำได้จริงไหม?",
