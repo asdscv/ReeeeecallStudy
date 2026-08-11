@@ -116,6 +116,17 @@ class LearningTodayPO {
   /** Goal progress, which replaced the chip row that used to switch plans from inside one. */
   hasProgress() { return exists('learning-progress') }
 
+  /**
+   * The plan's one paid model call.
+   *
+   * `weak-explain` is the container and only renders when a weak card has a MISSED attempt to
+   * ground on, so its absence is the normal state on a healthy goal — it is `weak-explain-ask`
+   * appearing WITHOUT that premise that would mean the learner is being sold something with
+   * nothing behind it. Deliberately never tapped by the suite: a press spends real credits.
+   */
+  hasExplain() { return exists('weak-explain') }
+  hasExplainAsk() { return exists('weak-explain-ask') }
+
   async pageSource(): Promise<string> {
     return (await browser.getPageSource().catch(() => '')) ?? ''
   }
