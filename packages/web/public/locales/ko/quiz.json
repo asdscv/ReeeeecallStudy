@@ -53,7 +53,8 @@
     "generating": "문제를 만드는 중…",
     "difficulty": "난이도",
     "clampedCount_one": "이 덱으로는 {{count, number}}문항이 만들어져요.",
-    "clampedCount_other": "이 덱으로는 {{count, number}}문항이 만들어져요."
+    "clampedCount_other": "이 덱으로는 {{count, number}}문항이 만들어져요.",
+    "generatingBatch": "문제를 만드는 중… ({{done, number}}/{{total, number}})"
   },
   "run": {
     "loading": "불러오는 중…",

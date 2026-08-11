@@ -68,7 +68,10 @@
     "6m": "6B",
     "1y": "1T",
     "2y": "2T",
-    "5y": "5T"
+    "5y": "5T",
+    "custom": "Kustom",
+    "from": "Dari tanggal",
+    "to": "Sampai tanggal"
   },
   "confirmDialog": {
     "cancel": "Batal",
@@ -266,5 +269,14 @@
   },
   "shares": {
     "title": "Berbagi Saya"
+  },
+  "analytics": {
+    "retentionLabel": "Tingkat retensi",
+    "errorRateLabel": "Tingkat kesalahan",
+    "studyTimeLabel": "Waktu belajar",
+    "percent": "{{value, number}}%",
+    "minutes_one": "{{count, number}} menit",
+    "minutes_other": "{{count, number}} menit",
+    "allTime": "Sepanjang waktu"
   }
 }

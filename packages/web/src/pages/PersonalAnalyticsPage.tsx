@@ -7,6 +7,7 @@ import {
 } from 'recharts'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../stores/auth-store'
+import { resolveRange, type DateRange, type TimePeriod } from '../lib/time-period'
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
 
@@ -16,10 +17,27 @@ interface TimeDistribution { hour: string; minutes: number }
 interface ModeEffectiveness { mode: string; retention: number }
 interface ProgressPoint { week: string; mastered: number }
 
+interface AnalyticsProps {
+  /**
+   * The window the BEHAVIOUR charts cover. Omitted means all time.
+   *
+   * Only three of the five charts can honour it. Weak topics, time-of-day and mode
+   * effectiveness are counts of things that happened, so a window is meaningful. The
+   * retention curve and the progress line read the learner's CURRENT card state — there is
+   * no such thing as "my retention during July", only "my retention now" — so they stay
+   * all-time and say so on screen rather than silently ignoring the control.
+   */
+  period?: TimePeriod
+  range?: DateRange | null
+}
+
 /** Standalone analytics content — can be used as a tab inside StudyHistoryPage */
-export function PersonalAnalyticsContent() {
+export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {}) {
   const { t } = useTranslation('common')
   const { user } = useAuthStore()
+  const window = period ? resolveRange(period, range ?? null) : null
+  const fromIso = window ? new Date(window.fromMs).toISOString() : null
+  const toIso = window ? new Date(window.toMs).toISOString() : null
 
   const [retentionData, setRetentionData] = useState<RetentionPoint[]>([])
   const [weakTopics, setWeakTopics] = useState<WeakTopic[]>([])
@@ -30,11 +48,25 @@ export function PersonalAnalyticsContent() {
 
 
   async function loadRetentionCurve(userId: string) {
-    const { data: cards } = await supabase
-      .from('cards')
-      .select('srs_status, interval_days, last_reviewed_at')
-      .eq('user_id', userId)
-    if (!cards) return
+    // `learner_card_schedule` (mig 184), NOT `cards`.
+    //
+    // A learner's SRS state lives in `cards` only for decks they OWN. For a subscribed deck
+    // the cards belong to the publisher and the learner's schedule is in
+    // `user_card_progress` — 14,805 rows across 7 accounts in production. Reading
+    // `cards WHERE user_id = me` therefore returned nothing at all for a subscriber, and
+    // this chart drew a flat 0% retention curve that looked like a finding rather than a
+    // missing join.
+    const { data } = await supabase.rpc('learner_card_schedule', {
+      p_user_id: userId,
+      p_deck_ids: null,
+    })
+    // The RPC is untyped here, so name its shape once rather than at each use.
+    const cards = (data ?? []) as Array<{
+      srs_status: string | null
+      interval_days: number | null
+      last_reviewed_at: string | null
+    }>
+    if (!cards.length) return
     const intervals = [
       { label: '1d', min: 0, max: 1 },
       { label: '3d', min: 2, max: 3 },
@@ -44,8 +76,9 @@ export function PersonalAnalyticsContent() {
       { label: '60d+', min: 31, max: Infinity },
     ]
     const result: RetentionPoint[] = intervals.map(({ label, min, max }) => {
-      const bucket = cards.filter(c => c.interval_days >= min && c.interval_days <= max && c.last_reviewed_at)
-      const retained = bucket.filter(c => c.srs_status === 'review')
+      const bucket = cards.filter((c) =>
+        (c.interval_days ?? -1) >= min && (c.interval_days ?? -1) <= max && c.last_reviewed_at)
+      const retained = bucket.filter((c) => c.srs_status === 'review')
       const rate = bucket.length > 0 ? Math.round((retained.length / bucket.length) * 100) : 0
       return { interval: label, retention: rate }
     })
@@ -57,6 +90,8 @@ export function PersonalAnalyticsContent() {
       .from('study_logs')
       .select('deck_id, rating')
       .eq('user_id', userId)
+      .gte('studied_at', fromIso ?? '1970-01-01T00:00:00.000Z')
+      .lte('studied_at', toIso ?? '2999-01-01T00:00:00.000Z')
       .order('studied_at', { ascending: false })
       .limit(2000)
     if (!logs || logs.length === 0) return
@@ -93,6 +128,8 @@ export function PersonalAnalyticsContent() {
       .from('study_sessions')
       .select('started_at, total_duration_ms')
       .eq('user_id', userId)
+      .gte('started_at', fromIso ?? '1970-01-01T00:00:00.000Z')
+      .lte('started_at', toIso ?? '2999-01-01T00:00:00.000Z')
     if (!sessions) return
 
     const hourMap: Record<number, number> = {}
@@ -116,6 +153,8 @@ export function PersonalAnalyticsContent() {
       .from('study_logs')
       .select('study_mode, rating')
       .eq('user_id', userId)
+      .gte('studied_at', fromIso ?? '1970-01-01T00:00:00.000Z')
+      .lte('studied_at', toIso ?? '2999-01-01T00:00:00.000Z')
       .limit(5000)
     if (!logs || logs.length === 0) return
 
@@ -184,7 +223,7 @@ export function PersonalAnalyticsContent() {
       setLoading(false)
     }
     load()
-  }, [user])
+  }, [user, fromIso, toIso])
 
   if (loading) {
     return (
@@ -204,16 +243,20 @@ export function PersonalAnalyticsContent() {
 
       {/* Retention Curve */}
       <div className={sectionClass}>
-        <h2 className="text-lg font-semibold text-foreground mb-4">
-          {t('analytics.retentionCurve')}
-        </h2>
+        <div className="mb-4 flex items-baseline justify-between gap-2">
+          <h2 className="text-lg font-semibold text-foreground">{t('analytics.retentionCurve')}</h2>
+          {/* Said out loud: this chart reads current card state, so a period control cannot
+              apply to it. Silently ignoring the selection is what makes a dashboard feel
+              broken. */}
+          <span className="text-xs text-content-tertiary">{t('analytics.allTime')}</span>
+        </div>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={retentionData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="interval" />
               <YAxis domain={[0, 100]} tickFormatter={v => `${v}%`} />
-              <Tooltip formatter={(v) => [`${v}%`, 'Retention']} />
+              <Tooltip formatter={(v) => [t('analytics.percent', { value: Number(v) }), t('analytics.retentionLabel')]} />
               <Line type="monotone" dataKey="retention" stroke="#3b82f6" strokeWidth={2} dot={{ r: 4 }} />
             </LineChart>
           </ResponsiveContainer>
@@ -233,7 +276,7 @@ export function PersonalAnalyticsContent() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis type="number" domain={[0, 100]} tickFormatter={v => `${v}%`} />
                 <YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 12 }} />
-                <Tooltip formatter={(v) => [`${v}%`, 'Error Rate']} />
+                <Tooltip formatter={(v) => [t('analytics.percent', { value: Number(v) }), t('analytics.errorRateLabel')]} />
                 <Bar dataKey="errorRate" fill="#ef4444" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -261,7 +304,7 @@ export function PersonalAnalyticsContent() {
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(v) => [`${v}%`, 'Retention']} />
+                <Tooltip formatter={(v) => [t('analytics.percent', { value: Number(v) }), t('analytics.retentionLabel')]} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
@@ -280,7 +323,7 @@ export function PersonalAnalyticsContent() {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="hour" tick={{ fontSize: 11 }} />
               <YAxis tickFormatter={v => `${v}m`} />
-              <Tooltip formatter={(v) => [`${v} min`, 'Study Time']} />
+              <Tooltip formatter={(v) => [t('analytics.minutes', { count: Number(v) }), t('analytics.studyTimeLabel')]} />
               <Bar dataKey="minutes" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -289,9 +332,11 @@ export function PersonalAnalyticsContent() {
 
       {/* Progress Over Time */}
       <div className={sectionClass}>
-        <h2 className="text-lg font-semibold text-foreground mb-4">
-          {t('analytics.progress')}
-        </h2>
+        <div className="mb-4 flex items-baseline justify-between gap-2">
+          <h2 className="text-lg font-semibold text-foreground">{t('analytics.progress')}</h2>
+          {/* Cumulative by construction — a window would make the line start mid-air. */}
+          <span className="text-xs text-content-tertiary">{t('analytics.allTime')}</span>
+        </div>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={progressData}>

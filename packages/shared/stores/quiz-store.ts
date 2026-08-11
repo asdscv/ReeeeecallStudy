@@ -25,6 +25,25 @@ export type QuizScopeKind = 'deck' | 'tags' | 'cards'
 export type QuizAction = 'generate_mcq' | 'generate_short' | 'generate_essay'
   | 'grade_short' | 'grade_essay'
 
+/**
+ * Cards per generation call, mirroring `MAX_QUIZ_BATCH` in `ai-quiz-prompts.ts`.
+ *
+ * Kept slightly UNDER the server's cap on purpose. The server refuses at 10/10/3; sending
+ * exactly that leaves no room for a card list that grew between the quote and the call, and
+ * a refusal there costs the learner the whole batch. The essay figure is 3 because a rubric
+ * triples the output tokens per item — it is not a guess, it is the same number the server
+ * enforces.
+ *
+ * If this ever exceeds the server's cap, every batch fails with AI_REQUEST_TOO_LARGE — which
+ * is exactly the bug this batching exists to fix, so `quiz-batch-size.test.ts` pins the two
+ * together.
+ */
+export const QUIZ_BATCH_SIZE: Record<QuizQuestionType, number> = {
+  mcq: 8,
+  short: 8,
+  essay: 3,
+}
+
 export const QUIZ_GENERATE_ACTION: Record<QuizQuestionType, QuizAction> = {
   mcq: 'generate_mcq', short: 'generate_short', essay: 'generate_essay',
 }
@@ -197,6 +216,9 @@ interface QuizState {
   quote: (action: QuizAction, count: number) => Promise<QuizQuote>
   grantTrial: () => Promise<number>
 
+  /** Progress while a long quiz is being generated batch by batch. `null` when idle. */
+  generateProgress: { done: number; total: number } | null
+
   createAndGenerate: (input: {
     deckId: string
     title: string
@@ -239,6 +261,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   run: null,
   loading: false,
   generating: false,
+  generateProgress: null,
   grading: false,
 
   fetchSets: async () => {
@@ -320,23 +343,60 @@ export const useQuizStore = create<QuizState>((set, get) => ({
         fillers?: string[]
       }
 
-      const { error: genError } = await supabase.functions.invoke('ai-generate', {
-        body: {
-          kind: 'quiz_generate',
-          setId: result.set_id,
-          questionType: input.questionType,
-          cardIds: result.cards.map((c) => c.card_id),
-          fillers: result.fillers ?? [],
-          clientRef: newClientRef(),
-          maxPriceMicro: input.maxPriceMicro,
-        },
-      })
-      if (genError) throw new QuizError(await quizErrorCode(genError))
+      // ── Generate in batches ────────────────────────────────────────────────
+      //
+      // One call cannot hold a whole quiz. The edge function caps a call at
+      // `QUIZ_BATCH_SIZE` cards, and that cap is real: five questions took 22.1s against a
+      // 30s provider timeout. Sending everything at once is why 서술형 failed at EVERY
+      // count the screen offered — its cap is 3 and the smallest option was 4.
+      //
+      // Each batch reserves, generates and settles on its own, so a batch that fails costs
+      // nothing and leaves the ones that succeeded in place. `persist_quiz_questions`
+      // appends (mig 207), so the set accumulates.
+      const allCards = result.cards.map((c) => c.card_id)
+      const size = QUIZ_BATCH_SIZE[input.questionType]
+      const batches: string[][] = []
+      for (let i = 0; i < allCards.length; i += size) batches.push(allCards.slice(i, i + size))
+
+      set({ generateProgress: { done: 0, total: batches.length } })
+      let firstError: unknown = null
+      let delivered = 0
+
+      for (const [index, cardIds] of batches.entries()) {
+        const { error: genError } = await supabase.functions.invoke('ai-generate', {
+          body: {
+            kind: 'quiz_generate',
+            setId: result.set_id,
+            questionType: input.questionType,
+            cardIds,
+            fillers: result.fillers ?? [],
+            clientRef: newClientRef(),
+            // Per BATCH, not for the whole quiz: the reservation this authorises is this
+            // call's, and passing the total would let one batch spend all of it.
+            maxPriceMicro: Math.ceil(input.maxPriceMicro / batches.length),
+          },
+        })
+        if (genError) {
+          // Keep going. A later batch may well succeed, and a quiz of 40 is worth more to
+          // the learner than an error because question 12 could not be written. The first
+          // failure is remembered in case NOTHING lands.
+          if (firstError === null) firstError = genError
+        } else {
+          delivered += 1
+        }
+        set({ generateProgress: { done: index + 1, total: batches.length } })
+      }
+
+      // Only a total failure is an error. Anything else is under-delivery, which the set
+      // list already discloses ("asked for N").
+      if (delivered === 0 && firstError !== null) {
+        throw new QuizError(await quizErrorCode(firstError))
+      }
 
       await get().fetchSets()
       return result.set_id
     } finally {
-      set({ generating: false })
+      set({ generating: false, generateProgress: null })
     }
   },
 

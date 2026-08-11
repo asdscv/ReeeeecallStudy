@@ -83,7 +83,10 @@
     "6m": "6Th",
     "1y": "1Năm",
     "2y": "2Năm",
-    "5y": "5Năm"
+    "5y": "5Năm",
+    "custom": "Tùy chọn",
+    "from": "Từ ngày",
+    "to": "Đến ngày"
   },
   "confirmDialog": {
     "cancel": "Hủy",
@@ -216,7 +219,14 @@
     "weakTopics": "Weak Topics",
     "studyTime": "Study Time Distribution",
     "modeEffectiveness": "Mode Effectiveness",
-    "progress": "Progress Over Time"
+    "progress": "Progress Over Time",
+    "retentionLabel": "Tỷ lệ ghi nhớ",
+    "errorRateLabel": "Tỷ lệ sai",
+    "studyTimeLabel": "Thời gian học",
+    "percent": "{{value, number}}%",
+    "minutes_one": "{{count, number}} phút",
+    "minutes_other": "{{count, number}} phút",
+    "allTime": "Toàn bộ"
   },
   "pomodoro": {
     "focus": "Focus",

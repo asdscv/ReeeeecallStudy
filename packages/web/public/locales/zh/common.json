@@ -83,7 +83,10 @@
     "6m": "6月",
     "1y": "1年",
     "2y": "2年",
-    "5y": "5年"
+    "5y": "5年",
+    "custom": "自定义",
+    "from": "开始日期",
+    "to": "结束日期"
   },
   "confirmDialog": {
     "cancel": "取消",
@@ -216,7 +219,14 @@
     "weakTopics": "Weak Topics",
     "studyTime": "Study Time Distribution",
     "modeEffectiveness": "Mode Effectiveness",
-    "progress": "Progress Over Time"
+    "progress": "Progress Over Time",
+    "retentionLabel": "记忆保持率",
+    "errorRateLabel": "错误率",
+    "studyTimeLabel": "学习时间",
+    "percent": "{{value, number}}%",
+    "minutes_one": "{{count, number}} 分钟",
+    "minutes_other": "{{count, number}} 分钟",
+    "allTime": "全部时间"
   },
   "pomodoro": {
     "focus": "Focus",

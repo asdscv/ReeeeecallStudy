@@ -83,7 +83,10 @@
     "6m": "6 เดือน",
     "1y": "1 ปี",
     "2y": "2 ปี",
-    "5y": "5 ปี"
+    "5y": "5 ปี",
+    "custom": "กำหนดเอง",
+    "from": "วันเริ่มต้น",
+    "to": "วันสิ้นสุด"
   },
   "confirmDialog": {
     "cancel": "ยกเลิก",
@@ -216,7 +219,14 @@
     "weakTopics": "Weak Topics",
     "studyTime": "Study Time Distribution",
     "modeEffectiveness": "Mode Effectiveness",
-    "progress": "Progress Over Time"
+    "progress": "Progress Over Time",
+    "retentionLabel": "อัตราการจำได้",
+    "errorRateLabel": "อัตราผิด",
+    "studyTimeLabel": "เวลาเรียน",
+    "percent": "{{value, number}}%",
+    "minutes_one": "{{count, number}} นาที",
+    "minutes_other": "{{count, number}} นาที",
+    "allTime": "ทั้งหมด"
   },
   "pomodoro": {
     "focus": "Focus",
