@@ -31,7 +31,6 @@
 --
 -- Nothing here is charged and nothing calls a model: both changes are additional reads over
 -- rows that were already being written.
-\set ON_ERROR_STOP on
 BEGIN;
 
 -- ── 1) The digest, per day ───────────────────────────────────────────────────

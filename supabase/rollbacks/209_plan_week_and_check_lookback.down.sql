@@ -5,7 +5,6 @@
 --
 -- The check functions have to go back to their 3-argument signatures, because a client on
 -- the old bundle calls them by name with the old parameter set.
-\set ON_ERROR_STOP on
 BEGIN;
 
 DROP FUNCTION IF EXISTS public.count_daily_check_cards(text, integer);

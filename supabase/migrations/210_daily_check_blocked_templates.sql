@@ -22,7 +22,6 @@
 --
 -- So `blocked` comes back with it: the templates whose cards were studied and dropped, with
 -- enough to name them and link to their editor. Nothing about the refusal changes.
-\set ON_ERROR_STOP on
 BEGIN;
 
 CREATE OR REPLACE FUNCTION public.count_daily_check_cards(

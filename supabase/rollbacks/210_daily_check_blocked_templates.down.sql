@@ -2,7 +2,6 @@
 --
 -- Safe in either direction: the screen renders the explanation only when `blocked` is a
 -- non-empty array, so a server without the key falls back to the silence 209 shipped with.
-\set ON_ERROR_STOP on
 BEGIN;
 
 CREATE OR REPLACE FUNCTION public.count_daily_check_cards(
