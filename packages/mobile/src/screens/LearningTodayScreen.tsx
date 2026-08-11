@@ -387,7 +387,7 @@ export function LearningTodayScreen() {
     plan, planItems, planCards, planLoading, planGenerating, planError, planErrorFrom,
     planBlockedReason,
     fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
-    extendPlan, planExtending, planExtension,
+    extendPlan, planExtending, planExtension, generateAheadPlan,
     attempts, attemptsLoading, fetchAttempts,
     knowledge, fetchGoalKnowledge,
     insights, weakCardDecks, insightsGoalId, fetchInsights,
@@ -994,6 +994,31 @@ export function LearningTodayScreen() {
                       ? t('today.empty.nextReview', { when: formatWhen(caughtUpState.atISO) })
                       : t('today.empty.nothingScheduled')}
                 </Text>
+                {/* The day daily study was impossible from — see the web note. `더 하기` lives
+                    inside the plan branch, and on a day with nothing due there IS no plan. */}
+                {caughtUpState.kind !== 'empty' && goal && (
+                  <>
+                    <TouchableOpacity
+                      onPress={() => { void generateAheadPlan(goal, currentPlanContext()) }}
+                      disabled={planGenerating}
+                      style={[styles.primaryBtn, {
+                        backgroundColor: theme.colors.surfaceElevated,
+                        borderWidth: 1, borderColor: theme.colors.border, marginTop: 12,
+                      }, planGenerating && styles.disabled]}
+                      accessibilityRole="button"
+                      {...testProps('learning-study-ahead')}
+                    >
+                      <Text style={[theme.typography.bodySmall, { color: theme.colors.text }]}>
+                        {planGenerating ? t('today.generating') : t('today.studyAhead')}
+                      </Text>
+                    </TouchableOpacity>
+                    <Text style={[theme.typography.caption, {
+                      color: theme.colors.textTertiary, marginTop: 6,
+                    }]}>
+                      {t('today.studyAheadNote')}
+                    </Text>
+                  </>
+                )}
               </View>
             )}
 

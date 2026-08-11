@@ -404,7 +404,7 @@ export function LearningTodayPage() {
     plan, planItems, planCards, planLoading, planGenerating, planError,
     planBlockedReason,
     fetchPlan, generatePlan, autoGeneratePlan, planAbsentFor, autoPlanAttempted,
-    extendPlan, planExtending, planExtension,
+    extendPlan, planExtending, planExtension, generateAheadPlan,
     knowledge, fetchGoalKnowledge, completeGoalIfEarned,
     planErrorFrom,
   } = useLearningStore()
@@ -672,6 +672,25 @@ export function LearningTodayPage() {
                 ? t('today.empty.nextReview', { when: formatWhen(caughtUpState.atISO) })
                 : t('today.empty.nothingScheduled')}
           </p>
+          {/* The day daily study was impossible from.
+              `더 하기` lives inside the plan branch, and on a day with nothing due there IS no
+              plan — so a goal set to seven days a week offered nothing at all on most days.
+              This is the way in: it builds today out of cards whose turn has not come, on a
+              press, and the line under it says that is what it did. */}
+          {caughtUpState.kind !== 'empty' && goal && (
+            <>
+              <button
+                type="button"
+                onClick={() => { void generateAheadPlan(goal, ctx) }}
+                disabled={planGenerating}
+                className="mt-3 w-full cursor-pointer rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent disabled:opacity-50"
+                data-testid="study-ahead"
+              >
+                {planGenerating ? t('today.generating') : t('today.studyAhead')}
+              </button>
+              <p className="mt-2 text-[11px] text-content-tertiary">{t('today.studyAheadNote')}</p>
+            </>
+          )}
         </div>
       ) : planLoading ? (
         <ListSkeleton />

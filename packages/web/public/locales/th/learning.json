@@ -70,7 +70,9 @@
     "backSoonNote_other": "วันนี้เสร็จแล้ว การ์ดที่เพิ่งตอบจะกลับมาในอีกประมาณ {{count, number}} นาที",
     "extendAhead": "ดึงการ์ดที่ยังไม่ถึงคิวมา {{count, number}} ใบ",
     "extendAhead_one": "ดึงการ์ดที่ยังไม่ถึงคิวมา {{count, number}} ใบ",
-    "extendAhead_other": "ดึงการ์ดที่ยังไม่ถึงคิวมา {{count, number}} ใบ"
+    "extendAhead_other": "ดึงการ์ดที่ยังไม่ถึงคิวมา {{count, number}} ใบ",
+    "studyAhead": "เรียนล่วงหน้า",
+    "studyAheadNote": "วันนี้ไม่มีการ์ดถึงกำหนด ระบบจะดึงการ์ดที่ยังไม่ถึงคิวมาทำเป็นส่วนของวันนี้"
   },
   "goals": {
     "title": "เป้าหมายการเรียนรู้",

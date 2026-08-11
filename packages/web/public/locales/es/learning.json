@@ -70,7 +70,9 @@
     "backSoonNote_other": "Hoy está hecho. Las tarjetas que acabas de responder vuelven en unos {{count, number}} minutos.",
     "extendAhead": "Se adelantaron {{count, number}} tarjetas: aún no era su turno.",
     "extendAhead_one": "Se adelantaron {{count, number}} tarjetas: aún no era su turno.",
-    "extendAhead_other": "Se adelantaron {{count, number}} tarjetas: aún no era su turno."
+    "extendAhead_other": "Se adelantaron {{count, number}} tarjetas: aún no era su turno.",
+    "studyAhead": "Estudiar por adelantado",
+    "studyAheadNote": "Hoy no vence nada. Esto arma una sesión con tarjetas cuyo turno aún no ha llegado."
   },
   "goals": {
     "title": "Objetivos de aprendizaje",
