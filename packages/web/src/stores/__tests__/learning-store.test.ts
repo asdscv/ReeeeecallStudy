@@ -1014,6 +1014,73 @@ describe('the archive', () => {
 // "더 하기". The operation that could not exist before mig 185: the only way to add work to a
 // day was `save_daily_plan`, which deletes every item and zeroes the day's progress — so a
 // learner who had done half the plan and wanted more would have lost the half they did.
+// ── the session the learner asked for ──────────────────────────────────────
+//
+// `daily_minutes` is what they said they do IN A SESSION — the goal form divides by
+// `perStudyDayMultiplier` precisely because of that. The planner had no obligation to reach
+// it: it took whatever was due and stopped. On a small or well-learned deck that is nothing
+// most days, so a goal set to seven days a week produced a plan on six days out of
+// twenty-nine. `settings.cadence` was stored and never read by anything that plans.
+describe('generatePlan fills the session', () => {
+  const DECKS = [{ deck_id: 'deck-1', importance: 0.9 }]
+
+  it('tops a short day up from cards whose turn is nearly here', async () => {
+    // One card due, a twenty-minute budget: about a minute of work, then an empty screen.
+    queue('cards', { data: [cardRow('due-1')], error: null })          // due
+    queue('cards', { data: [], error: null })                         // intake
+    queue('card_templates', { data: [], error: null })
+    queue('study_logs', { data: [], error: null })
+    // The top-up pass, bounded to the next few days.
+    queue('decks', { data: [deckRow()], error: null })
+    queue('cards', {
+      data: Array.from({ length: 8 }, (_, i) => cardRow(`soon-${i}`, {
+        next_review_at: '2026-08-01T00:00:00.000Z',
+        last_reviewed_at: '2026-07-29T00:00:00.000Z',
+      })),
+      error: null,
+    })
+    queue('cards', { data: [], error: null })
+    queue('card_templates', { data: [], error: null })
+    queue('study_logs', { data: [], error: null })
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+    queue('daily_plans', { data: null, error: null })
+    queue('daily_plan_items', { data: [], error: null })
+    queue('cards', { data: [], error: null })
+
+    await useLearningStore.getState().generatePlan(goalWithDecks(DECKS), CTX)
+
+    const [, args] = mockRpc.mock.calls.find(([n]) => n === 'save_daily_plan')!
+    const items = (args as { p_items: unknown[] }).p_items
+    // The one due card ALONE would be a one-minute day against a twenty-minute budget.
+    expect(items.length).toBeGreaterThan(1)
+  })
+
+  it('leaves owed work on the table alone', async () => {
+    // Forty due cards, and a language goal plans twenty of them — the activity mix declines to
+    // spend the whole budget on one class. Ten minutes look "missing" while twenty OWED cards
+    // sit unselected, and reaching forward there would pull tomorrow's work onto the desk of
+    // someone already behind. Leaving candidates unselected means the day is as full as the
+    // planner wants it.
+    queue('cards', {
+      data: Array.from({ length: 40 }, (_, i) => cardRow(`due-${i}`)),
+      error: null,
+    })
+    queue('cards', { data: [], error: null })
+    queue('card_templates', { data: [], error: null })
+    queue('study_logs', { data: [], error: null })
+    mockRpc.mockResolvedValue({ data: { ok: true }, error: null })
+    queue('daily_plans', { data: null, error: null })
+    queue('daily_plan_items', { data: [], error: null })
+    queue('cards', { data: [], error: null })
+
+    await useLearningStore.getState().generatePlan(goalWithDecks(DECKS), CTX)
+
+    // `decks` is read once per collect pass. A second read means the top-up ran.
+    const deckReads = mockFrom.mock.calls.filter(([t]) => t === 'decks').length
+    expect(deckReads, 'the top-up ran on a day that was already full').toBe(1)
+  })
+})
+
 describe('extendPlan', () => {
   const DECKS = [{ deck_id: 'deck-1', importance: 0.5 }]
 

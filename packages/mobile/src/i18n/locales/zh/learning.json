@@ -219,7 +219,9 @@
     "backSoonNote_other": "今天的都做完了。刚回答的卡片大约 {{count, number}} 分钟后会再出现。",
     "extendAhead": "提前取了 {{count, number}} 张还没轮到的卡片。",
     "extendAhead_one": "提前取了 {{count, number}} 张还没轮到的卡片。",
-    "extendAhead_other": "提前取了 {{count, number}} 张还没轮到的卡片。"
+    "extendAhead_other": "提前取了 {{count, number}} 张还没轮到的卡片。",
+    "studyAhead": "提前学习",
+    "studyAheadNote": "今天没有到期的卡片。这会提前取用还没轮到的卡片来组成今天的份量。"
   },
   "progress": {
     "title": "进度",

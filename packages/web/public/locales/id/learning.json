@@ -70,7 +70,9 @@
     "backSoonNote_other": "Hari ini selesai. Kartu yang baru kamu jawab kembali sekitar {{count, number}} menit lagi.",
     "extendAhead": "Mengambil {{count, number}} kartu lebih awal — belum gilirannya.",
     "extendAhead_one": "Mengambil {{count, number}} kartu lebih awal — belum gilirannya.",
-    "extendAhead_other": "Mengambil {{count, number}} kartu lebih awal — belum gilirannya."
+    "extendAhead_other": "Mengambil {{count, number}} kartu lebih awal — belum gilirannya.",
+    "studyAhead": "Belajar lebih awal",
+    "studyAheadNote": "Tidak ada yang jatuh tempo hari ini. Ini menyusun sesi dari kartu yang belum gilirannya."
   },
   "goals": {
     "title": "Tujuan belajar",

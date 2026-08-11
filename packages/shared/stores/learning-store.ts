@@ -628,6 +628,13 @@ interface LearningState {
    * impossible before — a learner who had done half the plan would have lost the half.
    */
   extendPlan: (goal: LearningGoalWithDecks, ctx: PlanContext) => Promise<boolean>
+  /**
+   * Build today out of cards whose turn has not come, on explicit request.
+   *
+   * The answer to "매일 공부하고 싶은데 오늘 아무것도 안 뜬다". Unbounded, unlike the automatic
+   * top-up in {@link generatePlan}, because a press is a decision.
+   */
+  generateAheadPlan: (goal: LearningGoalWithDecks, ctx: PlanContext) => Promise<boolean>
   recordAttempt: (input: AttemptInput, planDate: string) => Promise<boolean>
   fetchAttempts: (goalId: string) => Promise<void>
   fetchGoalKnowledge: (goalId: string, atISO: string) => Promise<void>
@@ -769,6 +776,15 @@ const EXTRA_BLOCK_MINUTES = 10
  */
 const AHEAD_BLOCK_MINUTES = 3
 
+/**
+ * How far ahead the DAILY plan may reach to fill a short session, in days.
+ *
+ * Small on purpose. This runs automatically, so it has to be a reach nobody would object to:
+ * a card due tomorrow answered today is a few hours early, not a rescheduling. Anything
+ * further is a decision, and decisions live behind a press.
+ */
+const AUTO_AHEAD_DAYS = 3
+
 /** Nothing to exclude — `generatePlan` builds the whole day from scratch. */
 const EMPTY_EXCLUSIONS: ReadonlySet<string> = new Set()
 
@@ -809,9 +825,20 @@ async function collectPlanInputs(
   ctx: PlanContext,
   userId: string,
   excludeCardIds: ReadonlySet<string>,
-  opts: { aheadOfSchedule?: boolean } = {},
+  opts: { aheadOfSchedule?: boolean; aheadWithinDays?: number } = {},
 ): Promise<PlanInputs> {
   const ahead = opts.aheadOfSchedule === true
+  /**
+   * How far ahead a widened fetch may reach, in days. Undefined means no bound.
+   *
+   * Bounded is what makes an AUTOMATIC top-up safe. Pulling a card due tomorrow forward by a
+   * day costs almost nothing; pulling one due in three weeks forward compresses a schedule the
+   * learner never asked to compress. So the daily plan reaches only a few days out, and the
+   * unbounded reach stays behind an explicit press.
+   */
+  const aheadHorizon = ahead && Number.isFinite(opts.aheadWithinDays)
+    ? new Date(Date.parse(ctx.now) + (opts.aheadWithinDays as number) * 86_400_000).toISOString()
+    : null
   const deckIds = goal.decks.map((link) => link.deck_id)
   if (deckIds.length === 0) {
     // Nothing to plan over. Reported rather than thrown: sending an empty item list would
@@ -866,7 +893,10 @@ async function collectPlanInputs(
       // `next_review_at` ascending puts everything owed ahead of everything upcoming, so a
       // widened fetch still serves the backlog first and only then pulls the nearest card
       // forward.
-      const { data, error } = await (ahead ? query : query.lte('next_review_at', ctx.now))
+      const bounded = ahead
+        ? (aheadHorizon ? query.lte('next_review_at', aheadHorizon) : query)
+        : query.lte('next_review_at', ctx.now)
+      const { data, error } = await bounded
         .order('next_review_at', { ascending: true })
         .limit(fetchLimit)
         .returns<Card[]>()
@@ -908,9 +938,12 @@ async function collectPlanInputs(
         .select('id, user_id, card_id, deck_id, srs_status, ease_factor, interval_days, repetitions, next_review_at, last_reviewed_at, srs_revision, created_at, updated_at')
         .eq('user_id', userId)
         .in('deck_id', progressDeckIds)
-      const { data: progressRows, error: progressErr } = await (ahead
-        ? progressQuery
-        : progressQuery.or(`next_review_at.is.null,next_review_at.lte.${ctx.now}`))
+      const boundedProgress = ahead
+        ? (aheadHorizon
+          ? progressQuery.or(`next_review_at.is.null,next_review_at.lte.${aheadHorizon}`)
+          : progressQuery)
+        : progressQuery.or(`next_review_at.is.null,next_review_at.lte.${ctx.now}`)
+      const { data: progressRows, error: progressErr } = await boundedProgress
         .order('next_review_at', { ascending: true, nullsFirst: false })
         .limit(fetchLimit)
         .returns<UserCardProgress[]>()
@@ -928,7 +961,10 @@ async function collectPlanInputs(
       const attached = attachProgressToCards(cardData ?? [], rows)
       // Re-checked in memory because a progress row can be seeded with a due date the query
       // matched on — except when the caller asked to look ahead, where not-yet-due IS the point.
-      return ahead ? attached : attached.filter((card) => isDueAt(card.next_review_at, ctx.now))
+      if (!ahead) return attached.filter((card) => isDueAt(card.next_review_at, ctx.now))
+      return aheadHorizon
+        ? attached.filter((card) => !card.next_review_at || card.next_review_at <= aheadHorizon)
+        : attached
     })()
 
     // No slice. Each source is already bounded by what the budget can hold, and cutting the
@@ -1449,7 +1485,68 @@ export const useLearningStore = create<LearningState>((set, get) => ({
         return false
       }
 
-      const items = toPlanItemRows(output, cards, templatesById, candidates)
+      let items = toPlanItemRows(output, cards, templatesById, candidates)
+
+      /**
+       * Fill the session the learner asked for.
+       *
+       * `daily_minutes` is what they said they do IN A SESSION — `GoalFormModal` divides by
+       * `perStudyDayMultiplier` precisely because of that. The planner had no obligation to
+       * reach it: it took whatever was due, and stopped. On a small or well-learned deck that
+       * is nothing most days, so a goal set to study seven days a week produced a plan on six
+       * days out of twenty-nine and an empty screen on the rest. The setting promised daily
+       * study and nothing in the planning path had ever read it.
+       *
+       * So a short day is topped up from cards whose turn is NEARLY here — bounded by
+       * {@link AUTO_AHEAD_DAYS}, because that bound is what makes doing this automatically
+       * defensible. Pulling a card due tomorrow forward by a day costs almost nothing. Reaching
+       * three weeks out to manufacture a session would compress a schedule the learner never
+       * asked to compress, so that reach stays behind an explicit press (`generateAheadPlan`).
+       */
+      const plannedMinutes = output.items.reduce((sum, i) => sum + i.estimatedMinutes, 0)
+      const shortBy = goal.daily_minutes - plannedMinutes
+      /**
+       * The day is short only when the planner RAN OUT, not merely when it stopped.
+       *
+       * Budget-versus-planned is the wrong signal, and measuring it that way would have shipped
+       * a bad bug: a language goal with forty due cards plans twenty of them — the activity mix
+       * declines to spend the whole budget on one class — so ten minutes look "missing" while
+       * twenty owed cards sit unselected. Reaching forward there would pull tomorrow's work
+       * onto the desk of someone already behind.
+       *
+       * Leaving candidates on the table means the day is as full as the planner wants it. Only
+       * an exhausted pool says there was nothing more to take.
+       */
+      const poolExhausted = output.items.length >= candidates.length
+      if (poolExhausted && shortBy >= RECALL_MINUTES * 2) {
+        const already = new Set(items.map((i) => i.card_id).filter((id): id is string => !!id))
+        const near = await collectPlanInputs(goal, ctx, userId, already, {
+          aheadOfSchedule: true, aheadWithinDays: AUTO_AHEAD_DAYS,
+        })
+        if (!near.blocked) {
+          const topUp = buildDailyPlan({
+            goal: toDomainGoal(goal, userId),
+            candidates: near.candidates,
+            budgetMinutes: shortBy,
+            // Intake is already spent by the pass above; this block is review only.
+            newCardsPerDay: 0,
+            activityMix: activityMixForDomain(goal.domain_id),
+            now: ctx.now,
+            timezone: ctx.timezone,
+            algorithmVersion: DAILY_PLANNER_VERSION,
+          }, {
+            supportedActivityTypes: supportedActivityTypesForDomain(goal.domain_id),
+          })
+          if (topUp.items.length > 0) {
+            // Appended, not interleaved: `save_daily_plan` takes position from array order, and
+            // owed work should still be the first thing the learner sees.
+            items = [
+              ...items,
+              ...toPlanItemRows(topUp, near.cards, near.templatesById, near.candidates),
+            ]
+          }
+        }
+      }
 
       const { error: saveErr } = await supabase.rpc('save_daily_plan', {
         p_goal_id: goal.id,
@@ -1464,6 +1561,74 @@ export const useLearningStore = create<LearningState>((set, get) => ({
 
       // Re-read: the stored rows (with their ids and server-side statuses) are what
       // the UI acts on, not the in-memory planner output.
+      await get().fetchPlan(goal.id, ctx.planDate)
+      return true
+    } catch (e) {
+      set({ planError: toLearningError(e), planErrorFrom: 'generate' })
+      return false
+    } finally {
+      set({ planGenerating: false })
+    }
+  },
+
+  /**
+   * Build a day out of cards whose turn has NOT come, on explicit request.
+   *
+   * The day the learner opens a caught-up goal and wants to study anyway. `generatePlan` will
+   * not do this: it reaches three days ahead at most, because it runs automatically and an
+   * automatic reach into next month is a rescheduling nobody asked for. This one is a press,
+   * so it is unbounded — and the screen says what it did.
+   *
+   * Deliberately NOT wired into `autoGeneratePlan`. A goal that quietly manufactures a full
+   * session every day stops being spaced repetition; the learner has to ask.
+   */
+  generateAheadPlan: async (goal, ctx) => {
+    if (get().planGenerating) return false
+    set({ planGenerating: true, planError: null, planErrorFrom: null, planBlockedReason: null })
+    try {
+      const { data: userData } = await supabase.auth.getUser()
+      const userId = userData?.user?.id
+      if (!userId) throw { code: 'P0001', message: 'Authentication required' }
+
+      const inputs = await collectPlanInputs(goal, ctx, userId, EMPTY_EXCLUSIONS, {
+        aheadOfSchedule: true,
+      })
+      if (inputs.blocked) {
+        // Nothing owed AND nothing upcoming: the goal's decks are genuinely empty of anything
+        // this learner could study, which is the one state the blocked card is true for.
+        set({ planBlockedReason: inputs.blocked })
+        return false
+      }
+      const { cards, templatesById, candidates } = inputs
+
+      const output = buildDailyPlan({
+        goal: toDomainGoal(goal, userId),
+        candidates,
+        budgetMinutes: goal.daily_minutes,
+        newCardsPerDay: parseNewCardsPerDay(goal.settings) ?? DEFAULT_NEW_CARDS_PER_DAY,
+        activityMix: activityMixForDomain(goal.domain_id),
+        now: ctx.now,
+        timezone: ctx.timezone,
+        algorithmVersion: DAILY_PLANNER_VERSION,
+      }, {
+        supportedActivityTypes: supportedActivityTypesForDomain(goal.domain_id),
+      })
+      if (output.items.length === 0) {
+        set({ planBlockedReason: 'no_candidates' })
+        return false
+      }
+
+      const { error: saveErr } = await supabase.rpc('save_daily_plan', {
+        p_goal_id: goal.id,
+        p_plan_date: ctx.planDate,
+        p_timezone: ctx.timezone,
+        p_algorithm_version: output.algorithmVersion,
+        p_input_fingerprint: output.inputFingerprint,
+        p_budget_minutes: goal.daily_minutes,
+        p_items: toPlanItemRows(output, cards, templatesById, candidates),
+      })
+      if (saveErr) throw saveErr
+
       await get().fetchPlan(goal.id, ctx.planDate)
       return true
     } catch (e) {
