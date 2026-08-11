@@ -75,11 +75,6 @@ const baseState = (over: StoreState = {}): StoreState => ({
   recordAttempt: vi.fn().mockResolvedValue(true), fetchAttempts: vi.fn(),
   insights: null, weakCardDecks: {}, insightsLoading: false, insightsGoalId: null,
   fetchInsights: vi.fn(),
-  enrichment: null, enrichmentPendingCardId: null, enrichmentError: null,
-  enrichmentSaving: false, enrichmentQuote: null,
-  requestEnrichment: vi.fn().mockResolvedValue(true),
-  loadEnrichmentQuote: vi.fn().mockResolvedValue(undefined),
-  resolveEnrichment: vi.fn(), dismissEnrichment: vi.fn(),
 
   // The week, and the coach that lives inside it.
   planWeek: planWeek({ by_day: LIVE_WEEK, days: 7, items_planned: 52, items_done: 28 }),

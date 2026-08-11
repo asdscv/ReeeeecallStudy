@@ -110,15 +110,6 @@ const baseState = (over: StoreState = {}): StoreState => ({
   insightsLoading: false,
   insightsGoalId: null,
   fetchInsights: vi.fn(),
-  enrichment: null,
-  enrichmentPendingCardId: null,
-  enrichmentError: null,
-  enrichmentSaving: false,
-  enrichmentQuote: null,
-  requestEnrichment: vi.fn().mockResolvedValue(true),
-  loadEnrichmentQuote: vi.fn().mockResolvedValue(undefined),
-  resolveEnrichment: vi.fn(),
-  dismissEnrichment: vi.fn(),
   ...over,
 })
 

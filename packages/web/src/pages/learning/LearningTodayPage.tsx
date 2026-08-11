@@ -14,6 +14,9 @@ import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summ
 import { goalCompletion } from '@reeeeecall/shared/lib/goal-completion'
 import { caughtUp } from '@reeeeecall/shared/lib/caught-up'
 import {
+  latestAttemptForCard, attemptNeedsRemediation,
+} from '@reeeeecall/shared/lib/learning-attempt-selection'
+import {
   parseNewCardsPerDay, DEFAULT_NEW_CARDS_PER_DAY,
 } from '@reeeeecall/shared/learning/application/cadence'
 import { useQuizStore, type DailyCheckCount } from '@reeeeecall/shared/stores/quiz-store'
@@ -264,9 +267,111 @@ function LearningDiagnostics({ goalId }: { goalId: string }) {
             </Link>
           ))}
           <p className="text-[11px] text-content-tertiary">{t('insights.weakHint')}</p>
+
+          {/* The one paid AI action in the learning plan, and the one place it is grounded.
+              A weak card is a card the learner has attempted twice or more and missed most of
+              the time — so there IS a real attempt to explain, which is what the server
+              refuses to proceed without. */}
+          <WeakCardExplain goalId={goalId} cardIds={weakByDeck.flatMap((g) => g.cardIds)} />
         </div>
       )}
     </section>
+  )
+}
+
+/**
+ * "왜 자꾸 틀리는지" — the learning plan's one paid model call.
+ *
+ * Everything else on this screen is computed on the device: the plan is a deterministic ranker,
+ * the week strip is a SQL digest, the coach is an ordered rule chain over eight integers, and
+ * 오늘의 확인 asks the card's own question. The owner asked, fairly, 뭐가 AI란 말이야. This is
+ * the answer — and the whole server half of it has been deployed the entire time with no caller:
+ * the edge function's `kind: 'remediation'` branch reserves against the wallet, loads the
+ * grounding, prompts, validates, persists, and releases the hold when the model fails.
+ *
+ * Grounded, or refused. `learning-attempt-selection.ts` picks the attempt — the most recent one
+ * on the card — and only offers the button when that attempt was actually a MISS
+ * (`normalized_score < 0.75`). Selling an explanation of something the learner just said they
+ * knew would be selling a premise that does not exist, and `explain` on a success has nothing
+ * to work with beyond the card itself.
+ */
+function WeakCardExplain({ goalId, cardIds }: { goalId: string; cardIds: readonly string[] }) {
+  const { t, i18n } = useTranslation('learning')
+  const {
+    attempts, requestRemediation, dismissRemediation,
+    remediation, remediationBusyAttemptId, remediationError,
+  } = useLearningStore()
+
+  /**
+   * The weakest card that has an attempt worth explaining.
+   *
+   * One button, not one per card. A column of paid buttons is a shop; the learner asked which
+   * card they keep missing, and the list above already answers that.
+   */
+  const target = useMemo(() => {
+    const found = cardIds
+      .map((cardId) => ({ cardId, attempt: latestAttemptForCard(attempts, cardId) }))
+      .find((candidate) => attemptNeedsRemediation(candidate.attempt))
+    return found?.attempt ? { cardId: found.cardId, attempt: found.attempt } : null
+  }, [attempts, cardIds])
+
+  if (!target) return null
+
+  const shown = remediation?.attemptId === target.attempt.id ? remediation : null
+  const busy = remediationBusyAttemptId === target.attempt.id
+
+  return (
+    <div className="mt-2 rounded-lg border border-brand/30 bg-brand/5 p-3" data-testid="weak-explain">
+      {shown ? (
+        <>
+          <p className="text-sm text-foreground">{shown.summary}</p>
+          {shown.blocks.map((block, i) => (
+            typeof block.content === 'string' && block.content.trim() !== '' ? (
+              <p key={i} className="mt-1.5 text-xs text-content-tertiary">{block.content}</p>
+            ) : null
+          ))}
+          {/* The model's own reservations, when it had any. Dropping them would present a
+              hedged answer as a confident one. */}
+          {shown.warnings.map((warning, i) => (
+            <p key={`w${i}`} className="mt-1.5 text-[11px] text-amber-600">{warning}</p>
+          ))}
+          <button
+            type="button"
+            onClick={dismissRemediation}
+            className="mt-3 cursor-pointer text-xs text-brand underline underline-offset-2"
+          >
+            {t('explain.dismiss')}
+          </button>
+        </>
+      ) : (
+        <>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => {
+              void requestRemediation({
+                action: 'explain',
+                goalId,
+                attemptId: target.attempt.id,
+                cardId: target.cardId,
+                uiLang: i18n.language,
+              })
+            }}
+            className="w-full cursor-pointer rounded-lg bg-brand px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
+            data-testid="weak-explain-ask"
+          >
+            {busy ? t('explain.asking') : t('explain.ask')}
+          </button>
+          <p className="mt-2 text-[11px] text-content-tertiary">{t('explain.note')}</p>
+        </>
+      )}
+      {remediationError && (
+        <p role="alert" className="mt-2 text-xs text-destructive">
+          {t(remediationError.code === 'AI_INSUFFICIENT_CREDITS'
+            ? 'explain.needsCredits' : 'explain.failed')}
+        </p>
+      )}
+    </div>
   )
 }
 
