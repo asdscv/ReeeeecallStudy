@@ -18,6 +18,7 @@ import {
 import { planWeek as derivePlanWeek, type PlanWeek, type WeekDigest } from '../learning/application/plan-week'
 import type { TemplateFieldOrder } from '../lib/card-prompt'
 import { supabase } from '../lib/supabase'
+import { callServerAI } from '../lib/ai/server-client'
 import {
   buildCandidatesFromCards, legacyCardItemShape, planItemAnswerPayload, RECALL_MINUTES,
   TYPED_ANSWER_MAX_CHARS, type CandidateStudyLog,
@@ -255,6 +256,16 @@ export interface PlanCardRef {
   field_values: Record<string, string>
 }
 
+/**
+ * The remediation actions this app offers.
+ *
+ * A strict subset of the protocol vocabulary, and deliberately the same subset the server
+ * actually serves (`SERVED_REMEDIATION_ACTIONS` in supabase/functions/_shared/ai-remediation.ts).
+ * Sending anything else is refused before the wallet is touched, so a wider union here would
+ * only let a screen offer a button that always fails.
+ */
+export type RemediationAction = 'explain' | 'hint' | 'compare'
+
 export interface AttemptRow {
   id: string
   goal_id: string | null
@@ -480,6 +491,31 @@ interface LearningState {
   planErrorFrom: 'read' | 'generate' | 'extend' | 'record' | null
   /** A failed history read. Its own field so it cannot be mistaken for a failed plan. */
   attemptsError: LearningError | null
+  /**
+   * The last paid explanation the learner asked for, and which attempt it was about.
+   *
+   * Keyed by attempt so a second card's explanation cannot appear under the first card's
+   * heading — the failure mode every other goal-scoped read on this screen has a guard for.
+   */
+  remediation: {
+    attemptId: string
+    action: RemediationAction
+    summary: string
+    blocks: Array<{ type: string; content: unknown }>
+    warnings: string[]
+  } | null
+  /** The attempt a paid request is in flight for, so only that row shows a spinner. */
+  remediationBusyAttemptId: string | null
+  /**
+   * The server's OWN code, verbatim — `AI_INSUFFICIENT_CREDITS`, `AI_RATE_CAP`,
+   * `COMPARE_UNGROUNDED:…`, `NETWORK_ERROR`.
+   *
+   * Not a `LearningError`: that maps Postgres SQLSTATEs, and `callServerAI` throws
+   * `new Error(code)` where the code is the edge function's, so routing it through the SQL
+   * mapper would turn every distinct AI failure into `UNKNOWN` — including the one the learner
+   * can act on, which is having no credits.
+   */
+  remediationError: { code: string } | null
   /** A coach that could not be produced. Never shown; kept so a failure is not swallowed. */
   coachError: LearningError | null
   /**
@@ -661,6 +697,29 @@ interface LearningState {
    * second implementation free to disagree.
    */
   applyPlanCoach: (recommendationId: string) => Promise<boolean>
+  /**
+   * Ask the server for a paid explanation of ONE attempt.
+   *
+   * The whole server half of this has been deployed the entire time — the edge function's
+   * `kind: 'remediation'` branch reserves against the wallet, loads the grounding, builds the
+   * prompt, validates the result, persists it and releases the hold on failure. There has never
+   * been a caller. `packages/shared/lib/learning-attempt-selection.ts` even holds the rule for
+   * WHICH attempt may be sent, written as a pure function so both platforms pick the same one.
+   *
+   * `attemptId` is passed in, never guessed here: a paid call must be grounded in an attempt a
+   * screen deliberately chose, and a store that picks one on the caller's behalf is how a
+   * learner ends up paying for an explanation of something they did not ask about.
+   */
+  requestRemediation: (input: {
+    action: RemediationAction
+    goalId: string
+    attemptId: string
+    cardId: string | null
+    uiLang: string
+  }) => Promise<boolean>
+  /** Drop the explanation on screen. Not a refund — it has been paid for and persisted. */
+  dismissRemediation: () => void
+
   reset: () => void
 }
 
@@ -1099,6 +1158,9 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   planErrorFrom: null,
   attemptsError: null,
   coachError: null,
+  remediation: null,
+  remediationBusyAttemptId: null,
+  remediationError: null,
   planWeek: null,
   planWeekGoalId: null,
   planAbsentFor: null,
@@ -2219,6 +2281,63 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   /** Close the preview without deciding. It stays 'preview' server-side and can be
    *  resolved later; the money is spent either way. */
 
+  requestRemediation: async ({ action, goalId, attemptId, cardId, uiLang }) => {
+    if (get().remediationBusyAttemptId) return false
+    set({ remediationBusyAttemptId: attemptId, remediationError: null })
+    try {
+      const result = await callServerAI({
+        kind: 'remediation',
+        action,
+        uiLang,
+        goalId,
+        attemptId,
+        // The card is sent so the server can load the prompt and the declared answer field. An
+        // absent card is not an error: `explain` can stand on the attempt alone.
+        ...(cardId ? { cardIds: [cardId] } : {}),
+      })
+      const content = result.content as {
+        summary?: unknown
+        blocks?: unknown
+        warnings?: unknown
+      }
+      // Re-checked here even though the server validated it: this store is what the screen
+      // renders from, and a shape assertion at the boundary is what stops one bad response
+      // becoming a blank card the learner has already paid for.
+      const summary = typeof content.summary === 'string' ? content.summary.trim() : ''
+      const blocks = Array.isArray(content.blocks)
+        ? (content.blocks as Array<{ type?: unknown; content?: unknown }>)
+          .filter((b) => b && typeof b.type === 'string')
+          .map((b) => ({ type: String(b.type), content: b.content }))
+        : []
+      if (summary === '' && blocks.length === 0) throw { code: 'AI_INVALID_RESULT' }
+
+      set({
+        remediation: {
+          attemptId,
+          action,
+          summary,
+          blocks,
+          warnings: Array.isArray(content.warnings)
+            ? (content.warnings as unknown[]).filter((w): w is string => typeof w === 'string')
+            : [],
+        },
+      })
+      return true
+    } catch (e) {
+      // `callServerAI` throws `new Error(<code>)`, so the code is the MESSAGE. Anything else
+      // reaching here is a client-side fault, which is not a code the learner can act on.
+      const code = e instanceof Error && e.message ? e.message
+        : typeof (e as { code?: unknown })?.code === 'string' ? String((e as { code: string }).code)
+          : 'SERVER_ERROR'
+      set({ remediationError: { code } })
+      return false
+    } finally {
+      set({ remediationBusyAttemptId: null })
+    }
+  },
+
+  dismissRemediation: () => set({ remediation: null, remediationError: null }),
+
   reset: () => {
     // Bump both generations so any response still in flight is recognised as superseded and
     // cannot repopulate the store after a logout.
@@ -2229,6 +2348,7 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       plan: null, planItems: [], planCards: {}, planTemplateFields: {},
       planLoading: false, planGenerating: false,
       planError: null, planErrorFrom: null, attemptsError: null, coachError: null,
+      remediation: null, remediationBusyAttemptId: null, remediationError: null,
       planBlockedReason: null,
       // Both must go with the plan they describe. A surviving `planAbsentFor` would assert
       // "there is no plan today" about the account that just signed OUT, and a surviving

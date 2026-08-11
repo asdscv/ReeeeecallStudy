@@ -310,5 +310,13 @@
       "none": "Không có kế hoạch"
     },
     "streakBroken": "Chuỗi ngày đã đứt. Hôm nay có thể bắt đầu lại"
+  },
+  "explain": {
+    "ask": "Giải thích vì sao tôi cứ sai thẻ này",
+    "asking": "Đang viết giải thích…",
+    "note": "Dựa trên lần trả lời gần nhất của bạn với thẻ này. Sử dụng tín dụng.",
+    "dismiss": "Đóng",
+    "needsCredits": "Hết tín dụng nên không tạo được giải thích.",
+    "failed": "Không tạo được giải thích. Vui lòng thử lại."
   }
 }

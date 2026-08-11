@@ -201,7 +201,13 @@ export function buildRemediationPrompt(refs: RemediationRefs, context: Remediati
     ] : []),
     requireGrounding
       ? 'Ground all substantive claims in the supplied sources and include at least one valid citation. If sources are insufficient, say so in warnings.'
-      : 'Use only supplied learning context; state uncertainty in warnings.',
+      // No sources were supplied, so there is nothing a citation could point AT. Said
+      // explicitly because the schema line above still names a `citations` field, and a model
+      // that helpfully fills it in cites an id that does not exist — which
+      // `validateRemediationResult` used to reject, turning a paid request the learner had
+      // already been charged the provider tokens for into a 502.
+      : 'No sources were supplied: citations MUST be an empty array. Use only the supplied'
+        + ' learning context; state uncertainty in warnings.',
     `Write learner-facing text in locale ${refs.uiLang}.`,
   ].join('\n')
   const safeContext = JSON.stringify({ refs, context: { ...context, attempt: promptAttempt } }).slice(0, 64 * 1024)
@@ -223,7 +229,16 @@ export function validateRemediationResult(
   for (const citation of value.citations) {
     if (!citation || typeof citation !== 'object') return { valid: false, reason: 'invalid citation' }
     const sourceId = (citation as Record<string, unknown>).sourceId
-    if (typeof sourceId !== 'string' || !allowedSourceIds.includes(sourceId)) return { valid: false, reason: 'unknown citation source' }
+    if (typeof sourceId !== 'string' || !allowedSourceIds.includes(sourceId)) {
+      // When the answer had to be grounded, an unknown citation is the failure this validator
+      // exists for: the model claimed a source it was not given.
+      if (requireGrounding) return { valid: false, reason: 'unknown citation source' }
+      // When it did NOT, there were no sources at all, so a volunteered citation points at
+      // nothing renderable — and failing the whole request over a field the learner never sees
+      // is worse than dropping it. The prompt above now says to omit them; this is what
+      // happens when a model ignores that.
+      continue
+    }
     sourceIds.push(sourceId)
   }
   if (requireGrounding && sourceIds.length === 0) return { valid: false, reason: 'source grounding required' }
