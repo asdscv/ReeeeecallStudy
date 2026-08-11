@@ -37,7 +37,7 @@
     "extendAdded_other": "Se añadieron {{count, number}} elementos más.",
     "extendTomorrow_one": "{{count, number}} es nueva, así que mañana tendrás ese mismo número de repasos más.",
     "extendTomorrow_other": "{{count, number}} son nuevas, así que mañana tendrás ese mismo número de repasos más.",
-    "extendNothing": "Ahora mismo no hay nada más que añadir.",
+    "extendNothing": "No quedan más tarjetas en esta meta para añadir.",
     "remaining": "Quedan {{count, number}} hoy",
     "remaining_one": "Quedan {{count, number}} hoy",
     "remaining_other": "Quedan {{count, number}} hoy",
@@ -61,7 +61,13 @@
     "deckListMore_other": "{{names}} +{{count, number}} más",
     "itemsUnavailable": "{{count, number}} tarjetas de este plan no se pueden abrir ahora. Puede que se hayan borrado.",
     "itemsUnavailable_one": "{{count, number}} tarjetas de este plan no se pueden abrir ahora. Puede que se hayan borrado.",
-    "itemsUnavailable_other": "{{count, number}} tarjetas de este plan no se pueden abrir ahora. Puede que se hayan borrado."
+    "itemsUnavailable_other": "{{count, number}} tarjetas de este plan no se pueden abrir ahora. Puede que se hayan borrado.",
+    "backSoonNote": "Hoy está hecho. Las tarjetas que acabas de responder vuelven en unos {{count, number}} minutos.",
+    "backSoonNote_one": "Hoy está hecho. Las tarjetas que acabas de responder vuelven en unos {{count, number}} minutos.",
+    "backSoonNote_other": "Hoy está hecho. Las tarjetas que acabas de responder vuelven en unos {{count, number}} minutos.",
+    "extendAhead": "Se adelantaron {{count, number}} tarjetas: aún no era su turno.",
+    "extendAhead_one": "Se adelantaron {{count, number}} tarjetas: aún no era su turno.",
+    "extendAhead_other": "Se adelantaron {{count, number}} tarjetas: aún no era su turno."
   },
   "goals": {
     "title": "Objetivos de aprendizaje",

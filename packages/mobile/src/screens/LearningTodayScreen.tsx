@@ -738,7 +738,10 @@ export function LearningTodayScreen() {
   // "배운 29장" whenever the headline was about a backlog — a count with no denominator, one
   // line under a different count with a different one.
   const progressDetail = goalSummary.notStarted ? '' : [
-    t('progress.detailWithinWindow', { count: goalSummary.withinWindow }),
+    // Each half omitted when empty — see the web note. "복습 주기 안 0장" is a real state:
+    // every card just answered means every card is in a learning step.
+    goalSummary.withinWindow > 0
+      ? t('progress.detailWithinWindow', { count: goalSummary.withinWindow }) : null,
     goalSummary.unstudied > 0 ? t('progress.unstudied', { count: goalSummary.unstudied }) : null,
   ].filter(Boolean).join(' · ')
 
@@ -1067,10 +1070,14 @@ export function LearningTodayScreen() {
                       {t('today.itemsUnavailable', { count: unreachableTotal || pendingTotal })}
                     </Text>
                   ) : (
+                    /* "내일 또 만나요" is wrong whenever the cards come back sooner — and after
+                       a session they usually do. See the web note. */
                     <Text style={[theme.typography.bodySmall, {
                       color: theme.colors.success, marginTop: 12, textAlign: 'center',
                     }]} {...testProps('learning-all-done')}>
-                      {t('today.allDoneNote')}
+                      {caughtUpState.kind === 'soon'
+                        ? t('today.backSoonNote', { count: caughtUpState.minutes ?? 1 })
+                        : t('today.allDoneNote')}
                     </Text>
                   )}
                 </View>
@@ -1151,6 +1158,10 @@ export function LearningTodayScreen() {
                       // and a button that grows tomorrow's list in silence is how a learner
                       // ends up abandoning a goal they were doing well at.
                       : t('today.extendAdded', { count: planExtension.appended })
+                        + (planExtension.aheadOfSchedule
+                          // Studying early has a real cost; it is never done silently.
+                          ? ' ' + t('today.extendAhead', { count: planExtension.appended })
+                          : '')
                         + (planExtension.reviewsTomorrow > 0
                           ? ' ' + t('today.extendTomorrow', { count: planExtension.reviewsTomorrow })
                           : '')}

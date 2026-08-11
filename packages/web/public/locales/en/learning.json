@@ -37,7 +37,7 @@
     "extendAdded_other": "Added {{count, number}} more items.",
     "extendTomorrow_one": "{{count, number}} of them is new, so tomorrow gains that many reviews.",
     "extendTomorrow_other": "{{count, number}} of them are new, so tomorrow gains that many reviews.",
-    "extendNothing": "There's nothing left to add right now.",
+    "extendNothing": "There are no more cards in this goal to add.",
     "remaining": "{{count, number}} left today",
     "remaining_one": "{{count, number}} left today",
     "remaining_other": "{{count, number}} left today",
@@ -61,7 +61,13 @@
     "deckListMore_other": "{{names}} +{{count, number}} more",
     "itemsUnavailable": "{{count, number}} cards in this plan cannot be opened right now. They may have been deleted.",
     "itemsUnavailable_one": "{{count, number}} cards in this plan cannot be opened right now. They may have been deleted.",
-    "itemsUnavailable_other": "{{count, number}} cards in this plan cannot be opened right now. They may have been deleted."
+    "itemsUnavailable_other": "{{count, number}} cards in this plan cannot be opened right now. They may have been deleted.",
+    "backSoonNote": "Today is done. The cards you just answered come back in about {{count, number}} minutes.",
+    "backSoonNote_one": "Today is done. The cards you just answered come back in about {{count, number}} minutes.",
+    "backSoonNote_other": "Today is done. The cards you just answered come back in about {{count, number}} minutes.",
+    "extendAhead": "Pulled {{count, number}} cards forward — their turn had not come yet.",
+    "extendAhead_one": "Pulled {{count, number}} cards forward — their turn had not come yet.",
+    "extendAhead_other": "Pulled {{count, number}} cards forward — their turn had not come yet."
   },
   "goals": {
     "title": "Learning goals",

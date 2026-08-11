@@ -37,7 +37,7 @@
     "extendAdded_other": "{{count, number}}件を追加しました。",
     "extendTomorrow_one": "うち新規カードが{{count, number}}枚なので、明日の復習がその分増えます。",
     "extendTomorrow_other": "うち新規カードが{{count, number}}枚なので、明日の復習がその分増えます。",
-    "extendNothing": "今は追加できるものがありません。",
+    "extendNothing": "この目標に追加できるカードがもうありません。",
     "remaining": "残り {{count, number}}枚",
     "remaining_one": "残り {{count, number}}枚",
     "remaining_other": "残り {{count, number}}枚",
@@ -61,7 +61,13 @@
     "deckListMore_other": "{{names}} ほか{{count, number}}件",
     "itemsUnavailable": "このプランのカード{{count, number}}枚を今は開けません。削除された可能性があります。",
     "itemsUnavailable_one": "このプランのカード{{count, number}}枚を今は開けません。削除された可能性があります。",
-    "itemsUnavailable_other": "このプランのカード{{count, number}}枚を今は開けません。削除された可能性があります。"
+    "itemsUnavailable_other": "このプランのカード{{count, number}}枚を今は開けません。削除された可能性があります。",
+    "backSoonNote": "今日の分は終わりました。さっき答えたカードが約{{count, number}}分後にまた出ます。",
+    "backSoonNote_one": "今日の分は終わりました。さっき答えたカードが約{{count, number}}分後にまた出ます。",
+    "backSoonNote_other": "今日の分は終わりました。さっき答えたカードが約{{count, number}}分後にまた出ます。",
+    "extendAhead": "まだ順番でないカード{{count, number}}枚を先に持ってきました。",
+    "extendAhead_one": "まだ順番でないカード{{count, number}}枚を先に持ってきました。",
+    "extendAhead_other": "まだ順番でないカード{{count, number}}枚を先に持ってきました。"
   },
   "goals": {
     "title": "学習目標",

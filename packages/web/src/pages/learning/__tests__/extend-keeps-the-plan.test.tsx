@@ -126,6 +126,48 @@ beforeEach(() => {
   }
 })
 
+/**
+ * 오늘 몫을 하다가 중단한 날.
+ *
+ * The day is not a binary. A learner does five of twelve, closes the app, and comes back —
+ * hours later, or tomorrow. Every claim the screen makes has to survive that, and two of them
+ * did not: the totals were summed from a grouping that could silently shrink, and the
+ * finished-day note promised "내일 또 만나요" while the cards were coming back in minutes.
+ */
+describe('a day that was interrupted partway', () => {
+  const halfDone = {
+    plan: { ...finishedPlan, completed_items: 5 },
+    planItems: finishedItems.map((it, i) => ({
+      ...it, status: i < 5 ? 'completed' : 'pending',
+    })),
+  }
+
+  it('says what is left, from the plan\'s own counters', () => {
+    renderToday(halfDone)
+    expect(screen.getByText(/today\.remaining/)).toBeInTheDocument()
+    expect(screen.queryByText('today.allDone')).not.toBeInTheDocument()
+  })
+
+  it('offers to CONTINUE, not to start over', () => {
+    // `이어서 학습` vs `학습 시작`. Reading it off `completed_items` rather than off the
+    // resolvable items means a card deleted mid-day cannot make the day look untouched.
+    renderToday(halfDone)
+    expect(screen.getByRole('link', { name: /today\.continueStudy/ })).toBeInTheDocument()
+  })
+
+  it('does not offer 더 하기 before the day is done', () => {
+    // "더 하기" means MORE than today's share. Offering it beside unfinished work invites the
+    // learner to grow a list they have not started.
+    renderToday(halfDone)
+    expect(screen.queryByRole('button', { name: 'today.extend' })).not.toBeInTheDocument()
+  })
+
+  it('offers it the moment the day IS done', () => {
+    renderToday()
+    expect(screen.getByRole('button', { name: 'today.extend' })).toBeInTheDocument()
+  })
+})
+
 describe('더 하기 on a finished day', () => {
   it('offers the button once the day is done', () => {
     renderToday()
