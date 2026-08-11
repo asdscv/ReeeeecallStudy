@@ -69,7 +69,10 @@
     "6m": "6M",
     "1y": "1Y",
     "2y": "2Y",
-    "5y": "5Y"
+    "5y": "5Y",
+    "custom": "Custom",
+    "from": "From",
+    "to": "To"
   },
   "confirmDialog": {
     "cancel": "Cancel",
@@ -266,5 +269,14 @@
   },
   "shares": {
     "title": "My Shares"
+  },
+  "analytics": {
+    "retentionLabel": "Retention",
+    "errorRateLabel": "Error rate",
+    "studyTimeLabel": "Study time",
+    "percent": "{{value, number}}%",
+    "minutes_one": "{{count, number}} min",
+    "minutes_other": "{{count, number}} min",
+    "allTime": "All time"
   }
 }

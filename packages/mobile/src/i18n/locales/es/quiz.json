@@ -53,7 +53,8 @@
     "generating": "Escribiendo preguntas…",
     "difficulty": "Dificultad",
     "clampedCount_one": "Este mazo genera {{count, number}} pregunta.",
-    "clampedCount_other": "Este mazo genera {{count, number}} preguntas."
+    "clampedCount_other": "Este mazo genera {{count, number}} preguntas.",
+    "generatingBatch": "Creando… ({{done, number}}/{{total, number}})"
   },
   "run": {
     "loading": "Cargando…",

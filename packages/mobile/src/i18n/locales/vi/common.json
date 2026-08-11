@@ -68,7 +68,10 @@
     "6m": "6Th",
     "1y": "1Năm",
     "2y": "2Năm",
-    "5y": "5Năm"
+    "5y": "5Năm",
+    "custom": "Tùy chọn",
+    "from": "Từ ngày",
+    "to": "Đến ngày"
   },
   "confirmDialog": {
     "cancel": "Hủy",
@@ -266,5 +269,14 @@
   },
   "shares": {
     "title": "Chia sẻ của tôi"
+  },
+  "analytics": {
+    "retentionLabel": "Tỷ lệ ghi nhớ",
+    "errorRateLabel": "Tỷ lệ sai",
+    "studyTimeLabel": "Thời gian học",
+    "percent": "{{value, number}}%",
+    "minutes_one": "{{count, number}} phút",
+    "minutes_other": "{{count, number}} phút",
+    "allTime": "Toàn bộ"
   }
 }

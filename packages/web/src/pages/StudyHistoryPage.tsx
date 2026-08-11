@@ -17,6 +17,7 @@ import {
 } from '../lib/study-history'
 import {
   filterSessionsByPeriod,
+  filterSessionsByRange,
   filterSessionsByDeckScope,
   computeOverviewStats,
   computeModeBreakdown,
@@ -27,8 +28,8 @@ import {
 } from '../lib/study-history-stats'
 import type { DeckScope } from '../lib/study-history-stats'
 import { getStreakDays } from '../lib/stats'
-import { periodToDays } from '../lib/time-period'
-import type { TimePeriod } from '../lib/time-period'
+import { periodToDays, rangeDays, resolveRange } from '../lib/time-period'
+import type { DateRange, TimePeriod } from '../lib/time-period'
 import { TimePeriodTabs } from '../components/common/TimePeriodTabs'
 import { OverviewStatsCards } from '../components/study-history/OverviewStatsCards'
 import { StudyVolumeChart } from '../components/study-history/StudyVolumeChart'
@@ -71,6 +72,7 @@ export function StudyHistoryPage() {
   const [deckProgress, setDeckProgress] = useState<DeckProgress[]>([])
   const [loading, setLoading] = useState(true)
   const [period, setPeriod] = useState<TimePeriod>('1m')
+  const [customRange, setCustomRange] = useState<DateRange | null>(null)
   const [deckScope, setDeckScope] = useState<DeckScope>('all')
   const [modeFilter, setModeFilter] = useState<string>('all')
   const [currentPage, setCurrentPage] = useState(1)
@@ -161,12 +163,18 @@ export function StudyHistoryPage() {
 
   // ── Derived data (memoized) ──
 
-  const days = periodToDays(period)
+  // One window for every period, preset or custom — so the charts, the stats and the list
+  // can never be describing different spans. `null` means a custom range with a field still
+  // empty; the previous window stays on screen rather than blanking everything mid-typing.
+  const range = useMemo(() => resolveRange(period, customRange), [period, customRange])
+  const days = range ? rangeDays(range) : periodToDays(period)
 
   // Step 1: filter by period
   const periodSessions = useMemo(
-    () => filterSessionsByPeriod(sessions, days),
-    [sessions, days]
+    () => (range
+      ? filterSessionsByRange(sessions, range.fromMs, range.toMs)
+      : filterSessionsByPeriod(sessions, days)),
+    [sessions, range, days]
   )
 
   // Step 2: filter by deck scope — this affects ALL charts and stats
@@ -214,10 +222,13 @@ export function StudyHistoryPage() {
   )
 
   // Reset page when filters change — render-time adjustment avoids effect-based setState.
-  const [prevPeriod, setPrevPeriod] = useState(period)
+  const [prevPeriod, setPrevPeriod] = useState<string>(period)
   const [prevDeckScope, setPrevDeckScope] = useState(deckScope)
-  if (period !== prevPeriod || deckScope !== prevDeckScope) {
-    setPrevPeriod(period)
+  // Keyed by the resolved window, not the chip: moving a custom date changes the page's
+  // contents without changing `period`, and page 7 of the old window is meaningless in the new.
+  const periodKey = `${period}|${customRange?.from ?? ''}|${customRange?.to ?? ''}`
+  if (periodKey !== prevPeriod || deckScope !== prevDeckScope) {
+    setPrevPeriod(periodKey)
     setPrevDeckScope(deckScope)
     setCurrentPage(1)
   }
@@ -287,19 +298,37 @@ export function StudyHistoryPage() {
       </div>
 
       {historyTab === 'analytics' ? (
-        <Suspense fallback={
-          <div className="flex justify-center py-20">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand border-t-transparent" />
+        <div className="flex flex-col gap-3">
+          {/* The analytics tab had no period control at all: every chart was all-time with
+              nothing saying so, and no way to ask a narrower question. It shares the history
+              tab's selection, so switching tabs keeps the window the learner chose. */}
+          <div className="flex justify-end">
+            <TimePeriodTabs
+              value={period}
+              onChange={setPeriod}
+              range={customRange}
+              onRangeChange={setCustomRange}
+            />
           </div>
-        }>
-          <PersonalAnalyticsContent />
-        </Suspense>
+          <Suspense fallback={
+            <div className="flex justify-center py-20">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand border-t-transparent" />
+            </div>
+          }>
+            <PersonalAnalyticsContent period={period} range={customRange} />
+          </Suspense>
+        </div>
       ) : (
       <>
       {/* ── Deck Scope + Period Selection ── */}
       <div className="flex flex-col gap-3">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-end gap-3">
-          <TimePeriodTabs value={period} onChange={setPeriod} />
+          <TimePeriodTabs
+            value={period}
+            onChange={setPeriod}
+            range={customRange}
+            onRangeChange={setCustomRange}
+          />
         </div>
 
         {/* Deck scope selector — scrollable tabs */}
