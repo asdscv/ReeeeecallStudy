@@ -221,7 +221,8 @@
     "extendAhead_one": "Pulled {{count, number}} cards forward — their turn had not come yet.",
     "extendAhead_other": "Pulled {{count, number}} cards forward — their turn had not come yet.",
     "studyAhead": "Study ahead",
-    "studyAheadNote": "Nothing is due today. This builds a session from cards whose turn has not come yet."
+    "studyAheadNote": "Nothing is due today. This builds a session from cards whose turn has not come yet.",
+    "retry": "Try loading again"
   },
   "progress": {
     "title": "Progress",
@@ -318,6 +319,8 @@
     "note": "Grounded in your most recent attempt on this card. Uses credits.",
     "dismiss": "Close",
     "needsCredits": "No credits left, so the explanation could not be written.",
-    "failed": "Could not write the explanation. Please try again."
+    "failed": "Could not write the explanation. Please try again.",
+    "reopen": "Show the explanation again",
+    "inFlight": "Still working on your explanation — one moment."
   }
 }

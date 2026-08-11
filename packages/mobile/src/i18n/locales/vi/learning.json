@@ -221,7 +221,8 @@
     "extendAhead_one": "Đã lấy trước {{count, number}} thẻ chưa đến lượt.",
     "extendAhead_other": "Đã lấy trước {{count, number}} thẻ chưa đến lượt.",
     "studyAhead": "Học trước",
-    "studyAheadNote": "Hôm nay không có thẻ đến hạn. Thao tác này lấy trước những thẻ chưa đến lượt."
+    "studyAheadNote": "Hôm nay không có thẻ đến hạn. Thao tác này lấy trước những thẻ chưa đến lượt.",
+    "retry": "Tải lại"
   },
   "progress": {
     "title": "Tiến độ",
@@ -318,6 +319,8 @@
     "note": "Dựa trên lần trả lời gần nhất của bạn với thẻ này. Sử dụng tín dụng.",
     "dismiss": "Đóng",
     "needsCredits": "Hết tín dụng nên không tạo được giải thích.",
-    "failed": "Không tạo được giải thích. Vui lòng thử lại."
+    "failed": "Không tạo được giải thích. Vui lòng thử lại.",
+    "reopen": "Xem lại phần giải thích",
+    "inFlight": "Đang tạo phần giải thích, vui lòng đợi một chút."
   }
 }

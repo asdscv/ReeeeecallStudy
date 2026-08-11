@@ -37,4 +37,38 @@ config.resolver.sourceExts = [
 // guarantees TS-first resolution.
 config.resolver.unstable_enablePackageExports = false;
 
+// ONE i18next for the whole bundle, app and @reeeeecall/shared alike.
+//
+// This app declares `i18next: ^24.2.2` and the shared package declares `^25.8.10`. The ranges
+// do not overlap, so pnpm installs two copies, and `import i18next from 'i18next'` meant two
+// different singletons depending on which package the importing file lived in. `src/i18n`
+// initialises the app's copy; nothing ever initialised the shared one.
+//
+// Every `i18next.t()` in `packages/shared/lib` therefore returned nothing on the phone, and it
+// was visible: 학습 기록 rendered a session as "srs · 6장 · 0undefined" — the study-mode label
+// falling back to its raw enum, and `formatDuration` concatenating a bare 0 with an undefined
+// unit. `i18next.language` was undefined too, so the shared date formatter fell back to the
+// system locale instead of the language the learner chose.
+//
+// Web never had this: it declares the same range as shared, so pnpm hoists one copy.
+//
+// Aliased rather than version-bumped on purpose. Shared's use of the singleton is `t()` and
+// `.language`, identical in 24 and 25, whereas moving this app to 25 also moves react-i18next
+// across a major and touches every screen. This makes the two agree today; aligning the
+// versions is the follow-up, not the emergency.
+// Resolved as if the import came from THIS package, wherever the importing file lives, rather
+// than by hardcoding a path — so it keeps working under whatever layout the installer produces
+// on CI and EAS.
+const SINGLETONS = new Set(['i18next']);
+const appOrigin = path.join(projectRoot, 'index.js');
+const defaultResolveRequest = config.resolver.resolveRequest;
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  const origin = SINGLETONS.has(moduleName)
+    ? { ...context, originModulePath: appOrigin }
+    : context;
+  return defaultResolveRequest
+    ? defaultResolveRequest(origin, moduleName, platform)
+    : origin.resolveRequest(origin, moduleName, platform);
+};
+
 module.exports = config;

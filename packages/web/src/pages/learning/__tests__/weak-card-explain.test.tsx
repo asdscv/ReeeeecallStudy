@@ -100,7 +100,10 @@ const baseState = (over: StoreState = {}): StoreState => ({
 
   requestRemediation: vi.fn().mockResolvedValue(true),
   dismissRemediation: vi.fn(),
-  remediation: null, remediationBusyAttemptId: null, remediationError: null,
+  loadRemediation: vi.fn().mockResolvedValue(false),
+  showOwnedRemediation: vi.fn().mockReturnValue(true),
+  remediation: null, remediationOwned: {},
+  remediationBusyAttemptId: null, remediationError: null,
   ...over,
 })
 
@@ -228,5 +231,92 @@ describe('the paid explanation', () => {
   it('reports any other failure as a failure', () => {
     renderToday(withWeakCard({ remediationError: { code: 'AI_PROVIDER_ERROR' } }))
     expect(screen.getByRole('alert')).toHaveTextContent('explain.failed')
+  })
+
+  it('offers a way to add credits when that is the problem', () => {
+    // `AiCreditNotice` carries the 충전 link on every other AI screen, but it is placed by
+    // feature id and the learning plan is registered `poweredBy: 'device'` — correctly, since
+    // almost all of it runs on the device. The consequence was that the app's newest paid
+    // button was the only one that could say "you have no credits" and then stop, leaving a
+    // learner who wants to pay with nowhere to do it.
+    renderToday(withWeakCard({ remediationError: { code: 'AI_INSUFFICIENT_CREDITS' } }))
+    const link = screen.getByRole('link', { name: 'wallet.topUp' })
+    expect(link).toHaveAttribute('href', '/settings')
+  })
+
+  it('does not advertise a top-up for an unrelated failure', () => {
+    renderToday(withWeakCard({ remediationError: { code: 'AI_PROVIDER_ERROR' } }))
+    expect(screen.queryByRole('link', { name: 'wallet.topUp' })).not.toBeInTheDocument()
+  })
+
+  it('says "still working", not "failed", while the first request is in flight', () => {
+    // A second press whose first request has not returned (mig 212's 409). Calling that a
+    // failure would be false, and it is the one condition whose answer is "wait" — a learner
+    // told it failed presses again, which is the behaviour the whole change exists to stop.
+    renderToday(withWeakCard({ remediationError: { code: 'AI_REMEDIATION_IN_FLIGHT' } }))
+    expect(screen.getByRole('alert')).toHaveTextContent('explain.inFlight')
+  })
+})
+
+/**
+ * Bought once.
+ *
+ * The explanation lived only in the store, so 닫기 — a button that says "close" — destroyed an
+ * artifact the learner had been charged for, and the paid button was the only way back to it.
+ * Every press was a fresh generation from byte-identical grounding, at full price. The server
+ * now replays (mig 212) and the client reads what it already owns; these pin the half a learner
+ * can see, which is that the paid button is not what they are offered for something paid for.
+ */
+describe('an explanation already paid for', () => {
+  const owned = {
+    attemptId: 'att-1', action: 'explain' as const,
+    summary: '조사 선택이 문제예요', blocks: [], warnings: [],
+  }
+
+  it('is looked up without spending anything', () => {
+    const state = renderToday(withWeakCard())
+    // A free read of `user_enrichments`, whose owner-read policy had existed since the table
+    // did with nothing ever using it.
+    expect(state.loadRemediation).toHaveBeenCalledWith(
+      expect.objectContaining({ attemptId: 'att-1', action: 'explain' }),
+    )
+    expect(state.requestRemediation).not.toHaveBeenCalled()
+  })
+
+  it('is reopened by a FREE button, never the paid one', () => {
+    renderToday(withWeakCard({ remediationOwned: { 'att-1': owned } }))
+    expect(screen.getByTestId('weak-explain-reopen')).toBeInTheDocument()
+    // The exact regression: offering "왜 자꾸 틀리는지 설명 받기" over something already bought.
+    expect(screen.queryByTestId('weak-explain-ask')).not.toBeInTheDocument()
+  })
+
+  it('does not repeat the price warning over something already paid for', () => {
+    renderToday(withWeakCard({ remediationOwned: { 'att-1': owned } }))
+    expect(screen.queryByText('explain.note')).not.toBeInTheDocument()
+  })
+
+  it('reopens from memory, with no server call', () => {
+    const state = renderToday(withWeakCard({ remediationOwned: { 'att-1': owned } }))
+    return userEvent.click(screen.getByTestId('weak-explain-reopen')).then(() => {
+      expect(state.showOwnedRemediation).toHaveBeenCalledWith('att-1')
+      expect(state.requestRemediation).not.toHaveBeenCalled()
+    })
+  })
+
+  it('does not treat another attempt\'s purchase as this one\'s', () => {
+    // Same guard as the display path. Without it a learner would be shown a free reopen for a
+    // card they have not bought anything for, and get someone else's paragraph.
+    renderToday(withWeakCard({ remediationOwned: { 'a-different-attempt': owned } }))
+    expect(screen.getByTestId('weak-explain-ask')).toBeInTheDocument()
+    expect(screen.queryByTestId('weak-explain-reopen')).not.toBeInTheDocument()
+  })
+
+  it('still shows the answer itself when it is open', () => {
+    renderToday(withWeakCard({
+      remediationOwned: { 'att-1': owned },
+      remediation: { ...owned, summary: '조사 선택이 문제예요' },
+    }))
+    expect(screen.getByText('조사 선택이 문제예요')).toBeInTheDocument()
+    expect(screen.queryByTestId('weak-explain-reopen')).not.toBeInTheDocument()
   })
 })

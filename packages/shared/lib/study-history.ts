@@ -52,28 +52,68 @@ export function getSessionPerformance(ratings: Record<string, number>): number {
   return Math.round(totalWeight / totalCount)
 }
 
-/** Group sessions by date (newest first) */
-export function groupSessionsByDate(
+/** A day's sessions: a machine key to compare, and a sentence to print. */
+export interface SessionDateGroup {
+  /** Local `YYYY-MM-DD`. Comparable, sortable, and never shown to anyone. */
+  key: string
+  /** The date written out in the reader's language. Display only — never re-parsed. */
+  label: string
   sessions: StudySession[]
-): { date: string; sessions: StudySession[] }[] {
-  const groups = new Map<string, StudySession[]>()
+}
+
+/** Local calendar day as `YYYY-MM-DD`, in the DEVICE's timezone, not UTC. */
+function localDateKey(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${date.getFullYear()}-${month}-${day}`
+}
+
+/**
+ * Group sessions by date (newest first).
+ *
+ * The group used to carry ONE string, the localized date, and it was used for both jobs — as
+ * the Map key and as the heading. Mobile then did `new Date(group.date)` to decide whether to
+ * print 오늘/어제, and `new Date('2026년 8월 12일')` is Invalid Date. Every header on 학습 기록
+ * read the literal text "Invalid Date" in ko, ja, zh, vi, th, id and es — seven of the eight
+ * languages this app ships. English escaped only because `new Date('August 12, 2026')` happens
+ * to parse.
+ *
+ * The Today/Yesterday branch was dead in all eight regardless: it compared that same localized
+ * string against `toISOString().split('T')[0]`, so even "August 12, 2026" never matched
+ * "2026-08-12".
+ *
+ * So the two jobs are now two fields. `key` is what code compares; `label` is what a person
+ * reads. Nothing has to parse a sentence back into a date.
+ */
+export function groupSessionsByDate(sessions: StudySession[]): SessionDateGroup[] {
+  const groups = new Map<string, { label: string; sessions: StudySession[] }>()
+  const locale = toIntlLocale(i18next.language)
 
   for (const session of sessions) {
     const d = new Date(session.completed_at)
-    const locale = toIntlLocale(i18next.language)
-    const dateKey = d.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' })
-    const arr = groups.get(dateKey) ?? []
-    arr.push(session)
-    groups.set(dateKey, arr)
+    // An unparseable timestamp would key every bad row together under one NaN heading; give
+    // them their own group rather than silently merging unrelated sessions.
+    const key = Number.isNaN(d.getTime()) ? session.completed_at : localDateKey(d)
+    const existing = groups.get(key)
+    if (existing) {
+      existing.sessions.push(session)
+      continue
+    }
+    groups.set(key, {
+      label: Number.isNaN(d.getTime())
+        ? session.completed_at
+        : d.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' }),
+      sessions: [session],
+    })
   }
 
   return Array.from(groups.entries())
     .sort((a, b) => {
-      const dateA = new Date(a[1][0].completed_at)
-      const dateB = new Date(b[1][0].completed_at)
+      const dateA = new Date(a[1].sessions[0].completed_at)
+      const dateB = new Date(b[1].sessions[0].completed_at)
       return dateB.getTime() - dateA.getTime()
     })
-    .map(([date, sessions]) => ({ date, sessions }))
+    .map(([key, { label, sessions: rows }]) => ({ key, label, sessions: rows }))
 }
 
 /** Get human-readable label for study mode */

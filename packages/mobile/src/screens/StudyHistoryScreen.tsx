@@ -123,7 +123,7 @@ export function StudyHistoryScreen() {
       <ScreenHeader title={t('title', { defaultValue: 'Study History' })} mode="drawer" />
       <FlatList
         data={activeTab === 'history' ? grouped : []}
-        keyExtractor={(item) => item.date}
+        keyExtractor={(item) => item.key}
         refreshControl={<RefreshControl refreshing={loading} onRefresh={loadData} />}
         contentContainerStyle={styles.list}
         ListHeaderComponent={
@@ -354,7 +354,7 @@ export function StudyHistoryScreen() {
         renderItem={({ item: group }) => (
           <View style={styles.dateGroup}>
             <Text style={[theme.typography.labelSmall, { color: theme.colors.textSecondary, marginBottom: 6 }]}>
-              {formatDateLabel(group.date)}
+              {formatDateLabel(group)}
             </Text>
             {group.sessions.map((session) => {
               const deck = decks.find((d) => d.id === session.deck_id)
@@ -403,16 +403,38 @@ export function StudyHistoryScreen() {
   )
 }
 
-function formatDateLabel(dateStr: string): string {
-  const today = new Date().toISOString().split('T')[0]
-  const yesterday = new Date()
-  yesterday.setDate(yesterday.getDate() - 1)
-  const yesterdayStr = yesterday.toISOString().split('T')[0]
-  const lang = i18next.language || 'en'
+/** Local `YYYY-MM-DD`, matching the key `groupSessionsByDate` builds. */
+function localDateKey(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${date.getFullYear()}-${month}-${day}`
+}
 
-  if (dateStr === today) return i18next.t('history:today', { defaultValue: 'Today' })
-  if (dateStr === yesterdayStr) return i18next.t('history:yesterday', { defaultValue: 'Yesterday' })
-  return new Date(dateStr).toLocaleDateString(lang, { month: 'short', day: 'numeric' })
+/**
+ * 오늘 / 어제, or the date the grouper already wrote out.
+ *
+ * Both halves of this were broken, and both for the same reason: it took the group's LOCALIZED
+ * date string and treated it as data. `new Date('2026년 8월 12일')` is Invalid Date, so the last
+ * line printed the literal text "Invalid Date" as every header in ko, ja, zh, vi, th, id and es
+ * — and the two comparisons above it tested that same sentence against an ISO day, which no
+ * language ever matched, so 오늘/어제 were unreachable even in English.
+ *
+ * Now the group carries both: `key` to compare and `label` to print. Nothing is re-parsed, and
+ * the comparison is against the LOCAL day — `toISOString()` is UTC, so a session finished at
+ * 9pm KST was already "tomorrow" to the old check.
+ */
+function formatDateLabel(group: { key: string; label: string }): string {
+  const now = new Date()
+  const yesterday = new Date(now)
+  yesterday.setDate(yesterday.getDate() - 1)
+
+  if (group.key === localDateKey(now)) {
+    return i18next.t('history:today', { defaultValue: 'Today' })
+  }
+  if (group.key === localDateKey(yesterday)) {
+    return i18next.t('history:yesterday', { defaultValue: 'Yesterday' })
+  }
+  return group.label
 }
 
 const styles = StyleSheet.create({

@@ -297,8 +297,12 @@ function LearningDiagnostics({ goalId }: { goalId: string }) {
  */
 function WeakCardExplain({ goalId, cardIds }: { goalId: string; cardIds: readonly string[] }) {
   const { t, i18n } = useTranslation('learning')
+  // The 충전 link's wording, shared with `AiCreditNotice` so the two cannot drift into
+  // offering the same action under two different names.
+  const { t: tAi } = useTranslation('ai-generate')
   const {
     attempts, requestRemediation, dismissRemediation,
+    loadRemediation, showOwnedRemediation, remediationOwned,
     remediation, remediationBusyAttemptId, remediationError,
   } = useLearningStore()
 
@@ -315,10 +319,26 @@ function WeakCardExplain({ goalId, cardIds }: { goalId: string; cardIds: readonl
     return found?.attempt ? { cardId: found.cardId, attempt: found.attempt } : null
   }, [attempts, cardIds])
 
-  if (!target) return null
+  const targetAttemptId = target?.attempt.id ?? null
 
-  const shown = remediation?.attemptId === target.attempt.id ? remediation : null
-  const busy = remediationBusyAttemptId === target.attempt.id
+  /**
+   * Was this already bought?
+   *
+   * A free read of `user_enrichments`, whose owner-read policy has existed since the table did
+   * and which nothing had ever used. Without it the answer lived only in memory, so a reload —
+   * or 닫기, a button that says "close" — left the paid button as the only way back to a
+   * paragraph the learner had already been charged for.
+   */
+  useEffect(() => {
+    if (!targetAttemptId || typeof loadRemediation !== 'function') return
+    void loadRemediation({ attemptId: targetAttemptId, action: 'explain' })
+  }, [targetAttemptId, loadRemediation])
+
+  if (!target || !targetAttemptId) return null
+
+  const shown = remediation?.attemptId === targetAttemptId ? remediation : null
+  const owned = remediationOwned?.[targetAttemptId] ?? null
+  const busy = remediationBusyAttemptId === targetAttemptId
 
   return (
     <div className="mt-2 rounded-lg border border-brand/30 bg-brand/5 p-3" data-testid="weak-explain">
@@ -343,6 +363,18 @@ function WeakCardExplain({ goalId, cardIds }: { goalId: string; cardIds: readonl
             {t('explain.dismiss')}
           </button>
         </>
+      ) : owned ? (
+        /* Bought, and closed. Reopening is free and must not look like the paid button —
+           offering "왜 자꾸 틀리는지 설명 받기" with its 크레딧 note over something already
+           paid for is how a learner buys the same paragraph twice. */
+        <button
+          type="button"
+          onClick={() => { showOwnedRemediation(targetAttemptId) }}
+          className="w-full cursor-pointer rounded-lg border border-brand/40 px-3 py-2 text-sm font-medium text-brand transition-colors hover:bg-brand/10"
+          data-testid="weak-explain-reopen"
+        >
+          {t('explain.reopen')}
+        </button>
       ) : (
         <>
           <button
@@ -352,7 +384,7 @@ function WeakCardExplain({ goalId, cardIds }: { goalId: string; cardIds: readonl
               void requestRemediation({
                 action: 'explain',
                 goalId,
-                attemptId: target.attempt.id,
+                attemptId: targetAttemptId,
                 cardId: target.cardId,
                 uiLang: i18n.language,
               })
@@ -367,8 +399,24 @@ function WeakCardExplain({ goalId, cardIds }: { goalId: string; cardIds: readonl
       )}
       {remediationError && (
         <p role="alert" className="mt-2 text-xs text-destructive">
-          {t(remediationError.code === 'AI_INSUFFICIENT_CREDITS'
-            ? 'explain.needsCredits' : 'explain.failed')}
+          {t(remediationError.code === 'AI_INSUFFICIENT_CREDITS' ? 'explain.needsCredits'
+            // A press whose first request is still running (mig 212). Telling the learner it
+            // failed would be false, and it is the one "error" whose answer is "wait".
+            : remediationError.code === 'AI_REMEDIATION_IN_FLIGHT' ? 'explain.inFlight'
+              : 'explain.failed')}
+          {/* The one failure the learner can act on, and this screen had no way to act on it.
+              `AiCreditNotice` — which carries the 충전 link everywhere else — is placed by
+              feature id, and the learning plan is registered `poweredBy: 'device'` because
+              almost all of it is. So the app's newest paid button was the only one that could
+              answer "you have no credits" with no way to add any. */}
+          {remediationError.code === 'AI_INSUFFICIENT_CREDITS' && (
+            <>
+              {' '}
+              <Link to="/settings" className="font-medium underline underline-offset-2">
+                {tAi('wallet.topUp')}
+              </Link>
+            </>
+          )}
         </p>
       )}
     </div>
@@ -950,6 +998,22 @@ export function LearningTodayPage() {
         <p className="py-3 text-center text-sm text-muted-foreground" aria-live="polite">
           {t('today.generating')}
         </p>
+      ) : planErrorFrom === 'read' ? (
+        /* The READ failed, so we do not know whether a plan exists — `fetchPlan`'s catch says
+           so explicitly by leaving `planAbsentFor` null. This branch used to fall through to
+           the generate button, which is not a retry: it BUILDS a plan, replacing whatever was
+           already there and taking `completed_items` back to zero. A learner who finished nine
+           of twelve cards and hit a flaky network was one tap from losing the record of it.
+           A read that failed is answered by reading again. */
+        <button
+          type="button"
+          onClick={() => { if (goal) void fetchPlan(goal.id, ctx.planDate) }}
+          disabled={!goal || planLoading}
+          className="w-full cursor-pointer rounded-lg border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-muted disabled:opacity-50"
+          data-testid="learning-plan-retry"
+        >
+          {t('today.retry')}
+        </button>
       ) : (
         // Only reachable once automation has had its turn and produced nothing — a failed save,
         // or a goal the learner has already regenerated today. The button is the way back.
@@ -958,6 +1022,7 @@ export function LearningTodayPage() {
           onClick={() => { if (goal) void generatePlan(goal, ctx) }}
           disabled={!goal}
           className="w-full cursor-pointer rounded-lg bg-brand px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
+          data-testid="learning-generate"
         >
           {t('today.generate')}
         </button>
