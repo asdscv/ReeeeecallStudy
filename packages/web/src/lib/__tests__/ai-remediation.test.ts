@@ -218,5 +218,52 @@ describe('AI remediation contracts', () => {
       expect(validateRemediationResult(
         { ...base, citations: ['nope'] }, refs, [], false).valid).toBe(false)
     })
+
+    it('does not invite the model to explain the citation rule to the learner', () => {
+      // The first live call against the deployed function returned, verbatim: "No sources were
+      // supplied, so citations are empty." That is our plumbing, printed under a paid answer,
+      // for someone who never made a request and cannot supply a source. It was invited by
+      // pairing the citations rule with "state uncertainty in warnings" one clause later.
+      const prompt = buildRemediationPrompt(refs, {
+        goal: {}, activity: null, attempt: {}, cards: [], concepts: [], sources: [],
+      })
+      const citationRule = prompt.systemPrompt
+        .split('\n').find((line) => /citations MUST be an empty array/i.test(line))!
+      expect(citationRule).not.toMatch(/warnings/i)
+      expect(prompt.systemPrompt).toMatch(/Never mention[\s\S]*citations/i)
+    })
+  })
+
+  /**
+   * The learner reads the caveats too.
+   *
+   * Live, `uiLang: 'ko'` produced a Korean summary and English warnings, because the locale
+   * line said "learner-facing text" and the model scoped that to the prose. A hedge the learner
+   * cannot read is worse than no hedge: it looks like the answer came with a disclaimer, and
+   * they have no way to find out it said "I could not determine the reason".
+   */
+  describe('the locale instruction', () => {
+    it('names the warnings, not just the prose', () => {
+      const refs = parseRemediationRefs({ action: 'explain', goalId: id, uiLang: 'ko' })!
+      const prompt = buildRemediationPrompt(refs, {
+        goal: {}, activity: null, attempt: {}, cards: [], concepts: [], sources: [],
+      })
+      const locale = prompt.systemPrompt.split('\n').find((line) => /locale ko/.test(line))!
+      expect(locale).toMatch(/warning/i)
+      expect(locale).toMatch(/summary/i)
+      expect(locale).toMatch(/block/i)
+    })
+
+    it('does not let the material\'s own language override the learner\'s', () => {
+      // An English deck is the normal case for every non-English locale here — that is what a
+      // language learner studies. The model must not answer in the language it is reading.
+      const refs = parseRemediationRefs({ action: 'explain', goalId: id, uiLang: 'th' })!
+      const prompt = buildRemediationPrompt(refs, {
+        goal: {}, activity: null, attempt: {},
+        cards: [{ id, front: 'auction', back: 'ˈɔːkʃən' }], concepts: [], sources: [],
+      })
+      expect(prompt.systemPrompt).toMatch(/locale th/)
+      expect(prompt.systemPrompt).toMatch(/whatever language the learning material itself is in/i)
+    })
   })
 })

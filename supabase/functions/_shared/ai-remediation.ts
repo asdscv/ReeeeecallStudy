@@ -207,8 +207,19 @@ export function buildRemediationPrompt(refs: RemediationRefs, context: Remediati
       // `validateRemediationResult` used to reject, turning a paid request the learner had
       // already been charged the provider tokens for into a 502.
       : 'No sources were supplied: citations MUST be an empty array. Use only the supplied'
-        + ' learning context; state uncertainty in warnings.',
-    `Write learner-facing text in locale ${refs.uiLang}.`,
+        + ' learning context.',
+    // `warnings` is rendered to the learner, under the explanation they paid for. Saying so is
+    // load-bearing: the first live call came back with "No sources were supplied, so citations
+    // are empty." — the model dutifully reporting on the request format, to someone who did not
+    // write the request and cannot do anything about it.
+    'warnings is shown to the LEARNER. Use it only for limits on the ANSWER — what you could'
+    + ' not work out about their mistake, and what they should not take on faith. Never mention'
+    + ' sources, citations, context, JSON, or how this request was assembled; none of that is'
+    + ' theirs to act on. If nothing limits the answer, return an empty array.',
+    // The locale line used to say "learner-facing text", and the model read that as the prose
+    // and not the caveats: a Korean learner got a Korean explanation under English warnings.
+    `Write EVERY learner-facing string — summary, every block's content, and every warning —`
+    + ` in locale ${refs.uiLang}, whatever language the learning material itself is in.`,
   ].join('\n')
   const safeContext = JSON.stringify({ refs, context: { ...context, attempt: promptAttempt } }).slice(0, 64 * 1024)
   return { systemPrompt, userPrompt: `Structured learning context:\n${safeContext}`, requireGrounding }
