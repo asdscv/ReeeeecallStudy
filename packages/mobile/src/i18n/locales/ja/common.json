@@ -68,7 +68,10 @@
     "6m": "6ヶ月",
     "1y": "1年",
     "2y": "2年",
-    "5y": "5年"
+    "5y": "5年",
+    "custom": "期間指定",
+    "from": "開始日",
+    "to": "終了日"
   },
   "confirmDialog": {
     "cancel": "キャンセル",
@@ -266,5 +269,14 @@
   },
   "shares": {
     "title": "共有"
+  },
+  "analytics": {
+    "retentionLabel": "定着率",
+    "errorRateLabel": "誤答率",
+    "studyTimeLabel": "学習時間",
+    "percent": "{{value, number}}%",
+    "minutes_one": "{{count, number}}分",
+    "minutes_other": "{{count, number}}分",
+    "allTime": "全期間"
   }
 }

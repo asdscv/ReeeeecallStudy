@@ -43,13 +43,22 @@ export function StudyVolumeChart({ data }: StudyVolumeChartProps) {
             />
             <YAxis allowDecimals={false} tick={{ fontSize: 10 }} width={25} />
             <Tooltip
+              // `units.sessions` / `units.cards` are the bare words "세션" / "장" with NO
+              // interpolation, so passing `count` to them did nothing and the value slot
+              // rendered the unit again — the tooltip read "장 : 장", with the number
+              // nowhere on screen. `charts.*CountLabel` are the counted forms and already
+              // existed; they were simply not used here.
               formatter={(value, name) => [
-                name === 'sessions' ? t('units.sessions', { count: Number(value) }) : t('units.cards', { count: Number(value) }),
+                name === 'sessions'
+                  ? t('charts.sessionCountLabel', { count: Number(value) })
+                  : t('charts.cardCountLabel', { count: Number(value) }),
                 name === 'sessions' ? t('units.sessions') : t('units.cards'),
               ]}
+              // The raw ISO key is what the axis already shortens; the tooltip header gets
+              // the same locale-aware form so the two cannot disagree.
               labelFormatter={(_label, payload) => {
                 const item = payload?.[0] as { payload?: { date?: string } } | undefined
-                return item?.payload?.date ?? ''
+                return item?.payload?.date ? formatDateKeyShort(item.payload.date, dateLocale) : ''
               }}
             />
             <Legend

@@ -16,6 +16,23 @@ export function filterSessionsByDeckScope(sessions: StudySession[], scope: DeckS
 
 // ── 기간 필터링 ──
 
+/**
+ * Sessions inside an explicit window.
+ *
+ * `filterSessionsByPeriod` below is the "last N days" shorthand and stays for the callers that
+ * only ever mean that. A custom range has two ends, so it needs both.
+ */
+export function filterSessionsByRange(
+  sessions: StudySession[],
+  fromMs: number,
+  toMs: number,
+): StudySession[] {
+  return sessions.filter((s) => {
+    const at = new Date(s.completed_at).getTime()
+    return at >= fromMs && at <= toMs
+  })
+}
+
 export function filterSessionsByPeriod(sessions: StudySession[], days: number): StudySession[] {
   const cutoff = new Date()
   cutoff.setHours(0, 0, 0, 0)

@@ -68,7 +68,10 @@
     "6m": "6M",
     "1y": "1A",
     "2y": "2A",
-    "5y": "5A"
+    "5y": "5A",
+    "custom": "Personalizado",
+    "from": "Desde",
+    "to": "Hasta"
   },
   "confirmDialog": {
     "cancel": "Cancelar",
@@ -266,5 +269,14 @@
   },
   "shares": {
     "title": "Mis compartidos"
+  },
+  "analytics": {
+    "retentionLabel": "Retención",
+    "errorRateLabel": "Tasa de error",
+    "studyTimeLabel": "Tiempo de estudio",
+    "percent": "{{value, number}} %",
+    "minutes_one": "{{count, number}} min",
+    "minutes_other": "{{count, number}} min",
+    "allTime": "Todo el tiempo"
   }
 }

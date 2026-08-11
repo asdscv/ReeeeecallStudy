@@ -84,7 +84,10 @@
     "6m": "6개월",
     "1y": "1년",
     "2y": "2년",
-    "5y": "5년"
+    "5y": "5년",
+    "custom": "직접 선택",
+    "from": "조회 시작일",
+    "to": "조회 종료일"
   },
   "confirmDialog": {
     "cancel": "취소",
@@ -222,7 +225,14 @@
     "weakTopics": "취약 주제",
     "studyTime": "학습 시간 분포",
     "modeEffectiveness": "학습 모드 효과",
-    "progress": "시간별 진행 상황"
+    "progress": "시간별 진행 상황",
+    "retentionLabel": "정착률",
+    "errorRateLabel": "오답률",
+    "studyTimeLabel": "학습 시간",
+    "percent": "{{value, number}}%",
+    "minutes_one": "{{count, number}}분",
+    "minutes_other": "{{count, number}}분",
+    "allTime": "전체 기간"
   },
   "pomodoro": {
     "focus": "집중",
