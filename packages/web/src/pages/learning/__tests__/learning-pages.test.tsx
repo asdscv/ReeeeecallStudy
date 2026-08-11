@@ -213,10 +213,42 @@ describe('LearningTodayPage', () => {
     expect(screen.getByText('today.empty.noDecks')).toBeInTheDocument()
   })
 
-  it('says the day is clear when nothing is due', () => {
-    renderToday({ planBlockedReason: 'no_candidates' })
+  describe('nothing due', () => {
+    // "오늘 이 덱들에서 복습할 카드가 없습니다" read as a failure — as though the cards had gone
+    // somewhere. In the reported state the opposite was true: the learner had just finished
+    // today's twelve items and twelve cards were coming back inside ten minutes. "Nothing due"
+    // is three situations, and only the last needs the learner to do anything.
+    const withNextDue = (nextDueAt: string | null) => ({
+      planBlockedReason: 'no_candidates',
+      knowledge: {
+        'goal-1': {
+          total: 29, known: 17, unknown: 12, unseen: 0, overdue: 0, dueNow: 0,
+          mature: 14, rung1: 12, rung3: 0, rung8: 3, nextDueAt,
+        },
+      },
+    })
 
-    expect(screen.getByText('today.empty.nothingDue')).toBeInTheDocument()
+    it('leads with the good news, whichever case it is', () => {
+      renderToday(withNextDue(null))
+      expect(screen.getByText('today.empty.allCaughtUp')).toBeInTheDocument()
+    })
+
+    it('says the cards are coming back when they are minutes away', () => {
+      renderToday(withNextDue(new Date(Date.now() + 8 * 60_000).toISOString()))
+      expect(screen.getByText(/today\.empty\.backSoon/)).toBeInTheDocument()
+    })
+
+    it('names the time when the next review is not soon', () => {
+      renderToday(withNextDue(new Date(Date.now() + 26 * 3600_000).toISOString()))
+      expect(screen.getByText(/today\.empty\.nextReview/)).toBeInTheDocument()
+    })
+
+    it('says the goal has run out only when nothing is scheduled at all', () => {
+      // The one case that is genuinely bad news, and the only one that should ask the learner
+      // for something.
+      renderToday(withNextDue(null))
+      expect(screen.getByText('today.empty.nothingScheduled')).toBeInTheDocument()
+    })
   })
 
   it('renders the quota failure with its own message, not a generic one', () => {
@@ -455,8 +487,19 @@ describe('LearningTodayPage', () => {
   // right. `known` means "not past due", so one rating on an overdue card moves a card there —
   // but the screen called it 확실 and headlined "29장 중 1장 기억", which reads as having
   // forgotten 28 cards. The RPC never made that claim.
-  const knowledgeOf = (known: number, unknown: number, unseen: number) => ({
-    knowledge: { 'goal-1': { total: known + unknown + unseen, known, unknown, unseen } },
+  /**
+   * `overdue` defaults to `unknown` here only because these cases predate it and mean
+   * "everything out of window is genuinely late". It is a SEPARATE input now: `unknown`
+   * includes cards in a 1-minute learning step, and reading the backlog off it is what told a
+   * learner who had just finished today that they were twelve reviews behind.
+   */
+  const knowledgeOf = (known: number, unknown: number, unseen: number, overdue = unknown) => ({
+    knowledge: {
+      'goal-1': {
+        total: known + unknown + unseen, known, unknown, unseen,
+        overdue, dueNow: overdue,
+      },
+    },
   })
 
   // ── the finish line ───────────────────────────────────────────────────────
@@ -530,8 +573,19 @@ describe('LearningTodayPage', () => {
     renderToday(knowledgeOf(1, 18, 10))
 
     expect(screen.getByTestId('progress-headline')).toHaveTextContent('progress.behind')
-    // And the reassurance the headline gave up moves to the line below.
-    expect(screen.getByTestId('progress-detail')).toHaveTextContent('progress.detailStudied')
+    // The detail line no longer swaps populations with the headline. It used to print a bare
+    // "배운 29장" in this state — a count with no denominator, one line under a different count
+    // with a different one — and every number on the card is now a named part of `total`.
+    expect(screen.getByTestId('progress-detail')).toHaveTextContent('progress.detailWithinWindow')
+    expect(screen.getByTestId('progress-detail')).not.toHaveTextContent('progress.detailStudied')
+  })
+
+  it('does not call a just-finished day a backlog', () => {
+    // The report: twelve items done, their cards now in learning steps, nothing actually
+    // late. `unknown` is 12 and `overdue` is 0 — the headline follows `overdue`.
+    renderToday(knowledgeOf(17, 12, 0, 0))
+
+    expect(screen.getByTestId('progress-headline')).not.toHaveTextContent('progress.behind')
   })
 
   it('names the goal total once nothing is overdue', () => {
@@ -551,12 +605,23 @@ describe('LearningTodayPage', () => {
     expect(detail).toHaveTextContent('progress.unstudied')
   })
 
-  it('never fills the bar while a card has not been opened', () => {
-    // 17 studied of 29, nothing overdue. The old ratio was 17/17 and drew a COMPLETE bar over a
-    // goal 59% of the way through — the screen said "finished" about 12 untouched cards.
-    renderToday(knowledgeOf(17, 0, 12))
+  it('draws the bar against the finish line the card itself names', () => {
+    // The bar is 정착 / 목표 — the same statement as the line under it. It used to be
+    // `attempted / total`, cards opened at least once, which fills as soon as every card has
+    // been seen: a learner photographed a 100% bar sitting directly above "복습이 12장
+    // 밀렸어요" and "완료까지 약 25일". Three lines, three different questions, none named.
+    //
+    // 29 cards → ceil(29 × 0.8) = 24 must mature. Six are. 6/24 = 25%.
+    renderToday({
+      knowledge: {
+        'goal-1': {
+          total: 29, known: 17, unknown: 0, unseen: 12, overdue: 0, dueNow: 0,
+          mature: 6, rung1: 0, rung3: 0, rung8: 11,
+        },
+      },
+    })
 
-    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '59')
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '25')
   })
 
   it('drops a half of the detail line that has nothing in it', () => {
@@ -606,13 +671,29 @@ describe('learning diagnostics', () => {
     expect(screen.queryByTestId('insights-stats')).not.toBeInTheDocument()
   })
 
-  it('reports accuracy, typical time and adherence in one line', () => {
+  it('reports ONE number, and says what window it is over', () => {
+    // This line was "정답률 78% · 보통 1초 · 플랜 49% 이행" and a learner asked, verbatim,
+    // "플랜 49% 이행은 뭐야? 유저가 알기가 너무 힘들다."
+    //
+    //   - the three numbers spanned two windows (30 days, 30 days, 14 days) and printed
+    //     neither, while "알았음 6 · 몰랐음 6" — 50%, today — sat two inches above;
+    //   - 보통 1초 was the median dwell on a card INCLUDING reading the answer: how fast you
+    //     tap a button already showing you the answer, not how fast you recall;
+    //   - 플랜 이행 named no window, numerator or denominator, and no action taken today could
+    //     move it.
     renderToday(insightsOf())
 
     const stats = screen.getByTestId('insights-stats')
     expect(stats).toHaveTextContent('insights.accuracyValue')
-    expect(stats).toHaveTextContent('insights.typicalValue')
-    expect(stats).toHaveTextContent('insights.adherenceValue')
+    expect(stats).not.toHaveTextContent('insights.typicalValue')
+    expect(stats).not.toHaveTextContent('insights.adherenceValue')
+  })
+
+  it('does not explain which rows it read', () => {
+    // `scopeNote` answered "이 목표의 시도와 플랜을 기준으로 계산합니다" — which rows were
+    // queried. That is the one question no learner has ever asked about this screen.
+    renderToday(insightsOf())
+    expect(screen.queryByText('insights.scopeNote')).not.toBeInTheDocument()
   })
 
   it('says "not scored yet" instead of claiming 0% accuracy', () => {

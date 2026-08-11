@@ -88,9 +88,22 @@ export interface GoalCompletion {
   /** The ratio is met RIGHT NOW. Not the same as the goal being stamped completed. */
   earned: boolean
   /**
-   * Calendar days until the ratio can first be met, if every answer is correct from here.
+   * Calendar days until the ratio can first be met, if every answer from here is correct.
    *
    * `null` when it cannot be projected: a goal with no cards, or one already earned.
+   *
+   * A FLOOR, and the screen has to say so. It is the sum of the ladder rungs the remaining
+   * cards still have to sit through — pure calendar waiting, with no failure term. Cards climb
+   * in PARALLEL, so ten cards and one card both take twelve days; the deck's size is not an
+   * input and never was.
+   *
+   * It used to be divided by the learner's plan adherence before being shown, which is how a
+   * 29-card goal came to read "완료까지 약 25일": twelve ladder days ÷ 0.49. The learner asked
+   * what it meant and there was no answer on the screen — the 0.49 lived in a different
+   * section under a different name. That division is also not a model of anything. Adherence
+   * is the share of PLANNED ITEMS completed over fourteen days; the rungs are how long a
+   * memory has to rest. Skipping a plan item delays when a review is answered, which is a
+   * different quantity from how long the card must wait, and the two cannot be multiplied.
    */
   daysToComplete: number | null
 }
@@ -102,15 +115,14 @@ export interface GoalCompletion {
  * and an intake of 20 is at least 20 days from introducing them all — before any of them has
  * begun the twelve-day climb.
  *
- * `adherence` (0..1) stretches the estimate by what the learner actually does. Someone who
- * completes half of each day's plan takes roughly twice as long, and saying otherwise would
- * produce the one thing worse than no date: a confident wrong one. Absent or non-finite
- * adherence means "assume the plan is followed", which is the honest default before there is
- * any history to judge.
+ * There is deliberately no `adherence` option any more. It used to divide the answer, and the
+ * quotient was what a learner photographed as "완료까지 약 25일" on a 29-card goal without
+ * being able to work out where it came from. See `daysToComplete` for why the division was
+ * not a model of anything either.
  */
 export function goalCompletion(
   counts: GoalCompletionCounts,
-  options: { newCardsPerDay?: number; adherence?: number | null } = {},
+  options: { newCardsPerDay?: number } = {},
 ): GoalCompletion {
   const total = Math.max(0, Math.floor(counts.total));
   const mature = Math.max(0, Math.floor(counts.mature));
@@ -162,10 +174,5 @@ export function goalCompletion(
     days = Math.max(days, introDay + DAYS_FROM_RUNG_1)
   }
 
-  const adherence = options.adherence
-  const stretched = typeof adherence === 'number' && Number.isFinite(adherence) && adherence > 0
-    ? Math.ceil(days / Math.min(1, adherence))
-    : days
-
-  return { required, mature, remaining, percent, earned: false, daysToComplete: stretched }
+  return { required, mature, remaining, percent, earned: false, daysToComplete: days }
 }

@@ -96,28 +96,30 @@ describe('goalCompletion — the projected date', () => {
     expect(goalCompletion(counts({ total: 10, mature: 0, rung8: 1 })).daysToComplete).toBeNull()
   })
 
-  it('stretches the estimate by what the learner actually does', () => {
-    // Someone completing half of each day's plan takes about twice as long. Claiming the
-    // planned date anyway produces the one thing worse than no date: a confident wrong one.
-    const onPlan = goalCompletion(counts({ total: 10, mature: 6, rung8: 2 }), { adherence: 1 })
-    const halfPlan = goalCompletion(counts({ total: 10, mature: 6, rung8: 2 }), { adherence: 0.5 })
+  it('does not divide the wait by how much of the plan was done', () => {
+    // A learner asked "완료까지 약 25일은 뭐야? 지금 29장밖에 안 되는데?" and the answer was
+    // that 25 = 12 / 0.49 — twelve days of ladder waiting divided by a plan-adherence figure
+    // printed in a different section under a different name. The deck's size was never in it.
+    //
+    // The division was not just unexplained, it was not a model of anything. Adherence is the
+    // share of planned ITEMS completed over fourteen days; the rungs are how long a memory has
+    // to rest. Skipping a plan item delays when a review is ANSWERED, which is a different
+    // quantity from how long the card must WAIT, and the two do not multiply.
+    const c = counts({ total: 10, mature: 6, rung8: 2 })
 
-    expect(onPlan.daysToComplete).toBe(DAYS_FROM_RUNG_8)
-    expect(halfPlan.daysToComplete).toBe(DAYS_FROM_RUNG_8 * 2)
+    // Whatever a caller passes, the answer is what the cards need.
+    expect(goalCompletion(c).daysToComplete).toBe(DAYS_FROM_RUNG_8)
+    expect(goalCompletion(c, { newCardsPerDay: 20 }).daysToComplete).toBe(DAYS_FROM_RUNG_8)
   })
 
-  it('never shortens the estimate for someone who does MORE than planned', () => {
-    // Adherence above 1 means extra sessions, and extra sessions do not compress the calendar:
-    // a card at rung 8 is due in eight days no matter how many other cards were studied today.
-    expect(goalCompletion(counts({ total: 10, mature: 6, rung8: 2 }), { adherence: 3 }).daysToComplete)
-      .toBe(DAYS_FROM_RUNG_8)
-  })
+  it('does not depend on how many cards are left, only on how far they have to climb', () => {
+    // The other half of "29장밖에 안 되는데?". Cards climb the ladder in PARALLEL, so one card
+    // and ten cards at the same rung finish on the same day. Deck size is not an input, and a
+    // screen that implies otherwise invites the arithmetic the learner tried and failed to do.
+    const one = goalCompletion(counts({ total: 10, mature: 7, rung1: 1 }))
+    const many = goalCompletion(counts({ total: 100, mature: 70, rung1: 30 }))
 
-  it('ignores an adherence figure it cannot use', () => {
-    for (const adherence of [null, undefined, 0, Number.NaN, -1]) {
-      expect(goalCompletion(counts({ total: 10, mature: 6, rung8: 2 }), { adherence }).daysToComplete)
-        .toBe(DAYS_FROM_RUNG_8)
-    }
+    expect(one.daysToComplete).toBe(many.daysToComplete)
   })
 
   it('projects nothing once the goal is already earned', () => {

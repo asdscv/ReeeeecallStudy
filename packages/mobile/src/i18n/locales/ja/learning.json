@@ -103,9 +103,6 @@
     "title": "最近の学習",
     "title_one": "最近の試行 ({{count, number}})",
     "title_other": "最近の試行 ({{count, number}})",
-    "recap": "{{count, number}}枚 · {{minutes, number}}分 · 1枚あたり平均{{seconds, number}}秒",
-    "recap_one": "{{count, number}}枚 · {{minutes, number}}分 · 1枚あたり平均{{seconds, number}}秒",
-    "recap_other": "{{count, number}}枚 · {{minutes, number}}分 · 1枚あたり平均{{seconds, number}}秒",
     "band": {
       "known": "できた {{count, number}}",
       "known_one": "できた {{count, number}}",
@@ -116,32 +113,24 @@
       "missed": "できなかった {{count, number}}",
       "missed_one": "できなかった {{count, number}}",
       "missed_other": "できなかった {{count, number}}"
-    }
+    },
+    "recapCount": "今日 {{count, number}}回 答えました",
+    "recapCount_one": "今日 {{count, number}}回 答えました",
+    "recapCount_other": "今日 {{count, number}}回 答えました"
   },
   "insights": {
     "accuracy": "正答率",
-    "adherence": "プラン達成率 (14日)",
-    "adherenceEmpty": "この期間にプランがありません。",
-    "adherenceTitle": "日別プラン (14日)",
     "attemptCount": "{{count, number}} 回試行",
     "attemptCount_one": "{{count, number}} 回試行",
     "attemptCount_other": "{{count, number}} 回試行",
-    "attempts": "試行回数 (30日)",
     "cardFallback": "（今日のプランに含まれていないカード）",
-    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
     "noData": "データなし",
-    "noPlanItems": "計画された項目なし",
     "notScoredYet": "まだスコアのある試行がありません",
-    "scopeNote": "この目標の試行とプランに基づく計算です。デッキ単位のSRS統計は学習履歴にあります。",
-    "seconds": "{{count, decimal}}秒",
     "title": "学習診断",
-    "typicalTime": "平均所要時間",
     "weakEmpty": "遅れているカードはありません。",
-    "weakHint": "試行2回以上で平均60%未満のカードです。",
+    "weakHint": "2回以上見て、半分以上まちがえたカードです。",
     "weakTitle": "もう一度確認",
-    "accuracyValue": "正答率 {{pct, number}}%",
-    "typicalValue": "平均 {{seconds, decimal}}秒",
-    "adherenceValue": "プラン達成 {{pct, number}}%",
+    "accuracyValue": "直近30日 {{scored, number}}回中 {{known, number}}回正解（{{pct, number}}%）",
     "weakCount": "{{count, number}}枚",
     "weakCount_one": "{{count, number}}枚",
     "weakCount_other": "{{count, number}}枚",
@@ -166,7 +155,12 @@
       "createGoal": "目標を作成",
       "noDecks": "この目標にはデッキが紐付いていないため、プランを作成できません。",
       "noGoal": "進行中の学習目標がありません。目標では1日の学習時間とプランに使うデッキを設定します。",
-      "nothingDue": "今日これらのデッキで復習すべきカードはありません。"
+      "allCaughtUp": "今日の分は終わりました。",
+      "backSoon": "さっき答えたカードが約{{count, number}}分後にまた出ます。",
+      "backSoon_one": "さっき答えたカードが約{{count, number}}分後にまた出ます。",
+      "backSoon_other": "さっき答えたカードが約{{count, number}}分後にまた出ます。",
+      "nextReview": "次の復習は {{when}} です。",
+      "nothingScheduled": "この目標に予定された復習がありません。デッキにカードを追加してみてください。"
     },
     "error": {
       "authRequired": "再度ログインしてください。",
@@ -213,7 +207,10 @@
     },
     "deckListMore": "{{names}} ほか{{count, number}}件",
     "deckListMore_one": "{{names}} ほか{{count, number}}件",
-    "deckListMore_other": "{{names}} ほか{{count, number}}件"
+    "deckListMore_other": "{{names}} ほか{{count, number}}件",
+    "itemsUnavailable": "このプランのカード{{count, number}}枚を今は開けません。削除された可能性があります。",
+    "itemsUnavailable_one": "このプランのカード{{count, number}}枚を今は開けません。削除された可能性があります。",
+    "itemsUnavailable_other": "このプランのカード{{count, number}}枚を今は開けません。削除された可能性があります。"
   },
   "progress": {
     "title": "進捗",
@@ -224,23 +221,20 @@
     "unstudied": "未学習 {{count, number}}枚",
     "unstudied_one": "未学習 {{count, number}}枚",
     "unstudied_other": "未学習 {{count, number}}枚",
-    "behind": "復習が{{count, number}}枚たまっています",
-    "behind_one": "復習が{{count, number}}枚たまっています",
-    "behind_other": "復習が{{count, number}}枚たまっています",
+    "behind": "1日以上過ぎた復習が {{count, number}}枚 あります",
+    "behind_one": "1日以上過ぎた復習が {{count, number}}枚 あります",
+    "behind_other": "1日以上過ぎた復習が {{count, number}}枚 あります",
     "studied": "{{total, number}}枚中{{attempted, number}}枚を学習済み",
-    "detailStudied": "学習済み {{count, number}}枚",
-    "detailStudied_one": "学習済み {{count, number}}枚",
-    "detailStudied_other": "学習済み {{count, number}}枚",
     "detailWithinWindow": "復習期限内 {{count, number}}枚",
     "detailWithinWindow_one": "復習期限内 {{count, number}}枚",
     "detailWithinWindow_other": "復習期限内 {{count, number}}枚"
   },
   "completion": {
     "done": "目標達成",
-    "progress": "{{required, number}}枚中{{mature, number}}枚が定着",
-    "eta": "完了まで約{{count, number}}日",
-    "eta_one": "完了まで約{{count, number}}日",
-    "eta_other": "完了まで約{{count, number}}日"
+    "progress": "3週間あけても大丈夫なカード {{mature, number}}枚 · 目標 {{required, number}}枚（全{{total, number}}枚の80%）",
+    "etaIfDaily": "残り{{remaining, number}}枚が1日 → 3日 → 8日の復習を順に通る必要があります。全部正解でも最短{{count, number}}日。",
+    "etaIfDaily_one": "残り{{remaining, number}}枚が1日 → 3日 → 8日の復習を順に通る必要があります。全部正解でも最短{{count, number}}日。",
+    "etaIfDaily_other": "残り{{remaining, number}}枚が1日 → 3日 → 8日の復習を順に通る必要があります。全部正解でも最短{{count, number}}日。"
   },
   "check": {
     "title_one": "今日学習した{{count, number}}枚、本当に覚えたか確認",

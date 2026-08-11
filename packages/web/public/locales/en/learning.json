@@ -10,7 +10,12 @@
       "createGoal": "Create a goal",
       "noDecks": "This goal has no decks attached, so there is nothing to plan.",
       "attachDecks": "Attach decks",
-      "nothingDue": "Nothing is due in these decks today."
+      "allCaughtUp": "You are done for now.",
+      "backSoon": "The cards you just answered come back in about {{count, number}} minutes.",
+      "backSoon_one": "The cards you just answered come back in about {{count, number}} minutes.",
+      "backSoon_other": "The cards you just answered come back in about {{count, number}} minutes.",
+      "nextReview": "Next review: {{when}}.",
+      "nothingScheduled": "Nothing is scheduled for this goal. Try adding more cards to its decks."
     },
     "item": {
       "study": "Study",
@@ -53,7 +58,10 @@
     },
     "deckListMore": "{{names}} +{{count, number}} more",
     "deckListMore_one": "{{names}} +{{count, number}} more",
-    "deckListMore_other": "{{names}} +{{count, number}} more"
+    "deckListMore_other": "{{names}} +{{count, number}} more",
+    "itemsUnavailable": "{{count, number}} cards in this plan cannot be opened right now. They may have been deleted.",
+    "itemsUnavailable_one": "{{count, number}} cards in this plan cannot be opened right now. They may have been deleted.",
+    "itemsUnavailable_other": "{{count, number}} cards in this plan cannot be opened right now. They may have been deleted."
   },
   "goals": {
     "title": "Learning goals",
@@ -157,9 +165,6 @@
   },
   "history": {
     "title": "Recent study",
-    "recap": "{{count, number}} cards · {{minutes, number}} min · {{seconds, number}}s per card on average",
-    "recap_one": "{{count, number}} card · {{minutes, number}} min · {{seconds, number}}s per card on average",
-    "recap_other": "{{count, number}} cards · {{minutes, number}} min · {{seconds, number}}s per card on average",
     "band": {
       "known": "{{count, number}} knew it",
       "known_one": "{{count, number}} knew it",
@@ -170,32 +175,24 @@
       "missed": "{{count, number}} missed",
       "missed_one": "{{count, number}} missed",
       "missed_other": "{{count, number}} missed"
-    }
+    },
+    "recapCount": "{{count, number}} answers today",
+    "recapCount_one": "{{count, number}} answers today",
+    "recapCount_other": "{{count, number}} answers today"
   },
   "insights": {
     "title": "Learning insights",
     "noData": "No data yet",
-    "attempts": "Attempts (30d)",
     "accuracy": "Accuracy",
     "notScoredYet": "Nothing scored yet",
-    "typicalTime": "Typical time",
-    "seconds": "{{count, decimal}}s",
-    "adherence": "Plan adherence (14d)",
     "weakTitle": "Worth another look",
-    "weakHint": "Cards with at least two attempts averaging under 60%.",
+    "weakHint": "Cards you have seen at least twice and got wrong more than half the time.",
     "weakEmpty": "Nothing is falling behind.",
     "cardFallback": "(card not in today’s plan)",
     "attemptCount": "{{count, number}} attempts",
-    "adherenceTitle": "Daily plans (14d)",
-    "adherenceEmpty": "No plans in this window.",
-    "noPlanItems": "Nothing planned",
-    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
-    "scopeNote": "Based on this goal’s attempts and plans. Deck-level SRS statistics live under History.",
     "attemptCount_one": "{{count, number}} attempt",
     "attemptCount_other": "{{count, number}} attempts",
-    "accuracyValue": "Accuracy {{pct, number}}%",
-    "typicalValue": "Typically {{seconds, decimal}}s",
-    "adherenceValue": "Plan {{pct, number}}% done",
+    "accuracyValue": "{{known, number}} right out of {{scored, number}} over the last 30 days ({{pct, number}}%)",
     "weakCount": "{{count, number}} cards",
     "weakCount_one": "{{count, number}} card",
     "weakCount_other": "{{count, number}} cards",
@@ -223,23 +220,20 @@
     "unstudied": "{{count, number}} not studied yet",
     "unstudied_one": "{{count, number}} not studied yet",
     "unstudied_other": "{{count, number}} not studied yet",
-    "behind": "{{count, number}} reviews are overdue",
-    "behind_one": "{{count, number}} review is overdue",
-    "behind_other": "{{count, number}} reviews are overdue",
+    "behind": "{{count, number}} reviews are more than a day past due",
+    "behind_one": "{{count, number}} reviews are more than a day past due",
+    "behind_other": "{{count, number}} reviews are more than a day past due",
     "studied": "{{attempted, number}} of {{total, number}} cards studied",
-    "detailStudied": "{{count, number}} studied",
-    "detailStudied_one": "{{count, number}} studied",
-    "detailStudied_other": "{{count, number}} studied",
     "detailWithinWindow": "{{count, number}} within their review window",
     "detailWithinWindow_one": "{{count, number}} within its review window",
     "detailWithinWindow_other": "{{count, number}} within their review window"
   },
   "completion": {
     "done": "Goal complete",
-    "progress": "{{mature, number}} of {{required, number}} cards retained",
-    "eta": "about {{count, number}} days to go",
-    "eta_one": "about {{count, number}} day to go",
-    "eta_other": "about {{count, number}} days to go"
+    "progress": "{{mature, number}} cards you can leave for 3 weeks · target {{required, number}} (80% of all {{total, number}})",
+    "etaIfDaily": "The remaining {{remaining, number}} each have to sit through a 1-day, then 3-day, then 8-day review. {{count, number}} days at the very fastest, and only if every answer is right.",
+    "etaIfDaily_one": "The remaining {{remaining, number}} each have to sit through a 1-day, then 3-day, then 8-day review. {{count, number}} days at the very fastest, and only if every answer is right.",
+    "etaIfDaily_other": "The remaining {{remaining, number}} each have to sit through a 1-day, then 3-day, then 8-day review. {{count, number}} days at the very fastest, and only if every answer is right."
   },
   "check": {
     "title_one": "{{count, number}} card from today — do you really know it?",

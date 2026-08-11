@@ -10,7 +10,12 @@
       "createGoal": "목표 만들기",
       "noDecks": "이 목표에 연결된 덱이 없어 플랜을 만들 수 없습니다.",
       "attachDecks": "덱 연결하기",
-      "nothingDue": "오늘 이 덱들에서 복습할 카드가 없습니다."
+      "allCaughtUp": "오늘 몫은 끝났어요.",
+      "backSoon": "방금 답한 카드가 {{count, number}}분쯤 뒤에 다시 나와요.",
+      "backSoon_one": "방금 답한 카드가 {{count, number}}분쯤 뒤에 다시 나와요.",
+      "backSoon_other": "방금 답한 카드가 {{count, number}}분쯤 뒤에 다시 나와요.",
+      "nextReview": "다음 복습은 {{when}}이에요.",
+      "nothingScheduled": "이 목표에 예정된 복습이 없어요. 덱에 카드를 더 넣어보세요."
     },
     "item": {
       "study": "학습",
@@ -53,7 +58,10 @@
     },
     "deckListMore": "{{names}} 외 {{count, number}}개",
     "deckListMore_one": "{{names}} 외 {{count, number}}개",
-    "deckListMore_other": "{{names}} 외 {{count, number}}개"
+    "deckListMore_other": "{{names}} 외 {{count, number}}개",
+    "itemsUnavailable": "이 플랜의 카드 {{count, number}}장을 지금 열 수 없어요. 카드가 삭제됐을 수 있어요.",
+    "itemsUnavailable_one": "이 플랜의 카드 {{count, number}}장을 지금 열 수 없어요. 카드가 삭제됐을 수 있어요.",
+    "itemsUnavailable_other": "이 플랜의 카드 {{count, number}}장을 지금 열 수 없어요. 카드가 삭제됐을 수 있어요."
   },
   "goals": {
     "title": "학습 목표",
@@ -157,9 +165,6 @@
   },
   "history": {
     "title": "최근 학습",
-    "recap": "{{count, number}}장 · {{minutes, number}}분 · 카드당 평균 {{seconds, number}}초",
-    "recap_one": "{{count, number}}장 · {{minutes, number}}분 · 카드당 평균 {{seconds, number}}초",
-    "recap_other": "{{count, number}}장 · {{minutes, number}}분 · 카드당 평균 {{seconds, number}}초",
     "band": {
       "known": "알았음 {{count, number}}",
       "known_one": "알았음 {{count, number}}",
@@ -170,32 +175,24 @@
       "missed": "몰랐음 {{count, number}}",
       "missed_one": "몰랐음 {{count, number}}",
       "missed_other": "몰랐음 {{count, number}}"
-    }
+    },
+    "recapCount": "오늘 {{count, number}}번 답했어요",
+    "recapCount_one": "오늘 {{count, number}}번 답했어요",
+    "recapCount_other": "오늘 {{count, number}}번 답했어요"
   },
   "insights": {
     "title": "학습 진단",
     "noData": "데이터 없음",
-    "attempts": "시도 (30일)",
     "accuracy": "정답률",
     "notScoredYet": "아직 채점된 시도 없음",
-    "typicalTime": "보통 소요",
-    "seconds": "{{count, decimal}}초",
-    "adherence": "플랜 이행률 (14일)",
     "weakTitle": "다시 볼 카드",
-    "weakHint": "시도 2회 이상, 평균 60% 미만인 카드입니다.",
+    "weakHint": "두 번 이상 봤는데 절반 넘게 틀린 카드예요.",
     "weakEmpty": "뒤처지는 카드가 없습니다.",
     "cardFallback": "(오늘 플랜에 없는 카드)",
     "attemptCount": "시도 {{count, number}}회",
-    "adherenceTitle": "일별 플랜 (14일)",
-    "adherenceEmpty": "이 기간에 플랜이 없습니다.",
-    "noPlanItems": "계획된 항목 없음",
-    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
-    "scopeNote": "이 목표의 시도와 플랜을 기준으로 계산합니다. 덱 단위 SRS 통계는 학습 기록에 있습니다.",
     "attemptCount_one": "시도 {{count, number}}회",
     "attemptCount_other": "시도 {{count, number}}회",
-    "accuracyValue": "정답률 {{pct, number}}%",
-    "typicalValue": "보통 {{seconds, decimal}}초",
-    "adherenceValue": "플랜 {{pct, number}}% 이행",
+    "accuracyValue": "최근 30일 {{scored, number}}번 중 {{known, number}}번 맞혔어요 ({{pct, number}}%)",
     "weakCount": "{{count, number}}장",
     "weakCount_one": "{{count, number}}장",
     "weakCount_other": "{{count, number}}장",
@@ -223,23 +220,20 @@
     "unstudied": "아직 안 배움 {{count, number}}장",
     "unstudied_one": "아직 안 배움 {{count, number}}장",
     "unstudied_other": "아직 안 배움 {{count, number}}장",
-    "behind": "복습이 {{count, number}}장 밀렸어요",
-    "behind_one": "복습이 {{count, number}}장 밀렸어요",
-    "behind_other": "복습이 {{count, number}}장 밀렸어요",
+    "behind": "하루 넘게 지난 복습이 {{count, number}}장 있어요",
+    "behind_one": "하루 넘게 지난 복습이 {{count, number}}장 있어요",
+    "behind_other": "하루 넘게 지난 복습이 {{count, number}}장 있어요",
     "studied": "{{total, number}}장 중 {{attempted, number}}장 배움",
-    "detailStudied": "배운 {{count, number}}장",
-    "detailStudied_one": "배운 {{count, number}}장",
-    "detailStudied_other": "배운 {{count, number}}장",
     "detailWithinWindow": "복습 주기 안 {{count, number}}장",
     "detailWithinWindow_one": "복습 주기 안 {{count, number}}장",
     "detailWithinWindow_other": "복습 주기 안 {{count, number}}장"
   },
   "completion": {
     "done": "목표 달성",
-    "progress": "{{required, number}}장 중 {{mature, number}}장 정착",
-    "eta": "완료까지 약 {{count, number}}일",
-    "eta_one": "완료까지 약 {{count, number}}일",
-    "eta_other": "완료까지 약 {{count, number}}일"
+    "progress": "3주 뒤에 다시 봐도 되는 카드 {{mature, number}}장 · 목표 {{required, number}}장 (전체 {{total, number}}장의 80%)",
+    "etaIfDaily": "남은 {{remaining, number}}장이 1일 → 3일 → 8일 복습을 차례로 통과해야 해요. 다 맞히면 빨라야 {{count, number}}일.",
+    "etaIfDaily_one": "남은 {{remaining, number}}장이 1일 → 3일 → 8일 복습을 차례로 통과해야 해요. 다 맞히면 빨라야 {{count, number}}일.",
+    "etaIfDaily_other": "남은 {{remaining, number}}장이 1일 → 3일 → 8일 복습을 차례로 통과해야 해요. 다 맞히면 빨라야 {{count, number}}일."
   },
   "check": {
     "title_one": "오늘 공부한 {{count, number}}장, 진짜 아는지 확인해요",

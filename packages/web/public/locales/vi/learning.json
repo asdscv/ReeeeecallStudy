@@ -10,7 +10,12 @@
       "createGoal": "Tạo mục tiêu",
       "noDecks": "Mục tiêu này chưa có bộ thẻ nào, không có gì để lập kế hoạch.",
       "attachDecks": "Gắn bộ thẻ",
-      "nothingDue": "Hôm nay không có thẻ nào cần ôn tập trong các bộ thẻ này."
+      "allCaughtUp": "Phần hôm nay đã xong.",
+      "backSoon": "Những thẻ bạn vừa trả lời sẽ quay lại sau khoảng {{count, number}} phút.",
+      "backSoon_one": "Những thẻ bạn vừa trả lời sẽ quay lại sau khoảng {{count, number}} phút.",
+      "backSoon_other": "Những thẻ bạn vừa trả lời sẽ quay lại sau khoảng {{count, number}} phút.",
+      "nextReview": "Lần ôn tiếp theo: {{when}}.",
+      "nothingScheduled": "Mục tiêu này chưa có lần ôn nào được lên lịch. Hãy thêm thẻ vào bộ thẻ."
     },
     "item": {
       "study": "Học",
@@ -53,7 +58,10 @@
     },
     "deckListMore": "{{names}} và {{count, number}} bộ khác",
     "deckListMore_one": "{{names}} và {{count, number}} bộ khác",
-    "deckListMore_other": "{{names}} và {{count, number}} bộ khác"
+    "deckListMore_other": "{{names}} và {{count, number}} bộ khác",
+    "itemsUnavailable": "Hiện không mở được {{count, number}} thẻ trong kế hoạch này. Có thể chúng đã bị xoá.",
+    "itemsUnavailable_one": "Hiện không mở được {{count, number}} thẻ trong kế hoạch này. Có thể chúng đã bị xoá.",
+    "itemsUnavailable_other": "Hiện không mở được {{count, number}} thẻ trong kế hoạch này. Có thể chúng đã bị xoá."
   },
   "goals": {
     "title": "Mục tiêu học tập",
@@ -157,9 +165,6 @@
   },
   "history": {
     "title": "Học gần đây",
-    "recap": "{{count, number}} thẻ · {{minutes, number}} phút · trung bình {{seconds, number}} giây mỗi thẻ",
-    "recap_one": "{{count, number}} thẻ · {{minutes, number}} phút · trung bình {{seconds, number}} giây mỗi thẻ",
-    "recap_other": "{{count, number}} thẻ · {{minutes, number}} phút · trung bình {{seconds, number}} giây mỗi thẻ",
     "band": {
       "known": "Nhớ {{count, number}}",
       "known_one": "Nhớ {{count, number}}",
@@ -170,32 +175,24 @@
       "missed": "Quên {{count, number}}",
       "missed_one": "Quên {{count, number}}",
       "missed_other": "Quên {{count, number}}"
-    }
+    },
+    "recapCount": "{{count, number}} lượt trả lời hôm nay",
+    "recapCount_one": "{{count, number}} lượt trả lời hôm nay",
+    "recapCount_other": "{{count, number}} lượt trả lời hôm nay"
   },
   "insights": {
     "title": "Phân tích học tập",
     "noData": "Chưa có dữ liệu",
-    "attempts": "Lần làm (30 ngày)",
     "accuracy": "Độ chính xác",
     "notScoredYet": "Chưa có lần nào được chấm điểm",
-    "typicalTime": "Thời gian thường",
-    "seconds": "{{count, decimal}}s",
-    "adherence": "Tỷ lệ thực hiện kế hoạch (14 ngày)",
     "weakTitle": "Cần xem lại",
-    "weakHint": "Thẻ có ít nhất 2 lần làm với trung bình dưới 60%.",
+    "weakHint": "Những thẻ bạn đã xem ít nhất hai lần và sai quá nửa.",
     "weakEmpty": "Không có thẻ nào tụt lại.",
     "cardFallback": "(thẻ không có trong kế hoạch hôm nay)",
     "attemptCount": "{{count, number}} lần làm",
-    "adherenceTitle": "Kế hoạch hàng ngày (14 ngày)",
-    "adherenceEmpty": "Không có kế hoạch trong khoảng thời gian này.",
-    "noPlanItems": "Không có mục nào được lên kế hoạch",
-    "dayRatio": "{{done, number}}/{{total, number}} · {{pct, number}}%",
-    "scopeNote": "Dựa trên các lần làm và kế hoạch của mục tiêu này. Thống kê SRS theo bộ thẻ nằm trong Lịch sử học tập.",
     "attemptCount_one": "{{count, number}} lần làm",
     "attemptCount_other": "{{count, number}} lần làm",
-    "accuracyValue": "Độ chính xác {{pct, number}}%",
-    "typicalValue": "Thường {{seconds, decimal}} giây",
-    "adherenceValue": "Hoàn thành kế hoạch {{pct, number}}%",
+    "accuracyValue": "{{known, number}}/{{scored, number}} đúng trong 30 ngày qua ({{pct, number}}%)",
     "weakCount": "{{count, number}} thẻ",
     "weakCount_one": "{{count, number}} thẻ",
     "weakCount_other": "{{count, number}} thẻ",
@@ -223,23 +220,20 @@
     "unstudied": "{{count, number}} thẻ chưa học",
     "unstudied_one": "{{count, number}} thẻ chưa học",
     "unstudied_other": "{{count, number}} thẻ chưa học",
-    "behind": "{{count, number}} thẻ quá hạn ôn tập",
-    "behind_one": "{{count, number}} thẻ quá hạn ôn tập",
-    "behind_other": "{{count, number}} thẻ quá hạn ôn tập",
+    "behind": "Có {{count, number}} thẻ đã quá hạn hơn một ngày",
+    "behind_one": "Có {{count, number}} thẻ đã quá hạn hơn một ngày",
+    "behind_other": "Có {{count, number}} thẻ đã quá hạn hơn một ngày",
     "studied": "Đã học {{attempted, number}} trong {{total, number}} thẻ",
-    "detailStudied": "Đã học {{count, number}}",
-    "detailStudied_one": "Đã học {{count, number}}",
-    "detailStudied_other": "Đã học {{count, number}}",
     "detailWithinWindow": "{{count, number}} trong chu kỳ ôn tập",
     "detailWithinWindow_one": "{{count, number}} trong chu kỳ ôn tập",
     "detailWithinWindow_other": "{{count, number}} trong chu kỳ ôn tập"
   },
   "completion": {
     "done": "Đã hoàn thành mục tiêu",
-    "progress": "{{mature, number}}/{{required, number}} thẻ đã ghi nhớ",
-    "eta": "còn khoảng {{count, number}} ngày",
-    "eta_one": "còn khoảng {{count, number}} ngày",
-    "eta_other": "còn khoảng {{count, number}} ngày"
+    "progress": "{{mature, number}} thẻ có thể để 3 tuần · mục tiêu {{required, number}} (80% của {{total, number}} thẻ)",
+    "etaIfDaily": "{{remaining, number}} thẻ còn lại phải lần lượt qua các lần ôn 1 ngày → 3 ngày → 8 ngày. Nhanh nhất là {{count, number}} ngày, và chỉ khi đúng hết.",
+    "etaIfDaily_one": "{{remaining, number}} thẻ còn lại phải lần lượt qua các lần ôn 1 ngày → 3 ngày → 8 ngày. Nhanh nhất là {{count, number}} ngày, và chỉ khi đúng hết.",
+    "etaIfDaily_other": "{{remaining, number}} thẻ còn lại phải lần lượt qua các lần ôn 1 ngày → 3 ngày → 8 ngày. Nhanh nhất là {{count, number}} ngày, và chỉ khi đúng hết."
   },
   "check": {
     "title_one": "{{count, number}} thẻ hôm nay — bạn thực sự nhớ chứ?",
