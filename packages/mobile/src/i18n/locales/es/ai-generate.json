@@ -71,7 +71,16 @@
     "freeOnly": "Quedan {{free}} tarjetas gratuitas hoy",
     "imagePaid": "La generación con imagen es de pago — recarga tu saldo para continuar.",
     "needsCredits": "Las funciones de IA necesitan créditos y no te queda ninguno.",
-    "topUp": "Recargar"
+    "topUp": "Recargar",
+    "refusal": {
+      "insufficient": "No tienes saldo suficiente.",
+      "rate_capped": "Has agotado el límite de IA de hoy. Se reinicia mañana; recargar no lo amplía.",
+      "in_flight": "Aún estamos procesando la petición anterior, un momento.",
+      "price_changed": "El precio cambió mientras elegías. Compruébalo e inténtalo de nuevo.",
+      "failed": "No se pudo procesar. No se te ha cobrado nada.",
+      "retry": "Reintentar",
+      "gradeYourself": "Puedes terminar el test igualmente y corregir esta pregunta tú, gratis."
+    }
   },
   "alert": {
     "errorTitle": "Error",

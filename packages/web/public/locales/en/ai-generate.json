@@ -62,7 +62,16 @@
     "cardLimit": "{{available}} of {{limit}} cards left",
     "cardLimitUnlimited": "No card limit (admin)",
     "needsCredits": "AI features need credits, and you have none left.",
-    "topUp": "Top up"
+    "topUp": "Top up",
+    "refusal": {
+      "insufficient": "Not enough credit for this.",
+      "rate_capped": "Today's AI limit is used up. It resets tomorrow — topping up does not lift it.",
+      "in_flight": "Still working on the last request — one moment.",
+      "price_changed": "The price changed while you were choosing. Check it and try again.",
+      "failed": "That didn't work. Nothing was charged.",
+      "retry": "Try again",
+      "gradeYourself": "You can still finish the quiz and mark this yourself, free."
+    }
   },
   "wizard": {
     "setup": "Setup",
