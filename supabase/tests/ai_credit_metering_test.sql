@@ -109,22 +109,28 @@ BEGIN
   PERFORM charge_ai_generation('a1000000-0000-0000-0000-000000000001'::uuid, j_paid, 'gemini','gemini-2.5-flash-lite', 1000, 500);
   SELECT balance INTO b1 FROM ai_credit_balance WHERE user_id='a1000000-0000-0000-0000-000000000001';
   SELECT price_micro_won, charged INTO pr, ch FROM ai_generation_jobs WHERE id=j_paid;
-  ASSERT pr = 500, format('C1 price %s', pr);
-  ASSERT b1 = b0 - 500, format('C1 balance %s (from %s)', b1, b0);
+  -- The price is the LIST PRICE for the paid cards on this job (mig 216), not a markup on the
+  -- tokens. It used to be 500 here, derived from 1000/500 tokens x paid_share x markup — the
+  -- same arithmetic that made one explanation cost 1,095 and the next 50,325 when a model
+  -- changed underneath. What the learner pays no longer moves with the provider.
+  ASSERT pr = 2 * public._ai_action_price('card'), format('C1 price %s', pr);
+  ASSERT b1 = b0 - pr, format('C1 balance %s (from %s)', b1, b0);
   ASSERT ch = true, 'C1 charged';
-  SELECT count(*) INTO n FROM ai_credit_ledger WHERE ref=j_paid AND reason='spend' AND delta=-500;
+  SELECT count(*) INTO n FROM ai_credit_ledger WHERE ref=j_paid AND reason='spend' AND delta=-pr;
   ASSERT n = 1, format('C1 spend ledger row %s', n);
 
-  -- C2: idempotent — re-charge the same job is a no-op (balance unchanged)
+  -- C2: idempotent — re-charge the same job is a no-op (balance unchanged). Note the token
+  -- counts differ wildly from the first call; under a list price that must change nothing.
   PERFORM charge_ai_generation('a1000000-0000-0000-0000-000000000001'::uuid, j_paid, 'gemini','gemini-2.5-flash-lite', 9999, 9999);
   SELECT balance INTO b1 FROM ai_credit_balance WHERE user_id='a1000000-0000-0000-0000-000000000001';
-  ASSERT b1 = b0 - 500, format('C2 idempotent balance %s', b1);
+  ASSERT b1 = b0 - pr, format('C2 idempotent balance %s', b1);
 
   -- C3: charge a FREE-only job (paid_share=0) → price 0, wallet unchanged
   PERFORM charge_ai_generation('a1000000-0000-0000-0000-000000000001'::uuid, j_free, 'gemini','gemini-2.5-flash-lite', 1000, 500);
   SELECT price_micro_won INTO pr FROM ai_generation_jobs WHERE id=j_free;
   SELECT balance INTO b1 FROM ai_credit_balance WHERE user_id='a1000000-0000-0000-0000-000000000001';
-  ASSERT pr = 0 AND b1 = b0 - 500, format('C3 free price %s balance %s', pr, b1);
+  ASSERT pr = 0 AND b1 = b0 - 2 * public._ai_action_price('card'),
+    format('C3 free price %s balance %s', pr, b1);
 END $$;
 
 -- C4: charge is service_role/admin only
@@ -142,12 +148,17 @@ END $$;
 -- D. release — failure reverses counters, no wallet touch, idempotent (u3)
 -- ════════════════════════════════════════════════════════════════════════════
 SELECT set_config('request.jwt.claim.role', 'service_role', false);
-SELECT add_ai_credits('a3000000-0000-0000-0000-000000000003'::uuid, 1, 'purchase', 'pay_u3');  -- ₩0.000001 (tiny)
+-- Enough for exactly the three paid cards below, at the list price (mig 216). It used to be
+-- ₩0.000001 — the old gate was `balance > 0`, so any non-empty wallet could commit to any
+-- amount of work. That was tolerable while the charge followed cost; with a fixed price it
+-- would let a one-micro wallet commit to thirty thousand.
+SELECT add_ai_credits('a3000000-0000-0000-0000-000000000003'::uuid,
+                      3 * public._ai_action_price('card'), 'purchase', 'pay_u3');
 SELECT set_config('request.jwt.claim.role', 'authenticated', false);
 SELECT set_config('request.jwt.claim.sub', :'u3', false);
 DO $$ DECLARE j jsonb; jr text; BEGIN
   PERFORM reserve_ai_generation('cards', 10);                 -- exhaust free
-  j := reserve_ai_generation('cards', 3);                     -- paid=3; wallet=1>0 → gate passes
+  j := reserve_ai_generation('cards', 3);                     -- paid=3; wallet covers the list price
   ASSERT (j->>'paid_now')::int=3, format('D0 paid %s', j->>'paid_now');
 END $$;
 SELECT set_config('request.jwt.claim.role', 'service_role', false);
@@ -164,16 +175,30 @@ DO $$ DECLARE jr text; paid int; bal bigint; ref boolean; BEGIN
   ASSERT paid = 0, format('D2 idempotent %s', paid);
 END $$;
 
--- D3: SLIGHT NEGATIVE allowed — a ₩0.000001 wallet can still generate (gate passes on >0),
---     and the post-gen charge dips the balance below zero (bounded to one batch).
-SELECT set_config('request.jwt.claim.role', 'authenticated', false);
-DO $$ DECLARE j jsonb; BEGIN j := reserve_ai_generation('cards', 3); END $$;  -- free exhausted → paid 3, gate passes on bal=1
+-- D3: THE WALLET CANNOT GO NEGATIVE. This assertion is the reverse of what it used to be.
+--
+-- The old design deliberately allowed a dip below zero: the gate was `balance > 0`, and the
+-- post-generation charge — a markup on measured tokens — could take a nearly-empty wallet
+-- slightly negative. That was a reasonable trade when the overshoot was bounded by one batch's
+-- real cost. Under a fixed list price it is not: three cards commit to 30,000 regardless of how
+-- the generation goes, so a one-micro wallet would end at -29,999. The gate is now the price,
+-- and a learner who cannot afford the action is told so before any work is done.
 SELECT set_config('request.jwt.claim.role', 'service_role', false);
-DO $$ DECLARE jr text; bal bigint; BEGIN
-  SELECT id INTO jr FROM ai_generation_jobs WHERE user_id='a3000000-0000-0000-0000-000000000003' AND paid_cards=3 AND NOT charged AND NOT refunded ORDER BY created_at DESC LIMIT 1;
-  PERFORM charge_ai_generation('a3000000-0000-0000-0000-000000000003'::uuid, jr, 'gemini','gemini-2.5-flash-lite', 1000, 500);
+DO $$ BEGIN
+  UPDATE ai_credit_balance SET balance = public._ai_action_price('card') - 1
+   WHERE user_id = 'a3000000-0000-0000-0000-000000000003';
+END $$;
+SELECT set_config('request.jwt.claim.role', 'authenticated', false);
+DO $$ BEGIN
+  BEGIN
+    PERFORM reserve_ai_generation('cards', 1);
+    RAISE EXCEPTION 'D3 a wallet below the list price was allowed to commit';
+  EXCEPTION WHEN sqlstate 'P0002' THEN NULL; END;
+END $$;
+SELECT set_config('request.jwt.claim.role', 'service_role', false);
+DO $$ DECLARE bal bigint; BEGIN
   SELECT balance INTO bal FROM ai_credit_balance WHERE user_id='a3000000-0000-0000-0000-000000000003';
-  ASSERT bal < 0, format('D3 slight-negative allowed, balance %s', bal);   -- 1 - 2,025,000 = -2,024,999
+  ASSERT bal >= 0, format('D3 balance went negative: %s', bal);
 END $$;
 
 -- D4: release is service_role/admin only + does NOT release a CHARGED (succeeded) job
@@ -186,7 +211,7 @@ DO $$ DECLARE jr text; BEGIN
 END $$;
 SELECT set_config('request.jwt.claim.role', 'service_role', false);
 DO $$ DECLARE jr text; paid_before int; paid_after int; BEGIN
-  -- the D3 charged job: release must be a no-op (charged guard)
+  -- a charged job: release must be a no-op (charged guard)
   SELECT id INTO jr FROM ai_generation_jobs WHERE user_id='a3000000-0000-0000-0000-000000000003' AND charged LIMIT 1;
   SELECT paid_cards_used INTO paid_before FROM ai_generation_usage WHERE user_id='a3000000-0000-0000-0000-000000000003';
   PERFORM release_ai_job('a3000000-0000-0000-0000-000000000003'::uuid, jr);
