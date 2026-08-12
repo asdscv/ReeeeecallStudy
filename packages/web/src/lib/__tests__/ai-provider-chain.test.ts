@@ -68,3 +68,47 @@ describe('resolveModelChain', () => {
     }
   })
 })
+
+/**
+ * A dead model in the chain took every AI feature down with it.
+ *
+ * Found by driving production: 퀴즈 만들기 answered "지금 AI 서비스가 붐비고 있어요", and calling
+ * the provider directly showed why —
+ *
+ *   gemini-2.5-flash-lite   429 RESOURCE_EXHAUSTED   (free tier, 20 requests/day)
+ *   gemini-2.0-flash-lite   404 NOT_FOUND            (decommissioned)
+ *   gemini-2.0-flash        404 NOT_FOUND            (decommissioned)
+ *   gemini-2.5-flash        OK
+ *
+ * The chain existed precisely so one model's daily cap could not do this. It failed because
+ * `generate()` walked on only for a daily-quota error: the primary was correctly skipped, the
+ * first FALLBACK answered 404, that is not a quota error, and the loop rethrew — never reaching
+ * the model that worked. Two dead entries stood between the outage and the fix.
+ */
+describe('the fallback chain after two models were decommissioned', () => {
+  it('lists no model the API has retired', () => {
+    // Verified against the live API. Both 2.0 entries answer 404 "no longer available".
+    const RETIRED = ['gemini-2.0-flash', 'gemini-2.0-flash-lite']
+    const gemini = PROVIDERS.gemini
+    for (const dead of RETIRED) {
+      expect(gemini.textFallbacks ?? [], `text: ${dead}`).not.toContain(dead)
+      expect(gemini.visionFallbacks ?? [], `vision: ${dead}`).not.toContain(dead)
+      expect(gemini.textModel, `primary: ${dead}`).not.toBe(dead)
+      expect(gemini.visionModel, `vision primary: ${dead}`).not.toBe(dead)
+    }
+  })
+
+  it('still has somewhere to fall back to', () => {
+    // Removing the dead entries must not leave the primary alone — that is the outage again,
+    // just without the misleading 404 in the middle.
+    const gemini = PROVIDERS.gemini
+    expect((gemini.textFallbacks ?? []).length).toBeGreaterThan(0)
+    expect((gemini.visionFallbacks ?? []).length).toBeGreaterThan(0)
+  })
+
+  it('never falls back to the model it just gave up on', () => {
+    const gemini = PROVIDERS.gemini
+    expect(gemini.textFallbacks ?? []).not.toContain(gemini.textModel)
+    expect(gemini.visionFallbacks ?? []).not.toContain(gemini.visionModel)
+  })
+})
