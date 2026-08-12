@@ -71,7 +71,16 @@
     "freeOnly": "今日剩余 {{free}} 张免费卡片",
     "imagePaid": "图片生成为付费功能 — 请充值后继续。",
     "needsCredits": "AI 功能需要点数，你已经没有余额了。",
-    "topUp": "去充值"
+    "topUp": "去充值",
+    "refusal": {
+      "insufficient": "余额不足。",
+      "rate_capped": "今日 AI 使用次数已用完，明天重置（充值不会增加次数）。",
+      "in_flight": "上一个请求还在处理中，请稍候。",
+      "price_changed": "选择期间价格有变动，请确认后重试。",
+      "failed": "处理失败，未产生扣费。",
+      "retry": "重试",
+      "gradeYourself": "你仍可以完成测验，这道题自己批改是免费的。"
+    }
   },
   "alert": {
     "errorTitle": "错误",

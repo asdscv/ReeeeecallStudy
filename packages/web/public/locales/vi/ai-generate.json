@@ -62,7 +62,16 @@
     "cardLimit": "Còn {{available}}/{{limit}} thẻ",
     "cardLimitUnlimited": "Không giới hạn số thẻ (quản trị)",
     "needsCredits": "Tính năng AI cần tín dụng, và bạn đã hết.",
-    "topUp": "Nạp thêm"
+    "topUp": "Nạp thêm",
+    "refusal": {
+      "insufficient": "Số dư không đủ.",
+      "rate_capped": "Bạn đã dùng hết hạn mức AI hôm nay. Sẽ đặt lại vào ngày mai — nạp thêm không làm tăng hạn mức.",
+      "in_flight": "Yêu cầu trước vẫn đang xử lý, vui lòng đợi.",
+      "price_changed": "Giá đã thay đổi trong lúc bạn chọn. Hãy kiểm tra và thử lại.",
+      "failed": "Không xử lý được. Bạn không bị trừ tiền.",
+      "retry": "Thử lại",
+      "gradeYourself": "Bạn vẫn có thể hoàn thành bài và tự chấm câu này miễn phí."
+    }
   },
   "wizard": {
     "setup": "Setup",

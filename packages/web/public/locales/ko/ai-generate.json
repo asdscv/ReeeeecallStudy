@@ -62,7 +62,16 @@
     "cardLimit": "카드 한도 {{limit}}장 중 {{available}}장 남음",
     "cardLimitUnlimited": "카드 개수 제한 없음 (관리자)",
     "needsCredits": "AI 기능은 크레딧이 있어야 사용할 수 있어요. 남은 크레딧이 없습니다.",
-    "topUp": "충전하기"
+    "topUp": "충전하기",
+    "refusal": {
+      "insufficient": "충전금이 부족해요.",
+      "rate_capped": "오늘 AI 사용 한도를 다 썼어요. 내일 다시 초기화되고, 충전해도 늘어나지 않아요.",
+      "in_flight": "앞선 요청을 아직 처리 중이에요. 잠시만 기다려 주세요.",
+      "price_changed": "고르는 사이에 가격이 바뀌었어요. 확인하고 다시 시도해 주세요.",
+      "failed": "처리하지 못했어요. 차감된 금액은 없습니다.",
+      "retry": "다시 시도",
+      "gradeYourself": "퀴즈는 그대로 끝낼 수 있고, 이 문제는 직접 채점하면 무료예요."
+    }
   },
   "wizard": {
     "setup": "설정",
