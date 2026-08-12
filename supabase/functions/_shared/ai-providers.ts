@@ -54,8 +54,17 @@ export const PROVIDERS: Record<string, ProviderDef> = {
     // 404 "no longer available", and they sat ahead of a working model in this list.
     textModel: 'gemini-3.1-flash-lite',
     visionModel: 'gemini-3.1-flash-lite',
-    textFallbacks: ['gemini-2.5-flash', 'gemini-flash-lite-latest'],
-    visionFallbacks: ['gemini-2.5-flash'],
+    // Ordered CHEAPEST-FIRST, which the doc comment above this table already asked for and the
+    // list did not do. It matters more than it looks: `gemini-2.5-flash` costs 3x the input and
+    // 6.25x the output of the lite tier, so a chain that reaches for it first turns every
+    // fallback into a margin event. Under a fixed price per action — which is where this is
+    // heading — that is the difference between "degraded" and "sold at a loss".
+    //
+    // `gemini-flash-lite-latest` is the same tier as the primary, so falling to it costs what
+    // we already priced for. `gemini-2.5-flash` stays as the last resort: it is the model
+    // production actually ran on today, so it is proven, just expensive.
+    textFallbacks: ['gemini-flash-lite-latest', 'gemini-2.5-flash'],
+    visionFallbacks: ['gemini-flash-lite-latest', 'gemini-2.5-flash'],
   },
   xai: {
     baseUrl: 'https://api.x.ai/v1',

@@ -41,7 +41,10 @@ DO $$ DECLARE j jsonb; jr text; b0 bigint; b1 bigint; BEGIN
   PERFORM charge_ai_generation(auth.uid(), jr, 'gemini','gemini-2.5-flash-lite', 1000, 500);
   SELECT balance INTO b1 FROM ai_credit_balance WHERE user_id=auth.uid();
   ASSERT b1 < b0, format('SMOKE wallet debited %s → %s', b0, b1);
-  ASSERT b1 = b0 - 500, format('SMOKE charged 500 (paid_share 1/3), got %s', b0 - b1);  -- price for jr
+  -- Two paid cards at the list price (mig 216). Was 500, a markup on 1000/500 tokens.
+  ASSERT b1 = b0 - 2 * public._ai_action_price('card'),
+    format('SMOKE expected 2 cards at list price %s, got %s',
+           2 * public._ai_action_price('card'), b0 - b1);
 END $$;
 
 -- ════════════════════════════ NET-ZERO ════════════════════════════
@@ -84,14 +87,18 @@ DO $$ DECLARE p record; n0 int; n1 int; BEGIN
 END $$;
 
 -- ════════════════════════════ EST-PRICE (mig 115) ════════════════════════════
--- refresh_ai_est_price calibrates from the real (non-estimated) per-paid-card price.
--- Only real charged row is the SMOKE charge: price 500 / 2 paid = 250.
+-- refresh_ai_est_price calibrates the per-card estimate the UI shows from real charged rows.
+--
+-- Under a list price (mig 216) that calibration converges on the list price itself, which is
+-- the point: the number the screen shows before the learner presses and the number they are
+-- charged afterwards are now the same fact, not two estimates of a moving cost. It used to
+-- land on 500 / 2 paid = 250, a markup on whatever the tokens happened to be.
 SELECT set_config('request.jwt.claim.role', 'service_role', false);
-DO $$ DECLARE v bigint; setv bigint; BEGIN
+DO $$ DECLARE v bigint; setv bigint; expected bigint := public._ai_action_price('card'); BEGIN
   v := refresh_ai_est_price();
-  ASSERT v = 250, format('EST-PRICE refreshed to avg per-paid-card, got %s', v);
+  ASSERT v = expected, format('EST-PRICE should equal the list price %s, got %s', expected, v);
   SELECT est_price_per_card_micro INTO setv FROM ai_pricing_settings WHERE id=1;
-  ASSERT setv = 250, format('EST-PRICE setting updated, got %s', setv);
+  ASSERT setv = expected, format('EST-PRICE setting updated, got %s', setv);
 END $$;
 SELECT set_config('request.jwt.claim.role', 'authenticated', false);
 DO $$ BEGIN

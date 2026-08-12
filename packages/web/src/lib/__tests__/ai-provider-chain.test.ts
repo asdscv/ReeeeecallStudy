@@ -139,11 +139,55 @@ describe('the primary model', () => {
     for (const dead of RETIRED) expect(everything, dead).not.toContain(dead)
   })
 
-  it('falls back to what production was actually running on', () => {
-    // The worst case of repointing the primary must be the behaviour we already had, not a
-    // model nobody has exercised. `gemini-2.5-flash` served the 12-question quiz on the day
-    // this was changed.
-    expect(PROVIDERS.gemini.textFallbacks?.[0]).toBe('gemini-2.5-flash')
+  it('keeps the model production actually ran on somewhere in the chain', () => {
+    // `gemini-2.5-flash` served the 12-question quiz on the day the primary was repointed, so
+    // it is the proven last resort. It is deliberately NOT first: it costs 3x the input and
+    // 6.25x the output of the lite tier, and reaching for it before a same-tier model turns
+    // every fallback into a margin event. See the ordering tests below.
+    expect(PROVIDERS.gemini.textFallbacks).toContain('gemini-2.5-flash')
     expect(PROVIDERS.gemini.visionFallbacks).toContain('gemini-2.5-flash')
+  })
+})
+
+/**
+ * The chain must degrade to something CHEAPER, never pricier.
+ *
+ * `gemini-2.5-flash` costs 3x the input and 6.25x the output of the flash-lite tier. With the
+ * expensive model as the first fallback, every exhaustion of the primary tripled or sextupled
+ * the cost of the work while the learner paid the same — and under a fixed price per action,
+ * which is where the billing is heading, that is selling below cost rather than merely earning
+ * less. The doc comment on this table already said "ordered cheapest-first among the
+ * acceptable ones"; the list did not do it.
+ *
+ * Rates are the ones in `ai_pricing_config`, in micro-USD per million tokens.
+ */
+describe('fallback ordering', () => {
+  const RATE: Record<string, { in: number; out: number }> = {
+    'gemini-3.1-flash-lite': { in: 100_000, out: 400_000 },
+    'gemini-flash-lite-latest': { in: 100_000, out: 400_000 },
+    'gemini-2.5-flash': { in: 300_000, out: 2_500_000 },
+  }
+  /** A representative blend: our measured usage is roughly 2 parts input to 1 part output. */
+  const blended = (m: string) => RATE[m] ? RATE[m].in * 2 + RATE[m].out : null
+
+  it('never puts a pricier model ahead of a cheaper one', () => {
+    for (const chain of [
+      [PROVIDERS.gemini.textModel, ...(PROVIDERS.gemini.textFallbacks ?? [])],
+      [PROVIDERS.gemini.visionModel, ...(PROVIDERS.gemini.visionFallbacks ?? [])],
+    ]) {
+      const priced = chain.map(blended)
+      for (let i = 1; i < priced.length; i++) {
+        const prev = priced[i - 1], cur = priced[i]
+        if (prev === null || cur === null) continue // unpriced is caught by its own test
+        expect(cur, `${chain[i]} after ${chain[i - 1]}`).toBeGreaterThanOrEqual(prev)
+      }
+    }
+  })
+
+  it('reaches a same-tier model before an expensive one', () => {
+    // The specific regression: the first thing tried after the primary should cost what we
+    // priced for, not 3-6x it.
+    const first = PROVIDERS.gemini.textFallbacks?.[0]
+    expect(blended(first!)).toBe(blended(PROVIDERS.gemini.textModel))
   })
 })
