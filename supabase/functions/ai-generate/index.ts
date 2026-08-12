@@ -272,7 +272,47 @@ function retryAfterMs(res: Response, body: string): number | null {
  */
 const DEFAULT_TEMPERATURE = 0.8
 
-async function providerRequest(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrls?: string[], temperature = DEFAULT_TEMPERATURE): Promise<ProviderResult> {
+/**
+ * How many output tokens each action is allowed. Not a performance knob — a price ceiling.
+ *
+ * Every call used to share one `max_tokens: 16384`, which is 16x more than the largest output
+ * ever measured on any action. Under cost-following pricing that only ever cost us tokens; once
+ * an action has a FIXED price it decides the worst case we can be billed for, because output is
+ * priced 4-6x input and is 63-88% of every bill.
+ *
+ * The numbers are the measured maximum for each action, roughly tripled — generous enough that
+ * no real generation is cut off, tight enough that the worst case stays inside the price:
+ *
+ *   action            measured max out   cap
+ *   quiz generate     1144               3000   (a batch of up to 8 questions)
+ *   quiz grade          62                800   (one answer's feedback; essay measured 242)
+ *   remediation        466               1500
+ *   cards             2017               4000   (a few cards at once)
+ *   deck / template   —                  1500   (small metadata objects)
+ *   image -> deck     —                  8000   (a whole deck from a photo; genuinely large)
+ *
+ * A generation that hits its cap comes back as truncated JSON, fails `resultIsUsable`, and
+ * releases the job — the learner is not charged for a clipped answer. So a cap that is too low
+ * costs us a wasted provider call, which is why they are set well above the observed maximum.
+ */
+const OUTPUT_CAP: Record<string, number> = {
+  quiz_generate: 3000,
+  quiz_grade: 800,
+  remediation: 1500,
+  cards: 4000,
+  deck: 1500,
+  template: 1500,
+  image: 4000,
+  image_deck: 8000,
+}
+/** Used for a kind not named above, so a new kind is bounded rather than unbounded. */
+const OUTPUT_CAP_DEFAULT = 4000
+
+export function outputCapFor(kind: string): number {
+  return OUTPUT_CAP[kind] ?? OUTPUT_CAP_DEFAULT
+}
+
+async function providerRequest(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrls?: string[], temperature = DEFAULT_TEMPERATURE, maxTokens = OUTPUT_CAP_DEFAULT): Promise<ProviderResult> {
   // Vision: the OpenAI-compatible shape carries the image(s) in the user message
   // as a content array — one text part plus one image_url part per image (the API
   // accepts multiple images in a single message). Plain text uses a string.
@@ -290,7 +330,7 @@ async function providerRequest(m: ResolvedModel, systemPrompt: string, userPromp
     ],
     response_format: { type: 'json_object' },
     temperature,
-    max_tokens: 16384,
+    max_tokens: maxTokens,
   }
 
   for (let attempt = 0; attempt <= PROVIDER_RETRY_DELAYS.length; attempt++) {
@@ -373,14 +413,14 @@ async function providerRequest(m: ResolvedModel, systemPrompt: string, userPromp
 
 // Returns parsed JSON + token usage; one stricter-prompt retry on unparseable
 // output (mirrors callAI). On retry we paid for BOTH calls → SUM the usage.
-async function generateWith(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrls?: string[], temperature = DEFAULT_TEMPERATURE): Promise<{ json: Record<string, unknown>; usage: TokenUsage | null }> {
-  const a = await providerRequest(m, systemPrompt, userPrompt, imageUrls, temperature)
+async function generateWith(m: ResolvedModel, systemPrompt: string, userPrompt: string, imageUrls?: string[], temperature = DEFAULT_TEMPERATURE, maxTokens = OUTPUT_CAP_DEFAULT): Promise<{ json: Record<string, unknown>; usage: TokenUsage | null }> {
+  const a = await providerRequest(m, systemPrompt, userPrompt, imageUrls, temperature, maxTokens)
   try {
     return { json: JSON.parse(stripMarkdownFences(a.content)), usage: a.usage }
   } catch {
     const strict = systemPrompt +
       '\n\nIMPORTANT: You MUST respond with valid JSON only. No markdown, no explanation, just pure JSON.'
-    const b = await providerRequest(m, strict, userPrompt, imageUrls, temperature)
+    const b = await providerRequest(m, strict, userPrompt, imageUrls, temperature, maxTokens)
     return { json: JSON.parse(stripMarkdownFences(b.content)), usage: sumUsage(a.usage, b.usage) }
   }
 }
@@ -401,12 +441,12 @@ async function generateWith(m: ResolvedModel, systemPrompt: string, userPrompt: 
  */
 async function generate(
   chain: ResolvedModel[], systemPrompt: string, userPrompt: string, imageUrls?: string[],
-  temperature = DEFAULT_TEMPERATURE,
+  temperature = DEFAULT_TEMPERATURE, maxTokens = OUTPUT_CAP_DEFAULT,
 ): Promise<{ json: Record<string, unknown>; usage: TokenUsage | null; model: ResolvedModel }> {
   let lastError: unknown
   for (const [i, m] of chain.entries()) {
     try {
-      const out = await generateWith(m, systemPrompt, userPrompt, imageUrls, temperature)
+      const out = await generateWith(m, systemPrompt, userPrompt, imageUrls, temperature, maxTokens)
       if (i > 0) console.warn(`[ai-generate] fell back to ${m.model} after ${i} exhausted model(s)`)
       return { ...out, model: m }
     } catch (e) {
@@ -727,7 +767,7 @@ Deno.serve(async (req) => {
         const prompt = buildRemediationPrompt(refs, context)
         if (prompt.requireGrounding && sources.length === 0) throw new Error('GROUNDING_SOURCE_REQUIRED')
 
-        const generated = await generate(chain, prompt.systemPrompt, prompt.userPrompt)
+        const generated = await generate(chain, prompt.systemPrompt, prompt.userPrompt, undefined, DEFAULT_TEMPERATURE, outputCapFor('remediation'))
         const validated = validateRemediationResult(generated.json, refs, sources.map((source) => source.id), prompt.requireGrounding)
         if (!validated.valid) throw new Error(`INVALID_REMEDIATION:${validated.reason}`)
 
@@ -919,7 +959,7 @@ Deno.serve(async (req) => {
         const prompt = qType === 'mcq' ? buildMcqGenerationPrompt(sources, difficulty, uiLocale)
           : qType === 'short' ? buildShortAnswerGenerationPrompt(sources, difficulty, uiLocale)
           : buildEssayGenerationPrompt(sources, difficulty, uiLocale)
-        const generated = await generate(chain, prompt.systemPrompt, prompt.userPrompt)
+        const generated = await generate(chain, prompt.systemPrompt, prompt.userPrompt, undefined, DEFAULT_TEMPERATURE, outputCapFor('quiz_generate'))
 
         const makeItemId = (cardId: string, index: number) => `${setId}:${cardId}:${index}`
         const outcome = qType === 'mcq'
@@ -1112,7 +1152,8 @@ Deno.serve(async (req) => {
         // then read by the planner, the insights and the weak-card list. `QUIZ_TEMPERATURE`
         // has said so since it was written and had no importer until now.
         const generated = await generate(
-          chain, prompt.systemPrompt, prompt.userPrompt, undefined, QUIZ_TEMPERATURE.grade)
+          chain, prompt.systemPrompt, prompt.userPrompt, undefined, QUIZ_TEMPERATURE.grade,
+          outputCapFor('quiz_grade'))
 
         const verdict = quizType === 'essay'
           ? validateEssayGrade(generated.json, criteria, gradeInput)
@@ -1185,7 +1226,7 @@ Deno.serve(async (req) => {
 
       const { systemPrompt: iSys, userPrompt: iUser } = buildImageCardsPrompt(fields, cardCount, uiLang)
       try {
-        const { json: content, usage, model: usedModel } = await generate(chain, iSys, iUser, images)
+        const { json: content, usage, model: usedModel } = await generate(chain, iSys, iUser, images, DEFAULT_TEMPERATURE, outputCapFor('image'))
         if (!resultHasItems(content)) {   // empty vision result → refund, don't charge
           console.error('[ai-generate] image empty result — releasing job', imgMeter.job_ref)
           await releaseJob(userId, imgMeter.job_ref)
@@ -1233,7 +1274,7 @@ Deno.serve(async (req) => {
 
       const { systemPrompt: dSys, userPrompt: dUser } = buildImageDeckPrompt(uiLang)
       try {
-        const { json: content, usage, model: usedModel } = await generate(chain, dSys, dUser, images)
+        const { json: content, usage, model: usedModel } = await generate(chain, dSys, dUser, images, DEFAULT_TEMPERATURE, outputCapFor('image_deck'))
         if (!resultHasItems(content)) {   // empty deck result → refund, don't charge
           console.error('[ai-generate] image_deck empty result — releasing job', idMeter.job_ref)
           await releaseJob(userId, idMeter.job_ref)
@@ -1323,7 +1364,7 @@ Deno.serve(async (req) => {
   // rate, and charging the one we asked for first would misattribute the spend.
   let usedModel: ResolvedModel = model
     try {
-      const gen = await generate(chain, systemPrompt, userPrompt)
+      const gen = await generate(chain, systemPrompt, userPrompt, undefined, DEFAULT_TEMPERATURE, outputCapFor(kind))
       content = gen.json
       usage = gen.usage
       usedModel = gen.model
