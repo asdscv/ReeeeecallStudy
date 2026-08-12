@@ -41,8 +41,14 @@ export const PROVIDERS: Record<string, ProviderDef> = {
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai',
     textModel: 'gemini-2.5-flash-lite',
     visionModel: 'gemini-2.5-flash',
-    textFallbacks: ['gemini-2.0-flash-lite', 'gemini-2.0-flash', 'gemini-2.5-flash'],
-    visionFallbacks: ['gemini-2.0-flash', 'gemini-2.5-flash-lite'],
+    // `gemini-2.0-flash` and `gemini-2.0-flash-lite` are GONE — the API answers both with
+    // 404 "This model is no longer available". They sat AHEAD of the working model in this
+    // list, and a 404 is not a quota error, so the chain aborted on the first fallback and
+    // never reached `gemini-2.5-flash`. Every AI feature went down the moment the primary hit
+    // its daily quota, with a working model two entries further along. Verified by calling
+    // all four directly.
+    textFallbacks: ['gemini-2.5-flash'],
+    visionFallbacks: ['gemini-2.5-flash-lite'],
   },
   xai: {
     baseUrl: 'https://api.x.ai/v1',

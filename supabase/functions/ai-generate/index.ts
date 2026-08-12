@@ -412,8 +412,19 @@ async function generate(
     } catch (e) {
       lastError = e
       const msg = e instanceof Error ? e.message : ''
-      if (!msg.startsWith('PROVIDER_LIMIT') || !/PerDay|per day/i.test(msg)) throw e
-      // Exhausted for the day — try the next model in the chain.
+      const dailyExhausted = msg.startsWith('PROVIDER_LIMIT') && /PerDay|per day/i.test(msg)
+      // Walk on for a daily quota — that is what the chain is for. And walk on for ANY
+      // failure of a FALLBACK: those are models we chose to try after the primary was
+      // already spent, so aborting on one of them throws away the remaining options.
+      //
+      // That distinction is not academic. `gemini-2.0-flash-lite` was decommissioned and now
+      // answers 404, and it sat at position 1 with the working `gemini-2.5-flash` at
+      // position 3. A 404 is not a quota error, so the loop rethrew and every AI feature was
+      // down for the rest of the day — quiz generation, card generation, the paid
+      // explanation — while a model that worked sat one entry further along.
+      const isFallback = i > 0
+      if (!dailyExhausted && !isFallback) throw e
+      if (isFallback) console.warn(`[ai-generate] fallback ${m.model} failed: ${msg.slice(0, 120)}`)
     }
   }
   throw lastError instanceof Error ? lastError : new Error('PROVIDER_ERROR')
