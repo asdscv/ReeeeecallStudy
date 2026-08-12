@@ -64,7 +64,7 @@ END $$;
 -- ═══ 2) fixtures ════════════════════════════════════════════════════════════
 -- (a) WEB credit pack: intent + its ledger grant, keyed on the merchant_uid.
 INSERT INTO payment_intents
-  (merchant_uid, user_id, product_id, kind, amount_krw, amount_micro_won,
+  (merchant_uid, user_id, product_id, kind, amount_krw, amount_micro_usd,
    status, provider, provider_payment_id, platform, paid_at, created_at)
 VALUES
   ('pi_rp_web1', :web, 'credits_5000', 'credit_pack', 5000, 4990000,

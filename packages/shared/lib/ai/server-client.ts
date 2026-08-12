@@ -116,7 +116,7 @@ export async function getAiGenerationQuota(): Promise<AiGenerationQuota> {
 }
 
 export interface AiWallet {
-  balanceMicroWon: number      // prepaid balance in micro-WON (1e-6 KRW)
+  balanceMicroUsd: number      // prepaid balance in micro-WON (1e-6 KRW)
   estPricePerCardMicro: number // approximate micro-USD charged per PAID card (for the UI quote)
 }
 
@@ -130,7 +130,7 @@ export async function getAiWallet(): Promise<AiWallet | null> {
   const row = Array.isArray(data) ? data[0] : data
   if (error || !row) return null
   return {
-    balanceMicroWon: Number(row.balance_micro_won ?? 0),
+    balanceMicroUsd: Number(row.balance_micro_usd ?? 0),
     estPricePerCardMicro: Number(row.est_price_per_card_micro ?? 0),
   }
 }
@@ -140,7 +140,7 @@ export interface Affordable {
   paid: number       // ESTIMATED paid cards the balance can buy (metered → approximate)
   total: number
   walletKnown: boolean
-  balanceMicroWon?: number
+  balanceMicroUsd?: number
 }
 
 // Cards the user can generate right now = free remaining + an ESTIMATE of what the
@@ -151,8 +151,8 @@ export interface Affordable {
 export async function getAffordableCards(): Promise<Affordable> {
   const [q, w] = await Promise.all([getAiGenerationQuota(), getAiWallet()])
   if (!w) return { free: q.remaining, paid: 0, total: q.remaining, walletKnown: false }
-  const paid = w.estPricePerCardMicro > 0 ? Math.floor(w.balanceMicroWon / w.estPricePerCardMicro) : 0
-  return { free: q.remaining, paid, total: q.remaining + paid, walletKnown: true, balanceMicroWon: w.balanceMicroWon }
+  const paid = w.estPricePerCardMicro > 0 ? Math.floor(w.balanceMicroUsd / w.estPricePerCardMicro) : 0
+  return { free: q.remaining, paid, total: q.remaining + paid, walletKnown: true, balanceMicroUsd: w.balanceMicroUsd }
 }
 
 // The wallet is denominated in micro-USD (1 unit = 1e-6 USD) since mig 145 — the AI
@@ -183,7 +183,7 @@ export interface WalletLedgerEntry {
 }
 
 export interface AiWalletSummary {
-  balanceMicroWon: number
+  balanceMicroUsd: number
   estPricePerCardMicro: number
   freeLimit: number
   freeUsedToday: number
@@ -210,7 +210,7 @@ export async function getAiWalletSummary(): Promise<AiWalletSummary | null> {
   const { data, error } = await supabase.rpc('get_ai_wallet_summary')
   if (error || !data) return null
   const d = data as {
-    balance_micro_won?: number
+    balance_micro_usd?: number
     est_price_per_card_micro?: number
     free_limit?: number
     free_used_today?: number
@@ -223,7 +223,7 @@ export async function getAiWalletSummary(): Promise<AiWalletSummary | null> {
     ledger?: Array<{ delta: number; reason: string; balance_after: number; created_at: string }>
   }
   return {
-    balanceMicroWon: Number(d.balance_micro_won ?? 0),
+    balanceMicroUsd: Number(d.balance_micro_usd ?? 0),
     estPricePerCardMicro: Number(d.est_price_per_card_micro ?? 0),
     freeLimit: Number(d.free_limit ?? 10),
     freeUsedToday: Number(d.free_used_today ?? 0),
