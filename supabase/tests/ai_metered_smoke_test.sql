@@ -77,11 +77,11 @@ SELECT set_config('request.jwt.claim.role', 'service_role', false);
 DO $$ DECLARE p record; n0 int; n1 int; BEGIN
   SELECT count(*) INTO n0 FROM ai_cost_ledger;
   SELECT * INTO p FROM preview_ai_cost('gemini','gemini-2.5-flash-lite', 1000, 500);
-  ASSERT p.cost_won_micros = 300 AND p.price_won_micros = 1500 AND p.margin_bps = 8000,
+  ASSERT p.cost_micro_usd = 300 AND p.price_micro_usd = 1500 AND p.margin_bps = 8000,
     format('DRY-RUN flash-lite %s', p);
   SELECT * INTO p FROM preview_ai_cost('gemini','gemini-2.5-flash', 1000, 800);
   -- cost_usd=(1000*300000+800*2500000)/1e6=2300; cost_won=2300; price=×5=11500
-  ASSERT p.price_won_micros = 11500, format('DRY-RUN flash %s', p.price_won_micros);
+  ASSERT p.price_micro_usd = 11500, format('DRY-RUN flash %s', p.price_micro_usd);
   SELECT count(*) INTO n1 FROM ai_cost_ledger;
   ASSERT n0 = n1, 'DRY-RUN wrote nothing';
 END $$;

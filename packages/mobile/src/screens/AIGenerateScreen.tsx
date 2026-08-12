@@ -672,7 +672,7 @@ export function AIGenerateScreen() {
           )}
 
           {affordable && (() => {
-            const balanceMicro = affordable.balanceMicroWon ?? 0
+            const balanceMicro = affordable.balanceMicroUsd ?? 0
             const hasBalance = balanceMicro > 0
             // Balance only — no "≈ N cards" estimate. Metered pricing/markup can be
             // retuned at any time, so a headline card count would be a stale promise.

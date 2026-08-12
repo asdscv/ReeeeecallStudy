@@ -66,7 +66,7 @@ interface RawBillingProduct {
   title: string
   price_krw: number
   price_usd_cents: number | null
-  credits_micro_won: number | null
+  credits_micro_usd: number | null
   tier: string | null
   card_limit: number | null
   period: string | null
@@ -95,7 +95,7 @@ function mapProduct(r: RawBillingProduct): BillingProduct {
     title: r.title,
     priceKrw: Number(r.price_krw ?? 0),
     priceUsdCents: r.price_usd_cents == null ? null : Number(r.price_usd_cents),
-    creditsMicroWon: r.credits_micro_won == null ? null : Number(r.credits_micro_won),
+    creditsMicroWon: r.credits_micro_usd == null ? null : Number(r.credits_micro_usd),
     tier: r.tier,
     cardLimit: r.card_limit == null ? null : Number(r.card_limit),
     period: r.period,

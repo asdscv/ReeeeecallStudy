@@ -101,7 +101,7 @@ export function WalletSummary() {
       {/* Balance */}
       <View>
         <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('balance.title')}</Text>
-        <Text style={[styles.balance, { color: theme.colors.text }]}>{formatUsdMicro(summary.balanceMicroWon)}</Text>
+        <Text style={[styles.balance, { color: theme.colors.text }]}>{formatUsdMicro(summary.balanceMicroUsd)}</Text>
         <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, marginTop: 2 }]}>{t('balance.hint')}</Text>
 
         {SUBSCRIPTION_UI_ENABLED && creditPacks.length > 0 ? (

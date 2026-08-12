@@ -272,7 +272,7 @@ export function AdminBillingPage() {
           <AdminStatCard icon="🔁" label={t('billing.overview.activeSubscriptions')} value={billingOverview.active_subscriptions} color="green" />
           <AdminStatCard icon="⏳" label={t('billing.overview.canceling')} value={billingOverview.canceling} color="yellow" />
           <AdminStatCard icon="⚠️" label={t('billing.overview.pastDue')} value={billingOverview.past_due} color="red" />
-          <AdminStatCard icon="💰" label={t('billing.overview.mrr')} value={fmtMicro(billingOverview.mrr_micro_won)} color="blue" />
+          <AdminStatCard icon="💰" label={t('billing.overview.mrr')} value={fmtMicro(billingOverview.mrr_micro_usd)} color="blue" />
           <AdminStatCard icon="👛" label={t('billing.overview.walletTotal')} value={fmtMicro(billingOverview.wallet_total_micro)} color="purple" />
           <AdminStatCard icon="📈" label={t('billing.overview.revenue30d')} value={fmtMicro(billingOverview.paid_revenue_30d_micro)} color="teal" />
           <AdminStatCard icon="↩️" label={t('billing.overview.refunds30d')} value={billingOverview.refunds_30d} color="orange" />

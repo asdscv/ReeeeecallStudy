@@ -70,7 +70,7 @@ export interface RawPaymentIntent {
   product_id: string
   kind: string
   amount_krw: number
-  amount_micro_won: number | null
+  amount_micro_usd: number | null
   title: string
 }
 
@@ -80,7 +80,7 @@ export function mapPaymentIntent(r: RawPaymentIntent): PaymentIntent {
     productId: r.product_id,
     kind: r.kind === 'subscription' ? 'subscription' : 'credit_pack',
     amountKrw: Number(r.amount_krw ?? 0),
-    amountMicroWon: r.amount_micro_won == null ? null : Number(r.amount_micro_won),
+    amountMicroWon: r.amount_micro_usd == null ? null : Number(r.amount_micro_usd),
     title: r.title,
   }
 }

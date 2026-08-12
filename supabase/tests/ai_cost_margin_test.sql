@@ -38,9 +38,9 @@ INSERT INTO public.ai_generation_jobs (id, user_id, usage_date, free_cards, paid
 -- P1: gemini-flash-lite 1000/500 → cost_won 300; markup 5 → price 2,025,000; margin 80%
 DO $$ DECLARE p record; BEGIN
   SELECT * INTO p FROM preview_ai_cost('gemini','gemini-2.5-flash-lite', 1000, 500);
-  ASSERT p.cost_won_micros = 300, format('P1 cost %s', p.cost_won_micros);
-  ASSERT p.price_won_micros = 1500, format('P1 price %s', p.price_won_micros);
-  ASSERT p.margin_won_micros = 1200, format('P1 margin %s', p.margin_won_micros);
+  ASSERT p.cost_micro_usd = 300, format('P1 cost %s', p.cost_micro_usd);
+  ASSERT p.price_micro_usd = 1500, format('P1 price %s', p.price_micro_usd);
+  ASSERT p.margin_micro_usd = 1200, format('P1 margin %s', p.margin_micro_usd);
   ASSERT p.margin_bps = 8000, format('P1 bps %s', p.margin_bps);
   ASSERT p.estimated = false AND p.rate_missing = false, 'P1 flags';
 END $$;
@@ -48,13 +48,13 @@ END $$;
 -- P2: (0,0) → estimated, price 0
 DO $$ DECLARE p record; BEGIN
   SELECT * INTO p FROM preview_ai_cost('gemini','gemini-2.5-flash-lite', 0, 0);
-  ASSERT p.estimated = true AND p.price_won_micros = 0 AND p.cost_won_micros IS NULL, 'P2 (0,0) estimated';
+  ASSERT p.estimated = true AND p.price_micro_usd = 0 AND p.cost_micro_usd IS NULL, 'P2 (0,0) estimated';
 END $$;
 
 -- P3: unknown model → conservative fallback rate, rate_missing=true, price still computed
 DO $$ DECLARE p record; BEGIN
   SELECT * INTO p FROM preview_ai_cost('novendor','nomodel', 1000, 1000);
-  ASSERT p.rate_missing = true AND p.price_won_micros > 0, format('P3 %s', p);
+  ASSERT p.rate_missing = true AND p.price_micro_usd > 0, format('P3 %s', p);
 END $$;
 
 -- P4: preview is admin/service_role only
@@ -74,7 +74,7 @@ SELECT set_config('request.jwt.claim.role', 'service_role', false);
 DO $$ DECLARE r ai_cost_ledger; BEGIN
   PERFORM charge_ai_generation('c0000000-0000-0000-0000-000000000001'::uuid, 'jc_paid', 'gemini','gemini-2.5-flash-lite', 1000, 500);
   SELECT * INTO r FROM ai_cost_ledger WHERE job_ref='jc_paid';
-  ASSERT r.cost_won_micros = 300 AND r.price_won_micros = 1500, format('CH1 %s/%s', r.cost_won_micros, r.price_won_micros);
+  ASSERT r.cost_micro_usd = 300 AND r.price_micro_usd = 1500, format('CH1 %s/%s', r.cost_micro_usd, r.price_micro_usd);
   ASSERT r.margin_bps = 8000, format('CH1 bps %s', r.margin_bps);
 END $$;
 
@@ -82,10 +82,10 @@ END $$;
 DO $$ DECLARE r ai_cost_ledger; BEGIN
   PERFORM charge_ai_generation('c0000000-0000-0000-0000-000000000001'::uuid, 'jc_mix', 'gemini','gemini-2.5-flash-lite', 1000, 500);
   SELECT * INTO r FROM ai_cost_ledger WHERE job_ref='jc_mix';
-  ASSERT r.price_won_micros = 500, format('CH2 price %s', r.price_won_micros);
-  ASSERT r.cost_won_micros = 300, format('CH2 full cost %s', r.cost_won_micros);  -- full call cost recorded
+  ASSERT r.price_micro_usd = 500, format('CH2 price %s', r.price_micro_usd);
+  ASSERT r.cost_micro_usd = 300, format('CH2 full cost %s', r.cost_micro_usd);  -- full call cost recorded
   -- margin = price - FULL cost = 500 - 300 = 200 (blended, free cards drag it below 80%)
-  ASSERT r.margin_won_micros = 200, format('CH2 blended margin %s', r.margin_won_micros);
+  ASSERT r.margin_micro_usd = 200, format('CH2 blended margin %s', r.margin_micro_usd);
 END $$;
 
 -- CH3: image job → paid_share 1 → price = cost×5
@@ -93,7 +93,7 @@ DO $$ DECLARE r ai_cost_ledger; BEGIN
   PERFORM charge_ai_generation('c0000000-0000-0000-0000-000000000001'::uuid, 'jc_img', 'gemini','gemini-2.5-flash', 1000, 800);
   SELECT * INTO r FROM ai_cost_ledger WHERE job_ref='jc_img';
   -- cost_usd=(1000*300000+800*2500000)/1e6=2300; cost_won=2300 (rate 1, mig 145); price=×5=11500
-  ASSERT r.cost_won_micros = 2300 AND r.price_won_micros = 11500, format('CH3 %s/%s', r.cost_won_micros, r.price_won_micros);
+  ASSERT r.cost_micro_usd = 2300 AND r.price_micro_usd = 11500, format('CH3 %s/%s', r.cost_micro_usd, r.price_micro_usd);
   ASSERT r.margin_bps = 8000, format('CH3 bps %s', r.margin_bps);
 END $$;
 
@@ -101,7 +101,7 @@ END $$;
 DO $$ DECLARE r ai_cost_ledger; ch boolean; BEGIN
   PERFORM charge_ai_generation('c0000000-0000-0000-0000-000000000001'::uuid, 'jc_zero', 'gemini','gemini-2.5-flash-lite', 0, 0);
   SELECT * INTO r FROM ai_cost_ledger WHERE job_ref='jc_zero';
-  ASSERT r.estimated = true AND r.price_won_micros = 0, 'CH4 (0,0) estimated, price 0';
+  ASSERT r.estimated = true AND r.price_micro_usd = 0, 'CH4 (0,0) estimated, price 0';
   SELECT charged INTO ch FROM ai_generation_jobs WHERE id='jc_zero';
   ASSERT ch = true, 'CH4 still marked charged';
 END $$;
@@ -114,7 +114,7 @@ END $$;
 DO $$ DECLARE p record; BEGIN
   PERFORM set_ai_pricing_settings(p_target_margin_bps => 9000);
   SELECT * INTO p FROM preview_ai_cost('gemini','gemini-2.5-flash-lite', 1000, 500);
-  ASSERT p.price_won_micros = 3000, format('E1 markup10 price %s', p.price_won_micros);  -- 300*10
+  ASSERT p.price_micro_usd = 3000, format('E1 markup10 price %s', p.price_micro_usd);  -- 300*10
   ASSERT p.margin_bps = 9000, format('E1 bps %s', p.margin_bps);
   PERFORM set_ai_pricing_settings(p_target_margin_bps => 8000);  -- restore
 END $$;
@@ -126,7 +126,7 @@ DO $$ DECLARE r ai_cost_ledger; BEGIN
   SELECT * INTO r FROM ai_cost_ledger WHERE job_ref='jc_new';
   ASSERT r.rate_missing = false, 'E2 uses new rate';
   -- cost_usd=(1000*1250000+1000*10000000)/1e6=11250; cost_won=11250 (rate 1, mig 145); price=×5=56250
-  ASSERT r.cost_won_micros = 11250 AND r.price_won_micros = 56250, format('E2 %s/%s', r.cost_won_micros, r.price_won_micros);
+  ASSERT r.cost_micro_usd = 11250 AND r.price_micro_usd = 56250, format('E2 %s/%s', r.cost_micro_usd, r.price_micro_usd);
 END $$;
 
 -- E3: 100% margin (10000 bps) is rejected — it would make markup divide by zero
@@ -154,7 +154,7 @@ DO $$ DECLARE row record; found boolean := false; BEGIN
     ASSERT row.jobs = 3, format('F2 jobs %s', row.jobs);                    -- jc_paid, jc_mix, jc_zero
     ASSERT row.unknown_cost_jobs = 1, format('F2 estimated %s', row.unknown_cost_jobs);  -- jc_zero
     -- price sum (non-estimated): jc_paid 1,500 + jc_mix 500 = 2,000 (micro-USD, rate 1)
-    ASSERT row.price_won_micros = 2000, format('F2 price %s', row.price_won_micros);
+    ASSERT row.price_micro_usd = 2000, format('F2 price %s', row.price_micro_usd);
   END LOOP;
   ASSERT found, 'F2 group present';
 END $$;

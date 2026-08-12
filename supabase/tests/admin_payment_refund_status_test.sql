@@ -38,7 +38,7 @@ INSERT INTO profiles (id, role) VALUES (:adm,'admin'),(:buyer,'user')
 -- is the interesting value — if the fix ever gets applied to the wrong arm, this
 -- row would start reporting 'paid'.
 INSERT INTO payment_intents
-  (merchant_uid, user_id, product_id, kind, amount_krw, amount_micro_won,
+  (merchant_uid, user_id, product_id, kind, amount_krw, amount_micro_usd,
    status, provider, provider_payment_id, platform, paid_at, created_at)
 VALUES
   ('pi_paystat_web_paid', :buyer, 'credits_10000', 'credit_pack', 0, 990000,
