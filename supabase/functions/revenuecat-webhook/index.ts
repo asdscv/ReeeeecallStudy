@@ -66,7 +66,7 @@
 //   INITIAL_PURCHASE / NON_RENEWING_PURCHASE (subscription product)
 //                                → sync_subscription_by_user(active,  expiry, cancel=false)
 //   NON_RENEWING_PURCHASE (credit_pack product)
-//                                → add_ai_credits(credits_micro_won, 'purchase', event.id)
+//                                → add_ai_credits(credits_micro_usd, 'purchase', event.id)
 //   RENEWAL / UNCANCELLATION / PRODUCT_CHANGE / SUBSCRIPTION_EXTENDED
 //                                → sync_subscription_by_user(active,  new expiry, cancel=false)
 //   CANCELLATION (auto-renew off)→ sync_subscription('canceled', expiry, cancel=true)
@@ -404,7 +404,11 @@ Deno.serve(async (req) => {
     // Server catalog decides kind + credit amount — never the webhook body.
     const { data: prod, error: prodErr } = await sb
       .from('billing_products')
-      .select('kind, credits_micro_won')
+      // `select('*')`, not the column by name, so this survives mig 217's rename in BOTH
+      // directions. PostgREST errors on a column that does not exist, so naming either
+      // spelling would break every credit-pack purchase in the window between the migration
+      // landing and this function being redeployed — and no ordering of the two avoids it.
+      .select('*')
       .eq('id', ourProductId)
       .maybeSingle()
     if (prodErr) {
@@ -413,10 +417,10 @@ Deno.serve(async (req) => {
     }
     if (!prod) return json({ error: 'Unknown product', code: 'BAD_REQUEST' }, 400)
 
-    // CONSUMABLE credit pack → top up the micro-WON wallet (idempotent on RC event id).
+    // CONSUMABLE credit pack → top up the wallet (micro-USD) (idempotent on RC event id).
     if (prod.kind === 'credit_pack') {
-      const microWon = Number(prod.credits_micro_won)
-      if (!Number.isFinite(microWon) || microWon <= 0) {
+      const microUsd = Number(prod.credits_micro_usd ?? prod.credits_micro_won)
+      if (!Number.isFinite(microUsd) || microUsd <= 0) {
         return json({ error: 'Invalid product', code: 'BAD_REQUEST' }, 400)
       }
       // Idempotency key: anchor on the store TRANSACTION key (mig 134) so a later REFUND
@@ -458,7 +462,7 @@ Deno.serve(async (req) => {
       }
       const { data, error } = await sb.rpc('add_ai_credits', {
         p_user_id: appUserId,
-        p_micro_won: microWon,
+        p_micro_won: microUsd,
         p_reason: 'purchase',
         p_ref: creditRef,
       })
@@ -467,7 +471,7 @@ Deno.serve(async (req) => {
       // payment record, so the store has to be stamped on the ledger or the admin
       // payment list cannot show which store sold it (mig 156).
       await tagCreditGrantPlatform(creditRef)
-      return json({ received: true, type, kind: 'credit_pack', balance_micro_won: data ?? null, platform, environment }, 200)
+      return json({ received: true, type, kind: 'credit_pack', balance_micro_usd: data ?? null, platform, environment }, 200)
     }
 
     // SUBSCRIPTION product → UPSERT the sub as active for this user/product, keyed by the

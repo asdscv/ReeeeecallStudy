@@ -283,7 +283,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
   // metered (per-token × markup) and the markup can be retuned at any time, so a
   // headline card count would be a promise we can't keep. `affordable.paid`/`.total`
   // still drive the affordability gate in ai-generate-store; they just aren't advertised.
-  const balanceMicro = affordable?.balanceMicroWon ?? 0
+  const balanceMicro = affordable?.balanceMicroUsd ?? 0
   const hasBalance = balanceMicro > 0
   const balanceText = () => t('wallet.balance', { amount: formatUsdMicro(balanceMicro) })
   const walletText = !affordable

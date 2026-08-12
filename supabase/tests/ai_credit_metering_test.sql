@@ -108,7 +108,7 @@ BEGIN
   --     round(300 * 1/3 * 5) = 500 micro-USD; deduct.
   PERFORM charge_ai_generation('a1000000-0000-0000-0000-000000000001'::uuid, j_paid, 'gemini','gemini-2.5-flash-lite', 1000, 500);
   SELECT balance INTO b1 FROM ai_credit_balance WHERE user_id='a1000000-0000-0000-0000-000000000001';
-  SELECT price_micro_won, charged INTO pr, ch FROM ai_generation_jobs WHERE id=j_paid;
+  SELECT price_micro_usd, charged INTO pr, ch FROM ai_generation_jobs WHERE id=j_paid;
   -- The price is the LIST PRICE for the paid cards on this job (mig 216), not a markup on the
   -- tokens. It used to be 500 here, derived from 1000/500 tokens x paid_share x markup — the
   -- same arithmetic that made one explanation cost 1,095 and the next 50,325 when a model
@@ -127,7 +127,7 @@ BEGIN
 
   -- C3: charge a FREE-only job (paid_share=0) → price 0, wallet unchanged
   PERFORM charge_ai_generation('a1000000-0000-0000-0000-000000000001'::uuid, j_free, 'gemini','gemini-2.5-flash-lite', 1000, 500);
-  SELECT price_micro_won INTO pr FROM ai_generation_jobs WHERE id=j_free;
+  SELECT price_micro_usd INTO pr FROM ai_generation_jobs WHERE id=j_free;
   SELECT balance INTO b1 FROM ai_credit_balance WHERE user_id='a1000000-0000-0000-0000-000000000001';
   ASSERT pr = 0 AND b1 = b0 - 2 * public._ai_action_price('card'),
     format('C3 free price %s balance %s', pr, b1);

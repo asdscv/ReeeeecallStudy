@@ -96,7 +96,7 @@ interface RawProduct {
   title: string
   price_krw: number
   price_usd_cents: number | null
-  credits_micro_won: number | null
+  credits_micro_usd: number | null
   tier: string | null
   card_limit: number | null
   period: string | null
@@ -114,7 +114,7 @@ function mapProduct(r: RawProduct): BillingProduct {
     priceKrw: Number(r.price_krw ?? 0),
     priceUsdCents: r.price_usd_cents == null ? null : Number(r.price_usd_cents),
     // bigint returned as a JSON number; every configured pack is <= 1e10 (safe).
-    creditsMicroWon: r.credits_micro_won == null ? null : Number(r.credits_micro_won),
+    creditsMicroWon: r.credits_micro_usd == null ? null : Number(r.credits_micro_usd),
     tier: r.tier ?? null,
     cardLimit: r.card_limit == null ? null : Number(r.card_limit),
     period: r.period ?? null,
@@ -220,7 +220,7 @@ export async function getMySubscription(): Promise<MySubscription | null> {
 //
 // Flow (see mig 120 + payment-webhook contract):
 //   1) client calls createPaymentIntent(productId) -> server snapshots
-//      price(amount_krw) + kind + amount_micro_won into a 'pending'
+//      price(amount_krw) + kind + amount_micro_usd into a 'pending'
 //      payment_intents row and returns a fresh `merchantUid`.
 //   2) client opens the provider checkout carrying that `merchantUid`.
 //   3) the PROVIDER'S server POSTs the signed payment-webhook, which
@@ -246,7 +246,7 @@ interface RawPaymentIntent {
   product_id: string
   kind: string
   amount_krw: number
-  amount_micro_won: number | null
+  amount_micro_usd: number | null
   title: string
 }
 
@@ -268,7 +268,7 @@ export async function createPaymentIntent(productId: string): Promise<PaymentInt
     productId: String(r.product_id),
     kind: r.kind as BillingProductKind,
     amountKrw: Number(r.amount_krw ?? 0),
-    amountMicroWon: r.amount_micro_won == null ? null : Number(r.amount_micro_won),
+    amountMicroWon: r.amount_micro_usd == null ? null : Number(r.amount_micro_usd),
     title: String(r.title ?? ''),
   }
 }

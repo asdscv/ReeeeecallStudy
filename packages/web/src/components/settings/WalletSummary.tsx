@@ -41,7 +41,7 @@ export function WalletSummary() {
       {/* Balance */}
       <div>
         <p className="text-xs text-muted-foreground mb-1">{t('balance.title')}</p>
-        <div className="text-3xl font-bold text-foreground tabular-nums">{formatUsdMicro(summary.balanceMicroWon)}</div>
+        <div className="text-3xl font-bold text-foreground tabular-nums">{formatUsdMicro(summary.balanceMicroUsd)}</div>
         <p className="text-xs text-muted-foreground mt-1">{t('balance.hint')}</p>
         <p className="text-xs text-content-tertiary mt-1">{t('cardPlanHint')}</p>
         <button
@@ -100,7 +100,7 @@ export function WalletSummary() {
 
       {/* History — infinite scroll via get_ai_credit_ledger (mig 130); reloads page 1
           when the balance moves (a top-up/spend) so a new entry appears live. */}
-      <CreditLedgerList refreshKey={summary.balanceMicroWon} />
+      <CreditLedgerList refreshKey={summary.balanceMicroUsd} />
     </div>
   )
 }

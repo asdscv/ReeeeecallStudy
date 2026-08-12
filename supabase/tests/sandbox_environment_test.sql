@@ -101,7 +101,7 @@ DECLARE
 BEGIN
   ov := public.admin_billing_overview();
   v_active    := (ov->>'active_subscriptions')::int;
-  v_mrr       := (ov->>'mrr_micro_won')::bigint;
+  v_mrr       := (ov->>'mrr_micro_usd')::bigint;
   v_sbx_subs  := (ov->>'sandbox_subscriptions')::int;
   v_sbx_micro := (ov->>'sandbox_granted_micro')::bigint;
 
@@ -127,13 +127,13 @@ DECLARE
   before_mrr bigint;  after_mrr bigint;
 BEGIN
   before_active := (public.admin_billing_overview()->>'active_subscriptions')::int;
-  before_mrr    := (public.admin_billing_overview()->>'mrr_micro_won')::bigint;
+  before_mrr    := (public.admin_billing_overview()->>'mrr_micro_usd')::bigint;
 
   UPDATE billing_subscriptions SET environment = 'production'
    WHERE id = 'd9000000-0000-0000-0000-00000000b001';
 
   after_active := (public.admin_billing_overview()->>'active_subscriptions')::int;
-  after_mrr    := (public.admin_billing_overview()->>'mrr_micro_won')::bigint;
+  after_mrr    := (public.admin_billing_overview()->>'mrr_micro_usd')::bigint;
 
   ASSERT after_active = before_active + 1,
     'the previously-excluded sandbox subscription now counts';

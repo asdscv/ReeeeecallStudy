@@ -66,7 +66,7 @@ describe('creditNotice', () => {
   })
 
   it('names the free allowance and the balance when both exist', () => {
-    const n = creditNotice({ balanceMicroWon: 2_500_000, freeRemainingToday: 3 }, money)!
+    const n = creditNotice({ balanceMicroUsd: 2_500_000, freeRemainingToday: 3 }, money)!
     expect(n.tone).toBe('ok')
     expect(n.key).toBe('wallet.freeOnly')
     expect(n.params).toEqual({ free: 3 })
@@ -75,31 +75,31 @@ describe('creditNotice', () => {
   })
 
   it('names only what there is', () => {
-    const freeOnly = creditNotice({ balanceMicroWon: 0, freeRemainingToday: 3 }, money)!
+    const freeOnly = creditNotice({ balanceMicroUsd: 0, freeRemainingToday: 3 }, money)!
     expect(freeOnly.key).toBe('wallet.freeOnly')
     expect(freeOnly.secondKey).toBeNull()
 
-    const balanceOnly = creditNotice({ balanceMicroWon: 1_000_000, freeRemainingToday: 0 }, money)!
+    const balanceOnly = creditNotice({ balanceMicroUsd: 1_000_000, freeRemainingToday: 0 }, money)!
     expect(balanceOnly.key).toBe('wallet.balance')
     expect(balanceOnly.secondKey).toBeNull()
   })
 
   it('is the requirement notice when there is nothing to spend', () => {
     // The state the feature exists for, and the only one that asks the learner for anything.
-    const n = creditNotice({ balanceMicroWon: 0, freeRemainingToday: 0 }, money)!
+    const n = creditNotice({ balanceMicroUsd: 0, freeRemainingToday: 0 }, money)!
     expect(n.tone).toBe('empty')
     expect(n.key).toBe('wallet.needsCredits')
   })
 
   it('treats a missing free count as no free allowance', () => {
     // Surfaces without a free tier omit the field; absent must not read as unlimited.
-    const n = creditNotice({ balanceMicroWon: 0 }, money)!
+    const n = creditNotice({ balanceMicroUsd: 0 }, money)!
     expect(n.tone).toBe('empty')
   })
 
   it('never reads a negative balance as something to spend', () => {
     // A clawback can drive a wallet below zero. "-$1.20 available" is not a sentence.
-    const n = creditNotice({ balanceMicroWon: -1_200_000, freeRemainingToday: 0 }, money)!
+    const n = creditNotice({ balanceMicroUsd: -1_200_000, freeRemainingToday: 0 }, money)!
     expect(n.tone).toBe('empty')
   })
 
@@ -107,8 +107,8 @@ describe('creditNotice', () => {
     // Amounts were removed from the flow on purpose. The BALANCE is a lookup; a per-action
     // price is the thing this notice must not become.
     for (const wallet of [
-      { balanceMicroWon: 0, freeRemainingToday: 0 },
-      { balanceMicroWon: 5_000_000, freeRemainingToday: 2 },
+      { balanceMicroUsd: 0, freeRemainingToday: 0 },
+      { balanceMicroUsd: 5_000_000, freeRemainingToday: 2 },
     ]) {
       const n = creditNotice(wallet, money)!
       for (const key of [n.key, n.secondKey].filter(Boolean) as string[]) {

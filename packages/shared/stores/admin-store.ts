@@ -30,7 +30,7 @@ export interface AdminBillingOverview {
   active_subscriptions: number
   canceling: number
   past_due: number
-  mrr_micro_won: number
+  mrr_micro_usd: number
   wallet_total_micro: number
   paid_revenue_30d_micro: number
   refunds_30d: number

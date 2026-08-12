@@ -169,9 +169,9 @@ END $$;
 -- ═══ 5) credit grant = USD face value 1:1 (mig 145) ═════════════════════════
 DO $$
 BEGIN
-  ASSERT (SELECT credits_micro_won FROM billing_products WHERE id='credits_1000') = 990000,
+  ASSERT (SELECT credits_micro_usd FROM billing_products WHERE id='credits_1000') = 990000,
     'credits_1000 grants 990,000 micro-USD ($0.99)';
-  ASSERT (SELECT credits_micro_won FROM billing_products WHERE id='credits_10000') = 9990000,
+  ASSERT (SELECT credits_micro_usd FROM billing_products WHERE id='credits_10000') = 9990000,
     'credits_10000 grants 9,990,000 micro-USD ($9.99)';
 END $$;
 

@@ -25,7 +25,7 @@ import { aiHubEntryFor } from './hub/catalog'
 /** The wallet fields the notice reads. A subset of `AiWalletSummary`, so either shape fits. */
 export interface CreditNoticeWallet {
   /** Prepaid balance, micro-USD. */
-  readonly balanceMicroWon: number
+  readonly balanceMicroUsd: number
   /** Card generations still free today. Absent on surfaces with no free tier. */
   readonly freeRemainingToday?: number
 }
@@ -82,7 +82,7 @@ export function creditNotice(
   }
 
   const free = Math.max(0, Number(wallet.freeRemainingToday ?? 0))
-  const balance = Math.max(0, Number(wallet.balanceMicroWon ?? 0))
+  const balance = Math.max(0, Number(wallet.balanceMicroUsd ?? 0))
 
   if (free > 0 && balance > 0) {
     return {
