@@ -62,7 +62,16 @@
     "cardLimit": "{{available}} dari {{limit}} kartu tersisa",
     "cardLimitUnlimited": "Tanpa batas kartu (admin)",
     "needsCredits": "Fitur AI butuh kredit, dan kredit kamu habis.",
-    "topUp": "Isi ulang"
+    "topUp": "Isi ulang",
+    "refusal": {
+      "insufficient": "Saldo tidak cukup.",
+      "rate_capped": "Kuota AI hari ini sudah habis. Direset besok — mengisi saldo tidak menambah kuota.",
+      "in_flight": "Permintaan sebelumnya masih diproses, mohon tunggu.",
+      "price_changed": "Harga berubah saat kamu memilih. Periksa lalu coba lagi.",
+      "failed": "Gagal diproses. Tidak ada saldo yang terpotong.",
+      "retry": "Coba lagi",
+      "gradeYourself": "Kamu tetap bisa menyelesaikan kuis dan menilai soal ini sendiri, gratis."
+    }
   },
   "wizard": {
     "setup": "Setup",

@@ -7,6 +7,7 @@ import {
   type QuizRunItem, type QuizSubmitResult,
 } from '@reeeeecall/shared/stores/quiz-store'
 import { QuizFeedback } from './QuizFeedback'
+import { AiRefusalNotice } from '../../components/ai/AiRefusalNotice'
 
 /**
  * Taking the quiz. Outside the app Layout, like the study session, so nothing competes with
@@ -84,7 +85,7 @@ export function QuizRunPage() {
       setResult(submitted)
       if (runId) await loadRun(runId)
     } catch (e) {
-      setError(t(`error.${e instanceof QuizError ? e.code : 'UNKNOWN'}`))
+      setError(e instanceof QuizError ? e.code : 'UNKNOWN')
     }
   }
 
@@ -94,7 +95,10 @@ export function QuizRunPage() {
     try {
       await gradeWithAi(item.item_id, text.trim(), shownPrice)
     } catch (e) {
-      setError(t(`error.${e instanceof QuizError ? e.code : 'UNKNOWN'}`))
+      // The CODE, not a sentence. `AiRefusalNotice` decides what it means and what the
+      // learner can do about it — which on this screen is the whole point: a refused grade
+      // here used to print "충전하면 계속할 수 있어요" with no way to 충전 anywhere on the run.
+      setError(e instanceof QuizError ? e.code : 'UNKNOWN')
     }
   }
 
@@ -217,11 +221,11 @@ export function QuizRunPage() {
         />
       )}
 
-      {error && (
-        <div role="alert" className="p-3 bg-destructive/10 border border-destructive/30 rounded-lg text-sm text-destructive">
-          {error}
-        </div>
-      )}
+      <AiRefusalNotice
+        code={error}
+        actionId="quiz_grade"
+        onRetry={() => void requestGrade()}
+      />
 
       <div className="flex gap-2">
         {!answered ? (

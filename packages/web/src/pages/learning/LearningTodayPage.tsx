@@ -23,6 +23,7 @@ import { useQuizStore, type DailyCheckCount } from '@reeeeecall/shared/stores/qu
 import type { PlanWeek, DayState } from '@reeeeecall/shared/learning/application/plan-week'
 import { useDeckStore } from '../../stores/deck-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
+import { AiRefusalNotice } from '../../components/ai/AiRefusalNotice'
 
 /**
  * One goal's plan — today, and the days after it.
@@ -297,9 +298,6 @@ function LearningDiagnostics({ goalId }: { goalId: string }) {
  */
 function WeakCardExplain({ goalId, cardIds }: { goalId: string; cardIds: readonly string[] }) {
   const { t, i18n } = useTranslation('learning')
-  // The 충전 link's wording, shared with `AiCreditNotice` so the two cannot drift into
-  // offering the same action under two different names.
-  const { t: tAi } = useTranslation('ai-generate')
   const {
     attempts, requestRemediation, dismissRemediation,
     loadRemediation, showOwnedRemediation, remediationOwned,
@@ -397,28 +395,15 @@ function WeakCardExplain({ goalId, cardIds }: { goalId: string; cardIds: readonl
           <p className="mt-2 text-[11px] text-content-tertiary">{t('explain.note')}</p>
         </>
       )}
-      {remediationError && (
-        <p role="alert" className="mt-2 text-xs text-destructive">
-          {t(remediationError.code === 'AI_INSUFFICIENT_CREDITS' ? 'explain.needsCredits'
-            // A press whose first request is still running (mig 212). Telling the learner it
-            // failed would be false, and it is the one "error" whose answer is "wait".
-            : remediationError.code === 'AI_REMEDIATION_IN_FLIGHT' ? 'explain.inFlight'
-              : 'explain.failed')}
-          {/* The one failure the learner can act on, and this screen had no way to act on it.
-              `AiCreditNotice` — which carries the 충전 link everywhere else — is placed by
-              feature id, and the learning plan is registered `poweredBy: 'device'` because
-              almost all of it is. So the app's newest paid button was the only one that could
-              answer "you have no credits" with no way to add any. */}
-          {remediationError.code === 'AI_INSUFFICIENT_CREDITS' && (
-            <>
-              {' '}
-              <Link to="/settings" className="font-medium underline underline-offset-2">
-                {tAi('wallet.topUp')}
-              </Link>
-            </>
-          )}
-        </p>
-      )}
+      {/* One rendering for every paid refusal in the app. This block used to be a ternary
+          over two codes plus a hand-added <Link to="/settings"> and a six-line comment
+          explaining why the learning plan was the only screen that needed one — which was
+          itself the argument for putting the route on the classification instead. */}
+      <AiRefusalNotice
+        code={remediationError?.code}
+        actionId="remediation"
+        className="mt-2"
+      />
     </div>
   )
 }

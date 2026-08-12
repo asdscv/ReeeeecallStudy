@@ -404,6 +404,28 @@ export const useQuizStore = create<QuizState>((set, get) => ({
       let firstError: unknown = null
       let delivered = 0
 
+      /**
+       * What the learner approved, drawn down as batches spend it.
+       *
+       * It used to be `maxPriceMicro / batches.length` — an even split of a quote whose free
+       * units are anything but even. `reserve_ai_quiz` allocates trial, then today's free
+       * units, then paid, PER CALL, so the free units all land on the first batch and the
+       * paid units pile onto the later ones. The server refuses a call whose true price
+       * exceeds the ceiling it was handed (P0008 -> AI_PRICE_CHANGED), and it checks that
+       * BEFORE the balance, so a full wallet does not help.
+       *
+       * Measured against production with the free allowance spent and $50 in the wallet:
+       * 12 multiple-choice questions quote 120,000 micro, the even split hands each batch
+       * 60,000, and the first batch of eight really costs 80,000. Refused. Zero of twelve
+       * questions delivered. Of the eight sizes the setup screen offers — 4, 6, 8, 10, 12,
+       * 20, 30, 50 — everything above one batch failed the same way.
+       *
+       * A budget, not a quota: each batch is authorised for whatever is left of the total the
+       * learner agreed to. The sum across batches still cannot exceed it, which is the
+       * property the division was reaching for.
+       */
+      let budgetLeft = input.maxPriceMicro
+
       // The FIRST batch is awaited; the rest are not.
       //
       // Fifty multiple-choice questions is seven calls at roughly fifteen seconds each, so
@@ -412,6 +434,10 @@ export const useQuizStore = create<QuizState>((set, get) => ({
       // paid for fifty. Returning after the first batch lets the quiz be opened immediately
       // and lets the rest arrive while it is being answered — and a learner who abandons
       // early simply never requests the batches they would not have reached.
+      /** This batch's cost if every unit in it were paid — the worst case, for drawdown. */
+      const batchCeiling = (cards: number) =>
+        Math.ceil((input.maxPriceMicro / Math.max(1, allCards.length)) * cards)
+
       const runBatch = async (cardIds: string[], index: number) => {
         const { error: genError } = await supabase.functions.invoke('ai-generate', {
           body: {
@@ -421,9 +447,10 @@ export const useQuizStore = create<QuizState>((set, get) => ({
             cardIds,
             fillers: result.fillers ?? [],
             clientRef: newClientRef(),
-            // Per BATCH, not for the whole quiz: the reservation this authorises is this
-            // call's, and passing the total would let one batch spend all of it.
-            maxPriceMicro: Math.ceil(input.maxPriceMicro / batches.length),
+            // Whatever is left of the total the learner approved. The server prices this
+            // call itself and refuses if it exceeds this, so the ceiling only has to be an
+            // honest remaining budget — not a guess at this batch's share.
+            maxPriceMicro: budgetLeft,
           },
         })
         if (genError) {
@@ -433,6 +460,10 @@ export const useQuizStore = create<QuizState>((set, get) => ({
           if (firstError === null) firstError = genError
         } else {
           delivered += 1
+          // Draw down by what this batch could have cost at the full paid rate. The server
+          // does not report what it actually charged here, and over-estimating is the safe
+          // direction: it can only stop us early, never overspend what was approved.
+          budgetLeft = Math.max(0, budgetLeft - batchCeiling(cardIds.length))
         }
         set({ generateProgress: { done: index + 1, total: batches.length } })
       }

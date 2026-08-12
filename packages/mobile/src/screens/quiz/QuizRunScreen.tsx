@@ -12,6 +12,7 @@ import {
 import { Screen, Button, EmptyState } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
+import { AiRefusalNotice } from '../../components/ai/AiRefusalNotice'
 import { QuizFeedback } from './QuizFeedback'
 import type { QuizStackParamList } from '../../navigation/types'
 
@@ -103,7 +104,7 @@ export function QuizRunScreen() {
       setResult(submitted)
       await loadRun(runId)
     } catch (e) {
-      setError(t(`error.${e instanceof QuizError ? e.code : 'UNKNOWN'}`))
+      setError(e instanceof QuizError ? e.code : 'UNKNOWN')
     }
   }
 
@@ -113,7 +114,7 @@ export function QuizRunScreen() {
     try {
       await gradeWithAi(item.item_id, text.trim(), shownPrice)
     } catch (e) {
-      setError(t(`error.${e instanceof QuizError ? e.code : 'UNKNOWN'}`))
+      setError(e instanceof QuizError ? e.code : 'UNKNOWN')
     }
   }
 
@@ -238,7 +239,16 @@ export function QuizRunScreen() {
             />
           )}
 
-          {error && <Text style={[theme.typography.caption, { color: theme.colors.error }]}>{error}</Text>}
+          {/* The CODE goes in, not a sentence: the kernel decides what it means and carries
+              the route out. This screen has `gestureEnabled: false` and no header, so its only
+              exit abandons the run — a refusal here without a way to act on it stranded a
+              learner who had already paid to have earlier answers graded. */}
+          <AiRefusalNotice
+            code={error}
+            actionId="quiz_grade"
+            onRetry={() => void requestGrade()}
+            style={{ marginTop: 12 }}
+          />
         </ScrollView>
 
         <View style={styles.footer}>

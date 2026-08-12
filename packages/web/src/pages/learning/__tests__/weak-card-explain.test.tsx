@@ -223,38 +223,45 @@ describe('the paid explanation', () => {
   })
 
   it('names an empty wallet as the reason, not a generic failure', () => {
-    // The one failure the learner can do something about.
+    // Through the shared refusal kernel now, so this screen cannot disagree with the quiz
+    // about what one server code means.
     renderToday(withWeakCard({ remediationError: { code: 'AI_INSUFFICIENT_CREDITS' } }))
-    expect(screen.getByRole('alert')).toHaveTextContent('explain.needsCredits')
+    const alert = screen.getByTestId('ai-refusal')
+    expect(alert).toHaveAttribute('data-kind', 'insufficient')
+    expect(alert).toHaveTextContent('wallet.refusal.insufficient')
   })
 
-  it('reports any other failure as a failure', () => {
+  it('reports any other failure as a failure, and does not blame the wallet', () => {
     renderToday(withWeakCard({ remediationError: { code: 'AI_PROVIDER_ERROR' } }))
-    expect(screen.getByRole('alert')).toHaveTextContent('explain.failed')
-  })
-
-  it('offers a way to add credits when that is the problem', () => {
-    // `AiCreditNotice` carries the 충전 link on every other AI screen, but it is placed by
-    // feature id and the learning plan is registered `poweredBy: 'device'` — correctly, since
-    // almost all of it runs on the device. The consequence was that the app's newest paid
-    // button was the only one that could say "you have no credits" and then stop, leaving a
-    // learner who wants to pay with nowhere to do it.
-    renderToday(withWeakCard({ remediationError: { code: 'AI_INSUFFICIENT_CREDITS' } }))
-    const link = screen.getByRole('link', { name: 'wallet.topUp' })
-    expect(link).toHaveAttribute('href', '/settings')
-  })
-
-  it('does not advertise a top-up for an unrelated failure', () => {
-    renderToday(withWeakCard({ remediationError: { code: 'AI_PROVIDER_ERROR' } }))
-    expect(screen.queryByRole('link', { name: 'wallet.topUp' })).not.toBeInTheDocument()
+    expect(screen.getByTestId('ai-refusal')).toHaveAttribute('data-kind', 'failed')
   })
 
   it('says "still working", not "failed", while the first request is in flight', () => {
     // A second press whose first request has not returned (mig 212's 409). Calling that a
     // failure would be false, and it is the one condition whose answer is "wait" — a learner
-    // told it failed presses again, which is the behaviour the whole change exists to stop.
+    // told it failed presses again, which is the behaviour the replay work exists to stop.
     renderToday(withWeakCard({ remediationError: { code: 'AI_REMEDIATION_IN_FLIGHT' } }))
-    expect(screen.getByRole('alert')).toHaveTextContent('explain.inFlight')
+    expect(screen.getByTestId('ai-refusal')).toHaveAttribute('data-kind', 'in_flight')
+  })
+
+  it('offers a way to add credits when that is the problem', () => {
+    // The route out is attached to the CLASSIFICATION, not added per screen. This screen was
+    // the only one that had it, added by hand, which is what argued for the kernel.
+    renderToday(withWeakCard({ remediationError: { code: 'AI_INSUFFICIENT_CREDITS' } }))
+    expect(screen.getByTestId('ai-refusal-topup')).toHaveAttribute('href', '/settings')
+  })
+
+  it('does not advertise a top-up for a failure money cannot fix', () => {
+    // The daily request cap is not a money problem. A charge link here sells nothing.
+    renderToday(withWeakCard({ remediationError: { code: 'AI_RATE_CAP' } }))
+    expect(screen.getByTestId('ai-refusal')).toHaveAttribute('data-kind', 'rate_capped')
+    expect(screen.queryByTestId('ai-refusal-topup')).not.toBeInTheDocument()
+  })
+
+  it('does not offer a free way out on a feature that has none', () => {
+    // Only grading has one. Showing it here would invent an option.
+    renderToday(withWeakCard({ remediationError: { code: 'AI_INSUFFICIENT_CREDITS' } }))
+    expect(screen.queryByTestId('ai-refusal-fallback')).not.toBeInTheDocument()
   })
 })
 
