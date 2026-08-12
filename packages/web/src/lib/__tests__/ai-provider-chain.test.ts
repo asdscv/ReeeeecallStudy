@@ -112,3 +112,38 @@ describe('the fallback chain after two models were decommissioned', () => {
     expect(gemini.visionFallbacks ?? []).not.toContain(gemini.visionModel)
   })
 })
+
+/**
+ * The primary must not be a model Google has stopped funding.
+ *
+ * Measured against the live key: `gemini-2.5-flash-lite` is served under
+ * `GenerateRequestsPerDayPerProjectPerModel-FreeTier` with a quotaValue of **20 per day**, and
+ * refused on the third request of a burst. It was the PRIMARY — the first thing every AI
+ * feature in the app touched — so twenty requests took the whole product down for a day.
+ *
+ * `gemini-3.1-flash-lite` took thirty consecutive requests with no quota error on the same key.
+ * The lesson is not "this model is good" but "a pinned model rots": two entries in this chain
+ * had already been decommissioned, and a third had its allowance cut to nothing, all while the
+ * code kept pointing at them.
+ */
+describe('the primary model', () => {
+  it('is not the model measured at 20 requests a day', () => {
+    expect(PROVIDERS.gemini.textModel).not.toBe('gemini-2.5-flash-lite')
+    expect(PROVIDERS.gemini.visionModel).not.toBe('gemini-2.5-flash-lite')
+  })
+
+  it('is not retired, in any position of either chain', () => {
+    const RETIRED = ['gemini-2.0-flash', 'gemini-2.0-flash-lite']
+    const g = PROVIDERS.gemini
+    const everything = [g.textModel, g.visionModel, ...(g.textFallbacks ?? []), ...(g.visionFallbacks ?? [])]
+    for (const dead of RETIRED) expect(everything, dead).not.toContain(dead)
+  })
+
+  it('falls back to what production was actually running on', () => {
+    // The worst case of repointing the primary must be the behaviour we already had, not a
+    // model nobody has exercised. `gemini-2.5-flash` served the 12-question quiz on the day
+    // this was changed.
+    expect(PROVIDERS.gemini.textFallbacks?.[0]).toBe('gemini-2.5-flash')
+    expect(PROVIDERS.gemini.visionFallbacks).toContain('gemini-2.5-flash')
+  })
+})

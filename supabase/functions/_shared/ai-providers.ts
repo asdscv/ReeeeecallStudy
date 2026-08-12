@@ -39,16 +39,23 @@ export interface ProviderDef {
 export const PROVIDERS: Record<string, ProviderDef> = {
   gemini: {
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai',
-    textModel: 'gemini-2.5-flash-lite',
-    visionModel: 'gemini-2.5-flash',
-    // `gemini-2.0-flash` and `gemini-2.0-flash-lite` are GONE — the API answers both with
-    // 404 "This model is no longer available". They sat AHEAD of the working model in this
-    // list, and a 404 is not a quota error, so the chain aborted on the first fallback and
-    // never reached `gemini-2.5-flash`. Every AI feature went down the moment the primary hit
-    // its daily quota, with a working model two entries further along. Verified by calling
-    // all four directly.
-    textFallbacks: ['gemini-2.5-flash'],
-    visionFallbacks: ['gemini-2.5-flash-lite'],
+    // OFF `gemini-2.5-flash-lite`. Measured against the live key: that model is served under
+    // `GenerateRequestsPerDayPerProjectPerModel-FreeTier` with a quotaValue of **20 a day**,
+    // and it refused on the third request of a burst. It is a legacy model and Google has cut
+    // its allowance to almost nothing; being the PRIMARY made it the first thing every AI
+    // feature in the app touched.
+    //
+    // `gemini-3.1-flash-lite` took 30 consecutive requests without a quota error, returns the
+    // declared JSON shape, and reads images. The fallbacks below are ordered so the first one
+    // is exactly what production ran on today, i.e. the worst case of this change is the
+    // behaviour we already had.
+    //
+    // `gemini-2.0-flash` and `gemini-2.0-flash-lite` were REMOVED: the API answers both with
+    // 404 "no longer available", and they sat ahead of a working model in this list.
+    textModel: 'gemini-3.1-flash-lite',
+    visionModel: 'gemini-3.1-flash-lite',
+    textFallbacks: ['gemini-2.5-flash', 'gemini-flash-lite-latest'],
+    visionFallbacks: ['gemini-2.5-flash'],
   },
   xai: {
     baseUrl: 'https://api.x.ai/v1',
