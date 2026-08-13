@@ -60,7 +60,11 @@
     "finish": "Finish",
     "grading": "Grading…",
     "reference": "Answer: {{answer}}",
-    "grade": "Grade this answer"
+    "grade": "Grade this answer",
+    "length": {
+      "count": "{{chars, number}} / {{max, number}}",
+      "tooShort": "At least {{min, number}} characters to grade"
+    }
   },
   "result": {
     "percent": "{{percent, number}}%",

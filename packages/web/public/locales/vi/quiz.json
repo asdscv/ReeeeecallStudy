@@ -60,7 +60,11 @@
     "finish": "Kết thúc",
     "grading": "Đang chấm…",
     "reference": "Đáp án: {{answer}}",
-    "grade": "Chấm câu này"
+    "grade": "Chấm câu này",
+    "length": {
+      "count": "{{chars, number}} / {{max, number}} ký tự",
+      "tooShort": "Cần ít nhất {{min, number}} ký tự để chấm"
+    }
   },
   "result": {
     "percent": "{{percent, number}}%",
