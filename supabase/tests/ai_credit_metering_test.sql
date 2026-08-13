@@ -76,12 +76,32 @@ DO $$ DECLARE j jsonb; used int; paid int; bal bigint; BEGIN
   ASSERT bal=10000000, format('B2 wallet still untouched pre-charge %s', bal);
 END $$;
 
--- B3: template/deck never gated (paid=0), even with an empty wallet (u2)
+-- B3: template/deck ARE metered. This assertion is the reverse of what it used to be.
+--
+-- It read "template/deck never gated (paid=0), even with an empty wallet", which was true and
+-- deliberate: the setup step was left open so that someone who had not yet made a deck could
+-- not be blocked from making one. The effect was a second, unbounded loss channel sitting
+-- beside the daily free allowance — and on the most expensive call in the app. Measured on
+-- production: a template costs 851 micro against a card's 161.
+--
+-- They now consume one unit of the same allowance (mig 218), so the free allowance is the
+-- whole loss ceiling rather than the allowance plus a hole. Inside the allowance nothing is
+-- charged and nothing is refused, which is the case a learner actually meets.
 SELECT set_config('request.jwt.claim.sub', :'u2', false);
 DO $$ DECLARE j jsonb; BEGIN
-  PERFORM reserve_ai_generation('cards', 10);                 -- exhaust free
-  j := reserve_ai_generation('template', 0);                  -- paid=0 → no gate
+  j := reserve_ai_generation('template', 0);                  -- inside the allowance
+  ASSERT (j->>'free_now')::int=1, format('B3 template free %s', j->>'free_now');
   ASSERT (j->>'paid_now')::int=0, format('B3 template paid %s', j->>'paid_now');
+  ASSERT (j->>'price_micro')::bigint=0, 'B3 nothing charged inside the allowance';
+
+  -- The template above already took one of the ten, so nine finishes the allowance.
+  -- Asking for ten would tip into a paid card and raise P0002 outside the guard below —
+  -- the same refusal for a different reason, which would make this test pass by accident.
+  PERFORM reserve_ai_generation('cards', 9);                  -- exhaust the rest of the free
+  BEGIN
+    PERFORM reserve_ai_generation('template', 0);             -- past it, empty wallet → refused
+    RAISE EXCEPTION 'B3 a template ran past the allowance with an empty wallet';
+  EXCEPTION WHEN sqlstate 'P0002' THEN NULL; END;
 END $$;
 
 -- B4: paid card with an EMPTY wallet → 402 (P0002), before any provider work
