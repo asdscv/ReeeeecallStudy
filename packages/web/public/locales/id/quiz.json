@@ -60,7 +60,11 @@
     "finish": "Selesai",
     "grading": "Menilai…",
     "reference": "Jawaban: {{answer}}",
-    "grade": "Nilai jawaban ini"
+    "grade": "Nilai jawaban ini",
+    "length": {
+      "count": "{{chars, number}} / {{max, number}} karakter",
+      "tooShort": "Minimal {{min, number}} karakter untuk dinilai"
+    }
   },
   "result": {
     "percent": "{{percent, number}}%",

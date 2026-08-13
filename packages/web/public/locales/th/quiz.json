@@ -60,7 +60,11 @@
     "finish": "จบ",
     "grading": "กำลังตรวจ…",
     "reference": "คำตอบ: {{answer}}",
-    "grade": "ตรวจคำตอบนี้"
+    "grade": "ตรวจคำตอบนี้",
+    "length": {
+      "count": "{{chars, number}} / {{max, number}} ตัวอักษร",
+      "tooShort": "ต้องมีอย่างน้อย {{min, number}} ตัวอักษรจึงจะตรวจได้"
+    }
   },
   "result": {
     "percent": "{{percent, number}}%",

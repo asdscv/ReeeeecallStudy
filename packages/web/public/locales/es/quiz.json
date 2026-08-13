@@ -60,7 +60,11 @@
     "finish": "Terminar",
     "grading": "Corrigiendo…",
     "reference": "Respuesta: {{answer}}",
-    "grade": "Corregir esta respuesta"
+    "grade": "Corregir esta respuesta",
+    "length": {
+      "count": "{{chars, number}} / {{max, number}} caracteres",
+      "tooShort": "Se necesitan al menos {{min, number}} caracteres para corregir"
+    }
   },
   "result": {
     "percent": "{{percent, number}}%",

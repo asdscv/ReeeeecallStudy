@@ -8,6 +8,7 @@ import {
 } from '@reeeeecall/shared/stores/quiz-store'
 import { QuizFeedback } from './QuizFeedback'
 import { AiRefusalNotice } from '../../components/ai/AiRefusalNotice'
+import { answerLength } from '@reeeeecall/shared/lib/quiz-answer-limits'
 
 /**
  * Taking the quiz. Outside the app Layout, like the study session, so nothing competes with
@@ -132,6 +133,8 @@ export function QuizRunPage() {
   const answered = item.answered || result !== null
   const flaws = optionFlaws(item)
   const isLast = index === items.length - 1
+  /** Live length against the bound the SERVER will apply. Mirrored, and pinned by a test. */
+  const length = answerLength(text, item?.question_type === 'essay' ? 'essay' : 'short')
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-4 min-h-screen">
@@ -187,14 +190,35 @@ export function QuizRunPage() {
       )}
 
       {item.question_type !== 'mcq' && (
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          disabled={answered}
-          rows={item.question_type === 'essay' ? 8 : 3}
-          placeholder={t(`run.placeholder.${item.question_type}`)}
-          className="w-full px-3 py-2 text-sm bg-background border border-border rounded-lg text-foreground disabled:opacity-60"
-        />
+        <>
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            disabled={answered}
+            rows={item.question_type === 'essay' ? 8 : 3}
+            placeholder={t(`run.placeholder.${item.question_type}`)}
+            className="w-full px-3 py-2 text-sm bg-background border border-border rounded-lg text-foreground disabled:opacity-60"
+          />
+          {/* The server refuses an over-length answer rather than truncating it — correctly,
+              since grading the first 2,000 characters of a 4,000-character essay grades
+              something the learner did not write. It just never said so until 채점 was pressed,
+              and then said "비어 있거나 너무 길어요" for both directions at once. */}
+          {!answered && (
+            <p
+              className={`-mt-1 text-right text-xs tabular-nums ${
+                length.state === 'too_long' ? 'text-destructive'
+                  : length.state === 'near_limit' ? 'text-amber-600'
+                    : 'text-content-tertiary'
+              }`}
+              data-testid="answer-length"
+              data-state={length.state}
+            >
+              {length.state === 'too_short'
+                ? t('run.length.tooShort', { min: length.min })
+                : t('run.length.count', { chars: length.count, max: length.max })}
+            </p>
+          )}
+        </>
       )}
 
       {answered && item.score !== null && (
