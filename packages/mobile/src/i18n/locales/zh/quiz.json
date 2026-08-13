@@ -60,7 +60,11 @@
     "finish": "完成",
     "grading": "批改中…",
     "reference": "答案：{{answer}}",
-    "grade": "批改这个答案"
+    "grade": "批改这个答案",
+    "length": {
+      "count": "{{chars, number}} / {{max, number}} 字",
+      "tooShort": "至少 {{min, number}} 字才能批改"
+    }
   },
   "result": {
     "percent": "{{percent, number}}%",

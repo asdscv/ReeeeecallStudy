@@ -60,7 +60,11 @@
     "finish": "終わる",
     "grading": "採点中…",
     "reference": "答え: {{answer}}",
-    "grade": "この解答を採点"
+    "grade": "この解答を採点",
+    "length": {
+      "count": "{{chars, number}} / {{max, number}}文字",
+      "tooShort": "採点には{{min, number}}文字以上必要です"
+    }
   },
   "result": {
     "percent": "{{percent, number}}%",

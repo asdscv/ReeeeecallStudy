@@ -13,6 +13,7 @@ import { Screen, Button, EmptyState } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
 import { AiRefusalNotice } from '../../components/ai/AiRefusalNotice'
+import { answerLength } from '@reeeeecall/shared/lib/quiz-answer-limits'
 import { QuizFeedback } from './QuizFeedback'
 import type { QuizStackParamList } from '../../navigation/types'
 
@@ -140,6 +141,10 @@ export function QuizRunScreen() {
   }
   if (!item) return null
 
+  /** Live length against the bound the SERVER applies. Mirrored, and pinned by a test. */
+
+  const length = answerLength(text, item?.question_type === 'essay' ? 'essay' : 'short')
+
   const answered = item.answered || result !== null
   const flaws = optionFlaws(item)
   const isLast = index === items.length - 1
@@ -210,6 +215,26 @@ export function QuizRunScreen() {
               }]}
               {...testProps('quiz-answer-input')}
             />
+          )}
+
+          {/* The server refuses an over-length answer rather than truncating it — grading the
+              first 2,000 characters of a 4,000-character essay grades something the learner did
+              not write. It just never said so until 채점 was pressed, and then said
+              "비어 있거나 너무 길어요" for both directions at once. */}
+          {item.question_type !== 'mcq' && !answered && (
+            <Text
+              style={[theme.typography.caption, {
+                textAlign: 'right', marginTop: 4,
+                color: length.state === 'too_long' ? theme.colors.error
+                  : length.state === 'near_limit' ? theme.colors.warning
+                    : theme.colors.textTertiary,
+              }]}
+              {...testProps('answer-length')}
+            >
+              {length.state === 'too_short'
+                ? t('run.length.tooShort', { min: length.min })
+                : t('run.length.count', { chars: length.count, max: length.max })}
+            </Text>
           )}
 
           {answered && item.score !== null && (

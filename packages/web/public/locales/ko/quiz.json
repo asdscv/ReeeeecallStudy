@@ -60,7 +60,11 @@
     "finish": "마치기",
     "grading": "채점하는 중…",
     "reference": "정답: {{answer}}",
-    "grade": "이 답안 채점"
+    "grade": "이 답안 채점",
+    "length": {
+      "count": "{{chars, number}} / {{max, number}}자",
+      "tooShort": "{{min, number}}자 이상이어야 채점할 수 있어요"
+    }
   },
   "result": {
     "percent": "{{percent, number}}%",
