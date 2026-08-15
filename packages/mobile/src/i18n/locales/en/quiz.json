@@ -16,7 +16,8 @@
       "title": "No quizzes yet",
       "body": "Make one from any deck. It takes a few seconds."
     },
-    "fewerThanAsked": "{{requested, number}} requested"
+    "fewerThanAsked": "{{requested, number}} requested",
+    "remove": "Remove"
   },
   "setup": {
     "title": "New quiz",

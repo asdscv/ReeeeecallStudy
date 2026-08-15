@@ -17,7 +17,7 @@ import { QuizMistakes } from './QuizMistakes'
 export function QuizHomePage() {
   const { t } = useTranslation('quiz')
   const navigate = useNavigate()
-  const { sets, loading, fetchSets, grantTrial, startRun } = useQuizStore()
+  const { sets, loading, fetchSets, grantTrial, startRun, deleteSet } = useQuizStore()
   // The trial is still GRANTED — it is what makes a new account's first quizzes free — but
   // the amount is no longer announced. Nothing renders it, so nothing holds it.
   const [, setTrialUnits] = useState<number | null>(null)
@@ -30,6 +30,19 @@ export function QuizHomePage() {
     // on every later visit.
     void grantTrial().then(setTrialUnits).catch(() => setTrialUnits(null))
   }, [fetchSets, grantTrial])
+
+  /**
+   * Remove a set nobody has taken.
+   *
+   * Offered only at `generated_count === 0`, which is the state 17 of production's 49 sets were
+   * stuck in: a generation that produced nothing leaves a row that cannot be taken (the button
+   * is disabled) and could not be cleared. A set with questions stays, because taking it is
+   * still worth doing and its history is the reason the list shows sets at all.
+   */
+  const remove = async (setRow: QuizSetRow) => {
+    setBusy(setRow.id)
+    try { await deleteSet(setRow.id) } finally { setBusy(null) }
+  }
 
   const take = async (setRow: QuizSetRow) => {
     setBusy(setRow.id)
@@ -97,14 +110,26 @@ export function QuizHomePage() {
                     )}
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => void take(setRow)}
-                  disabled={busy === setRow.id || setRow.generated_count === 0}
-                  className="px-3 py-1.5 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50 shrink-0"
-                >
-                  {busy === setRow.id ? t('home.starting') : t('home.take')}
-                </button>
+                {setRow.generated_count === 0 ? (
+                  <button
+                    type="button"
+                    onClick={() => void remove(setRow)}
+                    disabled={busy === setRow.id}
+                    data-testid="quiz-set-delete"
+                    className="px-3 py-1.5 text-sm font-medium border border-border rounded-lg text-foreground cursor-pointer transition-colors hover:border-destructive/40 disabled:opacity-50 shrink-0"
+                  >
+                    {t('home.remove')}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => void take(setRow)}
+                    disabled={busy === setRow.id}
+                    className="px-3 py-1.5 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50 shrink-0"
+                  >
+                    {busy === setRow.id ? t('home.starting') : t('home.take')}
+                  </button>
+                )}
               </div>
             </li>
           ))}

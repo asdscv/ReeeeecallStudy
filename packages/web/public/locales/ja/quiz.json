@@ -16,7 +16,8 @@
       "title": "まだクイズがありません",
       "body": "どのデッキからでも数秒で作れます。"
     },
-    "fewerThanAsked": "リクエスト{{requested, number}}問"
+    "fewerThanAsked": "リクエスト{{requested, number}}問",
+    "remove": "削除"
   },
   "setup": {
     "title": "新しいクイズ",

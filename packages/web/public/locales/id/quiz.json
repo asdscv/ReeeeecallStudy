@@ -16,7 +16,8 @@
       "title": "Belum ada kuis",
       "body": "Buat dari dek mana pun, hanya perlu beberapa detik."
     },
-    "fewerThanAsked": "diminta {{requested, number}}"
+    "fewerThanAsked": "diminta {{requested, number}}",
+    "remove": "Hapus"
   },
   "setup": {
     "title": "Kuis baru",

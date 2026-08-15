@@ -16,7 +16,8 @@
       "title": "Chưa có bài kiểm tra nào",
       "body": "Tạo từ bất kỳ bộ thẻ nào, chỉ mất vài giây."
     },
-    "fewerThanAsked": "đã yêu cầu {{requested, number}}"
+    "fewerThanAsked": "đã yêu cầu {{requested, number}}",
+    "remove": "Xoá"
   },
   "setup": {
     "title": "Bài kiểm tra mới",

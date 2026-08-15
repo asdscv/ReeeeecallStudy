@@ -24,7 +24,7 @@ export function QuizHomeScreen() {
   const theme = useTheme()
   const { t } = useTranslation('quiz')
   const navigation = useNavigation<Nav>()
-  const { sets, loading, fetchSets, grantTrial, startRun } = useQuizStore()
+  const { sets, loading, fetchSets, grantTrial, startRun, deleteSet } = useQuizStore()
   const [trialUnits, setTrialUnits] = useState(0)
   const [busy, setBusy] = useState<string | null>(null)
 
@@ -34,6 +34,18 @@ export function QuizHomeScreen() {
     // seen buys nothing. The RPC is once-per-account, so later visits cost nothing.
     void grantTrial().then(setTrialUnits).catch(() => setTrialUnits(0))
   }, [fetchSets, grantTrial])
+
+  /**
+   * Remove a set nobody has taken.
+   *
+   * Offered only at `generated_count === 0` — the state 17 of production's 49 sets were stuck in.
+   * A generation that produced nothing leaves a row that cannot be taken and could not be
+   * cleared. A set with questions stays: its history is the reason the list shows sets at all.
+   */
+  const remove = useCallback(async (setRow: QuizSetRow) => {
+    setBusy(setRow.id)
+    try { await deleteSet(setRow.id) } finally { setBusy(null) }
+  }, [deleteSet])
 
   const take = useCallback(async (setRow: QuizSetRow) => {
     setBusy(setRow.id)
@@ -93,16 +105,30 @@ export function QuizHomeScreen() {
                   </Text>
                 )}
               </View>
-              <Pressable
-                onPress={() => void take(item)}
-                disabled={busy === item.id || item.generated_count === 0}
-                style={[styles.take, { backgroundColor: theme.colors.primary, opacity: busy === item.id ? 0.5 : 1 }]}
-                {...testProps(`quiz-take-${item.id}`)}
-              >
-                <Text style={[theme.typography.label, { color: '#fff' }]}>
-                  {busy === item.id ? t('home.starting') : t('home.take')}
-                </Text>
-              </Pressable>
+              {item.generated_count === 0 ? (
+                <Pressable
+                  onPress={() => void remove(item)}
+                  disabled={busy === item.id}
+                  style={[styles.take, { borderWidth: 1, borderColor: theme.colors.border,
+                    opacity: busy === item.id ? 0.5 : 1 }]}
+                  {...testProps(`quiz-delete-${item.id}`)}
+                >
+                  <Text style={[theme.typography.label, { color: theme.colors.text }]}>
+                    {t('home.remove')}
+                  </Text>
+                </Pressable>
+              ) : (
+                <Pressable
+                  onPress={() => void take(item)}
+                  disabled={busy === item.id}
+                  style={[styles.take, { backgroundColor: theme.colors.primary, opacity: busy === item.id ? 0.5 : 1 }]}
+                  {...testProps(`quiz-take-${item.id}`)}
+                >
+                  <Text style={[theme.typography.label, { color: '#fff' }]}>
+                    {busy === item.id ? t('home.starting') : t('home.take')}
+                  </Text>
+                </Pressable>
+              )}
             </View>
           )}
         />

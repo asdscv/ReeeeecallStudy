@@ -16,7 +16,8 @@
       "title": "아직 만든 퀴즈가 없어요",
       "body": "아무 덱에서나 몇 초면 만들 수 있어요."
     },
-    "fewerThanAsked": "요청 {{requested, number}}문항"
+    "fewerThanAsked": "요청 {{requested, number}}문항",
+    "remove": "삭제"
   },
   "setup": {
     "title": "새 퀴즈",

@@ -16,7 +16,8 @@
       "title": "Aún no hay cuestionarios",
       "body": "Créalo desde cualquier mazo; tarda unos segundos."
     },
-    "fewerThanAsked": "{{requested, number}} solicitadas"
+    "fewerThanAsked": "{{requested, number}} solicitadas",
+    "remove": "Eliminar"
   },
   "setup": {
     "title": "Nuevo cuestionario",

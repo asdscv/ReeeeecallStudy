@@ -16,7 +16,8 @@
       "title": "ยังไม่มีแบบทดสอบ",
       "body": "สร้างจากเด็คใดก็ได้ ใช้เวลาไม่กี่วินาที"
     },
-    "fewerThanAsked": "ขอไว้ {{requested, number}} ข้อ"
+    "fewerThanAsked": "ขอไว้ {{requested, number}} ข้อ",
+    "remove": "ลบ"
   },
   "setup": {
     "title": "แบบทดสอบใหม่",

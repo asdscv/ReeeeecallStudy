@@ -348,6 +348,19 @@ interface QuizState {
   loadMistakes: (deckId?: string, limit?: number) => Promise<void>
   /** How many distinct cards are in that list — a card missed four times is one card. */
   countMistakes: (deckId?: string) => Promise<number>
+
+  /**
+   * Remove a set that has never been taken, and drop it from the list.
+   *
+   * Only a set with no runs. Questions, runs, run items and the attempts under them all cascade
+   * from a set, so deleting one the learner has sat would destroy every answer they gave it —
+   * and their 오답 노트 entries for those cards with it. A set with a run is history; a set
+   * without one is a row nobody has seen the inside of.
+   *
+   * Resolves false when the server refuses because it HAS been taken, so a screen can say so
+   * without parsing an error.
+   */
+  deleteSet: (setId: string) => Promise<boolean>
 }
 
 export const useQuizStore = create<QuizState>((set, get) => ({
@@ -696,6 +709,18 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     const { data, error } = await supabase.rpc('count_quiz_mistakes', { p_deck_id: deckId ?? null })
     if (error) throw error
     return (data as number | null) ?? 0
+  },
+
+  deleteSet: async (setId) => {
+    const { error } = await supabase.rpc('delete_quiz_set', { p_set_id: setId })
+    // P0014 is "it has been taken", which is a refusal the learner should understand rather
+    // than a fault. Anything else is real.
+    if (error) {
+      if ((error as { code?: string }).code === 'P0014') return false
+      throw error
+    }
+    set({ sets: get().sets.filter((row) => row.id !== setId) })
+    return true
   },
 }))
 
