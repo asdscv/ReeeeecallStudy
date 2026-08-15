@@ -29,6 +29,7 @@ import { useQuizStore, type DailyCheckCount } from '@reeeeecall/shared/stores/qu
 import type { PlanWeek, DayState } from '@reeeeecall/shared/learning/application/plan-week'
 import { useStudy } from '../hooks/useStudy'
 import type { AIStackParamList } from '../navigation/types'
+import { WEAK_LIMIT } from '@reeeeecall/shared/lib/learning-insights'
 
 /**
  * Today's plan — mobile parity with the web `/learning` screen.
@@ -1564,7 +1565,14 @@ export function LearningTodayScreen() {
                     <Text style={[theme.typography.caption, {
                       color: theme.colors.textTertiary, marginTop: 2,
                     }]}>
-                      {t('insights.weakHint')}
+                      {/* The hint said only what a weak card IS. It never said the list is the
+                          WORST TEN of however many there are, so a learner with 340 read the
+                          count as their whole backlog. */}
+                      {insights.weakCardTotal > WEAK_LIMIT
+                        ? t('insights.weakHintCapped', {
+                          shown: WEAK_LIMIT, total: insights.weakCardTotal,
+                        })
+                        : t('insights.weakHint')}
                     </Text>
                   </TouchableOpacity>
                 ))}

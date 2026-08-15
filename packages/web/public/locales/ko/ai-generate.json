@@ -203,5 +203,8 @@
       "ai": "AI"
     },
     "openAction": "열기"
+  },
+  "doneStep": {
+    "viewCards": "카드 보기"
   }
 }

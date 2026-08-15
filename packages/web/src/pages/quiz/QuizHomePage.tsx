@@ -7,6 +7,8 @@ import { useQuizStore, isDailyCheckTitle, type QuizSetRow } from '@reeeeecall/sh
 import { ListSkeleton } from '../../components/common/Skeleton'
 import { QuizMistakes } from './QuizMistakes'
 import { dateLine } from '@reeeeecall/shared/lib/quiz-outcome'
+import { Button } from '../../components/ui/button'
+import { Trash2 } from 'lucide-react'
 
 /**
  * The quiz home: what you have made, and the way to make more.
@@ -40,7 +42,19 @@ export function QuizHomePage() {
    * is disabled) and could not be cleared. A set with questions stays, because taking it is
    * still worth doing and its history is the reason the list shows sets at all.
    */
+  /**
+   * Delete, after saying what goes with it.
+   *
+   * Any set since mig 231, not only the empty ones — and the cascade takes the sittings, the
+   * answers in them and their 오답 노트 entries, so the sentence that asks has to say so.
+   */
   const remove = async (setRow: QuizSetRow) => {
+    const runs = setRow.run_count ?? 0
+    const ok = window.confirm(
+      `${t('home.confirmTitle')}\n\n`
+      + (runs > 0 ? t('home.confirmTaken', { runs }) : t('home.confirmUnused')),
+    )
+    if (!ok) return
     setBusy(setRow.id)
     try { await deleteSet(setRow.id) } finally { setBusy(null) }
   }
@@ -139,26 +153,35 @@ export function QuizHomePage() {
                     ].filter(Boolean).join(' · ')}
                   </p>
                 </Link>
-                {setRow.generated_count === 0 ? (
-                  <button
-                    type="button"
+                {/* Both, always. They used to be mutually exclusive — a 0-question set showed
+                    only 삭제 and every other row only 풀기 — so a set that had been taken could
+                    not be removed from the list at all. Since mig 231 it can, and the two are
+                    different weights rather than alternatives: a labelled primary pill, and a
+                    quiet icon that turns destructive on hover. */}
+                <div className="flex items-center gap-1 shrink-0">
+                  {setRow.generated_count > 0 && (
+                    <Button
+                      size="sm"
+                      onClick={() => void take(setRow)}
+                      disabled={busy === setRow.id}
+                      data-testid="quiz-set-take"
+                    >
+                      {busy === setRow.id ? t('home.starting') : t('home.take')}
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => void remove(setRow)}
                     disabled={busy === setRow.id}
                     data-testid="quiz-set-delete"
-                    className="px-3 py-1.5 text-sm font-medium border border-border rounded-lg text-foreground cursor-pointer transition-colors hover:border-destructive/40 disabled:opacity-50 shrink-0"
+                    aria-label={t('home.remove')}
+                    title={t('home.remove')}
+                    className="h-8 w-8 text-content-tertiary hover:text-destructive hover:bg-destructive/10"
                   >
-                    {t('home.remove')}
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => void take(setRow)}
-                    disabled={busy === setRow.id}
-                    className="px-3 py-1.5 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50 shrink-0"
-                  >
-                    {busy === setRow.id ? t('home.starting') : t('home.take')}
-                  </button>
-                )}
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
             </li>
             )

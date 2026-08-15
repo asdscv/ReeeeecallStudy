@@ -203,5 +203,8 @@
       "ai": "AI"
     },
     "openAction": "เปิด"
+  },
+  "doneStep": {
+    "viewCards": "ดูการ์ด"
   }
 }

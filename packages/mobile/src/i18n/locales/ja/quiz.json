@@ -18,7 +18,12 @@
     },
     "fewerThanAsked": "リクエスト{{requested, number}}問",
     "remove": "削除",
-    "dailyCheckTitle": "今日のチェック"
+    "dailyCheckTitle": "今日のチェック",
+    "confirmTitle": "このクイズを削除しますか？",
+    "confirmTaken": "{{runs, number}}回分の解答履歴と、そのときの答え、間違いノートの項目も一緒に消えます。元に戻せません。",
+    "confirmUnused": "まだ解いていないクイズです。問題だけが消えます。",
+    "confirmDelete": "削除",
+    "confirmCancel": "キャンセル"
   },
   "setup": {
     "title": "新しいクイズ",

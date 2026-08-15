@@ -134,7 +134,8 @@
     "weakCount": "{{count, number}} 张",
     "weakCount_one": "{{count, number}} 张",
     "weakCount_other": "{{count, number}} 张",
-    "weakStudy": "只学这些卡片"
+    "weakStudy": "只学这些卡片",
+    "weakHintCapped": "看过两次以上且错超一半的{{total, number}}张卡片中最薄弱的{{shown, number}}张。"
   },
   "recommend": {
     "accept": "接受",

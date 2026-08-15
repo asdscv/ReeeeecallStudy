@@ -18,7 +18,12 @@
     },
     "fewerThanAsked": "diminta {{requested, number}}",
     "remove": "Hapus",
-    "dailyCheckTitle": "Cek harian"
+    "dailyCheckTitle": "Cek harian",
+    "confirmTitle": "Hapus kuis ini?",
+    "confirmTaken": "{{runs, number}} riwayat pengerjaan, jawaban Anda, dan catatan salahnya ikut terhapus. Tidak bisa dibatalkan.",
+    "confirmUnused": "Belum pernah dikerjakan. Hanya soalnya yang dihapus.",
+    "confirmDelete": "Hapus",
+    "confirmCancel": "Batal"
   },
   "setup": {
     "title": "Kuis baru",

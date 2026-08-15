@@ -54,7 +54,8 @@
     "title": "卡片已创建！",
     "subtitle": "AI生成的抽认卡已可用于学习。",
     "generateMore": "继续生成",
-    "done": "完成"
+    "done": "完成",
+    "viewCards": "查看卡片"
   },
   "errorStep": {
     "title": "生成失败",

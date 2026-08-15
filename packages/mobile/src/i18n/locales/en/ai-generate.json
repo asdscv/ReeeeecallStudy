@@ -74,7 +74,8 @@
     "title": "Cards Created!",
     "subtitle": "Your AI-generated flashcards are ready to study.",
     "generateMore": "Generate More",
-    "done": "Done"
+    "done": "Done",
+    "viewCards": "View cards"
   },
   "errorStep": {
     "title": "Generation Failed",

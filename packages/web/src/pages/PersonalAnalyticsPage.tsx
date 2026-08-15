@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
-  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
+  LineChart, Line, BarChart, Bar, Cell,
+  XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../stores/auth-store'
@@ -33,7 +33,9 @@ interface AnalyticsProps {
 
 /** Standalone analytics content — can be used as a tab inside StudyHistoryPage */
 export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {}) {
-  const { t } = useTranslation('common')
+  // 'study' as well as 'common': the mode labels live there, and a namespace that is not
+  // declared resolves to the raw key at first paint.
+  const { t } = useTranslation(['common', 'study'])
   const { user } = useAuthStore()
   const window = period ? resolveRange(period, range ?? null) : null
   const fromIso = window ? new Date(window.fromMs).toISOString() : null
@@ -47,7 +49,9 @@ export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {})
   const [loading, setLoading] = useState(true)
 
 
-  async function loadRetentionCurve(userId: string) {
+  // No `userId` parameter: `my_card_schedule` derives it from `auth.uid()`, which is the
+  // whole point of the wrapper.
+  async function loadRetentionCurve() {
     // `learner_card_schedule` (mig 184), NOT `cards`.
     //
     // A learner's SRS state lives in `cards` only for decks they OWN. For a subscribed deck
@@ -56,10 +60,16 @@ export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {})
     // `cards WHERE user_id = me` therefore returned nothing at all for a subscriber, and
     // this chart drew a flat 0% retention curve that looked like a finding rather than a
     // missing join.
-    const { data } = await supabase.rpc('learner_card_schedule', {
-      p_user_id: userId,
-      p_deck_ids: null,
-    })
+    // `my_card_schedule` (mig 232), not `learner_card_schedule`. The latter is SECURITY INVOKER
+    // and revoked from `authenticated` — mig 186 says so — so this call never once succeeded from
+    // a browser. `error` was not destructured either, so a permission denial arrived as an empty
+    // array and the chart drew a grid with nothing in it, which reads as "no data" rather than as
+    // "you are not allowed". The wrapper takes no user id: it derives one from `auth.uid()`.
+    const { data, error } = await supabase.rpc('my_card_schedule', { p_deck_ids: null })
+    if (error) {
+      console.error('[analytics] retention curve:', error.message)
+      return
+    }
     // The RPC is untyped here, so name its shape once rather than at each use.
     const cards = (data ?? []) as Array<{
       srs_status: string | null
@@ -170,19 +180,28 @@ export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {})
     setModeEffectiveness(
       Object.entries(modeStats).map(([mode, { total, good }]) => ({
         mode,
+        // The learner's word for it, not the column value. The history tab on this same page
+        // already translates `study_mode`; the chart printed the raw enum, so the legend read
+        // "srs".
+        modeLabel: t(`study:modes.${mode}.label`, { defaultValue: mode }),
         retention: Math.round((good / total) * 100),
       }))
     )
   }
 
-  async function loadProgress(userId: string) {
-    const { data: cards } = await supabase
-      .from('cards')
-      .select('srs_status, last_reviewed_at')
-      .eq('user_id', userId)
-      .eq('srs_status', 'review')
-      .not('last_reviewed_at', 'is', null)
-    if (!cards) return
+  async function loadProgress() {
+    // The same ownership bug the retention loader above was fixed for, left behind here: SRS
+    // state lives in `cards` only for decks the learner OWNS, and in `user_card_progress` for
+    // ones they subscribe to. `cards WHERE user_id = me` returns nothing at all for a subscriber,
+    // so this chart was empty for exactly the learners who study most from shared decks.
+    const { data, error } = await supabase.rpc('my_card_schedule', { p_deck_ids: null })
+    if (error) {
+      console.error('[analytics] progress over time:', error.message)
+      return
+    }
+    const cards = ((data ?? []) as Array<{
+      srs_status: string | null; last_reviewed_at: string | null
+    }>).filter((c) => c.srs_status === 'review' && c.last_reviewed_at)
 
     const weekMap: Record<string, number> = {}
     for (const c of cards) {
@@ -214,11 +233,11 @@ export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {})
     const load = async () => {
       setLoading(true)
       await Promise.all([
-        loadRetentionCurve(user.id),
+        loadRetentionCurve(),
         loadWeakTopics(user.id),
         loadTimeDistribution(user.id),
         loadModeEffectiveness(user.id),
-        loadProgress(user.id),
+        loadProgress(),
       ])
       setLoading(false)
     }
@@ -290,23 +309,25 @@ export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {})
           </h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={modeEffectiveness}
-                  dataKey="retention"
-                  nameKey="mode"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={90}
-                  label={({ name, value }) => `${name}: ${value}%`}
-                >
+              {/* BARS, not a pie.
+                  `retention` is a per-mode percentage — each one is 0-100 on its own — and a pie
+                  divides values by their sum, so three modes at 90/80/70% drew slices of 38/33/29%,
+                  numbers that mean nothing. With a single mode studied it drew one slice of 100%:
+                  the solid blue disc that filled the card. A bar per mode against a 0-100 axis is
+                  the same data saying something true, and it degrades gracefully to one bar. */}
+              <BarChart data={modeEffectiveness} layout="vertical"
+                margin={{ left: 8, right: 16, top: 8, bottom: 8 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => `${v}%`}
+                  tick={{ fontSize: 11 }} />
+                <YAxis type="category" dataKey="modeLabel" width={110} tick={{ fontSize: 11 }} />
+                <Tooltip formatter={(v) => [t('analytics.percent', { value: Number(v) }), t('analytics.retentionLabel')]} />
+                <Bar dataKey="retention" radius={[0, 4, 4, 0]}>
                   {modeEffectiveness.map((_, i) => (
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />
                   ))}
-                </Pie>
-                <Tooltip formatter={(v) => [t('analytics.percent', { value: Number(v) }), t('analytics.retentionLabel')]} />
-                <Legend />
-              </PieChart>
+                </Bar>
+              </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
@@ -322,7 +343,10 @@ export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {})
             <BarChart data={timeDistribution}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="hour" tick={{ fontSize: 11 }} />
-              <YAxis tickFormatter={v => `${v}m`} />
+              {/* Whole minutes only. A single one-minute session drew ticks at 0.25m / 0.5m /
+                  0.75m, which is a granularity the data does not have — study time is summed
+                  from session durations and never means a quarter of a minute. */}
+              <YAxis tickFormatter={(v) => `${Math.round(Number(v))}m`} allowDecimals={false} />
               <Tooltip formatter={(v) => [t('analytics.minutes', { count: Number(v) }), t('analytics.studyTimeLabel')]} />
               <Bar dataKey="minutes" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
             </BarChart>

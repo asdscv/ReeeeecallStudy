@@ -18,7 +18,12 @@
     },
     "fewerThanAsked": "请求 {{requested, number}} 题",
     "remove": "删除",
-    "dailyCheckTitle": "今日检查"
+    "dailyCheckTitle": "今日检查",
+    "confirmTitle": "要删除这个测验吗？",
+    "confirmTaken": "{{runs, number}}次作答记录、当时的答案以及错题本条目都会一并删除，且无法恢复。",
+    "confirmUnused": "还没做过的测验，只会删除题目。",
+    "confirmDelete": "删除",
+    "confirmCancel": "取消"
   },
   "setup": {
     "title": "新建测验",

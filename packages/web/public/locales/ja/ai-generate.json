@@ -203,5 +203,8 @@
       "ai": "AI"
     },
     "openAction": "開く"
+  },
+  "doneStep": {
+    "viewCards": "カードを見る"
   }
 }

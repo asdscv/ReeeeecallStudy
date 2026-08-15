@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native'
+import { View, Text, Pressable, ScrollView, StyleSheet, Alert } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
@@ -65,13 +65,35 @@ export function QuizSetDetailScreen() {
     } finally { setBusy(false) }
   }, [setRow, startRun, navigation])
 
-  const remove = useCallback(async () => {
+  /**
+   * Delete, after saying what goes with it.
+   *
+   * Since mig 231 a set that HAS been taken can be deleted too, and the cascade takes the
+   * sittings, the answers in them and their 오답 노트 entries. That used to be a refusal the
+   * learner could not get past; a refusal is not a safeguard, it is a dead end. The safeguard is
+   * telling them what they are agreeing to, in the sentence that asks.
+   */
+  const remove = useCallback(() => {
     if (!setRow) return
-    setBusy(true)
-    try {
-      if (await deleteSet(setRow.id)) navigation.goBack()
-    } finally { setBusy(false) }
-  }, [setRow, deleteSet, navigation])
+    const runs = setRow.run_count ?? 0
+    Alert.alert(
+      t('home.confirmTitle'),
+      runs > 0 ? t('home.confirmTaken', { runs }) : t('home.confirmUnused'),
+      [
+        { text: t('home.confirmCancel'), style: 'cancel' },
+        {
+          text: t('home.confirmDelete'),
+          style: 'destructive',
+          onPress: () => {
+            setBusy(true)
+            void deleteSet(setRow.id)
+              .then((ok) => { if (ok) navigation.goBack() })
+              .finally(() => setBusy(false))
+          },
+        },
+      ],
+    )
+  }, [setRow, deleteSet, navigation, t])
 
   const caption = { ...theme.typography.caption, color: theme.colors.textSecondary }
 
@@ -119,21 +141,16 @@ export function QuizSetDetailScreen() {
           disabled={busy || setRow.generated_count === 0}
           {...testProps('quiz-detail-take')}
         />
-        {/* Only while nobody has taken it. Questions, runs and the answers under them all
-            cascade from a set, so removing one that has been sat destroys the learner's own
-            history — their 오답 노트 for those cards included. */}
-        {(setRow.run_count ?? 0) === 0 && (
-          <Pressable
-            onPress={() => void remove()}
-            disabled={busy}
-            style={[styles.remove, { borderColor: theme.colors.border }]}
-            {...testProps('quiz-detail-delete')}
-          >
-            <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-              {t('home.remove')}
-            </Text>
-          </Pressable>
-        )}
+        {/* Any set, since mig 231 — with a confirm that names what the cascade takes. The
+            shared danger variant rather than a bordered pill: it should read as the weightier
+            action it is, without competing with the thing the screen is for. */}
+        <Button
+          title={t('home.remove')}
+          variant="danger"
+          onPress={remove}
+          disabled={busy}
+          {...testProps('quiz-detail-delete')}
+        />
 
         {/* The first thing anyone wonders on seeing 다시 풀기: are these the same questions, and
             does it cost anything. Both, in one line, before they tap. Multiple choice says
@@ -182,6 +199,5 @@ export function QuizSetDetailScreen() {
 
 const styles = StyleSheet.create({
   body: { padding: 16, gap: 10, paddingBottom: 32 },
-  remove: { paddingVertical: 10, borderRadius: 8, borderWidth: 1, alignItems: 'center' },
   run: { padding: 12, borderRadius: 12, borderWidth: 1, gap: 2 },
 })

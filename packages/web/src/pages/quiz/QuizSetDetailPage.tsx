@@ -9,6 +9,8 @@ import {
   dateLine, tallyFromCounts, tallyLine, isRunUnfinished,
 } from '@reeeeecall/shared/lib/quiz-outcome'
 import { retakeNoteKey } from '@reeeeecall/shared/lib/quiz-pricing'
+import { Button } from '../../components/ui/button'
+import { Trash2 } from 'lucide-react'
 
 /**
  * One quiz, on its own page.
@@ -62,8 +64,22 @@ export function QuizSetDetailPage() {
     } finally { setBusy(false) }
   }
 
+  /**
+   * Delete, after saying what goes with it.
+   *
+   * Since mig 231 a set that HAS been taken can be deleted too, and the cascade takes the
+   * sittings, the answers in them and their 오답 노트 entries. That used to be a refusal the
+   * learner could not get past; a refusal is not a safeguard, it is a dead end. The safeguard is
+   * telling them what they are agreeing to, in the sentence that asks.
+   */
   const remove = async () => {
     if (!setRow) return
+    const runs = setRow.run_count ?? 0
+    const ok = window.confirm(
+      `${t('home.confirmTitle')}\n\n`
+      + (runs > 0 ? t('home.confirmTaken', { runs }) : t('home.confirmUnused')),
+    )
+    if (!ok) return
     setBusy(true)
     try {
       if (await deleteSet(setRow.id)) navigate('/quiz')
@@ -117,30 +133,32 @@ export function QuizSetDetailPage() {
         </div>
       </div>
 
-      <div className="flex gap-2">
-        <button
-          type="button"
+      {/* The shared Button, not hand-rolled classes. The take button was `flex-1` in a two-child
+          row, which is why it stretched across the page and squeezed 삭제 into a corner: a
+          primary action and a destructive one are not two halves of one control. */}
+      <div className="flex items-center gap-2">
+        <Button
           onClick={() => void take()}
           disabled={busy || empty}
           data-testid="quiz-detail-take"
-          className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50"
+          className="flex-1"
         >
           {busy ? t('home.starting') : (setRow.run_count ? t('result.retake') : t('home.take'))}
-        </button>
-        {/* Only while nobody has taken it. Questions, runs and the answers under them all
-            cascade from a set, so removing one that has been sat destroys the learner's own
-            history — including their 오답 노트 for those cards. */}
-        {(setRow.run_count ?? 0) === 0 && (
-          <button
-            type="button"
-            onClick={() => void remove()}
-            disabled={busy}
-            data-testid="quiz-detail-delete"
-            className="px-3 py-2 text-sm font-medium border border-border rounded-lg text-foreground cursor-pointer hover:border-destructive/40 disabled:opacity-50"
-          >
-            {t('home.remove')}
-          </button>
-        )}
+        </Button>
+        {/* Any set, since mig 231 — with a confirm that names what the cascade takes. Ghost and
+            icon-only: it should be findable, not competing with the thing the page is for. */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => void remove()}
+          disabled={busy}
+          data-testid="quiz-detail-delete"
+          aria-label={t('home.remove')}
+          title={t('home.remove')}
+          className="text-content-tertiary hover:text-destructive hover:bg-destructive/10"
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
       </div>
 
       {/* The first thing anyone wonders on seeing 다시 풀기: are these the same questions, and

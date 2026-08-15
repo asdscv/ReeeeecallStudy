@@ -56,6 +56,21 @@ function q(result: unknown) {
     return builder
   }
   builder.maybeSingle = () => settled
+  /**
+   * `fetchAllRows` pages with `.range(from, to)`, so a builder without it silently resolves to
+   * `undefined` and the caller reads an empty result as a successful empty answer.
+   *
+   * One page, then done: the stub returns the whole queued result on the first range and an empty
+   * array afterwards, which is what a real short page looks like and what stops the pager
+   * looping. `fetchInsights` moved to `fetchAllRows` when its `.limit(2000)` was found to be
+   * silently truncated to 1,000 by PostgREST's `max_rows`.
+   */
+  let ranged = false
+  builder.range = () => {
+    if (ranged) return Promise.resolve({ data: [], error: null })
+    ranged = true
+    return settled
+  }
   builder.then = (onOk: unknown, onErr: unknown) =>
     settled.then(onOk as never, onErr as never)
   return builder
@@ -625,6 +640,7 @@ describe('recommendations', () => {
       { cardId: 'card-1', attempts: 3, meanScore: 0.2 },
       { cardId: 'card-2', attempts: 2, meanScore: 0.5 },
     ],
+    weakCardTotal: 2,
     adherence: [], overallAdherence: null,
   }
 
@@ -777,11 +793,19 @@ describe('fetchInsights — switching goals while a load is in flight', () => {
           return builder
         }
       }
-      builder.then = (onOk: unknown, onErr: unknown) => {
-        const settled = held
-          ? gate.then(() => firstResult)
-          : Promise.resolve({ data: [], error: null })
-        return settled.then(onOk as never, onErr as never)
+      const settle = () => (held
+        ? gate.then(() => firstResult)
+        : Promise.resolve({ data: [], error: null }))
+      builder.then = (onOk: unknown, onErr: unknown) =>
+        settle().then(onOk as never, onErr as never)
+      // The attempts read pages with `.range(from, to)` since it moved off `.limit(2000)`; the
+      // gate has to hold the FIRST page and then report a short one so the pager stops. Without
+      // this the builder is not thenable through range and the read resolves to undefined.
+      let ranged = false
+      builder.range = () => {
+        if (ranged) return Promise.resolve({ data: [], error: null })
+        ranged = true
+        return settle()
       }
       return builder
     })

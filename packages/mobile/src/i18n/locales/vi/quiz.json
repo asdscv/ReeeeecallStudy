@@ -18,7 +18,12 @@
     },
     "fewerThanAsked": "đã yêu cầu {{requested, number}}",
     "remove": "Xoá",
-    "dailyCheckTitle": "Kiểm tra hôm nay"
+    "dailyCheckTitle": "Kiểm tra hôm nay",
+    "confirmTitle": "Xoá bài kiểm tra này?",
+    "confirmTaken": "{{runs, number}} lần làm, các câu trả lời của bạn và mục trong sổ lỗi sai cũng bị xoá. Không thể hoàn tác.",
+    "confirmUnused": "Chưa từng làm. Chỉ xoá câu hỏi.",
+    "confirmDelete": "Xoá",
+    "confirmCancel": "Huỷ"
   },
   "setup": {
     "title": "Bài kiểm tra mới",

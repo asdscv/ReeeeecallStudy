@@ -18,7 +18,12 @@
     },
     "fewerThanAsked": "ขอไว้ {{requested, number}} ข้อ",
     "remove": "ลบ",
-    "dailyCheckTitle": "ตรวจสอบประจำวัน"
+    "dailyCheckTitle": "ตรวจสอบประจำวัน",
+    "confirmTitle": "ลบแบบทดสอบนี้ไหม",
+    "confirmTaken": "ประวัติการทำ {{runs, number}} ครั้ง คำตอบของคุณ และรายการในสมุดข้อผิดพลาดจะถูกลบไปด้วย และกู้คืนไม่ได้",
+    "confirmUnused": "ยังไม่เคยทำ จะลบเฉพาะคำถามเท่านั้น",
+    "confirmDelete": "ลบ",
+    "confirmCancel": "ยกเลิก"
   },
   "setup": {
     "title": "แบบทดสอบใหม่",

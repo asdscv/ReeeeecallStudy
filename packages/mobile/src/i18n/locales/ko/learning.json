@@ -134,7 +134,8 @@
     "weakCount": "{{count, number}}장",
     "weakCount_one": "{{count, number}}장",
     "weakCount_other": "{{count, number}}장",
-    "weakStudy": "이 카드만 학습하기"
+    "weakStudy": "이 카드만 학습하기",
+    "weakHintCapped": "두 번 이상 봤는데 절반 넘게 틀린 카드 {{total, number}}장 중 가장 약한 {{shown, number}}장이에요."
   },
   "recommend": {
     "accept": "수락",

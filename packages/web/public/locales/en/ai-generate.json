@@ -203,5 +203,8 @@
       "ai": "AI"
     },
     "openAction": "Open"
+  },
+  "doneStep": {
+    "viewCards": "View cards"
   }
 }

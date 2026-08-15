@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native'
+import { View, Text, StyleSheet, FlatList, Pressable, Alert } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
@@ -43,10 +43,30 @@ export function QuizHomeScreen() {
    * A generation that produced nothing leaves a row that cannot be taken and could not be
    * cleared. A set with questions stays: its history is the reason the list shows sets at all.
    */
-  const remove = useCallback(async (setRow: QuizSetRow) => {
-    setBusy(setRow.id)
-    try { await deleteSet(setRow.id) } finally { setBusy(null) }
-  }, [deleteSet])
+  /**
+   * Delete, after saying what goes with it.
+   *
+   * Any set since mig 231, not only the empty ones — and the cascade takes the sittings, the
+   * answers in them and their 오답 노트 entries, so the sentence that asks has to say so.
+   */
+  const remove = useCallback((setRow: QuizSetRow) => {
+    const runs = setRow.run_count ?? 0
+    Alert.alert(
+      t('home.confirmTitle'),
+      runs > 0 ? t('home.confirmTaken', { runs }) : t('home.confirmUnused'),
+      [
+        { text: t('home.confirmCancel'), style: 'cancel' },
+        {
+          text: t('home.confirmDelete'),
+          style: 'destructive',
+          onPress: () => {
+            setBusy(setRow.id)
+            void deleteSet(setRow.id).finally(() => setBusy(null))
+          },
+        },
+      ],
+    )
+  }, [deleteSet, t])
 
   const take = useCallback(async (setRow: QuizSetRow) => {
     setBusy(setRow.id)
@@ -131,30 +151,36 @@ export function QuizHomeScreen() {
                   ].filter(Boolean).join(' · ')}
                 </Text>
               </Pressable>
-              {item.generated_count === 0 ? (
+              {/* Both, always. They used to be mutually exclusive — a 0-question set showed only
+                  삭제 and every other row only 풀기 — so a set that had been taken could not be
+                  removed from the list at all. Since mig 231 it can, and the two are different
+                  weights rather than alternatives. */}
+              <View style={styles.rowActions}>
+                {item.generated_count > 0 && (
+                  <Pressable
+                    onPress={() => void take(item)}
+                    disabled={busy === item.id}
+                    style={[styles.take, { backgroundColor: theme.colors.primary, opacity: busy === item.id ? 0.5 : 1 }]}
+                    {...testProps(`quiz-take-${item.id}`)}
+                  >
+                    <Text style={[theme.typography.label, { color: '#fff' }]}>
+                      {busy === item.id ? t('home.starting') : t('home.take')}
+                    </Text>
+                  </Pressable>
+                )}
                 <Pressable
-                  onPress={() => void remove(item)}
+                  onPress={() => remove(item)}
                   disabled={busy === item.id}
-                  style={[styles.take, { borderWidth: 1, borderColor: theme.colors.border,
-                    opacity: busy === item.id ? 0.5 : 1 }]}
+                  hitSlop={8}
+                  style={{ padding: 6, opacity: busy === item.id ? 0.4 : 1 }}
+                  accessibilityLabel={t('home.remove')}
                   {...testProps(`quiz-delete-${item.id}`)}
                 >
-                  <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-                    {t('home.remove')}
-                  </Text>
+                  {/* The destructive colour, not a bordered pill the same size as 풀기: the two
+                      had identical geometry, so the row read as two equal choices. */}
+                  <Text style={{ fontSize: 17, color: theme.colors.error }}>🗑</Text>
                 </Pressable>
-              ) : (
-                <Pressable
-                  onPress={() => void take(item)}
-                  disabled={busy === item.id}
-                  style={[styles.take, { backgroundColor: theme.colors.primary, opacity: busy === item.id ? 0.5 : 1 }]}
-                  {...testProps(`quiz-take-${item.id}`)}
-                >
-                  <Text style={[theme.typography.label, { color: '#fff' }]}>
-                    {busy === item.id ? t('home.starting') : t('home.take')}
-                  </Text>
-                </Pressable>
-              )}
+              </View>
             </View>
             )
           }}
@@ -171,4 +197,5 @@ const styles = StyleSheet.create({
   card: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 12, borderWidth: 1 },
   cardBody: { flex: 1, gap: 2 },
   take: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
+  rowActions: { flexDirection: 'row', alignItems: 'center', gap: 4 },
 })

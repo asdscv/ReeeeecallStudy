@@ -203,5 +203,8 @@
       "ai": "AI"
     },
     "openAction": "打开"
+  },
+  "doneStep": {
+    "viewCards": "查看卡片"
   }
 }

@@ -54,7 +54,8 @@
     "title": "カードを作成しました！",
     "subtitle": "AIが生成したフラッシュカードで学習できます。",
     "generateMore": "さらに生成",
-    "done": "完了"
+    "done": "完了",
+    "viewCards": "カードを見る"
   },
   "errorStep": {
     "title": "生成に失敗しました",

@@ -203,5 +203,8 @@
       "ai": "AI"
     },
     "openAction": "Buka"
+  },
+  "doneStep": {
+    "viewCards": "Lihat kartu"
   }
 }

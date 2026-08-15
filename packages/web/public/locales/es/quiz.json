@@ -18,7 +18,12 @@
     },
     "fewerThanAsked": "{{requested, number}} solicitadas",
     "remove": "Eliminar",
-    "dailyCheckTitle": "Comprobación diaria"
+    "dailyCheckTitle": "Comprobación diaria",
+    "confirmTitle": "¿Eliminar este cuestionario?",
+    "confirmTaken": "Sus {{runs, number}} intentos, tus respuestas y sus entradas de errores se eliminan también. No se puede deshacer.",
+    "confirmUnused": "Nunca lo has hecho. Solo se eliminan las preguntas.",
+    "confirmDelete": "Eliminar",
+    "confirmCancel": "Cancelar"
   },
   "setup": {
     "title": "Nuevo cuestionario",

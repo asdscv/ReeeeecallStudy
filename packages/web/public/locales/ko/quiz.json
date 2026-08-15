@@ -18,7 +18,12 @@
     },
     "fewerThanAsked": "요청 {{requested, number}}문항",
     "remove": "삭제",
-    "dailyCheckTitle": "오늘의 확인"
+    "dailyCheckTitle": "오늘의 확인",
+    "confirmTitle": "이 퀴즈를 삭제할까요?",
+    "confirmTaken": "{{runs, number}}번 푼 기록과 그때 쓴 답, 오답 노트 항목까지 함께 지워져요. 되돌릴 수 없어요.",
+    "confirmUnused": "아직 안 푼 퀴즈예요. 문제만 지워져요.",
+    "confirmDelete": "삭제",
+    "confirmCancel": "취소"
   },
   "setup": {
     "title": "새 퀴즈",

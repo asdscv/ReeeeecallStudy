@@ -52,6 +52,13 @@ export interface LearningInsights {
   /** Median, not mean: one 20-minute interruption should not redefine a typical answer. */
   readonly medianDurationMs: number | null
   readonly weakCards: readonly WeakCard[]
+  /**
+   * How many cards met the weak bar in total, before `WEAK_LIMIT` cut the list down.
+   *
+   * The panel showed ten and said nothing about the rest, so a learner with 340 weak cards read
+   * "8장" as their whole backlog.
+   */
+  readonly weakCardTotal: number
   readonly adherence: readonly DayAdherence[]
   /** Completed items ÷ planned items across the window, or null when nothing was planned. */
   readonly overallAdherence: number | null
@@ -66,7 +73,14 @@ export const WEAK_MIN_ATTEMPTS = 2
 /** Below this mean score a card is worth resurfacing. */
 export const WEAK_MAX_MEAN_SCORE = 0.6
 
-const WEAK_LIMIT = 10
+/**
+ * How many weak cards the panel shows.
+ *
+ * Exported, unlike before, because a caller has to be able to say "10 of 340" — a bare ten with
+ * no denominator reads as "you have ten weak cards", which for a heavy learner is off by two
+ * orders of magnitude.
+ */
+export const WEAK_LIMIT = 10
 
 function median(values: readonly number[]): number | null {
   if (values.length === 0) return null
@@ -108,7 +122,7 @@ export function summarizeLearning(input: {
     else byCard.set(attempt.card_id, [attempt.normalized_score as number])
   }
 
-  const weakCards = [...byCard.entries()]
+  const allWeak = [...byCard.entries()]
     .map(([cardId, scores]) => ({
       cardId,
       attempts: scores.length,
@@ -116,8 +130,12 @@ export function summarizeLearning(input: {
     }))
     .filter((card) => card.attempts >= WEAK_MIN_ATTEMPTS && card.meanScore < WEAK_MAX_MEAN_SCORE)
     // Worst first; card id breaks ties so the list is stable across reloads.
+    // Worst first; card id breaks ties so the list is stable across reloads. At scale the
+    // tiebreak does most of the work — hundreds of cards score exactly 0 — so the ten shown are
+    // "the worst, then the lexicographically smallest among equals". Deterministic, and the
+    // reason the TOTAL matters: the ten alone would look like the whole problem.
     .sort((a, b) => a.meanScore - b.meanScore || a.cardId.localeCompare(b.cardId))
-    .slice(0, WEAK_LIMIT)
+  const weakCards = allWeak.slice(0, WEAK_LIMIT)
 
   const adherence = [...input.plans]
     .sort((a, b) => b.plan_date.localeCompare(a.plan_date))
@@ -139,6 +157,8 @@ export function summarizeLearning(input: {
     accuracy,
     medianDurationMs: median(durations),
     weakCards,
+    /** How many there ARE, before the cap. `weakCards.length` is at most `WEAK_LIMIT`. */
+    weakCardTotal: allWeak.length,
     adherence,
     overallAdherence: plannedTotal > 0 ? Math.min(1, completedTotal / plannedTotal) : null,
   }

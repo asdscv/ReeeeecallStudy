@@ -203,5 +203,8 @@
       "ai": "IA"
     },
     "openAction": "Abrir"
+  },
+  "doneStep": {
+    "viewCards": "Ver tarjetas"
   }
 }

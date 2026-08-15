@@ -54,7 +54,8 @@
     "title": "Đã tạo thẻ!",
     "subtitle": "Các thẻ ghi nhớ do AI tạo đã sẵn sàng để học.",
     "generateMore": "Tạo thêm",
-    "done": "Xong"
+    "done": "Xong",
+    "viewCards": "Xem thẻ"
   },
   "errorStep": {
     "title": "Tạo thất bại",

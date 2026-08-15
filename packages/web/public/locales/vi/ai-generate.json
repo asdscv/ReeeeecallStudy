@@ -203,5 +203,8 @@
       "ai": "AI"
     },
     "openAction": "Mở"
+  },
+  "doneStep": {
+    "viewCards": "Xem thẻ"
   }
 }

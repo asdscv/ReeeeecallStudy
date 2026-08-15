@@ -159,12 +159,19 @@ export async function getAffordableCards(): Promise<Affordable> {
 // provider bills USD, so there's no FX hop. The `*MicroWon` field names are kept for
 // churn reasons; their unit is micro-USD, which the UI renders via formatUsdMicro.
 //
-// Format a micro-USD amount as a `$` string. Balances render 2 decimals ($1.48);
-// tiny per-card spends (< $0.01) render up to 4 so they never floor to "$0.00".
+// Format a micro-USD amount as a `$` string.
+//
+// Two decimals when the amount IS a whole number of cents, four when it is not. A balance of
+// $1,000,000.00 stays readable, and $12.3456 is shown in full rather than rounded to $12.35 —
+// which was the complaint: the wallet said "$1,000,000.00" while a spend beside it said
+// "−$0.0012", so the balance could not be seen to move by the amount that had just left it.
+//
+// 10,000 micro is one cent, so the test is whether anything survives that modulus.
 // `sign` prefixes +/− (for ledger deltas).
 export function formatUsdMicro(micro: number, opts?: { sign?: boolean }): string {
-  const abs = Math.abs(micro || 0) / 1_000_000
-  const decimals = abs > 0 && abs < 0.01 ? 4 : 2
+  const whole = Math.abs(Math.round(micro || 0))
+  const abs = whole / 1_000_000
+  const decimals = whole % 10_000 === 0 ? 2 : 4
   const s = `$${groupThousands(abs.toFixed(decimals))}`
   if (opts?.sign) return ((micro || 0) < 0 ? '−' : '+') + s
   return s

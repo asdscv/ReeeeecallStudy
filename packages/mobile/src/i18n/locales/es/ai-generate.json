@@ -54,7 +54,8 @@
     "title": "¡Tarjetas creadas!",
     "subtitle": "Tus tarjetas generadas con IA están listas para estudiar.",
     "generateMore": "Generar más",
-    "done": "Listo"
+    "done": "Listo",
+    "viewCards": "Ver tarjetas"
   },
   "errorStep": {
     "title": "Error en la generación",

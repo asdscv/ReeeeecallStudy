@@ -74,7 +74,8 @@
     "title": "카드 생성 완료!",
     "subtitle": "AI가 만든 플래시카드가 학습 준비되었습니다.",
     "generateMore": "추가 생성",
-    "done": "완료"
+    "done": "완료",
+    "viewCards": "카드 보기"
   },
   "errorStep": {
     "title": "생성 실패",

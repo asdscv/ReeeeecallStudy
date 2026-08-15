@@ -54,7 +54,8 @@
     "title": "Kartu Dibuat!",
     "subtitle": "Kartu flash buatan AI siap untuk dipelajari.",
     "generateMore": "Buat Lagi",
-    "done": "Selesai"
+    "done": "Selesai",
+    "viewCards": "Lihat kartu"
   },
   "errorStep": {
     "title": "Pembuatan Gagal",
