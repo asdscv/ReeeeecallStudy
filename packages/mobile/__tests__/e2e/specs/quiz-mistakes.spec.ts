@@ -96,6 +96,24 @@ describe('quiz mistakes', () => {
     expect(study.length).toBeGreaterThan(0)
   })
 
+  it('says when each set was made and how its sittings went', async () => {
+    // The row read `제목 / 객관식 · 10문항` and stopped: a learner could not tell yesterday's set
+    // from March's, nor one sat three times from one never opened. All of it was already in the
+    // database. Asserted on the page source because the values are dates and counts this spec
+    // cannot know in advance — what it CAN say is that the line is there and carries a number.
+    const ok = await navigateToDrawerItem('Quiz')
+    expect(ok).toBe(true)
+    await browser.pause(1500)
+
+    const source = await driver.getPageSource()
+    // "Made 8/15" / "8월 15일 만듦" — the created line, on every row.
+    expect(/Made |만듦|作成|创建|Creado|Dibuat|สร้าง|Tạo /.test(source)).toBe(true)
+    // Either a sitting count or "never taken", which are the only two truths a row can tell.
+    const taken = source.match(/Taken \d+|\d+번 풀었어요|Not taken yet|아직 안 풀었어요/g) ?? []
+    console.log(`[history] rows reporting their sittings: ${taken.length}`)
+    expect(taken.length).toBeGreaterThan(0)
+  })
+
   it('offers remove on a set that generated nothing, instead of a dead take button', async () => {
     // 17 of production's 49 sets were stuck at zero questions: the take button was permanently
     // disabled and there was no other control on the row.
