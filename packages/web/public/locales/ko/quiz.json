@@ -132,7 +132,8 @@
     "partial": "일부",
     "not_met": "미충족",
     "unjudgeable": "판단 안 됨",
-    "unjudgeableNote": "일부는 판단할 수 없어서 점수에 불리하게 반영하지 않았어요."
+    "unjudgeableNote": "일부는 판단할 수 없어서 점수에 불리하게 반영하지 않았어요.",
+    "weight": "배점 {{weight, number}}"
   },
   "aspect": {
     "covers_answer": "핵심을 담았는가",
@@ -177,5 +178,14 @@
     "overgeneral": "너무 넓음",
     "plausible_form": "모양이 비슷",
     "unrelated": "무관"
+  },
+  "mistakes": {
+    "title": "오답 노트",
+    "summary": "{{cards, number}}개 카드 · {{decks, number}}개 덱",
+    "expand": "펼치기",
+    "collapse": "접기",
+    "studyAgain": "{{cards, number}}개 다시 학습",
+    "youWrote": "내 답: {{answer}}",
+    "andMore": "그 외 {{cards, number}}개"
   }
 }

@@ -132,7 +132,8 @@
     "partial": "部分",
     "not_met": "未覆盖",
     "unjudgeable": "未判断",
-    "unjudgeableNote": "有一部分无法判断，因此没有计入扣分。"
+    "unjudgeableNote": "有一部分无法判断，因此没有计入扣分。",
+    "weight": "占 {{weight, number}}"
   },
   "aspect": {
     "covers_answer": "覆盖要点",
@@ -177,5 +178,14 @@
     "overgeneral": "过于宽泛",
     "plausible_form": "形似",
     "unrelated": "无关"
+  },
+  "mistakes": {
+    "title": "错题本",
+    "summary": "{{cards, number}}张卡片 · {{decks, number}}个卡组",
+    "expand": "展开",
+    "collapse": "收起",
+    "studyAgain": "重新学习{{cards, number}}张",
+    "youWrote": "你的答案：{{answer}}",
+    "andMore": "还有{{cards, number}}张"
   }
 }

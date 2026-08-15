@@ -132,7 +132,8 @@
     "partial": "Partly",
     "not_met": "Not covered",
     "unjudgeable": "Not judged",
-    "unjudgeableNote": "Some of this could not be judged, so it did not count against you."
+    "unjudgeableNote": "Some of this could not be judged, so it did not count against you.",
+    "weight": "worth {{weight, number}}"
   },
   "aspect": {
     "covers_answer": "Covers the answer",
@@ -177,5 +178,14 @@
     "overgeneral": "Too broad",
     "plausible_form": "Looks similar",
     "unrelated": "Unrelated"
+  },
+  "mistakes": {
+    "title": "Mistakes",
+    "summary": "{{cards, number}} cards · {{decks, number}} decks",
+    "expand": "Show",
+    "collapse": "Hide",
+    "studyAgain": "Study {{cards, number}} again",
+    "youWrote": "You wrote: {{answer}}",
+    "andMore": "and {{cards, number}} more"
   }
 }

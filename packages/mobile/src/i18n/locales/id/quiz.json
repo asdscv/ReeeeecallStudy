@@ -132,7 +132,8 @@
     "partial": "Sebagian",
     "not_met": "Belum terpenuhi",
     "unjudgeable": "Tidak dinilai",
-    "unjudgeableNote": "Sebagian tidak bisa dinilai, jadi tidak mengurangi nilai Anda."
+    "unjudgeableNote": "Sebagian tidak bisa dinilai, jadi tidak mengurangi nilai Anda.",
+    "weight": "bobot {{weight, number}}"
   },
   "aspect": {
     "covers_answer": "Mencakup jawaban",
@@ -177,5 +178,14 @@
     "overgeneral": "Terlalu luas",
     "plausible_form": "Bentuknya mirip",
     "unrelated": "Tidak berkaitan"
+  },
+  "mistakes": {
+    "title": "Catatan salah",
+    "summary": "{{cards, number}} kartu · {{decks, number}} dek",
+    "expand": "Tampilkan",
+    "collapse": "Sembunyikan",
+    "studyAgain": "Pelajari {{cards, number}} lagi",
+    "youWrote": "Jawaban Anda: {{answer}}",
+    "andMore": "dan {{cards, number}} lagi"
   }
 }

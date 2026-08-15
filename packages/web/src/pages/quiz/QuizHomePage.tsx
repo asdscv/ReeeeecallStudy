@@ -5,6 +5,7 @@ import { AiCreditNotice } from '../../components/ai/AiCreditNotice'
 import { Link, useNavigate } from 'react-router-dom'
 import { useQuizStore, type QuizSetRow } from '@reeeeecall/shared/stores/quiz-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
+import { QuizMistakes } from './QuizMistakes'
 
 /**
  * The quiz home: what you have made, and the way to make more.
@@ -60,6 +61,10 @@ export function QuizHomePage() {
           feature id, so it follows the catalog rather than this file. */}
       <AiCreditNotice featureId={AI_HUB_QUIZ} />
 
+      {/* Above the sets, because it is the thing to act on. Renders nothing until there is a
+          miss to show, so a learner who has never got one wrong never sees it. */}
+      <QuizMistakes />
+
       {loading && sets.length === 0 ? (
         <ListSkeleton />
       ) : sets.length === 0 ? (
@@ -105,9 +110,6 @@ export function QuizHomePage() {
           ))}
         </ul>
       )}
-
-      <p className="text-xs text-content-tertiary text-center">
-      </p>
     </div>
   )
 }

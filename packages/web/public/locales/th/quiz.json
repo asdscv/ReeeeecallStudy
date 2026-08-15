@@ -132,7 +132,8 @@
     "partial": "บางส่วน",
     "not_met": "ไม่ครบ",
     "unjudgeable": "ไม่ได้ตัดสิน",
-    "unjudgeableNote": "บางส่วนตัดสินไม่ได้ จึงไม่ถูกหักคะแนน"
+    "unjudgeableNote": "บางส่วนตัดสินไม่ได้ จึงไม่ถูกหักคะแนน",
+    "weight": "น้ำหนัก {{weight, number}}"
   },
   "aspect": {
     "covers_answer": "ครอบคลุมคำตอบ",
@@ -177,5 +178,14 @@
     "overgeneral": "กว้างเกินไป",
     "plausible_form": "รูปคล้าย",
     "unrelated": "ไม่เกี่ยวข้อง"
+  },
+  "mistakes": {
+    "title": "สมุดข้อผิดพลาด",
+    "summary": "{{cards, number}} การ์ด · {{decks, number}} เด็ค",
+    "expand": "ดู",
+    "collapse": "ซ่อน",
+    "studyAgain": "ทบทวน {{cards, number}} ใบ",
+    "youWrote": "คำตอบของคุณ: {{answer}}",
+    "andMore": "และอีก {{cards, number}} ใบ"
   }
 }

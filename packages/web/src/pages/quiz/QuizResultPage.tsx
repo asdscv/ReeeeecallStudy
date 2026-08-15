@@ -99,6 +99,10 @@ export function QuizResultPage() {
                 <QuizFeedback
                   feedback={item.feedback}
                   rubric={item.rubric}
+                  /* Their own submission, back from the run item. Without it every
+                     `from: "learner"` span renders as nothing and the grading detail the
+                     learner paid for is visible only during the sitting itself. */
+                  learnerText={typeof item.response?.text === 'string' ? item.response.text : undefined}
                   referenceText={item.reference_answer}
                 />
               </div>

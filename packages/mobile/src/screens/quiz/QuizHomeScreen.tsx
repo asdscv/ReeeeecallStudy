@@ -10,6 +10,7 @@ import { Screen, Button, EmptyState, ListSkeleton, ScreenHeader } from '../../co
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
 import type { QuizStackParamList } from '../../navigation/types'
+import { QuizMistakes } from './QuizMistakes'
 
 type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizHome'>
 
@@ -57,6 +58,12 @@ export function QuizHomeScreen() {
           onPress={() => navigation.navigate('QuizSetup')}
           {...testProps('quiz-create')}
         />
+      </View>
+
+      {/* Above the sets, because it is the thing to act on. Renders nothing until there is a
+          miss to show, so a learner who has never got one wrong never sees it. */}
+      <View style={{ marginHorizontal: 16, marginBottom: 12 }}>
+        <QuizMistakes />
       </View>
 
       {loading && sets.length === 0 ? (

@@ -69,17 +69,40 @@ export function QuizFeedback({ feedback, rubric, learnerText, referenceText }: {
           {/* Per criterion, so a learner can see WHICH part they missed rather than one number.
               The aspect comes from the rubric stored with the question — the rubric they were
               graded against, not whatever the generator would produce today. */}
-          <ul className="space-y-1">
+          <ul className="space-y-1.5">
             {essay.criteria.map((criterion) => {
               const aspect = asStoredRubric(rubric).find((c) => c.id === criterion.criterionId)
+              // The span the grader returned for THIS criterion — "here is where you met it",
+              // or on a miss, what in the reference was missed. It was being paid for on every
+              // essay grade and drawn nowhere, which left the screen saying "not met" with no
+              // way to see what that referred to.
+              const { before, hit, after } = splitBySpan(
+                textFor(criterion.span?.from ?? 'learner'), criterion.span)
               return (
-                <li key={criterion.criterionId} className="flex items-baseline justify-between gap-3">
-                  <span className="text-sm text-foreground">
-                    {aspect ? t(`aspect.${aspect.aspect}`) : t('aspect.covers_answer')}
-                  </span>
-                  <span className="text-xs text-content-tertiary shrink-0">
-                    {t(`level.${criterion.level}`)}
-                  </span>
+                <li key={criterion.criterionId}>
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="text-sm text-foreground">
+                      {aspect ? t(`aspect.${aspect.aspect}`) : t('aspect.covers_answer')}
+                      {/* What this part was worth. A learner reading "not met" three times
+                          cannot otherwise tell which one cost them the grade. */}
+                      {aspect && aspect.weight > 0 && (
+                        <span className="text-xs text-content-tertiary ml-1.5">
+                          {t('level.weight', { weight: aspect.weight })}
+                        </span>
+                      )}
+                    </span>
+                    <span className="text-xs text-content-tertiary shrink-0">
+                      {t(`level.${criterion.level}`)}
+                    </span>
+                  </div>
+                  {hit !== '' && (
+                    <p className="text-xs text-content-tertiary mt-0.5">
+                      <span>{t(`span.${criterion.span?.from ?? 'learner'}`)}: </span>
+                      {before}
+                      <mark className="bg-brand/20 text-foreground rounded px-0.5">{hit}</mark>
+                      {after}
+                    </p>
+                  )}
                 </li>
               )
             })}

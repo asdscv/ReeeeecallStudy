@@ -132,7 +132,8 @@
     "partial": "Một phần",
     "not_met": "Chưa đạt",
     "unjudgeable": "Chưa đánh giá",
-    "unjudgeableNote": "Một phần không đánh giá được nên không bị trừ điểm."
+    "unjudgeableNote": "Một phần không đánh giá được nên không bị trừ điểm.",
+    "weight": "trọng số {{weight, number}}"
   },
   "aspect": {
     "covers_answer": "Nêu được ý chính",
@@ -177,5 +178,14 @@
     "overgeneral": "Quá rộng",
     "plausible_form": "Trông giống",
     "unrelated": "Không liên quan"
+  },
+  "mistakes": {
+    "title": "Sổ lỗi sai",
+    "summary": "{{cards, number}} thẻ · {{decks, number}} bộ thẻ",
+    "expand": "Xem",
+    "collapse": "Ẩn",
+    "studyAgain": "Học lại {{cards, number}} thẻ",
+    "youWrote": "Bạn đã viết: {{answer}}",
+    "andMore": "và {{cards, number}} thẻ nữa"
   }
 }

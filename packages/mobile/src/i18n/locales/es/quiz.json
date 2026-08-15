@@ -132,7 +132,8 @@
     "partial": "En parte",
     "not_met": "Sin cubrir",
     "unjudgeable": "Sin juzgar",
-    "unjudgeableNote": "Parte de esto no se pudo juzgar, así que no te ha penalizado."
+    "unjudgeableNote": "Parte de esto no se pudo juzgar, así que no te ha penalizado.",
+    "weight": "vale {{weight, number}}"
   },
   "aspect": {
     "covers_answer": "Cubre la respuesta",
@@ -177,5 +178,14 @@
     "overgeneral": "Demasiado amplio",
     "plausible_form": "Se parece",
     "unrelated": "Sin relación"
+  },
+  "mistakes": {
+    "title": "Errores",
+    "summary": "{{cards, number}} tarjetas · {{decks, number}} mazos",
+    "expand": "Ver",
+    "collapse": "Ocultar",
+    "studyAgain": "Estudiar {{cards, number}} de nuevo",
+    "youWrote": "Escribiste: {{answer}}",
+    "andMore": "y {{cards, number}} más"
   }
 }

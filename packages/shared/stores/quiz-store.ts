@@ -140,6 +140,34 @@ export interface QuizRunItem {
   meta: Record<string, unknown> | null
   rubric: unknown[] | null
   reference_answer: string | null
+  /**
+   * The learner's own submission — `{ text }` for written answers, `{ choice }` for multiple
+   * choice. Null until they answer.
+   *
+   * The result screen needs it to render the grading spans it already paid for: they are
+   * character ranges into the learner's own words, and a screen without those words drops every
+   * one of them silently.
+   */
+  response: Record<string, unknown> | null
+}
+
+/**
+ * One thing the learner got wrong, ready to read without opening anything.
+ *
+ * `card_id` is what makes the list actionable rather than a report card — it is the same id
+ * `StudyConfig.cardIds` takes, so "study these again" is one call away.
+ */
+export interface QuizMistake {
+  attempt_id: string
+  card_id: string | null
+  deck_id: string | null
+  deck_name: string | null
+  question_type: QuizQuestionType
+  stem: string
+  reference_answer: string | null
+  response: Record<string, unknown> | null
+  score: number
+  answered_at: string
 }
 
 export interface QuizRun {
@@ -235,6 +263,8 @@ interface QuizState {
   loading: boolean
   generating: boolean
   grading: boolean
+  /** The 오답 노트, as last loaded. Empty until `loadMistakes` runs. */
+  mistakes: QuizMistake[]
 
   fetchSets: () => Promise<void>
   countQuizzable: (deckId: string, scope?: QuizScopeKind, tags?: string[], cardIds?: string[]) => Promise<QuizzableCount>
@@ -296,6 +326,18 @@ interface QuizState {
   gradeWithAi: (itemId: string, answer: string, maxPriceMicro: number) => Promise<void>
   override: (itemId: string, score: number) => Promise<void>
   finishRun: (runId: string) => Promise<void>
+
+  /**
+   * What the learner has been getting wrong, newest first.
+   *
+   * A read over attempts that were already being recorded and never read back. It writes
+   * nothing and moves no SRS schedule: a quiz answer quietly rescheduling reviews would let one
+   * casual sitting rearrange weeks of study, so the misses are shown and the decision to
+   * restudy them stays the learner's.
+   */
+  loadMistakes: (deckId?: string, limit?: number) => Promise<void>
+  /** How many distinct cards are in that list — a card missed four times is one card. */
+  countMistakes: (deckId?: string) => Promise<number>
 }
 
 export const useQuizStore = create<QuizState>((set, get) => ({
@@ -305,6 +347,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   generating: false,
   generateProgress: null,
   grading: false,
+  mistakes: [],
 
   fetchSets: async () => {
     set({ loading: true })
@@ -623,7 +666,74 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     if (error) throw error
     await get().loadRun(runId)
   },
+
+  loadMistakes: async (deckId, limit) => {
+    set({ loading: true })
+    try {
+      const { data, error } = await supabase.rpc('get_quiz_mistakes', {
+        p_deck_id: deckId ?? null, p_limit: limit ?? 50,
+      })
+      if (error) throw error
+      set({ mistakes: (data ?? []) as QuizMistake[] })
+    } finally {
+      set({ loading: false })
+    }
+  },
+
+  countMistakes: async (deckId) => {
+    const { data, error } = await supabase.rpc('count_quiz_mistakes', { p_deck_id: deckId ?? null })
+    if (error) throw error
+    return (data as number | null) ?? 0
+  },
 }))
+
+/**
+ * What the learner actually wrote, or the option they picked, as one readable line.
+ *
+ * The response shape is the submission payload — `{ text }` or `{ choice }` — and a mistakes
+ * list that printed raw JSON would be unreadable. A choice INDEX is deliberately not resolved
+ * to its option text here: the options were shuffled for that sitting and the stored order is
+ * canonical, so an index off this row would name the wrong answer more often than not.
+ */
+export function mistakeResponseText(m: Pick<QuizMistake, 'response'>): string | null {
+  const text = m.response?.text
+  return typeof text === 'string' && text.trim() !== '' ? text.trim() : null
+}
+
+export interface MistakeDeckGroup {
+  readonly deckId: string
+  readonly deckName: string
+  readonly items: readonly QuizMistake[]
+}
+
+/**
+ * The misses, one row per card, bucketed by deck.
+ *
+ * Grouped because the deck is the unit a study session takes — cards from two decks cannot be one
+ * session, so a flat list would offer a "study these again" button that cannot work.
+ *
+ * One row per card because a card missed four times is one card to restudy, not four copies of
+ * the same stem. The input is newest-first, so the row kept is the most recent attempt: the
+ * learner's latest answer is the one worth showing them.
+ *
+ * A miss whose card has been deleted is dropped. There is nothing to restudy and no deck to open,
+ * and listing it would be a row whose only action is broken.
+ */
+export function groupMistakesByDeck(
+  mistakes: readonly QuizMistake[],
+): MistakeDeckGroup[] {
+  const seen = new Set<string>()
+  const byDeck = new Map<string, { deckId: string; deckName: string; items: QuizMistake[] }>()
+  for (const m of mistakes) {
+    if (!m.card_id || !m.deck_id) continue
+    if (seen.has(m.card_id)) continue
+    seen.add(m.card_id)
+    const bucket = byDeck.get(m.deck_id)
+    if (bucket) bucket.items.push(m)
+    else byDeck.set(m.deck_id, { deckId: m.deck_id, deckName: m.deck_name ?? '', items: [m] })
+  }
+  return [...byDeck.values()]
+}
 
 /**
  * Why each wrong option is wrong, in the order the options were served.

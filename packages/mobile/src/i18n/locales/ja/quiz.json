@@ -132,7 +132,8 @@
     "partial": "一部",
     "not_met": "満たしていない",
     "unjudgeable": "判断なし",
-    "unjudgeableNote": "一部は判断できなかったため、減点していません。"
+    "unjudgeableNote": "一部は判断できなかったため、減点していません。",
+    "weight": "配点 {{weight, number}}"
   },
   "aspect": {
     "covers_answer": "要点を押さえている",
@@ -177,5 +178,14 @@
     "overgeneral": "広すぎる",
     "plausible_form": "形が似ている",
     "unrelated": "無関係"
+  },
+  "mistakes": {
+    "title": "間違いノート",
+    "summary": "{{cards, number}}枚 · {{decks, number}}デッキ",
+    "expand": "表示",
+    "collapse": "閉じる",
+    "studyAgain": "{{cards, number}}枚を復習",
+    "youWrote": "あなたの答え: {{answer}}",
+    "andMore": "ほか{{cards, number}}枚"
   }
 }
