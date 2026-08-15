@@ -26,7 +26,7 @@ describe('what grading costs', () => {
       key: 'pricing.gradeCost', params: { amount: '$0.01' },
     })
     // grade_essay is 8 units — four times the price, and it has to say so.
-    expect(gradeCostLine(quote({ price_micro: 40_000 })).params.amount).toBe('$0.04')
+    expect(gradeCostLine(quote({ price_micro: 40_000 }))!.params.amount).toBe('$0.04')
   })
 
   it('says free, and how much free is left', () => {
