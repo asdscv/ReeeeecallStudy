@@ -170,7 +170,8 @@
       "streak": "Streak",
       "study": "Study",
       "social": "Social",
-      "milestone": "Milestone"
+      "milestone": "Milestone",
+      "ai": "AI 学习"
     },
     "badge": {
       "streak_3": "3-Day Streak",
@@ -187,7 +188,17 @@
       "deck_share": "First Deck Shared",
       "marketplace_pub": "Published to Marketplace",
       "first_study": "First Study Session",
-      "mastery_50": "掌握 50 张卡片"
+      "mastery_50": "掌握 50 张卡片",
+      "perfect_quiz": "满分测验",
+      "comeback": "逆转",
+      "quizzes_1": "首次测验",
+      "quizzes_5": "测验5次",
+      "quizzes_10": "测验10次",
+      "ai_cards_10": "AI卡片10张",
+      "ai_cards_50": "AI卡片50张",
+      "ai_cards_100": "AI卡片100张",
+      "graded_1": "首次AI批改",
+      "graded_10": "AI批改10次"
     },
     "badgeDesc": {
       "streak_3": "Study 3 days in a row",
@@ -281,7 +292,10 @@
     "cards": "Cards Studied",
     "sessions": "Sessions",
     "time": "Study Time",
-    "mastery": "Cards Mastered"
+    "mastery": "Cards Mastered",
+    "quizzes": "完成的测验",
+    "ai_cards": "AI 生成的卡片",
+    "graded": "AI 批改"
   },
   "appDownload": {
     "heading": "获取应用",

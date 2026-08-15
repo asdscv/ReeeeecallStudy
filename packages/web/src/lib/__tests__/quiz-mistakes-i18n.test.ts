@@ -167,3 +167,61 @@ describe('the translations are actually different from each other', () => {
     }
   })
 })
+
+/**
+ * The AI history and the AI badges, in every language.
+ *
+ * 기록 read study sessions and nothing else, and 업적 had 57 definitions about card study and
+ * none about the part of the app that costs money. Both now say something, and both have to say
+ * it in all eight.
+ */
+describe.each(['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id', 'es'] as const)('%s — AI 기록/업적', (lng) => {
+  const quiz = () => t('web', lng)
+  const common = () => {
+    const i18n = createInstance()
+    void i18n.init({
+      lng,
+      resources: { [lng]: { common: JSON.parse(readFileSync(
+        resolve(__dirname, `../../../public/locales/${lng}/common.json`), 'utf-8')) } },
+      ns: ['common'], defaultNS: 'common', initImmediate: false,
+      interpolation: { escapeValue: false },
+    })
+    return i18n.getFixedT(lng, 'common')
+  }
+
+  it('names every AI job kind', () => {
+    const tf = quiz()
+    // The list renders whatever `job_kind`/`quiz_action` the server sends. A missing key here
+    // shows the learner a raw enum like `image_deck`.
+    for (const kind of ['cards', 'deck', 'template', 'image', 'image_deck', 'remediation', 'quiz',
+      'generate_mcq', 'generate_short', 'generate_essay', 'grade_short', 'grade_essay',
+      'quiz_answer_key'] as const) {
+      const out = tf(`activity.job.${kind}`)
+      expect(out, kind).not.toBe(`activity.job.${kind}`)
+      expect(out.trim(), kind).not.toBe('')
+    }
+  })
+
+  it('titles the section and prices a job', () => {
+    const tf = quiz()
+    expect(tf('activity.title')).not.toBe('activity.title')
+    const line = tf('activity.quiz', { title: 'X', n: 3 })
+    expect(line).toContain('X')
+    expect(line).toContain('3')
+    // "무료" is information, not an absence — it has to exist as a word.
+    expect(tf('activity.free')).not.toBe('activity.free')
+    expect(tf('activity.refunded')).not.toBe('activity.refunded')
+  })
+
+  it('names the AI achievement category and its badges', () => {
+    const tf = common()
+    expect(tf('achievements.category.ai')).not.toBe('achievements.category.ai')
+    for (const id of ['perfect_quiz', 'comeback', 'quizzes_1', 'ai_cards_10', 'graded_1'] as const) {
+      expect(tf(`achievements.badge.${id}`), id).not.toBe(`achievements.badge.${id}`)
+    }
+    // The "next goal" rows read from `goals.<category>`, and three categories are new.
+    for (const cat of ['quizzes', 'ai_cards', 'graded'] as const) {
+      expect(tf(`goals.${cat}`), cat).not.toBe(`goals.${cat}`)
+    }
+  })
+})

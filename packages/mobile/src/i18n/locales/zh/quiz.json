@@ -217,5 +217,26 @@
     "gradeCost": "批改将扣除{{amount}}",
     "retakeMcq": "题目相同，只是选项顺序变化。重做和批改都免费。",
     "retakeWritten": "重做相同的题目。重做免费，批改是重新调用，所以每次都会扣费。"
+  },
+  "activity": {
+    "title": "AI 学习记录",
+    "quiz": "{{title}} · 第{{n, number}}次",
+    "free": "免费",
+    "refunded": "已退款",
+    "job": {
+      "cards": "AI 生成卡片",
+      "deck": "AI 创建卡组",
+      "template": "AI 模板",
+      "image": "AI 图片",
+      "image_deck": "AI 卡组封面",
+      "remediation": "AI 讲解",
+      "quiz": "AI 测验",
+      "generate_mcq": "生成选择题",
+      "generate_short": "生成简答题",
+      "generate_essay": "生成论述题",
+      "grade_short": "简答批改",
+      "grade_essay": "论述批改",
+      "quiz_answer_key": "判定答案栏"
+    }
   }
 }

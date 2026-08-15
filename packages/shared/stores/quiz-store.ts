@@ -134,6 +134,33 @@ export interface QuizSetRow {
   last_tally?: QuizRunCounts | null
 }
 
+/**
+ * One thing the learner did through AI — a quiz sitting, or a generation job.
+ *
+ * Two shapes in one list because they are one timeline. `kind` says which, and the fields the
+ * other kind does not have are simply absent rather than nulled into a shared shape.
+ */
+export interface AiActivityEntry {
+  kind: 'quiz' | 'ai_gen'
+  id: string
+  at: string
+  /** What it cost, micro-USD. Zero inside the free allowance, and zero is worth showing. */
+  price_micro: number
+  // quiz
+  title?: string
+  deck_name?: string | null
+  question_type?: QuizQuestionType
+  attempt_no?: number
+  status?: string
+  tally?: QuizRunCounts
+  // ai_gen
+  job_kind?: string
+  cards?: number
+  images?: number
+  quiz_action?: string | null
+  refunded?: boolean
+}
+
 /** One sitting, for the per-set history. */
 export interface QuizSetHistoryRun {
   run_id: string
@@ -389,6 +416,15 @@ interface QuizState {
    * for. The list already carries the last one, which is what the collapsed row needs.
    */
   loadSetHistory: (setId: string) => Promise<QuizSetHistoryRun[]>
+
+  /**
+   * What the learner has done through AI, newest first.
+   *
+   * 기록 read `study_sessions` and nothing else, so an afternoon of generating a deck, sitting
+   * three quizzes and paying for six gradings showed as an empty day. Quiz sittings and
+   * generation jobs are both here, each with what it cost.
+   */
+  loadAiActivity: (limit?: number) => Promise<AiActivityEntry[]>
 
   /**
    * One set, loaded from its id.
@@ -744,6 +780,14 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     const { data, error } = await supabase.rpc('count_quiz_mistakes', { p_deck_id: deckId ?? null })
     if (error) throw error
     return (data as number | null) ?? 0
+  },
+
+  loadAiActivity: async (limit) => {
+    const { data, error } = await supabase.rpc('get_ai_activity', {
+      p_limit: limit ?? 50, p_since: null,
+    })
+    if (error) throw error
+    return (data ?? []) as AiActivityEntry[]
   },
 
   loadSet: async (setId) => {

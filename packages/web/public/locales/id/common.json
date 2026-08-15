@@ -170,7 +170,8 @@
       "streak": "Streak",
       "study": "Study",
       "social": "Social",
-      "milestone": "Milestone"
+      "milestone": "Milestone",
+      "ai": "AI"
     },
     "badge": {
       "streak_3": "3-Day Streak",
@@ -187,7 +188,17 @@
       "deck_share": "First Deck Shared",
       "marketplace_pub": "Published to Marketplace",
       "first_study": "First Study Session",
-      "mastery_50": "50 kartu dikuasai"
+      "mastery_50": "50 kartu dikuasai",
+      "perfect_quiz": "Kuis sempurna",
+      "comeback": "Bangkit",
+      "quizzes_1": "Kuis pertama",
+      "quizzes_5": "5 kuis",
+      "quizzes_10": "10 kuis",
+      "ai_cards_10": "10 kartu AI",
+      "ai_cards_50": "50 kartu AI",
+      "ai_cards_100": "100 kartu AI",
+      "graded_1": "Penilaian AI pertama",
+      "graded_10": "10 penilaian AI"
     },
     "badgeDesc": {
       "streak_3": "Study 3 days in a row",
@@ -281,7 +292,10 @@
     "cards": "Cards Studied",
     "sessions": "Sessions",
     "time": "Study Time",
-    "mastery": "Cards Mastered"
+    "mastery": "Cards Mastered",
+    "quizzes": "Kuis dikerjakan",
+    "ai_cards": "Kartu buatan AI",
+    "graded": "Penilaian AI"
   },
   "appDownload": {
     "heading": "Dapatkan aplikasi",

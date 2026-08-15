@@ -217,5 +217,26 @@
     "gradeCost": "採点すると{{amount}}かかります",
     "retakeMcq": "同じ問題です。選択肢の順序だけ変わり、解き直しも採点も無料です。",
     "retakeWritten": "同じ問題をもう一度解きます。解き直しは無料で、採点は新しく行うため毎回かかります。"
+  },
+  "activity": {
+    "title": "AI 学習履歴",
+    "quiz": "{{title}} · {{n, number}}回目",
+    "free": "無料",
+    "refunded": "返金済み",
+    "job": {
+      "cards": "AIカード生成",
+      "deck": "AIデッキ作成",
+      "template": "AIテンプレート",
+      "image": "AI画像",
+      "image_deck": "AIデッキ画像",
+      "remediation": "AI解説",
+      "quiz": "AIクイズ",
+      "generate_mcq": "選択式の生成",
+      "generate_short": "記述式の生成",
+      "generate_essay": "論述の生成",
+      "grade_short": "記述式の採点",
+      "grade_essay": "論述の採点",
+      "quiz_answer_key": "解答欄の判定"
+    }
   }
 }

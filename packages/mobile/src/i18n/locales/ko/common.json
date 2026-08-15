@@ -157,7 +157,8 @@
       "streak": "연속 학습",
       "study": "학습",
       "social": "소셜",
-      "milestone": "마일스톤"
+      "milestone": "마일스톤",
+      "ai": "AI 학습"
     },
     "badge": {
       "streak_3": "3일 연속 학습",
@@ -174,7 +175,17 @@
       "deck_share": "첫 덱 공유",
       "marketplace_pub": "마켓에 출판",
       "first_study": "첫 학습 완료",
-      "mastery_50": "카드 50장 숙련"
+      "mastery_50": "카드 50장 숙련",
+      "perfect_quiz": "만점 퀴즈",
+      "comeback": "설욕전",
+      "quizzes_1": "첫 퀴즈",
+      "quizzes_5": "퀴즈 5회",
+      "quizzes_10": "퀴즈 10회",
+      "ai_cards_10": "AI 카드 10장",
+      "ai_cards_50": "AI 카드 50장",
+      "ai_cards_100": "AI 카드 100장",
+      "graded_1": "첫 AI 채점",
+      "graded_10": "AI 채점 10회"
     },
     "badgeDesc": {
       "streak_3": "3일 연속으로 학습하기",
@@ -200,7 +211,10 @@
     "cards": "학습한 카드",
     "sessions": "학습 세션",
     "time": "학습 시간",
-    "mastery": "마스터한 카드"
+    "mastery": "마스터한 카드",
+    "quizzes": "푼 퀴즈",
+    "ai_cards": "AI로 만든 카드",
+    "graded": "AI 채점"
   },
   "cancel": "취소",
   "loading": "로딩 중...",

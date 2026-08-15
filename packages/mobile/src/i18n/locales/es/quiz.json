@@ -217,5 +217,26 @@
     "gradeCost": "Corregir cuesta {{amount}}",
     "retakeMcq": "Las mismas preguntas, con las opciones reordenadas. Repetir y corregir son gratis.",
     "retakeWritten": "Las mismas preguntas otra vez. Repetir es gratis; corregir es una llamada nueva y cuesta cada vez."
+  },
+  "activity": {
+    "title": "Actividad de IA",
+    "quiz": "{{title}} · intento {{n, number}}",
+    "free": "Gratis",
+    "refunded": "Reembolsado",
+    "job": {
+      "cards": "Tarjetas con IA",
+      "deck": "Mazo con IA",
+      "template": "Plantilla con IA",
+      "image": "Imagen con IA",
+      "image_deck": "Imagen del mazo",
+      "remediation": "Explicación con IA",
+      "quiz": "Cuestionario con IA",
+      "generate_mcq": "Opción múltiple",
+      "generate_short": "Respuesta corta",
+      "generate_essay": "Ensayo",
+      "grade_short": "Corrección corta",
+      "grade_essay": "Corrección de ensayo",
+      "quiz_answer_key": "Campo de respuesta"
+    }
   }
 }

@@ -182,7 +182,8 @@
       "streak": "Streak",
       "study": "Study",
       "social": "Social",
-      "milestone": "Milestone"
+      "milestone": "Milestone",
+      "ai": "AI"
     },
     "badge": {
       "streak_3": "3-Day Streak",
@@ -199,7 +200,17 @@
       "deck_share": "First Deck Shared",
       "marketplace_pub": "Published to Marketplace",
       "first_study": "First Study Session",
-      "mastery_50": "50 Cards Mastered"
+      "mastery_50": "50 Cards Mastered",
+      "perfect_quiz": "Perfect quiz",
+      "comeback": "Comeback",
+      "quizzes_1": "First quiz",
+      "quizzes_5": "5 quizzes",
+      "quizzes_10": "10 quizzes",
+      "ai_cards_10": "10 AI cards",
+      "ai_cards_50": "50 AI cards",
+      "ai_cards_100": "100 AI cards",
+      "graded_1": "First AI grade",
+      "graded_10": "10 AI grades"
     },
     "badgeDesc": {
       "streak_3": "Study 3 days in a row",
@@ -281,7 +292,10 @@
     "cards": "Cards Studied",
     "sessions": "Sessions",
     "time": "Study Time",
-    "mastery": "Cards Mastered"
+    "mastery": "Cards Mastered",
+    "quizzes": "Quizzes taken",
+    "ai_cards": "AI-made cards",
+    "graded": "AI gradings"
   },
   "appDownload": {
     "heading": "Get the app",

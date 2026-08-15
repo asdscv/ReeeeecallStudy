@@ -13,12 +13,16 @@ import {
 } from '../stores/gamification-store'
 import type { Achievement, NextGoal } from '../stores/gamification-store'
 
-const CATEGORY_ORDER: Achievement['category'][] = ['streak', 'study', 'social', 'milestone']
+// `ai` sits after study and before social: it IS studying, and it is what the learner pays for.
+const CATEGORY_ORDER: Achievement['category'][] = ['streak', 'study', 'ai', 'social', 'milestone']
 const CATEGORY_EMOJI: Record<string, string> = {
   streak: '\uD83D\uDD25',
   study: '\uD83D\uDCD6',
   social: '\uD83E\uDD1D',
   milestone: '\uD83C\uDFC6',
+  // Quizzes, generation and grading — mig 228. Without a row the category fell through to the
+  // 🎯 default and looked like nothing in particular.
+  ai: '\uD83E\uDD16',
 }
 
 function formatValue(category: string, value: number): string {

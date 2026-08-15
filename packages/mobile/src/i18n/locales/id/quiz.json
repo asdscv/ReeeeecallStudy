@@ -217,5 +217,26 @@
     "gradeCost": "Penilaian dikenakan {{amount}}",
     "retakeMcq": "Soal yang sama, hanya urutan pilihan yang berubah. Mengulang dan menilai sama-sama gratis.",
     "retakeWritten": "Soal yang sama lagi. Mengulang gratis; penilaian adalah panggilan baru, jadi dikenakan biaya tiap kali."
+  },
+  "activity": {
+    "title": "Aktivitas AI",
+    "quiz": "{{title}} · percobaan {{n, number}}",
+    "free": "Gratis",
+    "refunded": "Dikembalikan",
+    "job": {
+      "cards": "Kartu AI",
+      "deck": "Dek AI",
+      "template": "Templat AI",
+      "image": "Gambar AI",
+      "image_deck": "Gambar dek AI",
+      "remediation": "Penjelasan AI",
+      "quiz": "Kuis AI",
+      "generate_mcq": "Pilihan ganda",
+      "generate_short": "Isian singkat",
+      "generate_essay": "Esai",
+      "grade_short": "Penilaian isian",
+      "grade_essay": "Penilaian esai",
+      "quiz_answer_key": "Kolom jawaban"
+    }
   }
 }

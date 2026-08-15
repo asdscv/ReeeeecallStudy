@@ -130,7 +130,8 @@
       "streak": "Streak",
       "study": "Study",
       "social": "Social",
-      "milestone": "Milestone"
+      "milestone": "Milestone",
+      "ai": "AI"
     },
     "badge": {
       "streak_3": "3-Day Streak",
@@ -147,7 +148,17 @@
       "deck_share": "First Deck Shared",
       "marketplace_pub": "Published to Marketplace",
       "first_study": "First Study Session",
-      "mastery_50": "เชี่ยวชาญ 50 ใบ"
+      "mastery_50": "เชี่ยวชาญ 50 ใบ",
+      "perfect_quiz": "ทำได้เต็ม",
+      "comeback": "แก้ตัวสำเร็จ",
+      "quizzes_1": "แบบทดสอบแรก",
+      "quizzes_5": "5 แบบทดสอบ",
+      "quizzes_10": "10 แบบทดสอบ",
+      "ai_cards_10": "การ์ด AI 10 ใบ",
+      "ai_cards_50": "การ์ด AI 50 ใบ",
+      "ai_cards_100": "การ์ด AI 100 ใบ",
+      "graded_1": "ตรวจด้วย AI ครั้งแรก",
+      "graded_10": "ตรวจด้วย AI 10 ครั้ง"
     },
     "badgeDesc": {
       "streak_3": "Study 3 days in a row",
@@ -179,7 +190,10 @@
     "cards": "Cards Studied",
     "sessions": "Sessions",
     "time": "Study Time",
-    "mastery": "Cards Mastered"
+    "mastery": "Cards Mastered",
+    "quizzes": "แบบทดสอบที่ทำ",
+    "ai_cards": "การ์ดจาก AI",
+    "graded": "การตรวจด้วย AI"
   },
   "drawerTips": {
     "hamburger": "แตะเมนู (☰) เพื่อนำทาง",

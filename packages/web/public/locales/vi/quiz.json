@@ -217,5 +217,26 @@
     "gradeCost": "Chấm bài tốn {{amount}}",
     "retakeMcq": "Vẫn là câu hỏi đó, chỉ đảo thứ tự đáp án. Làm lại và chấm đều miễn phí.",
     "retakeWritten": "Vẫn là câu hỏi đó. Làm lại miễn phí; chấm bài là lượt gọi mới nên tính phí mỗi lần."
+  },
+  "activity": {
+    "title": "Hoạt động AI",
+    "quiz": "{{title}} · lần {{n, number}}",
+    "free": "Miễn phí",
+    "refunded": "Đã hoàn",
+    "job": {
+      "cards": "Tạo thẻ bằng AI",
+      "deck": "Tạo bộ thẻ bằng AI",
+      "template": "Mẫu AI",
+      "image": "Ảnh AI",
+      "image_deck": "Ảnh bộ thẻ",
+      "remediation": "Giải thích AI",
+      "quiz": "Bài kiểm tra AI",
+      "generate_mcq": "Tạo trắc nghiệm",
+      "generate_short": "Tạo tự luận ngắn",
+      "generate_essay": "Tạo bài luận",
+      "grade_short": "Chấm tự luận ngắn",
+      "grade_essay": "Chấm bài luận",
+      "quiz_answer_key": "Xác định ô đáp án"
+    }
   }
 }

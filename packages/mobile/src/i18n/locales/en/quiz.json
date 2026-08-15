@@ -217,5 +217,26 @@
     "gradeCost": "Grading costs {{amount}}",
     "retakeMcq": "The same questions, with the options reshuffled. Retaking and grading are both free.",
     "retakeWritten": "The same questions again. Retaking is free; grading is a fresh call, so it costs each time."
+  },
+  "activity": {
+    "title": "AI activity",
+    "quiz": "{{title}} · attempt {{n, number}}",
+    "free": "Free",
+    "refunded": "Refunded",
+    "job": {
+      "cards": "AI cards",
+      "deck": "AI deck",
+      "template": "AI template",
+      "image": "AI image",
+      "image_deck": "AI deck image",
+      "remediation": "AI explanation",
+      "quiz": "AI quiz",
+      "generate_mcq": "Multiple choice",
+      "generate_short": "Short answer",
+      "generate_essay": "Essay",
+      "grade_short": "Short-answer grading",
+      "grade_essay": "Essay grading",
+      "quiz_answer_key": "Answer field"
+    }
   }
 }

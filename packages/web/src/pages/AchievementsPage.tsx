@@ -8,7 +8,8 @@ import { AchievementIcon, CategoryIcon } from '../components/achievements/Achiev
 
 // ── Helpers ──
 
-const CATEGORY_ORDER: Achievement['category'][] = ['streak', 'study', 'social', 'milestone']
+// `ai` sits after study and before social: it IS studying, and it is what the learner pays for.
+const CATEGORY_ORDER: Achievement['category'][] = ['streak', 'study', 'ai', 'social', 'milestone']
 
 function xpForLevel(level: number): number {
   return (level - 1) * 150

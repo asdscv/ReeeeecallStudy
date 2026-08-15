@@ -39,6 +39,7 @@ import { ModeBreakdownCards } from '../components/study-history/ModeBreakdownCar
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import { ListSkeleton } from '../components/common/Skeleton'
 import type { StudySession, StudyLog, Card, Deck, DeckStudyState } from '../types/database'
+import { AiActivityList } from '../components/study-history/AiActivityList'
 
 const PersonalAnalyticsContent = lazy(() =>
   import('./PersonalAnalyticsPage').then(m => ({ default: m.PersonalAnalyticsContent }))
@@ -320,6 +321,11 @@ export function StudyHistoryPage() {
         </div>
       ) : (
       <>
+      {/* Everything the learner did through AI. 기록 read `study_sessions` and `study_logs` and
+          nothing else, so an afternoon of generating a deck, sitting three quizzes and paying
+          for six gradings showed here as an empty day. Renders nothing when there is none. */}
+      <AiActivityList />
+
       {/* ── Deck Scope + Period Selection ── */}
       <div className="flex flex-col gap-3">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-end gap-3">

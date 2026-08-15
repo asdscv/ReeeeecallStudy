@@ -217,5 +217,26 @@
     "gradeCost": "채점하면 {{amount}} 차감돼요",
     "retakeMcq": "같은 문제를 다시 풀어요. 보기 순서만 바뀌고, 다시 풀기도 채점도 무료예요.",
     "retakeWritten": "같은 문제를 다시 풀어요. 다시 푸는 건 무료이고, 채점은 새로 하는 거라 회차마다 차감돼요."
+  },
+  "activity": {
+    "title": "AI 학습 기록",
+    "quiz": "{{title}} · {{n, number}}회차",
+    "free": "무료",
+    "refunded": "환불됨",
+    "job": {
+      "cards": "AI 카드 생성",
+      "deck": "AI 덱 만들기",
+      "template": "AI 템플릿",
+      "image": "AI 이미지",
+      "image_deck": "AI 덱 이미지",
+      "remediation": "AI 해설",
+      "quiz": "AI 퀴즈",
+      "generate_mcq": "객관식 생성",
+      "generate_short": "주관식 생성",
+      "generate_essay": "서술형 생성",
+      "grade_short": "주관식 채점",
+      "grade_essay": "서술형 채점",
+      "quiz_answer_key": "정답 필드 판별"
+    }
   }
 }
