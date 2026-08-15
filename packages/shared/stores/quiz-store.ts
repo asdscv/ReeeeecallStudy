@@ -323,11 +323,31 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   },
 
   countQuizzable: async (deckId, scope = 'deck', tags = [], cardIds = []) => {
-    const { data, error } = await supabase.rpc('count_quizzable_cards', {
-      p_deck_id: deckId, p_scope_kind: scope, p_tags: tags, p_card_ids: cardIds,
-    })
-    if (error) throw error
-    return (data ?? { total: 0, eligible: 0 }) as QuizzableCount
+    const read = async () => {
+      const { data, error } = await supabase.rpc('count_quizzable_cards', {
+        p_deck_id: deckId, p_scope_kind: scope, p_tags: tags, p_card_ids: cardIds,
+      })
+      if (error) throw error
+      return (data ?? { total: 0, eligible: 0 }) as QuizzableCount
+    }
+
+    const counts = await read()
+    // A deck with cards but nothing quizzable is almost always a template that declares two
+    // answers on the back, or none — 342 of the 771 cards on the reporting account were refused
+    // for exactly that. It is a question a model can settle from the author's own field labels,
+    // once per template, so ask rather than showing a dead end and instructions to go and edit
+    // a template. Free, and idempotent: a template that already has a key is not re-asked.
+    if (counts.total > 0 && counts.eligible === 0) {
+      try {
+        const { error } = await supabase.functions.invoke('ai-generate', {
+          body: { kind: 'quiz_answer_key', deckId },
+        })
+        if (!error) return await read()
+      } catch {
+        // The deck was unquizzable before and still is; the screen's own message covers it.
+      }
+    }
+    return counts
   },
 
   difficultyLevels: async () => {

@@ -296,6 +296,8 @@ const DEFAULT_TEMPERATURE = 0.8
  * costs us a wasted provider call, which is why they are set well above the observed maximum.
  */
 const OUTPUT_CAP: Record<string, number> = {
+  // One field key and a sentence of reasoning. Nothing here should be long.
+  quiz_answer_key: 400,
   quiz_generate: 3000,
   quiz_grade: 800,
   remediation: 1500,
@@ -603,7 +605,7 @@ Deno.serve(async (req) => {
     if (!body) return json({ error: 'Invalid body', code: 'BAD_REQUEST' }, 400, cors)
 
     const kind = body.kind
-    if (kind !== 'template' && kind !== 'deck' && kind !== 'cards' && kind !== 'image' && kind !== 'image_deck' && kind !== 'remediation' && kind !== 'quiz_generate' && kind !== 'quiz_grade') {
+    if (kind !== 'template' && kind !== 'deck' && kind !== 'cards' && kind !== 'image' && kind !== 'image_deck' && kind !== 'remediation' && kind !== 'quiz_generate' && kind !== 'quiz_grade' && kind !== 'quiz_answer_key') {
       return json({ error: 'Invalid kind', code: 'BAD_REQUEST' }, 400, cors)
     }
     const uiLang = typeof body.uiLang === 'string' ? body.uiLang : 'en'
@@ -731,7 +733,7 @@ Deno.serve(async (req) => {
           if (answerCard?.template_id) {
             const templateResult = await service
               .from('card_templates')
-              .select('id, fields, front_layout, back_layout')
+              .select('id, fields, front_layout, back_layout, quiz_answer_key')
               .eq('id', answerCard.template_id)
               .maybeSingle()
             if (templateResult.error) console.error('[ai-generate] template read failed:', templateResult.error.message)
@@ -819,6 +821,94 @@ Deno.serve(async (req) => {
     // and this function inserts the card's own primary field at a position derived from the
     // item id, so a wrong answer cannot be smuggled into the correct slot and position bias
     // is unreachable rather than merely mitigated.
+    // ── Which back field is the answer — one choice per TEMPLATE, not per card ──
+    //
+    // Four of five decks on the reporting account could not make a quiz: 342 of 771 cards, every
+    // one refused because its template declared two answers on the back, or none. `_quiz_eligible
+    // _cards` needs exactly one, and it was right to refuse rather than guess — on 영작 오답노트
+    // the first primary is the learner's OWN MISTAKE, so picking by layout order would have
+    // graded every answer against the wrong expression.
+    //
+    // A model does not have to guess: it reads the labels the author wrote. On that deck the
+    // options are "틀린 표현" and "올바른 표현"; on 50일 수학 they are "핵심개념", "예시", "암기팁".
+    //
+    // Cheap on purpose. The ambiguity belongs to the TEMPLATE, so all 29 cards of a deck share
+    // one question — one small call, stored, and every future quiz on that deck is free of it.
+    // The model returns a KEY, never text, and `set_quiz_answer_key` refuses a key that is not a
+    // text field on that template's back. The property `ai-quiz.ts` states — a model that cannot
+    // type the answer cannot mistype it — is untouched: the worst case is the wrong existing
+    // field, visible in one column, not an invented answer.
+    if (kind === 'quiz_answer_key') {
+      const deckId = typeof body.deckId === 'string' ? body.deckId : null
+      if (!deckId) return json({ error: 'deckId required', code: 'BAD_REQUEST' }, 400, cors)
+
+      const { data: pending, error: readErr } = await sbUser.rpc(
+        'get_quiz_answer_candidates', { p_deck_id: deckId })
+      if (readErr) {
+        if (readErr.code === '42501') return json({ error: 'Deck not accessible', code: 'FORBIDDEN' }, 403, cors)
+        console.error('[ai-generate] answer-key read error:', readErr.message)
+        return json({ error: 'Could not read the deck', code: 'AI_METER_ERROR' }, 500, cors)
+      }
+      const templates = Array.isArray(pending) ? pending : []
+      // Nothing ambiguous: the deck was already quizzable, or is refused for a reason a choice
+      // cannot fix (no text on a face, answer repeated on the front).
+      if (templates.length === 0) return json({ content: { resolved: 0 } }, 200, cors)
+
+      const service = sbServiceRole()
+      const chain = resolveModelChain('text', ENV)
+      let resolved = 0
+      const decisions: Array<{ template: string; key: string }> = []
+
+      for (const tpl of templates) {
+        const candidates = Array.isArray(tpl?.candidates) ? tpl.candidates : []
+        if (candidates.length < 2) continue
+        const keys = candidates.map((c: { key: string }) => c.key)
+
+        const systemPrompt = [
+          'You are choosing which field of a flashcard is THE ANSWER a learner should produce.',
+          'Return JSON only: {"answer_field_key": string, "why": string}.',
+          `answer_field_key MUST be exactly one of: ${JSON.stringify(keys)}.`,
+          'Choose the field a learner is meant to RECALL AND WRITE, not a hint, a note, an',
+          'explanation, a mnemonic, a pronunciation, or an example sentence.',
+          // The trap that made refusing correct in the first place, said out loud.
+          'If one field holds a MISTAKE, a wrong version, or a learner\'s previous error, it is',
+          'never the answer — choose the corrected one.',
+          'Judge from the field LABELS the author wrote and from the sample values.',
+        ].join('\n')
+        const userPrompt = JSON.stringify({
+          template: tpl.template_name,
+          candidates,
+          sampleCards: Array.isArray(tpl.samples) ? tpl.samples.slice(0, 3) : [],
+        }).slice(0, 16 * 1024)
+
+        try {
+          const out = await generate(chain, systemPrompt, userPrompt, undefined,
+            0, outputCapFor('quiz_answer_key'))
+          const picked = (out.json as { answer_field_key?: unknown }).answer_field_key
+          if (typeof picked !== 'string' || !keys.includes(picked)) {
+            console.warn('[ai-generate] answer-key: model returned an unusable key', picked)
+            continue
+          }
+          const { data: ok } = await service.rpc('set_quiz_answer_key',
+            { p_template_id: tpl.template_id, p_answer_key: picked })
+          if (ok === true) {
+            resolved += 1
+            decisions.push({ template: String(tpl.template_name ?? ''), key: picked })
+          }
+        } catch (error) {
+          // One template failing must not deny the learner the others. Their deck is already
+          // unquizzable; a partial improvement is strictly better than none.
+          console.error('[ai-generate] answer-key failure:',
+            error instanceof Error ? error.message : 'UNKNOWN')
+        }
+      }
+
+      // Free. It is a one-off repair of a template the app itself very often created in this
+      // shape (validators default an unknown style to primary), and charging a learner to make
+      // their own deck usable would be charging them for our bug.
+      return json({ content: { resolved, decisions } }, 200, cors)
+    }
+
     if (kind === 'quiz_generate') {
       const setId = typeof body.setId === 'string' ? body.setId : null
       const clientRef = typeof body.clientRef === 'string' ? body.clientRef : null
@@ -890,7 +980,7 @@ Deno.serve(async (req) => {
 
         const templateIds = [...new Set(cards.map((c) => c.template_id))]
         const templatesResult = await service.from('card_templates')
-          .select('id, fields, front_layout, back_layout').in('id', templateIds)
+          .select('id, fields, front_layout, back_layout, quiz_answer_key').in('id', templateIds)
         if (templatesResult.error) throw new Error(`CONTEXT_LOAD:${templatesResult.error.message}`)
         const templateById = new Map(
           (templatesResult.data ?? []).map((t: Record<string, unknown>) => [t.id as string, t]),
