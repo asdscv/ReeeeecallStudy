@@ -94,7 +94,9 @@
     "retake": "Take it again",
     "nothingGraded": "Not graded",
     "nothingGradedBody": "You haven't graded any answer in this sitting yet.",
-    "unanswered": "{{n, number}} left unanswered"
+    "unanswered": "{{n, number}} left unanswered",
+    "headline": "{{correct, number}} right",
+    "overrideLabel": "Correct this"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "Not enough credit. Top up to keep going.",
@@ -189,7 +191,10 @@
     "collapse": "Hide",
     "studyAgain": "Study {{cards, number}} again",
     "youWrote": "You wrote: {{answer}}",
-    "andMore": "and {{cards, number}} more"
+    "andMore": "and {{cards, number}} more",
+    "open": "Open",
+    "emptyTitle": "Nothing wrong yet",
+    "emptyBody": "Missed questions collect here as you take quizzes."
   },
   "history": {
     "dateThisYear": "{{m, number}}/{{d, number}}",

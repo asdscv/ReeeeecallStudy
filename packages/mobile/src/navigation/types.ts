@@ -22,6 +22,8 @@ export type QuizStackParamList = {
   QuizSetup: undefined
   /** One set, with every sitting of it. Reached by tapping a row on the quiz home. */
   QuizSetDetail: { setId: string }
+  /** 오답 노트, one deck at a time. Reached from the summary on the quiz home. */
+  QuizMistakes: undefined
   QuizRun: { runId: string }
   QuizResult: { runId: string }
 }

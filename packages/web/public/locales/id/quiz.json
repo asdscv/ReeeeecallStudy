@@ -94,7 +94,9 @@
     "retake": "Kerjakan lagi",
     "nothingGraded": "Belum dinilai",
     "nothingGradedBody": "Belum ada jawaban yang dinilai di sesi ini.",
-    "unanswered": "{{n, number}} soal belum dijawab"
+    "unanswered": "{{n, number}} soal belum dijawab",
+    "headline": "{{correct, number}} benar",
+    "overrideLabel": "Perbaiki sendiri"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "Saldo tidak cukup. Isi ulang untuk melanjutkan.",
@@ -189,7 +191,10 @@
     "collapse": "Sembunyikan",
     "studyAgain": "Pelajari {{cards, number}} lagi",
     "youWrote": "Jawaban Anda: {{answer}}",
-    "andMore": "dan {{cards, number}} lagi"
+    "andMore": "dan {{cards, number}} lagi",
+    "open": "Buka",
+    "emptyTitle": "Belum ada yang salah",
+    "emptyBody": "Soal yang salah akan terkumpul di sini saat Anda mengerjakan kuis."
   },
   "history": {
     "dateThisYear": "{{d, number}}/{{m, number}}",

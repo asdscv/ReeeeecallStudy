@@ -94,7 +94,9 @@
     "retake": "Repetirlo",
     "nothingGraded": "Sin calificar",
     "nothingGradedBody": "Todavía no has calificado ninguna respuesta en este intento.",
-    "unanswered": "{{n, number}} sin responder"
+    "unanswered": "{{n, number}} sin responder",
+    "headline": "{{correct, number}} acertadas",
+    "overrideLabel": "Corregir"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "No tienes saldo suficiente. Recarga para seguir.",
@@ -189,7 +191,10 @@
     "collapse": "Ocultar",
     "studyAgain": "Estudiar {{cards, number}} de nuevo",
     "youWrote": "Escribiste: {{answer}}",
-    "andMore": "y {{cards, number}} más"
+    "andMore": "y {{cards, number}} más",
+    "open": "Abrir",
+    "emptyTitle": "Nada fallado todavía",
+    "emptyBody": "Las preguntas falladas se recogen aquí al hacer cuestionarios."
   },
   "history": {
     "dateThisYear": "{{d, number}}/{{m, number}}",

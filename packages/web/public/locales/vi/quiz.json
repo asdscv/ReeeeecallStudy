@@ -94,7 +94,9 @@
     "retake": "Làm lại",
     "nothingGraded": "Chưa chấm",
     "nothingGradedBody": "Bạn chưa chấm câu trả lời nào trong lượt này.",
-    "unanswered": "Còn {{n, number}} câu chưa trả lời"
+    "unanswered": "Còn {{n, number}} câu chưa trả lời",
+    "headline": "Đúng {{correct, number}} câu",
+    "overrideLabel": "Tự sửa"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "Không đủ số dư. Hãy nạp thêm để tiếp tục.",
@@ -189,7 +191,10 @@
     "collapse": "Ẩn",
     "studyAgain": "Học lại {{cards, number}} thẻ",
     "youWrote": "Bạn đã viết: {{answer}}",
-    "andMore": "và {{cards, number}} thẻ nữa"
+    "andMore": "và {{cards, number}} thẻ nữa",
+    "open": "Mở",
+    "emptyTitle": "Chưa có câu nào sai",
+    "emptyBody": "Các câu sai sẽ được gom về đây khi bạn làm bài kiểm tra."
   },
   "history": {
     "dateThisYear": "{{d, number}}/{{m, number}}",

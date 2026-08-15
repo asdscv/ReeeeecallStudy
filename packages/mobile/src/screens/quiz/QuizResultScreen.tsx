@@ -9,6 +9,7 @@ import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
 import { tallyQuiz, tallyLine } from '@reeeeecall/shared/lib/quiz-outcome'
 import { QuizFeedback } from './QuizFeedback'
+import { QuizVerdictBadge } from './QuizVerdictBadge'
 import type { QuizStackParamList } from '../../navigation/types'
 import { retakeNoteKey } from '@reeeeecall/shared/lib/quiz-pricing'
 
@@ -69,7 +70,8 @@ export function QuizResultScreen() {
                 {...testProps('quiz-result-headline')}>
             {tally.judged === 0
               ? t('result.nothingGraded')
-              : `${t('run.verdict.correct')} ${tally.correct}`}
+              // "맞았어요 9" read as a sentence someone forgot to finish.
+              : t('result.headline', { correct: tally.correct })}
           </Text>
           <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}
                 {...testProps('quiz-result-tally')}>
@@ -104,9 +106,9 @@ export function QuizResultScreen() {
                   </Text>
                 )}
               </View>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-                {item.score === null ? t('result.ungraded') : `${Math.round(item.score * 100)}%`}
-              </Text>
+              {/* The verdict, not a percentage. `100%` and `0%` on a single item are a verdict
+                  wearing a number's clothes. */}
+              <QuizVerdictBadge item={{ answered: item.answered, score: item.score }} />
             </View>
 
             {item.feedback && (
@@ -126,6 +128,11 @@ export function QuizResultScreen() {
                 null previous score. */}
             {item.answered && (
               <View style={styles.overrides}>
+                {/* Labelled, so the two chips read as a correction the learner MAY make and not
+                    as the app's own verdict. The badge above is the verdict. */}
+                <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                  {t('result.overrideLabel')}
+                </Text>
                 <Pressable
                   disabled={busy === item.item_id || item.score === 1}
                   onPress={() => void flip(item, 1)}
@@ -173,6 +180,6 @@ const styles = StyleSheet.create({
   card: { padding: 12, borderRadius: 12, borderWidth: 1, gap: 8 },
   cardTop: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
   cardBody: { flex: 1, gap: 2 },
-  overrides: { flexDirection: 'row', gap: 8 },
+  overrides: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
   chip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, borderWidth: 1 },
 })

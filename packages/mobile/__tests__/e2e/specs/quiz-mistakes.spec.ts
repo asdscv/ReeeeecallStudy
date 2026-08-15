@@ -37,63 +37,38 @@ describe('quiz mistakes', () => {
     await loginIfNeeded()
   })
 
-  it('shows the 오답 노트 on the quiz home and lets it be opened', async () => {
+  it('opens the 오답 노트 on its own screen, one deck at a time', async () => {
     const ok = await navigateToDrawerItem('Quiz')
     expect(ok).toBe(true)
 
-    const panel = byId('quiz-mistakes')
-    await browser.waitUntil(async () => await panel.isExisting().catch(() => false), {
+    const summary = byId('quiz-mistakes')
+    await browser.waitUntil(async () => await summary.isExisting().catch(() => false), {
       timeout: 20_000, timeoutMsg: 'quiz home never settled',
     }).catch(() => {})
 
-    if (!(await panel.isExisting().catch(() => false))) {
-      console.log('[mistakes] no misses on this account — the panel hides itself, as designed')
+    if (!(await summary.isExisting().catch(() => false))) {
+      console.log('[mistakes] no misses on this account — the summary hides itself, as designed')
       return
     }
 
-    await expect(panel).toBeDisplayed()
-
-    // Read the page SOURCE rather than querying for text elements.
-    //
-    // Neither element route works here: `getText()` on the wrapper returns that element's own
-    // label, and a React Native View has none; and a class-chain query for StaticText comes back
-    // without the panel's own labels, because its header is a Pressable and iOS exposes the
-    // labels inside it differently. The source has every label in it and cannot be fooled by
-    // either — and a selector that silently matches nothing PASSES, which is worse than not
-    // testing at all.
-    const source = async () => await driver.getPageSource()
-
-    const collapsed = await source()
-    // The title, and a summary that counts DISTINCT cards. A panel rendered with nothing in it
-    // would be the bug — it hides itself at zero — so both have to be there.
+    // The summary is a link now, not a toggle. It expanded in place at first and buried the sets
+    // the learner came to the screen for, so the reading moved to a screen of its own.
+    const collapsed = await driver.getPageSource()
     expect(/Mistakes|오답 노트/.test(collapsed)).toBe(true)
     expect(/\d+ cards|\d+개 카드/.test(collapsed)).toBe(true)
-    console.log(`[mistakes] summary: ${(collapsed.match(/[^"]*\d+ cards[^"]*|[^"]*\d+개 카드[^"]*/) ?? ['?'])[0]}`)
 
-    // Tap the HEADER, not the wrapper. `testProps` gives the outer View an
-    // accessibilityIdentifier and nothing else on iOS, so it is not an accessibility element and
-    // a click on it lands nowhere — the source came back byte-identical. The header is a
-    // Pressable, and iOS merges its labels into one element: "Mistakes, 9 cards · 2 decks, Show".
-    //
-    // And tapped CONDITIONALLY. `appium:noReset` keeps the app running between runs, so the
-    // component does not remount and `expanded` survives — an unconditional tap collapsed a
-    // panel the previous run had opened, and the test then failed for the state it created.
-    if (!/Hide|접기/.test(collapsed)) {
-      await headerElement().click()
-      await browser.pause(1000)
-    }
+    await summary.click()
+    await browser.pause(1500)
 
-    // Expanded, the toggle flips and every deck group offers its own study action — cards from
-    // two decks cannot be one session, which is the whole reason the list is grouped.
-    //
-    // NOT asserted as "the source grew": iOS reports only what is on screen, and an expanded
-    // panel pushes the set list off the bottom, so the source legitimately SHRANK (96529 ->
-    // 93825) on a tap that worked perfectly.
-    const expanded = await source()
-    expect(/Hide|접기/.test(expanded)).toBe(true)
-    const study = expanded.match(/Study \d+ again|\d+개 다시 학습/g) ?? []
+    await expect($('~quiz-mistakes-page')).toBeDisplayed()
+    const page = await driver.getPageSource()
+    const study = page.match(/Study \d+ again|\d+개 다시 학습/g) ?? []
     console.log(`[mistakes] study actions: ${study.join(', ') || 'none'}`)
     expect(study.length).toBeGreaterThan(0)
+
+    // Back, or the NEXT test fails for a drawer this screen does not have.
+    await $('~screen-header-back').click().catch(() => driver.back())
+    await browser.pause(800)
   })
 
   it('says when each set was made and how its sittings went', async () => {

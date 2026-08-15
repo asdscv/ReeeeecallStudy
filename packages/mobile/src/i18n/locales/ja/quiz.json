@@ -94,7 +94,9 @@
     "retake": "もう一度解く",
     "nothingGraded": "未採点",
     "nothingGradedBody": "この回では採点した解答がありません。",
-    "unanswered": "{{n, number}}問は未回答です"
+    "unanswered": "{{n, number}}問は未回答です",
+    "headline": "{{correct, number}}問正解",
+    "overrideLabel": "自分で直す"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "残高が足りません。チャージすると続けられます。",
@@ -189,7 +191,10 @@
     "collapse": "閉じる",
     "studyAgain": "{{cards, number}}枚を復習",
     "youWrote": "あなたの答え: {{answer}}",
-    "andMore": "ほか{{cards, number}}枚"
+    "andMore": "ほか{{cards, number}}枚",
+    "open": "開く",
+    "emptyTitle": "まだ間違いはありません",
+    "emptyBody": "クイズを解くと間違えた問題がここに集まります。"
   },
   "history": {
     "dateThisYear": "{{m, number}}月{{d, number}}日",

@@ -36,24 +36,31 @@ test.describe('quiz home', () => {
     await page.goto('/quiz')
   })
 
-  test('오답 노트 lists real misses and offers a way to study them', async ({ page }) => {
-    const panel = page.getByTestId('quiz-mistakes')
-    await expect(panel).toBeVisible({ timeout: 20_000 })
+  test('오답 노트 opens its own page, one deck at a time', async ({ page }) => {
+    // The panel on the home is a SUMMARY now. It expanded in place at first and buried the sets
+    // the learner came to the screen for, so the reading moved to a page of its own.
+    const summary = page.getByTestId('quiz-mistakes')
+    await expect(summary).toBeVisible({ timeout: 20_000 })
+    await expect(summary).toContainText(/\d/)
+    await summary.click()
 
-    // The summary is the count of DISTINCT cards, so it must be a real number rather than the
-    // raw attempt count or a zero the panel should have hidden itself for.
-    await expect(panel).toContainText(/\d/)
+    await expect(page.getByTestId('quiz-mistakes-page')).toBeVisible({ timeout: 20_000 })
+    expect(page.url()).toContain('/quiz/mistakes')
 
-    await panel.getByRole('button').first().click()
-
-    // Expanded, the deck grouping shows and every group offers the study link — the whole point
-    // of grouping by deck is that a session cannot span two.
-    const study = panel.getByRole('link').first()
+    // Every deck offers its own study action — cards from two decks cannot be one session,
+    // which is the whole reason the list is grouped.
+    const study = page.getByTestId('quiz-mistakes-study')
     await expect(study).toBeVisible()
     const href = await study.getAttribute('href')
     expect(href).toMatch(/^\/decks\/[0-9a-f-]+\/study\?mode=srs&cards=/)
-    // The card ids are what the session takes; an empty list would be a link that starts nothing.
     expect(href!.split('cards=')[1].length).toBeGreaterThan(30)
+
+    // With more than one deck the chips pick between them.
+    const chips = page.getByTestId('quiz-mistakes-deck')
+    if (await chips.count() > 1) {
+      await chips.nth(1).click()
+      await expect(page.getByTestId('quiz-mistakes-study')).toBeVisible()
+    }
   })
 
   test('a quiz opens its own page, with every sitting on it', async ({ page }) => {

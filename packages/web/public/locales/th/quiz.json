@@ -94,7 +94,9 @@
     "retake": "ทำอีกครั้ง",
     "nothingGraded": "ยังไม่ตรวจ",
     "nothingGradedBody": "รอบนี้ยังไม่มีคำตอบที่ตรวจแล้ว",
-    "unanswered": "ยังไม่ได้ตอบ {{n, number}} ข้อ"
+    "unanswered": "ยังไม่ได้ตอบ {{n, number}} ข้อ",
+    "headline": "ถูก {{correct, number}} ข้อ",
+    "overrideLabel": "แก้เอง"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "ยอดคงเหลือไม่พอ เติมเงินเพื่อทำต่อ",
@@ -189,7 +191,10 @@
     "collapse": "ซ่อน",
     "studyAgain": "ทบทวน {{cards, number}} ใบ",
     "youWrote": "คำตอบของคุณ: {{answer}}",
-    "andMore": "และอีก {{cards, number}} ใบ"
+    "andMore": "และอีก {{cards, number}} ใบ",
+    "open": "เปิด",
+    "emptyTitle": "ยังไม่มีข้อผิด",
+    "emptyBody": "ข้อที่ตอบผิดจะมารวมที่นี่เมื่อคุณทำแบบทดสอบ"
   },
   "history": {
     "dateThisYear": "{{d, number}}/{{m, number}}",

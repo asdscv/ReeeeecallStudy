@@ -94,7 +94,9 @@
     "retake": "다시 풀기",
     "nothingGraded": "채점 안 함",
     "nothingGradedBody": "이번 시도에서는 채점한 답안이 없어요.",
-    "unanswered": "{{n, number}}문항은 답하지 않았어요"
+    "unanswered": "{{n, number}}문항은 답하지 않았어요",
+    "headline": "{{correct, number}}개 맞았어요",
+    "overrideLabel": "직접 고치기"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "충전금이 부족해요. 충전하면 계속할 수 있어요.",
@@ -189,7 +191,10 @@
     "collapse": "접기",
     "studyAgain": "{{cards, number}}개 다시 학습",
     "youWrote": "내 답: {{answer}}",
-    "andMore": "그 외 {{cards, number}}개"
+    "andMore": "그 외 {{cards, number}}개",
+    "open": "열기",
+    "emptyTitle": "아직 틀린 문제가 없어요",
+    "emptyBody": "퀴즈를 풀면 틀린 문제가 여기 모여요."
   },
   "history": {
     "dateThisYear": "{{m, number}}월 {{d, number}}일",

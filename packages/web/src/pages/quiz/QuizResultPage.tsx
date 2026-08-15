@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useQuizStore, type QuizRunItem } from '@reeeeecall/shared/stores/quiz-store'
 import { QuizFeedback } from './QuizFeedback'
 import { tallyQuiz, tallyLine } from '@reeeeecall/shared/lib/quiz-outcome'
+import { QuizVerdictBadge } from './QuizVerdictBadge'
 import { retakeNoteKey } from '@reeeeecall/shared/lib/quiz-pricing'
 
 /**
@@ -57,9 +58,8 @@ export function QuizResultPage() {
     <div className="max-w-2xl mx-auto p-4 space-y-4">
       <div className="p-4 bg-card rounded-xl border border-border text-center">
         <p className="text-2xl font-medium text-foreground" data-testid="quiz-result-headline">
-          {tally.judged === 0
-            ? t('result.nothingGraded')
-            : t('run.verdict.correct') + ' ' + tally.correct}
+          {/* "맞았어요 9" read as a sentence someone forgot to finish. */}
+          {tally.judged === 0 ? t('result.nothingGraded') : t('result.headline', { correct: tally.correct })}
         </p>
         <p className="text-sm text-content-tertiary mt-1" data-testid="quiz-result-tally">
           {/* The three numbers, because there are three outcomes. */}
@@ -90,9 +90,10 @@ export function QuizResultPage() {
                   </p>
                 )}
               </div>
-              <span className="text-sm font-medium text-foreground shrink-0">
-                {item.score === null ? t('result.ungraded') : `${Math.round(item.score * 100)}%`}
-              </span>
+              {/* The verdict, not a percentage. `100%` and `0%` on a single item are a verdict
+                  wearing a number's clothes, and the only other signal on this row was which
+                  override button happened to be disabled — which reads as an instruction. */}
+              <QuizVerdictBadge item={{ answered: item.answered, score: item.score }} size="sm" />
             </div>
 
             {item.feedback && (
@@ -113,7 +114,10 @@ export function QuizResultPage() {
                 the learner most needs to mark it themselves — they chose not to pay for the
                 grade, and without this the run has no score and no way to get one. */}
             {item.answered && (
-              <div className="flex gap-2 mt-2">
+              <div className="flex items-center gap-2 mt-2">
+                {/* Labelled, so the two buttons read as a correction the learner may make and
+                    not as the app's own verdict. The badge above is the verdict. */}
+                <span className="text-xs text-content-tertiary">{t('result.overrideLabel')}</span>
                 <button
                   type="button"
                   disabled={busy === item.item_id || item.score === 1}

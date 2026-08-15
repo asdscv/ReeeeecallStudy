@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { View, Text, Pressable, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import type { QuizStackParamList } from '../../navigation/types'
 import { useTranslation } from 'react-i18next'
-import { useQuizStore, mistakeResponseText, groupMistakesByDeck } from '@reeeeecall/shared/stores/quiz-store'
-import { useStudy } from '../../hooks/useStudy'
+import { useQuizStore, groupMistakesByDeck } from '@reeeeecall/shared/stores/quiz-store'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
 
@@ -14,122 +15,53 @@ import { useTheme } from '../../theme'
  * response, the score and the run item, and nothing ever read it back. A learner could miss the
  * same card five sittings running and the app would never say so.
  *
- * Grouped by deck, because that is the unit a study session takes — cards from two decks cannot
- * be one session, and a flat list would offer a button that cannot work. One row per card: a card
- * missed four times is one card to restudy, not four copies of the same stem.
+ * This is the SUMMARY on the quiz home — how many cards, across how many decks — and it opens
+ * `QuizMistakesScreen`, where the reading happens. It expanded in place at first and ran out of
+ * room immediately: five decks of misses is a wall of text above the sets the learner came for.
  *
- * It reschedules nothing on its own. A quiz answer silently moving SRS reviews would let one
- * casual sitting rearrange weeks of study, so the misses are shown and the decision to study them
- * stays the learner's — `startCardSession` is SRS, so choosing it DOES move the schedule.
+ * Renders nothing at zero, deliberately: someone who has never got one wrong should not be shown
+ * an empty 오답 노트 on every visit.
  */
 export function QuizMistakes() {
   const theme = useTheme()
   const { t } = useTranslation('quiz')
-  const navigation = useNavigation()
+  const navigation = useNavigation<NativeStackNavigationProp<QuizStackParamList>>()
   const { mistakes, loadMistakes } = useQuizStore()
-  const { startCardSession } = useStudy()
-  const [expanded, setExpanded] = useState(false)
-  const [starting, setStarting] = useState(false)
 
-  useEffect(() => { void loadMistakes(undefined, 50).catch(() => {}) }, [loadMistakes])
+  useEffect(() => { void loadMistakes(undefined, 200).catch(() => {}) }, [loadMistakes])
 
-  // Shared with the other platform: two copies of "which card, which deck, how many times" is
-  // two places for the list and the study button to start disagreeing.
+  // Shared with the other platform and with the screen itself: three copies of "which card,
+  // which deck, how many times" is three places for them to start disagreeing.
   const decks = useMemo(() => groupMistakesByDeck(mistakes), [mistakes])
-
-  const studyDeck = useCallback(async (deckId: string, cardIds: string[]) => {
-    setStarting(true)
-    try {
-      await startCardSession(deckId, cardIds)
-      // Cross-stack, the shape the diagnostics panel uses: `StudySession` lives in the Study
-      // tab's stack while quiz lives in its own.
-      const tabNav = navigation.getParent() as unknown as
-        { navigate: (name: string, params?: unknown) => void } | undefined
-      tabNav?.navigate('StudyTab', { screen: 'StudySession' })
-    } catch {
-      // Leaving the list on screen is the honest failure: nothing was lost, and the learner can
-      // open the deck themselves.
-    } finally {
-      setStarting(false)
-    }
-  }, [navigation, startCardSession])
-
   const total = decks.reduce((n, d) => n + d.items.length, 0)
   if (total === 0) return null
 
   return (
-    <View style={[styles.box, { borderColor: theme.colors.border, backgroundColor: theme.colors.surface }]}
-      {...testProps('quiz-mistakes')}>
-      <Pressable onPress={() => setExpanded((v) => !v)} style={styles.header}>
-        <View style={{ flex: 1 }}>
-          <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-            {t('mistakes.title')}
-          </Text>
-          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-            {t('mistakes.summary', { cards: total, decks: decks.length })}
-          </Text>
-        </View>
-        <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-          {expanded ? t('mistakes.collapse') : t('mistakes.expand')}
+    // A SUMMARY that opens the screen, not the list itself. Expanding five decks of misses in
+    // place buried the sets the learner came to this screen for.
+    <Pressable
+      onPress={() => navigation.navigate('QuizMistakes')}
+      style={[styles.box, { borderColor: theme.colors.border, backgroundColor: theme.colors.surface }]}
+      {...testProps('quiz-mistakes')}
+    >
+      <View style={{ flex: 1 }}>
+        <Text style={[theme.typography.label, { color: theme.colors.text }]}>
+          {t('mistakes.title')}
         </Text>
-      </Pressable>
-
-      {expanded && decks.map((deck) => (
-        <View key={deck.deckId} style={{ gap: 4 }}>
-          <View style={styles.header}>
-            <Text style={[theme.typography.caption, { color: theme.colors.text, flex: 1 }]}
-              numberOfLines={1}>
-              {deck.deckName}
-            </Text>
-            <Pressable
-              disabled={starting}
-              onPress={() => void studyDeck(deck.deckId, deck.items.map((m) => m.card_id as string))}
-              {...testProps(`quiz-mistakes-study-${deck.deckId}`)}
-            >
-              <Text style={[theme.typography.caption,
-                { color: theme.colors.primary, opacity: starting ? 0.4 : 1 }]}>
-                {t('mistakes.studyAgain', { cards: deck.items.length })}
-              </Text>
-            </Pressable>
-          </View>
-          {deck.items.slice(0, 8).map((m) => {
-            const mine = mistakeResponseText(m)
-            const detail = [
-              // Their own words beside the answer they were graded against: a list of stems
-              // alone says only "you failed something here".
-              mine ? t('mistakes.youWrote', { answer: mine }) : null,
-              m.reference_answer ? t('run.reference', { answer: m.reference_answer }) : null,
-            ].filter(Boolean).join(' · ')
-            return (
-              /* One line each. An essay answer is hundreds of characters and a stem can be a
-                 paragraph — unclamped, a single miss filled the panel and the list stopped being
-                 scannable, which is the only thing it is for. */
-              <View key={m.attempt_id}>
-                <Text numberOfLines={1}
-                  style={[theme.typography.caption, { color: theme.colors.text }]}>
-                  {m.stem}
-                </Text>
-                {detail !== '' && (
-                  <Text numberOfLines={1}
-                    style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                    {detail}
-                  </Text>
-                )}
-              </View>
-            )
-          })}
-          {deck.items.length > 8 && (
-            <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-              {t('mistakes.andMore', { cards: deck.items.length - 8 })}
-            </Text>
-          )}
-        </View>
-      ))}
-    </View>
+        <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+          {t('mistakes.summary', { cards: total, decks: decks.length })}
+        </Text>
+      </View>
+      <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
+        {t('mistakes.open')}
+      </Text>
+    </Pressable>
   )
 }
 
 const styles = StyleSheet.create({
-  box: { padding: 12, borderRadius: 12, borderWidth: 1, gap: 8 },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  box: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+    padding: 12, borderRadius: 12, borderWidth: 1,
+  },
 })

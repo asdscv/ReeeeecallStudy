@@ -94,7 +94,9 @@
     "retake": "再做一次",
     "nothingGraded": "未评分",
     "nothingGradedBody": "本次作答还没有评分的题目。",
-    "unanswered": "还有 {{n, number}} 题未作答"
+    "unanswered": "还有 {{n, number}} 题未作答",
+    "headline": "答对{{correct, number}}题",
+    "overrideLabel": "手动更正"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "余额不足。充值后即可继续。",
@@ -189,7 +191,10 @@
     "collapse": "收起",
     "studyAgain": "重新学习{{cards, number}}张",
     "youWrote": "你的答案：{{answer}}",
-    "andMore": "还有{{cards, number}}张"
+    "andMore": "还有{{cards, number}}张",
+    "open": "打开",
+    "emptyTitle": "还没有错题",
+    "emptyBody": "做测验后，答错的题目会收集到这里。"
   },
   "history": {
     "dateThisYear": "{{m, number}}月{{d, number}}日",
