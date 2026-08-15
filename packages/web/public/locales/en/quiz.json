@@ -17,7 +17,8 @@
       "body": "Make one from any deck. It takes a few seconds."
     },
     "fewerThanAsked": "{{requested, number}} requested",
-    "remove": "Remove"
+    "remove": "Remove",
+    "dailyCheckTitle": "Daily check"
   },
   "setup": {
     "title": "New quiz",

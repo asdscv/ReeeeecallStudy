@@ -17,7 +17,8 @@
       "body": "从任意牌组创建，只需几秒。"
     },
     "fewerThanAsked": "请求 {{requested, number}} 题",
-    "remove": "删除"
+    "remove": "删除",
+    "dailyCheckTitle": "今日检查"
   },
   "setup": {
     "title": "新建测验",

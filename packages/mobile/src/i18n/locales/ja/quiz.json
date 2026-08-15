@@ -17,7 +17,8 @@
       "body": "どのデッキからでも数秒で作れます。"
     },
     "fewerThanAsked": "リクエスト{{requested, number}}問",
-    "remove": "削除"
+    "remove": "削除",
+    "dailyCheckTitle": "今日のチェック"
   },
   "setup": {
     "title": "新しいクイズ",

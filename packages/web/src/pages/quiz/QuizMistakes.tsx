@@ -69,13 +69,20 @@ export function QuizMistakes() {
                 {deck.items.slice(0, 8).map((m) => {
                   const mine = mistakeResponseText(m)
                   return (
-                    <li key={m.attempt_id} className="text-xs text-content-tertiary">
-                      <span className="text-foreground">{m.stem}</span>
+                    /* One line each, ellipsised. An essay answer is hundreds of characters and
+                       a stem can be a paragraph — unclamped, a single miss filled the panel and
+                       the list stopped being scannable, which is the only thing it is for. The
+                       full text is a tap away on the run itself. */
+                    <li key={m.attempt_id} className="min-w-0">
+                      <p className="text-xs text-foreground truncate">{m.stem}</p>
                       {/* Their own words beside the answer they were graded against. Without
                           both, a list of stems says only "you failed something here". */}
-                      {mine && <span> · {t('mistakes.youWrote', { answer: mine })}</span>}
-                      {m.reference_answer && (
-                        <span> · {t('run.reference', { answer: m.reference_answer })}</span>
+                      {(mine || m.reference_answer) && (
+                        <p className="text-xs text-content-tertiary truncate">
+                          {mine && t('mistakes.youWrote', { answer: mine })}
+                          {mine && m.reference_answer && ' · '}
+                          {m.reference_answer && t('run.reference', { answer: m.reference_answer })}
+                        </p>
                       )}
                     </li>
                   )

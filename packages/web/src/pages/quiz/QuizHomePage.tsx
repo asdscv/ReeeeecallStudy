@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { AI_HUB_QUIZ } from '@reeeeecall/shared/lib/ai/hub/catalog'
 import { AiCreditNotice } from '../../components/ai/AiCreditNotice'
 import { Link, useNavigate } from 'react-router-dom'
-import { useQuizStore, type QuizSetRow } from '@reeeeecall/shared/stores/quiz-store'
+import { useQuizStore, isDailyCheckTitle, type QuizSetRow } from '@reeeeecall/shared/stores/quiz-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
 import { QuizMistakes } from './QuizMistakes'
 
@@ -91,7 +91,12 @@ export function QuizHomePage() {
             <li key={setRow.id} className="p-3 bg-card rounded-lg border border-border">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">{setRow.title}</p>
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {/* `__daily_check__` is a SENTINEL — `build_daily_check` finds today's check
+                        by that exact title rather than by a flag — and it was being shown to the
+                        learner as if they had named it that. */}
+                    {isDailyCheckTitle(setRow.title) ? t('home.dailyCheckTitle') : setRow.title}
+                  </p>
                   <div className="flex flex-wrap items-center gap-2 mt-1">
                     <span className="text-xs text-content-tertiary">
                       {t(`type.${setRow.question_type}`)}

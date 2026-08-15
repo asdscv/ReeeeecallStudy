@@ -17,7 +17,8 @@
       "body": "아무 덱에서나 몇 초면 만들 수 있어요."
     },
     "fewerThanAsked": "요청 {{requested, number}}문항",
-    "remove": "삭제"
+    "remove": "삭제",
+    "dailyCheckTitle": "오늘의 확인"
   },
   "setup": {
     "title": "새 퀴즈",

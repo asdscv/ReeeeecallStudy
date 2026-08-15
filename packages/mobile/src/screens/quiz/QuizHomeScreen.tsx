@@ -5,7 +5,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
 import { AI_HUB_QUIZ } from '@reeeeecall/shared/lib/ai/hub/catalog'
 import { AiCreditNotice } from '../../components/ai/AiCreditNotice'
-import { useQuizStore, type QuizSetRow } from '@reeeeecall/shared/stores/quiz-store'
+import { useQuizStore, isDailyCheckTitle, type QuizSetRow } from '@reeeeecall/shared/stores/quiz-store'
 import { Screen, Button, EmptyState, ListSkeleton, ScreenHeader } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
@@ -91,7 +91,10 @@ export function QuizHomeScreen() {
             <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
               <View style={styles.cardBody}>
                 <Text style={[theme.typography.label, { color: theme.colors.text }]} numberOfLines={1}>
-                  {item.title}
+                  {/* `__daily_check__` is a SENTINEL — `build_daily_check` finds today's check by
+                      that exact title rather than by a flag — and it was being shown to the
+                      learner as if they had named it that. */}
+                  {isDailyCheckTitle(item.title) ? t('home.dailyCheckTitle') : item.title}
                 </Text>
                 <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
                   {t(`type.${item.question_type}`)} · {t('home.questions', { count: item.generated_count })}

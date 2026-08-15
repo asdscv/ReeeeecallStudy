@@ -17,7 +17,8 @@
       "body": "Buat dari dek mana pun, hanya perlu beberapa detik."
     },
     "fewerThanAsked": "diminta {{requested, number}}",
-    "remove": "Hapus"
+    "remove": "Hapus",
+    "dailyCheckTitle": "Cek harian"
   },
   "setup": {
     "title": "Kuis baru",

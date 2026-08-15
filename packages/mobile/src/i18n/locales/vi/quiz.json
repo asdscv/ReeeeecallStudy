@@ -17,7 +17,8 @@
       "body": "Tạo từ bất kỳ bộ thẻ nào, chỉ mất vài giây."
     },
     "fewerThanAsked": "đã yêu cầu {{requested, number}}",
-    "remove": "Xoá"
+    "remove": "Xoá",
+    "dailyCheckTitle": "Kiểm tra hôm nay"
   },
   "setup": {
     "title": "Bài kiểm tra mới",

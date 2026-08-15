@@ -17,7 +17,8 @@
       "body": "สร้างจากเด็คใดก็ได้ ใช้เวลาไม่กี่วินาที"
     },
     "fewerThanAsked": "ขอไว้ {{requested, number}} ข้อ",
-    "remove": "ลบ"
+    "remove": "ลบ",
+    "dailyCheckTitle": "ตรวจสอบประจำวัน"
   },
   "setup": {
     "title": "แบบทดสอบใหม่",

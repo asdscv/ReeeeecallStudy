@@ -737,6 +737,21 @@ export function mistakeResponseText(m: Pick<QuizMistake, 'response'>): string | 
   return typeof text === 'string' && text.trim() !== '' ? text.trim() : null
 }
 
+/**
+ * The set title a screen should show.
+ *
+ * `build_daily_check` names its set `__daily_check__` — a sentinel, because the RPC finds today's
+ * existing check by that exact title rather than storing a flag. It is not a name, and it was
+ * appearing verbatim in the quiz list beside titles the learner wrote themselves.
+ *
+ * Returning null rather than a string keeps the translation at the call site: this file has no
+ * `t`, and an English fallback baked in here would show up in a Thai UI.
+ */
+export const DAILY_CHECK_TITLE = '__daily_check__'
+export function isDailyCheckTitle(title: string): boolean {
+  return title === DAILY_CHECK_TITLE
+}
+
 export interface MistakeDeckGroup {
   readonly deckId: string
   readonly deckName: string

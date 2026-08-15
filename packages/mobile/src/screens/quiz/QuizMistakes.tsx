@@ -94,15 +94,28 @@ export function QuizMistakes() {
           </View>
           {deck.items.slice(0, 8).map((m) => {
             const mine = mistakeResponseText(m)
+            const detail = [
+              // Their own words beside the answer they were graded against: a list of stems
+              // alone says only "you failed something here".
+              mine ? t('mistakes.youWrote', { answer: mine }) : null,
+              m.reference_answer ? t('run.reference', { answer: m.reference_answer }) : null,
+            ].filter(Boolean).join(' · ')
             return (
-              <Text key={m.attempt_id}
-                style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                <Text style={{ color: theme.colors.text }}>{m.stem}</Text>
-                {/* Their own words beside the answer they were graded against: a list of stems
-                    alone says only "you failed something here". */}
-                {mine ? ` · ${t('mistakes.youWrote', { answer: mine })}` : ''}
-                {m.reference_answer ? ` · ${t('run.reference', { answer: m.reference_answer })}` : ''}
-              </Text>
+              /* One line each. An essay answer is hundreds of characters and a stem can be a
+                 paragraph — unclamped, a single miss filled the panel and the list stopped being
+                 scannable, which is the only thing it is for. */
+              <View key={m.attempt_id}>
+                <Text numberOfLines={1}
+                  style={[theme.typography.caption, { color: theme.colors.text }]}>
+                  {m.stem}
+                </Text>
+                {detail !== '' && (
+                  <Text numberOfLines={1}
+                    style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                    {detail}
+                  </Text>
+                )}
+              </View>
             )
           })}
           {deck.items.length > 8 && (

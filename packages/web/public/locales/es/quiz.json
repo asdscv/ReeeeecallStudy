@@ -17,7 +17,8 @@
       "body": "Créalo desde cualquier mazo; tarda unos segundos."
     },
     "fewerThanAsked": "{{requested, number}} solicitadas",
-    "remove": "Eliminar"
+    "remove": "Eliminar",
+    "dailyCheckTitle": "Comprobación diaria"
   },
   "setup": {
     "title": "Nuevo cuestionario",
