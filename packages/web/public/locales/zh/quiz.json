@@ -109,7 +109,8 @@
     "QUIZ_CARDS_TOO_SHORT": "这些卡片太短，无法出论述题——论述题按卡片本身的用词批改。这个牌组更适合简答或选择题。",
     "AI_PROVIDER_ERROR": "AI 服务当前繁忙。未扣费，请稍后再试。",
     "AI_PROVIDER_DAILY_LIMIT": "本应用今日的 AI 用量已达上限。未扣费，明天会重置。",
-    "AI_PROVIDER_BUSY": "AI 服务繁忙。未扣费，请稍后再试。"
+    "AI_PROVIDER_BUSY": "AI 服务繁忙。未扣费，请稍后再试。",
+    "QUIZ_DIFFICULTY_UNAVAILABLE": "该难度暂不支持这种题型，请选择其他难度。"
   },
   "verdict": {
     "equivalent": "正确",

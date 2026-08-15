@@ -75,7 +75,7 @@ import type { AIStackParamList } from '../navigation/types'
  * feature the learner cannot reach and cannot fix from this screen.
  */
 function DailyCheckCard({ goalId }: { goalId: string }) {
-  const { t } = useTranslation('learning')
+  const { t, i18n } = useTranslation('learning')
   const theme = useTheme()
   const navigation = useNavigation<NavigationProp<AIStackParamList>>()
   const { countDailyCheck, buildDailyCheck, startRun } = useQuizStore()
@@ -131,7 +131,12 @@ function DailyCheckCard({ goalId }: { goalId: string }) {
     try {
       // The SAME window the count was taken with, or the server refuses a check this card
       // has already offered.
-      const setId = await buildDailyCheck({ goalId, timezone, lookback: CHECK_LOOKBACK_DAYS })
+      const setId = await buildDailyCheck({
+        goalId, timezone, lookback: CHECK_LOOKBACK_DAYS,
+        // The check is built with one tap and no options, so this is the only place
+        // the learner's language can come from. Without it every check was Korean.
+        locale: i18n.language.split('-')[0],
+      })
       const runId = await startRun(setId)
       // The check runs in the quiz stack — same runner, same screens. `getParent` is how a
       // screen in one drawer stack hands off to another without importing its navigator.

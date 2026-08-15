@@ -78,3 +78,30 @@ export function tallyLine(t: QuizTally): { key: string; params: Record<string, n
   if (t.judged === 0) return { key: 'run.tally.none', params: { total: t.total } }
   return { key: 'run.tally.plain', params: { correct: t.correct, wrong: t.wrong + t.partial } }
 }
+
+/**
+ * The fewest quizzable cards a multiple-choice set needs, for one difficulty band.
+ *
+ * Both setup screens hardcoded `4`, with the comment "multiple choice needs three other cards to
+ * draw plausible distractors from". That is true of the EASIEST band and of nothing else. A model
+ * will not write a deliberately unrelated wrong answer — asked for wrong options for
+ * `lend → 빌려주다` it returns 빌리다, 갚다, 임대하다 at every phrasing — so the FAR slots are
+ * filled from other answers in the deck, and how many far slots there are is what the band says:
+ *
+ *     level 1   near_max 0   all three distractors far   -> 3 deck-mates, so 4 cards
+ *     level 2   near_max 1   two far                     -> 2 deck-mates, so 3 cards
+ *     level 3   near_max 3   as few as zero far          -> the card alone, so 1
+ *
+ * At the hardest band the model writes every distractor, and a six-card deck was being refused
+ * for deck-mates it did not need. The number also stops being a literal: `option_count` is a
+ * column, so a band showing six options asks for six and the screens follow without an edit.
+ */
+export function minCardsForMcq(
+  band: { near_max?: number | null; option_count?: number | null } | null | undefined,
+): number {
+  const options = Math.min(6, Math.max(2, band?.option_count ?? 4))
+  const distractors = options - 1
+  const far = Math.max(0, distractors - Math.max(0, band?.near_max ?? 0))
+  // The card being asked about, plus one deck-mate per far slot.
+  return 1 + far
+}

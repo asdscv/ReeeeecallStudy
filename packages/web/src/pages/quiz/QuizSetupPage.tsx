@@ -8,6 +8,7 @@ import {
   type QuizQuestionType, type QuizQuote, type QuizzableCount, type QuizDifficultyBand,
 } from '@reeeeecall/shared/stores/quiz-store'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
+import { minCardsForMcq } from '@reeeeecall/shared/lib/quiz-outcome'
 
 const TYPES: QuizQuestionType[] = ['mcq', 'short', 'essay']
 // Presets plus a free field up to MAX_COUNT. The presets stop where a learner's idea of "a
@@ -86,11 +87,15 @@ export function QuizSetupPage() {
     ? difficulty
     : (usableBands.find((b) => b.is_default) ?? usableBands[0])?.level ?? null
   const eligible = shownCounts?.eligible ?? 0
-  // Multiple choice needs three other cards to draw plausible distractors from. Blocking here
-  // is kinder than letting the server refuse after the learner has picked everything.
+  // Blocking here is kinder than letting the server refuse after the learner has picked
+  // everything and seen a price.
   /** The chosen count is not one of the chips, so the custom box is what is in effect. */
   const isCustomCount = !COUNTS.includes(count)
-  const tooFewForMcq = type === 'mcq' && eligible > 0 && eligible < 4
+  // From the BAND, not a literal 4. The far distractor slots are what need deck-mates, and the
+  // band says how many there are — at the hardest one the model writes every distractor, so a
+  // six-card deck was being refused for cards it did not need.
+  const mcqMinimum = minCardsForMcq(usableBands.find((b) => b.level === activeBand))
+  const tooFewForMcq = type === 'mcq' && eligible > 0 && eligible < mcqMinimum
   const canSubmit = Boolean(deckId) && eligible > 0 && !tooFewForMcq && !generating
     && priced !== null && priced.sufficient
 

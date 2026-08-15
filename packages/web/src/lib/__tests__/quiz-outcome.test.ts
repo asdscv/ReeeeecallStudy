@@ -16,7 +16,7 @@
  */
 import { describe, it, expect } from 'vitest'
 import {
-  itemOutcome, tallyQuiz, tallyLine, CORRECT_AT, PARTIAL_AT,
+  itemOutcome, tallyQuiz, tallyLine, minCardsForMcq, CORRECT_AT, PARTIAL_AT,
 } from '@reeeeecall/shared/lib/quiz-outcome'
 
 describe('one item', () => {
@@ -100,5 +100,50 @@ describe('a run', () => {
   it('is empty-safe', () => {
     expect(tallyQuiz([])).toMatchObject({ judged: 0, total: 0 })
     expect(tallyLine(tallyQuiz([])).key).toBe('run.tally.none')
+  })
+})
+
+/**
+ * How few cards a multiple-choice quiz really needs.
+ *
+ * Both setup screens hardcoded 4, with the comment "multiple choice needs three other cards to
+ * draw plausible distractors from" — true of the easiest band and of nothing else. The model
+ * writes the near-misses; the FAR slots come from other answers in the deck, because a model
+ * asked for a deliberately unrelated wrong answer returns a near-miss at every phrasing. So the
+ * number of deck-mates required is the number of far slots, which is what the band says.
+ */
+describe('the multiple-choice minimum', () => {
+  const band = (near_max: number, option_count = 4) => ({ near_max, option_count })
+
+  it('follows the band instead of asserting four', () => {
+    // Production's three bands, in order. Only the easiest one ever needed 4.
+    expect(minCardsForMcq(band(0))).toBe(4)   // all three distractors far
+    expect(minCardsForMcq(band(1))).toBe(3)   // two far
+    expect(minCardsForMcq(band(3))).toBe(1)   // the model writes every one
+  })
+
+  it('lets a six-card deck make a hard quiz', () => {
+    // The case that found this: 6 quizzable cards, refused for deck-mates it did not need.
+    expect(minCardsForMcq(band(3))).toBeLessThanOrEqual(6)
+  })
+
+  it('follows option_count too, so a band is a row rather than an edit', () => {
+    expect(minCardsForMcq(band(0, 6))).toBe(6)
+    expect(minCardsForMcq(band(2, 6))).toBe(4)
+  })
+
+  it('clamps a nonsense band rather than blocking or admitting everything', () => {
+    expect(minCardsForMcq(band(0, 99))).toBe(6)
+    expect(minCardsForMcq(band(0, 0))).toBe(2)
+    expect(minCardsForMcq(band(99))).toBe(1)
+    expect(minCardsForMcq(band(-3))).toBe(4)
+  })
+
+  it('assumes the shipped default when no band is resolved yet', () => {
+    // The screens ask for bands asynchronously; before they arrive the gate must not be either
+    // "block everything" or "let anything through".
+    expect(minCardsForMcq(null)).toBe(4)
+    expect(minCardsForMcq(undefined)).toBe(4)
+    expect(minCardsForMcq({})).toBe(4)
   })
 })

@@ -1038,7 +1038,7 @@ export function LearningTodayPage() {
  * settle — a day they knew is free.
  */
 function DailyCheck({ goalId, timezone }: { goalId: string; timezone: string }) {
-  const { t } = useTranslation('learning')
+  const { t, i18n } = useTranslation('learning')
   const navigate = useNavigate()
   const { countDailyCheck, buildDailyCheck, startRun } = useQuizStore()
   const [counts, setCounts] = useState<DailyCheckCount | null>(null)
@@ -1090,7 +1090,12 @@ function DailyCheck({ goalId, timezone }: { goalId: string; timezone: string }) 
     try {
       // The SAME window the count was taken with, or the server refuses a check this
       // screen has already offered.
-      const setId = await buildDailyCheck({ goalId, timezone, lookback: CHECK_LOOKBACK_DAYS })
+      const setId = await buildDailyCheck({
+        goalId, timezone, lookback: CHECK_LOOKBACK_DAYS,
+        // The check is built with one tap and no options, so this is the only place
+        // the learner's language can come from. Without it every check was Korean.
+        locale: i18n.language.split('-')[0],
+      })
       const runId = await startRun(setId)
       navigate(`/quiz/${runId}/run`)
     } catch {

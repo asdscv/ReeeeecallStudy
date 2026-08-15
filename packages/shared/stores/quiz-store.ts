@@ -207,6 +207,11 @@ export const QUIZ_ERROR_CODES = [
   'QUIZ_NOT_ENOUGH_CARDS', 'AI_RATE_CAP', 'FORBIDDEN', 'AI_EMPTY_RESULT',
   'QUIZ_UNGRADEABLE', 'QUIZ_GRADE_REFUSED', 'QUIZ_ITEM_GONE',
   'QUIZ_CARDS_TOO_SHORT', 'AI_PROVIDER_ERROR', 'AI_PROVIDER_BUSY', 'AI_PROVIDER_DAILY_LIMIT',
+  // A band with no guidance for the chosen question type. `create_quiz_set` raises P0013 for it
+  // and nothing mapped the code, so it arrived as UNKNOWN: "문제가 생겼어요. 다시 시도해 주세요."
+  // The one thing that would fix it — pick another difficulty — was the one thing not said, and
+  // retrying with the same settings fails identically every time.
+  'QUIZ_DIFFICULTY_UNAVAILABLE',
   'UNKNOWN',
 ] as const
 export type QuizErrorCode = typeof QUIZ_ERROR_CODES[number]
@@ -311,6 +316,11 @@ interface QuizState {
    */
   buildDailyCheck: (input: {
     goalId?: string; timezone: string; limit?: number; lookback?: number
+    /**
+     * The UI language, which decides which side of a cross-lingual card the questions address
+     * the learner in. Omitted means Korean — the literal the RPC used to hardcode for everyone.
+     */
+    locale?: string
   }) => Promise<string>
 
   startRun: (setId: string) => Promise<string>
@@ -438,6 +448,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
       if (createError) {
         throw new QuizError(createError.code === 'P0010' ? 'QUIZ_NOT_ENOUGH_CARDS'
           : createError.code === 'P0009' ? 'AI_REQUEST_TOO_LARGE'
+          : createError.code === 'P0013' ? 'QUIZ_DIFFICULTY_UNAVAILABLE'
           : createError.code === '42501' ? 'FORBIDDEN' : 'UNKNOWN')
       }
       const result = created as {
@@ -581,12 +592,13 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     }
   },
 
-  buildDailyCheck: async ({ goalId, timezone, limit, lookback }) => {
+  buildDailyCheck: async ({ goalId, timezone, limit, lookback, locale }) => {
     const { data, error } = await supabase.rpc('build_daily_check', {
       p_goal_id: goalId ?? null,
       p_timezone: timezone,
       p_limit: limit ?? 8,
       p_lookback: lookback ?? 1,
+      p_locale: locale ?? 'ko',
     })
     // P0010 is the only outcome a screen has to phrase: nothing was studied today, so
     // there is nothing to check. Everything else is a real fault.

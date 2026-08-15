@@ -14,6 +14,7 @@ import { Screen, Button, ScreenHeader } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
 import type { QuizStackParamList } from '../../navigation/types'
+import { minCardsForMcq } from '@reeeeecall/shared/lib/quiz-outcome'
 
 type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizSetup'>
 
@@ -36,7 +37,9 @@ export function QuizSetupScreen() {
   const { t, i18n } = useTranslation('quiz')
   const navigation = useNavigation<Nav>()
   const { decks, fetchDecks } = useDeckStore()
-  const { countQuizzable, quote, createAndGenerate, generating, difficultyLevels } = useQuizStore()
+  const {
+    countQuizzable, quote, createAndGenerate, generating, generateProgress, difficultyLevels,
+  } = useQuizStore()
 
   const [deckId, setDeckId] = useState('')
   const [type, setType] = useState<QuizQuestionType>('mcq')
@@ -87,7 +90,11 @@ export function QuizSetupScreen() {
   const eligible = shownCounts?.eligible ?? 0
   /** The chosen count is not one of the chips, so the custom box is what is in effect. */
   const isCustomCount = !COUNTS.includes(count)
-  const tooFewForMcq = type === 'mcq' && eligible > 0 && eligible < 4
+  // From the BAND, not a literal 4. The far distractor slots are what need deck-mates, and the
+  // band says how many there are — at the hardest one the model writes every distractor, so a
+  // six-card deck was being refused for cards it did not need.
+  const mcqMinimum = minCardsForMcq(usableBands.find((b) => b.level === activeBand))
+  const tooFewForMcq = type === 'mcq' && eligible > 0 && eligible < mcqMinimum
   const canSubmit = Boolean(deckId) && eligible > 0 && !tooFewForMcq && !generating
     && priced !== null && priced.sufficient
 
@@ -275,7 +282,17 @@ export function QuizSetupScreen() {
         )}
 
         <Button
-          title={generating ? t('setup.generating') : t('setup.confirm')}
+          title={generating
+            // A 50-question quiz is several model calls and can take over a minute. The web
+            // button has counted batches since 208; this one said "만드는 중…" for the whole
+            // wait, which on a phone — where there is nothing else on screen to look at —
+            // reads as a hang. `generateProgress` was being written and never read here.
+            ? (generateProgress && generateProgress.total > 1
+              ? t('setup.generatingBatch', {
+                done: generateProgress.done, total: generateProgress.total,
+              })
+              : t('setup.generating'))
+            : t('setup.confirm')}
           onPress={() => void submit()}
           disabled={!canSubmit}
           {...testProps('quiz-confirm')}
