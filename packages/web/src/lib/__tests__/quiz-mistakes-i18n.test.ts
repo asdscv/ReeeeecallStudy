@@ -294,3 +294,39 @@ describe.each(
     expect(name).toMatch(/25[.,\u00a0\u202f ]?000/)
   })
 })
+
+
+/**
+ * No Hangul in a bundle that is not Korean.
+ *
+ * The English delete confirmation read "…and their 오답 노트 entries go with it" — the Korean
+ * name for the mistake note, left in the sentence that tells someone their answers are about to
+ * be destroyed. A key can be present, translated-looking, and still be half Korean; nothing else
+ * in the suite would notice.
+ *
+ * Scoped to `quiz.json` on purpose. A sweep of all sixteen bundles finds Hangul in exactly two
+ * other places and both are correct: `settings.language.ko` / `marketplace.learningLanguage.ko`
+ * are "한국어", which is what Korean is called in a language picker in every language, and the
+ * guide's example card is `'apple = 사과'`. A repo-wide version of this rule would have to
+ * whitelist them, and a whitelist is where the next real leak would hide.
+ */
+describe.each((['en', 'zh', 'ja', 'vi', 'th', 'id', 'es'] as const).flatMap(
+  (lng) => (['web', 'mobile'] as const).map((platform) => [lng, platform] as const)),
+)('%s/%s — 한글 유출', (lng, platform) => {
+  it('has no Hangul left in it', () => {
+    const bundle = JSON.parse(readFileSync(PLATFORMS[platform](lng), 'utf-8')) as Record<string, unknown>
+    // Hangul syllables and jamo. Japanese and Chinese share Han characters with nothing here, so
+    // this only ever fires on genuinely Korean text.
+    const HANGUL = /[\uac00-\ud7af\u1100-\u11ff\u3130-\u318f]/
+    const leaks: string[] = []
+    const walk = (node: unknown, path: string) => {
+      if (typeof node === 'string') {
+        if (HANGUL.test(node)) leaks.push(`${path}: ${node.slice(0, 60)}`)
+      } else if (node && typeof node === 'object') {
+        for (const [k, v] of Object.entries(node)) walk(v, `${path}.${k}`)
+      }
+    }
+    walk(bundle, '')
+    expect(leaks).toEqual([])
+  })
+})

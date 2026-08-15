@@ -20,7 +20,7 @@
     "remove": "Remove",
     "dailyCheckTitle": "Daily check",
     "confirmTitle": "Delete this quiz?",
-    "confirmTaken": "Its {{runs, number}} sittings, the answers you gave, and their 오답 노트 entries go with it. This cannot be undone.",
+    "confirmTaken": "Its {{runs, number}} sittings, the answers you gave, and their mistake-note entries go with it. This cannot be undone.",
     "confirmUnused": "Never taken. Only the questions are removed.",
     "confirmDelete": "Delete",
     "confirmCancel": "Cancel"
