@@ -205,5 +205,12 @@
   "detail": {
     "gone": "Este cuestionario ya no existe.",
     "historyTitle": "Historial"
+  },
+  "pricing": {
+    "gradeFreeLeft": "Corrección gratis · {{left, number}} más gratis",
+    "gradeFree": "Corrección gratis",
+    "gradeCost": "Corregir cuesta {{amount}}",
+    "retakeMcq": "Las mismas preguntas, con las opciones reordenadas. Repetir y corregir son gratis.",
+    "retakeWritten": "Las mismas preguntas otra vez. Repetir es gratis; corregir es una llamada nueva y cuesta cada vez."
   }
 }

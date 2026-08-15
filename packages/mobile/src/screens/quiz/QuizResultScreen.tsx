@@ -10,6 +10,7 @@ import { useTheme } from '../../theme'
 import { tallyQuiz, tallyLine } from '@reeeeecall/shared/lib/quiz-outcome'
 import { QuizFeedback } from './QuizFeedback'
 import type { QuizStackParamList } from '../../navigation/types'
+import { retakeNoteKey } from '@reeeeecall/shared/lib/quiz-pricing'
 
 type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizResult'>
 type Rt = RouteProp<QuizStackParamList, 'QuizResult'>
@@ -146,6 +147,13 @@ export function QuizResultScreen() {
           </View>
         ))}
 
+        {/* Said before the button, not after the charge: the same questions come back, and the
+            grading on them is a fresh call every sitting. */}
+        <Text style={[theme.typography.caption, {
+          color: theme.colors.textSecondary, textAlign: 'center',
+        }]}>
+          {t(retakeNoteKey(run.items[0]?.question_type))}
+        </Text>
         <Button title={t('result.retake')} onPress={() => void retake()} {...testProps('quiz-retake')} />
         <Button
           title={t('run.backToQuiz')}

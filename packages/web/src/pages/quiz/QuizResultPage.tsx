@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useQuizStore, type QuizRunItem } from '@reeeeecall/shared/stores/quiz-store'
 import { QuizFeedback } from './QuizFeedback'
 import { tallyQuiz, tallyLine } from '@reeeeecall/shared/lib/quiz-outcome'
+import { retakeNoteKey } from '@reeeeecall/shared/lib/quiz-pricing'
 
 /**
  * What the sitting came to, and the one control that matters: the learner can overrule any
@@ -134,6 +135,12 @@ export function QuizResultPage() {
           </li>
         ))}
       </ul>
+
+      {/* Said before the button, not after the charge: the same questions come back, and the
+          grading on them is a fresh call every sitting. */}
+      <p className="text-xs text-content-tertiary text-center">
+        {t(retakeNoteKey(run.items[0]?.question_type))}
+      </p>
 
       <div className="flex gap-2">
         <button

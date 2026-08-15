@@ -205,5 +205,12 @@
   "detail": {
     "gone": "Bài kiểm tra này không còn.",
     "historyTitle": "Lịch sử làm bài"
+  },
+  "pricing": {
+    "gradeFreeLeft": "Chấm miễn phí · còn {{left, number}} lần miễn phí",
+    "gradeFree": "Chấm miễn phí",
+    "gradeCost": "Chấm bài tốn {{amount}}",
+    "retakeMcq": "Vẫn là câu hỏi đó, chỉ đảo thứ tự đáp án. Làm lại và chấm đều miễn phí.",
+    "retakeWritten": "Vẫn là câu hỏi đó. Làm lại miễn phí; chấm bài là lượt gọi mới nên tính phí mỗi lần."
   }
 }

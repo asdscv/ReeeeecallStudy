@@ -205,5 +205,12 @@
   "detail": {
     "gone": "このクイズはありません。",
     "historyTitle": "解答履歴"
+  },
+  "pricing": {
+    "gradeFreeLeft": "無料で採点されます · あと{{left, number}}回無料",
+    "gradeFree": "無料で採点されます",
+    "gradeCost": "採点すると{{amount}}かかります",
+    "retakeMcq": "同じ問題です。選択肢の順序だけ変わり、解き直しも採点も無料です。",
+    "retakeWritten": "同じ問題をもう一度解きます。解き直しは無料で、採点は新しく行うため毎回かかります。"
   }
 }

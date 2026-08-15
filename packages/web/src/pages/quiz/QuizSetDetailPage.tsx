@@ -8,6 +8,7 @@ import {
 import {
   dateLine, tallyFromCounts, tallyLine, isRunUnfinished,
 } from '@reeeeecall/shared/lib/quiz-outcome'
+import { retakeNoteKey } from '@reeeeecall/shared/lib/quiz-pricing'
 
 /**
  * One quiz, on its own page.
@@ -141,6 +142,15 @@ export function QuizSetDetailPage() {
           </button>
         )}
       </div>
+
+      {/* The first thing anyone wonders on seeing 다시 풀기: are these the same questions, and
+          does it cost anything. Both, in one line, before they tap. Multiple choice says
+          something different because it genuinely IS free end to end. */}
+      {!empty && (
+        <p className="text-xs text-content-tertiary" data-testid="quiz-retake-note">
+          {t(retakeNoteKey(setRow.question_type))}
+        </p>
+      )}
 
       <div>
         <h2 className="text-sm font-medium text-foreground">{t('detail.historyTitle')}</h2>

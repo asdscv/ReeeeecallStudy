@@ -10,6 +10,7 @@ import {
 import {
   dateLine, tallyFromCounts, tallyLine, isRunUnfinished,
 } from '@reeeeecall/shared/lib/quiz-outcome'
+import { retakeNoteKey } from '@reeeeecall/shared/lib/quiz-pricing'
 import { Screen, Button, ScreenHeader } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
@@ -132,6 +133,15 @@ export function QuizSetDetailScreen() {
               {t('home.remove')}
             </Text>
           </Pressable>
+        )}
+
+        {/* The first thing anyone wonders on seeing 다시 풀기: are these the same questions, and
+            does it cost anything. Both, in one line, before they tap. Multiple choice says
+            something different because it genuinely IS free end to end. */}
+        {setRow.generated_count > 0 && (
+          <Text style={caption} {...testProps('quiz-retake-note')}>
+            {t(retakeNoteKey(setRow.question_type))}
+          </Text>
         )}
 
         <Text style={[theme.typography.label, { color: theme.colors.text, marginTop: 8 }]}>

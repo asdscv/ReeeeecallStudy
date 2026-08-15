@@ -205,5 +205,12 @@
   "detail": {
     "gone": "Kuis ini sudah tidak ada.",
     "historyTitle": "Riwayat"
+  },
+  "pricing": {
+    "gradeFreeLeft": "Dinilai gratis · {{left, number}} lagi gratis",
+    "gradeFree": "Dinilai gratis",
+    "gradeCost": "Penilaian dikenakan {{amount}}",
+    "retakeMcq": "Soal yang sama, hanya urutan pilihan yang berubah. Mengulang dan menilai sama-sama gratis.",
+    "retakeWritten": "Soal yang sama lagi. Mengulang gratis; penilaian adalah panggilan baru, jadi dikenakan biaya tiap kali."
   }
 }

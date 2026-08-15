@@ -6,7 +6,7 @@ import { useNavigation, useRoute, type RouteProp } from '@react-navigation/nativ
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
 import {
-  useQuizStore, QuizError, QUIZ_GRADE_ACTION, type QuizSubmitResult,
+  useQuizStore, QuizError, QUIZ_GRADE_ACTION, type QuizSubmitResult, type QuizQuote,
   optionFlaws,
 } from '@reeeeecall/shared/stores/quiz-store'
 import { Screen, Button, EmptyState } from '../../components/ui'
@@ -17,6 +17,7 @@ import { answerLength } from '@reeeeecall/shared/lib/quiz-answer-limits'
 import { itemOutcome, tallyQuiz, tallyLine } from '@reeeeecall/shared/lib/quiz-outcome'
 import { QuizFeedback } from './QuizFeedback'
 import type { QuizStackParamList } from '../../navigation/types'
+import { gradeCostLine } from '@reeeeecall/shared/lib/quiz-pricing'
 
 type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizRun'>
 type Rt = RouteProp<QuizStackParamList, 'QuizRun'>
@@ -48,7 +49,10 @@ export function QuizRunScreen() {
   const [result, setResult] = useState<QuizSubmitResult | null>(null)
   // Keyed by item: an essay costs four times a short answer, so an unkeyed price would quote
   // the previous question's on this one — and clearing it in the effect is a cascading render.
-  const [gradePrice, setGradePrice] = useState<{ itemId: string; micro: number } | null>(null)
+  // The whole quote, not just the price. The screen has to say whether this grading is covered
+  // by the free allowance or charged, and only the server knows how much of it the free units
+  // cover.
+  const [gradeQuote, setGradeQuote] = useState<{ itemId: string; quote: QuizQuote } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const drafts = useRef<Record<string, string>>({})
   const startedAt = useRef(Date.now())
@@ -79,12 +83,14 @@ export function QuizRunScreen() {
     const itemId = item.item_id
     let cancelled = false
     void quote(QUIZ_GRADE_ACTION[item.question_type], 1)
-      .then((q) => { if (!cancelled) setGradePrice({ itemId, micro: q.price_micro }) })
-      .catch(() => { if (!cancelled) setGradePrice(null) })
+      .then((q) => { if (!cancelled) setGradeQuote({ itemId, quote: q }) })
+      .catch(() => { if (!cancelled) setGradeQuote(null) })
     return () => { cancelled = true }
   }, [item, quote])
 
-  const shownPrice = item && gradePrice?.itemId === item.item_id ? gradePrice.micro : null
+  const shownQuote = item && gradeQuote?.itemId === item.item_id ? gradeQuote.quote : null
+  const shownPrice = shownQuote?.price_micro ?? null
+  const costLine = gradeCostLine(shownQuote)
 
   const goTo = (next: number) => {
     if (item) drafts.current[item.item_id] = text
@@ -341,6 +347,16 @@ export function QuizRunScreen() {
                 onPress={() => (isLast ? void finish() : goTo(index + 1))}
                 {...testProps(isLast ? 'quiz-finish' : 'quiz-next')}
               />
+              {/* What grading costs, or that it is covered. Beside the buttons rather than on
+                  one: the learner is deciding whether to spend and needs the number first. It
+                  used to be said nowhere at all. */}
+              {item.question_type !== 'mcq' && item.score === null && costLine && (
+                <Text style={[theme.typography.caption, {
+                  color: theme.colors.textSecondary, textAlign: 'center',
+                }]} {...testProps('quiz-grade-cost')}>
+                  {t(costLine.key, costLine.params)}
+                </Text>
+              )}
             </>
           )}
         </View>

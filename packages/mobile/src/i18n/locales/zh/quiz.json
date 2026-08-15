@@ -205,5 +205,12 @@
   "detail": {
     "gone": "这个测验已不存在。",
     "historyTitle": "作答记录"
+  },
+  "pricing": {
+    "gradeFreeLeft": "免费批改 · 还可免费{{left, number}}次",
+    "gradeFree": "免费批改",
+    "gradeCost": "批改将扣除{{amount}}",
+    "retakeMcq": "题目相同，只是选项顺序变化。重做和批改都免费。",
+    "retakeWritten": "重做相同的题目。重做免费，批改是重新调用，所以每次都会扣费。"
   }
 }

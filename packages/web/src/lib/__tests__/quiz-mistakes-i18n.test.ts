@@ -122,6 +122,23 @@ describe.each(Object.keys(PLATFORMS) as (keyof typeof PLATFORMS)[])('%s', (platf
       }
     })
 
+    it('tells the learner what grading and retaking cost', () => {
+      const tf = tr()
+      // The billing is simple on purpose; the TELLING has to reach every language, or a Thai
+      // learner taps 채점 not knowing whether it is free.
+      expect(tf('pricing.gradeCost', { amount: '$0.01' })).toContain('$0.01')
+      expect(tf('pricing.gradeFreeLeft', { left: 8 })).toContain('8')
+      for (const key of ['pricing.gradeFree', 'pricing.retakeMcq', 'pricing.retakeWritten'] as const) {
+        expect(tf(key)).not.toBe(key)
+        // Not a character-count floor. This was `> 5` and zh failed it on "免费批改" — four
+        // characters saying exactly what the English says in thirteen. A length bound on
+        // translated text is a Latin-alphabet assumption.
+        expect(tf(key).trim()).not.toBe('')
+      }
+      // The two retake notes must not be the same sentence: one promises free, the other warns.
+      expect(tf('pricing.retakeMcq')).not.toBe(tf('pricing.retakeWritten'))
+    })
+
     it('counts generation batches', () => {
       const out = tr()('setup.generatingBatch', { done: 2, total: 5 })
       expect(out).toContain('2')
@@ -135,7 +152,7 @@ describe('the translations are actually different from each other', () => {
     // The failure mode a key-presence check cannot see: a locale file that has every key and
     // every value copied from en.
     for (const key of ['mistakes.title', 'home.remove', 'history.never',
-      'error.QUIZ_DIFFICULTY_UNAVAILABLE'] as const) {
+      'pricing.retakeWritten', 'error.QUIZ_DIFFICULTY_UNAVAILABLE'] as const) {
       const rendered = LOCALES.map((lng) => t('web', lng)(key))
       expect(new Set(rendered).size).toBeGreaterThan(5)
     }
