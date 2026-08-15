@@ -126,16 +126,16 @@ describe.each(Object.keys(PLATFORMS) as (keyof typeof PLATFORMS)[])('%s', (platf
       const tf = tr()
       // The billing is simple on purpose; the TELLING has to reach every language, or a Thai
       // learner taps 채점 not knowing whether it is free.
-      expect(tf('pricing.gradeCost', { amount: '$0.01' })).toContain('$0.01')
-      expect(tf('pricing.gradeFreeLeft', { left: 8 })).toContain('8')
-      for (const key of ['pricing.gradeFree', 'pricing.retakeMcq', 'pricing.retakeWritten'] as const) {
+      expect(tf('pricing.gradeCost', { amount: '$0.10' })).toContain('$0.10')
+      for (const key of ['pricing.retakeMcq', 'pricing.retakeWritten'] as const) {
         expect(tf(key)).not.toBe(key)
         // Not a character-count floor. This was `> 5` and zh failed it on "免费批改" — four
         // characters saying exactly what the English says in thirteen. A length bound on
         // translated text is a Latin-alphabet assumption.
         expect(tf(key).trim()).not.toBe('')
       }
-      // The two retake notes must not be the same sentence: one promises free, the other warns.
+      // The two retake notes must not be the same sentence: multiple choice costs nothing
+      // because no model is called, written answers are charged per sitting.
       expect(tf('pricing.retakeMcq')).not.toBe(tf('pricing.retakeWritten'))
     })
 

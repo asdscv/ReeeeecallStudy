@@ -33,7 +33,7 @@
     "untitled": "Kuis",
     "type": "Jenis soal",
     "typeHint": {
-      "mcq": "Empat pilihan, dinilai seketika dan gratis.",
+      "mcq": "Empat pilihan. Diperiksa begitu Anda menjawab — tanpa AI, jadi tanpa kredit.",
       "short": "Jawab dengan kata atau frasa. Dinilai AI, dikenakan biaya per jawaban.",
       "essay": "Tulis beberapa kalimat, dinilai dengan rubrik. Paling menuntut dan paling mahal."
     },
@@ -218,11 +218,9 @@
     "historyTitle": "Riwayat"
   },
   "pricing": {
-    "gradeFreeLeft": "Dinilai gratis · {{left, number}} lagi gratis",
-    "gradeFree": "Dinilai gratis",
     "gradeCost": "Penilaian dikenakan {{amount}}",
-    "retakeMcq": "Soal yang sama, hanya urutan pilihan yang berubah. Mengulang dan menilai sama-sama gratis.",
-    "retakeWritten": "Soal yang sama lagi. Mengulang gratis; penilaian adalah panggilan baru, jadi dikenakan biaya tiap kali."
+    "retakeMcq": "Soal yang sama, pilihan jawabannya diacak. Pilihan ganda diperiksa tanpa AI, jadi tidak memakai kredit.",
+    "retakeWritten": "Soal yang sama lagi. Soalnya sudah dibayar, tetapi penilaian adalah panggilan baru dan dikenai biaya setiap kali."
   },
   "activity": {
     "title": "Aktivitas AI",

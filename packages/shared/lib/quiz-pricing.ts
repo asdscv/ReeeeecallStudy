@@ -7,7 +7,7 @@
  *
  * What was missing was the telling. The grade button reads "이 답안 채점" with no price on it —
  * that was a deliberate choice, a button is a decision and not a price tag — but nothing else said
- * anything either, so a learner tapped it with no idea whether it was free. And the retake button
+ * anything either, so a learner tapped it with no idea what it would cost. And the retake button
  * said nothing about the questions being identical, which is the first thing anyone wonders.
  *
  * Both platforms build their copy from here, so the two cannot quietly start explaining the same
@@ -27,9 +27,8 @@ export interface QuizGradeQuote {
 /**
  * What grading this answer will cost, as an i18n key and its params.
  *
- * Three outcomes, because there are three: covered by today's free allowance, covered by the
- * one-time trial, or charged. `price_micro` is the authority on which — the server has already
- * worked out how much of the call the free units cover, and a screen re-deriving that from unit
+ * One outcome, because there is one: grading is charged. `price_micro` is the authority — the
+ * server has already worked out what this call costs, and a screen re-deriving that from unit
  * counts would be a second opinion about the learner's own balance.
  *
  * Null when there is no quote yet. A screen saying nothing is better than one guessing, and the
@@ -40,14 +39,13 @@ export function gradeCostLine(
 ): { key: string; params: Record<string, string | number> } | null {
   if (!quote) return null
 
-  if (quote.price_micro <= 0) {
-    // How many more are covered, so "free" does not read as "always free". Trial units are
-    // counted in because the learner cannot tell them apart and does not need to.
-    const left = Math.max(0, (quote.free_remaining_today ?? 0) + (quote.trial_remaining ?? 0))
-    return left > 0
-      ? { key: 'pricing.gradeFreeLeft', params: { left } }
-      : { key: 'pricing.gradeFree', params: {} }
-  }
+  // NOTHING, not "무료로 채점돼요".
+  //
+  // Grading is charged every time now — migration 233 allocates zero free and zero trial units to
+  // `grade_*`, so a zero price here is not a free allowance, it is a quote that has not got a
+  // price to state. Saying "free" off the back of it would put back on the screen exactly the
+  // promise that was removed from the ledger, and it is the sentence the owner asked to be gone.
+  if (quote.price_micro <= 0) return null
 
   // The wallet's own formatter, so a grade and a balance are never denominated differently.
   return { key: 'pricing.gradeCost', params: { amount: formatUsdMicro(quote.price_micro) } }

@@ -299,7 +299,10 @@ const OUTPUT_CAP: Record<string, number> = {
   // One field key and a sentence of reasoning. Nothing here should be long.
   quiz_answer_key: 400,
   quiz_generate: 3000,
-  quiz_grade: 800,
+  // Essay grading writes a verdict, a per-criterion line and what the answer failed to
+  // mention. 800 truncated that into the thin feedback the owner reported; measured output for
+  // a full essay verdict is ~1,100 tokens.
+  quiz_grade: 1600,
   remediation: 1500,
   cards: 4000,
   deck: 1500,
@@ -333,6 +336,11 @@ async function providerRequest(m: ResolvedModel, systemPrompt: string, userPromp
     response_format: { type: 'json_object' },
     temperature,
     max_tokens: maxTokens,
+    // `max_tokens` covers a reasoning model's hidden thinking as well as its answer, so on
+    // DeepSeek's v4 line our 3,000-token quiz cap bought 2,847 tokens of reasoning and a
+    // truncated JSON object. See `ProviderDef.reasoningEffort`. Providers that have never
+    // heard of the field ignore an absent key, which is why it is spread rather than set.
+    ...(m.reasoningEffort ? { reasoning_effort: m.reasoningEffort } : {}),
   }
 
   for (let attempt = 0; attempt <= PROVIDER_RETRY_DELAYS.length; attempt++) {
@@ -1054,14 +1062,46 @@ Deno.serve(async (req) => {
         const prompt = qType === 'mcq' ? buildMcqGenerationPrompt(sources, difficulty, uiLocale)
           : qType === 'short' ? buildShortAnswerGenerationPrompt(sources, difficulty, uiLocale)
           : buildEssayGenerationPrompt(sources, difficulty, uiLocale)
-        const generated = await generate(chain, prompt.systemPrompt, prompt.userPrompt, undefined, DEFAULT_TEMPERATURE, outputCapFor('quiz_generate'))
-
         const makeItemId = (cardId: string, index: number) => `${setId}:${cardId}:${index}`
-        const outcome = qType === 'mcq'
-          ? validateMultipleChoiceGeneration(generated.json, sources, makeItemId, difficulty)
+        const validate = (json: Record<string, unknown>) => qType === 'mcq'
+          ? validateMultipleChoiceGeneration(json, sources, makeItemId, difficulty)
           : qType === 'short'
-            ? validateShortAnswerGeneration(generated.json, sources, makeItemId)
-            : validateEssayGeneration(generated.json, sources, makeItemId)
+            ? validateShortAnswerGeneration(json, sources, makeItemId)
+            : validateEssayGeneration(json, sources, makeItemId)
+
+        /**
+         * ONE corrective retry when the whole batch is unusable for a reason the model can fix.
+         *
+         * Some drops are the deck's fault and no amount of asking again will help — a two-word
+         * card cannot ground an essay rubric. But `schema_word_leaked` (the question names our
+         * JSON keys) and `answer_leaked_in_question` (it gives the answer away) are the model
+         * being careless, and they arrive in ALL-OR-NOTHING batches: measured on production,
+         * four 서술형 runs of the same three cards came back 3/3 clean, 0/3 schema-leaked, 3/3
+         * clean, 0/3 answer-leaked. The learner saw "AI 서비스가 붐비고 있어요" for a coin flip.
+         *
+         * A retry inside the same request is charged once — the reservation is already made —
+         * whereas the learner retrying by hand reserves and pays again.
+         */
+        const FIXABLE = new Set(['schema_word_leaked', 'answer_leaked_in_question', 'anchor_missing'])
+        let generated = await generate(chain, prompt.systemPrompt, prompt.userPrompt, undefined, DEFAULT_TEMPERATURE, outputCapFor('quiz_generate'))
+        let outcome = validate(generated.json)
+
+        if (!outcome.servable && outcome.dropped.length > 0
+            && outcome.dropped.every((d) => FIXABLE.has(d.reason))) {
+          const reasons = [...new Set(outcome.dropped.map((d) => d.reason))]
+          console.warn(`[ai-generate] retrying quiz batch once: every item dropped (${reasons.join(', ')})`)
+          const corrective = `${prompt.systemPrompt}
+
+Your previous attempt was rejected in full. Every item broke one of these rules:
+${reasons.map((r) => r === 'schema_word_leaked'
+    ? '- the question contained one of OUR field names (prompt, cardId, field_1, ...). Write the learner\'s subject matter, never the key names.'
+    : r === 'answer_leaked_in_question'
+      ? '- the question contained the card\'s ANSWER, so there was nothing left to answer. Quote only the card\'s question side.'
+      : '- the question did not quote the card\'s question side, so it was not anchored to the card.').join('\n')}
+Write them again, obeying those rules exactly.`
+          generated = await generate(chain, corrective, prompt.userPrompt, undefined, DEFAULT_TEMPERATURE, outputCapFor('quiz_generate'))
+          outcome = validate(generated.json)
+        }
 
         // The drop reasons ARE the prompt's report card; they are the only signal that would
         // ever tell us a prompt change made distractors worse.

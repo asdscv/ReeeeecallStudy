@@ -48,6 +48,21 @@ export interface ProviderDef {
    * the abort surfaced as AI_PROVIDER_ERROR: "지금 AI 서비스가 붐비고 있어요".
    */
   timeoutMs?: number
+  /**
+   * Ask this provider NOT to think out loud.
+   *
+   * A reasoning model spends the output budget on hidden `reasoning_content` BEFORE it writes
+   * a single character of the answer, and `max_tokens` covers both. Measured on
+   * deepseek-v4-flash with our real 3,000-token quiz cap: 2,847 tokens of reasoning, 153 left
+   * for the JSON, `finish_reason: "length"`, and a truncated object that fails to parse —
+   * which is why 서술형 quiz generation failed every single time while MCQ (a smaller answer)
+   * squeaked through at 2,489.
+   *
+   * The same call with reasoning off: 856 completion tokens, complete valid JSON, 6.0s instead
+   * of 23.0s. Our prompts already carry the structure the thinking was rediscovering each time,
+   * so this is cheaper, faster and — because it stops truncating — correct.
+   */
+  reasoningEffort?: 'none' | 'low' | 'medium' | 'high'
 }
 
 // Add a provider = add one entry. All are OpenAI-compatible.
@@ -102,6 +117,9 @@ export const PROVIDERS: Record<string, ProviderDef> = {
     // Measured, not guessed: 23.7s for three MCQ cards on the live key. Three times the default
     // leaves room for a full batch without leaving a learner watching a spinner forever.
     timeoutMs: 90_000,
+    // See `ProviderDef.reasoningEffort`. Without this the v4 line burns the whole output cap
+    // thinking and returns a truncated object.
+    reasoningEffort: 'none',
     // TEXT ONLY. `image_url` content parts are rejected outright — "unknown variant `image_url`,
     // expected `text`" — so a deployment that points vision here does not degrade, it 400s on
     // every card image. `AI_VISION_PROVIDER` exists for exactly this.
@@ -121,6 +139,7 @@ export type Purpose = 'text' | 'vision'
 export interface ResolvedModel {
   /** How long one call may take. Provider-specific — a reasoning model is legitimately slower. */
   timeoutMs: number
+  reasoningEffort?: 'none' | 'low' | 'medium' | 'high'
   apiKey: string
   baseUrl: string
   model: string
@@ -205,5 +224,5 @@ export function resolveModel(purpose: Purpose, env: EnvGetter): ResolvedModel | 
   const timeoutMs = Number(env('AI_PROVIDER_TIMEOUT_MS')) || def?.timeoutMs || 30_000
 
   if (!apiKey || !baseUrl || !model) return null
-  return { apiKey, baseUrl, model, provider, timeoutMs }
+  return { apiKey, baseUrl, model, provider, timeoutMs, reasoningEffort: def?.reasoningEffort }
 }

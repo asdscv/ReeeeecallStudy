@@ -165,9 +165,31 @@ export function splitBySpan(text: string, span: QuizSpanRef | null | undefined):
   if (!span || span.start < 0 || span.end > text.length || span.end <= span.start) {
     return { before: text, hit: '', after: '' }
   }
+  const [start, end] = snapToWords(text, span.start, span.end)
   return {
-    before: text.slice(0, span.start),
-    hit: text.slice(span.start, span.end),
-    after: text.slice(span.end),
+    before: text.slice(0, start),
+    hit: text.slice(start, end),
+    after: text.slice(end),
   }
+}
+
+/**
+ * Grow a span outward until both ends sit on a word boundary.
+ *
+ * The offsets are the model's, and they are counted in characters, so they land mid-word often
+ * enough to notice: a graded answer highlighted "산들[바람이라는]" — the word 산들바람 cut in
+ * half and the highlight running on into the particle. The learner reads a highlight as "this
+ * is the bit I got right", and half a word says something the grader did not mean.
+ *
+ * Whitespace is the only boundary used. Korean and Japanese do not put spaces inside a word, so
+ * anything finer would need a tokeniser per language; snapping to the surrounding run of
+ * non-space characters is the rule that holds in every script we ship.
+ */
+function snapToWords(text: string, start: number, end: number): [number, number] {
+  const isSpace = (i: number) => /\s/.test(text[i] ?? ' ')
+  let s = start
+  let e = end
+  while (s > 0 && !isSpace(s - 1)) s--
+  while (e < text.length && !isSpace(e)) e++
+  return [s, e]
 }

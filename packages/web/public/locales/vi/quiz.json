@@ -33,7 +33,7 @@
     "untitled": "Bài kiểm tra",
     "type": "Loại câu hỏi",
     "typeHint": {
-      "mcq": "Bốn lựa chọn, chấm ngay và miễn phí.",
+      "mcq": "Bốn lựa chọn. Kiểm tra ngay khi bạn trả lời — không dùng AI chấm nên không tốn tín dụng.",
       "short": "Trả lời bằng một từ hoặc cụm từ. AI chấm, tính phí theo từng câu.",
       "essay": "Viết vài câu, chấm theo tiêu chí. Khó nhất và đắt nhất."
     },
@@ -218,11 +218,9 @@
     "historyTitle": "Lịch sử làm bài"
   },
   "pricing": {
-    "gradeFreeLeft": "Chấm miễn phí · còn {{left, number}} lần miễn phí",
-    "gradeFree": "Chấm miễn phí",
     "gradeCost": "Chấm bài tốn {{amount}}",
-    "retakeMcq": "Vẫn là câu hỏi đó, chỉ đảo thứ tự đáp án. Làm lại và chấm đều miễn phí.",
-    "retakeWritten": "Vẫn là câu hỏi đó. Làm lại miễn phí; chấm bài là lượt gọi mới nên tính phí mỗi lần."
+    "retakeMcq": "Vẫn những câu hỏi đó, chỉ đảo thứ tự lựa chọn. Trắc nghiệm không dùng AI chấm nên không tốn tín dụng.",
+    "retakeWritten": "Làm lại đúng những câu hỏi đó. Câu hỏi đã được trả phí, nhưng chấm bài là lượt gọi mới và bị tính phí mỗi lần."
   },
   "activity": {
     "title": "Hoạt động AI",

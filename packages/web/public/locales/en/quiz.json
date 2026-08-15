@@ -33,7 +33,7 @@
     "untitled": "Quiz",
     "type": "Question type",
     "typeHint": {
-      "mcq": "Four options, graded instantly and free.",
+      "mcq": "Four options. Checked the moment you answer — no AI grading, so no credits.",
       "short": "A word or a phrase. Graded by AI, charged per answer.",
       "essay": "A few sentences, graded against a rubric. The most demanding, and the most expensive."
     },
@@ -218,11 +218,9 @@
     "historyTitle": "History"
   },
   "pricing": {
-    "gradeFreeLeft": "Graded free · {{left, number}} more free",
-    "gradeFree": "Graded free",
     "gradeCost": "Grading costs {{amount}}",
-    "retakeMcq": "The same questions, with the options reshuffled. Retaking and grading are both free.",
-    "retakeWritten": "The same questions again. Retaking is free; grading is a fresh call, so it costs each time."
+    "retakeMcq": "The same questions, with the options reshuffled. Multiple choice is checked without AI, so it uses no credits.",
+    "retakeWritten": "The same questions again. The questions are already paid for, but grading is a fresh call and is charged every time."
   },
   "activity": {
     "title": "AI activity",

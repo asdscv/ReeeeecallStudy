@@ -33,7 +33,7 @@
     "untitled": "Cuestionario",
     "type": "Tipo de pregunta",
     "typeHint": {
-      "mcq": "Cuatro opciones, corregidas al instante y gratis.",
+      "mcq": "Cuatro opciones. Se comprueba en cuanto respondes: sin IA, así que sin créditos.",
       "short": "Responde con una palabra o una frase. Corrige la IA y se cobra por respuesta.",
       "essay": "Escribe unas frases; se corrige con una rúbrica. Lo más exigente y lo más caro."
     },
@@ -218,11 +218,9 @@
     "historyTitle": "Historial"
   },
   "pricing": {
-    "gradeFreeLeft": "Corrección gratis · {{left, number}} más gratis",
-    "gradeFree": "Corrección gratis",
     "gradeCost": "Corregir cuesta {{amount}}",
-    "retakeMcq": "Las mismas preguntas, con las opciones reordenadas. Repetir y corregir son gratis.",
-    "retakeWritten": "Las mismas preguntas otra vez. Repetir es gratis; corregir es una llamada nueva y cuesta cada vez."
+    "retakeMcq": "Las mismas preguntas, con las opciones reordenadas. La opción múltiple se corrige sin IA, así que no consume créditos.",
+    "retakeWritten": "Las mismas preguntas otra vez. Las preguntas ya están pagadas, pero la corrección es una llamada nueva y se cobra cada vez."
   },
   "activity": {
     "title": "Actividad de IA",

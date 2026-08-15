@@ -20,7 +20,7 @@ const quote = (over: Partial<Parameters<typeof gradeCostLine>[0] & object> = {})
 
 describe('what grading costs', () => {
   it('names the amount in the wallet\'s own unit', () => {
-    // Measured: grade_short is 2 units × 5,000 micro. The balance elsewhere reads "$500.00",
+    // Measured: grade_short is 2 units × 50,000 micro. The balance elsewhere reads "$499.60",
     // so a grade denominated any other way would be a second currency on the same screen.
     expect(gradeCostLine(quote())).toEqual({
       key: 'pricing.gradeCost', params: { amount: '$0.01' },
@@ -29,21 +29,13 @@ describe('what grading costs', () => {
     expect(gradeCostLine(quote({ price_micro: 40_000 }))!.params.amount).toBe('$0.04')
   })
 
-  it('says free, and how much free is left', () => {
-    // `price_micro` is the authority. The server has already decided how much of this call the
-    // free and trial units cover; a screen re-deriving that would be a second opinion about the
-    // learner's own balance.
-    expect(gradeCostLine(quote({ price_micro: 0, free_units: 2, free_remaining_today: 8 })))
-      .toEqual({ key: 'pricing.gradeFreeLeft', params: { left: 8 } })
-    // Trial units count in: the learner cannot tell them apart and does not need to.
-    expect(gradeCostLine(quote({ price_micro: 0, trial_units: 2, trial_remaining: 12 })))
-      .toEqual({ key: 'pricing.gradeFreeLeft', params: { left: 12 } })
-  })
-
-  it('says plain "free" when this one is the last free one', () => {
-    // "0번 더 무료" is worse than saying nothing about the remainder.
-    expect(gradeCostLine(quote({ price_micro: 0, free_units: 2 })))
-      .toEqual({ key: 'pricing.gradeFree', params: {} })
+  it('says nothing when the quote carries no price, rather than saying free', () => {
+    // Grading has no free allowance any more: migration 233 gives `grade_*` zero free and zero
+    // trial units, so a zero price is a quote with nothing to state, not a gift. The screen used
+    // to read "무료로 채점돼요 · 27번 더 무료" off exactly this branch — the sentence the owner
+    // asked to be removed — so the branch went with it.
+    expect(gradeCostLine(quote({ price_micro: 0, free_units: 2, free_remaining_today: 8 }))).toBeNull()
+    expect(gradeCostLine(quote({ price_micro: 0, trial_units: 2, trial_remaining: 12 }))).toBeNull()
   })
 
   it('says nothing at all without a quote', () => {
