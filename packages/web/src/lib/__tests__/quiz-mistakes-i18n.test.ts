@@ -225,3 +225,72 @@ describe.each(['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id', 'es'] as const)('%s —
     }
   })
 })
+
+/**
+ * Every achievement in the database has a name, in every language.
+ *
+ * `achievement_definitions` holds 62 rows; the bundles had names for 25 of them. The rest fell
+ * through `defaultValue: id.replace(/_/g, ' ')` and shipped as "decks 1", "time 1800" and
+ * "market acquire 5" — identically in all eight languages, English included, because a raw id
+ * is not English either.
+ *
+ * The list is the production table, read from `achievement_definitions` and pinned here: a test
+ * cannot reach the database, and a badge added there without a name is exactly the failure this
+ * is for. Adding a row means adding a line here — which is the point, not an inconvenience.
+ */
+const ACHIEVEMENT_IDS = [
+  'ai_cards_10', 'ai_cards_50', 'cards_10', 'cards_100', 'cards_1000', 'cards_10000',
+  'cards_2000', 'cards_25000', 'cards_50', 'cards_500', 'cards_5000', 'cards_50000',
+  'comeback', 'decks_1', 'decks_10', 'decks_20', 'decks_5', 'decks_50',
+  'early_bird', 'first_deck', 'first_review', 'first_share', 'graded_1', 'market_acquire_10',
+  'market_acquire_25', 'market_acquire_5', 'mastery_10', 'mastery_100', 'mastery_1000', 'mastery_50',
+  'mastery_500', 'night_owl', 'perfect_session', 'quizzes_1', 'quizzes_5', 'reviews_10',
+  'reviews_5', 'sessions_1', 'sessions_10', 'sessions_100', 'sessions_1000', 'sessions_200',
+  'sessions_50', 'sessions_500', 'shares_1', 'shares_10', 'shares_5', 'streak_100',
+  'streak_14', 'streak_180', 'streak_3', 'streak_30', 'streak_365', 'streak_60',
+  'streak_7', 'time_1800', 'time_18000', 'time_300', 'time_60', 'time_600',
+  'time_6000', 'weekend_warrior',
+] as const
+
+// Both copies. Mobile keeps its own bundle AND its own Intl-free `number` formatter, so a name
+// that renders on web can still come out wrong on a phone.
+const COMMON_BUNDLES = {
+  web: (lng: string) => resolve(__dirname, `../../../public/locales/${lng}/common.json`),
+  mobile: (lng: string) => resolve(__dirname, `../../../../mobile/src/i18n/locales/${lng}/common.json`),
+} as const
+
+describe.each(
+  (['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id', 'es'] as const).flatMap(
+    (lng) => (['web', 'mobile'] as const).map((platform) => [lng, platform] as const)),
+)('%s/%s — 업적 이름', (lng, platform) => {
+  const common = () => {
+    const i18n = createInstance()
+    void i18n.init({
+      lng,
+      resources: { [lng]: { common: JSON.parse(readFileSync(COMMON_BUNDLES[platform](lng), 'utf-8')) } },
+      ns: ['common'], defaultNS: 'common', initImmediate: false,
+      interpolation: { escapeValue: false },
+    })
+    return i18n.getFixedT(lng, 'common')
+  }
+
+  it('names every badge, with its number in it', () => {
+    const tf = common()
+    for (const id of ACHIEVEMENT_IDS) {
+      const name = tf(`achievements.badge.${id}`, { n: 1234 })
+      expect(name, id).not.toBe(`achievements.badge.${id}`)
+      expect(name.trim(), id).not.toBe('')
+      // No leftover placeholder: `n` is a plain variable precisely so i18next's plural
+      // selection cannot swallow the lookup and leave `{{n, number}}` on the screen.
+      expect(name, id).not.toContain('{{')
+    }
+  })
+
+  it('groups the thousands in a badge name the way the language does', () => {
+    const tf = common()
+    // 25,000 cards is the largest rung. On mobile this goes through the Intl-free formatter,
+    // which is why the assertion is "not the bare digits" rather than a specific separator.
+    const name = tf('achievements.badge.cards_25000', { n: 25000 })
+    expect(name).toMatch(/25[.,\u00a0\u202f ]?000/)
+  })
+})
