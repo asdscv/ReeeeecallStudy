@@ -43,7 +43,10 @@
     "difficulty": "Độ khó",
     "clampedCount_one": "Bộ thẻ này tạo được {{count, number}} câu hỏi.",
     "clampedCount_other": "Bộ thẻ này tạo được {{count, number}} câu hỏi.",
-    "generatingBatch": "Đang tạo… ({{done, number}}/{{total, number}})"
+    "generatingBatch": "Đang tạo… ({{done, number}}/{{total, number}})",
+    "customCount": "Tự nhập",
+    "countEffective_one": "Tạo {{count, number}} câu",
+    "countEffective_other": "Tạo {{count, number}} câu"
   },
   "run": {
     "loading": "Đang tải…",
@@ -64,6 +67,17 @@
     "length": {
       "count": "{{chars, number}} / {{max, number}} ký tự",
       "tooShort": "Cần ít nhất {{min, number}} ký tự để chấm"
+    },
+    "verdict": {
+      "correct": "Đúng rồi",
+      "partial": "Đúng một phần",
+      "wrong": "Chưa đúng",
+      "ungraded": "Chưa chấm"
+    },
+    "tally": {
+      "plain": "Đúng {{correct, number}} · Sai {{wrong, number}}",
+      "withUngraded": "Đúng {{correct, number}} · Sai {{wrong, number}} · Chưa chấm {{ungraded, number}}",
+      "none": "{{total, number}} câu"
     }
   },
   "result": {
@@ -77,7 +91,8 @@
     "markWrong": "Tôi sai",
     "retake": "Làm lại",
     "nothingGraded": "Chưa chấm",
-    "nothingGradedBody": "Bạn chưa chấm câu trả lời nào trong lượt này."
+    "nothingGradedBody": "Bạn chưa chấm câu trả lời nào trong lượt này.",
+    "unanswered": "Còn {{n, number}} câu chưa trả lời"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "Không đủ số dư. Hãy nạp thêm để tiếp tục.",

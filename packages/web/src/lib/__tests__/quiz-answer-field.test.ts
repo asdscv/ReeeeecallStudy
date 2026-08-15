@@ -7,7 +7,7 @@
  * back. Those two shapes are between them the source of every case here.
  */
 import { describe, it, expect } from 'vitest'
-import { resolveQuizCardFaces, quizReferenceAnswer } from '@reeeeecall/shared/lib/quiz-answer-field'
+import { resolveQuizCardFaces, quizReferenceAnswer, quizPromptText } from '@reeeeecall/shared/lib/quiz-answer-field'
 import { resolveCardAnswerFaces, cardReferenceAnswer } from '@reeeeecall/shared/lib/card-answer'
 
 const text = (key: string, order: number) => ({ key, name: key, type: 'text' as const, order })
@@ -156,5 +156,74 @@ describe('it refuses rather than guesses', () => {
     expect(resolveQuizCardFaces(
       { fields, front_layout: front, back_layout: [] }, card,
     )).toBeNull()
+  })
+})
+
+/**
+ * "너 그 드라마 봤어? 완전 빠졌어 / 드라마 추천"
+ *
+ * Photographed from the app. The official bilingual template's front is
+ * [front/primary, situation/hint], and the stem was built by joining every non-empty front text
+ * field with ' / ' — so a hint field meant to sit beside the question ended up inside it. Every
+ * question on every official conversation deck read this way.
+ *
+ * Two things wrong with it at once: it reads like a rendering bug, and `situation` is the
+ * CATEGORY, so the learner is handed the topic of the sentence they are being asked to produce.
+ */
+describe('the question stem', () => {
+  const template = {
+    fields: [
+      { key: 'front', type: 'text' }, { key: 'situation', type: 'text' },
+      { key: 'back', type: 'text' }, { key: 'note', type: 'text' },
+    ],
+    front_layout: [
+      { field_key: 'front', style: 'primary' },
+      { field_key: 'situation', style: 'hint' },
+    ],
+    back_layout: [
+      { field_key: 'back', style: 'primary' },
+      { field_key: 'note', style: 'detail' },
+    ],
+  }
+  const card = {
+    field_values: {
+      front: '너 그 드라마 봤어? 완전 빠졌어',
+      situation: '드라마 추천',
+      back: "Have you watched that drama? I'm totally hooked.",
+      note: 'hooked = 푹 빠진',
+    },
+  }
+
+  it('asks only the primary front field', () => {
+    expect(quizPromptText(template as never, card as never))
+      .toBe('너 그 드라마 봤어? 완전 빠졌어')
+  })
+
+  it('does not leak the hint field into the question', () => {
+    // The exact regression. A hint is context beside the question, never part of it.
+    expect(quizPromptText(template as never, card as never)).not.toContain('드라마 추천')
+    expect(quizPromptText(template as never, card as never)).not.toContain(' / ')
+  })
+
+  it('still uses the whole front when nothing is declared primary', () => {
+    // With no primary there is no declaration to honour, and dropping fields would silently
+    // narrow the question on templates that legitimately ask with two fields.
+    const undeclared = {
+      ...template,
+      front_layout: [{ field_key: 'front', style: 'detail' }, { field_key: 'situation', style: 'detail' }],
+    }
+    expect(quizPromptText(undeclared as never, card as never))
+      .toBe('너 그 드라마 봤어? 완전 빠졌어 / 드라마 추천')
+  })
+
+  it('still refuses a card whose answer sits anywhere on the front', () => {
+    // Tightened alongside: the old check looked only at the STEM keys, so once the stem
+    // narrowed to the primary, an answer repeated in a hint field would have slipped through
+    // and shown the learner exactly what to produce.
+    const leaky = {
+      ...template,
+      front_layout: [{ field_key: 'front', style: 'primary' }, { field_key: 'back', style: 'hint' }],
+    }
+    expect(quizPromptText(leaky as never, card as never)).toBeNull()
   })
 })

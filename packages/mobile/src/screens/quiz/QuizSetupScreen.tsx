@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, Pressable, TextInput } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
@@ -21,6 +21,8 @@ const TYPES: QuizQuestionType[] = ['mcq', 'short', 'essay']
 // Same presets as web. Mobile has no free-entry field: a numeric keyboard for a value that
 // is almost always one of these is worse than one more chip.
 const COUNTS = [4, 6, 8, 10, 12, 20, 30, 50]
+/** Ceiling for the custom box. Matches web's MAX_COUNT and the server's per-set cap. */
+const MAX_COUNT = 50
 
 /**
  * Scope, type, count, price, confirm.
@@ -83,6 +85,8 @@ export function QuizSetupScreen() {
     ? difficulty
     : (usableBands.find((b) => b.is_default) ?? usableBands[0])?.level ?? null
   const eligible = shownCounts?.eligible ?? 0
+  /** The chosen count is not one of the chips, so the custom box is what is in effect. */
+  const isCustomCount = !COUNTS.includes(count)
   const tooFewForMcq = type === 'mcq' && eligible > 0 && eligible < 4
   const canSubmit = Boolean(deckId) && eligible > 0 && !tooFewForMcq && !generating
     && priced !== null && priced.sufficient
@@ -181,6 +185,43 @@ export function QuizSetupScreen() {
             </Pressable>
           ))}
         </View>
+
+        {/* Parity with web, which had a custom box and phones did not — a learner who wanted 13
+            questions simply could not ask for one here. Kept OUT of the chip row and labelled:
+            web's version sat inline as a ninth chip that always echoed the count, so typing 13
+            highlighted nothing and typing 6 lit up the 6 chip. Empty unless the count really is
+            custom, outlined when it is the thing in effect. */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
+          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+            {t('setup.customCount')}
+          </Text>
+          <TextInput
+            value={isCustomCount ? String(count) : ''}
+            onChangeText={(raw) => {
+              if (raw.trim() === '') return
+              const n = Number(raw.replace(/[^0-9]/g, ''))
+              if (Number.isFinite(n) && n > 0) setCount(Math.min(MAX_COUNT, Math.max(1, Math.round(n))))
+            }}
+            keyboardType="number-pad"
+            placeholder={`1–${MAX_COUNT}`}
+            placeholderTextColor={theme.colors.textTertiary}
+            style={{
+              width: 76, minHeight: 40, textAlign: 'center', borderRadius: 10, borderWidth: 1,
+              paddingHorizontal: 8, color: theme.colors.text,
+              borderColor: isCustomCount ? theme.colors.primary : theme.colors.border,
+              backgroundColor: theme.colors.surface,
+            }}
+            {...testProps('quiz-count-custom')}
+          />
+          {/* One place says what will actually be made, whichever control set it. */}
+          <Text
+            style={[theme.typography.caption, { color: theme.colors.textTertiary }]}
+            {...testProps('quiz-count-effective')}
+          >
+            {t('setup.countEffective', { count: Math.min(count, eligible || count) })}
+          </Text>
+        </View>
+
         {/* The submit clamps to `eligible`, and on a deck smaller than the smallest chip every
             chip is disabled — so the screen showed a count nobody could change and then quietly
             made a different number. Say the real number instead. */}

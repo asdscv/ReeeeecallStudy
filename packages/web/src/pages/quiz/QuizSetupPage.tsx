@@ -88,6 +88,8 @@ export function QuizSetupPage() {
   const eligible = shownCounts?.eligible ?? 0
   // Multiple choice needs three other cards to draw plausible distractors from. Blocking here
   // is kinder than letting the server refuse after the learner has picked everything.
+  /** The chosen count is not one of the chips, so the custom box is what is in effect. */
+  const isCustomCount = !COUNTS.includes(count)
   const tooFewForMcq = type === 'mcq' && eligible > 0 && eligible < 4
   const canSubmit = Boolean(deckId) && eligible > 0 && !tooFewForMcq && !generating
     && priced !== null && priced.sufficient
@@ -200,18 +202,44 @@ export function QuizSetupPage() {
                 {option}
               </button>
             ))}
+          </div>
+
+          {/* Out of the chip row, and labelled.
+              It used to sit inline as a ninth chip that always echoed `count`, so typing 13
+              highlighted nothing and typing 6 lit up the 6 chip — the same control appearing to
+              do two different things depending on the number. Now it is visibly a separate
+              input, empty unless the chosen count is genuinely custom, and highlighted when it
+              is the thing in effect. */}
+          <div className="mt-2 flex items-center gap-2">
+            <label htmlFor="quiz-count-custom" className="text-xs text-content-tertiary">
+              {t('setup.customCount')}
+            </label>
             <input
+              id="quiz-count-custom"
               type="number"
+              inputMode="numeric"
               min={1}
               max={MAX_COUNT}
-              value={count}
+              value={isCustomCount ? count : ''}
+              placeholder={`1–${MAX_COUNT}`}
               onChange={(e) => {
-                const n = Number(e.target.value)
+                const raw = e.target.value
+                if (raw === '') return
+                const n = Number(raw)
                 if (Number.isFinite(n)) setCount(Math.min(MAX_COUNT, Math.max(1, Math.round(n))))
               }}
-              aria-label={t('setup.count')}
-              className="w-16 rounded-lg border border-border bg-background px-2 py-1.5 text-center text-sm text-foreground"
+              aria-label={t('setup.customCount')}
+              data-testid="quiz-count-custom"
+              className={`w-20 rounded-lg border px-2 py-1.5 text-center text-sm text-foreground ${
+                isCustomCount
+                  ? 'border-brand bg-brand/5 font-medium'
+                  : 'border-border bg-background'
+              }`}
             />
+            {/* One place says what will actually be made, whichever control set it. */}
+            <span className="text-xs text-content-tertiary" data-testid="quiz-count-effective">
+              {t('setup.countEffective', { count: Math.min(count, eligible || count) })}
+            </span>
           </div>
           {/* The submit clamps to `eligible`, and on a deck smaller than the smallest chip every
               chip is disabled — so the screen showed a count nobody could change and then quietly

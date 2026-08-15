@@ -43,7 +43,10 @@
     "difficulty": "难度",
     "clampedCount_one": "这个卡组会生成 {{count, number}} 道题。",
     "clampedCount_other": "这个卡组会生成 {{count, number}} 道题。",
-    "generatingBatch": "生成中… ({{done, number}}/{{total, number}})"
+    "generatingBatch": "生成中… ({{done, number}}/{{total, number}})",
+    "customCount": "自定义",
+    "countEffective_one": "生成 {{count, number}} 题",
+    "countEffective_other": "生成 {{count, number}} 题"
   },
   "run": {
     "loading": "加载中…",
@@ -64,6 +67,17 @@
     "length": {
       "count": "{{chars, number}} / {{max, number}} 字",
       "tooShort": "至少 {{min, number}} 字才能批改"
+    },
+    "verdict": {
+      "correct": "答对了",
+      "partial": "部分正确",
+      "wrong": "答错了",
+      "ungraded": "未批改"
+    },
+    "tally": {
+      "plain": "对 {{correct, number}} · 错 {{wrong, number}}",
+      "withUngraded": "对 {{correct, number}} · 错 {{wrong, number}} · 未批改 {{ungraded, number}}",
+      "none": "{{total, number}} 题"
     }
   },
   "result": {
@@ -77,7 +91,8 @@
     "markWrong": "我答错了",
     "retake": "再做一次",
     "nothingGraded": "未评分",
-    "nothingGradedBody": "本次作答还没有评分的题目。"
+    "nothingGradedBody": "本次作答还没有评分的题目。",
+    "unanswered": "还有 {{n, number}} 题未作答"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "余额不足。充值后即可继续。",

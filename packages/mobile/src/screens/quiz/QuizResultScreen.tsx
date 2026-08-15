@@ -7,6 +7,7 @@ import { useQuizStore, type QuizRunItem } from '@reeeeecall/shared/stores/quiz-s
 import { Screen, Button } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
+import { tallyQuiz, tallyLine } from '@reeeeecall/shared/lib/quiz-outcome'
 import { QuizFeedback } from './QuizFeedback'
 import type { QuizStackParamList } from '../../navigation/types'
 
@@ -48,25 +49,39 @@ export function QuizResultScreen() {
     return <Screen><Text style={[theme.typography.body, styles.center, { color: theme.colors.textSecondary }]}>{t('run.loading')}</Text></Screen>
   }
 
-  // Over what was GRADED, not over what was asked — see the web screen. A run where the
-  // learner declined to pay for any grade was reading as a 0%.
-  const graded = run.items.filter((i) => i.score !== null).length
-  const percent = run.score_max > 0 ? Math.round((run.score_raw / run.score_max) * 100) : 0
+  // COUNTS, not a percentage.
+  //
+  // The comment here used to say "over what was GRADED, not over what was asked" — and then
+  // divided by `score_max`, the total question count set when the run starts. Answering six
+  // short-answer questions, paying to grade one and getting it right read as 17%.
+  //
+  // Fixing the denominator would not have been enough: a quiz item has three outcomes and a
+  // ratio has two. An ungraded answer is not a wrong answer.
+  const tally = tallyQuiz(run.items.map((i) => ({ answered: i.answered, score: i.score })))
+  const tallyText = tallyLine(tally)
 
   return (
     <Screen>
       <ScrollView contentContainerStyle={styles.body}>
         <View style={[styles.score, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-          <Text style={[theme.typography.h1, { color: theme.colors.text }]}>
-            {graded === 0 ? t('result.nothingGraded') : t('result.percent', { percent })}
+          <Text style={[theme.typography.h1, { color: theme.colors.text }]}
+                {...testProps('quiz-result-headline')}>
+            {tally.judged === 0
+              ? t('result.nothingGraded')
+              : `${t('run.verdict.correct')} ${tally.correct}`}
           </Text>
-          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-            {/* Whole questions: partial credit exists on essays, but "4.3 of 6" reads as a
-                rounding artefact rather than as a score. */}
-            {graded === 0
+          <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}
+                {...testProps('quiz-result-tally')}>
+            {/* The three numbers, because there are three outcomes. */}
+            {tally.judged === 0
               ? t('result.nothingGradedBody')
-              : t('result.of', { raw: Math.round(run.score_raw), max: run.score_max })}
+              : t(tallyText.key, tallyText.params)}
           </Text>
+          {tally.unanswered > 0 && (
+            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+              {t('result.unanswered', { n: tally.unanswered })}
+            </Text>
+          )}
           <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
             {t('result.attempt', { count: run.attempt_no })}
           </Text>

@@ -43,7 +43,10 @@
     "difficulty": "Tingkat kesulitan",
     "clampedCount_one": "Dek ini menghasilkan {{count, number}} soal.",
     "clampedCount_other": "Dek ini menghasilkan {{count, number}} soal.",
-    "generatingBatch": "Membuat… ({{done, number}}/{{total, number}})"
+    "generatingBatch": "Membuat… ({{done, number}}/{{total, number}})",
+    "customCount": "Isi sendiri",
+    "countEffective_one": "Buat {{count, number}} soal",
+    "countEffective_other": "Buat {{count, number}} soal"
   },
   "run": {
     "loading": "Memuat…",
@@ -64,6 +67,17 @@
     "length": {
       "count": "{{chars, number}} / {{max, number}} karakter",
       "tooShort": "Minimal {{min, number}} karakter untuk dinilai"
+    },
+    "verdict": {
+      "correct": "Benar",
+      "partial": "Sebagian benar",
+      "wrong": "Belum tepat",
+      "ungraded": "Belum dinilai"
+    },
+    "tally": {
+      "plain": "Benar {{correct, number}} · Salah {{wrong, number}}",
+      "withUngraded": "Benar {{correct, number}} · Salah {{wrong, number}} · Belum dinilai {{ungraded, number}}",
+      "none": "{{total, number}} soal"
     }
   },
   "result": {
@@ -77,7 +91,8 @@
     "markWrong": "Saya salah",
     "retake": "Kerjakan lagi",
     "nothingGraded": "Belum dinilai",
-    "nothingGradedBody": "Belum ada jawaban yang dinilai di sesi ini."
+    "nothingGradedBody": "Belum ada jawaban yang dinilai di sesi ini.",
+    "unanswered": "{{n, number}} soal belum dijawab"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "Saldo tidak cukup. Isi ulang untuk melanjutkan.",

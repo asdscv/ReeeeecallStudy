@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuizStore, type QuizRunItem } from '@reeeeecall/shared/stores/quiz-store'
 import { QuizFeedback } from './QuizFeedback'
+import { tallyQuiz, tallyLine } from '@reeeeecall/shared/lib/quiz-outcome'
 
 /**
  * What the sitting came to, and the one control that matters: the learner can overrule any
@@ -40,25 +41,36 @@ export function QuizResultPage() {
     return <div className="max-w-2xl mx-auto p-8 text-center text-sm text-content-tertiary">{t('run.loading')}</div>
   }
 
-  // Over what was GRADED, not over what was asked. A learner who answered six short-answer
-  // questions and paid to grade none of them was being shown "0%" and "0 of 6" — a total
-  // failure they did not earn, on a run where nothing had been judged at all.
-  const graded = run.items.filter((i) => i.score !== null).length
-  const percent = run.score_max > 0 ? Math.round((run.score_raw / run.score_max) * 100) : 0
+  // COUNTS, not a percentage.
+  //
+  // The comment that used to sit here said "over what was GRADED, not over what was asked" —
+  // and then divided by `score_max`, which is the total question count set when the run starts.
+  // Answering six short-answer questions, paying to grade one and getting it right read as 17%.
+  //
+  // Fixing the denominator would not have been enough. A quiz item has three outcomes and a
+  // ratio has two: an ungraded answer is not a wrong answer, and folding it into either half
+  // asserts something false about a learner who declined to spend. So the screen says all three.
+  const tally = tallyQuiz(run.items.map((i) => ({ answered: i.answered, score: i.score })))
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-4">
       <div className="p-4 bg-card rounded-xl border border-border text-center">
-        <p className="text-2xl font-medium text-foreground">
-          {graded === 0 ? t('result.nothingGraded') : t('result.percent', { percent })}
+        <p className="text-2xl font-medium text-foreground" data-testid="quiz-result-headline">
+          {tally.judged === 0
+            ? t('result.nothingGraded')
+            : t('run.verdict.correct') + ' ' + tally.correct}
         </p>
-        <p className="text-xs text-content-tertiary mt-1">
-          {/* Whole questions, not a decimal: partial credit exists on essays, but "4.3 of 6"
-              reads as a rounding artefact rather than as a score. */}
-          {graded === 0
+        <p className="text-sm text-content-tertiary mt-1" data-testid="quiz-result-tally">
+          {/* The three numbers, because there are three outcomes. */}
+          {tally.judged === 0
             ? t('result.nothingGradedBody')
-            : t('result.of', { raw: Math.round(run.score_raw), max: run.score_max })}
+            : t(tallyLine(tally).key, tallyLine(tally).params)}
         </p>
+        {tally.unanswered > 0 && (
+          <p className="text-xs text-content-tertiary mt-0.5">
+            {t('result.unanswered', { n: tally.unanswered })}
+          </p>
+        )}
         <p className="text-xs text-content-tertiary mt-0.5">
           {t('result.attempt', { count: run.attempt_no })}
         </p>

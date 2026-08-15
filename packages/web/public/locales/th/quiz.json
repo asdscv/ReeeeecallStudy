@@ -43,7 +43,10 @@
     "difficulty": "ระดับความยาก",
     "clampedCount_one": "เด็คนี้สร้างได้ {{count, number}} ข้อ",
     "clampedCount_other": "เด็คนี้สร้างได้ {{count, number}} ข้อ",
-    "generatingBatch": "กำลังสร้าง… ({{done, number}}/{{total, number}})"
+    "generatingBatch": "กำลังสร้าง… ({{done, number}}/{{total, number}})",
+    "customCount": "กำหนดเอง",
+    "countEffective_one": "สร้าง {{count, number}} ข้อ",
+    "countEffective_other": "สร้าง {{count, number}} ข้อ"
   },
   "run": {
     "loading": "กำลังโหลด…",
@@ -64,6 +67,17 @@
     "length": {
       "count": "{{chars, number}} / {{max, number}} ตัวอักษร",
       "tooShort": "ต้องมีอย่างน้อย {{min, number}} ตัวอักษรจึงจะตรวจได้"
+    },
+    "verdict": {
+      "correct": "ถูกต้อง",
+      "partial": "ถูกบางส่วน",
+      "wrong": "ยังไม่ถูก",
+      "ungraded": "ยังไม่ตรวจ"
+    },
+    "tally": {
+      "plain": "ถูก {{correct, number}} · ผิด {{wrong, number}}",
+      "withUngraded": "ถูก {{correct, number}} · ผิด {{wrong, number}} · ยังไม่ตรวจ {{ungraded, number}}",
+      "none": "{{total, number}} ข้อ"
     }
   },
   "result": {
@@ -77,7 +91,8 @@
     "markWrong": "ฉันตอบผิด",
     "retake": "ทำอีกครั้ง",
     "nothingGraded": "ยังไม่ตรวจ",
-    "nothingGradedBody": "รอบนี้ยังไม่มีคำตอบที่ตรวจแล้ว"
+    "nothingGradedBody": "รอบนี้ยังไม่มีคำตอบที่ตรวจแล้ว",
+    "unanswered": "ยังไม่ได้ตอบ {{n, number}} ข้อ"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "ยอดคงเหลือไม่พอ เติมเงินเพื่อทำต่อ",

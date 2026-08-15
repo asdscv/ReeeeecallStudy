@@ -14,6 +14,7 @@ import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
 import { AiRefusalNotice } from '../../components/ai/AiRefusalNotice'
 import { answerLength } from '@reeeeecall/shared/lib/quiz-answer-limits'
+import { itemOutcome, tallyQuiz, tallyLine } from '@reeeeecall/shared/lib/quiz-outcome'
 import { QuizFeedback } from './QuizFeedback'
 import type { QuizStackParamList } from '../../navigation/types'
 
@@ -146,6 +147,10 @@ export function QuizRunScreen() {
   const length = answerLength(text, item?.question_type === 'essay' ? 'essay' : 'short')
 
   const answered = item.answered || result !== null
+  /** This item's verdict, and the run so far. Counts, never a ratio — see quiz-outcome.ts. */
+  const outcome = item ? itemOutcome({ answered, score: item.score }) : 'unanswered'
+  const tally = tallyQuiz(items.map((i) => ({ answered: i.answered, score: i.score })))
+  const tallyText = tallyLine(tally)
   const flaws = optionFlaws(item)
   const isLast = index === items.length - 1
 
@@ -158,6 +163,7 @@ export function QuizRunScreen() {
         <View style={styles.topBar}>
           <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
             {t('run.progress', { current: index + 1, total: items.length })}
+            {tally.judged + tally.ungraded > 0 ? '  ' + t(tallyText.key, tallyText.params) : ''}
           </Text>
           <Pressable onPress={() => navigation.navigate('QuizHome')} {...testProps('quiz-leave')}>
             <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('run.leave')}</Text>
@@ -199,6 +205,36 @@ export function QuizRunScreen() {
               </View>
             )
           })}
+
+          {/* The verdict, said out loud.
+              The report was not "it marks me wrong" — it was that after answering there is only
+              the grader's explanation, and a learner cannot tell whether they got it. A coloured
+              border on one option does not answer "맞았나?". */}
+          {answered && (
+            <View
+              accessibilityRole="text"
+              style={{
+                flexDirection: 'row', alignItems: 'center', gap: 6,
+                borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10,
+                marginBottom: 12,
+                borderColor: outcome === 'correct' ? theme.colors.success
+                  : outcome === 'partial' ? theme.colors.warning
+                    : outcome === 'wrong' ? theme.colors.error : theme.colors.border,
+                backgroundColor: theme.colors.surface,
+              }}
+              {...testProps('quiz-verdict')}
+            >
+              <Text style={[theme.typography.body, {
+                color: outcome === 'correct' ? theme.colors.success
+                  : outcome === 'partial' ? theme.colors.warning
+                    : outcome === 'wrong' ? theme.colors.error : theme.colors.textSecondary,
+                fontWeight: '600',
+              }]}>
+                {outcome === 'correct' ? '\u2713 ' : outcome === 'wrong' ? '\u2715 ' : outcome === 'partial' ? '\u2248 ' : ''}
+                {t(`run.verdict.${outcome === 'unanswered' ? 'ungraded' : outcome}`)}
+              </Text>
+            </View>
+          )}
 
           {item.question_type !== 'mcq' && (
             <TextInput

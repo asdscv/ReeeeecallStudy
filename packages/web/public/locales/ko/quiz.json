@@ -43,7 +43,10 @@
     "difficulty": "난이도",
     "clampedCount_one": "이 덱으로는 {{count, number}}문항이 만들어져요.",
     "clampedCount_other": "이 덱으로는 {{count, number}}문항이 만들어져요.",
-    "generatingBatch": "문제를 만드는 중… ({{done, number}}/{{total, number}})"
+    "generatingBatch": "문제를 만드는 중… ({{done, number}}/{{total, number}})",
+    "customCount": "직접 입력",
+    "countEffective_one": "{{count, number}}문항 생성",
+    "countEffective_other": "{{count, number}}문항 생성"
   },
   "run": {
     "loading": "불러오는 중…",
@@ -64,6 +67,17 @@
     "length": {
       "count": "{{chars, number}} / {{max, number}}자",
       "tooShort": "{{min, number}}자 이상이어야 채점할 수 있어요"
+    },
+    "verdict": {
+      "correct": "맞았어요",
+      "partial": "부분 정답",
+      "wrong": "틀렸어요",
+      "ungraded": "채점 안 함"
+    },
+    "tally": {
+      "plain": "{{correct, number}}개 맞음 · {{wrong, number}}개 틀림",
+      "withUngraded": "{{correct, number}}개 맞음 · {{wrong, number}}개 틀림 · {{ungraded, number}}개 채점 안 함",
+      "none": "{{total, number}}문항"
     }
   },
   "result": {
@@ -77,7 +91,8 @@
     "markWrong": "내가 틀렸어요",
     "retake": "다시 풀기",
     "nothingGraded": "채점 안 함",
-    "nothingGradedBody": "이번 시도에서는 채점한 답안이 없어요."
+    "nothingGradedBody": "이번 시도에서는 채점한 답안이 없어요.",
+    "unanswered": "{{n, number}}문항은 답하지 않았어요"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "충전금이 부족해요. 충전하면 계속할 수 있어요.",

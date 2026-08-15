@@ -43,7 +43,10 @@
     "difficulty": "難易度",
     "clampedCount_one": "このデッキでは{{count, number}}問作成されます。",
     "clampedCount_other": "このデッキでは{{count, number}}問作成されます。",
-    "generatingBatch": "作成中… ({{done, number}}/{{total, number}})"
+    "generatingBatch": "作成中… ({{done, number}}/{{total, number}})",
+    "customCount": "直接入力",
+    "countEffective_one": "{{count, number}}問を作成",
+    "countEffective_other": "{{count, number}}問を作成"
   },
   "run": {
     "loading": "読み込み中…",
@@ -64,6 +67,17 @@
     "length": {
       "count": "{{chars, number}} / {{max, number}}文字",
       "tooShort": "採点には{{min, number}}文字以上必要です"
+    },
+    "verdict": {
+      "correct": "正解",
+      "partial": "部分正解",
+      "wrong": "不正解",
+      "ungraded": "未採点"
+    },
+    "tally": {
+      "plain": "正解 {{correct, number}} · 不正解 {{wrong, number}}",
+      "withUngraded": "正解 {{correct, number}} · 不正解 {{wrong, number}} · 未採点 {{ungraded, number}}",
+      "none": "{{total, number}}問"
     }
   },
   "result": {
@@ -77,7 +91,8 @@
     "markWrong": "不正解だった",
     "retake": "もう一度解く",
     "nothingGraded": "未採点",
-    "nothingGradedBody": "この回では採点した解答がありません。"
+    "nothingGradedBody": "この回では採点した解答がありません。",
+    "unanswered": "{{n, number}}問は未回答です"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "残高が足りません。チャージすると続けられます。",

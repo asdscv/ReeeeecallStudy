@@ -117,8 +117,23 @@ export function resolveQuizCardFaces(
   else if (primaries.length === 0 && candidates.length === 1) answerKey = candidates[0].key
   else return null
 
-  const promptKeys = promptEntries.map((entry) => entry.key)
-  if (promptKeys.includes(answerKey)) return null
+  // Only the PRIMARY front field becomes the question. Everything else on the front is
+  // context the learner is allowed to see, not part of what is being asked.
+  //
+  // This joined the whole front with ' / ', which on the official bilingual template —
+  // front_layout [front/primary, situation/hint] — produced questions reading
+  //
+  //     "너 그 드라마 봤어? 완전 빠졌어 / 드라마 추천"
+  //
+  // The trailing fragment is a HINT field. Putting it in the stem both reads like a bug and
+  // hands over the category for free. A front with no primary keeps the old behaviour: with
+  // nothing declared, every field is equally the question.
+  const primaryPrompts = promptEntries.filter((entry) => entry.style === 'primary')
+  const stemEntries = primaryPrompts.length > 0 ? primaryPrompts : promptEntries
+  const promptKeys = stemEntries.map((entry) => entry.key)
+  // The answer must not appear anywhere on the front, not merely in the stem — a hint field
+  // showing the answer gives it away just as completely.
+  if (promptEntries.some((entry) => entry.key === answerKey)) return null
 
   return {
     promptKeys,

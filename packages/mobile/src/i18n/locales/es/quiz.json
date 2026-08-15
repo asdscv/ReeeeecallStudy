@@ -43,7 +43,10 @@
     "difficulty": "Dificultad",
     "clampedCount_one": "Este mazo genera {{count, number}} pregunta.",
     "clampedCount_other": "Este mazo genera {{count, number}} preguntas.",
-    "generatingBatch": "Creando… ({{done, number}}/{{total, number}})"
+    "generatingBatch": "Creando… ({{done, number}}/{{total, number}})",
+    "customCount": "Personalizado",
+    "countEffective_one": "Crear {{count, number}} pregunta",
+    "countEffective_other": "Crear {{count, number}} preguntas"
   },
   "run": {
     "loading": "Cargando…",
@@ -64,6 +67,17 @@
     "length": {
       "count": "{{chars, number}} / {{max, number}} caracteres",
       "tooShort": "Se necesitan al menos {{min, number}} caracteres para corregir"
+    },
+    "verdict": {
+      "correct": "Correcto",
+      "partial": "Parcialmente correcto",
+      "wrong": "Incorrecto",
+      "ungraded": "Sin corregir"
+    },
+    "tally": {
+      "plain": "{{correct, number}} bien · {{wrong, number}} mal",
+      "withUngraded": "{{correct, number}} bien · {{wrong, number}} mal · {{ungraded, number}} sin corregir",
+      "none": "{{total, number}} preguntas"
     }
   },
   "result": {
@@ -77,7 +91,8 @@
     "markWrong": "Me equivoqué",
     "retake": "Repetirlo",
     "nothingGraded": "Sin calificar",
-    "nothingGradedBody": "Todavía no has calificado ninguna respuesta en este intento."
+    "nothingGradedBody": "Todavía no has calificado ninguna respuesta en este intento.",
+    "unanswered": "{{n, number}} sin responder"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "No tienes saldo suficiente. Recarga para seguir.",

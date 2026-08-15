@@ -9,6 +9,7 @@ import {
 import { QuizFeedback } from './QuizFeedback'
 import { AiRefusalNotice } from '../../components/ai/AiRefusalNotice'
 import { answerLength } from '@reeeeecall/shared/lib/quiz-answer-limits'
+import { itemOutcome, tallyQuiz, tallyLine } from '@reeeeecall/shared/lib/quiz-outcome'
 
 /**
  * Taking the quiz. Outside the app Layout, like the study session, so nothing competes with
@@ -133,6 +134,10 @@ export function QuizRunPage() {
   const answered = item.answered || result !== null
   const flaws = optionFlaws(item)
   const isLast = index === items.length - 1
+  /** This item's verdict, and the run so far. Counts, never a ratio — see quiz-outcome.ts. */
+  const outcome = item ? itemOutcome({ answered, score: item.score }) : 'unanswered'
+  const tally = tallyQuiz(items.map((i) => ({ answered: i.answered, score: i.score })))
+  const line = tallyLine(tally)
   /** Live length against the bound the SERVER will apply. Mirrored, and pinned by a test. */
   const length = answerLength(text, item?.question_type === 'essay' ? 'essay' : 'short')
 
@@ -141,6 +146,11 @@ export function QuizRunPage() {
       <div className="flex items-center justify-between gap-3">
         <span className="text-xs text-content-tertiary">
           {t('run.progress', { current: index + 1, total: items.length })}
+          {tally.judged + tally.ungraded > 0 && (
+            <span className="ml-2 text-content-tertiary" data-testid="quiz-tally">
+              {t(line.key, line.params)}
+            </span>
+          )}
         </span>
         <button
           type="button"
@@ -154,6 +164,29 @@ export function QuizRunPage() {
       <div className="p-4 bg-card rounded-xl border border-border">
         <p className="text-base text-foreground whitespace-pre-wrap">{item.stem}</p>
       </div>
+
+      {/* The verdict, said out loud.
+          The report was not "it marks me wrong" — it was that after answering there is only the
+          grader's explanation, and a learner cannot tell whether they got it. A coloured border
+          on one option is not an answer to "맞았나?". */}
+      {answered && (
+        <div
+          className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium ${
+            outcome === 'correct' ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+              : outcome === 'partial' ? 'border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400'
+                : outcome === 'wrong' ? 'border-destructive/40 bg-destructive/10 text-destructive'
+                  : 'border-border bg-card text-muted-foreground'
+          }`}
+          role="status"
+          data-testid="quiz-verdict"
+          data-outcome={outcome}
+        >
+          <span aria-hidden="true">
+            {outcome === 'correct' ? '\u2713' : outcome === 'wrong' ? '\u2715' : outcome === 'partial' ? '\u2248' : '\u2026'}
+          </span>
+          {t(`run.verdict.${outcome === 'unanswered' ? 'ungraded' : outcome}`)}
+        </div>
+      )}
 
       {item.question_type === 'mcq' && item.options && (
         <ul className="space-y-2">
