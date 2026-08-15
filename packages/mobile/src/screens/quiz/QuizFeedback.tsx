@@ -100,6 +100,17 @@ export function QuizFeedback({ feedback, rubric, learnerText, referenceText }: {
                     {after}
                   </Text>
                 )}
+                {/* WHAT was required. Carried in the rubric since generation — terms copied from
+                    the learner's own card — and never rendered, so a failed criterion said
+                    "미충족" and stopped. Only where something is missing. */}
+                {aspect && aspect.mustMention.length > 0 && criterion.level !== 'met' && (
+                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                    {t('level.mustMention')}{' '}
+                    <Text style={{ color: theme.colors.text }}>
+                      {aspect.mustMention.join(' · ')}
+                    </Text>
+                  </Text>
+                )}
               </View>
             )
           })}

@@ -143,7 +143,8 @@
     "not_met": "Sin cubrir",
     "unjudgeable": "Sin juzgar",
     "unjudgeableNote": "Parte de esto no se pudo juzgar, así que no te ha penalizado.",
-    "weight": "vale {{weight, number}}"
+    "weight": "vale {{weight, number}}",
+    "mustMention": "Hacía falta:"
   },
   "aspect": {
     "covers_answer": "Cubre la respuesta",

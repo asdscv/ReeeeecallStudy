@@ -103,6 +103,22 @@ export function QuizFeedback({ feedback, rubric, learnerText, referenceText }: {
                       {after}
                     </p>
                   )}
+                  {/* WHAT was required. The rubric has carried these since generation — terms
+                      copied from the learner's own card — and nothing rendered them, so a failed
+                      criterion said "미충족" and stopped. On a wrong answer this is the single
+                      most useful line on the screen, and it was already paid for. Shown only
+                      where something is missing: on a met criterion it is a spoiler for nothing. */}
+                  {aspect && aspect.mustMention.length > 0 && criterion.level !== 'met' && (
+                    <p className="text-xs text-content-tertiary mt-0.5">
+                      {t('level.mustMention')}{' '}
+                      {aspect.mustMention.map((term, i) => (
+                        <span key={term}>
+                          {i > 0 && ' · '}
+                          <span className="text-foreground">{term}</span>
+                        </span>
+                      ))}
+                    </p>
+                  )}
                 </li>
               )
             })}

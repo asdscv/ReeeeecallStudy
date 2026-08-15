@@ -337,7 +337,8 @@ async function providerRequest(m: ResolvedModel, systemPrompt: string, userPromp
 
   for (let attempt = 0; attempt <= PROVIDER_RETRY_DELAYS.length; attempt++) {
     const ctrl = new AbortController()
-    const timer = setTimeout(() => ctrl.abort(), PROVIDER_TIMEOUT_MS)
+    // The MODEL's budget, not one number for every provider. See `ProviderDef.timeoutMs`.
+    const timer = setTimeout(() => ctrl.abort(), m.timeoutMs || PROVIDER_TIMEOUT_MS)
     let res: Response
     try {
       res = await fetch(`${m.baseUrl}/chat/completions`, {
@@ -347,7 +348,11 @@ async function providerRequest(m: ResolvedModel, systemPrompt: string, userPromp
         signal: ctrl.signal,
       })
     } catch {
-      // network error or timeout(abort) — retry within budget, then fail.
+      // A TIMEOUT is not retried. The call already had its whole budget — 90s on a reasoning
+      // model — and spending it twice more only makes the learner wait three times as long for
+      // the same answer, while eating the edge function's own wall clock. A network error is a
+      // different thing and still gets its retries.
+      if (ctrl.signal.aborted) throw new Error('PROVIDER_TIMEOUT')
       if (attempt < PROVIDER_RETRY_DELAYS.length) { await sleep(PROVIDER_RETRY_DELAYS[attempt]); continue }
       throw new Error('PROVIDER_ERROR')
     } finally {

@@ -143,7 +143,8 @@
     "not_met": "Chưa đạt",
     "unjudgeable": "Chưa đánh giá",
     "unjudgeableNote": "Một phần không đánh giá được nên không bị trừ điểm.",
-    "weight": "trọng số {{weight, number}}"
+    "weight": "trọng số {{weight, number}}",
+    "mustMention": "Cần có:"
   },
   "aspect": {
     "covers_answer": "Nêu được ý chính",

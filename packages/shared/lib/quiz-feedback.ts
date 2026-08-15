@@ -119,7 +119,22 @@ function isSpan(v: unknown): v is QuizSpanRef {
 }
 
 /** The rubric as it was stored with the question, for naming each criterion on screen. */
-export interface StoredCriterion { id: string; aspect: string; weight: number }
+export interface StoredCriterion {
+  id: string
+  aspect: string
+  weight: number
+  /**
+   * The terms this criterion required, COPIED FROM THE CARD at generation time.
+   *
+   * The single most useful thing on a failed essay and it was never rendered. A learner saw
+   * "핵심을 담았는가 · 미충족" and no way to know that what was missing was `a×(b+c)=a×b+a×c`
+   * — which is written down, in their own card, in their own language, and was paid for.
+   *
+   * Never model prose: the generator is required to copy these from the card's own text and a
+   * term that does not appear there is discarded, so showing them cannot invent anything.
+   */
+  mustMention: string[]
+}
 
 export function asStoredRubric(raw: unknown): StoredCriterion[] {
   if (!Array.isArray(raw)) return []
@@ -127,7 +142,14 @@ export function asStoredRubric(raw: unknown): StoredCriterion[] {
     if (!c || typeof c !== 'object') return []
     const e = c as Record<string, unknown>
     if (typeof e.id !== 'string' || typeof e.aspect !== 'string') return []
-    return [{ id: e.id, aspect: e.aspect, weight: typeof e.weight === 'number' ? e.weight : 0 }]
+    return [{
+      id: e.id,
+      aspect: e.aspect,
+      weight: typeof e.weight === 'number' ? e.weight : 0,
+      mustMention: Array.isArray(e.mustMention)
+        ? e.mustMention.filter((m): m is string => typeof m === 'string' && m.trim() !== '')
+        : [],
+    }]
   })
 }
 

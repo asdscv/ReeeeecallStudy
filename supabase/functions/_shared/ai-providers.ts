@@ -11,6 +11,11 @@
 //   AI_GENERATION_PROVIDER_KEY  the API key (required)
 //   AI_GENERATION_BASE_URL      override baseUrl (e.g. a custom/self-hosted endpoint)
 //   AI_GENERATION_MODEL         text model    (default per provider below)
+//   AI_VISION_PROVIDER          provider for IMAGE reading; defaults to the text provider.
+//                               Needed because DeepSeek is far cheaper per token and cannot
+//                               read an image at all.
+//   AI_VISION_PROVIDER_KEY      that provider's key (falls back to the text key when unset)
+//   AI_VISION_MODEL_FALLBACKS   vision fallback chain, independent of the text one
 //   AI_VISION_MODEL             vision model  (Phase 1; falls back to text model)
 //   AI_GENERATION_MODEL_FALLBACKS  comma-separated models to try when the primary is
 //                                  DAILY-exhausted (see resolveModelChain)
@@ -33,6 +38,16 @@ export interface ProviderDef {
    */
   textFallbacks?: string[]
   visionFallbacks?: string[]
+  /**
+   * How long one call to this provider may take, in ms.
+   *
+   * A per-provider number because latency is a property of the model family, not of our patience.
+   * Gemini flash-lite answers a card prompt in a few seconds; DeepSeek's v4 line is a REASONING
+   * model — the usage payload reports `reasoning_tokens` — and a three-card MCQ prompt measured
+   * 23.7s against the live key. Under the shared 30s budget that aborted on anything real, and
+   * the abort surfaced as AI_PROVIDER_ERROR: "지금 AI 서비스가 붐비고 있어요".
+   */
+  timeoutMs?: number
 }
 
 // Add a provider = add one entry. All are OpenAI-compatible.
@@ -78,8 +93,19 @@ export const PROVIDERS: Record<string, ProviderDef> = {
   },
   deepseek: {
     baseUrl: 'https://api.deepseek.com',
-    textModel: 'deepseek-chat',
-    visionModel: 'deepseek-chat',
+    // `deepseek-chat` was stale — GET /models on the live key returns exactly two ids,
+    // `deepseek-v4-flash` and `deepseek-v4-pro`, and nothing else. Flash is the cheaper tier and
+    // answers the JSON-object response format the quiz and card prompts depend on; pro is the
+    // fallback, same key, same base URL.
+    textModel: 'deepseek-v4-flash',
+    textFallbacks: ['deepseek-v4-pro'],
+    // Measured, not guessed: 23.7s for three MCQ cards on the live key. Three times the default
+    // leaves room for a full batch without leaving a learner watching a spinner forever.
+    timeoutMs: 90_000,
+    // TEXT ONLY. `image_url` content parts are rejected outright — "unknown variant `image_url`,
+    // expected `text`" — so a deployment that points vision here does not degrade, it 400s on
+    // every card image. `AI_VISION_PROVIDER` exists for exactly this.
+    visionModel: '',
   },
   openrouter: {
     baseUrl: 'https://openrouter.ai/api/v1',
@@ -93,6 +119,8 @@ export const DEFAULT_PROVIDER = 'gemini'
 export type Purpose = 'text' | 'vision'
 
 export interface ResolvedModel {
+  /** How long one call may take. Provider-specific — a reasoning model is legitimately slower. */
+  timeoutMs: number
   apiKey: string
   baseUrl: string
   model: string
@@ -117,9 +145,12 @@ export function resolveModelChain(purpose: Purpose, env: EnvGetter): ResolvedMod
   const head = resolveModel(purpose, env)
   if (!head) return []
 
-  const provider = (env('AI_GENERATION_PROVIDER') || DEFAULT_PROVIDER).trim()
+  const provider = providerFor(purpose, env)
   const def = PROVIDERS[provider]
-  const raw = env('AI_GENERATION_MODEL_FALLBACKS')
+  const raw = purpose === 'vision'
+    ? (env('AI_VISION_MODEL_FALLBACKS') ?? (providerFor('text', env) === provider
+        ? env('AI_GENERATION_MODEL_FALLBACKS') : undefined))
+    : env('AI_GENERATION_MODEL_FALLBACKS')
   const configured = raw !== undefined
     ? raw.split(',').map((m) => m.trim()).filter(Boolean)
     : (purpose === 'vision' ? def?.visionFallbacks : def?.textFallbacks) ?? []
@@ -134,17 +165,45 @@ export function resolveModelChain(purpose: Purpose, env: EnvGetter): ResolvedMod
   return chain
 }
 
+/**
+ * Which provider serves this purpose.
+ *
+ * Vision can be a DIFFERENT provider from text, and has to be: DeepSeek is several times cheaper
+ * per token and cannot read an image at all — it rejects `image_url` content parts outright. One
+ * global provider would mean choosing between a cheap text model and working card images.
+ *
+ * `AI_VISION_PROVIDER` falls back to the text provider when unset, so a deployment that has never
+ * heard of this behaves exactly as it did.
+ */
+function providerFor(purpose: Purpose, env: EnvGetter): string {
+  const text = (env('AI_GENERATION_PROVIDER') || DEFAULT_PROVIDER).trim()
+  if (purpose !== 'vision') return text
+  return (env('AI_VISION_PROVIDER') || text).trim()
+}
+
 export function resolveModel(purpose: Purpose, env: EnvGetter): ResolvedModel | null {
-  const provider = (env('AI_GENERATION_PROVIDER') || DEFAULT_PROVIDER).trim()
+  const provider = providerFor(purpose, env)
   const def = PROVIDERS[provider]
 
-  const apiKey = (env('AI_GENERATION_PROVIDER_KEY') || '').trim()
+  // The vision provider brings its own key when it is a different one; without that, pointing
+  // vision at Gemini while text runs on DeepSeek would send DeepSeek's key to Google.
+  const apiKey = (purpose === 'vision'
+    ? (env('AI_VISION_PROVIDER_KEY') || env('AI_GENERATION_PROVIDER_KEY') || '')
+    : (env('AI_GENERATION_PROVIDER_KEY') || '')).trim()
   const baseUrl = (env('AI_GENERATION_BASE_URL') || def?.baseUrl || '').trim()
 
+  // `AI_GENERATION_MODEL` is NOT a vision fallback when the two providers differ — a text model
+  // name from one provider is not a model at the other, and the request would 404 rather than
+  // degrade.
+  const sameProvider = providerFor('text', env) === provider
   const model = purpose === 'vision'
-    ? (env('AI_VISION_MODEL') || env('AI_GENERATION_MODEL') || def?.visionModel || '').trim()
+    ? (env('AI_VISION_MODEL')
+       || (sameProvider ? env('AI_GENERATION_MODEL') : '')
+       || def?.visionModel || '').trim()
     : (env('AI_GENERATION_MODEL') || def?.textModel || '').trim()
 
+  const timeoutMs = Number(env('AI_PROVIDER_TIMEOUT_MS')) || def?.timeoutMs || 30_000
+
   if (!apiKey || !baseUrl || !model) return null
-  return { apiKey, baseUrl, model, provider }
+  return { apiKey, baseUrl, model, provider, timeoutMs }
 }

@@ -1,0 +1,83 @@
+# Watch every AI provider's model list, and open an issue when something new appears.
+#
+# Three times a model has moved under this app and it was found out the expensive way: two Gemini
+# models answered 404 "no longer available" while still ahead of a working one in the fallback
+# chain, `gemini-2.5-flash-lite` was cut to twenty requests a day while it was the PRIMARY, and
+# `deepseek-chat` sat in the provider table for months after the API stopped listing it. Every one
+# of those reached a learner before it reached us.
+#
+# The edge function does the polling and the diffing; this is only the clock and the postman.
+name: AI model watch
+
+on:
+  schedule:
+    # 09:00 KST daily. Model launches are announcements, not emergencies — a day's latency is
+    # fine, and an hourly poll would just be noise against a list that changes monthly.
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ask the providers what they have
+        id: watch
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SUPABASE_URL:-}" ] || [ -z "${SUPABASE_SERVICE_KEY:-}" ]; then
+            echo "::warning::SUPABASE_URL / SUPABASE_SERVICE_KEY not set — skipping"
+            echo "skipped=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          RESPONSE=$(curl -sS -X POST "$SUPABASE_URL/functions/v1/ai-model-watch" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+            -H "Content-Type: application/json" -d '{}')
+          echo "$RESPONSE" > watch.json
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          d = json.load(open('watch.json'))
+          added = d.get('added') or []
+          fails = d.get('failures') or []
+          print(f"added={len(added)}")
+          print(f"failures={len(fails)}")
+          # A provider that could not be reached is worth saying out loud: a silent watcher that
+          # has stopped watching is worse than no watcher.
+          lines = [f"- **{a['provider']}** `{a['model']}`" for a in added]
+          for f in fails:
+              lines.append(f"- ⚠️ **{f['provider']}** could not be checked: {f['error']}")
+          body = "\n".join(lines) or "_nothing new_"
+          print("body<<EOF"); print(body); print("EOF")
+          PY
+
+      - name: Say so
+        if: steps.watch.outputs.skipped != 'true' && (steps.watch.outputs.added != '0' || steps.watch.outputs.failures != '0')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cat > issue.md <<'EOF'
+          A provider's model list changed since the last check.
+
+          ${{ steps.watch.outputs.body }}
+
+          ---
+
+          What to do with it:
+
+          - a cheaper or newer model in the tier we use → consider `AI_GENERATION_MODEL` /
+            `AI_VISION_MODEL`, and add a rate row to `ai_pricing_config` so margin reporting stays
+            honest
+          - anything **retired** → check `PROVIDERS` in `supabase/functions/_shared/ai-providers.ts`;
+            a retired model left in a fallback chain is a 404 the learner sees
+          - nothing worth acting on → `UPDATE ai_known_models SET acknowledged = true WHERE …`,
+            which is what stops it being reported again
+
+          Raised by `.github/workflows/ai-model-watch.yml`.
+          EOF
+          gh issue create --title "AI model watch: $(date -u +%Y-%m-%d)" --body-file issue.md \
+            --label "ai" || gh issue create --title "AI model watch: $(date -u +%Y-%m-%d)" --body-file issue.md

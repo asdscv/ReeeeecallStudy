@@ -143,7 +143,8 @@
     "not_met": "ไม่ครบ",
     "unjudgeable": "ไม่ได้ตัดสิน",
     "unjudgeableNote": "บางส่วนตัดสินไม่ได้ จึงไม่ถูกหักคะแนน",
-    "weight": "น้ำหนัก {{weight, number}}"
+    "weight": "น้ำหนัก {{weight, number}}",
+    "mustMention": "ต้องมี:"
   },
   "aspect": {
     "covers_answer": "ครอบคลุมคำตอบ",

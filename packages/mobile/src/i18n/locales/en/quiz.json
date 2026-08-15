@@ -143,7 +143,8 @@
     "not_met": "Not covered",
     "unjudgeable": "Not judged",
     "unjudgeableNote": "Some of this could not be judged, so it did not count against you.",
-    "weight": "worth {{weight, number}}"
+    "weight": "worth {{weight, number}}",
+    "mustMention": "Needed:"
   },
   "aspect": {
     "covers_answer": "Covers the answer",
