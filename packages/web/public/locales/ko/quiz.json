@@ -190,5 +190,16 @@
     "studyAgain": "{{cards, number}}개 다시 학습",
     "youWrote": "내 답: {{answer}}",
     "andMore": "그 외 {{cards, number}}개"
+  },
+  "history": {
+    "dateThisYear": "{{m, number}}월 {{d, number}}일",
+    "dateWithYear": "{{y}}년 {{m, number}}월 {{d, number}}일",
+    "created": "{{date}} 만듦",
+    "never": "아직 안 풀었어요",
+    "taken": "{{runs, number}}번 풀었어요 · 마지막 {{date}}",
+    "show": "기록",
+    "hide": "닫기",
+    "attempt": "{{n, number}}회차 · {{date}}",
+    "inProgress": "진행 중"
   }
 }

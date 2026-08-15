@@ -190,5 +190,16 @@
     "studyAgain": "重新学习{{cards, number}}张",
     "youWrote": "你的答案：{{answer}}",
     "andMore": "还有{{cards, number}}张"
+  },
+  "history": {
+    "dateThisYear": "{{m, number}}月{{d, number}}日",
+    "dateWithYear": "{{y}}年{{m, number}}月{{d, number}}日",
+    "created": "{{date}}创建",
+    "never": "还没做过",
+    "taken": "做过{{runs, number}}次 · 最近{{date}}",
+    "show": "记录",
+    "hide": "收起",
+    "attempt": "第{{n, number}}次 · {{date}}",
+    "inProgress": "进行中"
   }
 }

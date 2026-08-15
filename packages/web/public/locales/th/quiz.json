@@ -190,5 +190,16 @@
     "studyAgain": "ทบทวน {{cards, number}} ใบ",
     "youWrote": "คำตอบของคุณ: {{answer}}",
     "andMore": "และอีก {{cards, number}} ใบ"
+  },
+  "history": {
+    "dateThisYear": "{{d, number}}/{{m, number}}",
+    "dateWithYear": "{{d, number}}/{{m, number}}/{{y}}",
+    "created": "สร้าง {{date}}",
+    "never": "ยังไม่ได้ทำ",
+    "taken": "ทำ {{runs, number}} ครั้ง · ล่าสุด {{date}}",
+    "show": "ประวัติ",
+    "hide": "ปิด",
+    "attempt": "ครั้งที่ {{n, number}} · {{date}}",
+    "inProgress": "กำลังทำ"
   }
 }

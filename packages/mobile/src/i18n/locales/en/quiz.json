@@ -190,5 +190,16 @@
     "studyAgain": "Study {{cards, number}} again",
     "youWrote": "You wrote: {{answer}}",
     "andMore": "and {{cards, number}} more"
+  },
+  "history": {
+    "dateThisYear": "{{m, number}}/{{d, number}}",
+    "dateWithYear": "{{m, number}}/{{d, number}}/{{y}}",
+    "created": "Made {{date}}",
+    "never": "Not taken yet",
+    "taken": "Taken {{runs, number}}× · last {{date}}",
+    "show": "History",
+    "hide": "Close",
+    "attempt": "Attempt {{n, number}} · {{date}}",
+    "inProgress": "In progress"
   }
 }

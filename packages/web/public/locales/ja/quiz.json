@@ -190,5 +190,16 @@
     "studyAgain": "{{cards, number}}枚を復習",
     "youWrote": "あなたの答え: {{answer}}",
     "andMore": "ほか{{cards, number}}枚"
+  },
+  "history": {
+    "dateThisYear": "{{m, number}}月{{d, number}}日",
+    "dateWithYear": "{{y}}年{{m, number}}月{{d, number}}日",
+    "created": "{{date}}作成",
+    "never": "まだ解いていません",
+    "taken": "{{runs, number}}回 · 最後は{{date}}",
+    "show": "履歴",
+    "hide": "閉じる",
+    "attempt": "{{n, number}}回目 · {{date}}",
+    "inProgress": "進行中"
   }
 }

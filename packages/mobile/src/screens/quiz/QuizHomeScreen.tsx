@@ -11,6 +11,7 @@ import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
 import type { QuizStackParamList } from '../../navigation/types'
 import { QuizMistakes } from './QuizMistakes'
+import { QuizSetHistory } from './QuizSetHistory'
 
 type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizHome'>
 
@@ -107,6 +108,9 @@ export function QuizHomeScreen() {
                     {t('home.fewerThanAsked', { requested: item.requested_count })}
                   </Text>
                 )}
+                {/* When it was made, whether it has been taken, and how it went — all of it was
+                    already in the database and none of it was on the row. */}
+                <QuizSetHistory setRow={item} />
               </View>
               {item.generated_count === 0 ? (
                 <Pressable

@@ -190,5 +190,16 @@
     "studyAgain": "Học lại {{cards, number}} thẻ",
     "youWrote": "Bạn đã viết: {{answer}}",
     "andMore": "và {{cards, number}} thẻ nữa"
+  },
+  "history": {
+    "dateThisYear": "{{d, number}}/{{m, number}}",
+    "dateWithYear": "{{d, number}}/{{m, number}}/{{y}}",
+    "created": "Tạo {{date}}",
+    "never": "Chưa làm",
+    "taken": "Đã làm {{runs, number}} lần · gần nhất {{date}}",
+    "show": "Lịch sử",
+    "hide": "Đóng",
+    "attempt": "Lần {{n, number}} · {{date}}",
+    "inProgress": "Đang làm"
   }
 }

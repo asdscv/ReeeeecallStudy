@@ -190,5 +190,16 @@
     "studyAgain": "Pelajari {{cards, number}} lagi",
     "youWrote": "Jawaban Anda: {{answer}}",
     "andMore": "dan {{cards, number}} lagi"
+  },
+  "history": {
+    "dateThisYear": "{{d, number}}/{{m, number}}",
+    "dateWithYear": "{{d, number}}/{{m, number}}/{{y}}",
+    "created": "Dibuat {{date}}",
+    "never": "Belum dikerjakan",
+    "taken": "{{runs, number}}× · terakhir {{date}}",
+    "show": "Riwayat",
+    "hide": "Tutup",
+    "attempt": "Percobaan {{n, number}} · {{date}}",
+    "inProgress": "Berlangsung"
   }
 }

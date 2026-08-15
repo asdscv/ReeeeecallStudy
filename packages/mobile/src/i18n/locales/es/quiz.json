@@ -190,5 +190,16 @@
     "studyAgain": "Estudiar {{cards, number}} de nuevo",
     "youWrote": "Escribiste: {{answer}}",
     "andMore": "y {{cards, number}} más"
+  },
+  "history": {
+    "dateThisYear": "{{d, number}}/{{m, number}}",
+    "dateWithYear": "{{d, number}}/{{m, number}}/{{y}}",
+    "created": "Creado el {{date}}",
+    "never": "Sin hacer todavía",
+    "taken": "{{runs, number}} veces · última el {{date}}",
+    "show": "Historial",
+    "hide": "Cerrar",
+    "attempt": "Intento {{n, number}} · {{date}}",
+    "inProgress": "En curso"
   }
 }

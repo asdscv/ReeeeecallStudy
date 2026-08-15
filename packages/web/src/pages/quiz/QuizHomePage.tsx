@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useQuizStore, isDailyCheckTitle, type QuizSetRow } from '@reeeeecall/shared/stores/quiz-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
 import { QuizMistakes } from './QuizMistakes'
+import { QuizSetHistory } from './QuizSetHistory'
 
 /**
  * The quiz home: what you have made, and the way to make more.
@@ -114,6 +115,9 @@ export function QuizHomePage() {
                       </span>
                     )}
                   </div>
+                  {/* When it was made, whether it has been taken, and how it went — all of it
+                      was already in the database and none of it was on the row. */}
+                  <QuizSetHistory setRow={setRow} />
                 </div>
                 {setRow.generated_count === 0 ? (
                   <button

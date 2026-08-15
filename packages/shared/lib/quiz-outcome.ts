@@ -105,3 +105,93 @@ export function minCardsForMcq(
   // The card being asked about, plus one deck-mate per far slot.
   return 1 + far
 }
+
+/**
+ * The counts a run came out with, as the server totalled them.
+ *
+ * `_quiz_run_tally` (migration 225) builds this from `answer_attempts` using the same 0.75 band
+ * as `itemOutcome`, so a sitting cannot read one way on the result screen and another in the
+ * history list. It reports no `partial`: the split only matters where the detail is shown, and
+ * `tallyLine` folds partial in with wrong anyway.
+ */
+export interface QuizRunCounts {
+  readonly total: number
+  readonly answered: number
+  readonly correct: number
+  readonly wrong: number
+  readonly ungraded: number
+}
+
+/** The server's counts as a `QuizTally`, so one function phrases every summary in the app. */
+export function tallyFromCounts(counts: QuizRunCounts | null | undefined): QuizTally {
+  const n = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? Math.max(0, v) : 0)
+  const total = n(counts?.total)
+  const answered = Math.min(n(counts?.answered), total)
+  const correct = n(counts?.correct)
+  const wrong = n(counts?.wrong)
+  const ungraded = n(counts?.ungraded)
+  return {
+    correct,
+    partial: 0,
+    wrong,
+    ungraded,
+    // What was never answered at all — a run abandoned halfway is not a run of wrong answers.
+    unanswered: Math.max(0, total - answered),
+    judged: correct + wrong,
+    total,
+  }
+}
+
+/**
+ * Whether a sitting is genuinely still open, as opposed to merely never closed.
+ *
+ * `quiz_runs.status` stays `in_progress` until `finish_quiz_run` is called, and nothing forces a
+ * learner to call it — they answer the last question and leave. Reporting that as "진행 중" hid
+ * the result of a run whose every answer was already in, which the history list exists to show.
+ *
+ * So the status is believed only when the counts agree with it.
+ */
+export function isRunUnfinished(
+  status: string | null | undefined, counts: QuizRunCounts | null | undefined,
+): boolean {
+  if (status !== 'in_progress') return false
+  const t = tallyFromCounts(counts)
+  return t.unanswered > 0
+}
+
+/**
+ * A timestamp as calendar parts, plus whether it falls in the current year.
+ *
+ * Deliberately NOT `toLocaleDateString`. Hermes ships without ICU, so on a phone that returns the
+ * same English on every device regardless of the app's language — the defect the plan week strip
+ * already documents. The parts come from here and the ORDER comes from the locale files, which is
+ * the only arrangement that gives all eight languages a correct date.
+ *
+ * The year is dropped inside the current year because "8월 15일" is what a learner reads a
+ * fortnight-old set as, and "2026년 8월 15일" on every row is noise until it is not.
+ *
+ * When it IS shown, the locale string interpolates it as `{{y}}` and NOT `{{y, number}}`: the
+ * number formatter groups thousands, and a year is the one number that must never be — a test
+ * caught `history.dateWithYear` rendering 2025 as "2,025" in all sixteen files.
+ */
+export function calendarParts(timestamp: string, now: Date = new Date()): {
+  y: number; m: number; d: number; thisYear: boolean
+} | null {
+  const at = new Date(timestamp)
+  if (Number.isNaN(at.getTime())) return null
+  return {
+    y: at.getFullYear(),
+    m: at.getMonth() + 1,
+    d: at.getDate(),
+    thisYear: at.getFullYear() === now.getFullYear(),
+  }
+}
+
+/** The i18n key and params for a date, year included only when it is not the current one. */
+export function dateLine(timestamp: string, now?: Date): { key: string; params: Record<string, number> } | null {
+  const parts = calendarParts(timestamp, now)
+  if (!parts) return null
+  return parts.thisYear
+    ? { key: 'history.dateThisYear', params: { m: parts.m, d: parts.d } }
+    : { key: 'history.dateWithYear', params: { y: parts.y, m: parts.m, d: parts.d } }
+}

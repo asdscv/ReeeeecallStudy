@@ -16,7 +16,8 @@
  */
 import { describe, it, expect } from 'vitest'
 import {
-  itemOutcome, tallyQuiz, tallyLine, minCardsForMcq, CORRECT_AT, PARTIAL_AT,
+  itemOutcome, tallyQuiz, tallyLine, minCardsForMcq, tallyFromCounts, dateLine, calendarParts, isRunUnfinished,
+  CORRECT_AT, PARTIAL_AT,
 } from '@reeeeecall/shared/lib/quiz-outcome'
 
 describe('one item', () => {
@@ -145,5 +146,83 @@ describe('the multiple-choice minimum', () => {
     expect(minCardsForMcq(null)).toBe(4)
     expect(minCardsForMcq(undefined)).toBe(4)
     expect(minCardsForMcq({})).toBe(4)
+  })
+})
+
+/**
+ * The set list's history line — dates and the counts beside them.
+ *
+ * Both come from the server: `_quiz_run_tally` (migration 225) totals a sitting from
+ * `answer_attempts` with the same 0.75 band this file defines, so a run cannot read one way on
+ * the result screen and another in the history list.
+ */
+describe('a sitting, as the server counted it', () => {
+  it('reads the server shape through the same summary the screens use', () => {
+    const t = tallyFromCounts({ total: 6, answered: 6, correct: 4, wrong: 1, ungraded: 1 })
+    expect(t).toMatchObject({ correct: 4, wrong: 1, ungraded: 1, unanswered: 0, judged: 5, total: 6 })
+    expect(tallyLine(t).key).toBe('run.tally.withUngraded')
+  })
+
+  it('counts what was never answered as unanswered, not wrong', () => {
+    // A run abandoned halfway is not a run of wrong answers, and `score_raw / score_max` — the
+    // arithmetic that reported 17% — is exactly the sum that says it is.
+    const t = tallyFromCounts({ total: 10, answered: 3, correct: 3, wrong: 0, ungraded: 0 })
+    expect(t.unanswered).toBe(7)
+    expect(t.wrong).toBe(0)
+    expect(t.judged).toBe(3)
+  })
+
+  it('survives a missing or malformed tally', () => {
+    expect(tallyFromCounts(null)).toMatchObject({ total: 0, judged: 0 })
+    expect(tallyFromCounts({ total: -5, answered: 99, correct: NaN, wrong: 1, ungraded: 0 } as never))
+      .toMatchObject({ total: 0, correct: 0, unanswered: 0 })
+  })
+})
+
+describe('dating a set without Intl', () => {
+  const now = new Date('2026-08-15T00:00:00Z')
+
+  it('drops the year inside the current one', () => {
+    // "2026년 8월 15일" on every row is noise; "8월 15일" is what a learner reads it as.
+    expect(dateLine('2026-03-02T10:00:00Z', now))
+      .toEqual({ key: 'history.dateThisYear', params: { m: 3, d: 2 } })
+  })
+
+  it('keeps the year when it is a different one', () => {
+    expect(dateLine('2025-12-31T10:00:00Z', now))
+      .toEqual({ key: 'history.dateWithYear', params: { y: 2025, m: 12, d: 31 } })
+  })
+
+  it('returns parts and a key, never a formatted string', () => {
+    // The whole point. `toLocaleDateString` on Hermes has no ICU and returns the same English
+    // on every device, so the ORDER has to live in the locale files.
+    const line = dateLine('2026-08-15T10:00:00Z', now)
+    expect(typeof line?.key).toBe('string')
+    expect(Object.values(line!.params).every((v) => typeof v === 'number')).toBe(true)
+  })
+
+  it('is null rather than "Invalid Date" on junk', () => {
+    expect(dateLine('not a date', now)).toBeNull()
+    expect(calendarParts('', now)).toBeNull()
+  })
+})
+
+describe('a run that was never formally finished', () => {
+  it('is only "in progress" while answers are actually missing', () => {
+    // `quiz_runs.status` stays `in_progress` until `finish_quiz_run` is called, and nothing
+    // makes a learner call it — they answer the last question and leave. The history list was
+    // reporting "진행 중" for runs whose every answer was already in, hiding the result.
+    expect(isRunUnfinished('in_progress', { total: 4, answered: 4, correct: 2, wrong: 2, ungraded: 0 }))
+      .toBe(false)
+    expect(isRunUnfinished('in_progress', { total: 4, answered: 1, correct: 1, wrong: 0, ungraded: 0 }))
+      .toBe(true)
+  })
+
+  it('never calls a completed or abandoned run in progress', () => {
+    expect(isRunUnfinished('completed', { total: 4, answered: 1, correct: 1, wrong: 0, ungraded: 0 }))
+      .toBe(false)
+    expect(isRunUnfinished('abandoned', { total: 4, answered: 0, correct: 0, wrong: 0, ungraded: 0 }))
+      .toBe(false)
+    expect(isRunUnfinished(null, null)).toBe(false)
   })
 })

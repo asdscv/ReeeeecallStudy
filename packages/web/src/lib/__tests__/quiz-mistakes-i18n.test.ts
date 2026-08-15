@@ -96,6 +96,32 @@ describe.each(Object.keys(PLATFORMS) as (keyof typeof PLATFORMS)[])('%s', (platf
       expect(out.length).toBeGreaterThan(10)
     })
 
+    it('dates a set without Intl', () => {
+      const tf = tr()
+      // Hermes has no ICU, so `toLocaleDateString` returns the same English on every phone. The
+      // PARTS come from `calendarParts` and the ORDER comes from these strings — which is why
+      // every locale has to carry both shapes.
+      const short = tf('history.dateThisYear', { m: 8, d: 15 })
+      expect(short).toContain('8')
+      expect(short).toContain('15')
+      const full = tf('history.dateWithYear', { y: 2025, m: 8, d: 15 })
+      expect(full).toContain('2025')
+      expect(full).toContain('15')
+    })
+
+    it('says when a set was made and how often it has been taken', () => {
+      const tf = tr()
+      expect(tf('history.created', { date: 'X' })).toContain('X')
+      const taken = tf('history.taken', { runs: 3, date: 'X' })
+      expect(taken).toContain('3')
+      expect(taken).toContain('X')
+      const attempt = tf('history.attempt', { n: 2, date: 'X' })
+      expect(attempt).toContain('2')
+      for (const key of ['history.never', 'history.show', 'history.hide', 'history.inProgress'] as const) {
+        expect(tf(key)).not.toBe(key)
+      }
+    })
+
     it('counts generation batches', () => {
       const out = tr()('setup.generatingBatch', { done: 2, total: 5 })
       expect(out).toContain('2')
@@ -108,7 +134,8 @@ describe('the translations are actually different from each other', () => {
   it('does not ship English eight times', () => {
     // The failure mode a key-presence check cannot see: a locale file that has every key and
     // every value copied from en.
-    for (const key of ['mistakes.title', 'home.remove', 'error.QUIZ_DIFFICULTY_UNAVAILABLE'] as const) {
+    for (const key of ['mistakes.title', 'home.remove', 'history.never',
+      'error.QUIZ_DIFFICULTY_UNAVAILABLE'] as const) {
       const rendered = LOCALES.map((lng) => t('web', lng)(key))
       expect(new Set(rendered).size).toBeGreaterThan(5)
     }

@@ -15,6 +15,7 @@
 //      number it returns is passed back as `maxPriceMicro`, and the server refuses the
 //      reservation if the price moved (P0008). No spending happens without a gesture.
 import { create } from 'zustand'
+import type { QuizRunCounts } from '../lib/quiz-outcome'
 import { supabase } from '../lib/supabase'
 import { newPersistenceId } from '../lib/persistence-id'
 
@@ -123,6 +124,24 @@ export interface QuizSetRow {
   status: 'ready' | 'stale' | 'archived'
   content_locale: string
   created_at: string
+  /** The deck the questions were written from. Null if it has since been deleted. */
+  deck_name?: string | null
+  /** How many sittings. Zero is a set never opened, which the list could not show before. */
+  run_count?: number
+  /** When the last sitting was, or null if there has not been one. */
+  last_taken_at?: string | null
+  /** How that last sitting went, counted the way the result screen counts. */
+  last_tally?: QuizRunCounts | null
+}
+
+/** One sitting, for the per-set history. */
+export interface QuizSetHistoryRun {
+  run_id: string
+  attempt_no: number
+  status: 'in_progress' | 'completed' | 'abandoned'
+  started_at: string
+  completed_at: string | null
+  tally: QuizRunCounts
 }
 
 export interface QuizRunItem {
@@ -361,6 +380,15 @@ interface QuizState {
    * without parsing an error.
    */
   deleteSet: (setId: string) => Promise<boolean>
+
+  /**
+   * Every sitting of one set, newest attempt first.
+   *
+   * Loaded on demand rather than with the list: a learner opens the history of one set, and
+   * fetching every run of every set to show a row that is usually collapsed is work nobody asked
+   * for. The list already carries the last one, which is what the collapsed row needs.
+   */
+  loadSetHistory: (setId: string) => Promise<QuizSetHistoryRun[]>
 }
 
 export const useQuizStore = create<QuizState>((set, get) => ({
@@ -375,12 +403,10 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   fetchSets: async () => {
     set({ loading: true })
     try {
-      const { data, error } = await supabase
-        .from('quiz_sets')
-        .select('id, deck_id, title, question_type, requested_count, generated_count, status, content_locale, created_at')
-        .eq('status', 'ready')
-        .order('created_at', { ascending: false })
-        .limit(50)
+      // An RPC rather than the table, because the row now carries an aggregate: when it was
+      // made, how many sittings, and how the last one went. Fifty sets would otherwise be
+      // fifty follow-up queries, and the aggregate is what makes the row worth reading.
+      const { data, error } = await supabase.rpc('list_quiz_sets', { p_limit: 50 })
       if (error) throw error
       set({ sets: (data ?? []) as QuizSetRow[] })
     } finally {
@@ -709,6 +735,12 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     const { data, error } = await supabase.rpc('count_quiz_mistakes', { p_deck_id: deckId ?? null })
     if (error) throw error
     return (data as number | null) ?? 0
+  },
+
+  loadSetHistory: async (setId) => {
+    const { data, error } = await supabase.rpc('get_quiz_set_history', { p_set_id: setId })
+    if (error) throw error
+    return (data ?? []) as QuizSetHistoryRun[]
   },
 
   deleteSet: async (setId) => {
