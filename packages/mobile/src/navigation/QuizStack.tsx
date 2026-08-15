@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { QuizHomeScreen } from '../screens/quiz/QuizHomeScreen'
 import { QuizSetupScreen } from '../screens/quiz/QuizSetupScreen'
+import { QuizSetDetailScreen } from '../screens/quiz/QuizSetDetailScreen'
 import { QuizRunScreen } from '../screens/quiz/QuizRunScreen'
 import { QuizResultScreen } from '../screens/quiz/QuizResultScreen'
 import type { QuizStackParamList } from './types'
@@ -25,6 +26,7 @@ export function QuizStack() {
     >
       <Stack.Screen name="QuizHome" component={QuizHomeScreen} />
       <Stack.Screen name="QuizSetup" component={QuizSetupScreen} />
+      <Stack.Screen name="QuizSetDetail" component={QuizSetDetailScreen} />
       {/* Taking the quiz disables the back gesture for the same reason the study session
           does: a swipe mid-question is almost always the phone, not the learner. */}
       <Stack.Screen name="QuizRun" component={QuizRunScreen} options={{ gestureEnabled: false }} />

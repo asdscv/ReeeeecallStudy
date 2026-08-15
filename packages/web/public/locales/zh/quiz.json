@@ -201,5 +201,9 @@
     "hide": "收起",
     "attempt": "第{{n, number}}次 · {{date}}",
     "inProgress": "进行中"
+  },
+  "detail": {
+    "gone": "这个测验已不存在。",
+    "historyTitle": "作答记录"
   }
 }

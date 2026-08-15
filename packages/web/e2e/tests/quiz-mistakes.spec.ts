@@ -56,6 +56,23 @@ test.describe('quiz home', () => {
     expect(href!.split('cards=')[1].length).toBeGreaterThan(30)
   })
 
+  test('a quiz opens its own page, with every sitting on it', async ({ page }) => {
+    // The history used to be a toggle on the list row, which is the wrong shape for it: a set is
+    // something a learner comes BACK to, and an expanding row leaves it unreachable by link.
+    const row = page.getByTestId('quiz-set-open').first()
+    await row.waitFor({ timeout: 20_000 })
+    await row.click()
+
+    await expect(page.getByTestId('quiz-set-detail')).toBeVisible({ timeout: 20_000 })
+    // The URL is the point — the page has to be linkable.
+    expect(page.url()).toMatch(/\/quiz\/set\/[0-9a-f-]+$/)
+    // Take (or retake) is always offered; the history is either sittings or "not taken yet".
+    await expect(page.getByTestId('quiz-detail-take')).toBeVisible()
+
+    const body = await page.getByTestId('quiz-set-detail').innerText()
+    expect(body).toMatch(/\d/)
+  })
+
   test('a set that generated nothing offers remove instead of a dead take button', async ({ page }) => {
     await expect(page.getByTestId('quiz-mistakes').or(page.getByRole('heading').first()))
       .toBeVisible({ timeout: 20_000 })

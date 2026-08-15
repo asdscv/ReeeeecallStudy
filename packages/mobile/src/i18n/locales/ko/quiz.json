@@ -201,5 +201,9 @@
     "hide": "닫기",
     "attempt": "{{n, number}}회차 · {{date}}",
     "inProgress": "진행 중"
+  },
+  "detail": {
+    "gone": "이 퀴즈는 없어요.",
+    "historyTitle": "푼 기록"
   }
 }

@@ -201,5 +201,9 @@
     "hide": "ปิด",
     "attempt": "ครั้งที่ {{n, number}} · {{date}}",
     "inProgress": "กำลังทำ"
+  },
+  "detail": {
+    "gone": "ไม่พบแบบทดสอบนี้",
+    "historyTitle": "ประวัติการทำ"
   }
 }

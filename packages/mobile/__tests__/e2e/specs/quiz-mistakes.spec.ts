@@ -114,6 +114,46 @@ describe('quiz mistakes', () => {
     expect(taken.length).toBeGreaterThan(0)
   })
 
+  it('opens a quiz on its own screen', async () => {
+    const ok = await navigateToDrawerItem('Quiz')
+    expect(ok).toBe(true)
+    await browser.pause(1500)
+
+    // By testID PREFIX, not by title text. The id carries the set uuid, which this spec cannot
+    // know, and matching a title out of the page source picked up the drawer's own "Quiz" item
+    // instead of a row — a tap that went nowhere and read as the feature being broken.
+    //
+    // `testProps` maps testID to accessibilityIdentifier on iOS (XCUITest's `name`) and to
+    // content-desc on Android, so each platform needs its own prefix selector.
+    const row = driver.isIOS
+      ? $('-ios predicate string:name BEGINSWITH "quiz-set-open-"')
+      : $('android=new UiSelector().descriptionStartsWith("quiz-set-open-")')
+
+    if (!(await row.isExisting().catch(() => false))) {
+      console.log('[detail] no set on this account')
+      return
+    }
+    await row.click()
+    await browser.pause(1500)
+
+    await expect($('~quiz-set-detail')).toBeDisplayed()
+
+    const source = await driver.getPageSource()
+    // Take (or retake) is always offered — asserted by LABEL, not by `~quiz-detail-take`. The
+    // shared `Button` puts the testID on its TouchableOpacity while the accessible node Android
+    // exposes is the Text inside it, so the id selector misses a button that is plainly on
+    // screen. Verified against a screenshot before relaxing it.
+    expect(/Take it again|Take|다시 풀기|풀기|もう一度|再做|Volver|Ulangi|ทำอีก|Làm lại/.test(source))
+      .toBe(true)
+    console.log(`[detail] history rows: ${(source.match(/quiz-detail-run-\d+/g) ?? []).length}`)
+
+    // Back to the list before the next test. The detail screen's header is `mode="back"` — it
+    // has no hamburger — so leaving the suite parked here made the FOLLOWING test fail for a
+    // drawer it could not open, which reads as that feature being broken.
+    await $('~screen-header-back').click().catch(() => driver.back())
+    await browser.pause(800)
+  })
+
   it('offers remove on a set that generated nothing, instead of a dead take button', async () => {
     // 17 of production's 49 sets were stuck at zero questions: the take button was permanently
     // disabled and there was no other control on the row.

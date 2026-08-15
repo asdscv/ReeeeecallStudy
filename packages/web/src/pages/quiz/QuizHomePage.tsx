@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useQuizStore, isDailyCheckTitle, type QuizSetRow } from '@reeeeecall/shared/stores/quiz-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
 import { QuizMistakes } from './QuizMistakes'
-import { QuizSetHistory } from './QuizSetHistory'
+import { dateLine } from '@reeeeecall/shared/lib/quiz-outcome'
 
 /**
  * The quiz home: what you have made, and the way to make more.
@@ -88,10 +88,20 @@ export function QuizHomePage() {
         </div>
       ) : (
         <ul className="space-y-2">
-          {sets.map((setRow) => (
+          {sets.map((setRow) => {
+            const created = dateLine(setRow.created_at)
+            const lastAt = setRow.last_taken_at ? dateLine(setRow.last_taken_at) : null
+            return (
             <li key={setRow.id} className="p-3 bg-card rounded-lg border border-border">
               <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
+                {/* The row opens the set's own page. The history, every past sitting and the
+                    delete belong there: a list row is a place to CHOOSE a quiz, not to read
+                    one, and an expanding row leaves the history unreachable by link. */}
+                <Link
+                  to={`/quiz/set/${setRow.id}`}
+                  className="min-w-0 no-underline"
+                  data-testid="quiz-set-open"
+                >
                   <p className="text-sm font-medium text-foreground truncate">
                     {/* `__daily_check__` is a SENTINEL — `build_daily_check` finds today's check
                         by that exact title rather than by a flag — and it was being shown to the
@@ -115,10 +125,20 @@ export function QuizHomePage() {
                       </span>
                     )}
                   </div>
-                  {/* When it was made, whether it has been taken, and how it went — all of it
-                      was already in the database and none of it was on the row. */}
-                  <QuizSetHistory setRow={setRow} />
-                </div>
+                  {/* One line of context, not the whole history: when it was made, and
+                      whether it has ever been taken. The rest is a click away. */}
+                  <p className="text-xs text-content-tertiary mt-0.5">
+                    {[
+                      created && t('history.created', { date: t(created.key, created.params) }),
+                      (setRow.run_count ?? 0) === 0
+                        ? t('history.never')
+                        : t('history.taken', {
+                          runs: setRow.run_count,
+                          date: lastAt ? t(lastAt.key, lastAt.params) : '',
+                        }),
+                    ].filter(Boolean).join(' · ')}
+                  </p>
+                </Link>
                 {setRow.generated_count === 0 ? (
                   <button
                     type="button"
@@ -141,7 +161,8 @@ export function QuizHomePage() {
                 )}
               </div>
             </li>
-          ))}
+            )
+          })}
         </ul>
       )}
     </div>

@@ -389,6 +389,15 @@ interface QuizState {
    * for. The list already carries the last one, which is what the collapsed row needs.
    */
   loadSetHistory: (setId: string) => Promise<QuizSetHistoryRun[]>
+
+  /**
+   * One set, loaded from its id.
+   *
+   * The detail screen is reachable by URL, so it cannot depend on the list having been fetched
+   * first — a deep link, a reload, or arriving straight from a run all skip it. Resolves null
+   * when the set is gone, which a screen says plainly rather than throwing.
+   */
+  loadSet: (setId: string) => Promise<QuizSetRow | null>
 }
 
 export const useQuizStore = create<QuizState>((set, get) => ({
@@ -735,6 +744,12 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     const { data, error } = await supabase.rpc('count_quiz_mistakes', { p_deck_id: deckId ?? null })
     if (error) throw error
     return (data as number | null) ?? 0
+  },
+
+  loadSet: async (setId) => {
+    const { data, error } = await supabase.rpc('get_quiz_set', { p_set_id: setId })
+    if (error) throw error
+    return (data ?? null) as QuizSetRow | null
   },
 
   loadSetHistory: async (setId) => {

@@ -201,5 +201,9 @@
     "hide": "Tutup",
     "attempt": "Percobaan {{n, number}} · {{date}}",
     "inProgress": "Berlangsung"
+  },
+  "detail": {
+    "gone": "Kuis ini sudah tidak ada.",
+    "historyTitle": "Riwayat"
   }
 }

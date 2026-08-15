@@ -20,6 +20,8 @@ export type AuthStackParamList = {
 export type QuizStackParamList = {
   QuizHome: undefined
   QuizSetup: undefined
+  /** One set, with every sitting of it. Reached by tapping a row on the quiz home. */
+  QuizSetDetail: { setId: string }
   QuizRun: { runId: string }
   QuizResult: { runId: string }
 }

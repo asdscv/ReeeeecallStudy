@@ -201,5 +201,9 @@
     "hide": "Đóng",
     "attempt": "Lần {{n, number}} · {{date}}",
     "inProgress": "Đang làm"
+  },
+  "detail": {
+    "gone": "Bài kiểm tra này không còn.",
+    "historyTitle": "Lịch sử làm bài"
   }
 }

@@ -201,5 +201,9 @@
     "hide": "Cerrar",
     "attempt": "Intento {{n, number}} · {{date}}",
     "inProgress": "En curso"
+  },
+  "detail": {
+    "gone": "Este cuestionario ya no existe.",
+    "historyTitle": "Historial"
   }
 }

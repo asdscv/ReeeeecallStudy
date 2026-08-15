@@ -201,5 +201,9 @@
     "hide": "Close",
     "attempt": "Attempt {{n, number}} · {{date}}",
     "inProgress": "In progress"
+  },
+  "detail": {
+    "gone": "This quiz is gone.",
+    "historyTitle": "History"
   }
 }

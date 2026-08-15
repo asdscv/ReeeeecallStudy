@@ -11,7 +11,7 @@ import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
 import type { QuizStackParamList } from '../../navigation/types'
 import { QuizMistakes } from './QuizMistakes'
-import { QuizSetHistory } from './QuizSetHistory'
+import { dateLine } from '@reeeeecall/shared/lib/quiz-outcome'
 
 type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizHome'>
 
@@ -88,9 +88,18 @@ export function QuizHomeScreen() {
           data={sets}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
-          renderItem={({ item }) => (
+          renderItem={({ item }) => {
+            const created = dateLine(item.created_at)
+            const lastAt = item.last_taken_at ? dateLine(item.last_taken_at) : null
+            return (
             <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-              <View style={styles.cardBody}>
+              {/* The row opens the set's own screen. The history, every past sitting and the
+                  delete belong there: a list row is a place to CHOOSE a quiz, not to read one. */}
+              <Pressable
+                style={styles.cardBody}
+                onPress={() => navigation.navigate('QuizSetDetail', { setId: item.id })}
+                {...testProps(`quiz-set-open-${item.id}`)}
+              >
                 <Text style={[theme.typography.label, { color: theme.colors.text }]} numberOfLines={1}>
                   {/* `__daily_check__` is a SENTINEL — `build_daily_check` finds today's check by
                       that exact title rather than by a flag — and it was being shown to the
@@ -108,10 +117,20 @@ export function QuizHomeScreen() {
                     {t('home.fewerThanAsked', { requested: item.requested_count })}
                   </Text>
                 )}
-                {/* When it was made, whether it has been taken, and how it went — all of it was
-                    already in the database and none of it was on the row. */}
-                <QuizSetHistory setRow={item} />
-              </View>
+                {/* One line of context, not the whole history: when it was made, and whether
+                    it has ever been taken. The rest is a tap away. */}
+                <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                  {[
+                    created ? t('history.created', { date: t(created.key, created.params) }) : null,
+                    (item.run_count ?? 0) === 0
+                      ? t('history.never')
+                      : t('history.taken', {
+                        runs: item.run_count,
+                        date: lastAt ? t(lastAt.key, lastAt.params) : '',
+                      }),
+                  ].filter(Boolean).join(' · ')}
+                </Text>
+              </Pressable>
               {item.generated_count === 0 ? (
                 <Pressable
                   onPress={() => void remove(item)}
@@ -137,7 +156,8 @@ export function QuizHomeScreen() {
                 </Pressable>
               )}
             </View>
-          )}
+            )
+          }}
         />
       )}
 

@@ -201,5 +201,9 @@
     "hide": "閉じる",
     "attempt": "{{n, number}}回目 · {{date}}",
     "inProgress": "進行中"
+  },
+  "detail": {
+    "gone": "このクイズはありません。",
+    "historyTitle": "解答履歴"
   }
 }
