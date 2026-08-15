@@ -237,7 +237,12 @@
     "percent": "{{value, number}} %",
     "minutes_one": "{{count, number}} min",
     "minutes_other": "{{count, number}} min",
-    "allTime": "Todo el tiempo"
+    "allTime": "Todo el tiempo",
+    "emptyRetention": "Todavía no hay tarjetas en fase de repaso. Repasa unas cuantas veces más y aparecerá tu curva de retención.",
+    "emptyWeakTopics": "No hay mazos débiles. Las tarjetas que marques como difíciles aparecerán aquí.",
+    "emptyModes": "Aún no hay datos por modo de estudio. Termina una sesión y compararemos la eficacia de cada modo.",
+    "emptyStudyTime": "No hay actividad de estudio en el periodo seleccionado.",
+    "emptyProgress": "Todavía no dominas ninguna tarjeta. Sigue repasando y tu progreso semanal se irá acumulando aquí."
   },
   "pomodoro": {
     "focus": "Focus",

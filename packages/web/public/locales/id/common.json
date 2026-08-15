@@ -237,7 +237,12 @@
     "percent": "{{value, number}}%",
     "minutes_one": "{{count, number}} menit",
     "minutes_other": "{{count, number}} menit",
-    "allTime": "Sepanjang waktu"
+    "allTime": "Sepanjang waktu",
+    "emptyRetention": "Belum ada kartu yang mencapai tahap ulasan. Ulangi beberapa kali lagi dan kurva retensi akan muncul.",
+    "emptyWeakTopics": "Tidak ada dek yang lemah. Kartu yang Anda tandai sulit akan muncul di sini.",
+    "emptyModes": "Belum ada data per mode belajar. Selesaikan satu sesi dan kami akan membandingkan efektivitas tiap mode.",
+    "emptyStudyTime": "Tidak ada aktivitas belajar pada periode yang dipilih.",
+    "emptyProgress": "Belum ada kartu yang dikuasai. Teruslah mengulang dan kemajuan mingguan akan terkumpul di sini."
   },
   "pomodoro": {
     "focus": "Focus",

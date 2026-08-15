@@ -243,7 +243,12 @@
     "percent": "{{value, number}}%",
     "minutes_one": "{{count, number}}분",
     "minutes_other": "{{count, number}}분",
-    "allTime": "전체 기간"
+    "allTime": "전체 기간",
+    "emptyRetention": "아직 복습 단계에 오른 카드가 없어요. 카드를 몇 번 더 복습하면 기억 유지 곡선이 그려집니다.",
+    "emptyWeakTopics": "취약한 덱이 없어요. 어렵다고 표시한 카드가 생기면 여기에 나타납니다.",
+    "emptyModes": "아직 학습 모드별 데이터가 없어요. 학습을 마치면 모드별 효과를 비교해 드릴게요.",
+    "emptyStudyTime": "선택한 기간에 학습 기록이 없어요.",
+    "emptyProgress": "아직 정착된 카드가 없어요. 복습을 이어가면 주별 진행 상황이 쌓입니다."
   },
   "pomodoro": {
     "focus": "집중",

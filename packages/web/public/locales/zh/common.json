@@ -237,7 +237,12 @@
     "percent": "{{value, number}}%",
     "minutes_one": "{{count, number}} 分钟",
     "minutes_other": "{{count, number}} 分钟",
-    "allTime": "全部时间"
+    "allTime": "全部时间",
+    "emptyRetention": "还没有卡片进入复习阶段。多复习几次，记忆保持曲线就会出现。",
+    "emptyWeakTopics": "没有薄弱的卡组。你标记为「困难」的卡片会显示在这里。",
+    "emptyModes": "还没有学习模式数据。完成一次学习后，我们会比较各模式的效果。",
+    "emptyStudyTime": "所选期间没有学习记录。",
+    "emptyProgress": "还没有掌握的卡片。继续复习，每周的进度会累积在这里。"
   },
   "pomodoro": {
     "focus": "Focus",

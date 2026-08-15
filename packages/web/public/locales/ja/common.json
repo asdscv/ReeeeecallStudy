@@ -237,7 +237,12 @@
     "percent": "{{value, number}}%",
     "minutes_one": "{{count, number}}分",
     "minutes_other": "{{count, number}}分",
-    "allTime": "全期間"
+    "allTime": "全期間",
+    "emptyRetention": "まだ復習段階に達したカードがありません。何度か復習すると記憶保持曲線が表示されます。",
+    "emptyWeakTopics": "苦手なデッキはありません。「難しい」と評価したカードがここに表示されます。",
+    "emptyModes": "まだ学習モードのデータがありません。学習を終えるとモードごとの効果を比較します。",
+    "emptyStudyTime": "選択した期間に学習記録がありません。",
+    "emptyProgress": "まだ定着したカードがありません。復習を続けると週ごとの進捗がたまります。"
   },
   "pomodoro": {
     "focus": "Focus",

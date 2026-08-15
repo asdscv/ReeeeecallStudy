@@ -237,7 +237,12 @@
     "percent": "{{value, number}}%",
     "minutes_one": "{{count, number}} phút",
     "minutes_other": "{{count, number}} phút",
-    "allTime": "Toàn bộ"
+    "allTime": "Toàn bộ",
+    "emptyRetention": "Chưa có thẻ nào bước vào giai đoạn ôn tập. Ôn thêm vài lần và đường cong ghi nhớ sẽ xuất hiện.",
+    "emptyWeakTopics": "Không có bộ thẻ yếu nào. Những thẻ bạn đánh dấu là khó sẽ hiện ở đây.",
+    "emptyModes": "Chưa có dữ liệu theo chế độ học. Hoàn thành một buổi học và chúng tôi sẽ so sánh hiệu quả từng chế độ.",
+    "emptyStudyTime": "Không có hoạt động học trong khoảng thời gian đã chọn.",
+    "emptyProgress": "Chưa có thẻ nào được ghi nhớ vững. Tiếp tục ôn tập để tiến độ hằng tuần tích lũy tại đây."
   },
   "pomodoro": {
     "focus": "Focus",

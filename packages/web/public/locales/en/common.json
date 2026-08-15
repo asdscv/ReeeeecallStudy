@@ -243,7 +243,12 @@
     "percent": "{{value, number}}%",
     "minutes_one": "{{count, number}} min",
     "minutes_other": "{{count, number}} min",
-    "allTime": "All time"
+    "allTime": "All time",
+    "emptyRetention": "No cards have reached the review stage yet. Review a few more times and your retention curve will appear.",
+    "emptyWeakTopics": "No weak decks. Cards you mark as hard will show up here.",
+    "emptyModes": "No study mode data yet. Finish a session and we will compare how each mode works for you.",
+    "emptyStudyTime": "No study activity in the selected period.",
+    "emptyProgress": "No cards mastered yet. Keep reviewing and your weekly progress will build up here."
   },
   "pomodoro": {
     "focus": "Focus",
