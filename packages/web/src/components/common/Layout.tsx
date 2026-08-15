@@ -86,6 +86,18 @@ export function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [openDesktopGroup, setOpenDesktopGroup] = useState<string | null>(null)
   const [openMobileGroups, setOpenMobileGroups] = useState<Set<string>>(new Set())
+  /**
+   * Which inline SECTIONS are open, by label.
+   *
+   * They used to render expanded, all four at once, so opening 학습 dropped a fifteen-row wall
+   * on the screen and the learner scanned it rather than chose from it. A section is a promise
+   * that its contents are related; showing every promise at once keeps none of them.
+   *
+   * `null` means "nothing has been touched yet" and the section holding the current route is the
+   * one open — arriving from /quiz should show 퀴즈 highlighted in context, not a closed list the
+   * learner has to guess their way back into.
+   */
+  const [openSections, setOpenSections] = useState<Set<string> | null>(null)
   const desktopNavRef = useRef<HTMLElement>(null)
 
   // Match on a segment boundary rather than on characters: '/ai' is the hub and '/ai-generate'
@@ -98,6 +110,20 @@ export function Layout() {
   const isGroupActive = (group: NavGroup): boolean =>
     (group.path !== undefined && isActive(group.path)) ||
     group.children.some(child => (child.kind === 'link' ? isActive(child.path) : isGroupActive(child)))
+
+  const isSectionOpen = (group: NavGroup): boolean =>
+    openSections === null ? isGroupActive(group) : openSections.has(group.label)
+
+  const toggleSection = (group: NavGroup) => {
+    setOpenSections((current) => {
+      // First touch: start from what is on screen, so the section the learner can see open does
+      // not jump shut because they clicked a different one.
+      const next = new Set(current ?? (isGroupActive(group) ? [group.label] : []))
+      if (next.has(group.label)) next.delete(group.label)
+      else next.add(group.label)
+      return next
+    })
+  }
 
   // 클릭 외부 감지로 데스크톱 드롭다운 닫기
   useEffect(() => {
@@ -153,23 +179,45 @@ export function Layout() {
       )
     }
 
+    const open = isSectionOpen(item)
+    // The LABEL is the group's own page when it has one (AI 학습 opens the hub); the CHEVRON
+    // toggles. Two targets in one row rather than one that does both, because a header that
+    // navigates AND expands does neither predictably.
     const header = <><span className="mr-2">{item.icon}</span>{item.label}</>
     return (
       <div key={item.label} className="mt-1 pt-1 border-t border-border first:mt-0 first:pt-0 first:border-t-0">
-        {item.path ? (
-          <Link
-            to={item.path}
-            onClick={() => setOpenDesktopGroup(null)}
-            className={`block px-4 py-1.5 whitespace-nowrap no-underline transition ${sectionClass} ${
-              isActive(item.path) ? 'text-brand' : `${sectionIdleClass} hover:text-foreground`
-            }`}
+        <div className="flex items-center">
+          {item.path ? (
+            <Link
+              to={item.path}
+              onClick={() => setOpenDesktopGroup(null)}
+              className={`flex-1 px-4 py-1.5 whitespace-nowrap no-underline transition ${sectionClass} ${
+                isActive(item.path) ? 'text-brand' : `${sectionIdleClass} hover:text-foreground`
+              }`}
+            >
+              {header}
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={() => toggleSection(item)}
+              className={`flex-1 text-left px-4 py-1.5 whitespace-nowrap cursor-pointer transition ${sectionClass} ${sectionIdleClass} hover:text-foreground`}
+            >
+              {header}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => toggleSection(item)}
+            aria-expanded={open}
+            aria-label={item.label}
+            data-testid={`nav-section-toggle-${item.label}`}
+            className={`px-2 py-1.5 cursor-pointer text-xs transition ${sectionIdleClass} hover:text-foreground`}
           >
-            {header}
-          </Link>
-        ) : (
-          <p className={`px-4 py-1.5 whitespace-nowrap ${sectionClass} ${sectionIdleClass}`}>{header}</p>
-        )}
-        <div className="pl-3">{item.children.map(renderDesktopSubItem)}</div>
+            {open ? '\u2227' : '\u2228'}
+          </button>
+        </div>
+        {open && <div className="pl-3">{item.children.map(renderDesktopSubItem)}</div>}
       </div>
     )
   }
@@ -191,23 +239,45 @@ export function Layout() {
       )
     }
 
+    const open = isSectionOpen(item)
+    // The LABEL is the group's own page when it has one (AI 학습 opens the hub); the CHEVRON
+    // toggles. Two targets in one row rather than one that does both, because a header that
+    // navigates AND expands does neither predictably.
     const header = <><span className="mr-2">{item.icon}</span>{item.label}</>
     return (
       <div key={item.label} className="mt-1 pt-2 border-t border-border first:mt-0 first:pt-0 first:border-t-0">
-        {item.path ? (
-          <Link
-            to={item.path}
-            onClick={() => setMobileMenuOpen(false)}
-            className={`block px-3 py-1.5 no-underline transition ${sectionClass} ${
-              isActive(item.path) ? 'text-brand' : `${sectionIdleClass} hover:text-foreground`
-            }`}
+        <div className="flex items-center">
+          {item.path ? (
+            <Link
+              to={item.path}
+              onClick={() => setMobileMenuOpen(false)}
+              className={`flex-1 px-3 py-1.5 whitespace-nowrap no-underline transition ${sectionClass} ${
+                isActive(item.path) ? 'text-brand' : `${sectionIdleClass} hover:text-foreground`
+              }`}
+            >
+              {header}
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={() => toggleSection(item)}
+              className={`flex-1 text-left px-3 py-1.5 whitespace-nowrap cursor-pointer transition ${sectionClass} ${sectionIdleClass} hover:text-foreground`}
+            >
+              {header}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => toggleSection(item)}
+            aria-expanded={open}
+            aria-label={item.label}
+            data-testid={`nav-section-toggle-${item.label}`}
+            className={`px-2 py-1.5 cursor-pointer text-xs transition ${sectionIdleClass} hover:text-foreground`}
           >
-            {header}
-          </Link>
-        ) : (
-          <p className={`px-3 py-1.5 ${sectionClass} ${sectionIdleClass}`}>{header}</p>
-        )}
-        <div className="pl-3">{item.children.map(renderMobileSubItem)}</div>
+            {open ? '\u2227' : '\u2228'}
+          </button>
+        </div>
+        {open && <div className="pl-3">{item.children.map(renderMobileSubItem)}</div>}
       </div>
     )
   }

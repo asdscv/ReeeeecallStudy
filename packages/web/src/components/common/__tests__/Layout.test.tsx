@@ -71,7 +71,7 @@ describe('데스크톱 드롭다운', () => {
     renderLayout()
     const nav = screen.getAllByRole('navigation')[0]
 
-    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
+    await openAllSections(user, nav)
 
     // The four sections the 학습 menu is now made of. AI 학습 is asserted by its own tests;
     // these three are the ones this restructure created.
@@ -110,7 +110,7 @@ describe('데스크톱 드롭다운', () => {
     renderLayout()
     const nav = screen.getAllByRole('navigation')[0]
 
-    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
+    await openAllSections(user, nav)
     expect(within(nav).getByText('nav.decks')).toBeInTheDocument()
 
     // 외부 (body) 클릭
@@ -119,6 +119,20 @@ describe('데스크톱 드롭다운', () => {
     expect(within(nav).queryByText('nav.decks')).not.toBeInTheDocument()
   })
 })
+
+/**
+ * Open the 학습 dropdown and every section inside it.
+ *
+ * The four sections used to render expanded, all at once — fifteen rows dropped on the screen the
+ * moment 학습 opened, which is a list to scan rather than a menu to choose from. They collapse
+ * now, so a test that wants a child has to open its section first, exactly as a learner does.
+ */
+async function openAllSections(user: ReturnType<typeof userEvent.setup>, nav: HTMLElement) {
+  await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
+  for (const toggle of within(nav).getAllByTestId(/^nav-section-toggle-/)) {
+    if (toggle.getAttribute('aria-expanded') !== 'true') await user.click(toggle)
+  }
+}
 
 // ─── Cycle 3: 활성 상태 하이라이트 ────────────────────────────
 describe('활성 상태', () => {
@@ -204,7 +218,7 @@ describe('모바일 아코디언', () => {
     await user.click(screen.getByRole('button', { name: /menu/ }))
     const mobileNav = screen.getAllByRole('navigation')[1]
 
-    await user.click(within(mobileNav).getByRole('button', { name: /nav\.study/ }))
+    await openAllSections(user, mobileNav)
 
     expect(within(mobileNav).getByText('nav.decks')).toBeInTheDocument()
     expect(within(mobileNav).getByText('nav.cardTemplates')).toBeInTheDocument()
@@ -232,7 +246,7 @@ describe('모바일 아코디언', () => {
 
     await user.click(screen.getByRole('button', { name: /menu/ }))
     const mobileNav = screen.getAllByRole('navigation')[1]
-    await user.click(within(mobileNav).getByRole('button', { name: /nav\.study/ }))
+    await openAllSections(user, mobileNav)
 
     await user.click(within(mobileNav).getByText('nav.decks'))
 
@@ -248,7 +262,7 @@ describe('링크 정확성', () => {
     renderLayout()
     const nav = screen.getAllByRole('navigation')[0]
 
-    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
+    await openAllSections(user, nav)
     expect(within(nav).getByText('nav.decks').closest('a')).toHaveAttribute('href', '/decks')
     // The label must say what the page is: `/templates` is titled 카드 템플릿, and calling it
     // "카드" next to 덱 promised a card list that does not exist anywhere in the app.
@@ -263,7 +277,7 @@ describe('링크 정확성', () => {
     renderLayout()
     const nav = screen.getAllByRole('navigation')[0]
 
-    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
+    await openAllSections(user, nav)
     await user.click(within(nav).getByText('nav.decks'))
 
     expect(within(nav).queryByText('nav.cards')).not.toBeInTheDocument()
@@ -309,7 +323,7 @@ describe('엣지 케이스', () => {
 
     // 데스크톱에서 학습 그룹 열기
     const desktopNav = screen.getAllByRole('navigation')[0]
-    await user.click(within(desktopNav).getByRole('button', { name: /nav\.study/ }))
+    await openAllSections(user, desktopNav)
     expect(within(desktopNav).getByText('nav.decks')).toBeInTheDocument()
 
     // 모바일 메뉴 열기
@@ -334,5 +348,76 @@ describe('엣지 케이스', () => {
 
     const studyBtn = within(nav).getByRole('button', { name: /nav\.study/ })
     expect(studyBtn.querySelector('svg')).toBeInTheDocument()
+  })
+})
+
+// ─── Cycle 9: 섹션은 눌러야 열린다 ─────────────────────────────
+//
+// They rendered expanded, all four at once, so opening 학습 dropped fifteen rows on the screen —
+// a list to scan rather than a menu to choose from. A section is a promise that its contents are
+// related, and showing every promise at once keeps none of them.
+describe('하위 섹션 접기', () => {
+  it('학습을 열어도 섹션 자식은 바로 보이지 않는다', async () => {
+    const user = userEvent.setup()
+    renderLayout('/dashboard')
+    const nav = screen.getAllByRole('navigation')[0]
+
+    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
+
+    // The section headers are there — they are the menu. Their children are not.
+    expect(within(nav).getByText('nav.deckAndCards')).toBeInTheDocument()
+    expect(within(nav).queryByText('nav.decks')).not.toBeInTheDocument()
+    expect(within(nav).queryByText('nav.achievements')).not.toBeInTheDocument()
+  })
+
+  it('섹션 토글을 누르면 그 섹션만 열린다', async () => {
+    const user = userEvent.setup()
+    renderLayout('/dashboard')
+    const nav = screen.getAllByRole('navigation')[0]
+    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
+
+    await user.click(within(nav).getByTestId('nav-section-toggle-nav.deckAndCards'))
+
+    expect(within(nav).getByText('nav.decks')).toBeInTheDocument()
+    // The other three stay shut: opening one section is not opening the menu again.
+    expect(within(nav).queryByText('nav.marketplace')).not.toBeInTheDocument()
+    expect(within(nav).queryByText('nav.achievements')).not.toBeInTheDocument()
+  })
+
+  it('다시 누르면 닫힌다', async () => {
+    const user = userEvent.setup()
+    renderLayout('/dashboard')
+    const nav = screen.getAllByRole('navigation')[0]
+    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
+
+    const toggle = within(nav).getByTestId('nav-section-toggle-nav.explore')
+    await user.click(toggle)
+    expect(within(nav).getByText('nav.marketplace')).toBeInTheDocument()
+    await user.click(toggle)
+    expect(within(nav).queryByText('nav.marketplace')).not.toBeInTheDocument()
+  })
+
+  it('현재 페이지가 든 섹션은 처음부터 열려 있다', async () => {
+    // Arriving from /achievements and finding 내 기록 shut would make the learner guess their
+    // way back to where they already are.
+    const user = userEvent.setup()
+    renderLayout('/achievements')
+    const nav = screen.getAllByRole('navigation')[0]
+
+    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
+
+    expect(within(nav).getByText('nav.achievements')).toBeInTheDocument()
+    expect(within(nav).queryByText('nav.decks')).not.toBeInTheDocument()
+  })
+
+  it('AI 학습 헤더는 여전히 허브로 가는 링크다', async () => {
+    // The label navigates and the chevron expands: a header that did both would do neither
+    // predictably.
+    const user = userEvent.setup()
+    renderLayout('/dashboard')
+    const nav = screen.getAllByRole('navigation')[0]
+    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
+
+    expect(within(nav).getByText('nav.aiHub').closest('a')).toHaveAttribute('href', '/ai')
   })
 })
