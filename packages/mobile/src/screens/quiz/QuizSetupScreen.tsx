@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, Pressable, TextInput } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
@@ -14,6 +14,8 @@ import { Screen, Button, ScreenHeader } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
 import type { QuizStackParamList } from '../../navigation/types'
+import { generateCostLine, freeLeftLine } from '@reeeeecall/shared/lib/quiz-pricing'
+import { minCardsForMcq } from '@reeeeecall/shared/lib/quiz-outcome'
 
 type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizSetup'>
 
@@ -21,6 +23,8 @@ const TYPES: QuizQuestionType[] = ['mcq', 'short', 'essay']
 // Same presets as web. Mobile has no free-entry field: a numeric keyboard for a value that
 // is almost always one of these is worse than one more chip.
 const COUNTS = [4, 6, 8, 10, 12, 20, 30, 50]
+/** Ceiling for the custom box. Matches web's MAX_COUNT and the server's per-set cap. */
+const MAX_COUNT = 50
 
 /**
  * Scope, type, count, price, confirm.
@@ -34,7 +38,9 @@ export function QuizSetupScreen() {
   const { t, i18n } = useTranslation('quiz')
   const navigation = useNavigation<Nav>()
   const { decks, fetchDecks } = useDeckStore()
-  const { countQuizzable, quote, createAndGenerate, generating, difficultyLevels } = useQuizStore()
+  const {
+    countQuizzable, quote, createAndGenerate, generating, generateProgress, difficultyLevels,
+  } = useQuizStore()
 
   const [deckId, setDeckId] = useState('')
   const [type, setType] = useState<QuizQuestionType>('mcq')
@@ -83,7 +89,15 @@ export function QuizSetupScreen() {
     ? difficulty
     : (usableBands.find((b) => b.is_default) ?? usableBands[0])?.level ?? null
   const eligible = shownCounts?.eligible ?? 0
-  const tooFewForMcq = type === 'mcq' && eligible > 0 && eligible < 4
+  /** The chosen count is not one of the chips, so the custom box is what is in effect. */
+  const isCustomCount = !COUNTS.includes(count)
+  // From the BAND, not a literal 4. The far distractor slots are what need deck-mates, and the
+  // band says how many there are — at the hardest one the model writes every distractor, so a
+  // six-card deck was being refused for cards it did not need.
+  const mcqMinimum = minCardsForMcq(usableBands.find((b) => b.level === activeBand))
+  const tooFewForMcq = type === 'mcq' && eligible > 0 && eligible < mcqMinimum
+  const costLine = generateCostLine(priced)
+  const freeLeft = freeLeftLine(priced)
   const canSubmit = Boolean(deckId) && eligible > 0 && !tooFewForMcq && !generating
     && priced !== null && priced.sufficient
 
@@ -102,6 +116,11 @@ export function QuizSetupScreen() {
         // default rather than being handed a guess.
         difficulty: activeBand ?? undefined,
         maxPriceMicro: priced.price_micro,
+        // The quote's own split, so the batch drawdown can follow the server's
+        // trial -> free -> paid order instead of guessing pro-rata. Without it the
+        // final batch is refused whenever free questions remain.
+        freeQuestions: (priced.free_items ?? 0) + (priced.trial_items ?? 0),
+        paidQuestions: priced.paid_items ?? 0,
       })
       navigation.navigate('QuizHome')
     } catch (e) {
@@ -181,6 +200,43 @@ export function QuizSetupScreen() {
             </Pressable>
           ))}
         </View>
+
+        {/* Parity with web, which had a custom box and phones did not — a learner who wanted 13
+            questions simply could not ask for one here. Kept OUT of the chip row and labelled:
+            web's version sat inline as a ninth chip that always echoed the count, so typing 13
+            highlighted nothing and typing 6 lit up the 6 chip. Empty unless the count really is
+            custom, outlined when it is the thing in effect. */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
+          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+            {t('setup.customCount')}
+          </Text>
+          <TextInput
+            value={isCustomCount ? String(count) : ''}
+            onChangeText={(raw) => {
+              if (raw.trim() === '') return
+              const n = Number(raw.replace(/[^0-9]/g, ''))
+              if (Number.isFinite(n) && n > 0) setCount(Math.min(MAX_COUNT, Math.max(1, Math.round(n))))
+            }}
+            keyboardType="number-pad"
+            placeholder={`1–${MAX_COUNT}`}
+            placeholderTextColor={theme.colors.textTertiary}
+            style={{
+              width: 76, minHeight: 40, textAlign: 'center', borderRadius: 10, borderWidth: 1,
+              paddingHorizontal: 8, color: theme.colors.text,
+              borderColor: isCustomCount ? theme.colors.primary : theme.colors.border,
+              backgroundColor: theme.colors.surface,
+            }}
+            {...testProps('quiz-count-custom')}
+          />
+          {/* One place says what will actually be made, whichever control set it. */}
+          <Text
+            style={[theme.typography.caption, { color: theme.colors.textTertiary }]}
+            {...testProps('quiz-count-effective')}
+          >
+            {t('setup.countEffective', { count: Math.min(count, eligible || count) })}
+          </Text>
+        </View>
+
         {/* The submit clamps to `eligible`, and on a deck smaller than the smallest chip every
             chip is disabled — so the screen showed a count nobody could change and then quietly
             made a different number. Say the real number instead. */}
@@ -218,9 +274,24 @@ export function QuizSetupScreen() {
           </Text>
         )}
 
-        {/* The amount is no longer announced in the flow. The QUOTE still runs — it is what
-            `maxPriceMicro` authorises — and the one thing left on screen is the one thing a
-            learner cannot act around: an empty wallet. */}
+        {/* What this batch costs, and what is left of today's free questions.
+            An allowance nobody can see is not an allowance: the free tier gets five questions a
+            day whatever the type, and until 239 the only way to find that out was to be charged
+            for the sixth. Both lines come from the shared helper so web and mobile cannot start
+            explaining the same billing differently. */}
+        {costLine && (
+          <View style={[styles.priceBox, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+            <Text style={[theme.typography.caption, { color: theme.colors.text }]} testID="quiz-generate-cost">
+              {t(costLine.key, costLine.params)}
+            </Text>
+            {freeLeft && (
+              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]} testID="quiz-free-left">
+                {t(freeLeft.key, freeLeft.params)}
+              </Text>
+            )}
+          </View>
+        )}
+
         {priced && !priced.sufficient && (
           <View style={[styles.priceBox, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
             <Text style={[theme.typography.caption, { color: theme.colors.error }]}>
@@ -234,7 +305,17 @@ export function QuizSetupScreen() {
         )}
 
         <Button
-          title={generating ? t('setup.generating') : t('setup.confirm')}
+          title={generating
+            // A 50-question quiz is several model calls and can take over a minute. The web
+            // button has counted batches since 208; this one said "만드는 중…" for the whole
+            // wait, which on a phone — where there is nothing else on screen to look at —
+            // reads as a hang. `generateProgress` was being written and never read here.
+            ? (generateProgress && generateProgress.total > 1
+              ? t('setup.generatingBatch', {
+                done: generateProgress.done, total: generateProgress.total,
+              })
+              : t('setup.generating'))
+            : t('setup.confirm')}
           onPress={() => void submit()}
           disabled={!canSubmit}
           {...testProps('quiz-confirm')}

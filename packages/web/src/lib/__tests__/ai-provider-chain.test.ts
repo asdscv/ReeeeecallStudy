@@ -191,3 +191,71 @@ describe('fallback ordering', () => {
     expect(blended(first!)).toBe(blended(PROVIDERS.gemini.textModel))
   })
 })
+
+/**
+ * Text on one provider, images on another.
+ *
+ * DeepSeek is several times cheaper per token and cannot read an image at all — it answers an
+ * `image_url` content part with "unknown variant `image_url`, expected `text`". With one global
+ * provider the choice was between a cheap text model and working card images, so vision gets its
+ * own provider, key and fallback chain, each defaulting to the text one when unset.
+ */
+describe('vision can run on a different provider from text', () => {
+  const split = {
+    AI_GENERATION_PROVIDER: 'deepseek',
+    AI_GENERATION_PROVIDER_KEY: 'ds-key',
+    AI_VISION_PROVIDER: 'gemini',
+    AI_VISION_PROVIDER_KEY: 'gm-key',
+  }
+
+  it('sends each purpose to its own provider, base url and key', () => {
+    const text = resolveModel('text', env(split))
+    expect(text).toMatchObject({ provider: 'deepseek', apiKey: 'ds-key' })
+    expect(text?.baseUrl).toContain('deepseek.com')
+    expect(text?.model).toBe('deepseek-v4-flash')
+
+    const vision = resolveModel('vision', env(split))
+    expect(vision).toMatchObject({ provider: 'gemini', apiKey: 'gm-key' })
+    expect(vision?.baseUrl).toContain('googleapis.com')
+  })
+
+  it('never sends one provider\'s key to the other', () => {
+    // The failure this guards is silent and expensive: Google would reject DeepSeek's key with a
+    // 401 that reads as "AI is down".
+    const vision = resolveModel('vision', env(split))
+    expect(vision?.apiKey).not.toBe('ds-key')
+  })
+
+  it('does not use the TEXT model name for vision across providers', () => {
+    // `AI_GENERATION_MODEL` names a model at the text provider. Reused at another provider it is
+    // a 404, not a degraded call.
+    const vision = resolveModel('vision', env({ ...split, AI_GENERATION_MODEL: 'deepseek-v4-pro' }))
+    expect(vision?.model).not.toBe('deepseek-v4-pro')
+    expect(vision?.model).toContain('gemini')
+  })
+
+  it('keeps the old single-provider behaviour when vision is not configured', () => {
+    const only = { AI_GENERATION_PROVIDER: 'gemini', AI_GENERATION_PROVIDER_KEY: 'k' }
+    const vision = resolveModel('vision', env(only))
+    expect(vision).toMatchObject({ provider: 'gemini', apiKey: 'k' })
+    // And the text model override still reaches vision, because it IS the same provider.
+    expect(resolveModel('vision', env({ ...only, AI_GENERATION_MODEL: 'gemini-2.5-flash' }))?.model)
+      .toBe('gemini-2.5-flash')
+  })
+
+  it('falls back within the vision provider, not into the text one', () => {
+    const chain = resolveModelChain('vision', env(split))
+    expect(chain.length).toBeGreaterThan(1)
+    expect(chain.every((m) => m.provider === 'gemini')).toBe(true)
+    expect(chain.every((m) => m.model.startsWith('gemini'))).toBe(true)
+  })
+
+  it('gives DeepSeek the two models the API actually lists', () => {
+    // `deepseek-chat` was in this table and is not in `GET /models` — the live key returns
+    // exactly `deepseek-v4-flash` and `deepseek-v4-pro`.
+    expect(PROVIDERS.deepseek.textModel).toBe('deepseek-v4-flash')
+    expect(PROVIDERS.deepseek.textFallbacks).toEqual(['deepseek-v4-pro'])
+    // Empty on purpose: pointing vision here would 400 on every card image.
+    expect(PROVIDERS.deepseek.visionModel).toBe('')
+  })
+})

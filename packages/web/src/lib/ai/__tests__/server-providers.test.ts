@@ -8,7 +8,11 @@ const env = (m: Record<string, string>) => (k: string) => m[k]
 describe('resolveModel — provider/model registry', () => {
   it('defaults to gemini text model with just a key', () => {
     expect(resolveModel('text', env({ AI_GENERATION_PROVIDER_KEY: 'k' }))).toEqual({
-      apiKey: 'k', baseUrl: PROVIDERS.gemini.baseUrl, model: PROVIDERS.gemini.textModel, provider: 'gemini',
+      apiKey: 'k', baseUrl: PROVIDERS.gemini.baseUrl, model: PROVIDERS.gemini.textModel,
+      provider: 'gemini',
+      // The call's own time budget, carried on the resolved model since a reasoning provider is
+      // legitimately slower than a flash one — DeepSeek measured 23.7s against a shared 30s cap.
+      timeoutMs: 30_000,
     })
   })
 

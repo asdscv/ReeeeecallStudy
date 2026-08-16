@@ -16,7 +16,14 @@
       "title": "ยังไม่มีแบบทดสอบ",
       "body": "สร้างจากเด็คใดก็ได้ ใช้เวลาไม่กี่วินาที"
     },
-    "fewerThanAsked": "ขอไว้ {{requested, number}} ข้อ"
+    "fewerThanAsked": "ขอไว้ {{requested, number}} ข้อ",
+    "remove": "ลบ",
+    "dailyCheckTitle": "ตรวจสอบประจำวัน",
+    "confirmTitle": "ลบแบบทดสอบนี้ไหม",
+    "confirmTaken": "ประวัติการทำ {{runs, number}} ครั้ง คำตอบของคุณ และรายการในสมุดข้อผิดพลาดจะถูกลบไปด้วย และกู้คืนไม่ได้",
+    "confirmUnused": "ยังไม่เคยทำ จะลบเฉพาะคำถามเท่านั้น",
+    "confirmDelete": "ลบ",
+    "confirmCancel": "ยกเลิก"
   },
   "setup": {
     "title": "แบบทดสอบใหม่",
@@ -26,7 +33,7 @@
     "untitled": "แบบทดสอบ",
     "type": "รูปแบบคำถาม",
     "typeHint": {
-      "mcq": "สี่ตัวเลือก ตรวจทันทีและฟรี",
+      "mcq": "สี่ตัวเลือก ตรวจทันทีที่ตอบ ไม่ใช้ AI ตรวจ จึงไม่เสียเครดิต",
       "short": "ตอบเป็นคำหรือวลี AI ตรวจให้ คิดค่าบริการต่อคำตอบ",
       "essay": "เขียนสองสามประโยค ตรวจตามเกณฑ์ ยากที่สุดและแพงที่สุด"
     },
@@ -43,7 +50,10 @@
     "difficulty": "ระดับความยาก",
     "clampedCount_one": "เด็คนี้สร้างได้ {{count, number}} ข้อ",
     "clampedCount_other": "เด็คนี้สร้างได้ {{count, number}} ข้อ",
-    "generatingBatch": "กำลังสร้าง… ({{done, number}}/{{total, number}})"
+    "generatingBatch": "กำลังสร้าง… ({{done, number}}/{{total, number}})",
+    "customCount": "กำหนดเอง",
+    "countEffective_one": "สร้าง {{count, number}} ข้อ",
+    "countEffective_other": "สร้าง {{count, number}} ข้อ"
   },
   "run": {
     "loading": "กำลังโหลด…",
@@ -64,6 +74,17 @@
     "length": {
       "count": "{{chars, number}} / {{max, number}} ตัวอักษร",
       "tooShort": "ต้องมีอย่างน้อย {{min, number}} ตัวอักษรจึงจะตรวจได้"
+    },
+    "verdict": {
+      "correct": "ถูกต้อง",
+      "partial": "ถูกบางส่วน",
+      "wrong": "ยังไม่ถูก",
+      "ungraded": "ยังไม่ตรวจ"
+    },
+    "tally": {
+      "plain": "ถูก {{correct, number}} · ผิด {{wrong, number}}",
+      "withUngraded": "ถูก {{correct, number}} · ผิด {{wrong, number}} · ยังไม่ตรวจ {{ungraded, number}}",
+      "none": "{{total, number}} ข้อ"
     }
   },
   "result": {
@@ -77,7 +98,10 @@
     "markWrong": "ฉันตอบผิด",
     "retake": "ทำอีกครั้ง",
     "nothingGraded": "ยังไม่ตรวจ",
-    "nothingGradedBody": "รอบนี้ยังไม่มีคำตอบที่ตรวจแล้ว"
+    "nothingGradedBody": "รอบนี้ยังไม่มีคำตอบที่ตรวจแล้ว",
+    "unanswered": "ยังไม่ได้ตอบ {{n, number}} ข้อ",
+    "headline": "ถูก {{correct, number}} ข้อ",
+    "overrideLabel": "แก้เอง"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "ยอดคงเหลือไม่พอ เติมเงินเพื่อทำต่อ",
@@ -94,7 +118,8 @@
     "QUIZ_CARDS_TOO_SHORT": "การ์ดเหล่านี้สั้นเกินกว่าจะออกข้อสอบเขียนตอบ เพราะการเขียนตอบตรวจจากถ้อยคำในการ์ดเอง เด็คนี้เหมาะกับตอบสั้นหรือปรนัยมากกว่า",
     "AI_PROVIDER_ERROR": "ขณะนี้บริการ AI ไม่ว่าง ไม่มีการเรียกเก็บเงิน ลองใหม่อีกสักครู่",
     "AI_PROVIDER_DAILY_LIMIT": "ถึงขีดจำกัด AI ต่อวันของแอปแล้ว ไม่มีการเรียกเก็บเงิน และจะรีเซ็ตในวันพรุ่งนี้",
-    "AI_PROVIDER_BUSY": "บริการ AI กำลังไม่ว่าง ไม่มีการเรียกเก็บเงิน ลองใหม่อีกสักครู่"
+    "AI_PROVIDER_BUSY": "บริการ AI กำลังไม่ว่าง ไม่มีการเรียกเก็บเงิน ลองใหม่อีกสักครู่",
+    "QUIZ_DIFFICULTY_UNAVAILABLE": "ระดับความยากนี้ยังไม่รองรับคำถามประเภทนี้ กรุณาเลือกระดับอื่น"
   },
   "verdict": {
     "equivalent": "ถูกต้อง",
@@ -117,7 +142,9 @@
     "partial": "บางส่วน",
     "not_met": "ไม่ครบ",
     "unjudgeable": "ไม่ได้ตัดสิน",
-    "unjudgeableNote": "บางส่วนตัดสินไม่ได้ จึงไม่ถูกหักคะแนน"
+    "unjudgeableNote": "บางส่วนตัดสินไม่ได้ จึงไม่ถูกหักคะแนน",
+    "weight": "น้ำหนัก {{weight, number}}",
+    "mustMention": "ต้องมี:"
   },
   "aspect": {
     "covers_answer": "ครอบคลุมคำตอบ",
@@ -162,5 +189,62 @@
     "overgeneral": "กว้างเกินไป",
     "plausible_form": "รูปคล้าย",
     "unrelated": "ไม่เกี่ยวข้อง"
+  },
+  "mistakes": {
+    "title": "สมุดข้อผิดพลาด",
+    "summary": "{{cards, number}} การ์ด · {{decks, number}} เด็ค",
+    "expand": "ดู",
+    "collapse": "ซ่อน",
+    "studyAgain": "ทบทวน {{cards, number}} ใบ",
+    "youWrote": "คำตอบของคุณ: {{answer}}",
+    "andMore": "และอีก {{cards, number}} ใบ",
+    "open": "เปิด",
+    "emptyTitle": "ยังไม่มีข้อผิด",
+    "emptyBody": "ข้อที่ตอบผิดจะมารวมที่นี่เมื่อคุณทำแบบทดสอบ"
+  },
+  "history": {
+    "dateThisYear": "{{d, number}}/{{m, number}}",
+    "dateWithYear": "{{d, number}}/{{m, number}}/{{y}}",
+    "created": "สร้าง {{date}}",
+    "never": "ยังไม่ได้ทำ",
+    "taken": "ทำ {{runs, number}} ครั้ง · ล่าสุด {{date}}",
+    "show": "ประวัติ",
+    "hide": "ปิด",
+    "attempt": "ครั้งที่ {{n, number}} · {{date}}",
+    "inProgress": "กำลังทำ"
+  },
+  "detail": {
+    "gone": "ไม่พบแบบทดสอบนี้",
+    "historyTitle": "ประวัติการทำ"
+  },
+  "pricing": {
+    "gradeCost": "การตรวจคิด {{amount}}",
+    "retakeMcq": "คำถามชุดเดิม สลับลำดับตัวเลือกเท่านั้น ข้อสอบปรนัยไม่ใช้ AI ตรวจ จึงไม่เสียเครดิต",
+    "retakeWritten": "ทำคำถามชุดเดิมอีกครั้ง คำถามจ่ายไปแล้ว แต่การตรวจเป็นการเรียกใหม่ จึงคิดค่าใช้จ่ายทุกครั้ง",
+    "genAllFree": "สร้างจากโควตาฟรี ไม่มีการหักเครดิต",
+    "genAllPaid": "{{paid, number}} ข้อ · {{amount}}",
+    "genPartlyFree": "ฟรี {{free, number}} ข้อ + คิดเงิน {{paid, number}} ข้อ · {{amount}}",
+    "genFreeLeft": "วันนี้เหลือข้อฟรี {{left, number}}/{{limit, number}} ข้อ (ทุกรูปแบบ)"
+  },
+  "activity": {
+    "title": "ประวัติการใช้ AI",
+    "quiz": "{{title}} · ครั้งที่ {{n, number}}",
+    "free": "ฟรี",
+    "refunded": "คืนเงินแล้ว",
+    "job": {
+      "cards": "สร้างการ์ดด้วย AI",
+      "deck": "สร้างเด็คด้วย AI",
+      "template": "เทมเพลต AI",
+      "image": "รูปจาก AI",
+      "image_deck": "รูปเด็คจาก AI",
+      "remediation": "คำอธิบายจาก AI",
+      "quiz": "แบบทดสอบ AI",
+      "generate_mcq": "สร้างปรนัย",
+      "generate_short": "สร้างอัตนัยสั้น",
+      "generate_essay": "สร้างเรียงความ",
+      "grade_short": "ตรวจอัตนัยสั้น",
+      "grade_essay": "ตรวจเรียงความ",
+      "quiz_answer_key": "ระบุช่องคำตอบ"
+    }
   }
 }

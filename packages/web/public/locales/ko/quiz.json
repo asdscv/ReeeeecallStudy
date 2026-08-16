@@ -16,7 +16,14 @@
       "title": "아직 만든 퀴즈가 없어요",
       "body": "아무 덱에서나 몇 초면 만들 수 있어요."
     },
-    "fewerThanAsked": "요청 {{requested, number}}문항"
+    "fewerThanAsked": "요청 {{requested, number}}문항",
+    "remove": "삭제",
+    "dailyCheckTitle": "오늘의 확인",
+    "confirmTitle": "이 퀴즈를 삭제할까요?",
+    "confirmTaken": "{{runs, number}}번 푼 기록과 그때 쓴 답, 오답 노트 항목까지 함께 지워져요. 되돌릴 수 없어요.",
+    "confirmUnused": "아직 안 푼 퀴즈예요. 문제만 지워져요.",
+    "confirmDelete": "삭제",
+    "confirmCancel": "취소"
   },
   "setup": {
     "title": "새 퀴즈",
@@ -26,7 +33,7 @@
     "untitled": "퀴즈",
     "type": "문제 유형",
     "typeHint": {
-      "mcq": "4지선다. 바로, 무료로 채점돼요.",
+      "mcq": "4지선다. 답을 고르면 바로 확인돼요. AI 채점을 쓰지 않아 크레딧이 들지 않아요.",
       "short": "단어나 구절로 답해요. AI가 채점하고 답안마다 과금돼요.",
       "essay": "몇 문장으로 답하고 루브릭으로 채점해요. 가장 어렵고 가장 비싸요."
     },
@@ -43,7 +50,10 @@
     "difficulty": "난이도",
     "clampedCount_one": "이 덱으로는 {{count, number}}문항이 만들어져요.",
     "clampedCount_other": "이 덱으로는 {{count, number}}문항이 만들어져요.",
-    "generatingBatch": "문제를 만드는 중… ({{done, number}}/{{total, number}})"
+    "generatingBatch": "문제를 만드는 중… ({{done, number}}/{{total, number}})",
+    "customCount": "직접 입력",
+    "countEffective_one": "{{count, number}}문항 생성",
+    "countEffective_other": "{{count, number}}문항 생성"
   },
   "run": {
     "loading": "불러오는 중…",
@@ -64,6 +74,17 @@
     "length": {
       "count": "{{chars, number}} / {{max, number}}자",
       "tooShort": "{{min, number}}자 이상이어야 채점할 수 있어요"
+    },
+    "verdict": {
+      "correct": "맞았어요",
+      "partial": "부분 정답",
+      "wrong": "틀렸어요",
+      "ungraded": "채점 안 함"
+    },
+    "tally": {
+      "plain": "{{correct, number}}개 맞음 · {{wrong, number}}개 틀림",
+      "withUngraded": "{{correct, number}}개 맞음 · {{wrong, number}}개 틀림 · {{ungraded, number}}개 채점 안 함",
+      "none": "{{total, number}}문항"
     }
   },
   "result": {
@@ -77,7 +98,10 @@
     "markWrong": "내가 틀렸어요",
     "retake": "다시 풀기",
     "nothingGraded": "채점 안 함",
-    "nothingGradedBody": "이번 시도에서는 채점한 답안이 없어요."
+    "nothingGradedBody": "이번 시도에서는 채점한 답안이 없어요.",
+    "unanswered": "{{n, number}}문항은 답하지 않았어요",
+    "headline": "{{correct, number}}개 맞았어요",
+    "overrideLabel": "직접 고치기"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "충전금이 부족해요. 충전하면 계속할 수 있어요.",
@@ -94,7 +118,8 @@
     "QUIZ_CARDS_TOO_SHORT": "이 카드들은 서술형 문제를 만들기에 너무 짧아요. 서술형은 카드 본문에서 뽑은 표현으로 채점하거든요. 이 덱에는 주관식이나 객관식이 맞아요.",
     "AI_PROVIDER_ERROR": "지금 AI 서비스가 붐비고 있어요. 요금은 청구되지 않았으니 잠시 후 다시 시도해 주세요.",
     "AI_PROVIDER_DAILY_LIMIT": "이 앱의 AI 일일 한도에 도달했어요. 요금은 청구되지 않았고, 내일 다시 열려요.",
-    "AI_PROVIDER_BUSY": "AI 서비스가 잠시 붐비고 있어요. 요금은 청구되지 않았어요. 잠시 후 다시 시도해 주세요."
+    "AI_PROVIDER_BUSY": "AI 서비스가 잠시 붐비고 있어요. 요금은 청구되지 않았어요. 잠시 후 다시 시도해 주세요.",
+    "QUIZ_DIFFICULTY_UNAVAILABLE": "이 난이도는 이 문제 유형에 아직 없어요. 다른 난이도를 골라 주세요."
   },
   "verdict": {
     "equivalent": "정답",
@@ -117,7 +142,9 @@
     "partial": "일부",
     "not_met": "미충족",
     "unjudgeable": "판단 안 됨",
-    "unjudgeableNote": "일부는 판단할 수 없어서 점수에 불리하게 반영하지 않았어요."
+    "unjudgeableNote": "일부는 판단할 수 없어서 점수에 불리하게 반영하지 않았어요.",
+    "weight": "배점 {{weight, number}}",
+    "mustMention": "이 말이 있어야 해요:"
   },
   "aspect": {
     "covers_answer": "핵심을 담았는가",
@@ -162,5 +189,62 @@
     "overgeneral": "너무 넓음",
     "plausible_form": "모양이 비슷",
     "unrelated": "무관"
+  },
+  "mistakes": {
+    "title": "오답 노트",
+    "summary": "{{cards, number}}개 카드 · {{decks, number}}개 덱",
+    "expand": "펼치기",
+    "collapse": "접기",
+    "studyAgain": "{{cards, number}}개 다시 학습",
+    "youWrote": "내 답: {{answer}}",
+    "andMore": "그 외 {{cards, number}}개",
+    "open": "열기",
+    "emptyTitle": "아직 틀린 문제가 없어요",
+    "emptyBody": "퀴즈를 풀면 틀린 문제가 여기 모여요."
+  },
+  "history": {
+    "dateThisYear": "{{m, number}}월 {{d, number}}일",
+    "dateWithYear": "{{y}}년 {{m, number}}월 {{d, number}}일",
+    "created": "{{date}} 만듦",
+    "never": "아직 안 풀었어요",
+    "taken": "{{runs, number}}번 풀었어요 · 마지막 {{date}}",
+    "show": "기록",
+    "hide": "닫기",
+    "attempt": "{{n, number}}회차 · {{date}}",
+    "inProgress": "진행 중"
+  },
+  "detail": {
+    "gone": "이 퀴즈는 없어요.",
+    "historyTitle": "푼 기록"
+  },
+  "pricing": {
+    "gradeCost": "채점하면 {{amount}} 차감돼요",
+    "retakeMcq": "같은 문제를 다시 풀어요. 보기 순서만 바뀌고, 객관식은 AI 채점을 쓰지 않아 크레딧이 들지 않아요.",
+    "retakeWritten": "같은 문제를 다시 풀어요. 문제는 이미 값을 치렀으니 다시 푸는 건 그대로지만, 채점은 회차마다 새로 차감돼요.",
+    "genAllFree": "무료 문항으로 만들어요. 차감되지 않아요.",
+    "genAllPaid": "{{paid, number}}문항 · {{amount}} 차감돼요",
+    "genPartlyFree": "무료 {{free, number}}문항 + 유료 {{paid, number}}문항 · {{amount}} 차감돼요",
+    "genFreeLeft": "오늘 무료 문항 {{left, number}}/{{limit, number}}개 남음 (유형 무관)"
+  },
+  "activity": {
+    "title": "AI 학습 기록",
+    "quiz": "{{title}} · {{n, number}}회차",
+    "free": "무료",
+    "refunded": "환불됨",
+    "job": {
+      "cards": "AI 카드 생성",
+      "deck": "AI 덱 만들기",
+      "template": "AI 템플릿",
+      "image": "AI 이미지",
+      "image_deck": "AI 덱 이미지",
+      "remediation": "AI 해설",
+      "quiz": "AI 퀴즈",
+      "generate_mcq": "객관식 생성",
+      "generate_short": "주관식 생성",
+      "generate_essay": "서술형 생성",
+      "grade_short": "주관식 채점",
+      "grade_essay": "서술형 채점",
+      "quiz_answer_key": "정답 필드 판별"
+    }
   }
 }

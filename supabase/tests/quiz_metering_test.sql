@@ -66,11 +66,18 @@ BEGIN
                          requested_count, content_locale)
     VALUES (v_uid, v_deck, 'S', 'mcq', 'deck', 4, 'en') RETURNING id INTO v_set;
 
-  -- $1.00 of balance, no trial, no free units — so every unit below is a paid unit and
+  -- $100.00 of balance, no trial, no free units — so every unit below is a paid unit and
   -- the arithmetic is visible.
-  INSERT INTO ai_credit_balance (user_id, balance) VALUES (v_uid, 1000000)
-    ON CONFLICT (user_id) DO UPDATE SET balance = 1000000;
+  -- Ten times the prices means ten times the float this fixture needs; it was 1,000,000 when a
+  -- unit cost 5,000, and 8 units at 50,000 is 400,000 with reservations stacking on top.
+  INSERT INTO ai_credit_balance (user_id, balance) VALUES (v_uid, 100000000)
+    ON CONFLICT (user_id) DO UPDATE SET balance = 100000000;
   UPDATE ai_pricing_settings SET free_quiz_units_per_day = 0, quiz_trial_units = 0 WHERE id = 1;
+  -- 무료 한도는 239부터 `ai_free_allowances`에서 옵니다. 이 스위트는 유닛 산술을 검사하므로
+  -- 정책도 유닛 방식으로 맞춰 둡니다(둘 다 지원됩니다). 예전 컬럼은 읽히지 않지만 함께
+  -- 세팅해 두면 두 숫자가 어긋난 채 남지 않습니다.
+  UPDATE ai_free_allowances SET per_day = 0, unit_kind = 'unit'
+   WHERE tier = 'free' AND action_group = 'quiz_generate';
 
   PERFORM set_config('request.jwt.claim.role', 'authenticated', true);
   PERFORM set_config('request.jwt.claim.sub', v_uid::text, true);
@@ -92,11 +99,14 @@ BEGIN
   IF (q->>'units_each')::int <> 2 OR (q->>'units_total')::int <> 8 THEN
     RAISE EXCEPTION 'FAIL: quote units wrong: %', q;
   END IF;
-  IF (q->>'paid_units')::int <> 8 OR (q->>'price_micro')::bigint <> 8 * 5000 THEN
+  -- Read from settings rather than hardcoded: mig 230 multiplied every price by ten, and a
+  -- test that pins the literal breaks on a price change instead of on a pricing BUG.
+  IF (q->>'paid_units')::int <> 8
+     OR (q->>'price_micro')::bigint <> 8 * (SELECT quiz_unit_price_micro FROM ai_pricing_settings WHERE id = 1) THEN
     RAISE EXCEPTION 'FAIL: quote price wrong: %', q;
   END IF;
   IF (q->>'sufficient')::boolean IS NOT TRUE THEN
-    RAISE EXCEPTION 'FAIL: quote said insufficient at balance 1000000: %', q;
+    RAISE EXCEPTION 'FAIL: quote said insufficient at balance 100000000: %', q;
   END IF;
 
   -- ── 3) Reserve moves NO money ─────────────────────────────────────────────
@@ -138,7 +148,7 @@ BEGIN
   -- ── 5) The hold counts against the next reserve ───────────────────────────
   -- 8 units are held ($0.04). A request for the remaining balance must see them.
   q := public.get_ai_quiz_quote('generate_mcq', 4);
-  IF (q->>'held_micro')::bigint <> 8 * 5000 THEN
+  IF (q->>'held_micro')::bigint <> 8 * (SELECT quiz_unit_price_micro FROM ai_pricing_settings WHERE id = 1) THEN
     RAISE EXCEPTION 'FAIL: outstanding hold not reflected in quote: %', q;
   END IF;
 
@@ -187,7 +197,7 @@ BEGIN
     RAISE EXCEPTION 'FAIL: settle units wrong: %', q;
   END IF;
   v_price := (q->>'price_micro')::bigint;
-  IF v_price <> 6 * 5000 THEN
+  IF v_price <> 6 * (SELECT quiz_unit_price_micro FROM ai_pricing_settings WHERE id = 1) THEN
     RAISE EXCEPTION 'FAIL: settle price % is not 6 units at list', v_price;
   END IF;
 
@@ -225,6 +235,8 @@ BEGIN
   -- ── 11) Free and trial units come off first, and come back on shortfall ──
   PERFORM set_config('request.jwt.claim.role', 'authenticated', true);
   UPDATE ai_pricing_settings SET free_quiz_units_per_day = 4, quiz_trial_units = 2 WHERE id = 1;
+  UPDATE ai_free_allowances SET per_day = 4, unit_kind = 'unit'
+   WHERE tier = 'free' AND action_group = 'quiz_generate';
   PERFORM public.grant_ai_quiz_trial();
 
   -- 4 mcq = 8 units: 2 trial, 4 free, 2 paid.
@@ -286,12 +298,16 @@ BEGIN
   -- abandoned amount, with nothing on any screen to explain it.
   PERFORM set_config('request.jwt.claim.role', 'authenticated', true);
   UPDATE ai_pricing_settings SET free_quiz_units_per_day = 0, quiz_trial_units = 0 WHERE id = 1;
+  UPDATE ai_free_allowances SET per_day = 0, unit_kind = 'unit'
+   WHERE tier = 'free' AND action_group = 'quiz_generate';
   UPDATE ai_quiz_trial SET units_remaining = 0 WHERE user_id = v_uid;
   INSERT INTO ai_credit_balance (user_id, balance) VALUES (v_uid, 100000)
-    ON CONFLICT (user_id) DO UPDATE SET balance = 100000;
+    ON CONFLICT (user_id) DO UPDATE SET balance = 1000000;
 
-  -- 8 mcq = 16 units = $0.08 of a $0.10 balance. Held, never delivered.
-  r1 := public.reserve_ai_quiz('generate_mcq', 8, gen_random_uuid(), 999999, v_deck);
+  -- 8 mcq = 16 units = $0.80 of a $1.00 balance. Held, never delivered. Ten times what it was:
+  -- mig 230 multiplied the unit price, and this scenario only means anything while the hold is
+  -- MOST of the balance.
+  r1 := public.reserve_ai_quiz('generate_mcq', 8, gen_random_uuid(), 9999999, v_deck);
   q := public.get_ai_quiz_quote('generate_mcq', 4);
   IF (q->>'sufficient')::boolean IS NOT FALSE THEN
     RAISE EXCEPTION 'FAIL: the hold should have made a second request unaffordable: %', q;
@@ -333,7 +349,8 @@ BEGIN
       RAISE EXCEPTION 'FAIL: wallet summary is missing %', v_key;
     END IF;
   END LOOP;
-  IF (q->>'quiz_unit_price_micro')::bigint <> 5000 THEN
+  IF (q->>'quiz_unit_price_micro')::bigint
+       <> (SELECT quiz_unit_price_micro FROM ai_pricing_settings WHERE id = 1) THEN
     RAISE EXCEPTION 'FAIL: wallet reported unit price %', q->>'quiz_unit_price_micro';
   END IF;
 

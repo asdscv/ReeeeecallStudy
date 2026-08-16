@@ -17,6 +17,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   resolveQuizCardFaces as sharedResolve,
+  resolveQuizCardCandidates as sharedCandidates,
   quizReferenceAnswer as sharedReference,
   quizPromptText as sharedPrompt,
   quizContextLines as sharedContext,
@@ -24,6 +25,7 @@ import {
 } from '@reeeeecall/shared/lib/quiz-answer-field'
 import {
   resolveQuizCardFaces as edgeResolve,
+  resolveQuizCardCandidates as edgeCandidates,
   quizReferenceAnswer as edgeReference,
   quizPromptText as edgePrompt,
   quizContextLines as edgeContext,
@@ -111,7 +113,7 @@ const CASES: Array<{
     card: { field_values: { a: 'A', b: 'B' } },
   },
   {
-    name: 'blank primary demotes to the remaining candidate',
+    name: 'blank primary is refused, not demoted to the remaining candidate',
     template: {
       fields: ['a', 'b', 'c'].map(t),
       front_layout: [{ field_key: 'a', style: 'primary' }],
@@ -146,6 +148,70 @@ const CASES: Array<{
     },
     card: { field_values: { a: 'A', b: 'B' } },
   },
+  {
+    name: 'stored key resolves a back the author marked twice',
+    template: {
+      fields: ['front', 'wrong', 'correct'].map(t),
+      front_layout: [{ field_key: 'front', style: 'primary' }],
+      back_layout: [
+        { field_key: 'wrong', style: 'primary' },
+        { field_key: 'correct', style: 'primary' },
+      ],
+      quiz_answer_key: 'correct',
+    },
+    card: { field_values: { front: 'F', wrong: 'W', correct: 'C' } },
+  },
+  {
+    name: 'stored key names a field this card left blank — refused, never demoted',
+    template: {
+      fields: ['front', 'wrong', 'correct'].map(t),
+      front_layout: [{ field_key: 'front', style: 'primary' }],
+      back_layout: [
+        { field_key: 'wrong', style: 'primary' },
+        { field_key: 'correct', style: 'primary' },
+      ],
+      quiz_answer_key: 'correct',
+    },
+    card: { field_values: { front: 'F', wrong: 'W', correct: '' } },
+  },
+  {
+    name: 'stored key the template no longer declares',
+    template: {
+      fields: ['front', 'wrong', 'correct'].map(t),
+      front_layout: [{ field_key: 'front', style: 'primary' }],
+      back_layout: [
+        { field_key: 'wrong', style: 'primary' },
+        { field_key: 'correct', style: 'primary' },
+      ],
+      quiz_answer_key: 'deleted_field',
+    },
+    card: { field_values: { front: 'F', wrong: 'W', correct: 'C' } },
+  },
+  {
+    name: 'stored key does not override a single declared primary',
+    template: {
+      fields: ['front', 'wrong', 'correct'].map(t),
+      front_layout: [{ field_key: 'front', style: 'primary' }],
+      back_layout: [
+        { field_key: 'correct', style: 'primary' },
+        { field_key: 'wrong', style: 'detail' },
+      ],
+      quiz_answer_key: 'wrong',
+    },
+    card: { field_values: { front: 'F', wrong: 'W', correct: 'C' } },
+  },
+  {
+    name: '착 붙는 중국어 — second primary declared but empty on every card',
+    template: {
+      fields: ['front', 'back', 'extra'].map(t),
+      front_layout: [{ field_key: 'front', style: 'primary' }],
+      back_layout: [
+        { field_key: 'back', style: 'primary' },
+        { field_key: 'extra', style: 'primary' },
+      ],
+    },
+    card: { field_values: { front: '借', back: '빌리다', extra: '' } },
+  },
 ]
 
 describe('shared and edge quiz resolvers agree', () => {
@@ -157,6 +223,10 @@ describe('shared and edge quiz resolvers agree', () => {
       expect(edgePrompt(template as any, card)).toEqual(sharedPrompt(template as any, card))
       expect(edgeContext(template as any, card)).toEqual(sharedContext(template as any, card))
       expect(edgeContextFields(template as any, card)).toEqual(sharedContextFields(template as any, card))
+      // The loose resolver is what decides whether a deck can be quizzed at all now, so a
+      // drift between the two copies would mean the setup screen and the generator disagree
+      // about which decks work.
+      expect(edgeCandidates(template as any, card)).toEqual(sharedCandidates(template as any, card))
       /* eslint-enable @typescript-eslint/no-explicit-any */
     })
   }
@@ -166,6 +236,7 @@ describe('shared and edge quiz resolvers agree', () => {
 
     expect(edgeResolve(null, card)).toEqual(sharedResolve(null, card))
     expect(edgeResolve(undefined, card)).toEqual(sharedResolve(undefined, card))
+    expect(edgeCandidates(null, card)).toEqual(sharedCandidates(null, card))
     expect(edgeContext(null, card)).toEqual(sharedContext(null, card))
   })
 })

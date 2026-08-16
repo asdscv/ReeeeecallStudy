@@ -16,7 +16,14 @@
       "title": "Aún no hay cuestionarios",
       "body": "Créalo desde cualquier mazo; tarda unos segundos."
     },
-    "fewerThanAsked": "{{requested, number}} solicitadas"
+    "fewerThanAsked": "{{requested, number}} solicitadas",
+    "remove": "Eliminar",
+    "dailyCheckTitle": "Comprobación diaria",
+    "confirmTitle": "¿Eliminar este cuestionario?",
+    "confirmTaken": "Sus {{runs, number}} intentos, tus respuestas y sus entradas de errores se eliminan también. No se puede deshacer.",
+    "confirmUnused": "Nunca lo has hecho. Solo se eliminan las preguntas.",
+    "confirmDelete": "Eliminar",
+    "confirmCancel": "Cancelar"
   },
   "setup": {
     "title": "Nuevo cuestionario",
@@ -26,7 +33,7 @@
     "untitled": "Cuestionario",
     "type": "Tipo de pregunta",
     "typeHint": {
-      "mcq": "Cuatro opciones, corregidas al instante y gratis.",
+      "mcq": "Cuatro opciones. Se comprueba en cuanto respondes: sin IA, así que sin créditos.",
       "short": "Responde con una palabra o una frase. Corrige la IA y se cobra por respuesta.",
       "essay": "Escribe unas frases; se corrige con una rúbrica. Lo más exigente y lo más caro."
     },
@@ -43,7 +50,10 @@
     "difficulty": "Dificultad",
     "clampedCount_one": "Este mazo genera {{count, number}} pregunta.",
     "clampedCount_other": "Este mazo genera {{count, number}} preguntas.",
-    "generatingBatch": "Creando… ({{done, number}}/{{total, number}})"
+    "generatingBatch": "Creando… ({{done, number}}/{{total, number}})",
+    "customCount": "Personalizado",
+    "countEffective_one": "Crear {{count, number}} pregunta",
+    "countEffective_other": "Crear {{count, number}} preguntas"
   },
   "run": {
     "loading": "Cargando…",
@@ -64,6 +74,17 @@
     "length": {
       "count": "{{chars, number}} / {{max, number}} caracteres",
       "tooShort": "Se necesitan al menos {{min, number}} caracteres para corregir"
+    },
+    "verdict": {
+      "correct": "Correcto",
+      "partial": "Parcialmente correcto",
+      "wrong": "Incorrecto",
+      "ungraded": "Sin corregir"
+    },
+    "tally": {
+      "plain": "{{correct, number}} bien · {{wrong, number}} mal",
+      "withUngraded": "{{correct, number}} bien · {{wrong, number}} mal · {{ungraded, number}} sin corregir",
+      "none": "{{total, number}} preguntas"
     }
   },
   "result": {
@@ -77,7 +98,10 @@
     "markWrong": "Me equivoqué",
     "retake": "Repetirlo",
     "nothingGraded": "Sin calificar",
-    "nothingGradedBody": "Todavía no has calificado ninguna respuesta en este intento."
+    "nothingGradedBody": "Todavía no has calificado ninguna respuesta en este intento.",
+    "unanswered": "{{n, number}} sin responder",
+    "headline": "{{correct, number}} acertadas",
+    "overrideLabel": "Corregir"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "No tienes saldo suficiente. Recarga para seguir.",
@@ -94,7 +118,8 @@
     "QUIZ_CARDS_TOO_SHORT": "Estas tarjetas son demasiado breves para plantear ensayos: un ensayo se corrige con términos tomados de la propia tarjeta. Prueba respuesta corta u opción múltiple con este mazo.",
     "AI_PROVIDER_ERROR": "El servicio de IA está saturado ahora mismo. No se te ha cobrado; inténtalo en un momento.",
     "AI_PROVIDER_DAILY_LIMIT": "Se ha alcanzado el límite diario de IA de la aplicación. No se te ha cobrado; se restablece mañana.",
-    "AI_PROVIDER_BUSY": "El servicio de IA está ocupado. No se te ha cobrado; inténtalo en un momento."
+    "AI_PROVIDER_BUSY": "El servicio de IA está ocupado. No se te ha cobrado; inténtalo en un momento.",
+    "QUIZ_DIFFICULTY_UNAVAILABLE": "Esa dificultad no está disponible para este tipo de pregunta. Elige otra."
   },
   "verdict": {
     "equivalent": "Correcto",
@@ -117,7 +142,9 @@
     "partial": "En parte",
     "not_met": "Sin cubrir",
     "unjudgeable": "Sin juzgar",
-    "unjudgeableNote": "Parte de esto no se pudo juzgar, así que no te ha penalizado."
+    "unjudgeableNote": "Parte de esto no se pudo juzgar, así que no te ha penalizado.",
+    "weight": "vale {{weight, number}}",
+    "mustMention": "Hacía falta:"
   },
   "aspect": {
     "covers_answer": "Cubre la respuesta",
@@ -162,5 +189,62 @@
     "overgeneral": "Demasiado amplio",
     "plausible_form": "Se parece",
     "unrelated": "Sin relación"
+  },
+  "mistakes": {
+    "title": "Errores",
+    "summary": "{{cards, number}} tarjetas · {{decks, number}} mazos",
+    "expand": "Ver",
+    "collapse": "Ocultar",
+    "studyAgain": "Estudiar {{cards, number}} de nuevo",
+    "youWrote": "Escribiste: {{answer}}",
+    "andMore": "y {{cards, number}} más",
+    "open": "Abrir",
+    "emptyTitle": "Nada fallado todavía",
+    "emptyBody": "Las preguntas falladas se recogen aquí al hacer cuestionarios."
+  },
+  "history": {
+    "dateThisYear": "{{d, number}}/{{m, number}}",
+    "dateWithYear": "{{d, number}}/{{m, number}}/{{y}}",
+    "created": "Creado el {{date}}",
+    "never": "Sin hacer todavía",
+    "taken": "{{runs, number}} veces · última el {{date}}",
+    "show": "Historial",
+    "hide": "Cerrar",
+    "attempt": "Intento {{n, number}} · {{date}}",
+    "inProgress": "En curso"
+  },
+  "detail": {
+    "gone": "Este cuestionario ya no existe.",
+    "historyTitle": "Historial"
+  },
+  "pricing": {
+    "gradeCost": "Corregir cuesta {{amount}}",
+    "retakeMcq": "Las mismas preguntas, con las opciones reordenadas. La opción múltiple se corrige sin IA, así que no consume créditos.",
+    "retakeWritten": "Las mismas preguntas otra vez. Las preguntas ya están pagadas, pero la corrección es una llamada nueva y se cobra cada vez.",
+    "genAllFree": "Se crean con tus preguntas gratuitas. No se cobra nada.",
+    "genAllPaid": "{{paid, number}} preguntas · {{amount}}",
+    "genPartlyFree": "{{free, number}} gratis + {{paid, number}} de pago · {{amount}}",
+    "genFreeLeft": "Te quedan {{left, number}} de {{limit, number}} preguntas gratis hoy (cualquier tipo)"
+  },
+  "activity": {
+    "title": "Actividad de IA",
+    "quiz": "{{title}} · intento {{n, number}}",
+    "free": "Gratis",
+    "refunded": "Reembolsado",
+    "job": {
+      "cards": "Tarjetas con IA",
+      "deck": "Mazo con IA",
+      "template": "Plantilla con IA",
+      "image": "Imagen con IA",
+      "image_deck": "Imagen del mazo",
+      "remediation": "Explicación con IA",
+      "quiz": "Cuestionario con IA",
+      "generate_mcq": "Opción múltiple",
+      "generate_short": "Respuesta corta",
+      "generate_essay": "Ensayo",
+      "grade_short": "Corrección corta",
+      "grade_essay": "Corrección de ensayo",
+      "quiz_answer_key": "Campo de respuesta"
+    }
   }
 }

@@ -45,7 +45,7 @@ export function AiCreditNotice({ featureId, style }: {
 
   if (!needed) return null
 
-  const notice = creditNotice(wallet, formatUsdMicro)
+  const notice = creditNotice(wallet, formatUsdMicro, featureId)
   // Nothing while the read is in flight. A phone row that appears and then changes its mind is
   // worse than one that appears once.
   if (!notice) return null

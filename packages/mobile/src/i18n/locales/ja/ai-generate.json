@@ -54,7 +54,8 @@
     "title": "カードを作成しました！",
     "subtitle": "AIが生成したフラッシュカードで学習できます。",
     "generateMore": "さらに生成",
-    "done": "完了"
+    "done": "完了",
+    "viewCards": "カードを見る"
   },
   "errorStep": {
     "title": "生成に失敗しました",
@@ -80,7 +81,8 @@
       "failed": "処理できませんでした。請求は発生していません。",
       "retry": "再試行",
       "gradeYourself": "クイズはそのまま終えられます。この問題は自分で採点すれば無料です。"
-    }
+    },
+    "freeQuizOnly": "本日の無料問題 残り{{free}}問"
   },
   "alert": {
     "errorTitle": "エラー",

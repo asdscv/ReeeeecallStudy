@@ -77,7 +77,7 @@ export function AchievementsSummary() {
         <div className="flex items-center gap-2">
           <span className="text-xs text-muted-foreground mr-1">{t('achievements.recent')}:</span>
           {recentEarned.map(ach => (
-            <div key={ach.id} title={t(`achievements.badge.${ach.id}`, ach.id)}>
+            <div key={ach.id} title={t(`achievements.badge.${ach.id}`, { n: ach.required_value, defaultValue: ach.id })}>
               <AchievementIcon id={ach.id} category={ach.category} dbIcon={ach.icon} size="sm" earned />
             </div>
           ))}

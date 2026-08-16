@@ -7,8 +7,11 @@ import { useQuizStore, type QuizRunItem } from '@reeeeecall/shared/stores/quiz-s
 import { Screen, Button } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
+import { tallyQuiz, tallyLine } from '@reeeeecall/shared/lib/quiz-outcome'
 import { QuizFeedback } from './QuizFeedback'
+import { QuizVerdictBadge } from './QuizVerdictBadge'
 import type { QuizStackParamList } from '../../navigation/types'
+import { retakeNoteKey } from '@reeeeecall/shared/lib/quiz-pricing'
 
 type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizResult'>
 type Rt = RouteProp<QuizStackParamList, 'QuizResult'>
@@ -48,25 +51,40 @@ export function QuizResultScreen() {
     return <Screen><Text style={[theme.typography.body, styles.center, { color: theme.colors.textSecondary }]}>{t('run.loading')}</Text></Screen>
   }
 
-  // Over what was GRADED, not over what was asked — see the web screen. A run where the
-  // learner declined to pay for any grade was reading as a 0%.
-  const graded = run.items.filter((i) => i.score !== null).length
-  const percent = run.score_max > 0 ? Math.round((run.score_raw / run.score_max) * 100) : 0
+  // COUNTS, not a percentage.
+  //
+  // The comment here used to say "over what was GRADED, not over what was asked" — and then
+  // divided by `score_max`, the total question count set when the run starts. Answering six
+  // short-answer questions, paying to grade one and getting it right read as 17%.
+  //
+  // Fixing the denominator would not have been enough: a quiz item has three outcomes and a
+  // ratio has two. An ungraded answer is not a wrong answer.
+  const tally = tallyQuiz(run.items.map((i) => ({ answered: i.answered, score: i.score })))
+  const tallyText = tallyLine(tally)
 
   return (
     <Screen>
       <ScrollView contentContainerStyle={styles.body}>
         <View style={[styles.score, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-          <Text style={[theme.typography.h1, { color: theme.colors.text }]}>
-            {graded === 0 ? t('result.nothingGraded') : t('result.percent', { percent })}
+          <Text style={[theme.typography.h1, { color: theme.colors.text }]}
+                {...testProps('quiz-result-headline')}>
+            {tally.judged === 0
+              ? t('result.nothingGraded')
+              // "맞았어요 9" read as a sentence someone forgot to finish.
+              : t('result.headline', { correct: tally.correct })}
           </Text>
-          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-            {/* Whole questions: partial credit exists on essays, but "4.3 of 6" reads as a
-                rounding artefact rather than as a score. */}
-            {graded === 0
+          <Text style={[theme.typography.bodySmall, { color: theme.colors.textSecondary }]}
+                {...testProps('quiz-result-tally')}>
+            {/* The three numbers, because there are three outcomes. */}
+            {tally.judged === 0
               ? t('result.nothingGradedBody')
-              : t('result.of', { raw: Math.round(run.score_raw), max: run.score_max })}
+              : t(tallyText.key, tallyText.params)}
           </Text>
+          {tally.unanswered > 0 && (
+            <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+              {t('result.unanswered', { n: tally.unanswered })}
+            </Text>
+          )}
           <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
             {t('result.attempt', { count: run.attempt_no })}
           </Text>
@@ -88,15 +106,19 @@ export function QuizResultScreen() {
                   </Text>
                 )}
               </View>
-              <Text style={[theme.typography.label, { color: theme.colors.text }]}>
-                {item.score === null ? t('result.ungraded') : `${Math.round(item.score * 100)}%`}
-              </Text>
+              {/* The verdict, not a percentage. `100%` and `0%` on a single item are a verdict
+                  wearing a number's clothes. */}
+              <QuizVerdictBadge item={{ answered: item.answered, score: item.score }} />
             </View>
 
             {item.feedback && (
               <QuizFeedback
                 feedback={item.feedback}
                 rubric={item.rubric}
+                /* Their own submission, back from the run item. Without it every
+                   `from: "learner"` span renders as nothing, so the grading detail the learner
+                   paid for is visible only during the sitting itself. */
+                learnerText={typeof item.response?.text === 'string' ? item.response.text : undefined}
                 referenceText={item.reference_answer}
               />
             )}
@@ -106,6 +128,11 @@ export function QuizResultScreen() {
                 null previous score. */}
             {item.answered && (
               <View style={styles.overrides}>
+                {/* Labelled, so the two chips read as a correction the learner MAY make and not
+                    as the app's own verdict. The badge above is the verdict. */}
+                <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                  {t('result.overrideLabel')}
+                </Text>
                 <Pressable
                   disabled={busy === item.item_id || item.score === 1}
                   onPress={() => void flip(item, 1)}
@@ -127,6 +154,13 @@ export function QuizResultScreen() {
           </View>
         ))}
 
+        {/* Said before the button, not after the charge: the same questions come back, and the
+            grading on them is a fresh call every sitting. */}
+        <Text style={[theme.typography.caption, {
+          color: theme.colors.textSecondary, textAlign: 'center',
+        }]}>
+          {t(retakeNoteKey(run.items[0]?.question_type))}
+        </Text>
         <Button title={t('result.retake')} onPress={() => void retake()} {...testProps('quiz-retake')} />
         <Button
           title={t('run.backToQuiz')}
@@ -146,6 +180,6 @@ const styles = StyleSheet.create({
   card: { padding: 12, borderRadius: 12, borderWidth: 1, gap: 8 },
   cardTop: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
   cardBody: { flex: 1, gap: 2 },
-  overrides: { flexDirection: 'row', gap: 8 },
+  overrides: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
   chip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, borderWidth: 1 },
 })

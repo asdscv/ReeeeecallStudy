@@ -62,3 +62,33 @@ describe('formatProductPrice', () => {
     expect(formatProductPrice({ priceKrw: 1_500_000, priceUsdCents: null })).toBe('₩1,500,000')
   })
 })
+
+/**
+ * Two decimals for whole cents, four when there is more to say.
+ *
+ * The wallet showed "$1,000,000.00" while the spend beside it showed "−$0.0012": the balance
+ * could not be seen to move by the amount that had just left it. The rule used to be "under a
+ * cent gets four decimals", which is not the same question — $12.3456 is well over a cent and
+ * was still being rounded away.
+ */
+describe('decimals follow the amount, not its size', () => {
+  it('keeps whole cents at two', () => {
+    expect(formatUsdMicro(1_000_000_000_000)).toBe('$1,000,000.00')
+    expect(formatUsdMicro(100_000)).toBe('$0.10')   // one AI card since mig 230
+    expect(formatUsdMicro(400_000)).toBe('$0.40')   // one essay grading
+    expect(formatUsdMicro(0)).toBe('$0.00')
+  })
+
+  it('shows four when the amount is not a whole cent', () => {
+    expect(formatUsdMicro(1_200)).toBe('$0.0012')
+    expect(formatUsdMicro(12_345_600)).toBe('$12.3456')
+    // The case the old rule got wrong: over a cent, so it took the two-decimal branch and
+    // rounded a real difference out of existence.
+    expect(formatUsdMicro(123_400)).toBe('$0.1234')
+  })
+
+  it('still signs a ledger delta', () => {
+    expect(formatUsdMicro(-1_200, { sign: true })).toBe('−$0.0012')
+    expect(formatUsdMicro(100_000, { sign: true })).toBe('+$0.10')
+  })
+})

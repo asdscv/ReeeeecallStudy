@@ -15,6 +15,7 @@
 //      number it returns is passed back as `maxPriceMicro`, and the server refuses the
 //      reservation if the price moved (P0008). No spending happens without a gesture.
 import { create } from 'zustand'
+import type { QuizRunCounts } from '../lib/quiz-outcome'
 import { supabase } from '../lib/supabase'
 import { newPersistenceId } from '../lib/persistence-id'
 
@@ -68,6 +69,17 @@ export interface QuizQuote {
   trial_remaining: number
   max_units_per_call: number
   sufficient: boolean
+  // ── Questions, not units (mig 239) ────────────────────────────────────────
+  // The free allowance is counted per QUESTION whatever its type, so these are the numbers a
+  // screen can put in a sentence. The unit fields above are still what the PRICE is computed
+  // from, and are left alone for exactly that reason.
+  trial_items: number
+  free_items: number
+  paid_items: number
+  free_items_limit: number
+  free_items_remaining_today: number
+  /** 'item' | 'unit' — which currency this tier's allowance is expressed in. */
+  free_unit_kind: string
 }
 
 export interface QuizzableCount { total: number; eligible: number }
@@ -123,6 +135,51 @@ export interface QuizSetRow {
   status: 'ready' | 'stale' | 'archived'
   content_locale: string
   created_at: string
+  /** The deck the questions were written from. Null if it has since been deleted. */
+  deck_name?: string | null
+  /** How many sittings. Zero is a set never opened, which the list could not show before. */
+  run_count?: number
+  /** When the last sitting was, or null if there has not been one. */
+  last_taken_at?: string | null
+  /** How that last sitting went, counted the way the result screen counts. */
+  last_tally?: QuizRunCounts | null
+}
+
+/**
+ * One thing the learner did through AI — a quiz sitting, or a generation job.
+ *
+ * Two shapes in one list because they are one timeline. `kind` says which, and the fields the
+ * other kind does not have are simply absent rather than nulled into a shared shape.
+ */
+export interface AiActivityEntry {
+  kind: 'quiz' | 'ai_gen'
+  id: string
+  at: string
+  /** What it cost, micro-USD. Zero inside the free allowance, and zero is worth showing. */
+  price_micro: number
+  // quiz
+  title?: string
+  deck_name?: string | null
+  question_type?: QuizQuestionType
+  attempt_no?: number
+  status?: string
+  tally?: QuizRunCounts
+  // ai_gen
+  job_kind?: string
+  cards?: number
+  images?: number
+  quiz_action?: string | null
+  refunded?: boolean
+}
+
+/** One sitting, for the per-set history. */
+export interface QuizSetHistoryRun {
+  run_id: string
+  attempt_no: number
+  status: 'in_progress' | 'completed' | 'abandoned'
+  started_at: string
+  completed_at: string | null
+  tally: QuizRunCounts
 }
 
 export interface QuizRunItem {
@@ -140,6 +197,34 @@ export interface QuizRunItem {
   meta: Record<string, unknown> | null
   rubric: unknown[] | null
   reference_answer: string | null
+  /**
+   * The learner's own submission — `{ text }` for written answers, `{ choice }` for multiple
+   * choice. Null until they answer.
+   *
+   * The result screen needs it to render the grading spans it already paid for: they are
+   * character ranges into the learner's own words, and a screen without those words drops every
+   * one of them silently.
+   */
+  response: Record<string, unknown> | null
+}
+
+/**
+ * One thing the learner got wrong, ready to read without opening anything.
+ *
+ * `card_id` is what makes the list actionable rather than a report card — it is the same id
+ * `StudyConfig.cardIds` takes, so "study these again" is one call away.
+ */
+export interface QuizMistake {
+  attempt_id: string
+  card_id: string | null
+  deck_id: string | null
+  deck_name: string | null
+  question_type: QuizQuestionType
+  stem: string
+  reference_answer: string | null
+  response: Record<string, unknown> | null
+  score: number
+  answered_at: string
 }
 
 export interface QuizRun {
@@ -179,6 +264,11 @@ export const QUIZ_ERROR_CODES = [
   'QUIZ_NOT_ENOUGH_CARDS', 'AI_RATE_CAP', 'FORBIDDEN', 'AI_EMPTY_RESULT',
   'QUIZ_UNGRADEABLE', 'QUIZ_GRADE_REFUSED', 'QUIZ_ITEM_GONE',
   'QUIZ_CARDS_TOO_SHORT', 'AI_PROVIDER_ERROR', 'AI_PROVIDER_BUSY', 'AI_PROVIDER_DAILY_LIMIT',
+  // A band with no guidance for the chosen question type. `create_quiz_set` raises P0013 for it
+  // and nothing mapped the code, so it arrived as UNKNOWN: "문제가 생겼어요. 다시 시도해 주세요."
+  // The one thing that would fix it — pick another difficulty — was the one thing not said, and
+  // retrying with the same settings fails identically every time.
+  'QUIZ_DIFFICULTY_UNAVAILABLE',
   'UNKNOWN',
 ] as const
 export type QuizErrorCode = typeof QUIZ_ERROR_CODES[number]
@@ -235,6 +325,8 @@ interface QuizState {
   loading: boolean
   generating: boolean
   grading: boolean
+  /** The 오답 노트, as last loaded. Empty until `loadMistakes` runs. */
+  mistakes: QuizMistake[]
 
   fetchSets: () => Promise<void>
   countQuizzable: (deckId: string, scope?: QuizScopeKind, tags?: string[], cardIds?: string[]) => Promise<QuizzableCount>
@@ -256,6 +348,15 @@ interface QuizState {
     cardIds?: string[]
     difficulty?: number
     maxPriceMicro: number
+    /**
+     * How many of `count` the quote said are free (free + trial items), and how many are paid.
+     *
+     * The drawdown below needs them. Omitted means "assume nothing is free", which is the
+     * pre-239 behaviour and stays correct — it can only make the client stop early, never
+     * overspend.
+     */
+    freeQuestions?: number
+    paidQuestions?: number
   }) => Promise<string>
 
   /**
@@ -281,6 +382,11 @@ interface QuizState {
    */
   buildDailyCheck: (input: {
     goalId?: string; timezone: string; limit?: number; lookback?: number
+    /**
+     * The UI language, which decides which side of a cross-lingual card the questions address
+     * the learner in. Omitted means Korean — the literal the RPC used to hardcode for everyone.
+     */
+    locale?: string
   }) => Promise<string>
 
   startRun: (setId: string) => Promise<string>
@@ -296,6 +402,58 @@ interface QuizState {
   gradeWithAi: (itemId: string, answer: string, maxPriceMicro: number) => Promise<void>
   override: (itemId: string, score: number) => Promise<void>
   finishRun: (runId: string) => Promise<void>
+
+  /**
+   * What the learner has been getting wrong, newest first.
+   *
+   * A read over attempts that were already being recorded and never read back. It writes
+   * nothing and moves no SRS schedule: a quiz answer quietly rescheduling reviews would let one
+   * casual sitting rearrange weeks of study, so the misses are shown and the decision to
+   * restudy them stays the learner's.
+   */
+  loadMistakes: (deckId?: string, limit?: number) => Promise<void>
+  /** How many distinct cards are in that list — a card missed four times is one card. */
+  countMistakes: (deckId?: string) => Promise<number>
+
+  /**
+   * Remove a set that has never been taken, and drop it from the list.
+   *
+   * Only a set with no runs. Questions, runs, run items and the attempts under them all cascade
+   * from a set, so deleting one the learner has sat would destroy every answer they gave it —
+   * and their 오답 노트 entries for those cards with it. A set with a run is history; a set
+   * without one is a row nobody has seen the inside of.
+   *
+   * Resolves false when the server refuses because it HAS been taken, so a screen can say so
+   * without parsing an error.
+   */
+  deleteSet: (setId: string) => Promise<boolean>
+
+  /**
+   * Every sitting of one set, newest attempt first.
+   *
+   * Loaded on demand rather than with the list: a learner opens the history of one set, and
+   * fetching every run of every set to show a row that is usually collapsed is work nobody asked
+   * for. The list already carries the last one, which is what the collapsed row needs.
+   */
+  loadSetHistory: (setId: string) => Promise<QuizSetHistoryRun[]>
+
+  /**
+   * What the learner has done through AI, newest first.
+   *
+   * 기록 read `study_sessions` and nothing else, so an afternoon of generating a deck, sitting
+   * three quizzes and paying for six gradings showed as an empty day. Quiz sittings and
+   * generation jobs are both here, each with what it cost.
+   */
+  loadAiActivity: (limit?: number) => Promise<AiActivityEntry[]>
+
+  /**
+   * One set, loaded from its id.
+   *
+   * The detail screen is reachable by URL, so it cannot depend on the list having been fetched
+   * first — a deep link, a reload, or arriving straight from a run all skip it. Resolves null
+   * when the set is gone, which a screen says plainly rather than throwing.
+   */
+  loadSet: (setId: string) => Promise<QuizSetRow | null>
 }
 
 export const useQuizStore = create<QuizState>((set, get) => ({
@@ -305,16 +463,15 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   generating: false,
   generateProgress: null,
   grading: false,
+  mistakes: [],
 
   fetchSets: async () => {
     set({ loading: true })
     try {
-      const { data, error } = await supabase
-        .from('quiz_sets')
-        .select('id, deck_id, title, question_type, requested_count, generated_count, status, content_locale, created_at')
-        .eq('status', 'ready')
-        .order('created_at', { ascending: false })
-        .limit(50)
+      // An RPC rather than the table, because the row now carries an aggregate: when it was
+      // made, how many sittings, and how the last one went. Fifty sets would otherwise be
+      // fifty follow-up queries, and the aggregate is what makes the row worth reading.
+      const { data, error } = await supabase.rpc('list_quiz_sets', { p_limit: 50 })
       if (error) throw error
       set({ sets: (data ?? []) as QuizSetRow[] })
     } finally {
@@ -323,11 +480,31 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   },
 
   countQuizzable: async (deckId, scope = 'deck', tags = [], cardIds = []) => {
-    const { data, error } = await supabase.rpc('count_quizzable_cards', {
-      p_deck_id: deckId, p_scope_kind: scope, p_tags: tags, p_card_ids: cardIds,
-    })
-    if (error) throw error
-    return (data ?? { total: 0, eligible: 0 }) as QuizzableCount
+    const read = async () => {
+      const { data, error } = await supabase.rpc('count_quizzable_cards', {
+        p_deck_id: deckId, p_scope_kind: scope, p_tags: tags, p_card_ids: cardIds,
+      })
+      if (error) throw error
+      return (data ?? { total: 0, eligible: 0 }) as QuizzableCount
+    }
+
+    const counts = await read()
+    // A deck with cards but nothing quizzable is almost always a template that declares two
+    // answers on the back, or none — 342 of the 771 cards on the reporting account were refused
+    // for exactly that. It is a question a model can settle from the author's own field labels,
+    // once per template, so ask rather than showing a dead end and instructions to go and edit
+    // a template. Free, and idempotent: a template that already has a key is not re-asked.
+    if (counts.total > 0 && counts.eligible === 0) {
+      try {
+        const { error } = await supabase.functions.invoke('ai-generate', {
+          body: { kind: 'quiz_answer_key', deckId },
+        })
+        if (!error) return await read()
+      } catch {
+        // The deck was unquizzable before and still is; the screen's own message covers it.
+      }
+    }
+    return counts
   },
 
   difficultyLevels: async () => {
@@ -375,6 +552,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
       if (createError) {
         throw new QuizError(createError.code === 'P0010' ? 'QUIZ_NOT_ENOUGH_CARDS'
           : createError.code === 'P0009' ? 'AI_REQUEST_TOO_LARGE'
+          : createError.code === 'P0013' ? 'QUIZ_DIFFICULTY_UNAVAILABLE'
           : createError.code === '42501' ? 'FORBIDDEN' : 'UNKNOWN')
       }
       const result = created as {
@@ -434,9 +612,33 @@ export const useQuizStore = create<QuizState>((set, get) => ({
       // paid for fifty. Returning after the first batch lets the quiz be opened immediately
       // and lets the rest arrive while it is being answered — and a learner who abandons
       // early simply never requests the batches they would not have reached.
-      /** This batch's cost if every unit in it were paid — the worst case, for drawdown. */
-      const batchCeiling = (cards: number) =>
-        Math.ceil((input.maxPriceMicro / Math.max(1, allCards.length)) * cards)
+      /**
+       * What this batch spends of the approved total — the PAID share, in the server's own order.
+       *
+       * It used to be pro-rata by card count, and that is wrong in a way that costs the learner
+       * questions they paid for. `reserve_ai_quiz` allocates trial, then today's free items, then
+       * paid, PER CALL — so the free allowance lands entirely on the FIRST batches and the paid
+       * questions pile onto the last. A flat pro-rata drawdown therefore over-draws early and
+       * leaves the final batch short of its own true price, and the server refuses it with P0008.
+       *
+       * Measured against the real functions, free tier with the allowance untouched: every size
+       * the setup screen offers above one batch lost a batch. Multiple choice 12 -> 8 delivered,
+       * 20 -> 16, 50 -> 48; essay 6 -> 3, 12 -> 9, 50 -> 48. The learner is never told — `runBatch`
+       * only surfaces a failure when NOTHING landed.
+       *
+       * So: count the free questions down as the batches consume them, and draw down only what is
+       * actually payable. The sum across batches still cannot exceed what was approved, which is
+       * the property this exists for.
+       */
+      let freeLeft = Math.max(0, input.freeQuestions ?? 0)
+      const paidTotal = Math.max(0, input.paidQuestions ?? allCards.length)
+      const pricePerPaid = paidTotal > 0 ? input.maxPriceMicro / paidTotal : 0
+      /** Called once per SUCCESSFUL batch, in order — it mutates `freeLeft`. */
+      const batchCeiling = (cards: number) => {
+        const free = Math.min(freeLeft, cards)
+        freeLeft -= free
+        return Math.ceil(pricePerPaid * (cards - free))
+      }
 
       const runBatch = async (cardIds: string[], index: number) => {
         const { error: genError } = await supabase.functions.invoke('ai-generate', {
@@ -518,12 +720,13 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     }
   },
 
-  buildDailyCheck: async ({ goalId, timezone, limit, lookback }) => {
+  buildDailyCheck: async ({ goalId, timezone, limit, lookback, locale }) => {
     const { data, error } = await supabase.rpc('build_daily_check', {
       p_goal_id: goalId ?? null,
       p_timezone: timezone,
       p_limit: limit ?? 8,
       p_lookback: lookback ?? 1,
+      p_locale: locale ?? 'ko',
     })
     // P0010 is the only outcome a screen has to phrase: nothing was studied today, so
     // there is nothing to check. Everything else is a real fault.
@@ -603,7 +806,121 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     if (error) throw error
     await get().loadRun(runId)
   },
+
+  loadMistakes: async (deckId, limit) => {
+    set({ loading: true })
+    try {
+      const { data, error } = await supabase.rpc('get_quiz_mistakes', {
+        p_deck_id: deckId ?? null, p_limit: limit ?? 50,
+      })
+      if (error) throw error
+      set({ mistakes: (data ?? []) as QuizMistake[] })
+    } finally {
+      set({ loading: false })
+    }
+  },
+
+  countMistakes: async (deckId) => {
+    const { data, error } = await supabase.rpc('count_quiz_mistakes', { p_deck_id: deckId ?? null })
+    if (error) throw error
+    return (data as number | null) ?? 0
+  },
+
+  loadAiActivity: async (limit) => {
+    const { data, error } = await supabase.rpc('get_ai_activity', {
+      p_limit: limit ?? 50, p_since: null,
+    })
+    if (error) throw error
+    return (data ?? []) as AiActivityEntry[]
+  },
+
+  loadSet: async (setId) => {
+    const { data, error } = await supabase.rpc('get_quiz_set', { p_set_id: setId })
+    if (error) throw error
+    return (data ?? null) as QuizSetRow | null
+  },
+
+  loadSetHistory: async (setId) => {
+    const { data, error } = await supabase.rpc('get_quiz_set_history', { p_set_id: setId })
+    if (error) throw error
+    return (data ?? []) as QuizSetHistoryRun[]
+  },
+
+  deleteSet: async (setId) => {
+    const { error } = await supabase.rpc('delete_quiz_set', { p_set_id: setId })
+    // P0014 is "it has been taken", which is a refusal the learner should understand rather
+    // than a fault. Anything else is real.
+    if (error) {
+      if ((error as { code?: string }).code === 'P0014') return false
+      throw error
+    }
+    set({ sets: get().sets.filter((row) => row.id !== setId) })
+    return true
+  },
 }))
+
+/**
+ * What the learner actually wrote, or the option they picked, as one readable line.
+ *
+ * The response shape is the submission payload — `{ text }` or `{ choice }` — and a mistakes
+ * list that printed raw JSON would be unreadable. A choice INDEX is deliberately not resolved
+ * to its option text here: the options were shuffled for that sitting and the stored order is
+ * canonical, so an index off this row would name the wrong answer more often than not.
+ */
+export function mistakeResponseText(m: Pick<QuizMistake, 'response'>): string | null {
+  const text = m.response?.text
+  return typeof text === 'string' && text.trim() !== '' ? text.trim() : null
+}
+
+/**
+ * The set title a screen should show.
+ *
+ * `build_daily_check` names its set `__daily_check__` — a sentinel, because the RPC finds today's
+ * existing check by that exact title rather than storing a flag. It is not a name, and it was
+ * appearing verbatim in the quiz list beside titles the learner wrote themselves.
+ *
+ * Returning null rather than a string keeps the translation at the call site: this file has no
+ * `t`, and an English fallback baked in here would show up in a Thai UI.
+ */
+export const DAILY_CHECK_TITLE = '__daily_check__'
+export function isDailyCheckTitle(title: string): boolean {
+  return title === DAILY_CHECK_TITLE
+}
+
+export interface MistakeDeckGroup {
+  readonly deckId: string
+  readonly deckName: string
+  readonly items: readonly QuizMistake[]
+}
+
+/**
+ * The misses, one row per card, bucketed by deck.
+ *
+ * Grouped because the deck is the unit a study session takes — cards from two decks cannot be one
+ * session, so a flat list would offer a "study these again" button that cannot work.
+ *
+ * One row per card because a card missed four times is one card to restudy, not four copies of
+ * the same stem. The input is newest-first, so the row kept is the most recent attempt: the
+ * learner's latest answer is the one worth showing them.
+ *
+ * A miss whose card has been deleted is dropped. There is nothing to restudy and no deck to open,
+ * and listing it would be a row whose only action is broken.
+ */
+export function groupMistakesByDeck(
+  mistakes: readonly QuizMistake[],
+): MistakeDeckGroup[] {
+  const seen = new Set<string>()
+  const byDeck = new Map<string, { deckId: string; deckName: string; items: QuizMistake[] }>()
+  for (const m of mistakes) {
+    if (!m.card_id || !m.deck_id) continue
+    if (seen.has(m.card_id)) continue
+    seen.add(m.card_id)
+    const bucket = byDeck.get(m.deck_id)
+    if (bucket) bucket.items.push(m)
+    else byDeck.set(m.deck_id, { deckId: m.deck_id, deckName: m.deck_name ?? '', items: [m] })
+  }
+  return [...byDeck.values()]
+}
 
 /**
  * Why each wrong option is wrong, in the order the options were served.

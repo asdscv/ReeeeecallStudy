@@ -208,7 +208,8 @@
     "weakCount": "{{count, number}} ใบ",
     "weakCount_one": "{{count, number}} ใบ",
     "weakCount_other": "{{count, number}} ใบ",
-    "weakStudy": "เรียนเฉพาะใบเหล่านี้"
+    "weakStudy": "เรียนเฉพาะใบเหล่านี้",
+    "weakHintCapped": "{{shown, number}} ใบที่อ่อนที่สุดจาก {{total, number}} ใบที่เคยเห็นสองครั้งขึ้นไปและผิดเกินครึ่ง"
   },
   "recommend": {
     "title": "คำแนะนำ",

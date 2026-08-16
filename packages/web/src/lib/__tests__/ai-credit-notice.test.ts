@@ -117,3 +117,51 @@ describe('creditNotice', () => {
     }
   })
 })
+
+
+/**
+ * The notice reports THIS screen's allowance, not always the card one.
+ *
+ * Found on a device: the quiz setup screen showed "오늘 남은 무료 카드 10장" across the top and
+ * "오늘 무료 문항 3/5개 남음" at the bottom. Two numbers, two different features, and the bigger
+ * and more prominent one was about the other one. The call sites already passed `featureId` —
+ * the notice was simply not asking the catalog what that feature spends.
+ */
+describe('the allowance the screen is actually about', () => {
+  const wallet = { balanceMicroUsd: 0, freeRemainingToday: 10, quizFreeRemainingToday: 3 }
+
+  it('reports questions on a quiz surface and cards on a generate surface', () => {
+    expect(creditNotice(wallet, money, AI_HUB_QUIZ)!.key).toBe('wallet.freeQuizOnly')
+    expect(creditNotice(wallet, money, AI_HUB_QUIZ)!.params.free).toBe(3)
+
+    expect(creditNotice(wallet, money, AI_HUB_GENERATE)!.key).toBe('wallet.freeOnly')
+    expect(creditNotice(wallet, money, AI_HUB_GENERATE)!.params.free).toBe(10)
+  })
+
+  it('says "nothing left" on a quiz screen whose QUESTIONS are spent, even with cards to spare', () => {
+    // The case that made this wrong the other way round: ten free cards left is not permission
+    // to make a free quiz question.
+    const n = creditNotice({ balanceMicroUsd: 0, freeRemainingToday: 10, quizFreeRemainingToday: 0 },
+      money, AI_HUB_QUIZ)!
+    expect(n.tone).toBe('empty')
+    expect(n.key).toBe('wallet.needsCredits')
+  })
+
+  it('every model-backed catalog entry declares which allowance it spends', () => {
+    // The extension point again: a fourth AI feature cannot be registered without saying what it
+    // draws on, so it cannot silently inherit the card number the way quiz did.
+    for (const entry of aiHubEntries().filter((e) => e.poweredBy === 'model')) {
+      expect(entry.spends, entry.id).not.toBeNull()
+    }
+    // And one that spends nothing says so, rather than being omitted.
+    const plan = aiHubEntries().find((e) => e.id === AI_HUB_LEARNING_PLAN)!
+    expect(plan.spends).toBeNull()
+  })
+
+  it('falls back to the card allowance for an unknown id rather than showing nothing', () => {
+    // A stale deep link should degrade to the oldest surface, not to a blank row.
+    expect(creditNotice(wallet, money, 'no_such_feature')!.key).toBe('wallet.freeOnly')
+    // And an omitted id keeps the pre-existing behaviour for any caller not yet updated.
+    expect(creditNotice(wallet, money)!.key).toBe('wallet.freeOnly')
+  })
+})

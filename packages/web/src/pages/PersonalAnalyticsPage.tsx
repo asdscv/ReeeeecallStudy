@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
-  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
+  LineChart, Line, BarChart, Bar, Cell,
+  XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../stores/auth-store'
@@ -11,11 +11,27 @@ import { resolveRange, type DateRange, type TimePeriod } from '../lib/time-perio
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
 
-interface RetentionPoint { interval: string; retention: number }
+interface RetentionPoint { interval: string; retention: number; cards: number }
 interface WeakTopic { name: string; errorRate: number }
 interface TimeDistribution { hour: string; minutes: number }
 interface ModeEffectiveness { mode: string; retention: number }
 interface ProgressPoint { week: string; mastered: number }
+
+/**
+ * A chart with nothing to draw should say so in words.
+ *
+ * recharts renders an empty series as a dashed grid and a set of axis ticks, which is exactly
+ * what a chart looks like when its query failed — and on this page several of them genuinely
+ * had failed, silently, for months. Keeping the box and filling it with a sentence means an
+ * empty chart can no longer be mistaken for a broken one.
+ */
+function ChartEmpty({ message }: { message: string }) {
+  return (
+    <div className="h-64 flex items-center justify-center">
+      <p className="text-sm text-muted-foreground text-center px-4">{message}</p>
+    </div>
+  )
+}
 
 interface AnalyticsProps {
   /**
@@ -33,7 +49,9 @@ interface AnalyticsProps {
 
 /** Standalone analytics content — can be used as a tab inside StudyHistoryPage */
 export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {}) {
-  const { t } = useTranslation('common')
+  // 'study' as well as 'common': the mode labels live there, and a namespace that is not
+  // declared resolves to the raw key at first paint.
+  const { t } = useTranslation(['common', 'study'])
   const { user } = useAuthStore()
   const window = period ? resolveRange(period, range ?? null) : null
   const fromIso = window ? new Date(window.fromMs).toISOString() : null
@@ -47,42 +65,22 @@ export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {})
   const [loading, setLoading] = useState(true)
 
 
-  async function loadRetentionCurve(userId: string) {
-    // `learner_card_schedule` (mig 184), NOT `cards`.
-    //
-    // A learner's SRS state lives in `cards` only for decks they OWN. For a subscribed deck
-    // the cards belong to the publisher and the learner's schedule is in
-    // `user_card_progress` — 14,805 rows across 7 accounts in production. Reading
-    // `cards WHERE user_id = me` therefore returned nothing at all for a subscriber, and
-    // this chart drew a flat 0% retention curve that looked like a finding rather than a
-    // missing join.
-    const { data } = await supabase.rpc('learner_card_schedule', {
-      p_user_id: userId,
-      p_deck_ids: null,
-    })
-    // The RPC is untyped here, so name its shape once rather than at each use.
-    const cards = (data ?? []) as Array<{
-      srs_status: string | null
-      interval_days: number | null
-      last_reviewed_at: string | null
-    }>
-    if (!cards.length) return
-    const intervals = [
-      { label: '1d', min: 0, max: 1 },
-      { label: '3d', min: 2, max: 3 },
-      { label: '7d', min: 4, max: 7 },
-      { label: '14d', min: 8, max: 14 },
-      { label: '30d', min: 15, max: 30 },
-      { label: '60d+', min: 31, max: Infinity },
-    ]
-    const result: RetentionPoint[] = intervals.map(({ label, min, max }) => {
-      const bucket = cards.filter((c) =>
-        (c.interval_days ?? -1) >= min && (c.interval_days ?? -1) <= max && c.last_reviewed_at)
-      const retained = bucket.filter((c) => c.srs_status === 'review')
-      const rate = bucket.length > 0 ? Math.round((retained.length / bucket.length) * 100) : 0
-      return { interval: label, retention: rate }
-    })
-    setRetentionData(result)
+  // No `userId` parameter: `my_card_schedule` derives it from `auth.uid()`, which is the
+  // whole point of the wrapper.
+  async function loadRetentionCurve() {
+    // AGGREGATED SERVER-SIDE. `my_card_schedule` returns one row per card across the whole
+    // library, and this page called it twice at once — PostgREST cancelled both with "canceling
+    // statement due to statement timeout", which the page swallowed into an empty chart exactly
+    // the way the earlier permission error had. Six numbers do not need thousands of rows: the
+    // RPC does the bucketing, and it went from 7.6s to 1.0s in the doing.
+    const { data, error } = await supabase.rpc('my_retention_curve')
+    if (error) {
+      console.error('[analytics] retention curve:', error.message)
+      return
+    }
+    const rows = (data ?? []) as Array<{ interval_label: string; retention: number; cards: number }>
+    if (!rows.length) return
+    setRetentionData(rows.map((r) => ({ interval: r.interval_label, retention: r.retention, cards: r.cards })))
   }
 
   async function loadWeakTopics(userId: string) {
@@ -170,40 +168,27 @@ export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {})
     setModeEffectiveness(
       Object.entries(modeStats).map(([mode, { total, good }]) => ({
         mode,
+        // The learner's word for it, not the column value. The history tab on this same page
+        // already translates `study_mode`; the chart printed the raw enum, so the legend read
+        // "srs".
+        modeLabel: t(`study:modes.${mode}.label`, { defaultValue: mode }),
         retention: Math.round((good / total) * 100),
       }))
     )
   }
 
-  async function loadProgress(userId: string) {
-    const { data: cards } = await supabase
-      .from('cards')
-      .select('srs_status, last_reviewed_at')
-      .eq('user_id', userId)
-      .eq('srs_status', 'review')
-      .not('last_reviewed_at', 'is', null)
-    if (!cards) return
-
-    const weekMap: Record<string, number> = {}
-    for (const c of cards) {
-      if (!c.last_reviewed_at) continue
-      const d = new Date(c.last_reviewed_at)
-      // ISO week start
-      const day = d.getDay()
-      const diff = d.getDate() - day + (day === 0 ? -6 : 1)
-      const weekStart = new Date(d.setDate(diff))
-      const key = weekStart.toISOString().slice(0, 10)
-      weekMap[key] = (weekMap[key] ?? 0) + 1
+  async function loadProgress() {
+    // Also aggregated server-side, and for the same two reasons: it pulled the whole library to
+    // count weeks, and it read `cards WHERE user_id = me` — which returns nothing for a
+    // SUBSCRIBER, so this chart was empty for exactly the learners who study most from shared
+    // decks. The RPC applies the same deck-level membership rule the rest of the app does.
+    const { data, error } = await supabase.rpc('my_review_progress', { p_weeks: 26 })
+    if (error) {
+      console.error('[analytics] progress over time:', error.message)
+      return
     }
-
-    const sorted = Object.entries(weekMap).sort(([a], [b]) => a.localeCompare(b))
-    let cumulative = 0
-    setProgressData(
-      sorted.map(([week, count]) => {
-        cumulative += count
-        return { week, mastered: cumulative }
-      })
-    )
+    const rows = (data ?? []) as Array<{ week: string; total: number }>
+    setProgressData(rows.map((r) => ({ week: r.week, mastered: r.total })))
   }
 
   // Declared after the loaders on purpose: the React Compiler rejects reading a
@@ -214,11 +199,11 @@ export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {})
     const load = async () => {
       setLoading(true)
       await Promise.all([
-        loadRetentionCurve(user.id),
+        loadRetentionCurve(),
         loadWeakTopics(user.id),
         loadTimeDistribution(user.id),
         loadModeEffectiveness(user.id),
-        loadProgress(user.id),
+        loadProgress(),
       ])
       setLoading(false)
     }
@@ -250,6 +235,12 @@ export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {})
               broken. */}
           <span className="text-xs text-content-tertiary">{t('analytics.allTime')}</span>
         </div>
+        {/* The RPC always returns all six buckets, so a learner with nothing in review gets a
+            flat line along zero — indistinguishable from the empty box this chart drew for
+            months while its query was failing. Count the cards, not the percentages. */}
+        {retentionData.every(p => p.cards === 0) ? (
+          <ChartEmpty message={t('analytics.emptyRetention')} />
+        ) : (
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={retentionData}>
@@ -261,6 +252,7 @@ export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {})
             </LineChart>
           </ResponsiveContainer>
         </div>
+        )}
       </div>
 
       {/* Two-column layout for smaller charts */}
@@ -270,17 +262,25 @@ export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {})
           <h2 className="text-lg font-semibold text-foreground mb-4">
             {t('analytics.weakTopics')}
           </h2>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={weakTopics} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" domain={[0, 100]} tickFormatter={v => `${v}%`} />
-                <YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 12 }} />
-                <Tooltip formatter={(v) => [t('analytics.percent', { value: Number(v) }), t('analytics.errorRateLabel')]} />
-                <Bar dataKey="errorRate" fill="#ef4444" radius={[0, 4, 4, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          {/* No decks, or every deck at a 0% error rate. A learner who has rated everything good
+              or easy has nothing weak, and recharts draws that as a dashed grid with a deck name
+              floating beside an invisible bar — pixel-for-pixel a broken chart. "Nothing is weak"
+              and "this failed to load" should not look the same. */}
+          {weakTopics.every(w => w.errorRate === 0) ? (
+            <ChartEmpty message={t('analytics.emptyWeakTopics')} />
+          ) : (
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={weakTopics} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" domain={[0, 100]} tickFormatter={v => `${v}%`} />
+                  <YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 12 }} />
+                  <Tooltip formatter={(v) => [t('analytics.percent', { value: Number(v) }), t('analytics.errorRateLabel')]} />
+                  <Bar dataKey="errorRate" fill="#ef4444" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
 
         {/* Mode Effectiveness */}
@@ -288,27 +288,33 @@ export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {})
           <h2 className="text-lg font-semibold text-foreground mb-4">
             {t('analytics.modeEffectiveness')}
           </h2>
+          {modeEffectiveness.length === 0 ? (
+            <ChartEmpty message={t('analytics.emptyModes')} />
+          ) : (
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={modeEffectiveness}
-                  dataKey="retention"
-                  nameKey="mode"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={90}
-                  label={({ name, value }) => `${name}: ${value}%`}
-                >
+              {/* BARS, not a pie.
+                  `retention` is a per-mode percentage — each one is 0-100 on its own — and a pie
+                  divides values by their sum, so three modes at 90/80/70% drew slices of 38/33/29%,
+                  numbers that mean nothing. With a single mode studied it drew one slice of 100%:
+                  the solid blue disc that filled the card. A bar per mode against a 0-100 axis is
+                  the same data saying something true, and it degrades gracefully to one bar. */}
+              <BarChart data={modeEffectiveness} layout="vertical"
+                margin={{ left: 8, right: 16, top: 8, bottom: 8 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => `${v}%`}
+                  tick={{ fontSize: 11 }} />
+                <YAxis type="category" dataKey="modeLabel" width={110} tick={{ fontSize: 11 }} />
+                <Tooltip formatter={(v) => [t('analytics.percent', { value: Number(v) }), t('analytics.retentionLabel')]} />
+                <Bar dataKey="retention" radius={[0, 4, 4, 0]}>
                   {modeEffectiveness.map((_, i) => (
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />
                   ))}
-                </Pie>
-                <Tooltip formatter={(v) => [t('analytics.percent', { value: Number(v) }), t('analytics.retentionLabel')]} />
-                <Legend />
-              </PieChart>
+                </Bar>
+              </BarChart>
             </ResponsiveContainer>
           </div>
+          )}
         </div>
       </div>
 
@@ -317,17 +323,24 @@ export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {})
         <h2 className="text-lg font-semibold text-foreground mb-4">
           {t('analytics.studyTime')}
         </h2>
+        {timeDistribution.every(d => d.minutes === 0) ? (
+          <ChartEmpty message={t('analytics.emptyStudyTime')} />
+        ) : (
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={timeDistribution}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="hour" tick={{ fontSize: 11 }} />
-              <YAxis tickFormatter={v => `${v}m`} />
+              {/* Whole minutes only. A single one-minute session drew ticks at 0.25m / 0.5m /
+                  0.75m, which is a granularity the data does not have — study time is summed
+                  from session durations and never means a quarter of a minute. */}
+              <YAxis tickFormatter={(v) => `${Math.round(Number(v))}m`} allowDecimals={false} />
               <Tooltip formatter={(v) => [t('analytics.minutes', { count: Number(v) }), t('analytics.studyTimeLabel')]} />
               <Bar dataKey="minutes" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
+        )}
       </div>
 
       {/* Progress Over Time */}
@@ -337,6 +350,9 @@ export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {})
           {/* Cumulative by construction — a window would make the line start mid-air. */}
           <span className="text-xs text-content-tertiary">{t('analytics.allTime')}</span>
         </div>
+        {progressData.length === 0 ? (
+          <ChartEmpty message={t('analytics.emptyProgress')} />
+        ) : (
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={progressData}>
@@ -344,10 +360,17 @@ export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {})
               <XAxis dataKey="week" tick={{ fontSize: 11 }} />
               <YAxis />
               <Tooltip />
-              <Line type="monotone" dataKey="mastered" stroke="#10b981" strokeWidth={2} dot={false} />
+              {/* Dots on a short series. A line between two points needs two points: an account
+                  with one week of history drew a curve of zero length and `dot={false}` meant
+                  there was nothing else to see — a chart with data in it that looked exactly as
+                  empty as the ones whose queries were failing. Dots are noise on a long series,
+                  so they are only turned on where the line cannot carry the shape itself. */}
+              <Line type="monotone" dataKey="mastered" stroke="#10b981" strokeWidth={2}
+                dot={progressData.length < 8} />
             </LineChart>
           </ResponsiveContainer>
         </div>
+        )}
       </div>
     </div>
   )

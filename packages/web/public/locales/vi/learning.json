@@ -208,7 +208,8 @@
     "weakCount": "{{count, number}} thẻ",
     "weakCount_one": "{{count, number}} thẻ",
     "weakCount_other": "{{count, number}} thẻ",
-    "weakStudy": "Chỉ học những thẻ này"
+    "weakStudy": "Chỉ học những thẻ này",
+    "weakHintCapped": "{{shown, number}} thẻ yếu nhất trong {{total, number}} thẻ bạn đã xem hai lần và sai quá nửa."
   },
   "recommend": {
     "title": "Gợi ý",

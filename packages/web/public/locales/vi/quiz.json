@@ -16,7 +16,14 @@
       "title": "Chưa có bài kiểm tra nào",
       "body": "Tạo từ bất kỳ bộ thẻ nào, chỉ mất vài giây."
     },
-    "fewerThanAsked": "đã yêu cầu {{requested, number}}"
+    "fewerThanAsked": "đã yêu cầu {{requested, number}}",
+    "remove": "Xoá",
+    "dailyCheckTitle": "Kiểm tra hôm nay",
+    "confirmTitle": "Xoá bài kiểm tra này?",
+    "confirmTaken": "{{runs, number}} lần làm, các câu trả lời của bạn và mục trong sổ lỗi sai cũng bị xoá. Không thể hoàn tác.",
+    "confirmUnused": "Chưa từng làm. Chỉ xoá câu hỏi.",
+    "confirmDelete": "Xoá",
+    "confirmCancel": "Huỷ"
   },
   "setup": {
     "title": "Bài kiểm tra mới",
@@ -26,7 +33,7 @@
     "untitled": "Bài kiểm tra",
     "type": "Loại câu hỏi",
     "typeHint": {
-      "mcq": "Bốn lựa chọn, chấm ngay và miễn phí.",
+      "mcq": "Bốn lựa chọn. Kiểm tra ngay khi bạn trả lời — không dùng AI chấm nên không tốn tín dụng.",
       "short": "Trả lời bằng một từ hoặc cụm từ. AI chấm, tính phí theo từng câu.",
       "essay": "Viết vài câu, chấm theo tiêu chí. Khó nhất và đắt nhất."
     },
@@ -43,7 +50,10 @@
     "difficulty": "Độ khó",
     "clampedCount_one": "Bộ thẻ này tạo được {{count, number}} câu hỏi.",
     "clampedCount_other": "Bộ thẻ này tạo được {{count, number}} câu hỏi.",
-    "generatingBatch": "Đang tạo… ({{done, number}}/{{total, number}})"
+    "generatingBatch": "Đang tạo… ({{done, number}}/{{total, number}})",
+    "customCount": "Tự nhập",
+    "countEffective_one": "Tạo {{count, number}} câu",
+    "countEffective_other": "Tạo {{count, number}} câu"
   },
   "run": {
     "loading": "Đang tải…",
@@ -64,6 +74,17 @@
     "length": {
       "count": "{{chars, number}} / {{max, number}} ký tự",
       "tooShort": "Cần ít nhất {{min, number}} ký tự để chấm"
+    },
+    "verdict": {
+      "correct": "Đúng rồi",
+      "partial": "Đúng một phần",
+      "wrong": "Chưa đúng",
+      "ungraded": "Chưa chấm"
+    },
+    "tally": {
+      "plain": "Đúng {{correct, number}} · Sai {{wrong, number}}",
+      "withUngraded": "Đúng {{correct, number}} · Sai {{wrong, number}} · Chưa chấm {{ungraded, number}}",
+      "none": "{{total, number}} câu"
     }
   },
   "result": {
@@ -77,7 +98,10 @@
     "markWrong": "Tôi sai",
     "retake": "Làm lại",
     "nothingGraded": "Chưa chấm",
-    "nothingGradedBody": "Bạn chưa chấm câu trả lời nào trong lượt này."
+    "nothingGradedBody": "Bạn chưa chấm câu trả lời nào trong lượt này.",
+    "unanswered": "Còn {{n, number}} câu chưa trả lời",
+    "headline": "Đúng {{correct, number}} câu",
+    "overrideLabel": "Tự sửa"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "Không đủ số dư. Hãy nạp thêm để tiếp tục.",
@@ -94,7 +118,8 @@
     "QUIZ_CARDS_TOO_SHORT": "Các thẻ này quá ngắn để ra đề tự luận — bài tự luận được chấm theo các cụm từ lấy từ chính thẻ. Hãy thử trả lời ngắn hoặc trắc nghiệm cho bộ này.",
     "AI_PROVIDER_ERROR": "Dịch vụ AI đang bận. Bạn không bị tính phí — hãy thử lại sau giây lát.",
     "AI_PROVIDER_DAILY_LIMIT": "Đã đạt giới hạn AI hằng ngày của ứng dụng. Bạn không bị tính phí — giới hạn sẽ được đặt lại vào ngày mai.",
-    "AI_PROVIDER_BUSY": "Dịch vụ AI đang bận. Bạn không bị tính phí — hãy thử lại sau giây lát."
+    "AI_PROVIDER_BUSY": "Dịch vụ AI đang bận. Bạn không bị tính phí — hãy thử lại sau giây lát.",
+    "QUIZ_DIFFICULTY_UNAVAILABLE": "Độ khó này chưa hỗ trợ dạng câu hỏi này. Hãy chọn độ khó khác."
   },
   "verdict": {
     "equivalent": "Đúng",
@@ -117,7 +142,9 @@
     "partial": "Một phần",
     "not_met": "Chưa đạt",
     "unjudgeable": "Chưa đánh giá",
-    "unjudgeableNote": "Một phần không đánh giá được nên không bị trừ điểm."
+    "unjudgeableNote": "Một phần không đánh giá được nên không bị trừ điểm.",
+    "weight": "trọng số {{weight, number}}",
+    "mustMention": "Cần có:"
   },
   "aspect": {
     "covers_answer": "Nêu được ý chính",
@@ -162,5 +189,62 @@
     "overgeneral": "Quá rộng",
     "plausible_form": "Trông giống",
     "unrelated": "Không liên quan"
+  },
+  "mistakes": {
+    "title": "Sổ lỗi sai",
+    "summary": "{{cards, number}} thẻ · {{decks, number}} bộ thẻ",
+    "expand": "Xem",
+    "collapse": "Ẩn",
+    "studyAgain": "Học lại {{cards, number}} thẻ",
+    "youWrote": "Bạn đã viết: {{answer}}",
+    "andMore": "và {{cards, number}} thẻ nữa",
+    "open": "Mở",
+    "emptyTitle": "Chưa có câu nào sai",
+    "emptyBody": "Các câu sai sẽ được gom về đây khi bạn làm bài kiểm tra."
+  },
+  "history": {
+    "dateThisYear": "{{d, number}}/{{m, number}}",
+    "dateWithYear": "{{d, number}}/{{m, number}}/{{y}}",
+    "created": "Tạo {{date}}",
+    "never": "Chưa làm",
+    "taken": "Đã làm {{runs, number}} lần · gần nhất {{date}}",
+    "show": "Lịch sử",
+    "hide": "Đóng",
+    "attempt": "Lần {{n, number}} · {{date}}",
+    "inProgress": "Đang làm"
+  },
+  "detail": {
+    "gone": "Bài kiểm tra này không còn.",
+    "historyTitle": "Lịch sử làm bài"
+  },
+  "pricing": {
+    "gradeCost": "Chấm bài tốn {{amount}}",
+    "retakeMcq": "Vẫn những câu hỏi đó, chỉ đảo thứ tự lựa chọn. Trắc nghiệm không dùng AI chấm nên không tốn tín dụng.",
+    "retakeWritten": "Làm lại đúng những câu hỏi đó. Câu hỏi đã được trả phí, nhưng chấm bài là lượt gọi mới và bị tính phí mỗi lần.",
+    "genAllFree": "Tạo bằng số câu miễn phí. Không bị trừ.",
+    "genAllPaid": "{{paid, number}} câu · {{amount}}",
+    "genPartlyFree": "{{free, number}} câu miễn phí + {{paid, number}} câu tính phí · {{amount}}",
+    "genFreeLeft": "Còn {{left, number}}/{{limit, number}} câu miễn phí hôm nay (mọi dạng)"
+  },
+  "activity": {
+    "title": "Hoạt động AI",
+    "quiz": "{{title}} · lần {{n, number}}",
+    "free": "Miễn phí",
+    "refunded": "Đã hoàn",
+    "job": {
+      "cards": "Tạo thẻ bằng AI",
+      "deck": "Tạo bộ thẻ bằng AI",
+      "template": "Mẫu AI",
+      "image": "Ảnh AI",
+      "image_deck": "Ảnh bộ thẻ",
+      "remediation": "Giải thích AI",
+      "quiz": "Bài kiểm tra AI",
+      "generate_mcq": "Tạo trắc nghiệm",
+      "generate_short": "Tạo tự luận ngắn",
+      "generate_essay": "Tạo bài luận",
+      "grade_short": "Chấm tự luận ngắn",
+      "grade_essay": "Chấm bài luận",
+      "quiz_answer_key": "Xác định ô đáp án"
+    }
   }
 }

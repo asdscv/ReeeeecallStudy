@@ -16,7 +16,14 @@
       "title": "まだクイズがありません",
       "body": "どのデッキからでも数秒で作れます。"
     },
-    "fewerThanAsked": "リクエスト{{requested, number}}問"
+    "fewerThanAsked": "リクエスト{{requested, number}}問",
+    "remove": "削除",
+    "dailyCheckTitle": "今日のチェック",
+    "confirmTitle": "このクイズを削除しますか？",
+    "confirmTaken": "{{runs, number}}回分の解答履歴と、そのときの答え、間違いノートの項目も一緒に消えます。元に戻せません。",
+    "confirmUnused": "まだ解いていないクイズです。問題だけが消えます。",
+    "confirmDelete": "削除",
+    "confirmCancel": "キャンセル"
   },
   "setup": {
     "title": "新しいクイズ",
@@ -26,7 +33,7 @@
     "untitled": "クイズ",
     "type": "問題形式",
     "typeHint": {
-      "mcq": "4択。その場で無料採点されます。",
+      "mcq": "4択。答えるとすぐに判定されます。AI採点を使わないのでクレジットはかかりません。",
       "short": "単語や語句で答えます。AIが採点し、解答ごとに課金されます。",
       "essay": "数文で答え、ルーブリックで採点します。最も難しく、最も高額です。"
     },
@@ -43,7 +50,10 @@
     "difficulty": "難易度",
     "clampedCount_one": "このデッキでは{{count, number}}問作成されます。",
     "clampedCount_other": "このデッキでは{{count, number}}問作成されます。",
-    "generatingBatch": "作成中… ({{done, number}}/{{total, number}})"
+    "generatingBatch": "作成中… ({{done, number}}/{{total, number}})",
+    "customCount": "直接入力",
+    "countEffective_one": "{{count, number}}問を作成",
+    "countEffective_other": "{{count, number}}問を作成"
   },
   "run": {
     "loading": "読み込み中…",
@@ -64,6 +74,17 @@
     "length": {
       "count": "{{chars, number}} / {{max, number}}文字",
       "tooShort": "採点には{{min, number}}文字以上必要です"
+    },
+    "verdict": {
+      "correct": "正解",
+      "partial": "部分正解",
+      "wrong": "不正解",
+      "ungraded": "未採点"
+    },
+    "tally": {
+      "plain": "正解 {{correct, number}} · 不正解 {{wrong, number}}",
+      "withUngraded": "正解 {{correct, number}} · 不正解 {{wrong, number}} · 未採点 {{ungraded, number}}",
+      "none": "{{total, number}}問"
     }
   },
   "result": {
@@ -77,7 +98,10 @@
     "markWrong": "不正解だった",
     "retake": "もう一度解く",
     "nothingGraded": "未採点",
-    "nothingGradedBody": "この回では採点した解答がありません。"
+    "nothingGradedBody": "この回では採点した解答がありません。",
+    "unanswered": "{{n, number}}問は未回答です",
+    "headline": "{{correct, number}}問正解",
+    "overrideLabel": "自分で直す"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "残高が足りません。チャージすると続けられます。",
@@ -94,7 +118,8 @@
     "QUIZ_CARDS_TOO_SHORT": "これらのカードは記述式の問題を作るには短すぎます。記述式はカード本文から取った語句で採点するためです。このデッキには短答式か選択式が向いています。",
     "AI_PROVIDER_ERROR": "現在AIサービスが混み合っています。料金は発生していません。少し待ってからお試しください。",
     "AI_PROVIDER_DAILY_LIMIT": "このアプリのAI一日あたりの上限に達しました。料金は発生していません。明日また使えます。",
-    "AI_PROVIDER_BUSY": "AIサービスが混み合っています。料金は発生していません。少し待ってお試しください。"
+    "AI_PROVIDER_BUSY": "AIサービスが混み合っています。料金は発生していません。少し待ってお試しください。",
+    "QUIZ_DIFFICULTY_UNAVAILABLE": "この難易度はこの問題形式にはまだありません。別の難易度を選んでください。"
   },
   "verdict": {
     "equivalent": "正解",
@@ -117,7 +142,9 @@
     "partial": "一部",
     "not_met": "満たしていない",
     "unjudgeable": "判断なし",
-    "unjudgeableNote": "一部は判断できなかったため、減点していません。"
+    "unjudgeableNote": "一部は判断できなかったため、減点していません。",
+    "weight": "配点 {{weight, number}}",
+    "mustMention": "必要な語:"
   },
   "aspect": {
     "covers_answer": "要点を押さえている",
@@ -162,5 +189,62 @@
     "overgeneral": "広すぎる",
     "plausible_form": "形が似ている",
     "unrelated": "無関係"
+  },
+  "mistakes": {
+    "title": "間違いノート",
+    "summary": "{{cards, number}}枚 · {{decks, number}}デッキ",
+    "expand": "表示",
+    "collapse": "閉じる",
+    "studyAgain": "{{cards, number}}枚を復習",
+    "youWrote": "あなたの答え: {{answer}}",
+    "andMore": "ほか{{cards, number}}枚",
+    "open": "開く",
+    "emptyTitle": "まだ間違いはありません",
+    "emptyBody": "クイズを解くと間違えた問題がここに集まります。"
+  },
+  "history": {
+    "dateThisYear": "{{m, number}}月{{d, number}}日",
+    "dateWithYear": "{{y}}年{{m, number}}月{{d, number}}日",
+    "created": "{{date}}作成",
+    "never": "まだ解いていません",
+    "taken": "{{runs, number}}回 · 最後は{{date}}",
+    "show": "履歴",
+    "hide": "閉じる",
+    "attempt": "{{n, number}}回目 · {{date}}",
+    "inProgress": "進行中"
+  },
+  "detail": {
+    "gone": "このクイズはありません。",
+    "historyTitle": "解答履歴"
+  },
+  "pricing": {
+    "gradeCost": "採点すると{{amount}}かかります",
+    "retakeMcq": "同じ問題をもう一度解きます。選択肢の順番だけが変わり、選択式はAI採点を使わないのでクレジットはかかりません。",
+    "retakeWritten": "同じ問題をもう一度解きます。問題の料金は支払い済みですが、採点は毎回新たに課金されます。",
+    "genAllFree": "無料の問題数で作成します。課金はありません。",
+    "genAllPaid": "{{paid, number}}問 · {{amount}}",
+    "genPartlyFree": "無料{{free, number}}問 + 有料{{paid, number}}問 · {{amount}}",
+    "genFreeLeft": "本日の無料問題 残り{{left, number}}/{{limit, number}}問（形式を問わず）"
+  },
+  "activity": {
+    "title": "AI 学習履歴",
+    "quiz": "{{title}} · {{n, number}}回目",
+    "free": "無料",
+    "refunded": "返金済み",
+    "job": {
+      "cards": "AIカード生成",
+      "deck": "AIデッキ作成",
+      "template": "AIテンプレート",
+      "image": "AI画像",
+      "image_deck": "AIデッキ画像",
+      "remediation": "AI解説",
+      "quiz": "AIクイズ",
+      "generate_mcq": "選択式の生成",
+      "generate_short": "記述式の生成",
+      "generate_essay": "論述の生成",
+      "grade_short": "記述式の採点",
+      "grade_essay": "論述の採点",
+      "quiz_answer_key": "解答欄の判定"
+    }
   }
 }

@@ -60,6 +60,11 @@ BEGIN
   UPDATE ai_pricing_settings
      SET free_quiz_units_per_day = 0, quiz_trial_units = 0, quiz_unit_price_micro = 5000
    WHERE id = 1;
+  -- 무료 한도는 239부터 `ai_free_allowances`에서 옵니다. 이 스위트는 유닛 산술을 검사하므로
+  -- 정책도 유닛 방식으로 맞춰 둡니다(둘 다 지원됩니다). 예전 컬럼은 읽히지 않지만 함께
+  -- 세팅해 두면 두 숫자가 어긋난 채 남지 않습니다.
+  UPDATE ai_free_allowances SET per_day = 0, unit_kind = 'unit'
+   WHERE tier = 'free' AND action_group = 'quiz_generate';
 
   PERFORM set_config('request.jwt.claim.role', 'authenticated', true);
   PERFORM set_config('request.jwt.claim.sub', v_uid::text, true);
@@ -169,6 +174,8 @@ BEGIN
   -- NET-ZERO — four failure paths, none of which may move money.
   -- ══════════════════════════════════════════════════════════════════════════
   UPDATE ai_pricing_settings SET free_quiz_units_per_day = 6, quiz_trial_units = 10 WHERE id = 1;
+  UPDATE ai_free_allowances SET per_day = 6, unit_kind = 'unit'
+   WHERE tier = 'free' AND action_group = 'quiz_generate';
   PERFORM public.grant_ai_quiz_trial();
 
   SELECT balance INTO b0 FROM ai_credit_balance WHERE user_id = v_uid;

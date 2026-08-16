@@ -119,7 +119,22 @@ function isSpan(v: unknown): v is QuizSpanRef {
 }
 
 /** The rubric as it was stored with the question, for naming each criterion on screen. */
-export interface StoredCriterion { id: string; aspect: string; weight: number }
+export interface StoredCriterion {
+  id: string
+  aspect: string
+  weight: number
+  /**
+   * The terms this criterion required, COPIED FROM THE CARD at generation time.
+   *
+   * The single most useful thing on a failed essay and it was never rendered. A learner saw
+   * "핵심을 담았는가 · 미충족" and no way to know that what was missing was `a×(b+c)=a×b+a×c`
+   * — which is written down, in their own card, in their own language, and was paid for.
+   *
+   * Never model prose: the generator is required to copy these from the card's own text and a
+   * term that does not appear there is discarded, so showing them cannot invent anything.
+   */
+  mustMention: string[]
+}
 
 export function asStoredRubric(raw: unknown): StoredCriterion[] {
   if (!Array.isArray(raw)) return []
@@ -127,7 +142,14 @@ export function asStoredRubric(raw: unknown): StoredCriterion[] {
     if (!c || typeof c !== 'object') return []
     const e = c as Record<string, unknown>
     if (typeof e.id !== 'string' || typeof e.aspect !== 'string') return []
-    return [{ id: e.id, aspect: e.aspect, weight: typeof e.weight === 'number' ? e.weight : 0 }]
+    return [{
+      id: e.id,
+      aspect: e.aspect,
+      weight: typeof e.weight === 'number' ? e.weight : 0,
+      mustMention: Array.isArray(e.mustMention)
+        ? e.mustMention.filter((m): m is string => typeof m === 'string' && m.trim() !== '')
+        : [],
+    }]
   })
 }
 
@@ -143,9 +165,31 @@ export function splitBySpan(text: string, span: QuizSpanRef | null | undefined):
   if (!span || span.start < 0 || span.end > text.length || span.end <= span.start) {
     return { before: text, hit: '', after: '' }
   }
+  const [start, end] = snapToWords(text, span.start, span.end)
   return {
-    before: text.slice(0, span.start),
-    hit: text.slice(span.start, span.end),
-    after: text.slice(span.end),
+    before: text.slice(0, start),
+    hit: text.slice(start, end),
+    after: text.slice(end),
   }
+}
+
+/**
+ * Grow a span outward until both ends sit on a word boundary.
+ *
+ * The offsets are the model's, and they are counted in characters, so they land mid-word often
+ * enough to notice: a graded answer highlighted "산들[바람이라는]" — the word 산들바람 cut in
+ * half and the highlight running on into the particle. The learner reads a highlight as "this
+ * is the bit I got right", and half a word says something the grader did not mean.
+ *
+ * Whitespace is the only boundary used. Korean and Japanese do not put spaces inside a word, so
+ * anything finer would need a tokeniser per language; snapping to the surrounding run of
+ * non-space characters is the rule that holds in every script we ship.
+ */
+function snapToWords(text: string, start: number, end: number): [number, number] {
+  const isSpace = (i: number) => /\s/.test(text[i] ?? ' ')
+  let s = start
+  let e = end
+  while (s > 0 && !isSpace(s - 1)) s--
+  while (e < text.length && !isSpace(e)) e++
+  return [s, e]
 }

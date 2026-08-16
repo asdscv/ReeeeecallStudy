@@ -107,6 +107,24 @@ export async function openDrawer() {
 /**
  * Navigate to a screen via the drawer menu using testIDs (language-independent).
  */
+/**
+ * Which collapsible section holds each drawer item.
+ *
+ * AI 학습's header is a LINK to the hub, so its chevron carries the `-toggle` suffix; the other
+ * three have no page of their own and their whole row toggles.
+ */
+const DRAWER_SECTION_OF: Record<string, string> = {
+  'AI Hub': 'drawer-ai-hub-toggle',
+  'Quiz': 'drawer-ai-hub-toggle',
+  'Learning Plan': 'drawer-ai-hub-toggle',
+  'AI Generate': 'drawer-ai-hub-toggle',
+  'Decks': 'drawer-decks-section',
+  'Cards': 'drawer-decks-section',
+  'Marketplace': 'drawer-explore-section',
+  'History': 'drawer-records-section',
+  'Achievements': 'drawer-records-section',
+}
+
 export async function navigateToDrawerItem(itemName: string) {
   const studyGroupItems = ['AI Hub', 'Quiz', 'Learning Plan', 'AI Generate',
                            'Decks', 'Cards', 'Marketplace', 'History', 'Achievements']
@@ -144,6 +162,21 @@ export async function navigateToDrawerItem(itemName: string) {
         expanded = await visible()
       }
     }
+    // Then the SECTION. The four sections inside 학습 used to render expanded together — a
+    // fifteen-row wall the moment the group opened — and they collapse now, one at a time. So a
+    // group that is open is no longer enough; the item's own section has to be opened too, and
+    // opening one closes another, which is why this looks first and taps once.
+    if (!expanded) {
+      const section = DRAWER_SECTION_OF[itemName]
+      if (section) {
+        await tapDrawerTestID(section)
+        for (let waited = 0; waited < 2500 && !expanded; waited += 250) {
+          await browser.pause(250)
+          expanded = await visible()
+        }
+      }
+    }
+
     if (!expanded) {
       console.log(`[nav] WARNING: study group never revealed ${itemName} (${testID})`)
     }

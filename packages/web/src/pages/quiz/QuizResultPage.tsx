@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuizStore, type QuizRunItem } from '@reeeeecall/shared/stores/quiz-store'
 import { QuizFeedback } from './QuizFeedback'
+import { tallyQuiz, tallyLine } from '@reeeeecall/shared/lib/quiz-outcome'
+import { QuizVerdictBadge } from './QuizVerdictBadge'
+import { retakeNoteKey } from '@reeeeecall/shared/lib/quiz-pricing'
 
 /**
  * What the sitting came to, and the one control that matters: the learner can overrule any
@@ -40,25 +43,35 @@ export function QuizResultPage() {
     return <div className="max-w-2xl mx-auto p-8 text-center text-sm text-content-tertiary">{t('run.loading')}</div>
   }
 
-  // Over what was GRADED, not over what was asked. A learner who answered six short-answer
-  // questions and paid to grade none of them was being shown "0%" and "0 of 6" — a total
-  // failure they did not earn, on a run where nothing had been judged at all.
-  const graded = run.items.filter((i) => i.score !== null).length
-  const percent = run.score_max > 0 ? Math.round((run.score_raw / run.score_max) * 100) : 0
+  // COUNTS, not a percentage.
+  //
+  // The comment that used to sit here said "over what was GRADED, not over what was asked" —
+  // and then divided by `score_max`, which is the total question count set when the run starts.
+  // Answering six short-answer questions, paying to grade one and getting it right read as 17%.
+  //
+  // Fixing the denominator would not have been enough. A quiz item has three outcomes and a
+  // ratio has two: an ungraded answer is not a wrong answer, and folding it into either half
+  // asserts something false about a learner who declined to spend. So the screen says all three.
+  const tally = tallyQuiz(run.items.map((i) => ({ answered: i.answered, score: i.score })))
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-4">
       <div className="p-4 bg-card rounded-xl border border-border text-center">
-        <p className="text-2xl font-medium text-foreground">
-          {graded === 0 ? t('result.nothingGraded') : t('result.percent', { percent })}
+        <p className="text-2xl font-medium text-foreground" data-testid="quiz-result-headline">
+          {/* "맞았어요 9" read as a sentence someone forgot to finish. */}
+          {tally.judged === 0 ? t('result.nothingGraded') : t('result.headline', { correct: tally.correct })}
         </p>
-        <p className="text-xs text-content-tertiary mt-1">
-          {/* Whole questions, not a decimal: partial credit exists on essays, but "4.3 of 6"
-              reads as a rounding artefact rather than as a score. */}
-          {graded === 0
+        <p className="text-sm text-content-tertiary mt-1" data-testid="quiz-result-tally">
+          {/* The three numbers, because there are three outcomes. */}
+          {tally.judged === 0
             ? t('result.nothingGradedBody')
-            : t('result.of', { raw: Math.round(run.score_raw), max: run.score_max })}
+            : t(tallyLine(tally).key, tallyLine(tally).params)}
         </p>
+        {tally.unanswered > 0 && (
+          <p className="text-xs text-content-tertiary mt-0.5">
+            {t('result.unanswered', { n: tally.unanswered })}
+          </p>
+        )}
         <p className="text-xs text-content-tertiary mt-0.5">
           {t('result.attempt', { count: run.attempt_no })}
         </p>
@@ -77,9 +90,10 @@ export function QuizResultPage() {
                   </p>
                 )}
               </div>
-              <span className="text-sm font-medium text-foreground shrink-0">
-                {item.score === null ? t('result.ungraded') : `${Math.round(item.score * 100)}%`}
-              </span>
+              {/* The verdict, not a percentage. `100%` and `0%` on a single item are a verdict
+                  wearing a number's clothes, and the only other signal on this row was which
+                  override button happened to be disabled — which reads as an instruction. */}
+              <QuizVerdictBadge item={{ answered: item.answered, score: item.score }} size="sm" />
             </div>
 
             {item.feedback && (
@@ -87,6 +101,10 @@ export function QuizResultPage() {
                 <QuizFeedback
                   feedback={item.feedback}
                   rubric={item.rubric}
+                  /* Their own submission, back from the run item. Without it every
+                     `from: "learner"` span renders as nothing and the grading detail the
+                     learner paid for is visible only during the sitting itself. */
+                  learnerText={typeof item.response?.text === 'string' ? item.response.text : undefined}
                   referenceText={item.reference_answer}
                 />
               </div>
@@ -96,7 +114,10 @@ export function QuizResultPage() {
                 the learner most needs to mark it themselves — they chose not to pay for the
                 grade, and without this the run has no score and no way to get one. */}
             {item.answered && (
-              <div className="flex gap-2 mt-2">
+              <div className="flex items-center gap-2 mt-2">
+                {/* Labelled, so the two buttons read as a correction the learner may make and
+                    not as the app's own verdict. The badge above is the verdict. */}
+                <span className="text-xs text-content-tertiary">{t('result.overrideLabel')}</span>
                 <button
                   type="button"
                   disabled={busy === item.item_id || item.score === 1}
@@ -118,6 +139,12 @@ export function QuizResultPage() {
           </li>
         ))}
       </ul>
+
+      {/* Said before the button, not after the charge: the same questions come back, and the
+          grading on them is a fresh call every sitting. */}
+      <p className="text-xs text-content-tertiary text-center">
+        {t(retakeNoteKey(run.items[0]?.question_type))}
+      </p>
 
       <div className="flex gap-2">
         <button

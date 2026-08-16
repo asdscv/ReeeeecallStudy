@@ -1,8 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-// We need to mock DOM APIs for download
+/**
+ * jsdom does not implement `URL.createObjectURL`, and `vi.spyOn` cannot stub a property that
+ * does not exist — it throws "createObjectURL does not exist".
+ *
+ * This file passed anyway, for a reason that had nothing to do with it: vitest shards test files
+ * across workers, some other file in the same worker defined the property first, and this one
+ * inherited it. Adding a single unrelated test file elsewhere in the repo reshuffles that
+ * assignment and these four tests start failing — which is exactly what happened.
+ *
+ * So the file provides what it needs. `configurable: true` so `vi.spyOn` can still replace it and
+ * `vi.restoreAllMocks()` can put it back.
+ */
 beforeEach(() => {
   vi.restoreAllMocks()
+  for (const name of ['createObjectURL', 'revokeObjectURL'] as const) {
+    if (typeof (URL as unknown as Record<string, unknown>)[name] !== 'function') {
+      Object.defineProperty(URL, name, {
+        value: () => undefined, writable: true, configurable: true,
+      })
+    }
+  }
 })
 
 describe('csv-export', () => {

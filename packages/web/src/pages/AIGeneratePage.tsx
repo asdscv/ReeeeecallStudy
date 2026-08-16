@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AI_HUB_GENERATE } from '@reeeeecall/shared/lib/ai/hub/catalog'
 import { AiCreditNotice } from '../components/ai/AiCreditNotice'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAIGenerateStore } from '../stores/ai-generate-store'
 import { useTemplateStore } from '../stores/template-store'
 import { ConfigStep } from '../components/ai-generate/steps/ConfigStep'
@@ -133,7 +133,31 @@ export function AIGeneratePage() {
     })
   }
 
+  const navigate = useNavigate()
   const handleReset = () => store.reset()
+
+  /**
+   * Land on the cards that were just made, without waiting to be asked.
+   *
+   * The wizard used to stop on a done screen with a 덱으로 이동 button and go nowhere on its own.
+   * A learner who then pressed browser Back landed on whatever was before /ai-generate — and the
+   * AI submenu lists 퀴즈 directly above 덱·카드 생성, so that was usually the quiz page. Making
+   * success navigate removes the dead end rather than papering over it.
+   *
+   * `replace`, so Back from the deck returns to where the learner started the wizard rather than
+   * to a finished wizard that would immediately navigate them forward again.
+   */
+  const doneDeckId = store.createdDeckId || store.existingDeckId || paramDeckId || null
+  useEffect(() => {
+    if (store.currentStep !== 'done' || !doneDeckId) return
+    // A beat on the 🎉 so the count and the deck name are readable — long enough to register,
+    // short enough that nobody reaches for a button.
+    const timer = setTimeout(() => {
+      store.reset()
+      navigate(`/decks/${doneDeckId}`, { replace: true })
+    }, 1200)
+    return () => clearTimeout(timer)
+  }, [store.currentStep, doneDeckId, navigate, store])
 
   const getFields = useMemo((): (() => GeneratedTemplateField[]) => {
     return () => {

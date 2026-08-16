@@ -26,6 +26,20 @@ export type AiHubPoweredBy =
   | 'device'
 
 /**
+ * Which daily free allowance this feature draws on.
+ *
+ * The same names as `ai_free_allowances.action_group` (mig 239), because that table is the
+ * authority and a second vocabulary would drift from it. `null` for a feature that spends
+ * nothing — the learning plan.
+ *
+ * It exists because the credit notice was reporting the CARD allowance on every AI surface,
+ * quiz screens included: a learner setting up a quiz read "오늘 남은 무료 카드 10장" above the
+ * form and "오늘 무료 문항 3/5개 남음" below it. Two numbers, two different features, and the
+ * bigger and more prominent one was about the other one.
+ */
+export type AiHubSpends = 'card' | 'quiz_generate' | null
+
+/**
  * A key of the mobile `MainTabParamList` (`packages/mobile/src/navigation/types.ts`).
  *
  * Naming a mobile navigator from shared code is coupling, and it is the deliberate price of the
@@ -50,6 +64,13 @@ export interface AiHubEntry extends Identified {
   readonly mobileStack: AiHubMobileStack
   readonly mobileScreen: string
   readonly poweredBy: AiHubPoweredBy
+  /**
+   * The daily allowance this feature draws on, or `null` when it spends nothing.
+   *
+   * Not derived from `poweredBy`: two features can both call a model and draw on different
+   * allowances, which is exactly the case this field exists for.
+   */
+  readonly spends: AiHubSpends
 }
 
 /**

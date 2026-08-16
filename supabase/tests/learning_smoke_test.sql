@@ -45,10 +45,12 @@ INSERT INTO cards (
   1, '2020-01-01T00:00:00Z', 'new', 0, 2.5, 0
 );
 
--- reserve_ai_remediation requires a positive wallet balance.
+-- reserve_ai_remediation requires a wallet that can cover the LIST PRICE, which mig 230 took to
+-- 500,000 micro for an explanation. 100,000 was enough when it was 50,000 and is not now — the
+-- reservation gate is `balance >= price`, so the fixture has to be a float, not a token.
 INSERT INTO ai_credit_balance (user_id, balance)
-VALUES ('50000000-0000-4000-8000-000000000001', 100000)
-ON CONFLICT (user_id) DO UPDATE SET balance = 100000;
+VALUES ('50000000-0000-4000-8000-000000000001', 5000000)
+ON CONFLICT (user_id) DO UPDATE SET balance = 5000000;
 
 SET LOCAL session_replication_role = origin;
 

@@ -41,6 +41,14 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
   const { t, i18n } = useTranslation('common')
   const { user } = useAuthState()
   const [studyGroupOpen, setStudyGroupOpen] = useState(false)
+  /**
+   * Which section inside 학습 is open.
+   *
+   * `null` until touched, and until then the section holding the CURRENT screen is the open one
+   * — arriving from 퀴즈 should show it in context rather than behind a closed list. Before this
+   * all four rendered expanded at once, which is fifteen rows the moment the group opens.
+   */
+  const [openSection, setOpenSection] = useState<string | null>(null)
   const [role, setRole] = useState<string>('user')
   // Track which drawer item is active (not just the tab)
   const [activeItem, setActiveItem] = useState<string>('Dashboard')
@@ -58,6 +66,24 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
   }, [user])
 
   const isActive = (item: string) => activeItem === item
+
+  /**
+   * Which section holds the screen the learner is on, so the drawer opens where they already are
+   * rather than making them guess their way back into it.
+   */
+  const activeSection = (): string | null => {
+    if (isActive('AIHub') || aiHubEntries().some((e) => isActive(e.mobileScreen))) return 'ai'
+    if (isActive('DecksTab') || isActive('TemplatesList')) return 'decks'
+    if (isActive('MarketplaceTab') || isActive('PublisherStats') || isActive('MyShares')) return 'explore'
+    if (isActive('StudyHistory') || isActive('Achievements')) return 'records'
+    return null
+  }
+  const sectionOpen = (id: string) =>
+    openSection === null ? activeSection() === id : openSection === id
+  // One at a time. Four open sections is the wall this replaced, and on a phone the drawer is
+  // the whole screen — a second open section pushes the first off it.
+  const toggleSection = (id: string) =>
+    setOpenSection((current) => (sectionOpen(id) && (current !== null || activeSection() === id) ? '' : id))
 
   const go = (name: keyof MainTabParamList, screen?: string, item?: string) => {
     if (screen) {
@@ -118,8 +144,9 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
                 starts closed on every mount, and nesting another toggle would put the newest
                 menu three taps from the drawer opening. */}
             <SectionLabel label={t('nav.aiHub')} icon="🤖" theme={theme} active={isActive('AIHub')}
-              onPress={() => go('AITab', 'AIHub')} testID="drawer-ai-hub" />
-            {aiHubEntries().map((entry) => (
+              onPress={() => go('AITab', 'AIHub')} testID="drawer-ai-hub"
+              open={sectionOpen('ai')} onToggle={() => toggleSection('ai')} />
+            {sectionOpen('ai') && aiHubEntries().map((entry) => (
               <MenuItem key={entry.id} icon={entry.icon} label={t(entry.titleKey, { ns: 'ai-generate' })}
                 indent indentLevel={2} active={isActive(entry.mobileScreen)} theme={theme}
                 onPress={() => go(entry.mobileStack, entry.mobileScreen)} testID={`drawer-ai-${entry.id}`} />
@@ -127,29 +154,38 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
             {/* `nav.cards` pointed at TemplatesList, whose own screen is titled 카드 템플릿, and
                 there is no card list on mobile either — cards live inside a deck. Renamed, and
                 paired with 덱 rather than standing beside it as if it were the other half. */}
-            <SectionLabel label={t('nav.deckAndCards')} icon="🗃️" theme={theme} />
-            <MenuItem icon="📚" label={t('nav.decks')} indent indentLevel={2} active={isActive('DecksTab')} theme={theme}
-              onPress={() => go('DecksTab', undefined, 'DecksTab')} testID="drawer-decks" />
-            <MenuItem icon="📋" label={t('nav.cardTemplates')} indent indentLevel={2} active={isActive('TemplatesList')} theme={theme}
-              onPress={() => go('SettingsTab', 'TemplatesList')} testID="drawer-cards" />
+            <SectionLabel label={t('nav.deckAndCards')} icon="🗃️" theme={theme} testID="drawer-decks-section"
+              open={sectionOpen('decks')} onToggle={() => toggleSection('decks')} />
+            {sectionOpen('decks') && (<>
+              <MenuItem icon="📚" label={t('nav.decks')} indent indentLevel={2} active={isActive('DecksTab')} theme={theme}
+                onPress={() => go('DecksTab', undefined, 'DecksTab')} testID="drawer-decks" />
+              <MenuItem icon="📋" label={t('nav.cardTemplates')} indent indentLevel={2} active={isActive('TemplatesList')} theme={theme}
+                onPress={() => go('SettingsTab', 'TemplatesList')} testID="drawer-cards" />
+            </>)}
 
-            <SectionLabel label={t('nav.explore')} icon="🧭" theme={theme} />
-            <MenuItem icon="🏪" label={t('nav.marketplace')} indent indentLevel={2} active={isActive('MarketplaceTab')} theme={theme}
-              onPress={() => go('MarketplaceTab', undefined, 'MarketplaceTab')} testID="drawer-marketplace" />
-            <MenuItem icon="📊" label={t('nav.publisherStats', { defaultValue: 'Publisher Stats' })} indent indentLevel={2} active={isActive('PublisherStats')} theme={theme}
-              onPress={() => go('SettingsTab', 'PublisherStats')} testID="drawer-publisher-stats" />
-            {/* `nav.myShares`, not `settings:shares.title`: web needed the same row and had no
-                such key, and one menu label living in two namespaces drifts. */}
-            <MenuItem icon="🔗" label={t('nav.myShares')} indent indentLevel={2} active={isActive('MyShares')} theme={theme}
-              onPress={() => go('SettingsTab', 'MyShares')} testID="drawer-my-shares" />
+            <SectionLabel label={t('nav.explore')} icon="🧭" theme={theme} testID="drawer-explore-section"
+              open={sectionOpen('explore')} onToggle={() => toggleSection('explore')} />
+            {sectionOpen('explore') && (<>
+              <MenuItem icon="🏪" label={t('nav.marketplace')} indent indentLevel={2} active={isActive('MarketplaceTab')} theme={theme}
+                onPress={() => go('MarketplaceTab', undefined, 'MarketplaceTab')} testID="drawer-marketplace" />
+              <MenuItem icon="📊" label={t('nav.publisherStats', { defaultValue: 'Publisher Stats' })} indent indentLevel={2} active={isActive('PublisherStats')} theme={theme}
+                onPress={() => go('SettingsTab', 'PublisherStats')} testID="drawer-publisher-stats" />
+              {/* `nav.myShares`, not `settings:shares.title`: web needed the same row and had no
+                  such key, and one menu label living in two namespaces drifts. */}
+              <MenuItem icon="🔗" label={t('nav.myShares')} indent indentLevel={2} active={isActive('MyShares')} theme={theme}
+                onPress={() => go('SettingsTab', 'MyShares')} testID="drawer-my-shares" />
+            </>)}
 
             {/* 업적 was a top-level row while 기록 sat in here, splitting one question across two
                 menus. Same move as web. */}
-            <SectionLabel label={t('nav.myRecords')} icon="📜" theme={theme} />
-            <MenuItem icon="📝" label={t('nav.studyHistory')} indent indentLevel={2} active={isActive('StudyHistory')} theme={theme}
-              onPress={() => go('HomeTab', 'StudyHistory')} testID="drawer-history" />
-            <MenuItem icon="🏆" label={t('nav.achievements', { defaultValue: 'Achievements' })} indent indentLevel={2} active={isActive('Achievements')} theme={theme}
-              onPress={() => go('SettingsTab', 'Achievements')} testID="drawer-achievements" />
+            <SectionLabel label={t('nav.myRecords')} icon="📜" theme={theme} testID="drawer-records-section"
+              open={sectionOpen('records')} onToggle={() => toggleSection('records')} />
+            {sectionOpen('records') && (<>
+              <MenuItem icon="📝" label={t('nav.studyHistory')} indent indentLevel={2} active={isActive('StudyHistory')} theme={theme}
+                onPress={() => go('HomeTab', 'StudyHistory')} testID="drawer-history" />
+              <MenuItem icon="🏆" label={t('nav.achievements', { defaultValue: 'Achievements' })} indent indentLevel={2} active={isActive('Achievements')} theme={theme}
+                onPress={() => go('SettingsTab', 'Achievements')} testID="drawer-achievements" />
+            </>)}
           </View>
         )}
 
@@ -200,9 +236,21 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
  * and the two platforms have to agree, or the same menu teaches two different things about what
  * a heading does.
  */
-function SectionLabel({ label, icon, theme, onPress, active, testID }: {
+/**
+ * A section header inside the 학습 group, with its own collapse.
+ *
+ * The four sections rendered expanded, all at once, so opening 학습 dropped a fifteen-row wall
+ * into the drawer — a list to scan rather than a menu to choose from. A section is a promise that
+ * its contents are related, and showing every promise at once keeps none of them.
+ *
+ * `onPress` and `onToggle` are separate targets in one row: AI 학습's label opens the hub while
+ * its chevron expands the three features. A header that navigated AND expanded would do neither
+ * predictably.
+ */
+function SectionLabel({ label, icon, theme, onPress, active, testID, open, onToggle }: {
   label: string; icon: string; theme: ReturnType<typeof useTheme>
   onPress?: () => void; active?: boolean; testID?: string
+  open?: boolean; onToggle?: () => void
 }) {
   const color = active
     ? (theme.isDark ? palette.blue[400] : palette.blue[700])
@@ -210,21 +258,49 @@ function SectionLabel({ label, icon, theme, onPress, active, testID }: {
   const content = (
     <>
       <Text style={styles.sectionIcon}>{icon}</Text>
-      <Text style={[styles.sectionText, { color }]}>{label}</Text>
+      <Text style={[styles.sectionText, { color, flex: 1 }]}>{label}</Text>
     </>
   )
-  if (!onPress) return <View style={styles.sectionLabel}>{content}</View>
-  return (
+
+  const chevron = onToggle ? (
+    <TouchableOpacity
+      onPress={onToggle}
+      activeOpacity={0.7}
+      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+      testID={`${testID ?? label}-toggle`}
+      accessibilityLabel={`${testID ?? label}-toggle`}
+      accessibilityState={{ expanded: !!open }}
+    >
+      <Text style={[styles.chevron, { color: theme.colors.textSecondary }]}>
+        {open ? '\u2227' : '\u2228'}
+      </Text>
+    </TouchableOpacity>
+  ) : null
+
+  // Without its own page the WHOLE row toggles — there is nothing else for it to do.
+  const body = onPress ? (
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.7}
       testID={testID}
       accessibilityLabel={testID}
-      style={styles.sectionLabel}
+      style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
+    >
+      {content}
+    </TouchableOpacity>
+  ) : (
+    <TouchableOpacity
+      onPress={onToggle}
+      activeOpacity={0.7}
+      testID={testID}
+      accessibilityLabel={testID}
+      style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
     >
       {content}
     </TouchableOpacity>
   )
+
+  return <View style={styles.sectionLabel}>{body}{chevron}</View>
 }
 
 function MenuItem({ icon, label, active, theme, onPress, indent, indentLevel = 1, testID }: {

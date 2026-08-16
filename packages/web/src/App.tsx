@@ -53,6 +53,12 @@ import { GlobalConfirmDialog } from './components/common/GlobalConfirmDialog'
 const QuizRunPage = lazy(() =>
   import('./pages/quiz/QuizRunPage').then(m => ({ default: m.QuizRunPage }))
 )
+const QuizMistakesPage = lazy(() =>
+  import('./pages/quiz/QuizMistakesPage').then(m => ({ default: m.QuizMistakesPage }))
+)
+const QuizSetDetailPage = lazy(() =>
+  import('./pages/quiz/QuizSetDetailPage').then(m => ({ default: m.QuizSetDetailPage }))
+)
 const QuizResultPage = lazy(() =>
   import('./pages/quiz/QuizResultPage').then(m => ({ default: m.QuizResultPage }))
 )
@@ -299,6 +305,11 @@ function App() {
                   show-flip-self-rate, and quiz is a different act entirely. */}
               <Route path="/quiz" element={<QuizHomePage />} />
               <Route path="/quiz/new" element={<QuizSetupPage />} />
+              {/* `set/` in the path, not `/quiz/:setId` — the run routes already own a bare
+                  id segment, and two id-shaped routes at the same depth is how a result URL
+                  starts resolving as a set. */}
+              <Route path="/quiz/mistakes" element={<QuizMistakesPage />} />
+              <Route path="/quiz/set/:setId" element={<QuizSetDetailPage />} />
               <Route path="/quiz/:runId/result" element={<QuizResultPage />} />
               <Route path="/history" element={<StudyHistoryPage />} />
               <Route path="/history/detail" element={<SessionDetailPage />} />

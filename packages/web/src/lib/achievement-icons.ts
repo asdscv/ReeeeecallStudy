@@ -14,6 +14,7 @@ import {
   Flame, BookOpen, Zap, Clock, Star, Package,
   HandHeart, Trophy, Target, Moon, Sun, Calendar,
   Award, Crown, Diamond, Medal, Shield,
+  Bot, HelpCircle, PenLine, RotateCcw,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -29,6 +30,9 @@ const CATEGORY_ICONS: Record<string, IconConfig> = {
   study:     { icon: BookOpen,  bg: 'bg-brand/15 dark:bg-blue-900/30',     color: 'text-brand' },
   social:    { icon: HandHeart, bg: 'bg-pink-100 dark:bg-pink-900/30',     color: 'text-pink-500' },
   milestone: { icon: Trophy,    bg: 'bg-warning/15 dark:bg-yellow-900/30', color: 'text-warning' },
+  // Quizzes, generation and grading — mig 228. Without a row here the whole category fell back
+  // to the milestone trophy, so three different kinds of AI badge looked identical.
+  ai:        { icon: Bot,       bg: 'bg-violet-100 dark:bg-violet-900/30', color: 'text-violet-500' },
 }
 
 // Special achievement overrides (by prefix or exact ID)
@@ -57,6 +61,14 @@ const SPECIAL_ICONS: Record<string, IconConfig> = {
   reviews:         { icon: Star,     bg: 'bg-warning/15 dark:bg-yellow-900/30', color: 'text-warning' },
   first_review:    { icon: Star,     bg: 'bg-warning/15 dark:bg-yellow-900/30', color: 'text-warning' },
   market_acquire:  { icon: Award,    bg: 'bg-brand/15 dark:bg-blue-900/30', color: 'text-brand' },
+
+  // AI
+  quizzes:      { icon: HelpCircle, bg: 'bg-violet-100 dark:bg-violet-900/30', color: 'text-violet-500' },
+  ai_cards:     { icon: Bot,        bg: 'bg-cyan-100 dark:bg-cyan-900/30',    color: 'text-cyan-500' },
+  graded:       { icon: PenLine,    bg: 'bg-brand/15 dark:bg-blue-900/30',    color: 'text-brand' },
+  perfect_quiz: { icon: Target,     bg: 'bg-emerald-100 dark:bg-emerald-900/30', color: 'text-emerald-500' },
+  // The only badge that cannot be earned without going back to something you failed.
+  comeback:     { icon: RotateCcw,  bg: 'bg-amber-100 dark:bg-amber-900/30',  color: 'text-amber-500' },
 }
 
 // Tier icons based on DB icon field (💎, 👑, 🏆)

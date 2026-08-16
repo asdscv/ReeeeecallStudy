@@ -54,7 +54,8 @@
     "title": "¡Tarjetas creadas!",
     "subtitle": "Tus tarjetas generadas con IA están listas para estudiar.",
     "generateMore": "Generar más",
-    "done": "Listo"
+    "done": "Listo",
+    "viewCards": "Ver tarjetas"
   },
   "errorStep": {
     "title": "Error en la generación",
@@ -80,7 +81,8 @@
       "failed": "No se pudo procesar. No se te ha cobrado nada.",
       "retry": "Reintentar",
       "gradeYourself": "Puedes terminar el test igualmente y corregir esta pregunta tú, gratis."
-    }
+    },
+    "freeQuizOnly": "Te quedan {{free}} preguntas gratis hoy"
   },
   "alert": {
     "errorTitle": "Error",

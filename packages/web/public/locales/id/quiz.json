@@ -16,7 +16,14 @@
       "title": "Belum ada kuis",
       "body": "Buat dari dek mana pun, hanya perlu beberapa detik."
     },
-    "fewerThanAsked": "diminta {{requested, number}}"
+    "fewerThanAsked": "diminta {{requested, number}}",
+    "remove": "Hapus",
+    "dailyCheckTitle": "Cek harian",
+    "confirmTitle": "Hapus kuis ini?",
+    "confirmTaken": "{{runs, number}} riwayat pengerjaan, jawaban Anda, dan catatan salahnya ikut terhapus. Tidak bisa dibatalkan.",
+    "confirmUnused": "Belum pernah dikerjakan. Hanya soalnya yang dihapus.",
+    "confirmDelete": "Hapus",
+    "confirmCancel": "Batal"
   },
   "setup": {
     "title": "Kuis baru",
@@ -26,7 +33,7 @@
     "untitled": "Kuis",
     "type": "Jenis soal",
     "typeHint": {
-      "mcq": "Empat pilihan, dinilai seketika dan gratis.",
+      "mcq": "Empat pilihan. Diperiksa begitu Anda menjawab — tanpa AI, jadi tanpa kredit.",
       "short": "Jawab dengan kata atau frasa. Dinilai AI, dikenakan biaya per jawaban.",
       "essay": "Tulis beberapa kalimat, dinilai dengan rubrik. Paling menuntut dan paling mahal."
     },
@@ -43,7 +50,10 @@
     "difficulty": "Tingkat kesulitan",
     "clampedCount_one": "Dek ini menghasilkan {{count, number}} soal.",
     "clampedCount_other": "Dek ini menghasilkan {{count, number}} soal.",
-    "generatingBatch": "Membuat… ({{done, number}}/{{total, number}})"
+    "generatingBatch": "Membuat… ({{done, number}}/{{total, number}})",
+    "customCount": "Isi sendiri",
+    "countEffective_one": "Buat {{count, number}} soal",
+    "countEffective_other": "Buat {{count, number}} soal"
   },
   "run": {
     "loading": "Memuat…",
@@ -64,6 +74,17 @@
     "length": {
       "count": "{{chars, number}} / {{max, number}} karakter",
       "tooShort": "Minimal {{min, number}} karakter untuk dinilai"
+    },
+    "verdict": {
+      "correct": "Benar",
+      "partial": "Sebagian benar",
+      "wrong": "Belum tepat",
+      "ungraded": "Belum dinilai"
+    },
+    "tally": {
+      "plain": "Benar {{correct, number}} · Salah {{wrong, number}}",
+      "withUngraded": "Benar {{correct, number}} · Salah {{wrong, number}} · Belum dinilai {{ungraded, number}}",
+      "none": "{{total, number}} soal"
     }
   },
   "result": {
@@ -77,7 +98,10 @@
     "markWrong": "Saya salah",
     "retake": "Kerjakan lagi",
     "nothingGraded": "Belum dinilai",
-    "nothingGradedBody": "Belum ada jawaban yang dinilai di sesi ini."
+    "nothingGradedBody": "Belum ada jawaban yang dinilai di sesi ini.",
+    "unanswered": "{{n, number}} soal belum dijawab",
+    "headline": "{{correct, number}} benar",
+    "overrideLabel": "Perbaiki sendiri"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "Saldo tidak cukup. Isi ulang untuk melanjutkan.",
@@ -94,7 +118,8 @@
     "QUIZ_CARDS_TOO_SHORT": "Kartu-kartu ini terlalu pendek untuk soal esai — esai dinilai dari istilah yang diambil dari kartu itu sendiri. Coba jawaban singkat atau pilihan ganda untuk dek ini.",
     "AI_PROVIDER_ERROR": "Layanan AI sedang sibuk. Anda tidak dikenakan biaya — coba lagi sebentar.",
     "AI_PROVIDER_DAILY_LIMIT": "Batas AI harian aplikasi ini sudah tercapai. Anda tidak dikenakan biaya — batas ini disetel ulang besok.",
-    "AI_PROVIDER_BUSY": "Layanan AI sedang sibuk. Anda tidak dikenakan biaya — coba lagi sebentar."
+    "AI_PROVIDER_BUSY": "Layanan AI sedang sibuk. Anda tidak dikenakan biaya — coba lagi sebentar.",
+    "QUIZ_DIFFICULTY_UNAVAILABLE": "Tingkat kesulitan itu belum tersedia untuk tipe soal ini. Pilih yang lain."
   },
   "verdict": {
     "equivalent": "Benar",
@@ -117,7 +142,9 @@
     "partial": "Sebagian",
     "not_met": "Belum terpenuhi",
     "unjudgeable": "Tidak dinilai",
-    "unjudgeableNote": "Sebagian tidak bisa dinilai, jadi tidak mengurangi nilai Anda."
+    "unjudgeableNote": "Sebagian tidak bisa dinilai, jadi tidak mengurangi nilai Anda.",
+    "weight": "bobot {{weight, number}}",
+    "mustMention": "Perlu ada:"
   },
   "aspect": {
     "covers_answer": "Mencakup jawaban",
@@ -162,5 +189,62 @@
     "overgeneral": "Terlalu luas",
     "plausible_form": "Bentuknya mirip",
     "unrelated": "Tidak berkaitan"
+  },
+  "mistakes": {
+    "title": "Catatan salah",
+    "summary": "{{cards, number}} kartu · {{decks, number}} dek",
+    "expand": "Tampilkan",
+    "collapse": "Sembunyikan",
+    "studyAgain": "Pelajari {{cards, number}} lagi",
+    "youWrote": "Jawaban Anda: {{answer}}",
+    "andMore": "dan {{cards, number}} lagi",
+    "open": "Buka",
+    "emptyTitle": "Belum ada yang salah",
+    "emptyBody": "Soal yang salah akan terkumpul di sini saat Anda mengerjakan kuis."
+  },
+  "history": {
+    "dateThisYear": "{{d, number}}/{{m, number}}",
+    "dateWithYear": "{{d, number}}/{{m, number}}/{{y}}",
+    "created": "Dibuat {{date}}",
+    "never": "Belum dikerjakan",
+    "taken": "{{runs, number}}× · terakhir {{date}}",
+    "show": "Riwayat",
+    "hide": "Tutup",
+    "attempt": "Percobaan {{n, number}} · {{date}}",
+    "inProgress": "Berlangsung"
+  },
+  "detail": {
+    "gone": "Kuis ini sudah tidak ada.",
+    "historyTitle": "Riwayat"
+  },
+  "pricing": {
+    "gradeCost": "Penilaian dikenakan {{amount}}",
+    "retakeMcq": "Soal yang sama, pilihan jawabannya diacak. Pilihan ganda diperiksa tanpa AI, jadi tidak memakai kredit.",
+    "retakeWritten": "Soal yang sama lagi. Soalnya sudah dibayar, tetapi penilaian adalah panggilan baru dan dikenai biaya setiap kali.",
+    "genAllFree": "Dibuat dari jatah gratis Anda. Tidak ada biaya.",
+    "genAllPaid": "{{paid, number}} soal · {{amount}}",
+    "genPartlyFree": "{{free, number}} gratis + {{paid, number}} berbayar · {{amount}}",
+    "genFreeLeft": "Sisa {{left, number}}/{{limit, number}} soal gratis hari ini (semua tipe)"
+  },
+  "activity": {
+    "title": "Aktivitas AI",
+    "quiz": "{{title}} · percobaan {{n, number}}",
+    "free": "Gratis",
+    "refunded": "Dikembalikan",
+    "job": {
+      "cards": "Kartu AI",
+      "deck": "Dek AI",
+      "template": "Templat AI",
+      "image": "Gambar AI",
+      "image_deck": "Gambar dek AI",
+      "remediation": "Penjelasan AI",
+      "quiz": "Kuis AI",
+      "generate_mcq": "Pilihan ganda",
+      "generate_short": "Isian singkat",
+      "generate_essay": "Esai",
+      "grade_short": "Penilaian isian",
+      "grade_essay": "Penilaian esai",
+      "quiz_answer_key": "Kolom jawaban"
+    }
   }
 }

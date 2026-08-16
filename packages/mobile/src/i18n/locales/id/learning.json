@@ -134,7 +134,8 @@
     "weakCount": "{{count, number}} kartu",
     "weakCount_one": "{{count, number}} kartu",
     "weakCount_other": "{{count, number}} kartu",
-    "weakStudy": "Pelajari kartu ini saja"
+    "weakStudy": "Pelajari kartu ini saja",
+    "weakHintCapped": "{{shown, number}} terlemah dari {{total, number}} kartu yang sudah dilihat dua kali dan salah lebih dari separuh."
   },
   "recommend": {
     "accept": "Terima",

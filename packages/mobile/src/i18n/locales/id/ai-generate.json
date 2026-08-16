@@ -54,7 +54,8 @@
     "title": "Kartu Dibuat!",
     "subtitle": "Kartu flash buatan AI siap untuk dipelajari.",
     "generateMore": "Buat Lagi",
-    "done": "Selesai"
+    "done": "Selesai",
+    "viewCards": "Lihat kartu"
   },
   "errorStep": {
     "title": "Pembuatan Gagal",
@@ -80,7 +81,8 @@
       "failed": "Gagal diproses. Tidak ada saldo yang terpotong.",
       "retry": "Coba lagi",
       "gradeYourself": "Kamu tetap bisa menyelesaikan kuis dan menilai soal ini sendiri, gratis."
-    }
+    },
+    "freeQuizOnly": "Sisa {{free}} soal gratis hari ini"
   },
   "alert": {
     "errorTitle": "Kesalahan",
