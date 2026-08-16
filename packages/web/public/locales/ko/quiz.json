@@ -220,7 +220,11 @@
   "pricing": {
     "gradeCost": "채점하면 {{amount}} 차감돼요",
     "retakeMcq": "같은 문제를 다시 풀어요. 보기 순서만 바뀌고, 객관식은 AI 채점을 쓰지 않아 크레딧이 들지 않아요.",
-    "retakeWritten": "같은 문제를 다시 풀어요. 문제는 이미 값을 치렀으니 다시 푸는 건 그대로지만, 채점은 회차마다 새로 차감돼요."
+    "retakeWritten": "같은 문제를 다시 풀어요. 문제는 이미 값을 치렀으니 다시 푸는 건 그대로지만, 채점은 회차마다 새로 차감돼요.",
+    "genAllFree": "무료 문항으로 만들어요. 차감되지 않아요.",
+    "genAllPaid": "{{paid, number}}문항 · {{amount}} 차감돼요",
+    "genPartlyFree": "무료 {{free, number}}문항 + 유료 {{paid, number}}문항 · {{amount}} 차감돼요",
+    "genFreeLeft": "오늘 무료 문항 {{left, number}}/{{limit, number}}개 남음 (유형 무관)"
   },
   "activity": {
     "title": "AI 학습 기록",

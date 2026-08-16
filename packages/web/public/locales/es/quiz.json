@@ -220,7 +220,11 @@
   "pricing": {
     "gradeCost": "Corregir cuesta {{amount}}",
     "retakeMcq": "Las mismas preguntas, con las opciones reordenadas. La opción múltiple se corrige sin IA, así que no consume créditos.",
-    "retakeWritten": "Las mismas preguntas otra vez. Las preguntas ya están pagadas, pero la corrección es una llamada nueva y se cobra cada vez."
+    "retakeWritten": "Las mismas preguntas otra vez. Las preguntas ya están pagadas, pero la corrección es una llamada nueva y se cobra cada vez.",
+    "genAllFree": "Se crean con tus preguntas gratuitas. No se cobra nada.",
+    "genAllPaid": "{{paid, number}} preguntas · {{amount}}",
+    "genPartlyFree": "{{free, number}} gratis + {{paid, number}} de pago · {{amount}}",
+    "genFreeLeft": "Te quedan {{left, number}} de {{limit, number}} preguntas gratis hoy (cualquier tipo)"
   },
   "activity": {
     "title": "Actividad de IA",

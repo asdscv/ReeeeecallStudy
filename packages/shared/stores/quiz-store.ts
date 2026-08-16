@@ -69,6 +69,17 @@ export interface QuizQuote {
   trial_remaining: number
   max_units_per_call: number
   sufficient: boolean
+  // ── Questions, not units (mig 239) ────────────────────────────────────────
+  // The free allowance is counted per QUESTION whatever its type, so these are the numbers a
+  // screen can put in a sentence. The unit fields above are still what the PRICE is computed
+  // from, and are left alone for exactly that reason.
+  trial_items: number
+  free_items: number
+  paid_items: number
+  free_items_limit: number
+  free_items_remaining_today: number
+  /** 'item' | 'unit' — which currency this tier's allowance is expressed in. */
+  free_unit_kind: string
 }
 
 export interface QuizzableCount { total: number; eligible: number }

@@ -51,6 +51,68 @@ export function gradeCostLine(
   return { key: 'pricing.gradeCost', params: { amount: formatUsdMicro(quote.price_micro) } }
 }
 
+/** What a GENERATION quote carries. `get_ai_quiz_quote` returns all of these since mig 239. */
+export interface QuizGenerateQuote {
+  readonly count: number
+  readonly price_micro: number
+  readonly free_items: number
+  readonly trial_items: number
+  readonly paid_items: number
+  readonly free_items_limit: number
+  readonly free_items_remaining_today: number
+}
+
+/**
+ * What making these questions will cost, before the learner presses the button.
+ *
+ * The setup screen used to say nothing at all unless the wallet was short — so a learner on the
+ * free tier could not tell that their first five questions of the day cost nothing, and a learner
+ * past it could not tell that the next one did. An allowance nobody can see is not an allowance.
+ *
+ * Three outcomes, and they are genuinely three:
+ *
+ *   all free      the whole batch is inside today's allowance (or the one-time trial)
+ *   part free     the allowance runs out mid-batch — the commonest case at the boundary, and the
+ *                 one a single "무료" or a single price would both misreport
+ *   all paid      the allowance is spent, or this tier has none
+ *
+ * Counted in QUESTIONS, not units: since mig 239 the free allowance is per question whatever its
+ * type, and a screen that said "10 units" was reporting an implementation detail the learner
+ * cannot count in.
+ */
+export function generateCostLine(
+  quote: QuizGenerateQuote | null | undefined,
+): { key: string; params: Record<string, string | number> } | null {
+  if (!quote) return null
+  const free = Math.max(0, (quote.free_items ?? 0) + (quote.trial_items ?? 0))
+  const paid = Math.max(0, quote.paid_items ?? 0)
+  const amount = formatUsdMicro(quote.price_micro)
+
+  if (paid <= 0) return { key: 'pricing.genAllFree', params: { free } }
+  if (free <= 0) return { key: 'pricing.genAllPaid', params: { paid, amount } }
+  return { key: 'pricing.genPartlyFree', params: { free, paid, amount } }
+}
+
+/**
+ * "무료 3문항 남음" — today's remaining allowance, or null when there is none to speak of.
+ *
+ * Separate from the cost line because it answers a different question: the cost line is about
+ * THIS quiz, this is about the day. Null rather than "0 left" when the tier has no allowance at
+ * all, since a tier that never had free questions should not be told it has run out of them.
+ */
+export function freeLeftLine(
+  quote: QuizGenerateQuote | null | undefined,
+): { key: string; params: Record<string, number> } | null {
+  if (!quote || (quote.free_items_limit ?? 0) <= 0) return null
+  return {
+    key: 'pricing.genFreeLeft',
+    params: {
+      left: Math.max(0, quote.free_items_remaining_today ?? 0),
+      limit: quote.free_items_limit,
+    },
+  }
+}
+
 /**
  * What a learner should know before tapping 다시 풀기, for this set's question type.
  *

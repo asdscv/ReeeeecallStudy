@@ -220,7 +220,11 @@
   "pricing": {
     "gradeCost": "Chấm bài tốn {{amount}}",
     "retakeMcq": "Vẫn những câu hỏi đó, chỉ đảo thứ tự lựa chọn. Trắc nghiệm không dùng AI chấm nên không tốn tín dụng.",
-    "retakeWritten": "Làm lại đúng những câu hỏi đó. Câu hỏi đã được trả phí, nhưng chấm bài là lượt gọi mới và bị tính phí mỗi lần."
+    "retakeWritten": "Làm lại đúng những câu hỏi đó. Câu hỏi đã được trả phí, nhưng chấm bài là lượt gọi mới và bị tính phí mỗi lần.",
+    "genAllFree": "Tạo bằng số câu miễn phí. Không bị trừ.",
+    "genAllPaid": "{{paid, number}} câu · {{amount}}",
+    "genPartlyFree": "{{free, number}} câu miễn phí + {{paid, number}} câu tính phí · {{amount}}",
+    "genFreeLeft": "Còn {{left, number}}/{{limit, number}} câu miễn phí hôm nay (mọi dạng)"
   },
   "activity": {
     "title": "Hoạt động AI",

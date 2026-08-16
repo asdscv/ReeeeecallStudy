@@ -9,6 +9,7 @@ import {
 } from '@reeeeecall/shared/stores/quiz-store'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
 import { minCardsForMcq } from '@reeeeecall/shared/lib/quiz-outcome'
+import { generateCostLine, freeLeftLine } from '@reeeeecall/shared/lib/quiz-pricing'
 
 const TYPES: QuizQuestionType[] = ['mcq', 'short', 'essay']
 // Presets plus a free field up to MAX_COUNT. The presets stop where a learner's idea of "a
@@ -98,6 +99,8 @@ export function QuizSetupPage() {
   const tooFewForMcq = type === 'mcq' && eligible > 0 && eligible < mcqMinimum
   const canSubmit = Boolean(deckId) && eligible > 0 && !tooFewForMcq && !generating
     && priced !== null && priced.sufficient
+  const costLine = generateCostLine(priced)
+  const freeLeft = freeLeftLine(priced)
 
   const submit = async () => {
     if (!priced || !deckId) return
@@ -286,11 +289,22 @@ export function QuizSetupPage() {
         )}
       </div>
 
-      {/* The amount is no longer announced in the flow — a product decision, not a
-          rendering one. The QUOTE is still fetched and still gates the button: it is what
-          `maxPriceMicro` authorises, and without it a price that moved between choosing and
-          reserving would be spent silently. What remains on screen is the one thing a
-          learner cannot act on without: that they have nothing left to spend. */}
+      {/* What this batch costs, and what is left of today's free questions.
+          An allowance nobody can see is not an allowance: the free tier gets five questions a day
+          whatever the type, and until mig 239 the only way to discover that was to be charged for
+          the sixth. Both lines come from the shared helper, so the two platforms cannot start
+          explaining the same billing differently. */}
+      {costLine && (
+        <div className="p-3 bg-muted/50 border border-border rounded-lg space-y-1" data-testid="quiz-generate-cost">
+          <p className="text-xs text-foreground">{t(costLine.key, costLine.params)}</p>
+          {freeLeft && (
+            <p className="text-xs text-muted-foreground" data-testid="quiz-free-left">
+              {t(freeLeft.key, freeLeft.params)}
+            </p>
+          )}
+        </div>
+      )}
+
       {priced && !priced.sufficient && (
         <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
           <p className="text-xs text-destructive">{t('error.AI_INSUFFICIENT_CREDITS')}</p>

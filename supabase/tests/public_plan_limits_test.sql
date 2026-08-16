@@ -43,7 +43,11 @@ SET session_replication_role = DEFAULT;
 -- independently of the write path. Values chosen so a hardcoded 1000/10 cannot
 -- pass by coincidence.
 UPDATE card_limit_settings SET max_owned_cards   = 4321 WHERE id = 1;
+-- 239부터 무료 한도의 출처는 `ai_free_allowances`입니다. 예전 컬럼도 같이 써 두는 이유는
+-- 이 테스트가 증명하려는 게 "저장된 값을 읽는다"이지 "어느 테이블을 읽는다"가 아니기
+-- 때문입니다 — 둘이 어긋나 있으면 어느 쪽을 읽든 통과하는 테스트가 됩니다.
 UPDATE ai_pricing_settings SET free_cards_per_day = 37  WHERE id = 1;
+UPDATE ai_free_allowances  SET per_day = 37 WHERE tier = 'free' AND action_group = 'card';
 
 DO $$
 DECLARE l json;

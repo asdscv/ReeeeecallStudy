@@ -220,7 +220,11 @@
   "pricing": {
     "gradeCost": "Grading costs {{amount}}",
     "retakeMcq": "The same questions, with the options reshuffled. Multiple choice is checked without AI, so it uses no credits.",
-    "retakeWritten": "The same questions again. The questions are already paid for, but grading is a fresh call and is charged every time."
+    "retakeWritten": "The same questions again. The questions are already paid for, but grading is a fresh call and is charged every time.",
+    "genAllFree": "Made from your free questions. Nothing is charged.",
+    "genAllPaid": "{{paid, number}} questions · {{amount}}",
+    "genPartlyFree": "{{free, number}} free + {{paid, number}} paid · {{amount}}",
+    "genFreeLeft": "{{left, number}} of {{limit, number}} free questions left today (any type)"
   },
   "activity": {
     "title": "AI activity",

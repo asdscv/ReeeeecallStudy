@@ -134,6 +134,19 @@ describe.each(Object.keys(PLATFORMS) as (keyof typeof PLATFORMS)[])('%s', (platf
         // translated text is a Latin-alphabet assumption.
         expect(tf(key).trim()).not.toBe('')
       }
+      // The generation lines carry three interpolations between them, and `free`/`paid`/`amount`
+      // all have to land — a learner reading "무료 {{free}}문항" learns nothing.
+      expect(tf('pricing.genAllFree', { free: 5 })).not.toBe('pricing.genAllFree')
+      expect(tf('pricing.genAllPaid', { paid: 4, amount: '$0.40' })).toContain('$0.40')
+      const partly = tf('pricing.genPartlyFree', { free: 5, paid: 3, amount: '$0.45' })
+      expect(partly).toContain('$0.45')
+      expect(partly).toContain('5')
+      expect(partly).toContain('3')
+      const left = tf('pricing.genFreeLeft', { left: 2, limit: 5 })
+      expect(left).toContain('2')
+      expect(left).toContain('5')
+      expect(left).not.toContain('{{')
+
       // The two retake notes must not be the same sentence: multiple choice costs nothing
       // because no model is called, written answers are charged per sitting.
       expect(tf('pricing.retakeMcq')).not.toBe(tf('pricing.retakeWritten'))

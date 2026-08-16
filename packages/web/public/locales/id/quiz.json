@@ -220,7 +220,11 @@
   "pricing": {
     "gradeCost": "Penilaian dikenakan {{amount}}",
     "retakeMcq": "Soal yang sama, pilihan jawabannya diacak. Pilihan ganda diperiksa tanpa AI, jadi tidak memakai kredit.",
-    "retakeWritten": "Soal yang sama lagi. Soalnya sudah dibayar, tetapi penilaian adalah panggilan baru dan dikenai biaya setiap kali."
+    "retakeWritten": "Soal yang sama lagi. Soalnya sudah dibayar, tetapi penilaian adalah panggilan baru dan dikenai biaya setiap kali.",
+    "genAllFree": "Dibuat dari jatah gratis Anda. Tidak ada biaya.",
+    "genAllPaid": "{{paid, number}} soal · {{amount}}",
+    "genPartlyFree": "{{free, number}} gratis + {{paid, number}} berbayar · {{amount}}",
+    "genFreeLeft": "Sisa {{left, number}}/{{limit, number}} soal gratis hari ini (semua tipe)"
   },
   "activity": {
     "title": "Aktivitas AI",

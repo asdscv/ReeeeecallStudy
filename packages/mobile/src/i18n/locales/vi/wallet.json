@@ -41,9 +41,9 @@
   },
   "quiz": {
     "title": "Hạn mức kiểm tra",
-    "freeCount": "Hôm nay {{used, number}} / {{limit, number}} đơn vị",
+    "freeCount": "Hôm nay {{used, number}} / {{limit, number}} câu",
     "trial_one": "Còn {{count, number}} đơn vị dùng thử",
     "trial_other": "Còn {{count, number}} đơn vị dùng thử",
-    "note": "Trắc nghiệm chấm miễn phí. Chấm trả lời ngắn và tự luận dùng đơn vị."
+    "note": "Trắc nghiệm được chấm miễn phí. Câu miễn phí tính như nhau với mọi dạng."
   }
 }

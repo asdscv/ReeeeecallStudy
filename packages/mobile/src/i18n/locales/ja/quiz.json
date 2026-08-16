@@ -220,7 +220,11 @@
   "pricing": {
     "gradeCost": "採点すると{{amount}}かかります",
     "retakeMcq": "同じ問題をもう一度解きます。選択肢の順番だけが変わり、選択式はAI採点を使わないのでクレジットはかかりません。",
-    "retakeWritten": "同じ問題をもう一度解きます。問題の料金は支払い済みですが、採点は毎回新たに課金されます。"
+    "retakeWritten": "同じ問題をもう一度解きます。問題の料金は支払い済みですが、採点は毎回新たに課金されます。",
+    "genAllFree": "無料の問題数で作成します。課金はありません。",
+    "genAllPaid": "{{paid, number}}問 · {{amount}}",
+    "genPartlyFree": "無料{{free, number}}問 + 有料{{paid, number}}問 · {{amount}}",
+    "genFreeLeft": "本日の無料問題 残り{{left, number}}/{{limit, number}}問（形式を問わず）"
   },
   "activity": {
     "title": "AI 学習履歴",

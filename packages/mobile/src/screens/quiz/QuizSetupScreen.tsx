@@ -14,6 +14,7 @@ import { Screen, Button, ScreenHeader } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
 import type { QuizStackParamList } from '../../navigation/types'
+import { generateCostLine, freeLeftLine } from '@reeeeecall/shared/lib/quiz-pricing'
 import { minCardsForMcq } from '@reeeeecall/shared/lib/quiz-outcome'
 
 type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizSetup'>
@@ -95,6 +96,8 @@ export function QuizSetupScreen() {
   // six-card deck was being refused for cards it did not need.
   const mcqMinimum = minCardsForMcq(usableBands.find((b) => b.level === activeBand))
   const tooFewForMcq = type === 'mcq' && eligible > 0 && eligible < mcqMinimum
+  const costLine = generateCostLine(priced)
+  const freeLeft = freeLeftLine(priced)
   const canSubmit = Boolean(deckId) && eligible > 0 && !tooFewForMcq && !generating
     && priced !== null && priced.sufficient
 
@@ -266,9 +269,24 @@ export function QuizSetupScreen() {
           </Text>
         )}
 
-        {/* The amount is no longer announced in the flow. The QUOTE still runs — it is what
-            `maxPriceMicro` authorises — and the one thing left on screen is the one thing a
-            learner cannot act around: an empty wallet. */}
+        {/* What this batch costs, and what is left of today's free questions.
+            An allowance nobody can see is not an allowance: the free tier gets five questions a
+            day whatever the type, and until 239 the only way to find that out was to be charged
+            for the sixth. Both lines come from the shared helper so web and mobile cannot start
+            explaining the same billing differently. */}
+        {costLine && (
+          <View style={[styles.priceBox, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+            <Text style={[theme.typography.caption, { color: theme.colors.text }]} testID="quiz-generate-cost">
+              {t(costLine.key, costLine.params)}
+            </Text>
+            {freeLeft && (
+              <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]} testID="quiz-free-left">
+                {t(freeLeft.key, freeLeft.params)}
+              </Text>
+            )}
+          </View>
+        )}
+
         {priced && !priced.sufficient && (
           <View style={[styles.priceBox, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
             <Text style={[theme.typography.caption, { color: theme.colors.error }]}>

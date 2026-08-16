@@ -220,7 +220,11 @@
   "pricing": {
     "gradeCost": "批改将扣除{{amount}}",
     "retakeMcq": "还是这些题目，只是选项顺序会变。选择题不使用 AI 批改，因此不消耗额度。",
-    "retakeWritten": "再做一次同样的题目。题目已经付过费，但批改每次都会重新计费。"
+    "retakeWritten": "再做一次同样的题目。题目已经付过费，但批改每次都会重新计费。",
+    "genAllFree": "使用免费题额生成，不扣费。",
+    "genAllPaid": "{{paid, number}} 道题 · {{amount}}",
+    "genPartlyFree": "免费 {{free, number}} 道 + 付费 {{paid, number}} 道 · {{amount}}",
+    "genFreeLeft": "今日免费题额剩余 {{left, number}}/{{limit, number}} 道（不限题型）"
   },
   "activity": {
     "title": "AI 学习记录",
