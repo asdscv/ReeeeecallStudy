@@ -21,6 +21,7 @@
  * learning plan — is not covered, because nothing there spends anything.
  */
 import { aiHubEntryFor } from './hub/catalog'
+import type { AiHubSpends } from './hub/types'
 
 /** The wallet fields the notice reads. A subset of `AiWalletSummary`, so either shape fits. */
 export interface CreditNoticeWallet {
@@ -28,6 +29,8 @@ export interface CreditNoticeWallet {
   readonly balanceMicroUsd: number
   /** Card generations still free today. Absent on surfaces with no free tier. */
   readonly freeRemainingToday?: number
+  /** Quiz QUESTIONS still free today, any type (mig 239). */
+  readonly quizFreeRemainingToday?: number
 }
 
 export type CreditNoticeTone =
@@ -61,6 +64,19 @@ export function aiFeatureRequiresCredits(entryId: string): boolean {
 }
 
 /**
+ * Which daily allowance this screen's feature draws on, from the catalog.
+ *
+ * An unknown id reports `'card'` rather than nothing: the generate flow is the oldest caller and
+ * the one a stale id is most likely to be, and a wrong-but-present number is easier to notice
+ * than a silently missing line.
+ */
+function spendsOf(entryId: string | undefined): AiHubSpends {
+  if (entryId === undefined) return 'card'
+  const entry = aiHubEntryFor(entryId)
+  return entry ? entry.spends : 'card'
+}
+
+/**
  * The notice for a wallet, or `null` when there is nothing to say.
  *
  * `formatAmount` is injected because the two platforms format micro-USD through the same
@@ -73,6 +89,7 @@ export function aiFeatureRequiresCredits(entryId: string): boolean {
 export function creditNotice(
   wallet: CreditNoticeWallet | null | undefined,
   formatAmount: (micro: number) => string,
+  entryId?: string,
 ): CreditNotice | null {
   if (wallet === undefined) return null
   // A failed read is NOT an empty wallet. Saying "you have nothing" on a network blip sends a
@@ -81,18 +98,30 @@ export function creditNotice(
     return { tone: 'unknown', key: 'wallet.unknown', params: {}, secondKey: null, secondParams: {} }
   }
 
-  const free = Math.max(0, Number(wallet.freeRemainingToday ?? 0))
+  // THE ALLOWANCE THAT BELONGS TO THIS SCREEN.
+  //
+  // It used to always be the card allowance, on every AI surface. So a learner setting up a quiz
+  // read "오늘 남은 무료 카드 10장" at the top of the form and "오늘 무료 문항 3/5개 남음" at
+  // the bottom of it — two numbers, two different features, and the larger and more prominent one
+  // was about the other one. The catalog already knew which feature the screen was; it just was
+  // not being asked.
+  const spends = spendsOf(entryId)
+  const free = spends === 'quiz_generate'
+    ? Math.max(0, Number(wallet.quizFreeRemainingToday ?? 0))
+    : spends === 'card' ? Math.max(0, Number(wallet.freeRemainingToday ?? 0))
+    : 0
+  const freeKey = spends === 'quiz_generate' ? 'wallet.freeQuizOnly' : 'wallet.freeOnly'
   const balance = Math.max(0, Number(wallet.balanceMicroUsd ?? 0))
 
   if (free > 0 && balance > 0) {
     return {
       tone: 'ok',
-      key: 'wallet.freeOnly', params: { free },
+      key: freeKey, params: { free },
       secondKey: 'wallet.balance', secondParams: { amount: formatAmount(balance) },
     }
   }
   if (free > 0) {
-    return { tone: 'ok', key: 'wallet.freeOnly', params: { free }, secondKey: null, secondParams: {} }
+    return { tone: 'ok', key: freeKey, params: { free }, secondKey: null, secondParams: {} }
   }
   if (balance > 0) {
     return {

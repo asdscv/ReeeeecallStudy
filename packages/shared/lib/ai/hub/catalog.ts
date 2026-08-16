@@ -31,6 +31,7 @@ export function createDefaultAiHubRegistry(): Registry<AiHubEntry> {
       mobileScreen: 'LearningGoals',
       // Not a model call — see the `AiHubPoweredBy` docblock before changing this.
       poweredBy: 'device',
+      spends: null,
     })
     .register({
       id: AI_HUB_QUIZ,
@@ -44,6 +45,9 @@ export function createDefaultAiHubRegistry(): Registry<AiHubEntry> {
       mobileStack: 'QuizTab',
       mobileScreen: 'QuizHome',
       poweredBy: 'model',
+      // Questions, not cards. Since mig 239 the quiz allowance is counted per QUESTION whatever
+      // its type, on its own daily limit.
+      spends: 'quiz_generate',
     })
     .register({
       id: AI_HUB_GENERATE,
@@ -55,6 +59,7 @@ export function createDefaultAiHubRegistry(): Registry<AiHubEntry> {
       mobileStack: 'AITab',
       mobileScreen: 'AIGenerate',
       poweredBy: 'model',
+      spends: 'card',
     })
 }
 

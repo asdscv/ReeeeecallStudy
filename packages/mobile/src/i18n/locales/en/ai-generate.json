@@ -51,7 +51,8 @@
       "failed": "That didn't work. Nothing was charged.",
       "retry": "Try again",
       "gradeYourself": "You can still finish the quiz and mark this yourself, free."
-    }
+    },
+    "freeQuizOnly": "{{free}} free questions left today"
   },
   "deck": {
     "section": "SELECT DECK",

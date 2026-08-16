@@ -81,7 +81,8 @@
       "failed": "Gagal diproses. Tidak ada saldo yang terpotong.",
       "retry": "Coba lagi",
       "gradeYourself": "Kamu tetap bisa menyelesaikan kuis dan menilai soal ini sendiri, gratis."
-    }
+    },
+    "freeQuizOnly": "Sisa {{free}} soal gratis hari ini"
   },
   "alert": {
     "errorTitle": "Kesalahan",

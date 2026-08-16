@@ -42,7 +42,7 @@ export function AiCreditNotice({ featureId, className = '' }: {
 
   if (!needed) return null
 
-  const notice = creditNotice(wallet, formatUsdMicro)
+  const notice = creditNotice(wallet, formatUsdMicro, featureId)
   if (!notice) {
     // Reserve the row while the read is in flight, so the content below does not jump.
     return <div className={`h-10 animate-pulse rounded-lg border border-border bg-card ${className}`} />
