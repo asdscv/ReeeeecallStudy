@@ -53,6 +53,13 @@ async function listModels(baseUrl: string, apiKey: string): Promise<string[]> {
     .filter(Boolean)
 }
 
+/** Constant-time string compare. Equal lengths are checked by the caller. */
+function timingSafeEqual(a: string, b: string): boolean {
+  let diff = 0
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i)
+  return diff === 0
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
@@ -63,12 +70,33 @@ Deno.serve(async (req) => {
   // form — and only one of them is in that variable. So the caller's own token builds the client
   // and `record_ai_models` applies its `auth.role() = 'service_role'` check, which is the same
   // rule stated once, in the place that owns the table.
+  //
+  // A SECOND door, for the scheduler: `x-watch-token`.
+  //
+  // The daily run lives in GitHub Actions, and the only credential that could open the first door
+  // is a service-role key — the highest-privilege secret the project has, for a job whose entire
+  // power is "ask two vendors what models they sell". A leaked key there is a database; a leaked
+  // token here is a wasted HTTP request. So the scheduler gets a purpose-built secret and the
+  // function supplies the service role itself, from an environment variable that never leaves
+  // Supabase.
+  //
+  // Constant-time compare, because this is a shared secret checked against a header and the
+  // difference between a fast reject and a slow one is a character-by-character oracle.
+  const watchToken = (Deno.env.get('MODEL_WATCH_TOKEN') ?? '').trim()
+  const offered = (req.headers.get('x-watch-token') ?? '').trim()
+  const viaToken = watchToken.length >= 16 && offered.length === watchToken.length
+    && timingSafeEqual(offered, watchToken)
+
   const auth = req.headers.get('Authorization') ?? ''
-  if (!auth.startsWith('Bearer ')) return json({ error: 'Service role required' }, 403)
+  if (!viaToken && !auth.startsWith('Bearer ')) {
+    return json({ error: 'Service role or watch token required' }, 403)
+  }
 
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
-    auth.slice('Bearer '.length),
+    viaToken
+      ? (Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '')
+      : auth.slice('Bearer '.length),
     { auth: { persistSession: false } },
   )
 

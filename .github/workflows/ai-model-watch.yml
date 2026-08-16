@@ -27,15 +27,23 @@ jobs:
         id: watch
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          # The gateway wants SOME bearer before a function runs, and the anon key is public by
+          # design — it is in every shipped client. The authority is the header below it.
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          # A purpose-built secret whose entire power is "ask two vendors what models they sell".
+          # Not the service-role key: that opens the database, for a job that reads no learner
+          # data and writes one table the function itself owns. A leaked key there is a database;
+          # a leaked token here is a wasted HTTP request.
+          MODEL_WATCH_TOKEN: ${{ secrets.MODEL_WATCH_TOKEN }}
         run: |
           set -euo pipefail
-          if [ -z "${SUPABASE_URL:-}" ] || [ -z "${SUPABASE_SERVICE_KEY:-}" ]; then
-            echo "::warning::SUPABASE_URL / SUPABASE_SERVICE_KEY not set — skipping"
+          if [ -z "${SUPABASE_URL:-}" ] || [ -z "${MODEL_WATCH_TOKEN:-}" ]; then
+            echo "::warning::SUPABASE_URL / MODEL_WATCH_TOKEN not set — skipping"
             echo "skipped=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
           RESPONSE=$(curl -sS -X POST "$SUPABASE_URL/functions/v1/ai-model-watch" \
-            -H "Authorization: Bearer $SUPABASE_SERVICE_KEY" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY:-anon}" \
+            -H "x-watch-token: $MODEL_WATCH_TOKEN" \
             -H "Content-Type: application/json" -d '{}')
           echo "$RESPONSE" > watch.json
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
