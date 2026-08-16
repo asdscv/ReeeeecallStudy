@@ -116,6 +116,11 @@ export function QuizSetupScreen() {
         // default rather than being handed a guess.
         difficulty: activeBand ?? undefined,
         maxPriceMicro: priced.price_micro,
+        // The quote's own split, so the batch drawdown can follow the server's
+        // trial -> free -> paid order instead of guessing pro-rata. Without it the
+        // final batch is refused whenever free questions remain.
+        freeQuestions: (priced.free_items ?? 0) + (priced.trial_items ?? 0),
+        paidQuestions: priced.paid_items ?? 0,
       })
       navigation.navigate('QuizHome')
     } catch (e) {

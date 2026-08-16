@@ -348,6 +348,15 @@ interface QuizState {
     cardIds?: string[]
     difficulty?: number
     maxPriceMicro: number
+    /**
+     * How many of `count` the quote said are free (free + trial items), and how many are paid.
+     *
+     * The drawdown below needs them. Omitted means "assume nothing is free", which is the
+     * pre-239 behaviour and stays correct — it can only make the client stop early, never
+     * overspend.
+     */
+    freeQuestions?: number
+    paidQuestions?: number
   }) => Promise<string>
 
   /**
@@ -603,9 +612,33 @@ export const useQuizStore = create<QuizState>((set, get) => ({
       // paid for fifty. Returning after the first batch lets the quiz be opened immediately
       // and lets the rest arrive while it is being answered — and a learner who abandons
       // early simply never requests the batches they would not have reached.
-      /** This batch's cost if every unit in it were paid — the worst case, for drawdown. */
-      const batchCeiling = (cards: number) =>
-        Math.ceil((input.maxPriceMicro / Math.max(1, allCards.length)) * cards)
+      /**
+       * What this batch spends of the approved total — the PAID share, in the server's own order.
+       *
+       * It used to be pro-rata by card count, and that is wrong in a way that costs the learner
+       * questions they paid for. `reserve_ai_quiz` allocates trial, then today's free items, then
+       * paid, PER CALL — so the free allowance lands entirely on the FIRST batches and the paid
+       * questions pile onto the last. A flat pro-rata drawdown therefore over-draws early and
+       * leaves the final batch short of its own true price, and the server refuses it with P0008.
+       *
+       * Measured against the real functions, free tier with the allowance untouched: every size
+       * the setup screen offers above one batch lost a batch. Multiple choice 12 -> 8 delivered,
+       * 20 -> 16, 50 -> 48; essay 6 -> 3, 12 -> 9, 50 -> 48. The learner is never told — `runBatch`
+       * only surfaces a failure when NOTHING landed.
+       *
+       * So: count the free questions down as the batches consume them, and draw down only what is
+       * actually payable. The sum across batches still cannot exceed what was approved, which is
+       * the property this exists for.
+       */
+      let freeLeft = Math.max(0, input.freeQuestions ?? 0)
+      const paidTotal = Math.max(0, input.paidQuestions ?? allCards.length)
+      const pricePerPaid = paidTotal > 0 ? input.maxPriceMicro / paidTotal : 0
+      /** Called once per SUCCESSFUL batch, in order — it mutates `freeLeft`. */
+      const batchCeiling = (cards: number) => {
+        const free = Math.min(freeLeft, cards)
+        freeLeft -= free
+        return Math.ceil(pricePerPaid * (cards - free))
+      }
 
       const runBatch = async (cardIds: string[], index: number) => {
         const { error: genError } = await supabase.functions.invoke('ai-generate', {
