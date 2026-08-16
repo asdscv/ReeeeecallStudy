@@ -35,6 +35,7 @@ import {
 } from '@reeeeecall/shared/lib/study-history'
 import type { StudySession, StudyLog } from '@reeeeecall/shared/types/database'
 import type { HomeStackParamList } from '../navigation/types'
+import { AiActivityList } from '../components/history/AiActivityList'
 
 /**
  * Matches web StudyHistoryPage:
@@ -387,6 +388,11 @@ export function StudyHistoryScreen() {
             })}
           </View>
         )}
+        ListFooterComponent={
+          // Below the sessions rather than above them: the AI list is a record, and the thing a
+          // learner opens 기록 for first is what they studied today.
+          activeTab === 'history' ? <AiActivityList /> : null
+        }
         ListEmptyComponent={
           !loading && activeTab === 'history' ? (
             <View style={[styles.emptyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>

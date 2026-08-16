@@ -2,10 +2,10 @@
 # ============================================================================
 # card_limit_subscription_e2e.sh — HTTP E2E of the SUBSCRIPTION ↔ CARD-CAP
 # integration against a live Supabase stack:
-#   grant_subscription (5k / unlimited) → _owned_card_limit raises → get_card_usage_detail
+#   grant_subscription (5k / top tier) → _owned_card_limit raises → get_card_usage_detail
 #   reflects it → over-cap ARCHIVE restores (get_active_card_threshold NULL) → downgrade
 #   (expire) → cap falls back → archive re-applies. Also get_my_subscription.
-# Requires `supabase start` + `db reset`. NOT CI-wired.
+# Requires `supabase start` + `db reset`. CI: `Edge & webhook E2E (Supabase)` job.
 # ============================================================================
 set -uo pipefail
 command -v node >/dev/null 2>&1 || export PATH="/opt/homebrew/opt/node/bin:$PATH"
@@ -53,10 +53,16 @@ chk "threshold null (under 5000)" "$(thr)" "null"
 MYSUB=$(curl -s "$API/rest/v1/rpc/get_my_subscription" -H "apikey: $ANON" -H "Authorization: Bearer $JWT" -H 'Content-Type: application/json' -d '{}')
 chk "get_my_subscription card_limit=5000" "$(echo "$MYSUB"|J .card_limit)" "5000"
 
-echo "── UPGRADE sub_unlimited_monthly → unlimited ──"
+echo "── UPGRADE sub_unlimited_monthly → the top plan's FINITE 100k cap (mig 148) ──"
+# mig 148 capped the top tier at 100,000 owned cards: it is not "unlimited" any more, and
+# is_unlimited (defined as card_limit >= 1e9 in mig 137) is false for it by design. The cap
+# and the flag are asserted TOGETHER on purpose — asserting only is_unlimited=false would
+# pass for any cap below 1e9, including a regression back to the 5k tier's value.
 chk "grant unlimited → 204" "$(grant "{\"p_user\":\"$U\",\"p_product_id\":\"sub_unlimited_monthly\",\"p_provider\":\"test\",\"p_provider_ref\":\"e2e-unl-$TS\",\"p_period_end\":\"$(node -e 'console.log(new Date(Date.now()+30*864e5).toISOString())')\"}")" "204"
 D2=$(det)
-chk "is_unlimited=true"    "$(echo "$D2"|J .is_unlimited)" "true"
+chk "card_limit=100000 (mig 148 ceiling)" "$(echo "$D2"|J .card_limit)" "100000"
+chk "is_unlimited=false (capped, not unlimited)" "$(echo "$D2"|J .is_unlimited)" "false"
+chk "available=98500 (100000-1500)" "$(echo "$D2"|J .available)" "98500"
 chk "archived_total=0"     "$(echo "$D2"|J .archived_total)" "0"
 
 echo "── DOWNGRADE (expire the sub) → cap back to 1000, re-archived ──"

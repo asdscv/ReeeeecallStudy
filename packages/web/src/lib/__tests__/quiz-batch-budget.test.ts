@@ -133,3 +133,94 @@ describe('the budget drawdown', () => {
     }
   })
 })
+
+
+/**
+ * The same bug again, wearing the free allowance.
+ *
+ * Everything above models a quote where every question is paid — and under that assumption a
+ * pro-rata drawdown and a paid-share drawdown are the same number, which is why this file passed
+ * before and after mig 239 while the app lost a batch on every multi-batch size.
+ *
+ * `reserve_ai_quiz` allocates trial, then today's free items, then paid, PER CALL. So the free
+ * questions land entirely on the FIRST batches and the paid ones pile onto the last. A drawdown
+ * that charges every batch its pro-rata share therefore over-draws early and leaves the final
+ * batch short of its own price — the server refuses it with P0008, and `runBatch` says nothing
+ * because something did land.
+ *
+ * Measured against the real 239 functions, free tier untouched (5 free questions):
+ *   mcq 12 -> 8 delivered, 20 -> 16, 30 -> 24, 50 -> 48; essay 6 -> 3, 12 -> 9, 50 -> 48.
+ */
+const FREE_ITEMS = 5
+
+/** What the server charges a batch, once `freeLeft` free questions have been used up first. */
+function serverPrice(type: keyof typeof UNITS_PER_QUESTION, cards: number, freeLeft: number) {
+  const free = Math.min(freeLeft, cards)
+  return { price: (cards - free) * UNITS_PER_QUESTION[type] * UNIT_PRICE_MICRO, freeUsed: free }
+}
+
+/** The quote the learner approves: only the paid questions cost anything. */
+function quoteWithFree(type: keyof typeof UNITS_PER_QUESTION, count: number) {
+  const paid = Math.max(0, count - Math.min(FREE_ITEMS, count))
+  return { approved: paid * UNITS_PER_QUESTION[type] * UNIT_PRICE_MICRO, free: count - paid, paid }
+}
+
+/** Drawdown as `createAndGenerate` does it: `proRata` is the version this file used to pin. */
+function runFreeAware(
+  type: keyof typeof UNITS_PER_QUESTION, count: number, mode: 'proRata' | 'paidShare',
+) {
+  const { approved, free: freeTotal, paid: paidTotal } = quoteWithFree(type, count)
+  const batches = batchesFor(type, count)
+  const pricePerPaid = paidTotal > 0 ? approved / paidTotal : 0
+  const perCard = approved / Math.max(1, count)
+
+  let serverFreeLeft = freeTotal      // what reserve_ai_quiz will hand out, in order
+  let clientFreeLeft = freeTotal      // what the client believes, same order
+  let left = approved
+  const refused: number[] = []
+  let authorisedTotal = 0
+
+  batches.forEach((cards, i) => {
+    const { price, freeUsed } = serverPrice(type, cards, serverFreeLeft)
+    if (price > left) { refused.push(i); return }
+    serverFreeLeft -= freeUsed
+    authorisedTotal += price
+    if (mode === 'proRata') {
+      left = Math.max(0, left - Math.ceil(perCard * cards))
+    } else {
+      const f = Math.min(clientFreeLeft, cards)
+      clientFreeLeft -= f
+      left = Math.max(0, left - Math.ceil(pricePerPaid * (cards - f)))
+    }
+  })
+  return { approved, batches, refused, authorisedTotal }
+}
+
+describe('the drawdown when some questions are free', () => {
+  it('pro-rata loses a batch on every multi-batch size — the bug as shipped', () => {
+    const broken = COUNTS.filter((count) => runFreeAware('mcq', count, 'proRata').refused.length > 0)
+    expect(broken).toEqual([10, 12, 20, 30, 50])
+    // The exact case: 12 questions approved at 70,000, batch two refused, 8 delivered.
+    const twelve = runFreeAware('mcq', 12, 'proRata')
+    expect(twelve.approved).toBe(70_000)
+    expect(twelve.batches).toEqual([8, 4])
+    expect(twelve.refused).toEqual([1])
+  })
+
+  it('the paid-share drawdown delivers every batch, for every type and size', () => {
+    for (const type of ['mcq', 'short', 'essay'] as const) {
+      for (const count of COUNTS) {
+        expect(runFreeAware(type, count, 'paidShare').refused, `${type} ${count}`).toEqual([])
+      }
+    }
+  })
+
+  it('and still never authorises more than the learner approved', () => {
+    for (const type of ['mcq', 'short', 'essay'] as const) {
+      for (const count of COUNTS) {
+        const { approved, authorisedTotal } = runFreeAware(type, count, 'paidShare')
+        expect(authorisedTotal, `${type} ${count}`).toBeLessThanOrEqual(approved)
+      }
+    }
+  })
+})

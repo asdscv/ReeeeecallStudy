@@ -370,6 +370,38 @@ jobs:
           PGPASSWORD: postgres
         run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/quiz_run_rpcs_test.sql
 
+      # This file existed and was never run, which is its own finding: deleting a quiz that had
+      # been taken failed on production with 23503 while the assertions for it sat here unused.
+      - name: Run quiz set deletion assertions (migs 231/237 — cascade order under the void-orphans trigger)
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f supabase/tests/quiz_set_delete_test.sql
+
+      # Nine more suites that were written, committed, and never run. Each one passes today —
+      # they were simply missing a step here, so nothing they assert has been protected. Grouped
+      # rather than listed one by one so the next file added is a one-line change.
+      - name: Run the remaining SQL assertion suites
+        env:
+          PGPASSWORD: postgres
+        run: |
+          for f in \
+            supabase/tests/deck_template_metered_test.sql \
+            supabase/tests/fixed_action_price_test.sql \
+            supabase/tests/goal_knowledge_next_due_test.sql \
+            supabase/tests/plan_digest_intake_key_test.sql \
+            supabase/tests/plan_week_test.sql \
+            supabase/tests/quiz_answer_key_precedence_test.sql \
+            supabase/tests/quiz_filler_pool_test.sql \
+            supabase/tests/ai_free_allowance_test.sql \
+            supabase/tests/ai_free_allowance_failure_test.sql \
+            supabase/tests/my_card_schedule_isolation_test.sql \
+            supabase/tests/quiz_set_history_test.sql \
+            supabase/tests/remediation_replay_test.sql \
+            supabase/tests/unpriced_model_test.sql; do
+            echo "==> $f"
+            psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f "$f"
+          done
+
       - name: Run quiz smoke + net-zero + dry-run + isolation audit
         env:
           PGPASSWORD: postgres

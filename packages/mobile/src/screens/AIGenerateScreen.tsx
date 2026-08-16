@@ -420,6 +420,38 @@ export function AIGenerateScreen() {
     }
   }
 
+  /**
+   * The deck the cards just went into.
+   *
+   * `createdDeckId` for a deck the wizard made, `existingDeckId` for cards added to one that was
+   * already there, and the route param for the entry points that pass a deck in.
+   */
+  const generatedDeckId = () => {
+    const s = useAIGenerateStore.getState()
+    return s.createdDeckId ?? s.existingDeckId ?? route.params?.deckId ?? null
+  }
+
+  /**
+   * Land on the cards that were just made.
+   *
+   * This used to be `navigation.goBack()`, which almost never went where the learner came from.
+   * Every entry point outside the hub mounts AITab with AIGenerate as its ONLY route, so there is
+   * nothing to pop: the back bubbles to the drawer, whose default `backBehavior` is 'firstRoute',
+   * and the learner lands on the Dashboard. When AITab HAS been visited, it pops to the AI hub
+   * instead — whose middle tile is 퀴즈, which is the "돌아간다" that was reported.
+   *
+   * `initial: false` matters. Without it React Navigation rebuilds DecksTab with DeckDetail as its
+   * only route, which is the same trap that made `goBack()` fall out of the AI stack.
+   */
+  const goToGeneratedCards = () => {
+    const deckId = generatedDeckId()
+    if (!deckId) { navigation.goBack(); return }
+    const tabNav = navigation.getParent() as unknown as
+      { navigate: (name: string, params?: unknown) => void } | undefined
+    if (!tabNav) { navigation.goBack(); return }
+    tabNav.navigate('DecksTab', { screen: 'DeckDetail', params: { deckId }, initial: false })
+  }
+
   const handleSave = async () => {
     setStep('saving')
     try {
@@ -800,7 +832,7 @@ export function AIGenerateScreen() {
           </Text>
           <View style={styles.doneActions}>
             <Button title={t('doneStep.generateMore')} onPress={handleReset} />
-            <Button title={t('doneStep.done')} variant="secondary" onPress={() => navigation.goBack()} />
+            <Button title={t('doneStep.viewCards')} variant="secondary" onPress={goToGeneratedCards} />
           </View>
         </View>
       </Screen>

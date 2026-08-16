@@ -130,6 +130,15 @@ describe('AI hub catalogue', () => {
         for (const key of ['hub.title', 'hub.subtitle', 'hub.badge.ai', 'hub.openAction']) {
           expect(typeof leaf(ns, key), `${platform}/${locale} ${key}`).toBe('string')
         }
+        // The credit notice's line, one key per allowance a catalog entry can declare. A
+        // feature registered with `spends: 'quiz_generate'` renders `wallet.freeQuizOnly`, and
+        // a missing leaf there falls back to English on a screen that is otherwise translated.
+        for (const key of ['wallet.freeOnly', 'wallet.freeQuizOnly', 'wallet.balance',
+                           'wallet.needsCredits', 'wallet.unknown']) {
+          const value = leaf(ns, key)
+          expect(typeof value, `${platform}/${locale} ${key}`).toBe('string')
+          expect((value as string).trim().length, `${platform}/${locale} ${key}`).toBeGreaterThan(0)
+        }
       }
     }
   })

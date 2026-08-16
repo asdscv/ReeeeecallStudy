@@ -38,7 +38,11 @@ export async function fetchAllRows<T>(
     const builder = makeQuery() as RangeQuery<T>
     const { data, error } = await builder.range(offset, offset + requestSize - 1)
     if (error) {
-      throw new Error(`Failed to fetch rows at offset ${offset}: ${errorMessage(error)}`)
+      // The ORIGINAL error travels as `cause`. PostgREST's `code` is how a caller tells 42501
+      // from a network blip — flattening it to a message string turned "you are not allowed"
+      // into "something went wrong" for every paginated read.
+      throw new Error(`Failed to fetch rows at offset ${offset}: ${errorMessage(error)}`,
+        { cause: error })
     }
 
     const rows = data ?? []

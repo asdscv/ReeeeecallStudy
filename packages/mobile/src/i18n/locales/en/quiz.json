@@ -16,7 +16,14 @@
       "title": "No quizzes yet",
       "body": "Make one from any deck. It takes a few seconds."
     },
-    "fewerThanAsked": "{{requested, number}} requested"
+    "fewerThanAsked": "{{requested, number}} requested",
+    "remove": "Remove",
+    "dailyCheckTitle": "Daily check",
+    "confirmTitle": "Delete this quiz?",
+    "confirmTaken": "Its {{runs, number}} sittings, the answers you gave, and their mistake-note entries go with it. This cannot be undone.",
+    "confirmUnused": "Never taken. Only the questions are removed.",
+    "confirmDelete": "Delete",
+    "confirmCancel": "Cancel"
   },
   "setup": {
     "title": "New quiz",
@@ -26,7 +33,7 @@
     "untitled": "Quiz",
     "type": "Question type",
     "typeHint": {
-      "mcq": "Four options, graded instantly and free.",
+      "mcq": "Four options. Checked the moment you answer — no AI grading, so no credits.",
       "short": "A word or a phrase. Graded by AI, charged per answer.",
       "essay": "A few sentences, graded against a rubric. The most demanding, and the most expensive."
     },
@@ -43,7 +50,10 @@
     "difficulty": "Difficulty",
     "clampedCount_one": "This deck makes {{count, number}} question.",
     "clampedCount_other": "This deck makes {{count, number}} questions.",
-    "generatingBatch": "Writing… ({{done, number}}/{{total, number}})"
+    "generatingBatch": "Writing… ({{done, number}}/{{total, number}})",
+    "customCount": "Custom",
+    "countEffective_one": "{{count, number}} question",
+    "countEffective_other": "{{count, number}} questions"
   },
   "run": {
     "loading": "Loading…",
@@ -64,6 +74,17 @@
     "length": {
       "count": "{{chars, number}} / {{max, number}}",
       "tooShort": "At least {{min, number}} characters to grade"
+    },
+    "verdict": {
+      "correct": "Correct",
+      "partial": "Partly right",
+      "wrong": "Not quite",
+      "ungraded": "Not graded"
+    },
+    "tally": {
+      "plain": "{{correct, number}} right · {{wrong, number}} wrong",
+      "withUngraded": "{{correct, number}} right · {{wrong, number}} wrong · {{ungraded, number}} ungraded",
+      "none": "{{total, number}} questions"
     }
   },
   "result": {
@@ -77,7 +98,10 @@
     "markWrong": "I was wrong",
     "retake": "Take it again",
     "nothingGraded": "Not graded",
-    "nothingGradedBody": "You haven't graded any answer in this sitting yet."
+    "nothingGradedBody": "You haven't graded any answer in this sitting yet.",
+    "unanswered": "{{n, number}} left unanswered",
+    "headline": "{{correct, number}} right",
+    "overrideLabel": "Correct this"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "Not enough credit. Top up to keep going.",
@@ -94,7 +118,8 @@
     "QUIZ_CARDS_TOO_SHORT": "These cards are too short to build essay questions from — an essay is graded against terms taken from the card itself. Try short answer or multiple choice for this deck.",
     "AI_PROVIDER_ERROR": "The AI service is busy right now. Nothing was charged — try again in a moment.",
     "AI_PROVIDER_DAILY_LIMIT": "The daily AI limit for this app has been reached. Nothing was charged — it resets tomorrow.",
-    "AI_PROVIDER_BUSY": "The AI service is busy. Nothing was charged — try again in a moment."
+    "AI_PROVIDER_BUSY": "The AI service is busy. Nothing was charged — try again in a moment.",
+    "QUIZ_DIFFICULTY_UNAVAILABLE": "That difficulty is not available for this question type. Pick another one."
   },
   "verdict": {
     "equivalent": "Correct",
@@ -117,7 +142,9 @@
     "partial": "Partly",
     "not_met": "Not covered",
     "unjudgeable": "Not judged",
-    "unjudgeableNote": "Some of this could not be judged, so it did not count against you."
+    "unjudgeableNote": "Some of this could not be judged, so it did not count against you.",
+    "weight": "worth {{weight, number}}",
+    "mustMention": "Needed:"
   },
   "aspect": {
     "covers_answer": "Covers the answer",
@@ -162,5 +189,62 @@
     "overgeneral": "Too broad",
     "plausible_form": "Looks similar",
     "unrelated": "Unrelated"
+  },
+  "mistakes": {
+    "title": "Mistakes",
+    "summary": "{{cards, number}} cards · {{decks, number}} decks",
+    "expand": "Show",
+    "collapse": "Hide",
+    "studyAgain": "Study {{cards, number}} again",
+    "youWrote": "You wrote: {{answer}}",
+    "andMore": "and {{cards, number}} more",
+    "open": "Open",
+    "emptyTitle": "Nothing wrong yet",
+    "emptyBody": "Missed questions collect here as you take quizzes."
+  },
+  "history": {
+    "dateThisYear": "{{m, number}}/{{d, number}}",
+    "dateWithYear": "{{m, number}}/{{d, number}}/{{y}}",
+    "created": "Made {{date}}",
+    "never": "Not taken yet",
+    "taken": "Taken {{runs, number}}× · last {{date}}",
+    "show": "History",
+    "hide": "Close",
+    "attempt": "Attempt {{n, number}} · {{date}}",
+    "inProgress": "In progress"
+  },
+  "detail": {
+    "gone": "This quiz is gone.",
+    "historyTitle": "History"
+  },
+  "pricing": {
+    "gradeCost": "Grading costs {{amount}}",
+    "retakeMcq": "The same questions, with the options reshuffled. Multiple choice is checked without AI, so it uses no credits.",
+    "retakeWritten": "The same questions again. The questions are already paid for, but grading is a fresh call and is charged every time.",
+    "genAllFree": "Made from your free questions. Nothing is charged.",
+    "genAllPaid": "{{paid, number}} questions · {{amount}}",
+    "genPartlyFree": "{{free, number}} free + {{paid, number}} paid · {{amount}}",
+    "genFreeLeft": "{{left, number}} of {{limit, number}} free questions left today (any type)"
+  },
+  "activity": {
+    "title": "AI activity",
+    "quiz": "{{title}} · attempt {{n, number}}",
+    "free": "Free",
+    "refunded": "Refunded",
+    "job": {
+      "cards": "AI cards",
+      "deck": "AI deck",
+      "template": "AI template",
+      "image": "AI image",
+      "image_deck": "AI deck image",
+      "remediation": "AI explanation",
+      "quiz": "AI quiz",
+      "generate_mcq": "Multiple choice",
+      "generate_short": "Short answer",
+      "generate_essay": "Essay",
+      "grade_short": "Short-answer grading",
+      "grade_essay": "Essay grading",
+      "quiz_answer_key": "Answer field"
+    }
   }
 }

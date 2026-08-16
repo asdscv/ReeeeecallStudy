@@ -16,7 +16,14 @@
       "title": "还没有测验",
       "body": "从任意牌组创建，只需几秒。"
     },
-    "fewerThanAsked": "请求 {{requested, number}} 题"
+    "fewerThanAsked": "请求 {{requested, number}} 题",
+    "remove": "删除",
+    "dailyCheckTitle": "今日检查",
+    "confirmTitle": "要删除这个测验吗？",
+    "confirmTaken": "{{runs, number}}次作答记录、当时的答案以及错题本条目都会一并删除，且无法恢复。",
+    "confirmUnused": "还没做过的测验，只会删除题目。",
+    "confirmDelete": "删除",
+    "confirmCancel": "取消"
   },
   "setup": {
     "title": "新建测验",
@@ -26,7 +33,7 @@
     "untitled": "测验",
     "type": "题型",
     "typeHint": {
-      "mcq": "四个选项，即时批改且免费。",
+      "mcq": "四选一。作答后立即判定，不使用 AI 批改，因此不消耗额度。",
       "short": "用词语或短句作答。由 AI 批改，按答案计费。",
       "essay": "写几句话，按评分标准批改。最难，也最贵。"
     },
@@ -43,7 +50,10 @@
     "difficulty": "难度",
     "clampedCount_one": "这个卡组会生成 {{count, number}} 道题。",
     "clampedCount_other": "这个卡组会生成 {{count, number}} 道题。",
-    "generatingBatch": "生成中… ({{done, number}}/{{total, number}})"
+    "generatingBatch": "生成中… ({{done, number}}/{{total, number}})",
+    "customCount": "自定义",
+    "countEffective_one": "生成 {{count, number}} 题",
+    "countEffective_other": "生成 {{count, number}} 题"
   },
   "run": {
     "loading": "加载中…",
@@ -64,6 +74,17 @@
     "length": {
       "count": "{{chars, number}} / {{max, number}} 字",
       "tooShort": "至少 {{min, number}} 字才能批改"
+    },
+    "verdict": {
+      "correct": "答对了",
+      "partial": "部分正确",
+      "wrong": "答错了",
+      "ungraded": "未批改"
+    },
+    "tally": {
+      "plain": "对 {{correct, number}} · 错 {{wrong, number}}",
+      "withUngraded": "对 {{correct, number}} · 错 {{wrong, number}} · 未批改 {{ungraded, number}}",
+      "none": "{{total, number}} 题"
     }
   },
   "result": {
@@ -77,7 +98,10 @@
     "markWrong": "我答错了",
     "retake": "再做一次",
     "nothingGraded": "未评分",
-    "nothingGradedBody": "本次作答还没有评分的题目。"
+    "nothingGradedBody": "本次作答还没有评分的题目。",
+    "unanswered": "还有 {{n, number}} 题未作答",
+    "headline": "答对{{correct, number}}题",
+    "overrideLabel": "手动更正"
   },
   "error": {
     "AI_INSUFFICIENT_CREDITS": "余额不足。充值后即可继续。",
@@ -94,7 +118,8 @@
     "QUIZ_CARDS_TOO_SHORT": "这些卡片太短，无法出论述题——论述题按卡片本身的用词批改。这个牌组更适合简答或选择题。",
     "AI_PROVIDER_ERROR": "AI 服务当前繁忙。未扣费，请稍后再试。",
     "AI_PROVIDER_DAILY_LIMIT": "本应用今日的 AI 用量已达上限。未扣费，明天会重置。",
-    "AI_PROVIDER_BUSY": "AI 服务繁忙。未扣费，请稍后再试。"
+    "AI_PROVIDER_BUSY": "AI 服务繁忙。未扣费，请稍后再试。",
+    "QUIZ_DIFFICULTY_UNAVAILABLE": "该难度暂不支持这种题型，请选择其他难度。"
   },
   "verdict": {
     "equivalent": "正确",
@@ -117,7 +142,9 @@
     "partial": "部分",
     "not_met": "未覆盖",
     "unjudgeable": "未判断",
-    "unjudgeableNote": "有一部分无法判断，因此没有计入扣分。"
+    "unjudgeableNote": "有一部分无法判断，因此没有计入扣分。",
+    "weight": "占 {{weight, number}}",
+    "mustMention": "需要包含："
   },
   "aspect": {
     "covers_answer": "覆盖要点",
@@ -162,5 +189,62 @@
     "overgeneral": "过于宽泛",
     "plausible_form": "形似",
     "unrelated": "无关"
+  },
+  "mistakes": {
+    "title": "错题本",
+    "summary": "{{cards, number}}张卡片 · {{decks, number}}个卡组",
+    "expand": "展开",
+    "collapse": "收起",
+    "studyAgain": "重新学习{{cards, number}}张",
+    "youWrote": "你的答案：{{answer}}",
+    "andMore": "还有{{cards, number}}张",
+    "open": "打开",
+    "emptyTitle": "还没有错题",
+    "emptyBody": "做测验后，答错的题目会收集到这里。"
+  },
+  "history": {
+    "dateThisYear": "{{m, number}}月{{d, number}}日",
+    "dateWithYear": "{{y}}年{{m, number}}月{{d, number}}日",
+    "created": "{{date}}创建",
+    "never": "还没做过",
+    "taken": "做过{{runs, number}}次 · 最近{{date}}",
+    "show": "记录",
+    "hide": "收起",
+    "attempt": "第{{n, number}}次 · {{date}}",
+    "inProgress": "进行中"
+  },
+  "detail": {
+    "gone": "这个测验已不存在。",
+    "historyTitle": "作答记录"
+  },
+  "pricing": {
+    "gradeCost": "批改将扣除{{amount}}",
+    "retakeMcq": "还是这些题目，只是选项顺序会变。选择题不使用 AI 批改，因此不消耗额度。",
+    "retakeWritten": "再做一次同样的题目。题目已经付过费，但批改每次都会重新计费。",
+    "genAllFree": "使用免费题额生成，不扣费。",
+    "genAllPaid": "{{paid, number}} 道题 · {{amount}}",
+    "genPartlyFree": "免费 {{free, number}} 道 + 付费 {{paid, number}} 道 · {{amount}}",
+    "genFreeLeft": "今日免费题额剩余 {{left, number}}/{{limit, number}} 道（不限题型）"
+  },
+  "activity": {
+    "title": "AI 学习记录",
+    "quiz": "{{title}} · 第{{n, number}}次",
+    "free": "免费",
+    "refunded": "已退款",
+    "job": {
+      "cards": "AI 生成卡片",
+      "deck": "AI 创建卡组",
+      "template": "AI 模板",
+      "image": "AI 图片",
+      "image_deck": "AI 卡组封面",
+      "remediation": "AI 讲解",
+      "quiz": "AI 测验",
+      "generate_mcq": "生成选择题",
+      "generate_short": "生成简答题",
+      "generate_essay": "生成论述题",
+      "grade_short": "简答批改",
+      "grade_essay": "论述批改",
+      "quiz_answer_key": "判定答案栏"
+    }
   }
 }

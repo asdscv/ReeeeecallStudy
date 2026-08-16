@@ -208,7 +208,8 @@
     "weakCount": "{{count, number}} cards",
     "weakCount_one": "{{count, number}} card",
     "weakCount_other": "{{count, number}} cards",
-    "weakStudy": "Study just these"
+    "weakStudy": "Study just these",
+    "weakHintCapped": "The {{shown, number}} weakest of {{total, number}} cards you have seen twice and missed more than half the time."
   },
   "recommend": {
     "title": "Recommendations",

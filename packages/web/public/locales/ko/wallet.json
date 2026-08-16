@@ -30,9 +30,9 @@
   "cardPlanHint": "카드 한도 플랜은 ‘카드 저장 용량’에서 관리해요.",
   "quiz": {
     "title": "퀴즈 제공량",
-    "freeCount": "오늘 {{used, number}} / {{limit, number}} 유닛",
+    "freeCount": "오늘 {{used, number}} / {{limit, number}}문항",
     "trial_one": "체험 {{count, number}}유닛 남음",
     "trial_other": "체험 {{count, number}}유닛 남음",
-    "note": "객관식 채점은 무료예요. 주관식·서술형 채점에 유닛을 씁니다."
+    "note": "객관식 채점은 무료예요. 무료 문항은 유형과 상관없이 하루 한도로 셉니다."
   }
 }

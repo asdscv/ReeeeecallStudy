@@ -4,11 +4,13 @@ import { useNavigate, useParams } from 'react-router-dom'
 import {
   useQuizStore, QuizError, QUIZ_GRADE_ACTION,
   optionFlaws,
-  type QuizRunItem, type QuizSubmitResult,
+  type QuizRunItem, type QuizSubmitResult, type QuizQuote,
 } from '@reeeeecall/shared/stores/quiz-store'
 import { QuizFeedback } from './QuizFeedback'
 import { AiRefusalNotice } from '../../components/ai/AiRefusalNotice'
 import { answerLength } from '@reeeeecall/shared/lib/quiz-answer-limits'
+import { itemOutcome, tallyQuiz, tallyLine } from '@reeeeecall/shared/lib/quiz-outcome'
+import { gradeCostLine } from '@reeeeecall/shared/lib/quiz-pricing'
 
 /**
  * Taking the quiz. Outside the app Layout, like the study session, so nothing competes with
@@ -33,7 +35,11 @@ export function QuizRunPage() {
   // Keyed by item for the same reason the deck counts are on the setup screen: clearing it
   // synchronously inside the effect is a cascading render, and an unkeyed value would quote
   // the previous question's price on this one — an essay costs four times a short answer.
-  const [gradePrice, setGradePrice] = useState<{ itemId: string; micro: number } | null>(null)
+  // The whole quote, not just the price. The screen has to say whether this grading is covered
+  // by the free allowance or charged, and only the server knows how much of it the free units
+  // cover — a client re-deriving that from unit counts would be a second opinion about the
+  // learner's own balance.
+  const [gradeQuote, setGradeQuote] = useState<{ itemId: string; quote: QuizQuote } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [startedAt, setStartedAt] = useState(() => Date.now())
 
@@ -63,12 +69,14 @@ export function QuizRunPage() {
     const itemId = item.item_id
     let cancelled = false
     void quote(QUIZ_GRADE_ACTION[item.question_type], 1)
-      .then((q) => { if (!cancelled) setGradePrice({ itemId, micro: q.price_micro }) })
-      .catch(() => { if (!cancelled) setGradePrice(null) })
+      .then((q) => { if (!cancelled) setGradeQuote({ itemId, quote: q }) })
+      .catch(() => { if (!cancelled) setGradeQuote(null) })
     return () => { cancelled = true }
   }, [item, quote])
 
-  const shownPrice = item && gradePrice?.itemId === item.item_id ? gradePrice.micro : null
+  const shownQuote = item && gradeQuote?.itemId === item.item_id ? gradeQuote.quote : null
+  const shownPrice = shownQuote?.price_micro ?? null
+  const costLine = gradeCostLine(shownQuote)
 
   const goTo = (next: number) => {
     setIndex(next); setChoice(null); setText(''); setResult(null); setError(null)
@@ -133,6 +141,10 @@ export function QuizRunPage() {
   const answered = item.answered || result !== null
   const flaws = optionFlaws(item)
   const isLast = index === items.length - 1
+  /** This item's verdict, and the run so far. Counts, never a ratio — see quiz-outcome.ts. */
+  const outcome = item ? itemOutcome({ answered, score: item.score }) : 'unanswered'
+  const tally = tallyQuiz(items.map((i) => ({ answered: i.answered, score: i.score })))
+  const line = tallyLine(tally)
   /** Live length against the bound the SERVER will apply. Mirrored, and pinned by a test. */
   const length = answerLength(text, item?.question_type === 'essay' ? 'essay' : 'short')
 
@@ -141,6 +153,11 @@ export function QuizRunPage() {
       <div className="flex items-center justify-between gap-3">
         <span className="text-xs text-content-tertiary">
           {t('run.progress', { current: index + 1, total: items.length })}
+          {tally.judged + tally.ungraded > 0 && (
+            <span className="ml-2 text-content-tertiary" data-testid="quiz-tally">
+              {t(line.key, line.params)}
+            </span>
+          )}
         </span>
         <button
           type="button"
@@ -154,6 +171,29 @@ export function QuizRunPage() {
       <div className="p-4 bg-card rounded-xl border border-border">
         <p className="text-base text-foreground whitespace-pre-wrap">{item.stem}</p>
       </div>
+
+      {/* The verdict, said out loud.
+          The report was not "it marks me wrong" — it was that after answering there is only the
+          grader's explanation, and a learner cannot tell whether they got it. A coloured border
+          on one option is not an answer to "맞았나?". */}
+      {answered && (
+        <div
+          className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium ${
+            outcome === 'correct' ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+              : outcome === 'partial' ? 'border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400'
+                : outcome === 'wrong' ? 'border-destructive/40 bg-destructive/10 text-destructive'
+                  : 'border-border bg-card text-muted-foreground'
+          }`}
+          role="status"
+          data-testid="quiz-verdict"
+          data-outcome={outcome}
+        >
+          <span aria-hidden="true">
+            {outcome === 'correct' ? '\u2713' : outcome === 'wrong' ? '\u2715' : outcome === 'partial' ? '\u2248' : '\u2026'}
+          </span>
+          {t(`run.verdict.${outcome === 'unanswered' ? 'ungraded' : outcome}`)}
+        </div>
+      )}
 
       {item.question_type === 'mcq' && item.options && (
         <ul className="space-y-2">
@@ -275,9 +315,9 @@ export function QuizRunPage() {
                 disabled={grading || shownPrice === null}
                 className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50"
               >
-                {/* The price is no longer on the button. The QUOTE still runs and still
-                    authorises the spend through `maxPriceMicro`; only the announcement is
-                    gone. */}
+                {/* The price stays off the BUTTON — a button is a decision, not a price tag —
+                    and is said in the line below it instead. It used to be said nowhere at all,
+                    so a learner tapped this with no idea whether it cost anything. */}
                 {grading ? t('run.grading') : t('run.grade')}
               </button>
             )}
@@ -295,6 +335,14 @@ export function QuizRunPage() {
           </>
         )}
       </div>
+
+      {/* What grading this answer costs, or that it is covered. Under the buttons, not on one:
+          the learner is choosing whether to spend, and needs the number before they tap. */}
+      {item.question_type !== 'mcq' && item.score === null && costLine && (
+        <p className="text-xs text-content-tertiary text-center" data-testid="quiz-grade-cost">
+          {t(costLine.key, costLine.params)}
+        </p>
+      )}
     </div>
   )
 }

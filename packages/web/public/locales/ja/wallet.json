@@ -30,9 +30,9 @@
   "cardPlanHint": "カード上限プランは「カードストレージ」で管理します。",
   "quiz": {
     "title": "クイズの提供量",
-    "freeCount": "本日 {{used, number}} / {{limit, number}} ユニット",
+    "freeCount": "本日 {{used, number}} / {{limit, number}}問",
     "trial_one": "お試し残り{{count, number}}ユニット",
     "trial_other": "お試し残り{{count, number}}ユニット",
-    "note": "選択式の採点は無料です。記述式の採点にユニットを使います。"
+    "note": "選択式の採点は無料です。無料問題は形式を問わず1日の上限で数えます。"
   }
 }

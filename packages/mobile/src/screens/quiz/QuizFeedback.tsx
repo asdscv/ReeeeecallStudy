@@ -71,14 +71,46 @@ export function QuizFeedback({ feedback, rubric, learnerText, referenceText }: {
               against, not whatever the generator would produce today. */}
           {essay.criteria.map((criterion) => {
             const aspect = asStoredRubric(rubric).find((c) => c.id === criterion.criterionId)
+            // The span the grader returned for THIS criterion — where it was met, or on a miss
+            // what in the reference was missed. Paid for on every essay grade and drawn nowhere,
+            // which left "not met" on screen with nothing to point at.
+            const { before, hit, after } = splitBySpan(
+              textFor(criterion.span?.from ?? 'learner'), criterion.span)
             return (
-              <View key={criterion.criterionId} style={styles.row}>
-                <Text style={[theme.typography.body, { color: theme.colors.text, flex: 1 }]}>
-                  {aspect ? t(`aspect.${aspect.aspect}`) : t('aspect.covers_answer')}
-                </Text>
-                <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
-                  {t(`level.${criterion.level}`)}
-                </Text>
+              <View key={criterion.criterionId} style={{ gap: 2 }}>
+                <View style={styles.row}>
+                  <Text style={[theme.typography.body, { color: theme.colors.text, flex: 1 }]}>
+                    {aspect ? t(`aspect.${aspect.aspect}`) : t('aspect.covers_answer')}
+                    {/* What this part was worth: "not met" three times over is unreadable
+                        without knowing which one cost the grade. */}
+                    {aspect && aspect.weight > 0 && (
+                      <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                        {' '}{t('level.weight', { weight: aspect.weight })}
+                      </Text>
+                    )}
+                  </Text>
+                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                    {t(`level.${criterion.level}`)}
+                  </Text>
+                </View>
+                {hit !== '' && (
+                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                    {t(`span.${criterion.span?.from ?? 'learner'}`)}: {before}
+                    <Text style={{ color: theme.colors.primary, fontWeight: '600' }}>{hit}</Text>
+                    {after}
+                  </Text>
+                )}
+                {/* WHAT was required. Carried in the rubric since generation — terms copied from
+                    the learner's own card — and never rendered, so a failed criterion said
+                    "미충족" and stopped. Only where something is missing. */}
+                {aspect && aspect.mustMention.length > 0 && criterion.level !== 'met' && (
+                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                    {t('level.mustMention')}{' '}
+                    <Text style={{ color: theme.colors.text }}>
+                      {aspect.mustMention.join(' · ')}
+                    </Text>
+                  </Text>
+                )}
               </View>
             )
           })}

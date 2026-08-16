@@ -29,6 +29,7 @@ import { useQuizStore, type DailyCheckCount } from '@reeeeecall/shared/stores/qu
 import type { PlanWeek, DayState } from '@reeeeecall/shared/learning/application/plan-week'
 import { useStudy } from '../hooks/useStudy'
 import type { AIStackParamList } from '../navigation/types'
+import { WEAK_LIMIT } from '@reeeeecall/shared/lib/learning-insights'
 
 /**
  * Today's plan — mobile parity with the web `/learning` screen.
@@ -75,7 +76,7 @@ import type { AIStackParamList } from '../navigation/types'
  * feature the learner cannot reach and cannot fix from this screen.
  */
 function DailyCheckCard({ goalId }: { goalId: string }) {
-  const { t } = useTranslation('learning')
+  const { t, i18n } = useTranslation('learning')
   const theme = useTheme()
   const navigation = useNavigation<NavigationProp<AIStackParamList>>()
   const { countDailyCheck, buildDailyCheck, startRun } = useQuizStore()
@@ -131,7 +132,12 @@ function DailyCheckCard({ goalId }: { goalId: string }) {
     try {
       // The SAME window the count was taken with, or the server refuses a check this card
       // has already offered.
-      const setId = await buildDailyCheck({ goalId, timezone, lookback: CHECK_LOOKBACK_DAYS })
+      const setId = await buildDailyCheck({
+        goalId, timezone, lookback: CHECK_LOOKBACK_DAYS,
+        // The check is built with one tap and no options, so this is the only place
+        // the learner's language can come from. Without it every check was Korean.
+        locale: i18n.language.split('-')[0],
+      })
       const runId = await startRun(setId)
       // The check runs in the quiz stack — same runner, same screens. `getParent` is how a
       // screen in one drawer stack hands off to another without importing its navigator.
@@ -1559,7 +1565,14 @@ export function LearningTodayScreen() {
                     <Text style={[theme.typography.caption, {
                       color: theme.colors.textTertiary, marginTop: 2,
                     }]}>
-                      {t('insights.weakHint')}
+                      {/* The hint said only what a weak card IS. It never said the list is the
+                          WORST TEN of however many there are, so a learner with 340 read the
+                          count as their whole backlog. */}
+                      {insights.weakCardTotal > WEAK_LIMIT
+                        ? t('insights.weakHintCapped', {
+                          shown: WEAK_LIMIT, total: insights.weakCardTotal,
+                        })
+                        : t('insights.weakHint')}
                     </Text>
                   </TouchableOpacity>
                 ))}

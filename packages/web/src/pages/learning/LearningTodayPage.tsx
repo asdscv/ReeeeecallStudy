@@ -24,6 +24,7 @@ import type { PlanWeek, DayState } from '@reeeeecall/shared/learning/application
 import { useDeckStore } from '../../stores/deck-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
 import { AiRefusalNotice } from '../../components/ai/AiRefusalNotice'
+import { WEAK_LIMIT } from '@reeeeecall/shared/lib/learning-insights'
 
 /**
  * One goal's plan — today, and the days after it.
@@ -267,7 +268,14 @@ function LearningDiagnostics({ goalId }: { goalId: string }) {
               </span>
             </Link>
           ))}
-          <p className="text-[11px] text-content-tertiary">{t('insights.weakHint')}</p>
+          {/* The hint said only what a weak card IS. It never said the list is the WORST TEN of
+              however many there are — so a learner with 340 read "8장" as their whole backlog,
+              and the ten never visibly changed because at scale the tiebreak is a UUID sort. */}
+          <p className="text-[11px] text-content-tertiary">
+            {insights.weakCardTotal > WEAK_LIMIT
+              ? t('insights.weakHintCapped', { shown: WEAK_LIMIT, total: insights.weakCardTotal })
+              : t('insights.weakHint')}
+          </p>
 
           {/* The one paid AI action in the learning plan, and the one place it is grounded.
               A weak card is a card the learner has attempted twice or more and missed most of
@@ -1038,7 +1046,7 @@ export function LearningTodayPage() {
  * settle — a day they knew is free.
  */
 function DailyCheck({ goalId, timezone }: { goalId: string; timezone: string }) {
-  const { t } = useTranslation('learning')
+  const { t, i18n } = useTranslation('learning')
   const navigate = useNavigate()
   const { countDailyCheck, buildDailyCheck, startRun } = useQuizStore()
   const [counts, setCounts] = useState<DailyCheckCount | null>(null)
@@ -1090,7 +1098,12 @@ function DailyCheck({ goalId, timezone }: { goalId: string; timezone: string }) 
     try {
       // The SAME window the count was taken with, or the server refuses a check this
       // screen has already offered.
-      const setId = await buildDailyCheck({ goalId, timezone, lookback: CHECK_LOOKBACK_DAYS })
+      const setId = await buildDailyCheck({
+        goalId, timezone, lookback: CHECK_LOOKBACK_DAYS,
+        // The check is built with one tap and no options, so this is the only place
+        // the learner's language can come from. Without it every check was Korean.
+        locale: i18n.language.split('-')[0],
+      })
       const runId = await startRun(setId)
       navigate(`/quiz/${runId}/run`)
     } catch {

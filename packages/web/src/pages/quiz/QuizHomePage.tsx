@@ -3,8 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { AI_HUB_QUIZ } from '@reeeeecall/shared/lib/ai/hub/catalog'
 import { AiCreditNotice } from '../../components/ai/AiCreditNotice'
 import { Link, useNavigate } from 'react-router-dom'
-import { useQuizStore, type QuizSetRow } from '@reeeeecall/shared/stores/quiz-store'
+import { useQuizStore, isDailyCheckTitle, type QuizSetRow } from '@reeeeecall/shared/stores/quiz-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
+import { QuizMistakes } from './QuizMistakes'
+import { dateLine } from '@reeeeecall/shared/lib/quiz-outcome'
+import { Button } from '../../components/ui/button'
+import { Trash2 } from 'lucide-react'
 
 /**
  * The quiz home: what you have made, and the way to make more.
@@ -16,7 +20,7 @@ import { ListSkeleton } from '../../components/common/Skeleton'
 export function QuizHomePage() {
   const { t } = useTranslation('quiz')
   const navigate = useNavigate()
-  const { sets, loading, fetchSets, grantTrial, startRun } = useQuizStore()
+  const { sets, loading, fetchSets, grantTrial, startRun, deleteSet } = useQuizStore()
   // The trial is still GRANTED — it is what makes a new account's first quizzes free — but
   // the amount is no longer announced. Nothing renders it, so nothing holds it.
   const [, setTrialUnits] = useState<number | null>(null)
@@ -29,6 +33,31 @@ export function QuizHomePage() {
     // on every later visit.
     void grantTrial().then(setTrialUnits).catch(() => setTrialUnits(null))
   }, [fetchSets, grantTrial])
+
+  /**
+   * Remove a set nobody has taken.
+   *
+   * Offered only at `generated_count === 0`, which is the state 17 of production's 49 sets were
+   * stuck in: a generation that produced nothing leaves a row that cannot be taken (the button
+   * is disabled) and could not be cleared. A set with questions stays, because taking it is
+   * still worth doing and its history is the reason the list shows sets at all.
+   */
+  /**
+   * Delete, after saying what goes with it.
+   *
+   * Any set since mig 231, not only the empty ones — and the cascade takes the sittings, the
+   * answers in them and their 오답 노트 entries, so the sentence that asks has to say so.
+   */
+  const remove = async (setRow: QuizSetRow) => {
+    const runs = setRow.run_count ?? 0
+    const ok = window.confirm(
+      `${t('home.confirmTitle')}\n\n`
+      + (runs > 0 ? t('home.confirmTaken', { runs }) : t('home.confirmUnused')),
+    )
+    if (!ok) return
+    setBusy(setRow.id)
+    try { await deleteSet(setRow.id) } finally { setBusy(null) }
+  }
 
   const take = async (setRow: QuizSetRow) => {
     setBusy(setRow.id)
@@ -60,6 +89,10 @@ export function QuizHomePage() {
           feature id, so it follows the catalog rather than this file. */}
       <AiCreditNotice featureId={AI_HUB_QUIZ} />
 
+      {/* Above the sets, because it is the thing to act on. Renders nothing until there is a
+          miss to show, so a learner who has never got one wrong never sees it. */}
+      <QuizMistakes />
+
       {loading && sets.length === 0 ? (
         <ListSkeleton />
       ) : sets.length === 0 ? (
@@ -69,11 +102,26 @@ export function QuizHomePage() {
         </div>
       ) : (
         <ul className="space-y-2">
-          {sets.map((setRow) => (
+          {sets.map((setRow) => {
+            const created = dateLine(setRow.created_at)
+            const lastAt = setRow.last_taken_at ? dateLine(setRow.last_taken_at) : null
+            return (
             <li key={setRow.id} className="p-3 bg-card rounded-lg border border-border">
               <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">{setRow.title}</p>
+                {/* The row opens the set's own page. The history, every past sitting and the
+                    delete belong there: a list row is a place to CHOOSE a quiz, not to read
+                    one, and an expanding row leaves the history unreachable by link. */}
+                <Link
+                  to={`/quiz/set/${setRow.id}`}
+                  className="min-w-0 no-underline"
+                  data-testid="quiz-set-open"
+                >
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {/* `__daily_check__` is a SENTINEL — `build_daily_check` finds today's check
+                        by that exact title rather than by a flag — and it was being shown to the
+                        learner as if they had named it that. */}
+                    {isDailyCheckTitle(setRow.title) ? t('home.dailyCheckTitle') : setRow.title}
+                  </p>
                   <div className="flex flex-wrap items-center gap-2 mt-1">
                     <span className="text-xs text-content-tertiary">
                       {t(`type.${setRow.question_type}`)}
@@ -91,23 +139,55 @@ export function QuizHomePage() {
                       </span>
                     )}
                   </div>
+                  {/* One line of context, not the whole history: when it was made, and
+                      whether it has ever been taken. The rest is a click away. */}
+                  <p className="text-xs text-content-tertiary mt-0.5">
+                    {[
+                      created && t('history.created', { date: t(created.key, created.params) }),
+                      (setRow.run_count ?? 0) === 0
+                        ? t('history.never')
+                        : t('history.taken', {
+                          runs: setRow.run_count,
+                          date: lastAt ? t(lastAt.key, lastAt.params) : '',
+                        }),
+                    ].filter(Boolean).join(' · ')}
+                  </p>
+                </Link>
+                {/* Both, always. They used to be mutually exclusive — a 0-question set showed
+                    only 삭제 and every other row only 풀기 — so a set that had been taken could
+                    not be removed from the list at all. Since mig 231 it can, and the two are
+                    different weights rather than alternatives: a labelled primary pill, and a
+                    quiet icon that turns destructive on hover. */}
+                <div className="flex items-center gap-1 shrink-0">
+                  {setRow.generated_count > 0 && (
+                    <Button
+                      size="sm"
+                      onClick={() => void take(setRow)}
+                      disabled={busy === setRow.id}
+                      data-testid="quiz-set-take"
+                    >
+                      {busy === setRow.id ? t('home.starting') : t('home.take')}
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => void remove(setRow)}
+                    disabled={busy === setRow.id}
+                    data-testid="quiz-set-delete"
+                    aria-label={t('home.remove')}
+                    title={t('home.remove')}
+                    className="h-8 w-8 text-content-tertiary hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => void take(setRow)}
-                  disabled={busy === setRow.id || setRow.generated_count === 0}
-                  className="px-3 py-1.5 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50 shrink-0"
-                >
-                  {busy === setRow.id ? t('home.starting') : t('home.take')}
-                </button>
               </div>
             </li>
-          ))}
+            )
+          })}
         </ul>
       )}
-
-      <p className="text-xs text-content-tertiary text-center">
-      </p>
     </div>
   )
 }

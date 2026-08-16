@@ -51,7 +51,8 @@
       "failed": "That didn't work. Nothing was charged.",
       "retry": "Try again",
       "gradeYourself": "You can still finish the quiz and mark this yourself, free."
-    }
+    },
+    "freeQuizOnly": "{{free}} free questions left today"
   },
   "deck": {
     "section": "SELECT DECK",
@@ -74,7 +75,8 @@
     "title": "Cards Created!",
     "subtitle": "Your AI-generated flashcards are ready to study.",
     "generateMore": "Generate More",
-    "done": "Done"
+    "done": "Done",
+    "viewCards": "View cards"
   },
   "errorStep": {
     "title": "Generation Failed",

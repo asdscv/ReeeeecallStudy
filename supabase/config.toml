@@ -359,7 +359,25 @@ deno_version = 2
 # ai-generate resolves provider+model via the registry in
 # supabase/functions/_shared/ai-providers.ts — switch with NO code change
 # (registry knows gemini|xai|openai|deepseek|openrouter base URLs).
-AI_GENERATION_PROVIDER_KEY = "env(GEMINI_API_KEY)"  # required
+# AI_GENERATION_PROVIDER_KEY = "env(GEMINI_API_KEY)"
+#
+# COMMENTED OUT ON PURPOSE — this line overwrote the PRODUCTION key. 2026-08-16, measured:
+#
+#   $ supabase secrets set MODEL_WATCH_TOKEN=...
+#   {"count":2,...}                 ← two secrets, and only one was asked for
+#
+# `supabase secrets set` pushes this whole block along with whatever you name on the command
+# line, so every secrets operation from this repo re-sent the local `GEMINI_API_KEY` as the
+# production TEXT provider key. Text generation runs on DeepSeek since mig 233, so the key it
+# then presented was Google's: every quiz and card generation answered
+#
+#   401 "Authentication Fails, Your api key: ****Jw3w is invalid"
+#
+# until the key was set back. The block header says "Local dev only" and that is exactly the
+# assumption that made it dangerous — it is local dev only until a CLI command decides otherwise.
+#
+# For local edge functions, pass the key explicitly instead:
+#   supabase functions serve ai-generate --env-file supabase/functions/.env.local
 # payment-webhook: set PAYMENT_WEBHOOK_SECRET as an edge secret in prod (dashboard);
 # for local dev pass it via `supabase functions serve payment-webhook --env-file`.
 # AI_GENERATION_PROVIDER = "env(AI_GENERATION_PROVIDER)"  # default 'gemini' — selects baseUrl

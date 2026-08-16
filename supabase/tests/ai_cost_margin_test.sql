@@ -35,7 +35,11 @@ INSERT INTO public.ai_generation_jobs (id, user_id, usage_date, free_cards, paid
 -- ════════════════════════════════════════════════════════════════════════════
 -- P. preview_ai_cost — DRY RUN of the metered price (no wallet write)
 -- ════════════════════════════════════════════════════════════════════════════
--- P1: gemini-flash-lite 1000/500 → cost_won 300; markup 5 → price 2,025,000; margin 80%
+-- P1: gemini-flash-lite 1000/500 → cost_won 300; markup 5 → price 1,500; margin 80%
+--
+-- `target_margin_bps` is deliberately untouched by mig 230's ten-times price rise: it defines
+-- `under_target` in the cost ledger, and moving it would have flipped every historical job red.
+-- Prices moved in `ai_action_prices`; the margin TARGET did not.
 DO $$ DECLARE p record; BEGIN
   SELECT * INTO p FROM preview_ai_cost('gemini','gemini-2.5-flash-lite', 1000, 500);
   ASSERT p.cost_micro_usd = 300, format('P1 cost %s', p.cost_micro_usd);
@@ -70,7 +74,7 @@ END $$;
 -- ════════════════════════════════════════════════════════════════════════════
 SELECT set_config('request.jwt.claim.role', 'service_role', false);
 
--- CH1: fully-paid card job → paid_share 1 → price = cost×5 = 2,025,000; cost_ledger reflects it
+-- CH1: fully-paid card job → paid_share 1 → price = cost×5; ledger reflects it
 DO $$ DECLARE r ai_cost_ledger; BEGIN
   PERFORM charge_ai_generation('c0000000-0000-0000-0000-000000000001'::uuid, 'jc_paid', 'gemini','gemini-2.5-flash-lite', 1000, 500);
   SELECT * INTO r FROM ai_cost_ledger WHERE job_ref='jc_paid';
@@ -78,7 +82,7 @@ DO $$ DECLARE r ai_cost_ledger; BEGIN
   ASSERT r.margin_bps = 8000, format('CH1 bps %s', r.margin_bps);
 END $$;
 
--- CH2: mixed job (paid_share 1/3) → price = round(300/3*5) = 500; margin vs FULL cost (free CAC drag)
+-- CH2: mixed job (paid_share 1/3) → price = round(300/3*5) = 500; margin vs FULL cost
 DO $$ DECLARE r ai_cost_ledger; BEGIN
   PERFORM charge_ai_generation('c0000000-0000-0000-0000-000000000001'::uuid, 'jc_mix', 'gemini','gemini-2.5-flash-lite', 1000, 500);
   SELECT * INTO r FROM ai_cost_ledger WHERE job_ref='jc_mix';
@@ -110,13 +114,19 @@ END $$;
 -- E. config-driven markup + rate (EXTENSIBILITY, no code)
 -- ════════════════════════════════════════════════════════════════════════════
 
--- E1: change target margin 80%→90% → markup 10 → preview price doubles vs P1
-DO $$ DECLARE p record; BEGIN
+-- E1: the markup is CONFIG. Set 9,000 bps and the preview follows — the point of this test is
+-- that a price change needs no code, which is what mig 230 then relied on.
+DO $$ DECLARE p record; v_was integer; BEGIN
+  -- Save the CURRENT value, not a literal. This test has no transaction wrapper, so its restore
+  -- writes straight to the database — and restoring a hardcoded 8000 silently undid mig 230's
+  -- price change the first time the suite ran after it. A test that edits config has to put back
+  -- what was there, not what was there when it was written.
+  SELECT target_margin_bps INTO v_was FROM ai_pricing_settings WHERE id = 1;
   PERFORM set_ai_pricing_settings(p_target_margin_bps => 9000);
   SELECT * INTO p FROM preview_ai_cost('gemini','gemini-2.5-flash-lite', 1000, 500);
   ASSERT p.price_micro_usd = 3000, format('E1 markup10 price %s', p.price_micro_usd);  -- 300*10
   ASSERT p.margin_bps = 9000, format('E1 bps %s', p.margin_bps);
-  PERFORM set_ai_pricing_settings(p_target_margin_bps => 8000);  -- restore
+  PERFORM set_ai_pricing_settings(p_target_margin_bps => v_was);  -- restore what was there
 END $$;
 
 -- E2: add a rate for a NEW model = 1 row → charge prices it (rate_missing=false)
@@ -146,7 +156,7 @@ DO $$ BEGIN
   EXCEPTION WHEN sqlstate '42501' THEN NULL; END;
 END $$;
 
--- F2: gemini-2.5-flash-lite group = jc_paid (fully paid, 80%) + jc_mix + jc_zero(estimated)
+-- F2: gemini-2.5-flash-lite group = jc_paid (fully paid) + jc_mix + jc_zero (estimated)
 SELECT set_config('request.jwt.claim.role', 'service_role', false);
 DO $$ DECLARE row record; found boolean := false; BEGIN
   FOR row IN SELECT * FROM get_ai_margin_daily() WHERE provider='gemini' AND model='gemini-2.5-flash-lite' LOOP

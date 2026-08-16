@@ -71,7 +71,8 @@
       "failed": "処理できませんでした。請求は発生していません。",
       "retry": "再試行",
       "gradeYourself": "クイズはそのまま終えられます。この問題は自分で採点すれば無料です。"
-    }
+    },
+    "freeQuizOnly": "本日の無料問題 残り{{free}}問"
   },
   "wizard": {
     "setup": "Setup",
@@ -203,5 +204,8 @@
       "ai": "AI"
     },
     "openAction": "開く"
+  },
+  "doneStep": {
+    "viewCards": "カードを見る"
   }
 }

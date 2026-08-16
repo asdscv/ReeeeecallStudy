@@ -107,6 +107,13 @@ const GROUNDING = [
   'If a card looks wrong, incomplete, or unfamiliar, work with it exactly as written. Do not correct it,'
   + ' do not complete it, and do not substitute what you believe the right answer to be.',
   'Never mention a fact, term, person, statute, dosage, or figure that does not appear in the card you were given.',
+  // `prompt` is both the name of a field we hand over and a word this instruction uses, and a
+  // model that is not thinking things through copies the label into the question it writes:
+  // "다음 카드의 prompt에 대해 서술하시오". Every such item is discarded by `leaksSchemaWord`,
+  // which took whole essay batches to zero — intermittently, which is worse than always.
+  'The words `prompt`, `answer`, `cardId`, `otherFields`, `probeFieldKey` and `field_1`, `field_2`, … are the'
+  + ' names of OUR data structure. Use their VALUES; never write the names themselves into a question, an option,'
+  + ' or a rubric. A question mentioning one of them is discarded.',
 ].join('\n')
 
 /**
@@ -333,7 +340,8 @@ ${languageRule(uiLocale)}
 
 Rules:
 ${bullets([
-  'The question MUST contain the card\'s prompt text verbatim, and must NOT contain its answer. Both are checked.',
+  'The question MUST quote the card\'s question side verbatim — the VALUE of its `prompt` field, not the word'
+  + ' "prompt" — and must NOT contain its answer. Both are checked.',
   'Ask the learner to reconstruct and explain what the card says. Never ask them to bring in material the card does not contain.',
   `Between ${ESSAY_MIN_CRITERIA} and ${ESSAY_MAX_CRITERIA} criteria. Each aspect at most once.`,
   `"weight" is a whole number; the weights of one card's criteria must sum to exactly ${ESSAY_WEIGHT_TOTAL}.`,

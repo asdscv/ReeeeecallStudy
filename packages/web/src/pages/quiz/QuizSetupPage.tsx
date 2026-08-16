@@ -8,6 +8,8 @@ import {
   type QuizQuestionType, type QuizQuote, type QuizzableCount, type QuizDifficultyBand,
 } from '@reeeeecall/shared/stores/quiz-store'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
+import { minCardsForMcq } from '@reeeeecall/shared/lib/quiz-outcome'
+import { generateCostLine, freeLeftLine } from '@reeeeecall/shared/lib/quiz-pricing'
 
 const TYPES: QuizQuestionType[] = ['mcq', 'short', 'essay']
 // Presets plus a free field up to MAX_COUNT. The presets stop where a learner's idea of "a
@@ -86,11 +88,19 @@ export function QuizSetupPage() {
     ? difficulty
     : (usableBands.find((b) => b.is_default) ?? usableBands[0])?.level ?? null
   const eligible = shownCounts?.eligible ?? 0
-  // Multiple choice needs three other cards to draw plausible distractors from. Blocking here
-  // is kinder than letting the server refuse after the learner has picked everything.
-  const tooFewForMcq = type === 'mcq' && eligible > 0 && eligible < 4
+  // Blocking here is kinder than letting the server refuse after the learner has picked
+  // everything and seen a price.
+  /** The chosen count is not one of the chips, so the custom box is what is in effect. */
+  const isCustomCount = !COUNTS.includes(count)
+  // From the BAND, not a literal 4. The far distractor slots are what need deck-mates, and the
+  // band says how many there are — at the hardest one the model writes every distractor, so a
+  // six-card deck was being refused for cards it did not need.
+  const mcqMinimum = minCardsForMcq(usableBands.find((b) => b.level === activeBand))
+  const tooFewForMcq = type === 'mcq' && eligible > 0 && eligible < mcqMinimum
   const canSubmit = Boolean(deckId) && eligible > 0 && !tooFewForMcq && !generating
     && priced !== null && priced.sufficient
+  const costLine = generateCostLine(priced)
+  const freeLeft = freeLeftLine(priced)
 
   const submit = async () => {
     if (!priced || !deckId) return
@@ -107,6 +117,11 @@ export function QuizSetupPage() {
         // default rather than being handed a guess.
         difficulty: activeBand ?? undefined,
         maxPriceMicro: priced.price_micro,
+        // The quote's own split, so the batch drawdown can follow the server's
+        // trial -> free -> paid order instead of guessing pro-rata. Without it the
+        // final batch is refused whenever free questions remain.
+        freeQuestions: (priced.free_items ?? 0) + (priced.trial_items ?? 0),
+        paidQuestions: priced.paid_items ?? 0,
       })
       navigate(`/quiz?created=${setId}`)
     } catch (e) {
@@ -200,18 +215,44 @@ export function QuizSetupPage() {
                 {option}
               </button>
             ))}
+          </div>
+
+          {/* Out of the chip row, and labelled.
+              It used to sit inline as a ninth chip that always echoed `count`, so typing 13
+              highlighted nothing and typing 6 lit up the 6 chip — the same control appearing to
+              do two different things depending on the number. Now it is visibly a separate
+              input, empty unless the chosen count is genuinely custom, and highlighted when it
+              is the thing in effect. */}
+          <div className="mt-2 flex items-center gap-2">
+            <label htmlFor="quiz-count-custom" className="text-xs text-content-tertiary">
+              {t('setup.customCount')}
+            </label>
             <input
+              id="quiz-count-custom"
               type="number"
+              inputMode="numeric"
               min={1}
               max={MAX_COUNT}
-              value={count}
+              value={isCustomCount ? count : ''}
+              placeholder={`1–${MAX_COUNT}`}
               onChange={(e) => {
-                const n = Number(e.target.value)
+                const raw = e.target.value
+                if (raw === '') return
+                const n = Number(raw)
                 if (Number.isFinite(n)) setCount(Math.min(MAX_COUNT, Math.max(1, Math.round(n))))
               }}
-              aria-label={t('setup.count')}
-              className="w-16 rounded-lg border border-border bg-background px-2 py-1.5 text-center text-sm text-foreground"
+              aria-label={t('setup.customCount')}
+              data-testid="quiz-count-custom"
+              className={`w-20 rounded-lg border px-2 py-1.5 text-center text-sm text-foreground ${
+                isCustomCount
+                  ? 'border-brand bg-brand/5 font-medium'
+                  : 'border-border bg-background'
+              }`}
             />
+            {/* One place says what will actually be made, whichever control set it. */}
+            <span className="text-xs text-content-tertiary" data-testid="quiz-count-effective">
+              {t('setup.countEffective', { count: Math.min(count, eligible || count) })}
+            </span>
           </div>
           {/* The submit clamps to `eligible`, and on a deck smaller than the smallest chip every
               chip is disabled — so the screen showed a count nobody could change and then quietly
@@ -253,11 +294,22 @@ export function QuizSetupPage() {
         )}
       </div>
 
-      {/* The amount is no longer announced in the flow — a product decision, not a
-          rendering one. The QUOTE is still fetched and still gates the button: it is what
-          `maxPriceMicro` authorises, and without it a price that moved between choosing and
-          reserving would be spent silently. What remains on screen is the one thing a
-          learner cannot act on without: that they have nothing left to spend. */}
+      {/* What this batch costs, and what is left of today's free questions.
+          An allowance nobody can see is not an allowance: the free tier gets five questions a day
+          whatever the type, and until mig 239 the only way to discover that was to be charged for
+          the sixth. Both lines come from the shared helper, so the two platforms cannot start
+          explaining the same billing differently. */}
+      {costLine && (
+        <div className="p-3 bg-muted/50 border border-border rounded-lg space-y-1" data-testid="quiz-generate-cost">
+          <p className="text-xs text-foreground">{t(costLine.key, costLine.params)}</p>
+          {freeLeft && (
+            <p className="text-xs text-muted-foreground" data-testid="quiz-free-left">
+              {t(freeLeft.key, freeLeft.params)}
+            </p>
+          )}
+        </div>
+      )}
+
       {priced && !priced.sufficient && (
         <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
           <p className="text-xs text-destructive">{t('error.AI_INSUFFICIENT_CREDITS')}</p>

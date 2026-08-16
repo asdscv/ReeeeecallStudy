@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 export interface Achievement {
   id: string
-  category: 'streak' | 'study' | 'social' | 'milestone'
+  /** `ai` is quizzes, AI generation and AI grading — added in mig 228. */
+  category: 'streak' | 'study' | 'social' | 'milestone' | 'ai'
   icon: string
   required_value: number
   xp_reward: number

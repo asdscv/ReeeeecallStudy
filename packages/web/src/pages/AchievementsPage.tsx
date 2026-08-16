@@ -8,7 +8,8 @@ import { AchievementIcon, CategoryIcon } from '../components/achievements/Achiev
 
 // ── Helpers ──
 
-const CATEGORY_ORDER: Achievement['category'][] = ['streak', 'study', 'social', 'milestone']
+// `ai` sits after study and before social: it IS studying, and it is what the learner pays for.
+const CATEGORY_ORDER: Achievement['category'][] = ['streak', 'study', 'ai', 'social', 'milestone']
 
 function xpForLevel(level: number): number {
   return (level - 1) * 150
@@ -133,7 +134,7 @@ export function AchievementsPage() {
                   <AchievementIcon id={ach.id} category={ach.category} dbIcon={ach.icon} size="md" earned />
                 </div>
                 <p className="text-xs font-medium text-foreground truncate">
-                  {t(`achievements.badge.${ach.id}`, ach.id.replace(/_/g, ' '))}
+                  {t(`achievements.badge.${ach.id}`, { n: ach.required_value, defaultValue: ach.id.replace(/_/g, ' ') })}
                 </p>
                 <p className="text-[10px] text-content-tertiary mt-1">
                   {ach.earned_at ? new Date(ach.earned_at).toLocaleDateString() : ''}
@@ -192,7 +193,7 @@ export function AchievementsPage() {
                           <AchievementIcon id={ach.id} category={ach.category} dbIcon={ach.icon} size="sm" earned />
                         </div>
                         <p className="text-xs font-medium text-foreground truncate">
-                          {t(`achievements.badge.${ach.id}`, ach.id.replace(/_/g, ' '))}
+                          {t(`achievements.badge.${ach.id}`, { n: ach.required_value, defaultValue: ach.id.replace(/_/g, ' ') })}
                         </p>
                         <span className="text-[10px] text-warning">+{ach.xp_reward} XP</span>
                       </div>
@@ -205,7 +206,7 @@ export function AchievementsPage() {
                           <AchievementIcon id={nextLocked.id} category={nextLocked.category} dbIcon={nextLocked.icon} size="sm" earned={false} />
                         </div>
                         <p className="text-xs font-medium text-muted-foreground truncate">
-                          {t(`achievements.badge.${nextLocked.id}`, nextLocked.id.replace(/_/g, ' '))}
+                          {t(`achievements.badge.${nextLocked.id}`, { n: nextLocked.required_value, defaultValue: nextLocked.id.replace(/_/g, ' ') })}
                         </p>
                         <div className="flex items-center justify-center gap-1 mt-1">
                           <Lock className="w-3 h-3 text-content-tertiary" />

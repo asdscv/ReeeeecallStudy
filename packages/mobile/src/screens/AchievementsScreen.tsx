@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
+import { dateLine } from '@reeeeecall/shared/lib/quiz-outcome'
 import { Screen, ScreenHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
 import { useGamification } from '../hooks/useGamification'
@@ -13,12 +14,16 @@ import {
 } from '../stores/gamification-store'
 import type { Achievement, NextGoal } from '../stores/gamification-store'
 
-const CATEGORY_ORDER: Achievement['category'][] = ['streak', 'study', 'social', 'milestone']
+// `ai` sits after study and before social: it IS studying, and it is what the learner pays for.
+const CATEGORY_ORDER: Achievement['category'][] = ['streak', 'study', 'ai', 'social', 'milestone']
 const CATEGORY_EMOJI: Record<string, string> = {
   streak: '\uD83D\uDD25',
   study: '\uD83D\uDCD6',
   social: '\uD83E\uDD1D',
   milestone: '\uD83C\uDFC6',
+  // Quizzes, generation and grading — mig 228. Without a row the category fell through to the
+  // 🎯 default and looked like nothing in particular.
+  ai: '\uD83E\uDD16',
 }
 
 function formatValue(category: string, value: number): string {
@@ -32,10 +37,19 @@ function formatValue(category: string, value: number): string {
 
 // ── Screen ──
 
+/** A badge's earn date, in the learner's language, without Intl. */
+function earnedOn(iso: string | null, t: (k: string, o?: Record<string, unknown>) => string): string {
+  if (!iso) return ''
+  const line = dateLine(iso)
+  return line ? t(`quiz:${line.key}`, line.params) : ''
+}
+
 export function AchievementsScreen() {
   const theme = useTheme()
   const navigation = useNavigation()
-  const { t } = useTranslation('common')
+  // 'quiz' as well: the Intl-free date strings live there, and an undeclared namespace
+  // renders the raw key on first paint.
+  const { t } = useTranslation(['common', 'quiz'])
 
   // All data from shared Zustand store — no duplicate fetches
   const { achievements, levelInfo, goals: nextGoals, loading } = useGamification()
@@ -126,10 +140,14 @@ export function AchievementsScreen() {
                 <View key={ach.id} style={[styles.recentCard, { backgroundColor: 'rgba(234,179,8,0.1)', borderColor: 'rgba(234,179,8,0.3)' }]}>
                   <Text style={{ fontSize: 28 }}>{ach.icon || '\uD83C\uDFC5'}</Text>
                   <Text style={[theme.typography.caption, { color: theme.colors.text, fontWeight: '500', textAlign: 'center' }]} numberOfLines={1}>
-                    {t(`achievements.badge.${ach.id}`, { defaultValue: ach.id.replace(/_/g, ' ') })}
+                    {t(`achievements.badge.${ach.id}`, { n: ach.required_value, defaultValue: ach.id.replace(/_/g, ' ') })}
                   </Text>
                   <Text style={[{ fontSize: 10, color: theme.colors.textTertiary }]}>
-                    {ach.earned_at ? new Date(ach.earned_at).toLocaleDateString() : ''}
+                    {/* NOT toLocaleDateString: Hermes ships without ICU, so it returns the same
+                        US format on a Korean phone as on an American one — "8/15/2026" under a
+                        badge whose name is in Korean. The shared formatter builds the date from
+                        translated parts instead. */}
+                    {earnedOn(ach.earned_at, t)}
                   </Text>
                 </View>
               ))}
@@ -178,7 +196,7 @@ export function AchievementsScreen() {
                       <View key={ach.id} style={[styles.badgeCard, { borderColor: 'rgba(234,179,8,0.5)', backgroundColor: theme.colors.surfaceElevated }]}>
                         <Text style={{ fontSize: 24 }}>{ach.icon || '\uD83C\uDFC5'}</Text>
                         <Text style={[theme.typography.caption, { color: theme.colors.text, fontWeight: '500', textAlign: 'center' }]} numberOfLines={1}>
-                          {t(`achievements.badge.${ach.id}`, { defaultValue: ach.id.replace(/_/g, ' ') })}
+                          {t(`achievements.badge.${ach.id}`, { n: ach.required_value, defaultValue: ach.id.replace(/_/g, ' ') })}
                         </Text>
                         <Text style={[{ fontSize: 10, color: palette.yellow[600] }]}>+{ach.xp_reward} XP</Text>
                       </View>
@@ -189,7 +207,7 @@ export function AchievementsScreen() {
                       <View style={[styles.badgeCard, { borderColor: theme.colors.border, backgroundColor: theme.colors.surface, opacity: 0.7 }]}>
                         <Text style={{ fontSize: 24 }}>{nextLocked.icon || '\uD83D\uDD12'}</Text>
                         <Text style={[theme.typography.caption, { color: theme.colors.textTertiary, textAlign: 'center' }]} numberOfLines={1}>
-                          {t(`achievements.badge.${nextLocked.id}`, { defaultValue: nextLocked.id.replace(/_/g, ' ') })}
+                          {t(`achievements.badge.${nextLocked.id}`, { n: nextLocked.required_value, defaultValue: nextLocked.id.replace(/_/g, ' ') })}
                         </Text>
                         <Text style={[{ fontSize: 10, color: theme.colors.textTertiary }]}>{'\uD83D\uDD12'} +{nextLocked.xp_reward} XP</Text>
                       </View>

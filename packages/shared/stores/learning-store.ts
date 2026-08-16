@@ -37,6 +37,7 @@ import {
 import { activityMixForDomain, supportedActivityTypesForDomain } from '../learning/adapters/index'
 import type { LearningGoal } from '../learning/domain/index'
 import type { Card, LayoutItem, TemplateField } from '../types/database'
+import { fetchAllRows } from '../lib/fetch-all-rows'
 
 // ── Row shapes (snake_case, as returned by PostgREST) ───────────────────────
 export interface LearningGoalRow {
@@ -2083,14 +2084,29 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       const plansSince = new Date(now - 14 * 86_400_000).toISOString().slice(0, 10)
 
       const [attemptsResult, plansResult] = await Promise.all([
-        supabase
+        // PAGINATED, not `.limit(2000)`.
+        //
+        // PostgREST caps a single response at `max_rows = 1000` (supabase/config.toml), silently
+        // — the same S-H1 truncation `study-store.ts` was fixed for. Asking for 2,000 and
+        // receiving 1,000 with no error made this window "the last 1,000 attempts" rather than
+        // "30 days", and it did so WORST for the heaviest learners: at 200 attempts a day the
+        // effective window is five days, a card failed twice three weeks ago contributes nothing,
+        // and a card whose two attempts straddle row 1,000 is filtered out by `WEAK_MIN_ATTEMPTS`
+        // entirely. The panel got quieter the more you studied.
+        fetchAllRows<InsightAttempt>(() => supabase
           .from('answer_attempts')
           .select('card_id, normalized_score, duration_ms, created_at')
           .eq('goal_id', goalId)
           .gte('created_at', attemptsSince)
           .order('created_at', { ascending: false })
-          .limit(2000)
-          .returns<InsightAttempt[]>(),
+          .returns<InsightAttempt[]>())
+          .then((data) => ({ data, error: null }))
+          // `cause` carries the PostgREST error, code and all; the wrapper Error only carries a
+          // sentence, and this store maps 42501 to FORBIDDEN by code.
+          .catch((error: unknown) => ({
+            data: null,
+            error: (error instanceof Error && error.cause) ? error.cause : error,
+          })),
         supabase
           .from('daily_plans')
           .select('plan_date, total_items, completed_items')
