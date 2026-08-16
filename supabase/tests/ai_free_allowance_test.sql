@@ -128,6 +128,27 @@ BEGIN
   END IF;
   UPDATE ai_free_allowances SET per_day = 10 WHERE tier = 'free' AND action_group = 'card';
 
+  -- ── 8. 결제 안내는 무료 요금제를 광고한다, 부르는 사람의 요금제가 아니라 ──
+  --
+  -- `get_plan_limits()`는 비로그인 사용자도 부르는 결제 안내입니다. 239는 이걸 부르는 사람의
+  -- 티어로 답하게 만들었고, 오늘은 'free' 행만 있어서 차이가 없었습니다. 차이가 생기는 순간이
+  -- 정확히 이 커널이 광고하는 그 INSERT입니다 — 그래서 그 INSERT를 여기서 해 봅니다.
+  INSERT INTO ai_free_allowances (tier, action_group, per_day, unit_kind, trial_applies)
+    VALUES ('pro', 'card', 200, 'item', false);
+  UPDATE subscriptions SET tier = 'pro' WHERE user_id = v_uid AND status = 'active';
+
+  IF (get_plan_limits() ->> 'free_ai_cards_per_day')::int <> 10 THEN
+    RAISE EXCEPTION 'FAIL: 결제 안내가 무료 요금제(10)가 아니라 %를 광고한다',
+      get_plan_limits() ->> 'free_ai_cards_per_day';
+  END IF;
+  -- 그리고 그 사용자 자신의 한도는 여전히 200이어야 합니다 — 둘은 다른 질문입니다.
+  IF public._ai_free_cards_per_day() <> 200 THEN
+    RAISE EXCEPTION 'FAIL: pro 사용자의 실제 한도가 200이 아니다 (%)', public._ai_free_cards_per_day();
+  END IF;
+
+  DELETE FROM ai_free_allowances WHERE tier = 'pro';
+  UPDATE subscriptions SET tier = 'free' WHERE user_id = v_uid;
+
   RAISE NOTICE 'ai_free_allowance_test: all assertions passed';
 END $$;
 
