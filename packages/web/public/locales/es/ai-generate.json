@@ -71,7 +71,8 @@
       "failed": "No se pudo procesar. No se te ha cobrado nada.",
       "retry": "Reintentar",
       "gradeYourself": "Puedes terminar el test igualmente y corregir esta pregunta tú, gratis."
-    }
+    },
+    "freeQuizOnly": "Te quedan {{free}} preguntas gratis hoy"
   },
   "wizard": {
     "setup": "Setup",
