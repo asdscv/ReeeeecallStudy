@@ -1,14 +1,21 @@
 #!/usr/bin/env bash
 # ============================================================================
-# payment-webhook edge function — LOCAL end-to-end test (self-contained, no
-# external payment provider). Validates the money-minting seam is fail-closed +
-# HMAC-gated + idempotent:
+# payment-webhook edge function — end-to-end test (self-contained, no external
+# payment provider). Validates the money-minting seam is fail-closed, HMAC-gated,
+# idempotent, and grants ONLY from the server-side intent snapshot:
 #   * no secret configured        → 503 (never grants)
 #   * bad / missing signature     → 401
-#   * valid HMAC signature        → 200 + micro-WON granted to the wallet
+#   * SIGNED legacy direct-grant body (user_id+amount_won) → 400, grants nothing
+#   * signed merchant_uid         → 200 + wallet credited from payment_intents
 #   * webhook redelivery (same id)→ idempotent (granted once)
-# Requires `supabase start` + `supabase db reset` (migrations 108-115 applied).
-# NOT CI-wired (needs the Docker stack); run: bash supabase/tests/payment_webhook_e2e.sh
+#   * unknown / absent merchant_uid → 400, wallet untouched
+#
+# The body can neither pick a price nor self-grant: create_payment_intent snapshots
+# price+kind server-side (mig 120) and confirm_payment applies THAT snapshot, so every
+# amount asserted here is read back from the intent rather than hardcoded.
+#
+# Requires `supabase start` + `supabase db reset`.
+# CI: `Edge & webhook E2E (Supabase)` job. Locally: bash supabase/tests/payment_webhook_e2e.sh
 # ============================================================================
 set -uo pipefail
 command -v node >/dev/null 2>&1 || export PATH="/opt/homebrew/opt/node/bin:$PATH"
@@ -16,11 +23,12 @@ cd "$(cd "$(dirname "$0")/../.." && pwd)"
 
 PASS=0; FAIL=0
 chk() { if [ "$2" = "$3" ]; then echo "  ✅ $1 ($2)"; PASS=$((PASS+1)); else echo "  ❌ $1 — expected '$3' got '$2'"; FAIL=$((FAIL+1)); fi; }
+J() { node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{console.log(JSON.parse(s)$1)}catch(e){console.log('')}})"; }
 
 ST=$(supabase status -o json)
-API=$(echo "$ST" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>console.log(JSON.parse(s).API_URL))")
-ANON=$(echo "$ST" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>console.log(JSON.parse(s).ANON_KEY))")
-SVC=$(echo "$ST" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>console.log(JSON.parse(s).SERVICE_ROLE_KEY))")
+API=$(echo "$ST" | J .API_URL)
+ANON=$(echo "$ST" | J .ANON_KEY)
+SVC=$(echo "$ST" | J .SERVICE_ROLE_KEY)
 DBURL="postgresql://postgres:postgres@127.0.0.1:54322/postgres"
 [ -z "$API" ] && { echo "FATAL: local stack not running"; exit 1; }
 FN="$API/functions/v1/payment-webhook"
@@ -29,15 +37,23 @@ SECRET="test_webhook_secret_123"
 # a real user to credit
 EMAIL="pw_$(date +%s)@example.com"; PW="Passw0rd!e2e"
 USERID=$(curl -s "$API/auth/v1/admin/users" -H "apikey: $SVC" -H "Authorization: Bearer $SVC" -H 'Content-Type: application/json' \
-  -d "{\"email\":\"$EMAIL\",\"password\":\"$PW\",\"email_confirm\":true}" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>console.log(JSON.parse(s).id||''))")
+  -d "{\"email\":\"$EMAIL\",\"password\":\"$PW\",\"email_confirm\":true}" | J .id)
 TOK=$(curl -s "$API/auth/v1/token?grant_type=password" -H "apikey: $ANON" -H 'Content-Type: application/json' \
-  -d "{\"email\":\"$EMAIL\",\"password\":\"$PW\"}" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>console.log(JSON.parse(s).access_token||''))")
+  -d "{\"email\":\"$EMAIL\",\"password\":\"$PW\"}" | J .access_token)
 [ -z "$USERID" ] && { echo "FATAL: no user"; exit 1; }
+[ -z "$TOK" ] && { echo "FATAL: no access token"; exit 1; }
 echo "user=$USERID"
 
 sign() { node -e "console.log(require('crypto').createHmac('sha256',process.argv[1]).update(process.argv[2]).digest('hex'))" "$SECRET" "$1"; }
 post() { curl -s -o /dev/null -w "%{http_code}" "$FN" -H "apikey: $ANON" -H 'Content-Type: application/json' -H "x-webhook-signature: $2" -d "$1"; }
-wallet() { psql() { command psql "$DBURL" -tAc "$1"; }; command psql "$DBURL" -tAc "select coalesce(balance,0) from ai_credit_balance where user_id='$USERID'"; }
+# coalesce OUTSIDE the row lookup: before the first grant there is no balance row at all,
+# and a bare `select ... where user_id=` would return the empty string, not 0.
+wallet() { psql "$DBURL" -tAc "select coalesce((select balance from ai_credit_balance where user_id='$USERID'),0)"; }
+# open a server-authoritative intent AS THE USER (auth.uid()), print its merchant_uid
+intent() { curl -s "$API/rest/v1/rpc/create_payment_intent" -H "apikey: $ANON" -H "Authorization: Bearer $TOK" \
+  -H 'Content-Type: application/json' -d "{\"p_product_id\":\"$1\"}" | J .merchant_uid; }
+# what the SERVER snapshotted for that order — the only legitimate grant amount
+snapshot() { psql "$DBURL" -tAc "select amount_micro_usd from payment_intents where merchant_uid='$1'"; }
 
 # $1 = env file, $2 = expected no-signature probe code for THIS env (503 when no
 # secret, 401 when the secret is set). Waiting for the exact code confirms the NEW
@@ -60,39 +76,61 @@ serve() { pkill -f "supabase functions serve" 2>/dev/null; pkill -9 -f "function
 echo "── no secret configured (fail-closed) ──"
 printf 'SUPABASE_SERVICE_ROLE_KEY=%s\n' "$SVC" > /tmp/pw_env_nosecret
 serve /tmp/pw_env_nosecret 503 || exit 1
-BODY="{\"user_id\":\"$USERID\",\"amount_won\":5000,\"payment_id\":\"pay_x\"}"
-chk "no-secret → 503 (never grants)" "$(post "$BODY" "$(sign "$BODY")")" "503"
+PROBE='{"merchant_uid":"pi_probe"}'
+chk "no-secret → 503 (never grants)" "$(post "$PROBE" "$(sign "$PROBE")")" "503"
 
-# ── PHASE 2: SECRET set → signature-gated grant ──
+# ── PHASE 2: SECRET set → signature-gated, intent-reconciled grant ──
 echo "── secret configured ──"
 printf 'PAYMENT_WEBHOOK_SECRET=%s\nSUPABASE_SERVICE_ROLE_KEY=%s\n' "$SECRET" "$SVC" > /tmp/pw_env
 serve /tmp/pw_env 401 || exit 1
 
-chk "bad signature → 401" "$(post "$BODY" "deadbeef")" "401"
-chk "missing signature → 401" "$(curl -s -o /dev/null -w '%{http_code}' "$FN" -H "apikey: $ANON" -H 'Content-Type: application/json' -d "$BODY")" "401"
+chk "bad signature → 401" "$(post "$PROBE" "deadbeef")" "401"
+chk "missing signature → 401" "$(curl -s -o /dev/null -w '%{http_code}' "$FN" -H "apikey: $ANON" -H 'Content-Type: application/json' -d "$PROBE")" "401"
 
-BODY1="{\"user_id\":\"$USERID\",\"amount_won\":5000,\"payment_id\":\"pay_1\"}"
-chk "valid signature → 200 (grant)" "$(post "$BODY1" "$(sign "$BODY1")")" "200"
+# The legacy direct-grant body (user_id + amount_won + payment_id) was REMOVED: a body may
+# only name WHICH order settled. A CORRECTLY SIGNED legacy body must still be refused —
+# holding the secret must not be enough to pick your own price. This is the assertion that
+# keeps the removed path removed.
+echo "── legacy direct-grant body is refused even when signed ──"
+LEGACY="{\"user_id\":\"$USERID\",\"amount_won\":5000,\"payment_id\":\"pay_legacy\"}"
+chk "signed legacy body → 400" "$(post "$LEGACY" "$(sign "$LEGACY")")" "400"
+chk "legacy body granted nothing" "$(wallet)" "0"
+
+# ── HAPPY PATH: intent reconciliation ──
+echo "── signed merchant_uid → grant from the server snapshot ──"
+MU=$(intent credits_1000)
+[ -z "$MU" ] && { echo "FATAL: create_payment_intent returned no merchant_uid"; exit 1; }
+SNAP=$(snapshot "$MU")
+echo "  intent=${MU:0:14}… snapshot=$SNAP"
+B1="{\"merchant_uid\":\"$MU\",\"provider\":\"e2e\",\"provider_payment_id\":\"charge_1\"}"
+chk "signed intent → 200 (grant)" "$(post "$B1" "$(sign "$B1")")" "200"
 sleep 1
-chk "wallet credited ₩5000 = 5e9 micro-WON" "$(wallet)" "5000000000"
+chk "wallet credited from the SNAPSHOT" "$(wallet)" "$SNAP"
 
-# idempotent: same payment_id redelivered → granted once
-chk "redelivery same id → 200" "$(post "$BODY1" "$(sign "$BODY1")")" "200"
+# idempotent: same order redelivered → granted once
+chk "redelivery same merchant_uid → 200" "$(post "$B1" "$(sign "$B1")")" "200"
 sleep 1
-chk "idempotent — wallet still 5e9" "$(wallet)" "5000000000"
+chk "idempotent — wallet unchanged" "$(wallet)" "$SNAP"
 
-# a NEW payment stacks
-BODY2="{\"user_id\":\"$USERID\",\"amount_won\":3000,\"payment_id\":\"pay_2\"}"
-chk "second payment → 200" "$(post "$BODY2" "$(sign "$BODY2")")" "200"
+# a SECOND order stacks on top
+MU2=$(intent credits_5000)
+SNAP2=$(snapshot "$MU2")
+B2="{\"merchant_uid\":\"$MU2\",\"provider\":\"e2e\",\"provider_payment_id\":\"charge_2\"}"
+chk "second intent → 200" "$(post "$B2" "$(sign "$B2")")" "200"
 sleep 1
-chk "wallet now 8e9 (5000+3000)" "$(wallet)" "8000000000"
+chk "wallet stacks (snap1+snap2)" "$(wallet)" "$((SNAP+SNAP2))"
 
-# bad payloads → 400
-BAD="{\"user_id\":\"not-a-uuid\",\"amount_won\":5000,\"payment_id\":\"p\"}"
-chk "bad user_id → 400" "$(post "$BAD" "$(sign "$BAD")")" "400"
-OVER="{\"user_id\":\"$USERID\",\"amount_won\":9999999,\"payment_id\":\"p3\"}"
-chk "over-cap amount → 400" "$(post "$OVER" "$(sign "$OVER")")" "400"
+# ── refusals never move money ──
+echo "── unknown / absent references ──"
+UNK='{"merchant_uid":"pi_does_not_exist"}'
+chk "unknown merchant_uid → 400" "$(post "$UNK" "$(sign "$UNK")")" "400"
+NOMU='{"provider":"e2e"}'
+chk "body without merchant_uid → 400" "$(post "$NOMU" "$(sign "$NOMU")")" "400"
+sleep 1
+chk "wallet untouched by refusals" "$(wallet)" "$((SNAP+SNAP2))"
 
 echo ""; echo "════════ RESULT: PASS=$PASS FAIL=$FAIL ════════"
 pkill -f "functions serve payment-webhook" 2>/dev/null
+# cleanup — the auth user cascades ai_credit_balance / payment_intents
+curl -s -X DELETE "$API/auth/v1/admin/users/$USERID" -H "apikey: $SVC" -H "Authorization: Bearer $SVC" >/dev/null
 [ "$FAIL" = "0" ] && { echo "ALL_PAYMENT_WEBHOOK_TESTS_PASSED"; exit 0; } || { echo "PAYMENT_WEBHOOK_FAILURES"; exit 1; }

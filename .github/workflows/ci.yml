@@ -394,6 +394,7 @@ jobs:
             supabase/tests/quiz_filler_pool_test.sql \
             supabase/tests/ai_free_allowance_test.sql \
             supabase/tests/ai_free_allowance_failure_test.sql \
+            supabase/tests/my_card_schedule_isolation_test.sql \
             supabase/tests/quiz_set_history_test.sql \
             supabase/tests/remediation_replay_test.sql \
             supabase/tests/unpriced_model_test.sql; do
