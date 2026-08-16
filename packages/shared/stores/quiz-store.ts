@@ -39,6 +39,15 @@ export type QuizAction = 'generate_mcq' | 'generate_short' | 'generate_essay'
  * is exactly the bug this batching exists to fix, so `quiz-batch-size.test.ts` pins the two
  * together.
  */
+/**
+ * Decks we have already asked the model to resolve an answer key for, this session.
+ *
+ * Module-level rather than store state: it is not something a screen renders, and putting it in
+ * the store would put a cache-invalidation question in front of every future reader of the store
+ * shape. Cleared by a reload, which is when a learner who edited their template wants a re-ask.
+ */
+const answerKeyAsked = new Set<string>()
+
 export const QUIZ_BATCH_SIZE: Record<QuizQuestionType, number> = {
   mcq: 8,
   short: 8,
@@ -493,8 +502,24 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     // answers on the back, or none — 342 of the 771 cards on the reporting account were refused
     // for exactly that. It is a question a model can settle from the author's own field labels,
     // once per template, so ask rather than showing a dead end and instructions to go and edit
-    // a template. Free, and idempotent: a template that already has a key is not re-asked.
-    if (counts.total > 0 && counts.eligible === 0) {
+    // a template. Free: this path neither reserves nor charges.
+    //
+    // ONCE PER DECK, though.
+    //
+    // The claim that it is "idempotent because a template that already has a key is not
+    // re-asked" only holds when the model SUCCEEDS. `get_quiz_answer_candidates` excludes
+    // templates that now have a key — a template where the model keeps answering with something
+    // outside the candidate list never gets one, so it was re-asked in full on every visit to
+    // the setup screen. Free to the learner is not free to us, and selecting a deck also waited
+    // on that loop: one model call per ambiguous template, sequentially, against DeepSeek's 90s
+    // timeout.
+    //
+    // Session-scoped, deliberately. The honest fix is a server-side record of "asked and it did
+    // not resolve", which is a table and a migration; this bounds the repeat to once per deck
+    // per app session, which is the part that was unbounded. A reload asks again, and that is
+    // the right behaviour for a learner who has just gone and fixed the template.
+    if (counts.total > 0 && counts.eligible === 0 && !answerKeyAsked.has(deckId)) {
+      answerKeyAsked.add(deckId)
       try {
         const { error } = await supabase.functions.invoke('ai-generate', {
           body: { kind: 'quiz_answer_key', deckId },
