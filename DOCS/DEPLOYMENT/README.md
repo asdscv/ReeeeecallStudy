@@ -46,9 +46,19 @@
 웹은 **Cloudflare Worker + 정적 자산**(`wrangler.jsonc`: `main: ./worker.js`, `assets.directory: ./packages/web/dist`)이다. `worker.js` + `worker-modules/`가 봇/SEO(사이트맵·hreflang·robots·JSON-LD·인사이트 콘텐츠)를 서버사이드로 처리하고, 일반 사용자에겐 SPA 자산을 서빙한다.
 
 ### 배포 방법 — 자동 (별도 명령 불필요)
-- **Cloudflare Git 통합**이 `main` 브랜치를 watch → push 시 **자동 빌드 + 배포**.
+- **Cloudflare Git 통합**이 ★ **`develop` 브랜치**를 watch → push 시 **자동 빌드 + 배포**.
 - `.github/workflows`에 웹 배포 스텝은 **없다**(Cloudflare가 직접 함). `wrangler deploy`를 CI에서 돌리지 않는다.
-- 즉 **develop → main PR을 머지하면 웹이 자동 재배포**된다.
+- 즉 ★ **feature → develop PR을 머지하면 그 시점에 웹이 전 사용자에게 나간다.** `develop`은 스테이징이 아니다.
+
+> ⚠️ **2026-08-17 정정.** 이 줄은 오랫동안 "`main` 브랜치를 watch"라고 적혀 있었고 **틀렸다.**
+> 실측: 라이브 `reeeeecallstudy.xyz`가 `origin/main`에는 없고 `origin/develop`에만 있는 키를 서빙하고 있었다
+> (`develop`이 `main`보다 34커밋 앞선 시점).
+> ```bash
+> curl -sS https://reeeeecallstudy.xyz/locales/ko/ai-generate.json | jq .wallet.freeQuizOnly
+> # → "오늘 남은 무료 문항 {{free}}개"   (develop 에만 있는 키)
+> git show origin/main:packages/web/public/locales/ko/ai-generate.json | jq .wallet.freeQuizOnly  # → null
+> ```
+> 이 오류는 `DOCS/STANDARD/09_DEPLOYMENT`·`01_ARCHITECTURE`로도 그대로 전파됐다가 함께 정정됐다.
 
 ### 배포 확인
 ```bash
