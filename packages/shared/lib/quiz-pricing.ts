@@ -2,8 +2,14 @@
  * What a quiz costs, said out loud on the screen where the learner decides.
  *
  * The rule itself is deliberately simple and stays that way: the QUESTIONS are the asset and are
- * paid for once, so retaking a set is free forever; GRADING is a fresh model call every time and
- * is charged every time. Multiple choice is compared server-side and costs nothing either way.
+ * paid for once, so retaking a set is free forever; a MODEL CALL AFTER AN ANSWER is fresh every
+ * time and is charged every time.
+ *
+ * Multiple choice buys something different with that call. Its mark is decided in SQL on submit,
+ * free and final, so what is on sale is the EXPLANATION — the axis the right option and theirs
+ * differ on. Cheaper than grading (1 unit against 2 and 8) because the hard part is already
+ * done, and optional in a way a grade is not: the learner already knows whether they were
+ * right.
  *
  * What was missing was the telling. The grade button reads "이 답안 채점" with no price on it —
  * that was a deliberate choice, a button is a decision and not a price tag — but nothing else said
@@ -116,9 +122,10 @@ export function freeLeftLine(
 /**
  * What a learner should know before tapping 다시 풀기, for this set's question type.
  *
- * Multiple choice is a genuinely free retake end to end — the questions are already paid for and
- * the grading is a string comparison — so saying "채점만 차감돼요" there would invent a cost that
- * does not exist. Written answers do carry one, every sitting, and that is the sentence.
+ * Multiple choice keeps its own sentence, but it no longer says "free". The retake itself still
+ * costs nothing — the questions are paid for and the marking is an index compare — and now there
+ * is an optional per-answer explanation on top, which is a different promise from a written
+ * answer's "every sitting charges you to be graded at all".
  */
 export function retakeNoteKey(questionType: string | null | undefined): string {
   return questionType === 'mcq' ? 'pricing.retakeMcq' : 'pricing.retakeWritten'

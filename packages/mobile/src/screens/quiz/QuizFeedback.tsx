@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import {
-  asShortAnswerFeedback, asEssayFeedback, asStoredRubric, splitBySpan,
+  asMcqFeedback, asShortAnswerFeedback, asEssayFeedback, asStoredRubric, splitBySpan,
 } from '@reeeeecall/shared/lib/quiz-feedback'
 import { useTheme } from '../../theme'
+import { testProps } from '../../utils/testProps'
 
 /**
  * What the grader said, rendered without a word the model wrote.
@@ -25,15 +26,40 @@ export function QuizFeedback({ feedback, rubric, learnerText, referenceText }: {
   const theme = useTheme()
   const { t } = useTranslation('quiz')
 
+  const mcq = asMcqFeedback(feedback)
   const short = asShortAnswerFeedback(feedback)
   const essay = asEssayFeedback(feedback)
-  if (!short && !essay) return null
+  if (!mcq && !short && !essay) return null
 
   const textFor = (from: 'learner' | 'reference') =>
     from === 'learner' ? (learnerText ?? '') : (referenceText ?? '')
 
   return (
     <View style={[styles.box, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+      {/* Multiple choice. The mark came from SQL on submit and is not repeated here; this is the
+          part that was bought — what the two options differ on, and the words in the learner's
+          own card that carry the difference. */}
+      {mcq && (
+        <>
+          <Text style={[theme.typography.label, { color: theme.colors.text }]}
+            {...testProps('quiz-mcq-axis')}>
+            {t(`mcqAxis.${mcq.axis}`)}
+          </Text>
+          {mcq.spans.map((span, i) => {
+            const { before, hit, after } = splitBySpan(textFor(span.from), span)
+            if (hit === '') return null
+            return (
+              <Text key={i} style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+                {/* 같은 두 키 — "내 답에서"는 고른 보기, "카드에서"는 정답 보기. */}
+                {t(`span.${span.from}`)}: {before}
+                <Text style={{ color: theme.colors.primary, fontWeight: '600' }}>{hit}</Text>
+                {after}
+              </Text>
+            )
+          })}
+        </>
+      )}
+
       {short && (
         <>
           <Text style={[theme.typography.label, { color: theme.colors.text }]}>

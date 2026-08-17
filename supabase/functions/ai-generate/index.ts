@@ -32,14 +32,14 @@ import {
 import {
   buildQuizCardSource,
   validateMultipleChoiceGeneration, validateShortAnswerGeneration, validateEssayGeneration,
-  gradeGate, validateShortAnswerGrade, validateEssayGrade,
+  gradeGate, validateShortAnswerGrade, validateEssayGrade, validateMcqExplanation,
   DEFAULT_DIFFICULTY, isMcqDistractorFlaw,
   type QuizCardSource, type QuizItem, type EssayCriterion, type QuizDifficulty,
 } from '../_shared/ai-quiz.ts'
 import {
   QUIZ_TEMPERATURE,
   buildMcqGenerationPrompt, buildShortAnswerGenerationPrompt, buildEssayGenerationPrompt,
-  buildShortAnswerGradePrompt, buildEssayGradePrompt, MAX_QUIZ_BATCH,
+  buildShortAnswerGradePrompt, buildEssayGradePrompt, buildMcqExplanationPrompt, MAX_QUIZ_BATCH,
 } from '../_shared/ai-quiz-prompts.ts'
 
 // Provider + model are resolved per request from the registry (env-driven) —
@@ -186,6 +186,125 @@ async function settleQuiz(
 async function sha256Hex(text: string): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('')
+}
+
+/**
+ * Buy an explanation for a multiple-choice answer that is already marked.
+ *
+ * The learner asked "왜 이게 답이야?" about a question whose correctness the server settled on
+ * submit. So the money buys an EXPLANATION, never a verdict:
+ *
+ *   correctness  → `submit_quiz_answer`, index compare, free, on submit, final
+ *   explanation  → here, one provider call, priced as `grade_mcq`, at the learner's request
+ *
+ * Nothing in this path may write `normalized_score`. `apply_quiz_explanation` (mig 245) is a
+ * separate RPC for exactly that reason: `apply_quiz_grade` rewrites the score and the run tally,
+ * and a model that disagreed with the answer key would silently mark a right answer wrong on a
+ * question that has an objective key.
+ */
+async function explainMultipleChoice(ctx: {
+  // deno-lint-ignore no-explicit-any
+  service: any; sbUser: any
+  userId: string; itemId: string; clientRef: string; maxPrice: number
+  cors: Record<string, string>
+  question: { stem: string; options: string[] | null; correct_index: number | null; reference_answer: string }
+  optionOrder: number[] | null
+  chain: ResolvedModel[]; model: ResolvedModel
+}): Promise<Response> {
+  const { service, sbUser, userId, itemId, clientRef, maxPrice, cors, question, optionOrder } = ctx
+  const options = question.options ?? []
+  const correctIndex = question.correct_index
+
+  if (options.length === 0 || correctIndex === null || !optionOrder) {
+    return json({ error: 'This question no longer exists', code: 'QUIZ_ITEM_GONE' }, 410, cors)
+  }
+
+  // The learner's choice is read from the attempt, not from the request body. The client already
+  // told us once, on submit, and that is the copy the score was computed from — trusting a second
+  // telling would let a learner buy an explanation of an answer they did not give.
+  const attemptResult = await service.from('answer_attempts')
+    .select('response, normalized_score, feedback')
+    .eq('quiz_run_item_id', itemId).maybeSingle()
+  const attempt = attemptResult.data as
+    { response: { choice?: number } | null; normalized_score: number | null; feedback: unknown } | null
+  if (!attempt) {
+    return json({ error: 'Answer this question first', code: 'QUIZ_NOT_ANSWERED' }, 409, cors)
+  }
+
+  // Already bought. Hand back what they paid for rather than charging again for the same
+  // sentence — a double tap on a slow connection is not a second purchase.
+  const bought = attempt.feedback as { axis?: unknown } | null
+  if (bought && typeof bought === 'object' && typeof bought.axis === 'string') {
+    return json({ itemId, grade: bought, balance: null, cached: true }, 200, cors)
+  }
+
+  const shown = attempt.response?.choice
+  if (typeof shown !== 'number' || shown < 0 || shown >= optionOrder.length) {
+    return json({ error: 'Answer this question first', code: 'QUIZ_NOT_ANSWERED' }, 409, cors)
+  }
+  const chosenCanonical = optionOrder[shown]
+  const chosen = options[chosenCanonical] ?? ''
+  const correct = options[correctIndex] ?? question.reference_answer
+  if (chosen === '' || correct === '') {
+    return json({ error: 'This question no longer exists', code: 'QUIZ_ITEM_GONE' }, 410, cors)
+  }
+
+  const input = {
+    question: question.stem,
+    reference: correct,
+    learner: chosen,
+    alternatives: options.filter((_, i) => i !== correctIndex && i !== chosenCanonical),
+    correct: chosenCanonical === correctIndex,
+  }
+
+  const { data: reserveRaw, error: reserveError } = await sbUser.rpc('reserve_ai_quiz', {
+    p_action: 'grade_mcq',
+    p_count: 1,
+    p_client_ref: clientRef,
+    p_max_price_micro: maxPrice,
+    p_run_item_id: itemId,
+  })
+  if (reserveError) {
+    const mapped = quizReserveResponse(reserveError.code, cors)
+    if (mapped) return mapped
+    console.error('[ai-generate] mcq explain reserve error:', reserveError.message)
+    return json({ error: 'Metering error', code: 'AI_METER_ERROR' }, 500, cors)
+  }
+  const meter = (reserveRaw ?? {}) as { job_ref?: string }
+
+  try {
+    const prompt = buildMcqExplanationPrompt(input)
+    // Deterministic, for the same reason grading is: the same answer explained twice must not
+    // name two different axes, or the learner is told two different things about one mistake.
+    const generated = await generate(
+      ctx.chain, prompt.systemPrompt, prompt.userPrompt, undefined, QUIZ_TEMPERATURE.grade,
+      outputCapFor('quiz_grade'))
+
+    const verdict = validateMcqExplanation(generated.json, input)
+    if (!verdict.graded) {
+      await releaseJob(userId, meter.job_ref)
+      return json({ error: 'Explanation failed', code: 'QUIZ_GRADE_REFUSED', reason: verdict.refusal }, 422, cors)
+    }
+
+    const grade = verdict.grade
+    const { error: applyError } = await service.rpc('apply_quiz_explanation', {
+      p_run_item_id: itemId,
+      // Merged into whatever the submit-time grader wrote, never over it.
+      p_evaluator_result: { mcq_explanation: grade },
+      p_feedback: grade,
+      p_evaluator_version: `${generated.model.provider}:${generated.model.model}`,
+    })
+    if (applyError) throw new Error(`PERSISTENCE:${applyError.message}`)
+
+    const settled = await settleQuiz(userId, meter.job_ref, 1, generated.model, generated.usage)
+    return json({ itemId, grade, balance: settled?.balance ?? null }, 200, cors)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'UNKNOWN'
+    console.error('[ai-generate] mcq explanation failure:', message)
+    await releaseJob(userId, meter.job_ref)
+    const code = message.startsWith('PERSISTENCE:') ? 'AI_PERSISTENCE_ERROR' : 'AI_PROVIDER_ERROR'
+    return json({ error: 'Explanation failed', code }, 502, cors)
+  }
 }
 
 /** Reserve errors are the same four everywhere; map them once. */
@@ -1205,9 +1324,13 @@ Write them again, obeying those rules exactly.`
     // ── Quiz grading — the repeating meter ──
     //
     // Charged per submitted answer, because unlike generation this cannot be cached: the
-    // learner writes something different every time. Multiple choice never reaches here —
-    // `submit_quiz_answer` grades it by index comparison in SQL, for free, and `grade_mcq`
-    // has no row in `ai_quiz_price_units` so it cannot even be reserved.
+    // learner writes something different every time.
+    //
+    // Multiple choice takes a different road through the same branch. Its CORRECTNESS is not
+    // ours to decide here — `submit_quiz_answer` settled it on submit by comparing indexes
+    // against the card's own key, instantly and free, and no model result is allowed to
+    // overwrite it. What `grade_mcq` buys is an explanation: the axis the two options differ
+    // on, and a span into text the learner already has (mig 245).
     if (kind === 'quiz_grade') {
       const itemId = typeof body.runItemId === 'string' ? body.runItemId : null
       const clientRef = typeof body.clientRef === 'string' ? body.clientRef : null
@@ -1219,7 +1342,7 @@ Write them again, obeying those rules exactly.`
 
       const service = sbServiceRole()
       const itemResult = await service.from('quiz_run_items')
-        .select('id, question_id, run_id, status, quiz_runs!inner(user_id)')
+        .select('id, question_id, run_id, status, option_order, quiz_runs!inner(user_id)')
         .eq('id', itemId).maybeSingle()
       if (itemResult.error || !itemResult.data
           || (itemResult.data as { quiz_runs?: { user_id?: string } }).quiz_runs?.user_id !== userId) {
@@ -1229,7 +1352,7 @@ Write them again, obeying those rules exactly.`
       if (!questionId) return json({ error: 'This question no longer exists', code: 'QUIZ_ITEM_GONE' }, 410, cors)
 
       const qResult = await service.from('quiz_questions')
-        .select('id, question_type, stem, reference_answer, reference_context, rubric, meta')
+        .select('id, question_type, stem, reference_answer, reference_context, rubric, meta, options, correct_index')
         .eq('id', questionId).maybeSingle()
       if (qResult.error || !qResult.data) {
         return json({ error: 'This question no longer exists', code: 'QUIZ_ITEM_GONE' }, 410, cors)
@@ -1238,9 +1361,15 @@ Write them again, obeying those rules exactly.`
         question_type: string; stem: string; reference_answer: string
         reference_context: string | null; rubric: EssayCriterion[] | null
         meta: { crossLingual?: boolean } | null
+        options: string[] | null; correct_index: number | null
       }
+
       if (question.question_type === 'mcq') {
-        return json({ error: 'Multiple choice is graded without AI', code: 'BAD_REQUEST' }, 400, cors)
+        return await explainMultipleChoice({
+          service, sbUser, userId, itemId, clientRef, maxPrice, cors,
+          question, optionOrder: (itemResult.data as { option_order: number[] | null }).option_order,
+          chain, model,
+        })
       }
       const quizType = question.question_type === 'essay' ? 'essay' : 'short_answer'
 

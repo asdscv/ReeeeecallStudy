@@ -33,7 +33,7 @@
     "untitled": "测验",
     "type": "题型",
     "typeHint": {
-      "mcq": "四选一。作答后立即判定，不使用 AI 批改，因此不消耗额度。",
+      "mcq": "四选一。选择后立即判分——免费，且该判分不会更改。如果需要，可以购买 AI 解析说明原因。",
       "short": "用词语或短句作答。由 AI 批改，按答案计费。",
       "essay": "写几句话，按评分标准批改。最难，也最贵。"
     },
@@ -69,6 +69,8 @@
     "next": "下一题",
     "finish": "完成",
     "grading": "批改中…",
+    "explain": "用 AI 解析这题",
+    "explaining": "正在生成解析…",
     "reference": "答案：{{answer}}",
     "grade": "批改这个答案",
     "length": {
@@ -219,7 +221,7 @@
   },
   "pricing": {
     "gradeCost": "批改将扣除{{amount}}",
-    "retakeMcq": "还是这些题目，只是选项顺序会变。选择题不使用 AI 批改，因此不消耗额度。",
+    "retakeMcq": "同样的题目，只是选项顺序会变。重做本身不扣费，只有 AI 解析按题扣费。",
     "retakeWritten": "再做一次同样的题目。题目已经付过费，但批改每次都会重新计费。",
     "genAllFree": "使用免费题额生成，不扣费。",
     "genAllPaid": "{{paid, number}} 道题 · {{amount}}",
@@ -242,9 +244,20 @@
       "generate_mcq": "生成选择题",
       "generate_short": "生成简答题",
       "generate_essay": "生成论述题",
+      "grade_mcq": "选择题解析",
       "grade_short": "简答批改",
       "grade_essay": "论述批改",
       "quiz_answer_key": "判定答案栏"
     }
+  },
+  "mcqAxis": {
+    "category": "完全属于不同的领域。",
+    "component": "有一处不同——一个项、一个符号、一个词。",
+    "condition": "成立的条件不同——两者都可能正确。",
+    "direction": "方向相反——谁对谁做这件事颠倒了。",
+    "form": "只是长得像，意思不同。",
+    "order": "顺序或步骤不同。",
+    "quantity": "数量或程度不同。",
+    "scope": "适用范围不同——一个更宽。"
   }
 }

@@ -33,7 +33,7 @@
     "untitled": "Kuis",
     "type": "Jenis soal",
     "typeHint": {
-      "mcq": "Empat pilihan. Diperiksa begitu Anda menjawab — tanpa AI, jadi tanpa kredit.",
+      "mcq": "Empat pilihan. Dinilai begitu kamu menjawab — gratis, dan nilainya tidak berubah. Kalau mau, kamu bisa membeli penjelasan AI.",
       "short": "Jawab dengan kata atau frasa. Dinilai AI, dikenakan biaya per jawaban.",
       "essay": "Tulis beberapa kalimat, dinilai dengan rubrik. Paling menuntut dan paling mahal."
     },
@@ -69,6 +69,8 @@
     "next": "Berikutnya",
     "finish": "Selesai",
     "grading": "Menilai…",
+    "explain": "Jelaskan dengan AI",
+    "explaining": "Menyusun penjelasan…",
     "reference": "Jawaban: {{answer}}",
     "grade": "Nilai jawaban ini",
     "length": {
@@ -219,7 +221,7 @@
   },
   "pricing": {
     "gradeCost": "Penilaian dikenakan {{amount}}",
-    "retakeMcq": "Soal yang sama, pilihan jawabannya diacak. Pilihan ganda diperiksa tanpa AI, jadi tidak memakai kredit.",
+    "retakeMcq": "Soal yang sama, pilihannya diacak. Mengulang tidak dikenai biaya; hanya penjelasan AI yang dihitung per jawaban.",
     "retakeWritten": "Soal yang sama lagi. Soalnya sudah dibayar, tetapi penilaian adalah panggilan baru dan dikenai biaya setiap kali.",
     "genAllFree": "Dibuat dari jatah gratis Anda. Tidak ada biaya.",
     "genAllPaid": "{{paid, number}} soal · {{amount}}",
@@ -242,9 +244,20 @@
       "generate_mcq": "Pilihan ganda",
       "generate_short": "Isian singkat",
       "generate_essay": "Esai",
+      "grade_mcq": "Penjelasan pilihan ganda",
       "grade_short": "Penilaian isian",
       "grade_essay": "Penilaian esai",
       "quiz_answer_key": "Kolom jawaban"
     }
+  },
+  "mcqAxis": {
+    "category": "Keduanya dari bidang yang sama sekali berbeda.",
+    "component": "Ada satu bagian yang berbeda — satu suku, tanda, atau kata.",
+    "condition": "Berlaku pada kondisi yang berbeda — keduanya bisa benar.",
+    "direction": "Arahnya terbalik — siapa melakukan apa kepada siapa.",
+    "form": "Bentuknya mirip, artinya berbeda.",
+    "order": "Urutan atau tahapannya berbeda.",
+    "quantity": "Jumlah atau tingkatnya berbeda.",
+    "scope": "Cakupannya berbeda — satu lebih luas."
   }
 }

@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import {
-  asShortAnswerFeedback, asEssayFeedback, asStoredRubric, splitBySpan,
+  asMcqFeedback, asShortAnswerFeedback, asEssayFeedback, asStoredRubric, splitBySpan,
 } from '@reeeeecall/shared/lib/quiz-feedback'
 
 /**
@@ -23,15 +23,40 @@ export function QuizFeedback({ feedback, rubric, learnerText, referenceText }: {
 }) {
   const { t } = useTranslation('quiz')
 
+  const mcq = asMcqFeedback(feedback)
   const short = asShortAnswerFeedback(feedback)
   const essay = asEssayFeedback(feedback)
-  if (!short && !essay) return null
+  if (!mcq && !short && !essay) return null
 
   const textFor = (from: 'learner' | 'reference') =>
     from === 'learner' ? (learnerText ?? '') : (referenceText ?? '')
 
   return (
     <div className="p-3 bg-card rounded-lg border border-border space-y-2">
+      {/* Multiple choice. The mark came from SQL on submit and is not repeated here; this is the
+          part that was bought — what the two options differ on, and the words in the learner's
+          own card that carry the difference. */}
+      {mcq && (
+        <>
+          <p className="text-sm font-medium text-foreground" data-testid="quiz-mcq-axis">
+            {t(`mcqAxis.${mcq.axis}`)}
+          </p>
+          {mcq.spans.map((span, i) => {
+            const { before, hit, after } = splitBySpan(textFor(span.from), span)
+            if (hit === '') return null
+            return (
+              <p key={i} className="text-xs text-content-tertiary">
+                {/* 같은 두 키를 씁니다 — "내 답에서"는 고른 보기, "카드에서"는 정답 보기. */}
+                <span>{t(`span.${span.from}`)}: </span>
+                {before}
+                <mark className="bg-brand/20 text-foreground rounded px-0.5">{hit}</mark>
+                {after}
+              </p>
+            )
+          })}
+        </>
+      )}
+
       {short && (
         <>
           <p className="text-sm font-medium text-foreground">

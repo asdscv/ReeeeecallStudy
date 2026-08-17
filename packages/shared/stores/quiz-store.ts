@@ -22,9 +22,16 @@ import { newPersistenceId } from '../lib/persistence-id'
 export type QuizQuestionType = 'mcq' | 'short' | 'essay'
 export type QuizScopeKind = 'deck' | 'tags' | 'cards'
 
-/** Mirrors `ai_quiz_price_units.action`. `grade_mcq` is absent because it is free. */
+/**
+ * Mirrors `ai_quiz_price_units.action`.
+ *
+ * `grade_mcq` buys an EXPLANATION, not a mark. Multiple-choice correctness is decided by
+ * `submit_quiz_answer` in SQL the moment the answer lands — instantly, free, and final — and no
+ * model result is allowed to overwrite it (mig 245). What the learner pays for is the axis the
+ * right option and theirs differ on, and the line of their own card that settles it.
+ */
 export type QuizAction = 'generate_mcq' | 'generate_short' | 'generate_essay'
-  | 'grade_short' | 'grade_essay'
+  | 'grade_mcq' | 'grade_short' | 'grade_essay'
 
 /**
  * Cards per generation call, mirroring `MAX_QUIZ_BATCH` in `ai-quiz-prompts.ts`.
@@ -57,9 +64,15 @@ export const QUIZ_BATCH_SIZE: Record<QuizQuestionType, number> = {
 export const QUIZ_GENERATE_ACTION: Record<QuizQuestionType, QuizAction> = {
   mcq: 'generate_mcq', short: 'generate_short', essay: 'generate_essay',
 }
-/** Multiple choice is missing on purpose: it is graded by index comparison, for free. */
-export const QUIZ_GRADE_ACTION: Record<Exclude<QuizQuestionType, 'mcq'>, QuizAction> = {
-  short: 'grade_short', essay: 'grade_essay',
+/**
+ * What the AI call after an answer costs, per type.
+ *
+ * Multiple choice is the odd one: its entry buys an explanation of an answer already scored,
+ * while the other two buy the score itself. That is why it is the cheapest — the hard part is
+ * already done, in SQL, for free.
+ */
+export const QUIZ_GRADE_ACTION: Record<QuizQuestionType, QuizAction> = {
+  mcq: 'grade_mcq', short: 'grade_short', essay: 'grade_essay',
 }
 
 export interface QuizQuote {

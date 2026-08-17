@@ -33,7 +33,7 @@
     "untitled": "Bài kiểm tra",
     "type": "Loại câu hỏi",
     "typeHint": {
-      "mcq": "Bốn lựa chọn. Kiểm tra ngay khi bạn trả lời — không dùng AI chấm nên không tốn tín dụng.",
+      "mcq": "Bốn lựa chọn. Chấm ngay khi bạn trả lời — miễn phí, và kết quả đó không thay đổi. Nếu muốn, bạn có thể mua phần giải thích bằng AI.",
       "short": "Trả lời bằng một từ hoặc cụm từ. AI chấm, tính phí theo từng câu.",
       "essay": "Viết vài câu, chấm theo tiêu chí. Khó nhất và đắt nhất."
     },
@@ -69,6 +69,8 @@
     "next": "Tiếp",
     "finish": "Kết thúc",
     "grading": "Đang chấm…",
+    "explain": "Nhờ AI giải thích câu này",
+    "explaining": "Đang viết phần giải thích…",
     "reference": "Đáp án: {{answer}}",
     "grade": "Chấm câu này",
     "length": {
@@ -219,7 +221,7 @@
   },
   "pricing": {
     "gradeCost": "Chấm bài tốn {{amount}}",
-    "retakeMcq": "Vẫn những câu hỏi đó, chỉ đảo thứ tự lựa chọn. Trắc nghiệm không dùng AI chấm nên không tốn tín dụng.",
+    "retakeMcq": "Vẫn những câu hỏi đó, chỉ đảo thứ tự lựa chọn. Làm lại không mất phí; chỉ phần giải thích bằng AI mới tính theo từng câu.",
     "retakeWritten": "Làm lại đúng những câu hỏi đó. Câu hỏi đã được trả phí, nhưng chấm bài là lượt gọi mới và bị tính phí mỗi lần.",
     "genAllFree": "Tạo bằng số câu miễn phí. Không bị trừ.",
     "genAllPaid": "{{paid, number}} câu · {{amount}}",
@@ -242,9 +244,20 @@
       "generate_mcq": "Tạo trắc nghiệm",
       "generate_short": "Tạo tự luận ngắn",
       "generate_essay": "Tạo bài luận",
+      "grade_mcq": "Giải thích câu trắc nghiệm",
       "grade_short": "Chấm tự luận ngắn",
       "grade_essay": "Chấm bài luận",
       "quiz_answer_key": "Xác định ô đáp án"
     }
+  },
+  "mcqAxis": {
+    "category": "Thuộc hai lĩnh vực hoàn toàn khác nhau.",
+    "component": "Khác một thành phần — một hạng tử, một dấu, một từ.",
+    "condition": "Áp dụng trong điều kiện khác nhau — cả hai đều có thể đúng.",
+    "direction": "Chiều ngược lại — ai làm gì với ai.",
+    "form": "Trông giống nhau nhưng nghĩa khác nhau.",
+    "order": "Thứ tự hoặc các bước khác nhau.",
+    "quantity": "Khác về lượng hoặc mức độ.",
+    "scope": "Phạm vi khác nhau — một bên rộng hơn."
   }
 }

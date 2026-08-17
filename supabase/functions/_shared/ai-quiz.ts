@@ -591,7 +591,15 @@ export interface QuizItemMultipleChoice {
   readonly type: 'multiple_choice'
   readonly itemId: string
   readonly cardId: string
-  /** The card's own prompt, verbatim. Never model-authored. */
+  /**
+   * The question the learner answers.
+   *
+   * Model-authored, then checked: it may not leak the answer, name our JSON keys, or run past
+   * `MAX_QUESTION_CHARS`. A stem that fails any of those falls back to the card's own prompt —
+   * which is what this field held for every item until then, and reads as a title rather than a
+   * question on any card whose front is a heading ("인수분해 공식(1) - 완전제곱식", four formulas
+   * below it and no word about which to pick).
+   */
   readonly question: string
   /** Exactly `MCQ_OPTION_COUNT`, assembled server-side with the card's answer at `correctIndex`. */
   readonly options: readonly string[]
@@ -1350,4 +1358,93 @@ export function validateEssayGrade(
     graded: true,
     grade: { criteria: out, score: Math.min(1, Math.max(0, earned / judged)), unjudgeableWeight },
   }
+}
+
+/**
+ * What separates the right option from the one the learner picked.
+ *
+ * Multiple choice is scored by `submit_quiz_answer` — an integer compare against the key we
+ * wrote — and that stays the authority. A model cannot make that verdict better; it can only
+ * agree, disagree (a defect), or cost money to agree. So `grade_mcq` buys something else: the
+ * AXIS the two options differ on, and a span into the learner's own card that settles it.
+ *
+ * Deliberately different from `MCQ_DISTRACTOR_FLAWS`. A flaw label is written at generation time
+ * and says what the option IS ("반대", "너무 넓음"). An axis is chosen after seeing what the
+ * learner actually picked and says what the DISTINCTION hinges on — which is the thing they got
+ * wrong, and the thing they have to hold on to next time.
+ *
+ * Subject-neutral for the same reason every other closed set here is: these hold for a
+ * pharmacology deck and a JLPT deck alike, and each has one hand-translated string.
+ */
+export const MCQ_EXPLANATION_AXES = [
+  /** Who does what to whom, or which way it runs. 貸す/借りる, 원고/피고, 산/염기. */
+  'direction',
+  /** One covers more cases than the other. */
+  'scope',
+  /** Both are true, but only under different conditions. */
+  'condition',
+  /** They look or sound alike and mean different things. affect/effect, 待つ/持つ. */
+  'form',
+  /** One part of a multi-part answer differs — a term, a coefficient, a sign. */
+  'component',
+  /** The steps or stages come in a different order. */
+  'order',
+  /** Same idea, different amount, degree or count. */
+  'quantity',
+  /** Different subject areas entirely; recognising the area is enough to separate them. */
+  'category',
+] as const
+export type McqExplanationAxis = typeof MCQ_EXPLANATION_AXES[number]
+
+const isMcqAxis = (v: unknown): v is McqExplanationAxis =>
+  typeof v === 'string' && (MCQ_EXPLANATION_AXES as readonly string[]).includes(v)
+
+export interface McqExplanation {
+  readonly axis: McqExplanationAxis
+  /** Into the chosen option or the correct one. At most `MAX_GAPS_PER_GRADE`. */
+  readonly spans: readonly QuizSpan[]
+}
+
+export interface McqExplanationInput {
+  readonly question: string
+  /** The correct option, verbatim. Spans with `from: 'reference'` index into this. */
+  readonly reference: string
+  /** The option the learner chose. Equal to `reference` when they were right. */
+  readonly learner: string
+  /** The other options, for context. Nothing indexes into these. */
+  readonly alternatives: readonly string[]
+  readonly correct: boolean
+}
+
+/**
+ * Validate an MCQ explanation.
+ *
+ * There is no score here and there must never be one: `normalized_score` was written on submit
+ * and `apply_quiz_explanation` does not touch it. A model that returns a score is returning a
+ * field we drop.
+ *
+ * An unrecognised axis is a refusal rather than a default. Every other closed set in this file
+ * refuses on an unknown member, and picking one for the model would put a label on the screen
+ * that nothing in the answer supports — the learner would be told they confused direction when
+ * the grader had no idea.
+ */
+export function validateMcqExplanation(
+  raw: unknown,
+  input: McqExplanationInput,
+): QuizGradeOutcome<McqExplanation> {
+  if (!isRecord(raw)) return { graded: false, refusal: 'invalid_result' }
+  const axis = raw.axis
+  if (!isMcqAxis(axis)) return { graded: false, refusal: 'invalid_result' }
+
+  // Same shape as the short-answer grader: consider a bounded slice, cap the SURVIVORS, so a
+  // malformed span cannot starve out a valid one behind it.
+  const spans: QuizSpan[] = []
+  const rawSpans = Array.isArray(raw.spans) ? raw.spans.slice(0, MAX_SPANS_CONSIDERED) : []
+  for (const s of rawSpans) {
+    if (spans.length >= MAX_GAPS_PER_GRADE) break
+    const span = validateSpan(s, input.learner.length, input.reference.length)
+    if (span) spans.push(span)
+  }
+
+  return { graded: true, grade: { axis, spans } }
 }

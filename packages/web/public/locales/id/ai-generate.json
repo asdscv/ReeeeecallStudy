@@ -70,7 +70,7 @@
       "price_changed": "Harga berubah saat kamu memilih. Periksa lalu coba lagi.",
       "failed": "Gagal diproses. Tidak ada saldo yang terpotong.",
       "retry": "Coba lagi",
-      "gradeYourself": "Kamu tetap bisa menyelesaikan kuis dan menilai soal ini sendiri, gratis."
+      "gradeYourself": "Kuis tetap bisa kamu selesaikan. Pilihan ganda sudah dinilai, dan jawaban tertulis yang kamu nilai sendiri gratis."
     },
     "freeQuizOnly": "Sisa {{free}} soal gratis hari ini"
   },

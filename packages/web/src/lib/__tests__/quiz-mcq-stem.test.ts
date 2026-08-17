@@ -104,9 +104,12 @@ describe('덱메이트 보기 중복', () => {
       (c, i) => `${c}:${i}`,
     )
     expect(out.items).toHaveLength(1)
-    const options = out.items[0].options
+    const item = out.items[0]
+    // 좁혀두지 않으면 유니온의 다른 갈래(단답)에는 options 가 없어 타입검사가 막는다.
+    if (item.type !== 'multiple_choice') throw new Error(`객관식이 아니다: ${item.type}`)
+    const options: readonly string[] = item.options
     expect(options).toContain('x²+5x+6=(x+2)(x+3)')
-    expect(options.some((o) => o.includes('(제곱)−(제곱)'))).toBe(false)
+    expect(options.some((o: string) => o.includes('(제곱)−(제곱)'))).toBe(false)
     // 그리고 어떤 보기도 다른 보기를 삼키지 않는다
     for (const a of options) {
       for (const b of options) {
