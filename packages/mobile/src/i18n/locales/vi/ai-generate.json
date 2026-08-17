@@ -80,7 +80,7 @@
       "price_changed": "Giá đã thay đổi trong lúc bạn chọn. Hãy kiểm tra và thử lại.",
       "failed": "Không xử lý được. Bạn không bị trừ tiền.",
       "retry": "Thử lại",
-      "gradeYourself": "Bạn vẫn có thể hoàn thành bài và tự chấm câu này miễn phí."
+      "gradeYourself": "Bạn vẫn có thể hoàn thành bài kiểm tra. Trắc nghiệm đã được chấm, còn câu tự luận bạn tự chấm thì miễn phí."
     },
     "freeQuizOnly": "Còn {{free}} câu miễn phí hôm nay"
   },

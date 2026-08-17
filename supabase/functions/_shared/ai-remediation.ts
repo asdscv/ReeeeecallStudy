@@ -2,7 +2,7 @@
  * The protocol vocabulary — every action name the SQL allowlists accept
  * (`reserve_ai_remediation`, `persist_ai_remediation`). NOT the list this server will run.
  */
-export const REMEDIATION_ACTIONS = ['explain', 'compare', 'hint', 'generate', 'evaluate', 'recommend'] as const
+export const REMEDIATION_ACTIONS = ['explain', 'compare', 'hint', 'generate', 'evaluate', 'recommend', 'diagnose'] as const
 export type RemediationAction = typeof REMEDIATION_ACTIONS[number]
 
 /**
@@ -36,9 +36,16 @@ export type RemediationAction = typeof REMEDIATION_ACTIONS[number]
  *
  * `generate` is content authoring, and `recommend` duplicates the free `weak-card-v1` path.
  *
+ * `diagnose` (mig 246) is the one that was widened, and it came with the thing that makes it
+ * honest: `get_learning_diagnosis_evidence` counts labels this app has been recording since
+ * mig 193 and never read back, `diagnosisGroundingError` refuses a thin window BEFORE the
+ * wallet is touched, and the output is a closed set — no prose, so nothing it returns can be
+ * confidently wrong about the subject. It takes its own path in `index.ts` rather than sharing
+ * `buildRemediationPrompt`, whose whole contract is `blocks[]` of model-written text.
+ *
  * Widen this ONLY together with the thing that makes the action honest.
  */
-export const SERVED_REMEDIATION_ACTIONS = ['explain', 'hint', 'compare'] as const
+export const SERVED_REMEDIATION_ACTIONS = ['explain', 'hint', 'compare', 'diagnose'] as const
 
 export interface RemediationRefs {
   action: RemediationAction

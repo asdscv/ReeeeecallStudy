@@ -33,7 +33,7 @@
     "untitled": "Quiz",
     "type": "Question type",
     "typeHint": {
-      "mcq": "Four options. Checked the moment you answer — no AI grading, so no credits.",
+      "mcq": "Four options. Marked the moment you answer — free, and that mark stands. If you want, you can buy an AI explanation of why.",
       "short": "A word or a phrase. Graded by AI, charged per answer.",
       "essay": "A few sentences, graded against a rubric. The most demanding, and the most expensive."
     },
@@ -69,6 +69,8 @@
     "next": "Next",
     "finish": "Finish",
     "grading": "Grading…",
+    "explain": "Explain this with AI",
+    "explaining": "Writing the explanation…",
     "reference": "Answer: {{answer}}",
     "grade": "Grade this answer",
     "length": {
@@ -219,7 +221,7 @@
   },
   "pricing": {
     "gradeCost": "Grading costs {{amount}}",
-    "retakeMcq": "The same questions, with the options reshuffled. Multiple choice is checked without AI, so it uses no credits.",
+    "retakeMcq": "The same questions, with the options reshuffled. Retaking costs nothing; only an AI explanation is charged, one answer at a time.",
     "retakeWritten": "The same questions again. The questions are already paid for, but grading is a fresh call and is charged every time.",
     "genAllFree": "Made from your free questions. Nothing is charged.",
     "genAllPaid": "{{paid, number}} questions · {{amount}}",
@@ -242,9 +244,20 @@
       "generate_mcq": "Multiple choice",
       "generate_short": "Short answer",
       "generate_essay": "Essay",
+      "grade_mcq": "Multiple-choice explanation",
       "grade_short": "Short-answer grading",
       "grade_essay": "Essay grading",
       "quiz_answer_key": "Answer field"
     }
+  },
+  "mcqAxis": {
+    "category": "They belong to different subjects entirely.",
+    "component": "One part differs — a term, a sign, a single word.",
+    "condition": "They apply under different conditions — both can be true.",
+    "direction": "The direction is reversed — who does what to whom.",
+    "form": "They look alike and mean different things.",
+    "order": "The steps come in a different order.",
+    "quantity": "The amount or degree differs.",
+    "scope": "They cover different ranges — one is broader."
   }
 }

@@ -29,7 +29,10 @@ describe('AI remediation contracts', () => {
   })
 
   it('serves exactly the actions an attempt can ground', () => {
-    expect([...SERVED_REMEDIATION_ACTIONS]).toEqual(['explain', 'hint', 'compare'])
+    // `diagnose` joined in mig 246 with the thing that makes it honest, the way `compare` did:
+    // counted evidence instead of one attempt, a refusal BEFORE the wallet when the window is
+    // thin, and a closed-set output so nothing it returns can be wrong about the subject.
+    expect([...SERVED_REMEDIATION_ACTIONS]).toEqual(['explain', 'hint', 'compare', 'diagnose'])
     for (const action of SERVED_REMEDIATION_ACTIONS) {
       expect(parseRemediationRefs({ action, goalId: id }), action).not.toBeNull()
     }

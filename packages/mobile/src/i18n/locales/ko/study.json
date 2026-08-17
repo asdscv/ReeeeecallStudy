@@ -109,6 +109,7 @@
     "mastery": "마스터율",
     "ratingDistribution": "평가 분포",
     "backToDeck": "덱으로 돌아가기",
+    "backToPlan": "플랜으로 돌아가기",
     "studyAgain": "다시 학습",
     "crammingAgain": "다시 벼락치기"
   },

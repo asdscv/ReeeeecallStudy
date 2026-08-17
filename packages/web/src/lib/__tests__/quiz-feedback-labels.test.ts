@@ -25,7 +25,7 @@ import { readFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
-  QUIZ_VERDICTS, QUIZ_GAPS, QUIZ_LEVELS, QUIZ_ASPECTS, QUIZ_FLAWS,
+  QUIZ_VERDICTS, QUIZ_GAPS, QUIZ_LEVELS, QUIZ_ASPECTS, QUIZ_FLAWS, QUIZ_MCQ_AXES,
 } from '@reeeeecall/shared/lib/quiz-feedback'
 import { QUIZ_ERROR_CODES, QUIZ_GENERATE_ACTION } from '@reeeeecall/shared/stores/quiz-store'
 
@@ -45,6 +45,10 @@ const FAMILIES: Array<[string, readonly string[]]> = [
   ['aspect', QUIZ_ASPECTS],
   // Rendered after answering, to explain why an option was wrong.
   ['flaw', QUIZ_FLAWS],
+  // What the paid multiple-choice explanation says. Computed key, like every family here, and
+  // the one a learner has actually spent money to read — a missing string would show them the
+  // bare identifier `right_category_wrong_item` in exchange for a charge.
+  ['mcqAxis', QUIZ_MCQ_AXES],
 ]
 
 /**
@@ -134,6 +138,7 @@ describe('the render-side enums match the edge contract', () => {
     ['ESSAY_LEVELS', QUIZ_LEVELS],
     ['ESSAY_ASPECTS', QUIZ_ASPECTS],
     ['MCQ_DISTRACTOR_FLAWS', QUIZ_FLAWS],
+    ['MCQ_EXPLANATION_AXES', QUIZ_MCQ_AXES],
   ])('%s', (edgeName, renderSet) => {
     // Sorted: the order the model is offered them in is a prompt decision, not a contract.
     expect([...renderSet].sort()).toEqual(edgeSet(edgeName).sort())

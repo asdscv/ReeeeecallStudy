@@ -33,6 +33,6 @@
     "freeCount": "Hôm nay {{used, number}} / {{limit, number}} câu",
     "trial_one": "Còn {{count, number}} đơn vị dùng thử",
     "trial_other": "Còn {{count, number}} đơn vị dùng thử",
-    "note": "Trắc nghiệm được chấm miễn phí. Câu miễn phí tính như nhau với mọi dạng."
+    "note": "Trắc nghiệm được chấm miễn phí. Chỉ phần giải thích bằng AI mới bị trừ, theo từng câu. Câu hỏi miễn phí được tính như nhau bất kể loại nào."
   }
 }

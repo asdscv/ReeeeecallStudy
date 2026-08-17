@@ -24,7 +24,10 @@ import type { PlanWeek, DayState } from '@reeeeecall/shared/learning/application
 import { useDeckStore } from '../../stores/deck-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
 import { AiRefusalNotice } from '../../components/ai/AiRefusalNotice'
-import { WEAK_LIMIT } from '@reeeeecall/shared/lib/learning-insights'
+import {
+  MCQ_FLAW_LABELS, SHORT_GAP_LABELS, ESSAY_ASPECT_LABELS, topLabels,
+  isWeakTheme, isDiagnosisAction,
+} from '@reeeeecall/shared/lib/weak-themes'
 
 /**
  * One goal's plan — today, and the days after it.
@@ -233,6 +236,9 @@ function LearningDiagnostics({ goalId }: { goalId: string }) {
    * now labelled — and the week strip above shows the same thing as seven days a learner can
    * count. Typical time is gone outright: nothing on this screen can act on it.
    */
+  /** How many weak cards are actually pressable, after unresolvable decks are dropped. */
+  const shownWeakCount = weakByDeck.reduce((sum, group) => sum + group.cardIds.length, 0)
+
   const stats = accuracy === null
     ? t('insights.notScoredYet')
     : t('insights.accuracyValue', {
@@ -249,6 +255,11 @@ function LearningDiagnostics({ goalId }: { goalId: string }) {
         <p className="text-sm text-foreground">{stats}</p>
       </div>
 
+      {/* What the accuracy line cannot say: WHAT is being got wrong. Free, counted server-side,
+          and made of labels this app has written on every graded answer since mig 193 and never
+          once read back. */}
+      <DiagnosisEvidencePanel goalId={goalId} />
+
       {weakByDeck.length > 0 && (
         <div className="mt-2 space-y-2" data-testid="insights-weak">
           {/* The count lives on the row, which is the thing you press. Saying it twice is the
@@ -257,7 +268,14 @@ function LearningDiagnostics({ goalId }: { goalId: string }) {
           {weakByDeck.map((group) => (
             <Link
               key={group.deckId}
-              to={`/decks/${group.deckId}/study?mode=srs&cards=${group.cardIds.join(',')}`}
+              // `goalId` so finishing returns to the PLAN, not to the deck.
+              //
+              // `StudySessionPage` decides where the session exits by reading this one parameter
+              // (`exitPath = goalId ? /learning/:goalId : /decks/:deckId`), and it also keys the
+              // completion screen's buttons off it. The plan's "오늘 학습 시작" link has always
+              // passed it; this one never did, so studying a weak card from the plan finished on
+              // the generic 학습 완료 screen and 덱으로 돌아가기 walked away from the plan.
+              to={`/decks/${group.deckId}/study?mode=srs&cards=${group.cardIds.join(',')}&goalId=${goalId}`}
               className="flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-sm text-foreground no-underline transition-colors hover:bg-accent"
             >
               <span className="min-w-0 truncate">
@@ -272,8 +290,16 @@ function LearningDiagnostics({ goalId }: { goalId: string }) {
               however many there are — so a learner with 340 read "8장" as their whole backlog,
               and the ten never visibly changed because at scale the tiebreak is a UUID sort. */}
           <p className="text-[11px] text-content-tertiary">
-            {insights.weakCardTotal > WEAK_LIMIT
-              ? t('insights.weakHintCapped', { shown: WEAK_LIMIT, total: insights.weakCardTotal })
+            {/* Capped OR undercounted, and both say the same true thing: what you can press is
+                fewer than what qualifies. A card whose deck could not be resolved is dropped a
+                few lines up with a bare `continue` — deleted since the diagnostics were
+                computed — so the visible number can silently fall below `weakCardTotal` with
+                nothing on screen admitting it. Gated on the mismatch rather than on the cap
+                alone, so the "of N" sentence never appears when nothing was actually lost. */}
+            {shownWeakCount < insights.weakCardTotal
+              ? t('insights.weakHintCapped', {
+                shown: shownWeakCount, total: insights.weakCardTotal,
+              })
               : t('insights.weakHint')}
           </p>
 
@@ -282,9 +308,186 @@ function LearningDiagnostics({ goalId }: { goalId: string }) {
               the time — so there IS a real attempt to explain, which is what the server
               refuses to proceed without. */}
           <WeakCardExplain goalId={goalId} cardIds={weakByDeck.flatMap((g) => g.cardIds)} />
+
+          {/* And the deep one: the model groups these cards and says what to do about them.
+              Whole-goal rather than per-card, which is why it costs more than an explanation
+              and why it is offered once rather than per row. */}
+          <GoalDiagnosis goalId={goalId} cardIds={weakByDeck.flatMap((g) => g.cardIds)} />
         </div>
       )}
     </section>
+  )
+}
+
+
+/**
+ * 무엇을 많이 틀리는가 — 무료로, 모델 없이.
+ *
+ * 학습 진단은 정답률 한 줄이었습니다. "최근 30일 62번 중 52번 맞혔어요 (84%)". 숫자는
+ * 맞았지만, 무엇을 많이 틀리는지에 대해서는 앱이 한 마디도 하지 않았습니다.
+ *
+ * 그 라벨들은 처음부터 다 기록되고 있었습니다. 객관식 오답마다 학습자가 고른 보기가 어떤
+ * 종류의 오답이었는지(`quiz_questions.meta.flaws`), 단답 채점마다 무엇이 빠졌는지, 서술형
+ * 채점마다 어느 국면이 미충족인지. 클라이언트는 `quiz_questions` 를 읽을 수 없으므로(193 §2)
+ * 서버가 세어서 개수만 돌려줍니다 — 문항 단위 라벨은 나가지 않습니다. 안 푼 문제의 라벨이
+ * 새면 다시 풀기가 공짜 정답이 됩니다.
+ *
+ * 라벨 목록을 **우리 쪽 배열로** 순회합니다. 서버가 준 객체의 키를 그대로 도는 화면은 번역이
+ * 없는 라벨을 날 것 그대로 인쇄하게 됩니다 — 이 저장소가 이미 두 번 겪은 결함입니다.
+ */
+function DiagnosisEvidencePanel({ goalId }: { goalId: string }) {
+  const { t } = useTranslation('learning')
+  const {
+    diagnosisEvidence, diagnosisEvidenceGoalId, fetchDiagnosisEvidence,
+  } = useLearningStore()
+
+  useEffect(() => { void fetchDiagnosisEvidence(goalId) }, [goalId, fetchDiagnosisEvidence])
+
+  const evidence = diagnosisEvidenceGoalId === goalId ? diagnosisEvidence : null
+  if (!evidence) return null
+
+  const flaws = topLabels(evidence.mcq_flaws, MCQ_FLAW_LABELS)
+  const gaps = topLabels(evidence.short_gaps, SHORT_GAP_LABELS)
+  // 서술형은 국면별 met/partial/not_met 이라, "못 한 것"만 세어 같은 모양으로 만듭니다.
+  const unmet = topLabels(
+    Object.fromEntries(Object.entries(evidence.essay_aspects ?? {})
+      .map(([aspect, c]) => [aspect, (c?.not_met ?? 0) + (c?.partial ?? 0)])),
+    ESSAY_ASPECT_LABELS)
+  // 오답이 가장 몰린 태그. 카드 단위로는 절대 보이지 않는 사실이고, 학습자가 바로 행동할 수
+  // 있는 종류의 사실입니다.
+  const worstTag = (evidence.tags ?? []).find((tag) => tag.answers - tag.known > 0) ?? null
+
+  // 최근 7일 대 창 전체. 하나의 비율이 절대 말할 수 없는 것.
+  const recentPct = evidence.recent_scored > 0
+    ? Math.round((evidence.recent_known / evidence.recent_scored) * 100) : null
+  const windowPct = evidence.scored > 0
+    ? Math.round((evidence.known / evidence.scored) * 100) : null
+  // 5문항 미만의 "최근 7일 40%"는 소음입니다. 두 숫자가 실제로 다를 때만 말합니다.
+  const trend = recentPct !== null && windowPct !== null && evidence.recent_scored >= 5
+    && Math.abs(recentPct - windowPct) >= 10 ? { recentPct, windowPct } : null
+
+  if (flaws.length === 0 && gaps.length === 0 && unmet.length === 0 && !worstTag && !trend) {
+    return null
+  }
+
+  // `count` 라는 이름으로 넘깁니다 — i18next 는 그 이름일 때만 복수형을 고르고,
+  // 스페인어는 실제로 굴절합니다(1 vez / 3 veces).
+  const line = (label: string, count: number) => `${label} ${t('diagnosis.count', { count })}`
+
+  return (
+    <div className="mt-2 rounded-xl border border-border bg-card p-3" data-testid="diagnosis-evidence">
+      <p className="text-xs text-muted-foreground">{t('diagnosis.evidenceTitle')}</p>
+      <ul className="mt-1.5 space-y-1">
+        {trend && (
+          <li className="text-sm text-foreground" data-testid="diagnosis-trend">
+            {t('diagnosis.trend', { recent: trend.recentPct, window: trend.windowPct })}
+          </li>
+        )}
+        {flaws.length > 0 && (
+          <li className="text-sm text-foreground">
+            <span className="text-content-tertiary">{t('diagnosis.mcqTitle')} </span>
+            {flaws.map((f) => line(t(`diagnosis.flaw.${f.label}`), f.count)).join(' · ')}
+          </li>
+        )}
+        {gaps.length > 0 && (
+          <li className="text-sm text-foreground">
+            <span className="text-content-tertiary">{t('diagnosis.shortTitle')} </span>
+            {gaps.map((g) => line(t(`diagnosis.gap.${g.label}`), g.count)).join(' · ')}
+          </li>
+        )}
+        {unmet.length > 0 && (
+          <li className="text-sm text-foreground">
+            <span className="text-content-tertiary">{t('diagnosis.essayTitle')} </span>
+            {unmet.map((a) => line(t(`diagnosis.aspect.${a.label}`), a.count)).join(' · ')}
+          </li>
+        )}
+        {worstTag && (
+          <li className="text-sm text-foreground">
+            {t('diagnosis.tagLine', {
+              tag: worstTag.tag, answers: worstTag.answers, known: worstTag.known,
+            })}
+          </li>
+        )}
+      </ul>
+    </div>
+  )
+}
+
+/**
+ * AI 정밀 진단 — 실패한 카드들을 묶고, 무엇을 할지 말한다.
+ *
+ * 위 패널은 무엇을 틀리는지 셉니다. 이것은 **왜 그것들이 서로 헷갈리는지**를 묻습니다:
+ * 답끼리 뜻이 겹치는지, 모양이 닮았는지, 앞면이 답을 결정하지 못하는지. 그리고 그에 맞는
+ * 처방을 최대 셋.
+ *
+ * 모델은 산문을 한 글자도 돌려주지 않습니다 — 라벨과 카드 id 뿐이고, 아래 모든 문장은 손으로
+ * 번역된 문자열입니다. 태국어 화면이 한국어 화면과 같은 품질인 이유이고, 모델이 주제에 대해
+ * 자신 있게 틀릴 수 없는 이유입니다.
+ *
+ * 근거가 얇으면 서버가 **지갑에 손대기 전에** 거절합니다. 세 개의 데이터 위에서 찾은 패턴은
+ * 운세이고, 운세를 파는 것은 이 기능이 존재하는 이유와 정반대입니다.
+ */
+function GoalDiagnosis({ goalId, cardIds }: { goalId: string; cardIds: readonly string[] }) {
+  const { t, i18n } = useTranslation('learning')
+  const {
+    diagnosis, diagnosisBusyGoalId, diagnosisError, requestDiagnosis,
+  } = useLearningStore()
+
+  const bought = diagnosis?.[goalId] ?? null
+  const busy = diagnosisBusyGoalId === goalId
+  // 두 장 미만으로는 묶을 것이 없습니다. 서버도 같은 선에서 거절하므로, 여기서 숨기는 것은
+  // 반드시 실패할 버튼을 내놓지 않기 위해서입니다.
+  if (cardIds.length < 2 && !bought) return null
+
+  return (
+    <div className="mt-2 rounded-lg border border-brand/30 bg-brand/5 p-3" data-testid="goal-diagnosis">
+      {bought ? (
+        <>
+          <p className="text-xs text-muted-foreground">{t('diagnosis.themeTitle')}</p>
+          <ul className="mt-1.5 space-y-1.5">
+            {bought.findings.filter((f) => isWeakTheme(f.theme)).map((finding, i) => (
+              <li key={i} className="text-sm text-foreground">
+                {t(`diagnosis.theme.${finding.theme}`, { n: finding.cardIds.length })}
+              </li>
+            ))}
+          </ul>
+          {bought.steps.length > 0 && (
+            <>
+              <p className="mt-3 text-xs text-muted-foreground">{t('diagnosis.stepsTitle')}</p>
+              <ul className="mt-1.5 space-y-1.5">
+                {bought.steps.filter((s) => isDiagnosisAction(s.action)).map((step, i) => (
+                  <li key={i} className="text-sm text-foreground">
+                    {t(`diagnosis.step.${step.action}`, { n: step.cardIds.length })}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </>
+      ) : (
+        <>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => {
+              void requestDiagnosis({ goalId, cardIds: [...cardIds], uiLang: i18n.language })
+            }}
+            className="w-full cursor-pointer rounded-lg bg-brand px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-hover disabled:opacity-50"
+            data-testid="goal-diagnosis-buy"
+          >
+            {busy ? t('diagnosis.buying') : t('diagnosis.buy')}
+          </button>
+          {/* 값을 버튼에 쓰지 않습니다 — 버튼은 결정이지 가격표가 아닙니다 — 대신 바로 아래
+              한 줄로 말합니다. 이 화면의 다른 유료 버튼과 같은 규칙입니다. */}
+          <p className="mt-1.5 text-center text-[11px] text-content-tertiary">
+            {t('diagnosis.priceNote')}
+          </p>
+        </>
+      )}
+      {/* 코드만 넘깁니다. 무엇을 뜻하고 무엇을 할 수 있는지는 커널이 정합니다 — 근거가 얇아
+          거절된 것과 지갑이 빈 것은 학습자가 할 일이 서로 다릅니다. */}
+      <AiRefusalNotice code={diagnosisError?.code ?? null} actionId="remediation" />
+    </div>
   )
 }
 

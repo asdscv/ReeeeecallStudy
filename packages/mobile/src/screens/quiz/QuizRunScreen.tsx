@@ -25,9 +25,12 @@ type Rt = RouteProp<QuizStackParamList, 'QuizRun'>
 /**
  * Taking the quiz on a phone.
  *
- * Multiple choice grades itself the moment it is submitted, in SQL, free. Short answer and
- * essay cost money, so grading is a separate, priced button rather than something that happens
- * to the learner — spending is always a gesture.
+ * Multiple choice is MARKED the moment it is submitted, in SQL, free — and that mark is final;
+ * no model revises it. What costs money there is the EXPLANATION: what the right option and the
+ * one they picked differ on. Short answer and essay buy the mark itself.
+ *
+ * All three are a separate, priced button rather than something that happens to the learner —
+ * spending is always a gesture.
  *
  * Typed answers are held per item in a ref, so moving between questions never loses text. That
  * covers the realistic loss: a learner drafting an essay, tapping back to re-read question two,
@@ -79,7 +82,10 @@ export function QuizRunScreen() {
   // Re-quoted per item: an essay costs four times a short answer, so one quote for the whole
   // run would show the wrong number on most of it.
   useEffect(() => {
-    if (!item || item.question_type === 'mcq' || item.answered) return
+    // Multiple choice is quoted AFTER answering: what is on sale there is an explanation of an
+    // answer that already exists, so there is nothing to price until one does.
+    if (!item) return
+    if (item.question_type === 'mcq' ? !item.answered || item.feedback : item.answered) return
     const itemId = item.item_id
     let cancelled = false
     void quote(QUIZ_GRADE_ACTION[item.question_type], 1)
@@ -120,7 +126,9 @@ export function QuizRunScreen() {
     if (!item || shownPrice === null) return
     setError(null)
     try {
-      await gradeWithAi(item.item_id, text.trim(), shownPrice)
+      // Multiple choice sends no text — the server reads the submitted choice from the attempt
+      // it already stored, the copy the mark was computed from.
+      await gradeWithAi(item.item_id, item.question_type === 'mcq' ? '' : text.trim(), shownPrice)
     } catch (e) {
       setError(e instanceof QuizError ? e.code : 'UNKNOWN')
     }
@@ -159,6 +167,16 @@ export function QuizRunScreen() {
   const tallyText = tallyLine(tally)
   const flaws = optionFlaws(item)
   const isLast = index === items.length - 1
+  /**
+   * The option this learner chose, by text.
+   *
+   * From the stored response rather than local state: reopening a run leaves `choice` null while
+   * the item is still answered.
+   */
+  const pickedIndex = typeof item.response?.choice === 'number' ? item.response.choice : choice
+  const pickedOption = item.question_type === 'mcq' && pickedIndex !== null
+    ? item.options?.[pickedIndex] ?? null
+    : null
 
   return (
     <Screen>
@@ -301,7 +319,10 @@ export function QuizRunScreen() {
             <QuizFeedback
               feedback={item.feedback}
               rubric={item.rubric}
-              learnerText={text}
+              // For multiple choice "what the learner wrote" is the option they picked — the
+              // string the spans were computed against. Passing the (always empty) text box
+              // would silently drop every highlight they just paid for.
+              learnerText={item.question_type === 'mcq' ? (pickedOption ?? '') : text}
               referenceText={item.reference_answer}
             />
           )}
@@ -332,10 +353,13 @@ export function QuizRunScreen() {
                   so a learner who submitted a short answer had exactly two buttons — pay, or
                   leave — and on the last item no way to finish the run at all. Charging is a
                   choice we offer; it must never be the only exit. */}
-              {item.question_type !== 'mcq' && item.score === null && (
+              {/* Multiple choice qualifies once answered and not yet explained; the other two
+                  once answered and unscored. Both mean "something is still on sale here". */}
+              {(item.question_type === 'mcq' ? !item.feedback : item.score === null) && (
                 <Button
-                  title={grading ? t('run.grading')
-                    : t('run.grade')}
+                  title={grading
+                    ? t(item.question_type === 'mcq' ? 'run.explaining' : 'run.grading')
+                    : t(item.question_type === 'mcq' ? 'run.explain' : 'run.grade')}
                   onPress={() => void requestGrade()}
                   disabled={grading || shownPrice === null}
                   {...testProps('quiz-grade')}
@@ -343,14 +367,15 @@ export function QuizRunScreen() {
               )}
               <Button
                 title={isLast ? t('run.finish') : t('run.next')}
-                variant={item.question_type !== 'mcq' && item.score === null ? 'secondary' : 'primary'}
+                variant={(item.question_type === 'mcq' ? !item.feedback : item.score === null)
+                  ? 'secondary' : 'primary'}
                 onPress={() => (isLast ? void finish() : goTo(index + 1))}
                 {...testProps(isLast ? 'quiz-finish' : 'quiz-next')}
               />
               {/* What grading costs, or that it is covered. Beside the buttons rather than on
                   one: the learner is deciding whether to spend and needs the number first. It
                   used to be said nowhere at all. */}
-              {item.question_type !== 'mcq' && item.score === null && costLine && (
+              {(item.question_type === 'mcq' ? !item.feedback : item.score === null) && costLine && (
                 <Text style={[theme.typography.caption, {
                   color: theme.colors.textSecondary, textAlign: 'center',
                 }]} {...testProps('quiz-grade-cost')}>

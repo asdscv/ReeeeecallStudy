@@ -6,7 +6,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation, useRoute, type NavigationProp, type RouteProp } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
-import { Screen, ScreenHeader } from '../components/ui'
+import { Screen, ScreenHeader, Button } from '../components/ui'
+import { AiRefusalNotice } from '../components/ai/AiRefusalNotice'
 import { useTheme } from '../theme'
 import { testProps } from '../utils/testProps'
 import { useLearningStore } from '@reeeeecall/shared/stores/learning-store'
@@ -29,7 +30,10 @@ import { useQuizStore, type DailyCheckCount } from '@reeeeecall/shared/stores/qu
 import type { PlanWeek, DayState } from '@reeeeecall/shared/learning/application/plan-week'
 import { useStudy } from '../hooks/useStudy'
 import type { AIStackParamList } from '../navigation/types'
-import { WEAK_LIMIT } from '@reeeeecall/shared/lib/learning-insights'
+import {
+  MCQ_FLAW_LABELS, SHORT_GAP_LABELS, ESSAY_ASPECT_LABELS, topLabels,
+  isWeakTheme, isDiagnosisAction,
+} from '@reeeeecall/shared/lib/weak-themes'
 
 /**
  * Today's plan — mobile parity with the web `/learning` screen.
@@ -365,6 +369,171 @@ function PlanWeekStrip({ week }: { week: PlanWeek }) {
           </View>
         </View>
       ))}
+    </View>
+  )
+}
+
+/**
+ * 무엇을 많이 틀리는가 — 무료로, 모델 없이. 웹의 같은 이름 컴포넌트와 같은 내용입니다.
+ *
+ * 학습 진단은 정답률 한 줄이었습니다. 그 아래 라벨들 — 어떤 종류의 오답 보기를 골랐는지,
+ * 무엇이 빠졌는지, 어느 국면이 미충족인지 — 은 처음부터 다 기록되고 있었고 아무도 읽지
+ * 않았습니다. 클라이언트는 `quiz_questions` 를 읽을 수 없으므로 서버가 세어 개수만 줍니다.
+ */
+function DiagnosisEvidencePanel({ goalId }: { goalId: string }) {
+  const { t } = useTranslation('learning')
+  const theme = useTheme()
+  const {
+    diagnosisEvidence, diagnosisEvidenceGoalId, fetchDiagnosisEvidence,
+  } = useLearningStore()
+
+  useEffect(() => { void fetchDiagnosisEvidence(goalId) }, [goalId, fetchDiagnosisEvidence])
+
+  const evidence = diagnosisEvidenceGoalId === goalId ? diagnosisEvidence : null
+  if (!evidence) return null
+
+  const flaws = topLabels(evidence.mcq_flaws, MCQ_FLAW_LABELS)
+  const gaps = topLabels(evidence.short_gaps, SHORT_GAP_LABELS)
+  const unmet = topLabels(
+    Object.fromEntries(Object.entries(evidence.essay_aspects ?? {})
+      .map(([aspect, c]) => [aspect, (c?.not_met ?? 0) + (c?.partial ?? 0)])),
+    ESSAY_ASPECT_LABELS)
+  const worstTag = (evidence.tags ?? []).find((tag) => tag.answers - tag.known > 0) ?? null
+
+  const recentPct = evidence.recent_scored > 0
+    ? Math.round((evidence.recent_known / evidence.recent_scored) * 100) : null
+  const windowPct = evidence.scored > 0
+    ? Math.round((evidence.known / evidence.scored) * 100) : null
+  // 5문항 미만의 "최근 7일 40%"는 소음입니다. 두 숫자가 실제로 다를 때만 말합니다.
+  const trend = recentPct !== null && windowPct !== null && evidence.recent_scored >= 5
+    && Math.abs(recentPct - windowPct) >= 10 ? { recentPct, windowPct } : null
+
+  if (flaws.length === 0 && gaps.length === 0 && unmet.length === 0 && !worstTag && !trend) {
+    return null
+  }
+
+  // `count` 라는 이름으로 넘깁니다 — i18next 는 그 이름일 때만 복수형을 고르고,
+  // 스페인어는 실제로 굴절합니다(1 vez / 3 veces).
+  const line = (label: string, count: number) => `${label} ${t('diagnosis.count', { count })}`
+  const row = (prefix: string, entries: Array<{ label: string; count: number }>, kind: string) =>
+    `${prefix} ${entries.map((e) => line(t(`diagnosis.${kind}.${e.label}`), e.count)).join(' · ')}`
+
+  return (
+    <View
+      style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+      {...testProps('diagnosis-evidence', true)}
+    >
+      <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+        {t('diagnosis.evidenceTitle')}
+      </Text>
+      {trend && (
+        <Text style={[theme.typography.bodySmall, { color: theme.colors.text, marginTop: 6 }]}>
+          {t('diagnosis.trend', { recent: trend.recentPct, window: trend.windowPct })}
+        </Text>
+      )}
+      {flaws.length > 0 && (
+        <Text style={[theme.typography.bodySmall, { color: theme.colors.text, marginTop: 6 }]}>
+          {row(t('diagnosis.mcqTitle'), flaws, 'flaw')}
+        </Text>
+      )}
+      {gaps.length > 0 && (
+        <Text style={[theme.typography.bodySmall, { color: theme.colors.text, marginTop: 6 }]}>
+          {row(t('diagnosis.shortTitle'), gaps, 'gap')}
+        </Text>
+      )}
+      {unmet.length > 0 && (
+        <Text style={[theme.typography.bodySmall, { color: theme.colors.text, marginTop: 6 }]}>
+          {row(t('diagnosis.essayTitle'), unmet, 'aspect')}
+        </Text>
+      )}
+      {worstTag && (
+        <Text style={[theme.typography.bodySmall, { color: theme.colors.text, marginTop: 6 }]}>
+          {t('diagnosis.tagLine', {
+            tag: worstTag.tag, answers: worstTag.answers, known: worstTag.known,
+          })}
+        </Text>
+      )}
+    </View>
+  )
+}
+
+/**
+ * AI 정밀 진단 — 실패한 카드들을 묶고, 무엇을 할지 말한다.
+ *
+ * 모델은 산문을 한 글자도 돌려주지 않습니다: 닫힌 집합의 라벨과 카드 id 뿐이고, 아래 모든
+ * 문장은 손으로 번역된 문자열입니다. 근거가 얇으면 서버가 지갑에 손대기 전에 거절합니다.
+ */
+function GoalDiagnosis({ goalId, cardIds }: { goalId: string; cardIds: readonly string[] }) {
+  const { t, i18n } = useTranslation('learning')
+  const theme = useTheme()
+  const {
+    diagnosis, diagnosisBusyGoalId, diagnosisError, requestDiagnosis,
+  } = useLearningStore()
+
+  const bought = diagnosis?.[goalId] ?? null
+  const busy = diagnosisBusyGoalId === goalId
+  // 서버도 같은 선에서 거절합니다. 여기서 숨기는 것은 반드시 실패할 버튼을 내놓지 않기 위해서.
+  if (cardIds.length < 2 && !bought) return null
+
+  return (
+    <View
+      style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.primary }]}
+      {...testProps('goal-diagnosis', true)}
+    >
+      {bought ? (
+        <>
+          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+            {t('diagnosis.themeTitle')}
+          </Text>
+          {bought.findings.filter((f) => isWeakTheme(f.theme)).map((finding, i) => (
+            <Text
+              key={`f${i}`}
+              style={[theme.typography.bodySmall, { color: theme.colors.text, marginTop: 6 }]}
+            >
+              {t(`diagnosis.theme.${finding.theme}`, { n: finding.cardIds.length })}
+            </Text>
+          ))}
+          {bought.steps.length > 0 && (
+            <>
+              <Text style={[theme.typography.caption, {
+                color: theme.colors.textSecondary, marginTop: 12,
+              }]}>
+                {t('diagnosis.stepsTitle')}
+              </Text>
+              {bought.steps.filter((st) => isDiagnosisAction(st.action)).map((step, i) => (
+                <Text
+                  key={`s${i}`}
+                  style={[theme.typography.bodySmall, { color: theme.colors.text, marginTop: 6 }]}
+                >
+                  {t(`diagnosis.step.${step.action}`, { n: step.cardIds.length })}
+                </Text>
+              ))}
+            </>
+          )}
+        </>
+      ) : (
+        <>
+          <Button
+            title={busy ? t('diagnosis.buying') : t('diagnosis.buy')}
+            disabled={busy}
+            onPress={() => {
+              void requestDiagnosis({ goalId, cardIds: [...cardIds], uiLang: i18n.language })
+            }}
+            {...testProps('goal-diagnosis-buy')}
+          />
+          {/* 값은 버튼이 아니라 그 아래 한 줄로. 버튼은 결정이지 가격표가 아닙니다. */}
+          <Text style={[theme.typography.caption, {
+            color: theme.colors.textTertiary, textAlign: 'center', marginTop: 6,
+          }]}>
+            {t('diagnosis.priceNote')}
+          </Text>
+        </>
+      )}
+      <AiRefusalNotice
+        code={diagnosisError?.code ?? null}
+        actionId="remediation"
+        style={{ marginTop: 8 }}
+      />
     </View>
   )
 }
@@ -784,10 +953,14 @@ export function LearningTodayScreen() {
       })
   }, [insights, t])
 
+  /** How many weak cards are actually pressable, after unresolvable decks are dropped. */
+  const shownWeakCount = useMemo(
+    () => weakByDeck.reduce((sum, group) => sum + group.cardIds.length, 0), [weakByDeck])
+
   const studyWeak = useCallback(async (group: { deckId: string; cardIds: string[] }) => {
     setStarting(true)
     try {
-      await startCardSession(group.deckId, group.cardIds)
+      await startCardSession(group.deckId, group.cardIds, goalId ?? undefined)
       // Cross-stack, same shape `startDeck` uses: `StudySession` lives in the Study tab's
       // stack while this screen lives in Settings.
       const tabNav = navigation.getParent() as unknown as
@@ -798,7 +971,7 @@ export function LearningTodayScreen() {
     } finally {
       setStarting(false)
     }
-  }, [startCardSession, navigation, t])
+  }, [startCardSession, goalId, navigation, t])
 
   /**
    * The goal's decks, named — resolved against the deck store so a rename shows through and a
@@ -1568,16 +1741,31 @@ export function LearningTodayScreen() {
                       {/* The hint said only what a weak card IS. It never said the list is the
                           WORST TEN of however many there are, so a learner with 340 read the
                           count as their whole backlog. */}
-                      {insights.weakCardTotal > WEAK_LIMIT
+                      {/* Capped OR undercounted — both mean "fewer than qualify". A card whose
+                          deck could not be resolved is dropped above with a bare `continue`, so
+                          the visible number can fall below `weakCardTotal` with nothing saying
+                          so. Gated on the mismatch, not on the cap. */}
+                      {shownWeakCount < insights.weakCardTotal
                         ? t('insights.weakHintCapped', {
-                          shown: WEAK_LIMIT, total: insights.weakCardTotal,
+                          shown: shownWeakCount, total: insights.weakCardTotal,
                         })
                         : t('insights.weakHint')}
                     </Text>
                   </TouchableOpacity>
                 ))}
 
+                {/* What the accuracy line cannot say: WHAT is being got wrong. Free, counted
+                    server-side, out of labels this app has written on every graded answer since
+                    mig 193 and never once read back. */}
+                <DiagnosisEvidencePanel goalId={goalId} />
+
                 <WeakCardExplain
+                  goalId={goalId}
+                  cardIds={weakByDeck.flatMap((group) => group.cardIds)}
+                />
+
+                {/* And the deep one: the model groups these cards and says what to do. */}
+                <GoalDiagnosis
                   goalId={goalId}
                   cardIds={weakByDeck.flatMap((group) => group.cardIds)}
                 />

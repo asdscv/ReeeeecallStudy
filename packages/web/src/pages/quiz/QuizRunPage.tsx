@@ -16,9 +16,13 @@ import { gradeCostLine } from '@reeeeecall/shared/lib/quiz-pricing'
  * Taking the quiz. Outside the app Layout, like the study session, so nothing competes with
  * the question.
  *
- * Multiple choice is graded the instant it is submitted, in SQL, for free. Short answer and
- * essay cost money to grade, so they are quoted and confirmed per answer — which is also why
- * they are not graded automatically on submit: spending is always a gesture.
+ * Multiple choice is MARKED the instant it is submitted, in SQL, for free — and that mark is
+ * final; no model revises it. What costs money on a multiple-choice item is the EXPLANATION:
+ * what the right option and the one they picked differ on, and where in their own card it says
+ * so. Short answer and essay buy the mark itself.
+ *
+ * All three are quoted and confirmed per answer, and none is bought automatically on submit:
+ * spending is always a gesture.
  */
 export function QuizRunPage() {
   const { t } = useTranslation('quiz')
@@ -65,7 +69,10 @@ export function QuizRunPage() {
   // Re-quote per item: the price depends on the type, and an essay costs four times a short
   // answer. Quoting once for the run would show the wrong number on most of it.
   useEffect(() => {
-    if (!item || item.question_type === 'mcq' || item.answered) return
+    // Multiple choice is quoted AFTER answering, not before: its purchase is an explanation of
+    // an answer that already exists, so there is nothing to price until one does.
+    if (!item) return
+    if (item.question_type === 'mcq' ? !item.answered || item.feedback : item.answered) return
     const itemId = item.item_id
     let cancelled = false
     void quote(QUIZ_GRADE_ACTION[item.question_type], 1)
@@ -102,7 +109,9 @@ export function QuizRunPage() {
     if (!item || shownPrice === null) return
     setError(null)
     try {
-      await gradeWithAi(item.item_id, text.trim(), shownPrice)
+      // Multiple choice sends no text — the server reads the submitted choice from the attempt
+      // it already stored, which is the copy the mark was computed from.
+      await gradeWithAi(item.item_id, item.question_type === 'mcq' ? '' : text.trim(), shownPrice)
     } catch (e) {
       // The CODE, not a sentence. `AiRefusalNotice` decides what it means and what the
       // learner can do about it — which on this screen is the whole point: a refused grade
@@ -140,6 +149,16 @@ export function QuizRunPage() {
 
   const answered = item.answered || result !== null
   const flaws = optionFlaws(item)
+  /**
+   * The option this learner chose, by text.
+   *
+   * From the stored response rather than local state: a reload, or coming back to a run from the
+   * list, leaves `choice` null while the item is still answered.
+   */
+  const pickedIndex = typeof item.response?.choice === 'number' ? item.response.choice : choice
+  const pickedOption = item.question_type === 'mcq' && pickedIndex !== null
+    ? item.options?.[pickedIndex] ?? null
+    : null
   const isLast = index === items.length - 1
   /** This item's verdict, and the run so far. Counts, never a ratio — see quiz-outcome.ts. */
   const outcome = item ? itemOutcome({ answered, score: item.score }) : 'unanswered'
@@ -210,7 +229,13 @@ export function QuizRunPage() {
                   type="button"
                   disabled={answered}
                   onClick={() => setChoice(optionIndex)}
-                  className={`w-full text-left px-3 py-2 text-sm rounded-lg border cursor-pointer transition-colors disabled:cursor-default ${
+                  // `whitespace-pre-wrap`: an option is card content and card content has line
+                  // breaks in it. A math card's answer field holds two formulas on two lines —
+                  // `a²+2ab+b²=(a+b)²` and `a²−2ab+b²=(a−b)²` — and HTML collapsed the newline,
+                  // so the option read as one run-on string that nobody could parse. The stem
+                  // above already does this; the options did not. (Mobile is unaffected: React
+                  // Native's <Text> keeps newlines.)
+                  className={`w-full text-left px-3 py-2 text-sm rounded-lg border cursor-pointer transition-colors disabled:cursor-default whitespace-pre-wrap ${
                     isCorrect ? 'bg-brand/10 border-brand text-foreground'
                       : isPicked ? 'bg-accent border-brand/40 text-foreground'
                       : 'bg-card border-border text-foreground hover:border-brand/40'
@@ -280,7 +305,10 @@ export function QuizRunPage() {
         <QuizFeedback
           feedback={item.feedback}
           rubric={item.rubric}
-          learnerText={text}
+          // For multiple choice "what the learner wrote" is the option they picked. The spans
+          // were computed against that string server-side, so passing the textarea (always
+          // empty here) would silently drop every highlight that was just paid for.
+          learnerText={item.question_type === 'mcq' ? (pickedOption ?? '') : text}
           referenceText={item.reference_answer}
         />
       )}
@@ -308,7 +336,10 @@ export function QuizRunPage() {
                 had exactly two buttons — pay, or leave. There was no 다음 and, on the last
                 item, no 마치기, so a run could not be completed without paying to grade every
                 single answer. Charging is a choice we offer; it must never be the only exit. */}
-            {item.question_type !== 'mcq' && item.score === null && (
+            {/* Multiple choice qualifies once it is answered and has no explanation yet; the
+                other two once they are answered and unscored. Both are "there is something left
+                to buy for this item", which is the only condition that should show a price. */}
+            {(item.question_type === 'mcq' ? !item.feedback : item.score === null) && (
               <button
                 type="button"
                 onClick={() => void requestGrade()}
@@ -318,14 +349,16 @@ export function QuizRunPage() {
                 {/* The price stays off the BUTTON — a button is a decision, not a price tag —
                     and is said in the line below it instead. It used to be said nowhere at all,
                     so a learner tapped this with no idea whether it cost anything. */}
-                {grading ? t('run.grading') : t('run.grade')}
+                {grading
+                  ? t(item.question_type === 'mcq' ? 'run.explaining' : 'run.grading')
+                  : t(item.question_type === 'mcq' ? 'run.explain' : 'run.grade')}
               </button>
             )}
             <button
               type="button"
               onClick={() => (isLast ? void finish() : goTo(index + 1))}
               className={`px-3 py-2 text-sm font-medium rounded-lg cursor-pointer transition-colors ${
-                item.question_type !== 'mcq' && item.score === null
+                (item.question_type === 'mcq' ? !item.feedback : item.score === null)
                   ? 'flex-1 border border-border text-foreground hover:border-brand/40'
                   : 'flex-1 bg-brand text-white hover:bg-brand-hover'
               }`}
@@ -338,7 +371,7 @@ export function QuizRunPage() {
 
       {/* What grading this answer costs, or that it is covered. Under the buttons, not on one:
           the learner is choosing whether to spend, and needs the number before they tap. */}
-      {item.question_type !== 'mcq' && item.score === null && costLine && (
+      {(item.question_type === 'mcq' ? !item.feedback : item.score === null) && costLine && (
         <p className="text-xs text-content-tertiary text-center" data-testid="quiz-grade-cost">
           {t(costLine.key, costLine.params)}
         </p>

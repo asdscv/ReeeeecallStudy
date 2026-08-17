@@ -72,6 +72,20 @@ interface StudyConfig {
    * Ratings take the normal `apply_study_rating` path and move the schedule like any other.
    */
   cardSelection?: string[]
+  /**
+   * Where this session came from, so its ending can go back there.
+   *
+   * A goal id when the session was started from that goal's learning plan — either the daily
+   * plan or the diagnostics panel's 다시 볼 카드. Absent for an ordinary deck session.
+   *
+   * Separate from `planSelection`/`cardSelection` on purpose: those say WHICH CARDS to serve,
+   * this says WHERE THE LEARNER WAS. Mobile had neither — finishing a plan session landed on
+   * StudySetup, the top of the deck stack, so a learner who studied one weak card from the plan
+   * was shown 학습 완료! / 덱으로 돌아가기 and walked out of the plan. Web carried it as a
+   * `?goalId=` query param and only for the daily plan, so its weak-card link had the same
+   * ending.
+   */
+  fromGoalId?: string
 }
 
 /** PostgREST puts `.in()` values in the query string, so a 500-item plan would blow the URL. */
@@ -89,11 +103,15 @@ interface LastRatedCard {
   /** Server rating-event id (apply_study_rating) so undo can compensate the DB. */
   ratingEventId: string | null
   /**
-   * The attempt this rating also recorded, when the session is a daily plan.
+   * The attempt this rating also recorded — a plan item's, or a goal's.
    *
    * Undo has to reverse BOTH halves or it recreates the split `apply_plan_study_rating`
    * exists to prevent, backwards: the card goes back to its old schedule while the plan
    * keeps claiming it is done, and the item can never be completed again.
+   *
+   * For a goal attempt with no plan item (mig 244) there is nothing to reopen, but the
+   * retracted answer must still not sit in the learner's diagnostics scoring a card they
+   * un-rated. `undo_plan_study_rating` finds it by this id and deletes it.
    */
   planAttemptId: string | null
   previousCard: Card
@@ -802,6 +820,16 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     // Minted beside the rating it describes: `p_response` is part of the RPC's idempotency
     // comparison, so an id created any earlier could be replayed against a different rating.
     const clientAttemptId = planItem ? newPersistenceId() : null
+    /**
+     * The goal attempt this rating records when the card is NOT on today's plan.
+     *
+     * The diagnostics panel picks weak cards by reading `answer_attempts` for the goal, and a
+     * weak card is by definition not on today's plan — so its rating found no plan item and
+     * wrote no attempt, and the panel handed back the identical five cards no matter how many
+     * times they were studied. Mig 244 records the rating as goal evidence instead, keyed by
+     * the rating event id itself, which is why there is no second id to mint here.
+     */
+    const goalAttemptId = !planItem && config.fromGoalId ? ratingEventId : null
 
     // Save undo state before rating (including queue manager snapshots)
     set({
@@ -810,7 +838,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       lastRatedCard: {
         cardId: card.id,
         ratingEventId,
-        planAttemptId: clientAttemptId,
+        planAttemptId: clientAttemptId ?? goalAttemptId,
         previousCard: { ...card },
         rating,
         previousIndex: currentIndex,
@@ -1031,6 +1059,10 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           p_expected_revision: expectedRevision,
           p_new_srs: newSrsPayload,
           p_review_duration_ms: durationMs,
+          // Only when the learner came from a goal. The server records evidence for it only
+          // if the card has no pending plan item — where a plan item exists it is still the
+          // plan half that runs, unchanged (mig 244).
+          p_goal_id: config.fromGoalId ?? null,
         })
 
       if (error) {

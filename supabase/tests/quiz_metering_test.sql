@@ -82,17 +82,27 @@ BEGIN
   PERFORM set_config('request.jwt.claim.role', 'authenticated', true);
   PERFORM set_config('request.jwt.claim.sub', v_uid::text, true);
 
-  -- ── 1) grade_mcq cannot be priced, therefore cannot be charged ────────────
-  BEGIN
-    PERFORM public.get_ai_quiz_quote('grade_mcq', 1);
-    RAISE EXCEPTION 'FAIL: grade_mcq was quotable';
-  EXCEPTION WHEN invalid_parameter_value THEN NULL;
-  END;
-  BEGIN
-    PERFORM public.reserve_ai_quiz('grade_mcq', 1, gen_random_uuid(), 999999);
-    RAISE EXCEPTION 'FAIL: grade_mcq was reservable';
-  EXCEPTION WHEN invalid_parameter_value THEN NULL;
-  END;
+  -- ── 1) grade_mcq is priced — and cheaper than grading anything ───────────
+  --
+  -- 245 부터 존재합니다. 그 전에는 이 자리가 정확히 반대를 주장했습니다("가격표에 없으므로
+  -- 청구될 수 없다"). 바뀐 것은 파는 물건입니다: 객관식 **채점**은 여전히 무료이고
+  -- `submit_quiz_answer` 가 제출 시점에 끝냅니다. 돈을 받는 것은 **해설** 쪽입니다.
+  --
+  -- 그래서 값은 채점보다 쌉니다. 어려운 부분(정답 판정)은 이미 끝나 있습니다.
+  q := public.get_ai_quiz_quote('grade_mcq', 1);
+  IF (q->>'units_each')::int <> 1 THEN
+    RAISE EXCEPTION 'FAIL: grade_mcq 가 % 유닛 (해설은 채점보다 싸야 한다)', q->>'units_each';
+  END IF;
+  IF (q->>'units_each')::int >= (SELECT units FROM ai_quiz_price_units WHERE action = 'grade_short') THEN
+    RAISE EXCEPTION 'FAIL: 해설이 주관식 채점보다 싸지 않다';
+  END IF;
+  -- 그리고 실제로 예약됩니다 — 가격표에 있다는 것만으로는 청구 경로가 열렸다는 뜻이 아닙니다.
+  -- 잡은 홀드는 바로 돌려줍니다. 아래 견적 단언들이 미결 홀드까지 세기 때문에, 남겨두면
+  -- 이 스위트의 산술이 이 한 줄 때문에 어긋납니다.
+  r1 := public.reserve_ai_quiz('grade_mcq', 1, gen_random_uuid(), 999999);
+  PERFORM set_config('request.jwt.claim.role', 'service_role', true);
+  PERFORM public.release_ai_job(v_uid, r1 ->> 'job_ref');
+  PERFORM set_config('request.jwt.claim.role', 'authenticated', true);
 
   -- ── 2) The quote is the arithmetic the charge will use ────────────────────
   q := public.get_ai_quiz_quote('generate_mcq', 4);

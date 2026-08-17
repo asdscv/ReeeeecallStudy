@@ -43,11 +43,29 @@ export const QUIZ_FLAWS = [
 ] as const
 export type QuizFlaw = typeof QUIZ_FLAWS[number]
 
+/**
+ * What the right option and the learner's option actually differ on.
+ *
+ * Mirrors `MCQ_EXPLANATION_AXES` in `ai-quiz.ts`. Distinct from `QUIZ_FLAWS` above: a flaw is
+ * written when the question is generated and describes what an option IS; an axis is chosen
+ * after seeing what the learner picked and names what the DISTINCTION hinges on. The flaw is
+ * free and already on screen — the axis is what `grade_mcq` buys.
+ */
+export const QUIZ_MCQ_AXES = [
+  'direction', 'scope', 'condition', 'form', 'component', 'order', 'quantity', 'category',
+] as const
+export type QuizMcqAxis = typeof QUIZ_MCQ_AXES[number]
+
 /** A pointer into text the client already holds. Never model-authored prose. */
 export interface QuizSpanRef {
   readonly from: 'learner' | 'reference'
   readonly start: number
   readonly end: number
+}
+
+export interface McqFeedback {
+  readonly axis: QuizMcqAxis
+  readonly spans: readonly QuizSpanRef[]
 }
 
 export interface ShortAnswerFeedback {
@@ -87,6 +105,23 @@ export function asShortAnswerFeedback(raw: unknown): ShortAnswerFeedback | null 
     verdict: r.verdict,
     score: typeof r.score === 'number' ? r.score : 0,
     gaps: Array.isArray(r.gaps) ? r.gaps.filter((g): g is QuizGap => inSet(QUIZ_GAPS, g)) : [],
+    spans: Array.isArray(r.spans) ? r.spans.filter(isSpan) : [],
+  }
+}
+
+/**
+ * Read a stored `feedback` blob as a multiple-choice explanation, or `null`.
+ *
+ * Checked before the short-answer reader on screens that try both: a blob with an `axis` has no
+ * `verdict`, so the two cannot be confused, but reading in a fixed order keeps that true even if
+ * a future payload gains a field.
+ */
+export function asMcqFeedback(raw: unknown): McqFeedback | null {
+  if (!raw || typeof raw !== 'object') return null
+  const r = raw as Record<string, unknown>
+  if (!inSet(QUIZ_MCQ_AXES, r.axis)) return null
+  return {
+    axis: r.axis,
     spans: Array.isArray(r.spans) ? r.spans.filter(isSpan) : [],
   }
 }

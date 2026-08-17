@@ -128,14 +128,14 @@
     "notScoredYet": "Nothing scored yet",
     "title": "Learning insights",
     "weakEmpty": "Nothing is falling behind.",
-    "weakHint": "Cards you have seen at least twice and got wrong more than half the time.",
+    "weakHint": "Cards you have seen at least twice, averaging under 60%.",
     "weakTitle": "Worth another look",
     "accuracyValue": "{{known, number}} right out of {{scored, number}} over the last 30 days ({{pct, number}}%)",
     "weakCount": "{{count, number}} cards",
     "weakCount_one": "{{count, number}} card",
     "weakCount_other": "{{count, number}} cards",
     "weakStudy": "Study just these",
-    "weakHintCapped": "The {{shown, number}} weakest of {{total, number}} cards you have seen twice and missed more than half the time."
+    "weakHintCapped": "The {{shown, number}} weakest of {{total, number}} cards you have seen at least twice, averaging under 60%."
   },
   "recommend": {
     "accept": "Accept",
@@ -157,9 +157,9 @@
       "noDecks": "This goal has no decks attached, so there is nothing to plan.",
       "noGoal": "You don't have an active learning goal yet. A goal sets your daily minutes and the decks to plan over.",
       "allCaughtUp": "You are done for now.",
-      "backSoon": "The cards you just answered come back in about {{count, number}} minutes.",
-      "backSoon_one": "The cards you just answered come back in about {{count, number}} minutes.",
-      "backSoon_other": "The cards you just answered come back in about {{count, number}} minutes.",
+      "backSoon": "Cards still in learning steps come back in about {{count, number}} minutes.",
+      "backSoon_one": "Cards still in learning steps come back in about {{count, number}} minutes.",
+      "backSoon_other": "Cards still in learning steps come back in about {{count, number}} minutes.",
       "nextReview": "Next review: {{when}}.",
       "nothingScheduled": "Nothing is scheduled for this goal. Try adding more cards to its decks."
     },
@@ -195,7 +195,7 @@
     "remaining_one": "{{count, number}} left today",
     "remaining_other": "{{count, number}} left today",
     "allDone": "Today's done",
-    "allDoneNote": "That's everything for today. See you tomorrow.",
+    "allDoneNote": "Today's plan is finished. Your next review is a while away. You can keep going now if you want to.",
     "startStudy": "Start studying",
     "continueStudy": "Keep going",
     "studyNote": "Rating a card there schedules its next review and ticks it off this plan.",
@@ -215,9 +215,9 @@
     "itemsUnavailable": "{{count, number}} cards in this plan cannot be opened right now. They may have been deleted.",
     "itemsUnavailable_one": "{{count, number}} cards in this plan cannot be opened right now. They may have been deleted.",
     "itemsUnavailable_other": "{{count, number}} cards in this plan cannot be opened right now. They may have been deleted.",
-    "backSoonNote": "Today is done. The cards you just answered come back in about {{count, number}} minutes.",
-    "backSoonNote_one": "Today is done. The cards you just answered come back in about {{count, number}} minutes.",
-    "backSoonNote_other": "Today is done. The cards you just answered come back in about {{count, number}} minutes.",
+    "backSoonNote": "Today's plan is finished. Cards still in learning steps come back in about {{count, number}} minutes. You can keep going now if you want to.",
+    "backSoonNote_one": "Today's plan is finished. Cards still in learning steps come back in about {{count, number}} minutes. You can keep going now if you want to.",
+    "backSoonNote_other": "Today's plan is finished. Cards still in learning steps come back in about {{count, number}} minutes. You can keep going now if you want to.",
     "extendAhead": "Pulled {{count, number}} cards forward — their turn had not come yet.",
     "extendAhead_one": "Pulled {{count, number}} cards forward — their turn had not come yet.",
     "extendAhead_other": "Pulled {{count, number}} cards forward — their turn had not come yet.",
@@ -323,5 +323,62 @@
     "failed": "Could not write the explanation. Please try again.",
     "reopen": "Show the explanation again",
     "inFlight": "Still working on your explanation — one moment."
+  },
+  "diagnosis": {
+    "evidenceTitle": "What you get wrong most",
+    "count": "{{count, number}}x",
+    "count_one": "{{count, number}}x",
+    "count_other": "{{count, number}}x",
+    "mcqTitle": "Multiple choice:",
+    "shortTitle": "Short answers:",
+    "essayTitle": "Essays:",
+    "trend": "The last 7 days are {{recent}}%, against {{window}}% over 30 days.",
+    "tagLine": "On the “{{tag}}” tag you got {{known}} of {{answers}} right.",
+    "themeTitle": "Why they get confused",
+    "stepsTitle": "Try this",
+    "buy": "Get an AI diagnosis",
+    "buying": "Analysing…",
+    "priceNote": "AI reads 30 days of your answers. This uses credits.",
+    "flaw": {
+      "adjacent_sense": "picked a near neighbour",
+      "opposite": "picked the opposite",
+      "overgeneral": "picked something too broad",
+      "partial": "picked a partly-right option",
+      "plausible_form": "picked a look-alike",
+      "right_category_wrong_item": "right kind, wrong item",
+      "unrelated": "picked something unrelated"
+    },
+    "gap": {
+      "extra_claim": "added something not there",
+      "missing_part": "left something out",
+      "spelling": "spelling",
+      "too_vague": "too vague",
+      "wrong_direction": "reversed the direction",
+      "wrong_language": "answered in another language"
+    },
+    "aspect": {
+      "covers_answer": "covering the answer",
+      "explains_why": "explaining why",
+      "gives_example": "giving an example",
+      "states_limits": "stating the limits",
+      "structure": "structure",
+      "uses_key_terms": "using the key terms"
+    },
+    "theme": {
+      "ambiguous_prompt": "{{n}} cards whose front does not pin down a single answer.",
+      "long_answer": "{{n}} cards with answers long enough that recalling them verbatim is the difficulty.",
+      "multi_part": "{{n}} cards asking for several things at once, so half-right counts as wrong.",
+      "no_pattern": "No pattern found across these cards.",
+      "similar_form": "{{n}} cards that look or sound alike.",
+      "similar_meaning": "{{n}} cards whose answers overlap in meaning. Not a gap in knowledge — you cannot separate them."
+    },
+    "step": {
+      "clarify_prompt": "Add the distinguishing detail to the front of these {{n}}.",
+      "drill_cards": "Study just these {{n}} again.",
+      "focus_topic": "Your misses cluster on one topic. Work through that deck or tag first.",
+      "quiz_short_answer": "Choosing is not separating them. Quiz these {{n}} as short answers.",
+      "slow_down": "Recent accuracy is falling. Reduce the daily load a little.",
+      "split_card": "These {{n}} ask for several things. Split them, one question each."
+    }
   }
 }

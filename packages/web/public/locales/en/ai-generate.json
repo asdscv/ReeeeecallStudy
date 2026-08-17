@@ -70,7 +70,7 @@
       "price_changed": "The price changed while you were choosing. Check it and try again.",
       "failed": "That didn't work. Nothing was charged.",
       "retry": "Try again",
-      "gradeYourself": "You can still finish the quiz and mark this yourself, free."
+      "gradeYourself": "You can finish the quiz as it is. Multiple choice is already marked, and a written answer you mark yourself is free."
     },
     "freeQuizOnly": "{{free}} free questions left today"
   },

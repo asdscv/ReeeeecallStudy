@@ -11,9 +11,9 @@
       "noDecks": "Tujuan ini tidak memiliki dek, jadi tidak ada yang bisa direncanakan.",
       "attachDecks": "Hubungkan dek",
       "allCaughtUp": "Bagian hari ini sudah selesai.",
-      "backSoon": "Kartu yang baru kamu jawab akan kembali sekitar {{count, number}} menit lagi.",
-      "backSoon_one": "Kartu yang baru kamu jawab akan kembali sekitar {{count, number}} menit lagi.",
-      "backSoon_other": "Kartu yang baru kamu jawab akan kembali sekitar {{count, number}} menit lagi.",
+      "backSoon": "Kartu yang masih dalam tahap belajar akan muncul lagi sekitar {{count, number}} menit lagi.",
+      "backSoon_one": "Kartu yang masih dalam tahap belajar akan muncul lagi sekitar {{count, number}} menit lagi.",
+      "backSoon_other": "Kartu yang masih dalam tahap belajar akan muncul lagi sekitar {{count, number}} menit lagi.",
       "nextReview": "Ulasan berikutnya: {{when}}.",
       "nothingScheduled": "Tidak ada ulasan terjadwal untuk target ini. Coba tambahkan kartu ke deknya."
     },
@@ -45,7 +45,7 @@
     "remaining_one": "Sisa {{count, number}} hari ini",
     "remaining_other": "Sisa {{count, number}} hari ini",
     "allDone": "Hari ini selesai!",
-    "allDoneNote": "Itu semua untuk hari ini. Sampai besok.",
+    "allDoneNote": "Rencana hari ini sudah selesai. Masih ada waktu sampai ulasan berikutnya. Kamu tetap bisa lanjut belajar sekarang.",
     "startStudy": "Mulai belajar",
     "continueStudy": "Lanjutkan",
     "studyNote": "Menilai kartu di sana menjadwalkan ulangan berikutnya sekaligus mencentangnya di rencana ini.",
@@ -65,9 +65,9 @@
     "itemsUnavailable": "{{count, number}} kartu dalam rencana ini tidak bisa dibuka sekarang. Mungkin sudah dihapus.",
     "itemsUnavailable_one": "{{count, number}} kartu dalam rencana ini tidak bisa dibuka sekarang. Mungkin sudah dihapus.",
     "itemsUnavailable_other": "{{count, number}} kartu dalam rencana ini tidak bisa dibuka sekarang. Mungkin sudah dihapus.",
-    "backSoonNote": "Hari ini selesai. Kartu yang baru kamu jawab kembali sekitar {{count, number}} menit lagi.",
-    "backSoonNote_one": "Hari ini selesai. Kartu yang baru kamu jawab kembali sekitar {{count, number}} menit lagi.",
-    "backSoonNote_other": "Hari ini selesai. Kartu yang baru kamu jawab kembali sekitar {{count, number}} menit lagi.",
+    "backSoonNote": "Rencana hari ini sudah selesai. Kartu yang masih dalam tahap belajar akan muncul lagi sekitar {{count, number}} menit lagi. Kamu tetap bisa lanjut belajar sekarang.",
+    "backSoonNote_one": "Rencana hari ini sudah selesai. Kartu yang masih dalam tahap belajar akan muncul lagi sekitar {{count, number}} menit lagi. Kamu tetap bisa lanjut belajar sekarang.",
+    "backSoonNote_other": "Rencana hari ini sudah selesai. Kartu yang masih dalam tahap belajar akan muncul lagi sekitar {{count, number}} menit lagi. Kamu tetap bisa lanjut belajar sekarang.",
     "extendAhead": "Mengambil {{count, number}} kartu lebih awal — belum gilirannya.",
     "extendAhead_one": "Mengambil {{count, number}} kartu lebih awal — belum gilirannya.",
     "extendAhead_other": "Mengambil {{count, number}} kartu lebih awal — belum gilirannya.",
@@ -198,7 +198,7 @@
     "accuracy": "Akurasi",
     "notScoredYet": "Belum ada yang dinilai",
     "weakTitle": "Perlu dilihat lagi",
-    "weakHint": "Kartu yang sudah kamu lihat minimal dua kali dan lebih dari separuh salah.",
+    "weakHint": "Kartu yang sudah kamu lihat minimal dua kali, dengan rata-rata di bawah 60%.",
     "weakEmpty": "Tidak ada yang tertinggal.",
     "cardFallback": "(kartu tidak ada di rencana hari ini)",
     "attemptCount": "{{count, number}} percobaan",
@@ -209,7 +209,7 @@
     "weakCount_one": "{{count, number}} kartu",
     "weakCount_other": "{{count, number}} kartu",
     "weakStudy": "Pelajari kartu ini saja",
-    "weakHintCapped": "{{shown, number}} terlemah dari {{total, number}} kartu yang sudah dilihat dua kali dan salah lebih dari separuh."
+    "weakHintCapped": "{{shown, number}} kartu terlemah dari {{total, number}} kartu yang sudah dilihat minimal dua kali, dengan rata-rata di bawah 60%."
   },
   "recommend": {
     "title": "Rekomendasi",
@@ -322,5 +322,62 @@
     "failed": "Gagal membuat penjelasan. Coba lagi.",
     "reopen": "Lihat lagi penjelasannya",
     "inFlight": "Penjelasan sedang dibuat, mohon tunggu sebentar."
+  },
+  "diagnosis": {
+    "evidenceTitle": "Yang paling sering salah",
+    "count": "{{count, number}} kali",
+    "count_one": "{{count, number}} kali",
+    "count_other": "{{count, number}} kali",
+    "mcqTitle": "Pilihan ganda:",
+    "shortTitle": "Jawaban singkat:",
+    "essayTitle": "Esai:",
+    "trend": "7 hari terakhir {{recent}}%, dibanding {{window}}% selama 30 hari.",
+    "tagLine": "Di tag “{{tag}}” kamu benar {{known}} dari {{answers}}.",
+    "themeTitle": "Kenapa tertukar",
+    "stepsTitle": "Coba ini",
+    "buy": "Minta diagnosis AI",
+    "buying": "Menganalisis…",
+    "priceNote": "AI membaca 30 hari jawabanmu. Ini memakai kredit.",
+    "flaw": {
+      "adjacent_sense": "memilih yang maknanya berdekatan",
+      "opposite": "memilih kebalikannya",
+      "overgeneral": "memilih yang terlalu luas",
+      "partial": "memilih yang benar sebagian",
+      "plausible_form": "memilih yang mirip bentuknya",
+      "right_category_wrong_item": "jenisnya benar, itemnya salah",
+      "unrelated": "memilih yang tidak berkaitan"
+    },
+    "gap": {
+      "extra_claim": "menambah yang tidak ada",
+      "missing_part": "ada bagian yang terlewat",
+      "spelling": "ejaan",
+      "too_vague": "terlalu umum",
+      "wrong_direction": "arahnya terbalik",
+      "wrong_language": "menjawab dalam bahasa lain"
+    },
+    "aspect": {
+      "covers_answer": "mencakup jawabannya",
+      "explains_why": "menjelaskan alasannya",
+      "gives_example": "memberi contoh",
+      "states_limits": "menyebut batasannya",
+      "structure": "struktur",
+      "uses_key_terms": "memakai istilah kunci"
+    },
+    "theme": {
+      "ambiguous_prompt": "{{n}} kartu yang sisi depannya tidak menentukan satu jawaban.",
+      "long_answer": "{{n}} kartu dengan jawaban panjang, sehingga kesulitannya mengingat persis.",
+      "multi_part": "{{n}} kartu menanyakan beberapa hal sekaligus, jadi separuh benar tetap dihitung salah.",
+      "no_pattern": "Tidak ditemukan pola pada kartu-kartu ini.",
+      "similar_form": "{{n}} kartu yang bentuk atau bunyinya mirip.",
+      "similar_meaning": "{{n}} kartu dengan jawaban yang maknanya tumpang tindih. Bukan tidak tahu — belum bisa membedakan."
+    },
+    "step": {
+      "clarify_prompt": "Tambahkan petunjuk pembeda di depan {{n}} kartu ini.",
+      "drill_cards": "Pelajari {{n}} kartu ini saja lagi.",
+      "focus_topic": "Kesalahanmu menumpuk di satu topik. Mulai dari dek atau tag itu.",
+      "quiz_short_answer": "Memilih tidak memisahkannya. Ujikan {{n}} kartu ini sebagai jawaban singkat.",
+      "slow_down": "Akurasi terakhirmu menurun. Kurangi sedikit beban harian.",
+      "split_card": "{{n}} kartu ini menanyakan beberapa hal. Pecah jadi satu pertanyaan per kartu."
+    }
   }
 }

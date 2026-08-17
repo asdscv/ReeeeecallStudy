@@ -49,6 +49,16 @@ export function StudySummaryScreen() {
   const seconds = Math.floor((totalDurationMs % 60000) / 1000)
   const timeStr = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`
 
+  /**
+   * Where the learner came from, and therefore where 완료 has to put them back.
+   *
+   * A plan session — the daily plan or the diagnostics panel's 다시 볼 카드 — starts in the AI
+   * tab and used to end here with 덱으로 돌아가기 → `popToTop()` → StudySetup, the top of the
+   * *Study* stack. So finishing one weak card walked the learner out of the plan and into a deck
+   * menu they never asked for, with the plan they were working through still open one tab away.
+   */
+  const fromGoalId = config?.fromGoalId
+
   const handleStudyAgain = () => {
     reset()
     navigation.replace('StudySetup', {})
@@ -56,7 +66,15 @@ export function StudySummaryScreen() {
 
   const handleBackToDeck = () => {
     reset()
+    // Leave the Study stack where an ordinary session would leave it, so returning to the tab
+    // later does not land back on a finished summary...
     navigation.popToTop()
+    if (!fromGoalId) return
+    // ...then cross back to the plan. Same shape LearningTodayScreen uses to reach this stack:
+    // the tabs are siblings under the drawer, not parent and child.
+    const tabNav = navigation.getParent() as unknown as
+      { navigate: (name: string, params?: unknown) => void } | undefined
+    tabNav?.navigate('AITab', { screen: 'LearningToday', params: { goalId: fromGoalId } })
   }
 
   // Determine which ratings to show
@@ -129,15 +147,19 @@ export function StudySummaryScreen() {
         <View style={styles.actions}>
           <Button
             testID="summary-back-to-deck"
-            title={t('summary.backToDeck')}
-            variant="outline"
+            title={fromGoalId ? t('summary.backToPlan') : t('summary.backToDeck')}
+            variant={fromGoalId ? 'primary' : 'outline'}
             onPress={handleBackToDeck}
           />
-          <Button
-            testID="summary-study-again"
-            title={isCramming ? t('summary.crammingAgain') : t('summary.studyAgain')}
-            onPress={handleStudyAgain}
-          />
+          {/* 다시 학습 restarts the DECK, not the plan cards — offering it after a plan session
+              would send the learner somewhere they did not come from. Web hides it too. */}
+          {!fromGoalId && (
+            <Button
+              testID="summary-study-again"
+              title={isCramming ? t('summary.crammingAgain') : t('summary.studyAgain')}
+              onPress={handleStudyAgain}
+            />
+          )}
         </View>
       </View>
     </Screen>

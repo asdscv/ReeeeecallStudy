@@ -129,3 +129,61 @@ export function validateWeakThemes(
   // Already strongest-first, because that is the order they claimed cards in.
   return out
 }
+
+/**
+ * What to DO about it. Rendered under the findings, as steps rather than advice.
+ *
+ * Mirrors `DIAGNOSIS_ACTIONS` in `supabase/functions/_shared/ai-diagnosis.ts` — that file is
+ * import-free because it is deployed to the edge runtime, so this is the same list restated for
+ * rendering, and `diagnosis-labels.test.ts` asserts the two still agree AND that every member
+ * has a translated string in all eight locales on both platforms.
+ *
+ * Every member is something this app can actually do. A step the learner cannot take is a
+ * horoscope, and a step the app cannot offer is an advertisement.
+ */
+export const DIAGNOSIS_ACTIONS = [
+  'drill_cards', 'split_card', 'clarify_prompt', 'quiz_short_answer', 'focus_topic', 'slow_down',
+] as const
+export type DiagnosisAction = (typeof DIAGNOSIS_ACTIONS)[number]
+
+export function isDiagnosisAction(value: unknown): value is DiagnosisAction {
+  return typeof value === 'string' && (DIAGNOSIS_ACTIONS as readonly string[]).includes(value)
+}
+
+/**
+ * The evidence labels a screen renders, and the order it renders them in.
+ *
+ * `get_learning_diagnosis_evidence` returns counts keyed by label. A screen that iterated the
+ * object's own keys would render whatever the server sent, in whatever order — including a label
+ * added later with no translation, which is the raw-identifier defect this file exists to
+ * prevent. So the screen iterates THIS list and looks each one up.
+ */
+export const MCQ_FLAW_LABELS = [
+  'opposite', 'adjacent_sense', 'right_category_wrong_item', 'partial', 'overgeneral',
+  'plausible_form', 'unrelated',
+] as const
+export const SHORT_GAP_LABELS = [
+  'missing_part', 'extra_claim', 'wrong_direction', 'too_vague', 'spelling', 'wrong_language',
+] as const
+export const ESSAY_ASPECT_LABELS = [
+  'covers_answer', 'uses_key_terms', 'explains_why', 'gives_example', 'states_limits', 'structure',
+] as const
+
+/**
+ * The top few labels by count, strongest first, ignoring anything not in the closed list.
+ *
+ * Ties break by the list's own order rather than by the object's key order, so the same data
+ * always renders the same way — `jsonb_object_agg` makes no promise about key order.
+ */
+export function topLabels(
+  counts: Record<string, number> | null | undefined,
+  vocabulary: readonly string[],
+  limit = 3,
+): Array<{ label: string; count: number }> {
+  if (!counts) return []
+  return vocabulary
+    .map((label) => ({ label, count: typeof counts[label] === 'number' ? counts[label] : 0 }))
+    .filter((entry) => entry.count > 0)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, limit)
+}

@@ -11,9 +11,9 @@
       "noDecks": "この目標にはデッキが紐付いていないため、プランを作成できません。",
       "attachDecks": "デッキを紐付ける",
       "allCaughtUp": "今日の分は終わりました。",
-      "backSoon": "さっき答えたカードが約{{count, number}}分後にまた出ます。",
-      "backSoon_one": "さっき答えたカードが約{{count, number}}分後にまた出ます。",
-      "backSoon_other": "さっき答えたカードが約{{count, number}}分後にまた出ます。",
+      "backSoon": "学習中のカードが約{{count, number}}分後にまた出てきます。",
+      "backSoon_one": "学習中のカードが約{{count, number}}分後にまた出てきます。",
+      "backSoon_other": "学習中のカードが約{{count, number}}分後にまた出てきます。",
       "nextReview": "次の復習は {{when}} です。",
       "nothingScheduled": "この目標に予定された復習がありません。デッキにカードを追加してみてください。"
     },
@@ -45,7 +45,7 @@
     "remaining_one": "残り {{count, number}}枚",
     "remaining_other": "残り {{count, number}}枚",
     "allDone": "今日は終わり！",
-    "allDoneNote": "今日の分は終わりました。また明日。",
+    "allDoneNote": "今日のプランは終わりました。次の復習まではまだ時間があります。今すぐ続けることもできます。",
     "startStudy": "学習を始める",
     "continueStudy": "続きから",
     "studyNote": "学習画面で評価すると、次の復習日と今日のプランの両方に記録されます。",
@@ -65,9 +65,9 @@
     "itemsUnavailable": "このプランのカード{{count, number}}枚を今は開けません。削除された可能性があります。",
     "itemsUnavailable_one": "このプランのカード{{count, number}}枚を今は開けません。削除された可能性があります。",
     "itemsUnavailable_other": "このプランのカード{{count, number}}枚を今は開けません。削除された可能性があります。",
-    "backSoonNote": "今日の分は終わりました。さっき答えたカードが約{{count, number}}分後にまた出ます。",
-    "backSoonNote_one": "今日の分は終わりました。さっき答えたカードが約{{count, number}}分後にまた出ます。",
-    "backSoonNote_other": "今日の分は終わりました。さっき答えたカードが約{{count, number}}分後にまた出ます。",
+    "backSoonNote": "今日のプランは終わりました。学習中のカードが約{{count, number}}分後にまた出てきます。今すぐ続けることもできます。",
+    "backSoonNote_one": "今日のプランは終わりました。学習中のカードが約{{count, number}}分後にまた出てきます。今すぐ続けることもできます。",
+    "backSoonNote_other": "今日のプランは終わりました。学習中のカードが約{{count, number}}分後にまた出てきます。今すぐ続けることもできます。",
     "extendAhead": "まだ順番でないカード{{count, number}}枚を先に持ってきました。",
     "extendAhead_one": "まだ順番でないカード{{count, number}}枚を先に持ってきました。",
     "extendAhead_other": "まだ順番でないカード{{count, number}}枚を先に持ってきました。",
@@ -198,7 +198,7 @@
     "accuracy": "正答率",
     "notScoredYet": "まだスコアのある試行がありません",
     "weakTitle": "もう一度確認",
-    "weakHint": "2回以上見て、半分以上まちがえたカードです。",
+    "weakHint": "2回以上見て、平均が60%未満のカードです。",
     "weakEmpty": "遅れているカードはありません。",
     "cardFallback": "（今日のプランに含まれていないカード）",
     "attemptCount": "{{count, number}} 回試行",
@@ -208,8 +208,8 @@
     "weakCount": "{{count, number}}枚",
     "weakCount_one": "{{count, number}}枚",
     "weakCount_other": "{{count, number}}枚",
-    "weakStudy": "このカードだけ学習",
-    "weakHintCapped": "2回以上見て半分以上間違えたカード{{total, number}}枚のうち、最も弱い{{shown, number}}枚です。"
+    "weakStudy": "これらのカードだけ学習",
+    "weakHintCapped": "2回以上見て平均が60%未満のカード{{total, number}}枚のうち、もっとも弱い{{shown, number}}枚です。"
   },
   "recommend": {
     "title": "おすすめ",
@@ -322,5 +322,62 @@
     "failed": "説明を作成できませんでした。もう一度お試しください。",
     "reopen": "説明をもう一度見る",
     "inFlight": "説明を作成中です。少しお待ちください。"
+  },
+  "diagnosis": {
+    "evidenceTitle": "よく間違えるところ",
+    "count": "{{count, number}}回",
+    "count_one": "{{count, number}}回",
+    "count_other": "{{count, number}}回",
+    "mcqTitle": "選択問題では",
+    "shortTitle": "記述（短答）では",
+    "essayTitle": "記述（論述）では",
+    "trend": "直近7日は{{recent}}%で、30日平均の{{window}}%と差があります。",
+    "tagLine": "「{{tag}}」タグでは{{answers}}問中{{known}}問正解です。",
+    "themeTitle": "なぜ混ざるのか",
+    "stepsTitle": "こうしてみましょう",
+    "buy": "AI詳細診断を受ける",
+    "buying": "分析中…",
+    "priceNote": "30日分の解答をAIが分析します。クレジットを消費します。",
+    "flaw": {
+      "adjacent_sense": "意味の近いものを選んだ",
+      "opposite": "反対のものを選んだ",
+      "overgeneral": "広すぎるものを選んだ",
+      "partial": "一部だけ正しいものを選んだ",
+      "plausible_form": "形が似たものを選んだ",
+      "right_category_wrong_item": "同じ種類の別のものを選んだ",
+      "unrelated": "無関係なものを選んだ"
+    },
+    "gap": {
+      "extra_claim": "余計な内容を足した",
+      "missing_part": "抜けている部分",
+      "spelling": "つづり",
+      "too_vague": "曖昧すぎる",
+      "wrong_direction": "向きが逆",
+      "wrong_language": "別の言語で答えた"
+    },
+    "aspect": {
+      "covers_answer": "答えを網羅する",
+      "explains_why": "理由を説明する",
+      "gives_example": "例を挙げる",
+      "states_limits": "限界を述べる",
+      "structure": "構成",
+      "uses_key_terms": "重要語を使う"
+    },
+    "theme": {
+      "ambiguous_prompt": "表だけでは答えが一つに決まらないカードが{{n}}枚あります。",
+      "long_answer": "答えが長く、そのまま思い出すこと自体が難しいカードが{{n}}枚あります。",
+      "multi_part": "1枚で複数を同時に問うカードが{{n}}枚あります。半分合っても不正解になります。",
+      "no_pattern": "これらのカードに共通点は見つかりませんでした。",
+      "similar_form": "見た目や音が似ているカードが{{n}}枚あります。",
+      "similar_meaning": "答えの意味が重なるカードが{{n}}枚あります。知らないのではなく、区別がついていません。"
+    },
+    "step": {
+      "clarify_prompt": "この{{n}}枚は、表に区別できる手がかりを一行足しましょう。",
+      "drill_cards": "この{{n}}枚だけをもう一度学習しましょう。",
+      "focus_topic": "間違いが一つのテーマに偏っています。そのデッキやタグから見直しましょう。",
+      "quiz_short_answer": "選ぶだけでは区別がつきません。この{{n}}枚は短答で解きましょう。",
+      "slow_down": "最近の正答率が下がっています。1日の量を少し減らしましょう。",
+      "split_card": "この{{n}}枚は問いが複数あります。1枚1問に分けましょう。"
+    }
   }
 }
