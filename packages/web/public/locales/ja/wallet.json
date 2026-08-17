@@ -19,13 +19,16 @@
     "empty": "まだ使用履歴がありません。"
   },
   "reason": {
-    "purchase": "チャージ",
-    "spend": "AIカード生成",
-    "refund": "返金",
+    "admin_adjustment": "調整",
     "admin_grant": "クレジット付与",
-    "spend_cards": "AIカード",
+    "purchase": "チャージ",
+    "refund": "返金",
+    "spend": "AI利用",
+    "spend_cards": "AIカード生成",
+    "spend_diagnosis": "AI学習診断",
     "spend_image": "AI画像",
-    "admin_adjustment": "調整"
+    "spend_quiz": "AIクイズ",
+    "spend_remediation": "AIカード解説"
   },
   "cardPlanHint": "カード上限プランは「カードストレージ」で管理します。",
   "quiz": {

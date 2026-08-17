@@ -21,13 +21,16 @@
     "showLess": "접기"
   },
   "reason": {
-    "purchase": "충전",
-    "spend": "AI 카드 생성",
-    "refund": "환불",
+    "admin_adjustment": "조정",
     "admin_grant": "크레딧 지급",
-    "spend_cards": "AI 카드",
+    "purchase": "충전",
+    "refund": "환불",
+    "spend": "AI 사용",
+    "spend_cards": "AI 카드 생성",
+    "spend_diagnosis": "AI 학습 진단",
     "spend_image": "AI 이미지",
-    "admin_adjustment": "조정"
+    "spend_quiz": "AI 퀴즈",
+    "spend_remediation": "AI 카드 설명"
   },
   "credits": {
     "title": "AI 크레딧 충전",
