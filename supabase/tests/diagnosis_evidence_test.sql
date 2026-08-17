@@ -63,15 +63,18 @@ BEGIN
                               options, correct_index, reference_answer, source_fingerprint, meta)
     VALUES (v_set, v_uid, v_card1, 'mcq', 1, 'lend 의 뜻으로 옳은 것은?',
             ARRAY['빌려주다','빌리다','갚다','임대하다'], 0, '빌려주다', 'fp1',
-            jsonb_build_object('flaws', jsonb_build_object(
-              '1', 'adjacent_sense', '2', 'right_category_wrong_item', '3', 'overgeneral')))
+            -- 실제 모양: `options` 와 나란한 배열이고 정답 자리(index 0)는 null 입니다.
+            -- 246 의 이 테스트는 여기에 객체를 심었고, 그래서 프로덕션에서 언제나 비어 있던
+            -- 집계를 통과시켰습니다(247).
+            jsonb_build_object('flaws', jsonb_build_array(
+              null, 'adjacent_sense', 'right_category_wrong_item', 'overgeneral')))
     RETURNING id INTO v_q1;
   INSERT INTO quiz_questions (set_id, owner_user_id, card_id, question_type, position, stem,
                               options, correct_index, reference_answer, source_fingerprint, meta)
     VALUES (v_set, v_uid, v_card2, 'mcq', 2, 'borrow 의 뜻으로 옳은 것은?',
             ARRAY['빌리다','빌려주다','갚다','맡기다'], 0, '빌리다', 'fp2',
-            jsonb_build_object('flaws', jsonb_build_object(
-              '1', 'opposite', '2', 'unrelated', '3', 'plausible_form')))
+            jsonb_build_object('flaws', jsonb_build_array(
+              null, 'opposite', 'unrelated', 'plausible_form')))
     RETURNING id INTO v_q2;
 
   PERFORM set_config('request.jwt.claim.role', 'authenticated', true);
