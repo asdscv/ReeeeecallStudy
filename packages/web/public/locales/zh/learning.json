@@ -322,5 +322,60 @@
     "failed": "没能生成解释，请重试。",
     "reopen": "再次查看解释",
     "inFlight": "正在生成解释，请稍候。"
+  },
+  "diagnosis": {
+    "evidenceTitle": "最常错在哪里",
+    "count": "{{n}} 次",
+    "mcqTitle": "选择题：",
+    "shortTitle": "简答题：",
+    "essayTitle": "论述题：",
+    "trend": "最近 7 天为 {{recent}}%，与 30 天平均 {{window}}% 有差距。",
+    "tagLine": "在“{{tag}}”标签下，{{answers}} 题答对 {{known}} 题。",
+    "themeTitle": "为什么会混淆",
+    "stepsTitle": "可以这样做",
+    "buy": "获取 AI 深度诊断",
+    "buying": "分析中…",
+    "priceNote": "AI 会分析你 30 天的作答，将消耗额度。",
+    "flaw": {
+      "adjacent_sense": "选了意思相近的",
+      "opposite": "选了相反的",
+      "overgeneral": "选了范围太宽的",
+      "partial": "选了只对一部分的",
+      "plausible_form": "选了长得像的",
+      "right_category_wrong_item": "类别对但选错了项",
+      "unrelated": "选了无关的"
+    },
+    "gap": {
+      "extra_claim": "多写了没有的内容",
+      "missing_part": "漏掉的部分",
+      "spelling": "拼写",
+      "too_vague": "太笼统",
+      "wrong_direction": "方向反了",
+      "wrong_language": "用了别的语言作答"
+    },
+    "aspect": {
+      "covers_answer": "答全要点",
+      "explains_why": "解释原因",
+      "gives_example": "举例",
+      "states_limits": "说明局限",
+      "structure": "条理",
+      "uses_key_terms": "使用关键术语"
+    },
+    "theme": {
+      "ambiguous_prompt": "有 {{n}} 张卡片，只看正面无法确定唯一答案。",
+      "long_answer": "有 {{n}} 张卡片答案太长，难的是逐字回忆而不是理解。",
+      "multi_part": "有 {{n}} 张卡片一次问了好几件事，答对一半也算错。",
+      "no_pattern": "没有在这些卡片中找到共同点。",
+      "similar_form": "有 {{n}} 张卡片长得像或读音相近。",
+      "similar_meaning": "有 {{n}} 张卡片的答案意思重叠。不是不会，而是分不开。"
+    },
+    "step": {
+      "clarify_prompt": "给这 {{n}} 张的正面加一行可区分的线索。",
+      "drill_cards": "只把这 {{n}} 张再学一遍。",
+      "focus_topic": "错误集中在一个主题上，先把那个卡组或标签过一遍。",
+      "quiz_short_answer": "光靠选择分不开。这 {{n}} 张改用简答来测。",
+      "slow_down": "最近正确率在下降，把每天的量稍微减少一点。",
+      "split_card": "这 {{n}} 张问了好几件事，拆成一张一问。"
+    }
   }
 }

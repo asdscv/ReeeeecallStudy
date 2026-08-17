@@ -323,5 +323,60 @@
     "failed": "No se pudo escribir la explicación. Inténtalo de nuevo.",
     "reopen": "Ver la explicación otra vez",
     "inFlight": "Estamos preparando tu explicación, un momento."
+  },
+  "diagnosis": {
+    "evidenceTitle": "En qué fallas más",
+    "count": "{{n}} veces",
+    "mcqTitle": "Opción múltiple:",
+    "shortTitle": "Respuestas cortas:",
+    "essayTitle": "Ensayos:",
+    "trend": "Los últimos 7 días van al {{recent}}%, frente al {{window}}% de los 30 días.",
+    "tagLine": "En la etiqueta «{{tag}}» acertaste {{known}} de {{answers}}.",
+    "themeTitle": "Por qué se confunden",
+    "stepsTitle": "Prueba esto",
+    "buy": "Obtener un diagnóstico con IA",
+    "buying": "Analizando…",
+    "priceNote": "La IA lee 30 días de tus respuestas. Consume créditos.",
+    "flaw": {
+      "adjacent_sense": "elegiste algo muy parecido",
+      "opposite": "elegiste lo contrario",
+      "overgeneral": "elegiste algo demasiado amplio",
+      "partial": "elegiste algo solo en parte correcto",
+      "plausible_form": "elegiste algo que se parece",
+      "right_category_wrong_item": "categoría correcta, elemento equivocado",
+      "unrelated": "elegiste algo sin relación"
+    },
+    "gap": {
+      "extra_claim": "añadiste algo que no estaba",
+      "missing_part": "faltó una parte",
+      "spelling": "ortografía",
+      "too_vague": "demasiado vago",
+      "wrong_direction": "invertiste la dirección",
+      "wrong_language": "respondiste en otro idioma"
+    },
+    "aspect": {
+      "covers_answer": "cubrir la respuesta",
+      "explains_why": "explicar el porqué",
+      "gives_example": "dar un ejemplo",
+      "states_limits": "señalar los límites",
+      "structure": "estructura",
+      "uses_key_terms": "usar los términos clave"
+    },
+    "theme": {
+      "ambiguous_prompt": "{{n}} tarjetas cuyo anverso no determina una única respuesta.",
+      "long_answer": "{{n}} tarjetas con respuestas tan largas que la dificultad es recordarlas literalmente.",
+      "multi_part": "{{n}} tarjetas que piden varias cosas a la vez, así que media respuesta cuenta como fallo.",
+      "no_pattern": "No se encontró ningún patrón en estas tarjetas.",
+      "similar_form": "{{n}} tarjetas que se parecen o suenan igual.",
+      "similar_meaning": "{{n}} tarjetas cuyas respuestas se solapan en significado. No es que no lo sepas: no las separas."
+    },
+    "step": {
+      "clarify_prompt": "Añade el detalle que las distingue al anverso de estas {{n}}.",
+      "drill_cards": "Estudia solo estas {{n}} otra vez.",
+      "focus_topic": "Tus fallos se concentran en un tema. Empieza por ese mazo o etiqueta.",
+      "quiz_short_answer": "Elegir no las separa. Practica estas {{n}} como respuesta corta.",
+      "slow_down": "Tu precisión reciente está bajando. Reduce un poco la carga diaria.",
+      "split_card": "Estas {{n}} piden varias cosas. Divídelas, una pregunta cada una."
+    }
   }
 }

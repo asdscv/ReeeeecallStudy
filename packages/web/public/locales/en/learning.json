@@ -322,5 +322,60 @@
     "failed": "Could not write the explanation. Please try again.",
     "reopen": "Show the explanation again",
     "inFlight": "Still working on your explanation — one moment."
+  },
+  "diagnosis": {
+    "evidenceTitle": "What you get wrong most",
+    "count": "{{n}}x",
+    "mcqTitle": "Multiple choice:",
+    "shortTitle": "Short answers:",
+    "essayTitle": "Essays:",
+    "trend": "The last 7 days are {{recent}}%, against {{window}}% over 30 days.",
+    "tagLine": "On the “{{tag}}” tag you got {{known}} of {{answers}} right.",
+    "themeTitle": "Why they get confused",
+    "stepsTitle": "Try this",
+    "buy": "Get an AI diagnosis",
+    "buying": "Analysing…",
+    "priceNote": "AI reads 30 days of your answers. This uses credits.",
+    "flaw": {
+      "adjacent_sense": "picked a near neighbour",
+      "opposite": "picked the opposite",
+      "overgeneral": "picked something too broad",
+      "partial": "picked a partly-right option",
+      "plausible_form": "picked a look-alike",
+      "right_category_wrong_item": "right kind, wrong item",
+      "unrelated": "picked something unrelated"
+    },
+    "gap": {
+      "extra_claim": "added something not there",
+      "missing_part": "left something out",
+      "spelling": "spelling",
+      "too_vague": "too vague",
+      "wrong_direction": "reversed the direction",
+      "wrong_language": "answered in another language"
+    },
+    "aspect": {
+      "covers_answer": "covering the answer",
+      "explains_why": "explaining why",
+      "gives_example": "giving an example",
+      "states_limits": "stating the limits",
+      "structure": "structure",
+      "uses_key_terms": "using the key terms"
+    },
+    "theme": {
+      "ambiguous_prompt": "{{n}} cards whose front does not pin down a single answer.",
+      "long_answer": "{{n}} cards with answers long enough that recalling them verbatim is the difficulty.",
+      "multi_part": "{{n}} cards asking for several things at once, so half-right counts as wrong.",
+      "no_pattern": "No pattern found across these cards.",
+      "similar_form": "{{n}} cards that look or sound alike.",
+      "similar_meaning": "{{n}} cards whose answers overlap in meaning. Not a gap in knowledge — you cannot separate them."
+    },
+    "step": {
+      "clarify_prompt": "Add the distinguishing detail to the front of these {{n}}.",
+      "drill_cards": "Study just these {{n}} again.",
+      "focus_topic": "Your misses cluster on one topic. Work through that deck or tag first.",
+      "quiz_short_answer": "Choosing is not separating them. Quiz these {{n}} as short answers.",
+      "slow_down": "Recent accuracy is falling. Reduce the daily load a little.",
+      "split_card": "These {{n}} ask for several things. Split them, one question each."
+    }
   }
 }

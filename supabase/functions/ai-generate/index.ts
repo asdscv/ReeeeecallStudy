@@ -25,6 +25,10 @@ import {
 import { resolveModel, resolveModelChain, type ResolvedModel } from '../_shared/ai-providers.ts'
 import { opsGate } from '../_shared/ops-gate.ts'
 import { buildRemediationPrompt, compareGroundingError, parseRemediationRefs, validateRemediationResult } from '../_shared/ai-remediation.ts'
+import {
+  buildDiagnosisPrompt, diagnosisGroundingError, validateDiagnosis,
+  type DiagnosisEvidence,
+} from '../_shared/ai-diagnosis.ts'
 import { resolveCardAnswerFaces } from '../_shared/card-answer.ts'
 import {
   quizPromptText, quizReferenceAnswer, quizContextFields,
@@ -304,6 +308,154 @@ async function explainMultipleChoice(ctx: {
     await releaseJob(userId, meter.job_ref)
     const code = message.startsWith('PERSISTENCE:') ? 'AI_PERSISTENCE_ERROR' : 'AI_PROVIDER_ERROR'
     return json({ error: 'Explanation failed', code }, 502, cors)
+  }
+}
+
+/**
+ * 학습 진단 — 이미 기록해 온 라벨을 읽고, 실패한 카드들을 묶어 할 일을 준다.
+ *
+ * 지금까지 '학습 진단'은 정답률 한 줄이었습니다. 그 아래 라벨들은 처음부터 다 기록되고
+ * 있었고(어떤 오답 보기를 골랐는지, 무엇이 빠졌는지, 어느 국면이 미충족인지), 앱은 한 번도
+ * 읽어본 적이 없습니다.
+ *
+ * 순서가 중요합니다: **근거를 먼저 세고, 얇으면 지갑에 손대기 전에 거절합니다.** 세 개의
+ * 데이터 위에서 찾은 패턴은 운세이고, 운세를 팔지 않겠다는 것이 `compareGroundingError` 가
+ * 세운 규율입니다.
+ */
+async function runDiagnosis(ctx: {
+  // deno-lint-ignore no-explicit-any
+  service: any; sbUser: any
+  userId: string; cors: Record<string, string>
+  // deno-lint-ignore no-explicit-any
+  refs: any
+  chain: ResolvedModel[]
+}): Promise<Response> {
+  const { service, sbUser, userId, cors, refs } = ctx
+
+  // ── 1) 증거. 학습자 권한으로 부릅니다 — 목표 소유 확인은 그 함수의 첫 줄입니다.
+  const { data: evidenceRaw, error: evidenceError } = await sbUser.rpc(
+    'get_learning_diagnosis_evidence', { p_goal_id: refs.goalId, p_days: 30 })
+  if (evidenceError) {
+    if (evidenceError.code === '42501') {
+      return json({ error: 'Goal not accessible', code: 'FORBIDDEN' }, 403, cors)
+    }
+    console.error('[ai-generate] diagnosis evidence error:', evidenceError.message)
+    return json({ error: 'Diagnosis failed', code: 'AI_PERSISTENCE_ERROR' }, 500, cors)
+  }
+  const evidence = (evidenceRaw ?? {}) as DiagnosisEvidence
+
+  // ── 2) 팔 만한가. 지갑 이전.
+  const thin = diagnosisGroundingError(evidence)
+  if (thin) {
+    return json({ error: 'Not enough to diagnose', code: `AI_DIAGNOSIS_${thin}`, evidence }, 400, cors)
+  }
+  if (refs.cardIds.length < 2) {
+    return json({ error: 'Not enough to diagnose', code: 'AI_DIAGNOSIS_NOT_ENOUGH_CARDS', evidence }, 400, cors)
+  }
+
+  // ── 3) 예약.
+  const { data: reserveRaw, error: reserveError } = await sbUser.rpc('reserve_ai_remediation', {
+    p_action: 'diagnose',
+    p_goal_id: refs.goalId,
+    p_activity_id: null,
+    p_attempt_id: null,
+    p_card_ids: refs.cardIds,
+    p_concept_ids: [],
+  })
+  if (reserveError) {
+    if (reserveError.code === 'P0002') return json({ error: 'Insufficient AI balance', code: 'AI_INSUFFICIENT_CREDITS' }, 402, cors)
+    if (reserveError.code === '23514') return json({ error: 'Too many requests today', code: 'AI_RATE_CAP' }, 429, cors)
+    if (reserveError.code === '55006') return json({ error: 'Diagnosis already in flight', code: 'AI_REMEDIATION_IN_FLIGHT' }, 409, cors)
+    if (reserveError.code === '42501') return json({ error: 'Goal not accessible', code: 'FORBIDDEN' }, 403, cors)
+    console.error('[ai-generate] diagnosis reserve error:', reserveError.message)
+    return json({ error: 'Metering error', code: 'AI_METER_ERROR' }, 500, cors)
+  }
+  const meter = (reserveRaw ?? {}) as {
+    job_ref?: string; replay?: boolean; enrichment_id?: string; content?: Record<string, unknown>
+  }
+
+  // 이번 주에 이미 산 진단. 진단은 한 답이 아니라 한 시기를 읽는 것이라, 새로고침이 곧 과금이
+  // 되어서는 안 됩니다. 아무것도 예약되지 않았고 `balance: null` 은 "그대로"라는 뜻입니다.
+  if (meter.replay === true && meter.content) {
+    return json({
+      content: meter.content, enrichmentId: meter.enrichment_id ?? null,
+      balance: null, replay: true, evidence,
+    }, 200, cors)
+  }
+
+  try {
+    // ── 4) 카드의 두 면. 덱 이름도 태그도 보내지 않습니다 — 모델이 볼 것은 카드들이 서로
+    // 닮았는지뿐이고, "HSK 1" 같은 주제 힌트는 훈련 데이터에서의 회상을 부릅니다.
+    const cardsResult = await service.from('cards')
+      .select('id, template_id, field_values').in('id', refs.cardIds).eq('user_id', userId)
+    if (cardsResult.error) throw new Error(`CONTEXT_LOAD:${cardsResult.error.message}`)
+    const rows = (cardsResult.data ?? []) as Array<
+      { id: string; template_id: string; field_values: Record<string, string> }>
+
+    const templateIds = [...new Set(rows.map((c) => c.template_id))]
+    const templatesResult = await service.from('card_templates')
+      .select('id, fields, front_layout, back_layout, quiz_answer_key').in('id', templateIds)
+    if (templatesResult.error) throw new Error(`CONTEXT_LOAD:${templatesResult.error.message}`)
+    const templateById = new Map(
+      (templatesResult.data ?? []).map((t: Record<string, unknown>) => [t.id as string, t]))
+
+    const cards: Array<{ id: string; prompt: string; answer: string }> = []
+    for (const row of rows) {
+      // deno-lint-ignore no-explicit-any
+      const template = templateById.get(row.template_id) as any
+      const prompt = quizPromptText(template, row)
+      const answer = quizReferenceAnswer(template, row)
+      // 답 필드를 이름 붙일 수 없는 카드는 뺍니다. 위치로 찍으면 공식 단어 템플릿에서는
+      // 앞뒤가 뒤집히고, 뒤집힌 채로 "이 둘은 뜻이 비슷하다"를 판단하게 됩니다.
+      if (!prompt || !answer) continue
+      cards.push({ id: row.id, prompt, answer })
+    }
+    if (cards.length < 2) throw new Error('CONTEXT_LOAD:no resolvable cards')
+
+    const prompt = buildDiagnosisPrompt({ evidence, cards })
+    const generated = await generate(
+      ctx.chain, prompt.systemPrompt, prompt.userPrompt, undefined, DEFAULT_TEMPERATURE,
+      outputCapFor('remediation'))
+
+    const diagnosis = validateDiagnosis(generated.json, cards.map((c) => c.id))
+    // 발견이 하나도 안 남았으면 청구하지 않습니다. 홀드를 풀고 거절합니다 — 우리 쪽 실패를
+    // 학습자 지갑에 남기는 것은 0점을 매기는 것과 같은 종류의 잘못입니다.
+    if (diagnosis.findings.length === 0 && diagnosis.steps.length === 0) {
+      await releaseJob(userId, meter.job_ref)
+      return json({ error: 'No pattern found', code: 'AI_DIAGNOSIS_NO_PATTERN', evidence }, 422, cors)
+    }
+
+    const content = { ...diagnosis, evidence }
+    const { data: enrichmentId, error: persistenceError } = await service.rpc('persist_ai_remediation', {
+      p_user_id: userId,
+      p_action: 'diagnose',
+      p_content: content,
+      p_source_refs: [],
+      p_goal_id: refs.goalId,
+      p_concept_id: null,
+      p_card_id: null,
+      p_activity_id: null,
+      p_request_fingerprint: `diagnose|${refs.goalId}`,
+      p_model_version: generated.model.model,
+      p_provider: generated.model.provider,
+      p_prompt_version: 'diagnosis-v1',
+      p_attempt_id: null,
+    })
+    if (persistenceError || typeof enrichmentId !== 'string') {
+      throw new Error(`PERSISTENCE:${persistenceError?.message ?? 'missing id'}`)
+    }
+
+    const charge = await chargeGeneration(userId, meter.job_ref, generated.model, generated.usage)
+    return json({ content, enrichmentId, balance: charge?.balance ?? null, evidence }, 200, cors)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'UNKNOWN'
+    console.error('[ai-generate] diagnosis failure:', message)
+    await releaseJob(userId, meter.job_ref)
+    const code = message.startsWith('CONTEXT_LOAD') ? 'AI_DIAGNOSIS_NOT_ENOUGH_CARDS'
+      : message.startsWith('PERSISTENCE:') ? 'AI_PERSISTENCE_ERROR'
+      : 'AI_PROVIDER_ERROR'
+    return json({ error: 'Diagnosis failed', code },
+      code === 'AI_DIAGNOSIS_NOT_ENOUGH_CARDS' ? 400 : 502, cors)
   }
 }
 
@@ -763,6 +915,12 @@ Deno.serve(async (req) => {
     if (kind === 'remediation') {
       const refs = parseRemediationRefs(body)
       if (!refs) return json({ error: 'Invalid remediation references', code: 'BAD_REQUEST' }, 400, cors)
+
+      // Its own path: a diagnosis is grounded in COUNTED EVIDENCE rather than one attempt, and
+      // that evidence has to be read — and judged sufficient — before the wallet is touched.
+      if (refs.action === 'diagnose') {
+        return await runDiagnosis({ service: sbServiceRole(), sbUser, userId, cors, refs, chain })
+      }
 
       const { data: reserveRaw, error: reserveError } = await sbUser.rpc('reserve_ai_remediation', {
         p_action: refs.action,

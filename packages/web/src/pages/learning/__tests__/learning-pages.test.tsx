@@ -110,6 +110,16 @@ const baseState = (over: StoreState = {}): StoreState => ({
   insightsLoading: false,
   insightsGoalId: null,
   fetchInsights: vi.fn(),
+  // The diagnosis panel, added beside the accuracy line. `null` is the real store's initial
+  // state — the panel renders nothing until a read lands, which is what every test here is.
+  diagnosisEvidence: null,
+  diagnosisEvidenceGoalId: null,
+  diagnosisEvidenceLoading: false,
+  diagnosis: {},
+  diagnosisBusyGoalId: null,
+  diagnosisError: null,
+  fetchDiagnosisEvidence: vi.fn(),
+  requestDiagnosis: vi.fn().mockResolvedValue(true),
   ...over,
 })
 

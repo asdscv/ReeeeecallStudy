@@ -322,5 +322,60 @@
     "failed": "Không tạo được giải thích. Vui lòng thử lại.",
     "reopen": "Xem lại phần giải thích",
     "inFlight": "Đang tạo phần giải thích, vui lòng đợi một chút."
+  },
+  "diagnosis": {
+    "evidenceTitle": "Bạn sai nhiều nhất ở đâu",
+    "count": "{{n}} lần",
+    "mcqTitle": "Trắc nghiệm:",
+    "shortTitle": "Trả lời ngắn:",
+    "essayTitle": "Tự luận:",
+    "trend": "7 ngày gần đây là {{recent}}%, so với {{window}}% của 30 ngày.",
+    "tagLine": "Ở thẻ “{{tag}}”, bạn đúng {{known}} trên {{answers}} câu.",
+    "themeTitle": "Vì sao dễ nhầm",
+    "stepsTitle": "Hãy thử cách này",
+    "buy": "Nhận chẩn đoán bằng AI",
+    "buying": "Đang phân tích…",
+    "priceNote": "AI đọc 30 ngày câu trả lời của bạn. Việc này dùng tín dụng.",
+    "flaw": {
+      "adjacent_sense": "chọn nghĩa gần giống",
+      "opposite": "chọn phương án ngược lại",
+      "overgeneral": "chọn phương án quá rộng",
+      "partial": "chọn phương án chỉ đúng một phần",
+      "plausible_form": "chọn phương án trông giống",
+      "right_category_wrong_item": "đúng loại nhưng sai mục",
+      "unrelated": "chọn phương án không liên quan"
+    },
+    "gap": {
+      "extra_claim": "thêm điều không có",
+      "missing_part": "thiếu một phần",
+      "spelling": "chính tả",
+      "too_vague": "quá chung chung",
+      "wrong_direction": "ngược chiều",
+      "wrong_language": "trả lời bằng ngôn ngữ khác"
+    },
+    "aspect": {
+      "covers_answer": "nêu đủ ý",
+      "explains_why": "giải thích lý do",
+      "gives_example": "nêu ví dụ",
+      "states_limits": "nêu giới hạn",
+      "structure": "bố cục",
+      "uses_key_terms": "dùng thuật ngữ chính"
+    },
+    "theme": {
+      "ambiguous_prompt": "{{n}} thẻ mà mặt trước không xác định được một đáp án duy nhất.",
+      "long_answer": "{{n}} thẻ có đáp án dài đến mức cái khó là nhớ nguyên văn.",
+      "multi_part": "{{n}} thẻ hỏi nhiều thứ cùng lúc, nên đúng một nửa vẫn tính là sai.",
+      "no_pattern": "Không tìm thấy điểm chung nào giữa các thẻ này.",
+      "similar_form": "{{n}} thẻ trông hoặc nghe giống nhau.",
+      "similar_meaning": "{{n}} thẻ có đáp án chồng lấn về nghĩa. Không phải bạn không biết — bạn chưa tách được chúng."
+    },
+    "step": {
+      "clarify_prompt": "Thêm chi tiết phân biệt vào mặt trước của {{n}} thẻ này.",
+      "drill_cards": "Hãy học lại riêng {{n}} thẻ này.",
+      "focus_topic": "Lỗi của bạn dồn vào một chủ đề. Hãy bắt đầu từ bộ thẻ hoặc thẻ tag đó.",
+      "quiz_short_answer": "Chọn đáp án không giúp bạn tách chúng ra. Hãy kiểm tra {{n}} thẻ này bằng trả lời ngắn.",
+      "slow_down": "Độ chính xác gần đây đang giảm. Hãy giảm bớt khối lượng mỗi ngày.",
+      "split_card": "{{n}} thẻ này hỏi nhiều thứ. Hãy tách ra, mỗi thẻ một câu hỏi."
+    }
   }
 }

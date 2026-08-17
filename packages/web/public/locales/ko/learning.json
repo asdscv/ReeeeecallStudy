@@ -322,5 +322,60 @@
     "failed": "설명을 만들지 못했습니다. 다시 시도해 주세요.",
     "reopen": "설명 다시 보기",
     "inFlight": "설명을 만들고 있어요. 잠시만 기다려 주세요."
+  },
+  "diagnosis": {
+    "evidenceTitle": "무엇을 많이 틀리나요",
+    "count": "{{n}}회",
+    "mcqTitle": "객관식에서",
+    "shortTitle": "단답에서",
+    "essayTitle": "서술형에서",
+    "trend": "최근 7일 {{recent}}%로, 30일 평균 {{window}}%와 달라요.",
+    "tagLine": "‘{{tag}}’ 태그에서 {{answers}}번 중 {{known}}번 맞혔어요.",
+    "themeTitle": "왜 헷갈리나요",
+    "stepsTitle": "이렇게 해보세요",
+    "buy": "AI 정밀 진단 받기",
+    "buying": "분석하는 중…",
+    "priceNote": "30일치 답안을 AI가 분석해요. 크레딧이 차감돼요.",
+    "flaw": {
+      "adjacent_sense": "비슷한 이웃말을 고름",
+      "opposite": "반대되는 것을 고름",
+      "overgeneral": "너무 넓은 것을 고름",
+      "partial": "일부만 맞는 것을 고름",
+      "plausible_form": "모양이 비슷한 것을 고름",
+      "right_category_wrong_item": "같은 종류의 다른 것을 고름",
+      "unrelated": "관련 없는 것을 고름"
+    },
+    "gap": {
+      "extra_claim": "없는 말을 덧붙임",
+      "missing_part": "빠뜨린 부분",
+      "spelling": "철자",
+      "too_vague": "너무 두루뭉술함",
+      "wrong_direction": "방향이 반대",
+      "wrong_language": "다른 언어로 답함"
+    },
+    "aspect": {
+      "covers_answer": "답을 다 담기",
+      "explains_why": "이유 설명하기",
+      "gives_example": "예 들기",
+      "states_limits": "한계 짚기",
+      "structure": "짜임새",
+      "uses_key_terms": "핵심 용어 쓰기"
+    },
+    "theme": {
+      "ambiguous_prompt": "앞면만 봐서는 답이 하나로 정해지지 않는 카드 {{n}}장이에요.",
+      "long_answer": "답이 길어서 이해보다 그대로 떠올리기가 어려운 카드 {{n}}장이에요.",
+      "multi_part": "한 장에서 여러 개를 한꺼번에 묻는 카드 {{n}}장이에요. 절반 맞혀도 틀린 것으로 세어져요.",
+      "no_pattern": "이 카드들에서는 공통점을 찾지 못했어요.",
+      "similar_form": "모양이나 소리가 닮은 카드 {{n}}장이에요.",
+      "similar_meaning": "답끼리 뜻이 겹치는 카드 {{n}}장이에요. 몰라서가 아니라 구별이 안 붙는 거예요."
+    },
+    "step": {
+      "clarify_prompt": "이 {{n}}장은 앞면에 구분할 단서를 한 줄 넣어 보세요.",
+      "drill_cards": "이 {{n}}장만 모아서 다시 학습해 보세요.",
+      "focus_topic": "오답이 한 주제에 몰려 있어요. 그 덱이나 태그를 먼저 훑어 보세요.",
+      "quiz_short_answer": "고르기로는 구별이 안 붙어요. 이 {{n}}장은 단답 퀴즈로 풀어 보세요.",
+      "slow_down": "최근 정답률이 떨어지고 있어요. 하루 분량을 조금 줄여 보세요.",
+      "split_card": "이 {{n}}장은 묻는 것이 여러 개예요. 한 장에 하나씩으로 쪼개 보세요."
+    }
   }
 }

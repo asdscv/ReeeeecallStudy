@@ -40,7 +40,7 @@ export type ServerGenerateRequest =
     }
   | {
       kind: 'remediation'
-      action: 'explain' | 'compare' | 'hint' | 'generate' | 'evaluate' | 'recommend'
+      action: 'explain' | 'compare' | 'hint' | 'generate' | 'evaluate' | 'recommend' | 'diagnose'
       uiLang: string
       goalId?: string
       activityId?: string

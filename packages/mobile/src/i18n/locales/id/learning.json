@@ -323,5 +323,60 @@
     "failed": "Gagal membuat penjelasan. Coba lagi.",
     "reopen": "Lihat lagi penjelasannya",
     "inFlight": "Penjelasan sedang dibuat, mohon tunggu sebentar."
+  },
+  "diagnosis": {
+    "evidenceTitle": "Yang paling sering salah",
+    "count": "{{n}} kali",
+    "mcqTitle": "Pilihan ganda:",
+    "shortTitle": "Jawaban singkat:",
+    "essayTitle": "Esai:",
+    "trend": "7 hari terakhir {{recent}}%, dibanding {{window}}% selama 30 hari.",
+    "tagLine": "Di tag “{{tag}}” kamu benar {{known}} dari {{answers}}.",
+    "themeTitle": "Kenapa tertukar",
+    "stepsTitle": "Coba ini",
+    "buy": "Minta diagnosis AI",
+    "buying": "Menganalisis…",
+    "priceNote": "AI membaca 30 hari jawabanmu. Ini memakai kredit.",
+    "flaw": {
+      "adjacent_sense": "memilih yang maknanya berdekatan",
+      "opposite": "memilih kebalikannya",
+      "overgeneral": "memilih yang terlalu luas",
+      "partial": "memilih yang benar sebagian",
+      "plausible_form": "memilih yang mirip bentuknya",
+      "right_category_wrong_item": "jenisnya benar, itemnya salah",
+      "unrelated": "memilih yang tidak berkaitan"
+    },
+    "gap": {
+      "extra_claim": "menambah yang tidak ada",
+      "missing_part": "ada bagian yang terlewat",
+      "spelling": "ejaan",
+      "too_vague": "terlalu umum",
+      "wrong_direction": "arahnya terbalik",
+      "wrong_language": "menjawab dalam bahasa lain"
+    },
+    "aspect": {
+      "covers_answer": "mencakup jawabannya",
+      "explains_why": "menjelaskan alasannya",
+      "gives_example": "memberi contoh",
+      "states_limits": "menyebut batasannya",
+      "structure": "struktur",
+      "uses_key_terms": "memakai istilah kunci"
+    },
+    "theme": {
+      "ambiguous_prompt": "{{n}} kartu yang sisi depannya tidak menentukan satu jawaban.",
+      "long_answer": "{{n}} kartu dengan jawaban panjang, sehingga kesulitannya mengingat persis.",
+      "multi_part": "{{n}} kartu menanyakan beberapa hal sekaligus, jadi separuh benar tetap dihitung salah.",
+      "no_pattern": "Tidak ditemukan pola pada kartu-kartu ini.",
+      "similar_form": "{{n}} kartu yang bentuk atau bunyinya mirip.",
+      "similar_meaning": "{{n}} kartu dengan jawaban yang maknanya tumpang tindih. Bukan tidak tahu — belum bisa membedakan."
+    },
+    "step": {
+      "clarify_prompt": "Tambahkan petunjuk pembeda di depan {{n}} kartu ini.",
+      "drill_cards": "Pelajari {{n}} kartu ini saja lagi.",
+      "focus_topic": "Kesalahanmu menumpuk di satu topik. Mulai dari dek atau tag itu.",
+      "quiz_short_answer": "Memilih tidak memisahkannya. Ujikan {{n}} kartu ini sebagai jawaban singkat.",
+      "slow_down": "Akurasi terakhirmu menurun. Kurangi sedikit beban harian.",
+      "split_card": "{{n}} kartu ini menanyakan beberapa hal. Pecah jadi satu pertanyaan per kartu."
+    }
   }
 }
