@@ -843,6 +843,16 @@ export function validateMultipleChoiceGeneration(
         const norm = normalizeAnswer(filler)
         if (norm === '' || norm === answerNorm || seen.has(norm)) continue
         if (answerNorm.includes(norm) || norm.includes(answerNorm)) continue
+        // AND not a longer or shorter spelling of an option we already have.
+        //
+        // `seen` only catches an EXACT normalised match. A deck-mate whose answer field carries a
+        // formula plus a mnemonic on a second line — `a²−b²=(a+b)(a−b)\n(제곱)−(제곱)=(합)×(차)` —
+        // is not equal to a model distractor of `a²−b²=(a+b)(a−b)`, so both were shown, and two
+        // options saying the same thing is one option shown twice. Reported on a maths deck.
+        if (texts.some((t) => {
+          const other = normalizeAnswer(t)
+          return other !== '' && (other.includes(norm) || norm.includes(other))
+        })) continue
         if (!scriptCompatible(filler, card.answerText)) continue
         seen.add(norm)
         texts.push(filler)
@@ -854,6 +864,26 @@ export function validateMultipleChoiceGeneration(
     }
     if (texts.length < distractorCount) { drop(cardId, 'too_few_distractors'); continue }
 
+
+    /**
+     * The QUESTION, written by the model — with the card's prompt as the fallback.
+     *
+     * It used to be `card.promptText`, always. On a vocabulary card that reads acceptably
+     * ("timber" with four meanings under it), but on a card whose front is a heading it is not a
+     * question at all: a maths deck produced the stem "인수분해 공식(1) - 완전제곱식" with four
+     * formulas under it and nothing telling the learner what to do with them.
+     *
+     * The prompt now asks for a sentence. The fallback stays because a missing or rejected stem
+     * must not cost the item — degrading to the old behaviour shows a heading, which is worse
+     * than a question and better than nothing.
+     */
+    const offered = typeof entry.question === 'string' ? stripQuestionMarkup(entry.question) : ''
+    const stemUsable = offered !== ''
+      && offered.length <= MAX_QUESTION_CHARS
+      && !leaksSchemaWord(offered)
+      // The answer must not be in the question, by the same rule the other two types use.
+      && !containsNormalized(offered, card.answerText)
+    const stem = stemUsable ? offered : card.promptText
 
     const meanDistractor = texts.reduce((sum, t) => sum + t.length, 0) / texts.length
     if (meanDistractor > 0 && card.answerText.length > meanDistractor * MCQ_MAX_LENGTH_CUE_RATIO) {
@@ -900,7 +930,7 @@ export function validateMultipleChoiceGeneration(
     used.add(cardId)
     items.push({
       type: 'multiple_choice', itemId, cardId,
-      question: card.promptText, options, correctIndex, flaws: flawSlots, offBand,
+      question: stem, options, correctIndex, flaws: flawSlots, offBand,
     })
   }
 

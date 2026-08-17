@@ -210,7 +210,13 @@ export function QuizRunPage() {
                   type="button"
                   disabled={answered}
                   onClick={() => setChoice(optionIndex)}
-                  className={`w-full text-left px-3 py-2 text-sm rounded-lg border cursor-pointer transition-colors disabled:cursor-default ${
+                  // `whitespace-pre-wrap`: an option is card content and card content has line
+                  // breaks in it. A math card's answer field holds two formulas on two lines —
+                  // `a²+2ab+b²=(a+b)²` and `a²−2ab+b²=(a−b)²` — and HTML collapsed the newline,
+                  // so the option read as one run-on string that nobody could parse. The stem
+                  // above already does this; the options did not. (Mobile is unaffected: React
+                  // Native's <Text> keeps newlines.)
+                  className={`w-full text-left px-3 py-2 text-sm rounded-lg border cursor-pointer transition-colors disabled:cursor-default whitespace-pre-wrap ${
                     isCorrect ? 'bg-brand/10 border-brand text-foreground'
                       : isPicked ? 'bg-accent border-brand/40 text-foreground'
                       : 'bg-card border-border text-foreground hover:border-brand/40'

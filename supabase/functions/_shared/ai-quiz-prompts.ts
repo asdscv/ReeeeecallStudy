@@ -230,11 +230,20 @@ export function buildMcqGenerationPrompt(
 
   const systemPrompt = `${GROUNDING}
 
-For each card, write exactly ${distractorCount} WRONG options (distractors) for a multiple-choice question.
+For each card, write a multiple-choice QUESTION and exactly ${distractorCount} WRONG options (distractors).
 You are NOT asked for the correct option and must not write it — the app inserts the card's own answer itself.
 
 Respond with a single JSON object:
-{ "items": [ { "cardId": "...", "distractors": [ { "text": "...", "flaw": "opposite" } ] } ] }
+{ "items": [ { "cardId": "...", "question": "...", "distractors": [ { "text": "...", "flaw": "opposite" } ] } ] }
+
+THE QUESTION IS A SENTENCE A LEARNER ANSWERS, not the card's title.
+${bullets([
+  'Ask something exactly one of the options answers. "다음 중 옳은 것은?" / "Which of these is correct?" is the shape; a bare topic is not a question.',
+  'Name the subject INSIDE the sentence, using the card\'s own words, so the learner knows what is being asked about. A card headed "인수분해 공식(1) - 완전제곱식" becomes "완전제곱식의 인수분해 공식으로 옳은 것은?" — not the heading on its own.',
+  'Never put the answer in the question. The question is checked against the answer and a leaked one is discarded.',
+  'Plain text. No HTML, no markdown — it is rendered as text and the learner would read the tags.',
+  `Under ${MAX_QUESTION_CHARS} characters, and readable on a phone.`,
+])}
 
 Every distractor names the ONE way it is wrong:
 ${flaws}
@@ -251,6 +260,7 @@ ${bullets([
   'Match the answer\'s register and length. An answer that is longer and more careful than every alternative is the giveaway, not the knowledge.',
   `Keep each distractor under ${MAX_DISTRACTOR_CHARS} characters.`,
   'Use each cardId exactly once, and only cardIds that were given to you.',
+  'Write the question in the same language as the card. A question in another language is a different card.',
   'Skip a card you cannot write three distinct wrong options for. A missing item is fine; a guessable one is not.',
   `Valid flaws: ${MCQ_DISTRACTOR_FLAWS.map((f) => `"${f}"`).join(', ')}.`,
 ])}`
