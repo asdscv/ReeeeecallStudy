@@ -19,13 +19,16 @@
     "empty": "ยังไม่มีการใช้งาน"
   },
   "reason": {
-    "purchase": "เติมเงิน",
-    "spend": "การสร้างการ์ด AI",
-    "refund": "คืนเงิน",
+    "admin_adjustment": "การปรับยอด",
     "admin_grant": "ให้เครดิต",
-    "spend_cards": "การ์ด AI",
+    "purchase": "เติมเงิน",
+    "refund": "คืนเงิน",
+    "spend": "การใช้ AI",
+    "spend_cards": "สร้างการ์ดด้วย AI",
+    "spend_diagnosis": "ผลวิเคราะห์การเรียนด้วย AI",
     "spend_image": "รูปภาพ AI",
-    "admin_adjustment": "การปรับยอด"
+    "spend_quiz": "แบบทดสอบ AI",
+    "spend_remediation": "คำอธิบายการ์ดด้วย AI"
   },
   "cardPlanHint": "แพ็กเกจจำกัดการ์ดจัดการได้ในพื้นที่จัดเก็บการ์ด",
   "quiz": {

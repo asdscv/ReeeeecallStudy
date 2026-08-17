@@ -21,13 +21,16 @@
     "showLess": "Show less"
   },
   "reason": {
-    "purchase": "Top-up",
-    "spend": "AI card generation",
-    "refund": "Refund",
+    "admin_adjustment": "Adjustment",
     "admin_grant": "Credit grant",
-    "spend_cards": "AI cards",
+    "purchase": "Top-up",
+    "refund": "Refund",
+    "spend": "AI usage",
+    "spend_cards": "AI card generation",
+    "spend_diagnosis": "AI diagnosis",
     "spend_image": "AI image",
-    "admin_adjustment": "Adjustment"
+    "spend_quiz": "AI quiz",
+    "spend_remediation": "AI card explanation"
   },
   "credits": {
     "title": "Buy AI Credits",

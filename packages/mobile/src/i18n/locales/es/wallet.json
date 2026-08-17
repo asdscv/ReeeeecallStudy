@@ -21,13 +21,16 @@
     "showLess": "Ver menos"
   },
   "reason": {
-    "purchase": "Recarga",
-    "spend": "Generación de tarjetas IA",
-    "refund": "Reembolso",
+    "admin_adjustment": "Ajuste",
     "admin_grant": "Crédito otorgado",
-    "spend_cards": "Tarjetas de IA",
-    "spend_image": "Imagen de IA",
-    "admin_adjustment": "Ajuste"
+    "purchase": "Recarga",
+    "refund": "Reembolso",
+    "spend": "Uso de IA",
+    "spend_cards": "Generación de tarjetas con IA",
+    "spend_diagnosis": "Diagnóstico con IA",
+    "spend_image": "Imagen con IA",
+    "spend_quiz": "Cuestionario con IA",
+    "spend_remediation": "Explicación de tarjeta con IA"
   },
   "credits": {
     "title": "Comprar créditos de IA",

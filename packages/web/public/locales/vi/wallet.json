@@ -19,13 +19,16 @@
     "empty": "Chưa có mức sử dụng."
   },
   "reason": {
-    "purchase": "Nạp thêm",
-    "spend": "Tạo thẻ bằng AI",
-    "refund": "Hoàn tiền",
+    "admin_adjustment": "Điều chỉnh",
     "admin_grant": "Cấp tín dụng",
-    "spend_cards": "Thẻ AI",
-    "spend_image": "Ảnh AI",
-    "admin_adjustment": "Điều chỉnh"
+    "purchase": "Nạp thêm",
+    "refund": "Hoàn tiền",
+    "spend": "Sử dụng AI",
+    "spend_cards": "Tạo thẻ bằng AI",
+    "spend_diagnosis": "Chẩn đoán bằng AI",
+    "spend_image": "Hình ảnh AI",
+    "spend_quiz": "Bài kiểm tra AI",
+    "spend_remediation": "Giải thích thẻ bằng AI"
   },
   "cardPlanHint": "Các gói giới hạn thẻ được quản lý trong Lưu trữ thẻ.",
   "quiz": {

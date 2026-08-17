@@ -21,13 +21,16 @@
     "showLess": "Tampilkan lebih sedikit"
   },
   "reason": {
-    "purchase": "Isi ulang",
-    "spend": "Pembuatan kartu AI",
-    "refund": "Pengembalian dana",
+    "admin_adjustment": "Penyesuaian",
     "admin_grant": "Pemberian kredit",
-    "spend_cards": "Kartu AI",
+    "purchase": "Isi ulang",
+    "refund": "Pengembalian dana",
+    "spend": "Penggunaan AI",
+    "spend_cards": "Pembuatan kartu AI",
+    "spend_diagnosis": "Diagnosis AI",
     "spend_image": "Gambar AI",
-    "admin_adjustment": "Penyesuaian"
+    "spend_quiz": "Kuis AI",
+    "spend_remediation": "Penjelasan kartu AI"
   },
   "credits": {
     "title": "Beli Kredit AI",
