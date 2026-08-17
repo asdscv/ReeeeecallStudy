@@ -128,14 +128,14 @@
     "notScoredYet": "Nada puntuado aún",
     "title": "Diagnóstico de aprendizaje",
     "weakEmpty": "Nada se está quedando atrás.",
-    "weakHint": "Tarjetas que has visto al menos dos veces y fallado más de la mitad.",
+    "weakHint": "Tarjetas que has visto al menos dos veces, con una media inferior al 60%.",
     "weakTitle": "Vale otra mirada",
     "accuracyValue": "{{known, number}} aciertos de {{scored, number}} en los últimos 30 días ({{pct, number}}%)",
     "weakCount": "{{count, number}} tarjetas",
     "weakCount_one": "{{count, number}} tarjeta",
     "weakCount_other": "{{count, number}} tarjetas",
     "weakStudy": "Estudiar solo estas",
-    "weakHintCapped": "Las {{shown, number}} más flojas de {{total, number}} tarjetas vistas dos veces y falladas más de la mitad."
+    "weakHintCapped": "Las {{shown, number}} más débiles de {{total, number}} tarjetas vistas al menos dos veces, con una media inferior al 60%."
   },
   "recommend": {
     "accept": "Aceptar",
@@ -157,9 +157,9 @@
       "noDecks": "Este objetivo no tiene mazos asociados, así que no hay nada que planificar.",
       "noGoal": "Aún no tienes un objetivo de aprendizaje activo. Un objetivo establece tus minutos diarios y los mazos para planificar.",
       "allCaughtUp": "Por hoy has terminado.",
-      "backSoon": "Las tarjetas que acabas de responder vuelven en unos {{count, number}} minutos.",
-      "backSoon_one": "Las tarjetas que acabas de responder vuelven en unos {{count, number}} minutos.",
-      "backSoon_other": "Las tarjetas que acabas de responder vuelven en unos {{count, number}} minutos.",
+      "backSoon": "Las tarjetas en fase de aprendizaje vuelven en unos {{count, number}} minutos.",
+      "backSoon_one": "Las tarjetas en fase de aprendizaje vuelven en unos {{count, number}} minutos.",
+      "backSoon_other": "Las tarjetas en fase de aprendizaje vuelven en unos {{count, number}} minutos.",
       "nextReview": "Próximo repaso: {{when}}.",
       "nothingScheduled": "No hay repasos programados para esta meta. Prueba a añadir más tarjetas a sus mazos."
     },
@@ -195,7 +195,7 @@
     "remaining_one": "Quedan {{count, number}} hoy",
     "remaining_other": "Quedan {{count, number}} hoy",
     "allDone": "Hoy está hecho",
-    "allDoneNote": "Eso es todo por hoy. Nos vemos mañana.",
+    "allDoneNote": "Has terminado el plan de hoy. Falta un rato para el próximo repaso. Si quieres, puedes seguir estudiando ahora.",
     "startStudy": "Empezar a estudiar",
     "continueStudy": "Seguir",
     "studyNote": "Valorar una tarjeta allí programa su próximo repaso y la marca en este plan.",
@@ -215,9 +215,9 @@
     "itemsUnavailable": "{{count, number}} tarjetas de este plan no se pueden abrir ahora. Puede que se hayan borrado.",
     "itemsUnavailable_one": "{{count, number}} tarjetas de este plan no se pueden abrir ahora. Puede que se hayan borrado.",
     "itemsUnavailable_other": "{{count, number}} tarjetas de este plan no se pueden abrir ahora. Puede que se hayan borrado.",
-    "backSoonNote": "Hoy está hecho. Las tarjetas que acabas de responder vuelven en unos {{count, number}} minutos.",
-    "backSoonNote_one": "Hoy está hecho. Las tarjetas que acabas de responder vuelven en unos {{count, number}} minutos.",
-    "backSoonNote_other": "Hoy está hecho. Las tarjetas que acabas de responder vuelven en unos {{count, number}} minutos.",
+    "backSoonNote": "Has terminado el plan de hoy. Las tarjetas en fase de aprendizaje vuelven en unos {{count, number}} minutos. Si quieres, puedes seguir estudiando ahora.",
+    "backSoonNote_one": "Has terminado el plan de hoy. Las tarjetas en fase de aprendizaje vuelven en unos {{count, number}} minutos. Si quieres, puedes seguir estudiando ahora.",
+    "backSoonNote_other": "Has terminado el plan de hoy. Las tarjetas en fase de aprendizaje vuelven en unos {{count, number}} minutos. Si quieres, puedes seguir estudiando ahora.",
     "extendAhead": "Se adelantaron {{count, number}} tarjetas: aún no era su turno.",
     "extendAhead_one": "Se adelantaron {{count, number}} tarjetas: aún no era su turno.",
     "extendAhead_other": "Se adelantaron {{count, number}} tarjetas: aún no era su turno.",
@@ -323,5 +323,62 @@
     "failed": "No se pudo escribir la explicación. Inténtalo de nuevo.",
     "reopen": "Ver la explicación otra vez",
     "inFlight": "Estamos preparando tu explicación, un momento."
+  },
+  "diagnosis": {
+    "evidenceTitle": "En qué fallas más",
+    "count": "{{count, number}} veces",
+    "count_one": "{{count, number}} vez",
+    "count_other": "{{count, number}} veces",
+    "mcqTitle": "Opción múltiple:",
+    "shortTitle": "Respuestas cortas:",
+    "essayTitle": "Ensayos:",
+    "trend": "Los últimos 7 días van al {{recent}}%, frente al {{window}}% de los 30 días.",
+    "tagLine": "En la etiqueta «{{tag}}» acertaste {{known}} de {{answers}}.",
+    "themeTitle": "Por qué se confunden",
+    "stepsTitle": "Prueba esto",
+    "buy": "Obtener un diagnóstico con IA",
+    "buying": "Analizando…",
+    "priceNote": "La IA lee 30 días de tus respuestas. Consume créditos.",
+    "flaw": {
+      "adjacent_sense": "elegiste algo muy parecido",
+      "opposite": "elegiste lo contrario",
+      "overgeneral": "elegiste algo demasiado amplio",
+      "partial": "elegiste algo solo en parte correcto",
+      "plausible_form": "elegiste algo que se parece",
+      "right_category_wrong_item": "categoría correcta, elemento equivocado",
+      "unrelated": "elegiste algo sin relación"
+    },
+    "gap": {
+      "extra_claim": "añadiste algo que no estaba",
+      "missing_part": "faltó una parte",
+      "spelling": "ortografía",
+      "too_vague": "demasiado vago",
+      "wrong_direction": "invertiste la dirección",
+      "wrong_language": "respondiste en otro idioma"
+    },
+    "aspect": {
+      "covers_answer": "cubrir la respuesta",
+      "explains_why": "explicar el porqué",
+      "gives_example": "dar un ejemplo",
+      "states_limits": "señalar los límites",
+      "structure": "estructura",
+      "uses_key_terms": "usar los términos clave"
+    },
+    "theme": {
+      "ambiguous_prompt": "{{n}} tarjetas cuyo anverso no determina una única respuesta.",
+      "long_answer": "{{n}} tarjetas con respuestas tan largas que la dificultad es recordarlas literalmente.",
+      "multi_part": "{{n}} tarjetas que piden varias cosas a la vez, así que media respuesta cuenta como fallo.",
+      "no_pattern": "No se encontró ningún patrón en estas tarjetas.",
+      "similar_form": "{{n}} tarjetas que se parecen o suenan igual.",
+      "similar_meaning": "{{n}} tarjetas cuyas respuestas se solapan en significado. No es que no lo sepas: no las separas."
+    },
+    "step": {
+      "clarify_prompt": "Añade el detalle que las distingue al anverso de estas {{n}}.",
+      "drill_cards": "Estudia solo estas {{n}} otra vez.",
+      "focus_topic": "Tus fallos se concentran en un tema. Empieza por ese mazo o etiqueta.",
+      "quiz_short_answer": "Elegir no las separa. Practica estas {{n}} como respuesta corta.",
+      "slow_down": "Tu precisión reciente está bajando. Reduce un poco la carga diaria.",
+      "split_card": "Estas {{n}} piden varias cosas. Divídelas, una pregunta cada una."
+    }
   }
 }

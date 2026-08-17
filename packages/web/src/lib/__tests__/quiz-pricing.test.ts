@@ -3,7 +3,8 @@
  *
  * The billing rule is deliberately simple and stays that way: questions are the asset and are
  * paid for once, so retaking is free forever; grading is a fresh model call and is charged every
- * sitting; multiple choice is compared server-side and costs nothing either way.
+ * sitting; multiple choice is marked server-side for free, and only its optional AI explanation
+ * is charged.
  *
  * What was missing was the TELLING. The grade button reads "이 답안 채점" with no price — a
  * deliberate choice, a button is a decision and not a price tag — but nothing else said anything

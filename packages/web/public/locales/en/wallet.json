@@ -33,6 +33,6 @@
     "freeCount": "{{used, number}} / {{limit, number}} questions today",
     "trial_one": "{{count, number}} trial unit left",
     "trial_other": "{{count, number}} trial units left",
-    "note": "Multiple choice is graded free. Free questions count the same whatever the type."
+    "note": "Multiple choice is marked free. Only an AI explanation is charged, per answer. Free questions count the same whatever the type."
   }
 }

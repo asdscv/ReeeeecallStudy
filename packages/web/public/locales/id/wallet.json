@@ -33,6 +33,6 @@
     "freeCount": "Hari ini {{used, number}} / {{limit, number}} soal",
     "trial_one": "Sisa {{count, number}} unit percobaan",
     "trial_other": "Sisa {{count, number}} unit percobaan",
-    "note": "Pilihan ganda dinilai gratis. Soal gratis dihitung sama untuk semua tipe."
+    "note": "Pilihan ganda dinilai gratis. Hanya penjelasan AI yang dipotong, per jawaban. Soal gratis dihitung sama apa pun jenisnya."
   }
 }

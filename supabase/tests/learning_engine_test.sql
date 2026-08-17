@@ -165,9 +165,10 @@ END $$;
 DO $$ BEGIN
   ASSERT NOT has_function_privilege(
     'anon',
-    -- 204 added `p_complete_plan_item` and DROPPED the 10-argument form: two overloads
+    -- 204 added `p_complete_plan_item` and DROPPED the 10-argument form; 244 added
+    -- `p_goal_id` and dropped the 11-argument form for the same reason: two overloads
     -- differing only by a defaulted trailing parameter make every existing call ambiguous.
-    'public.apply_study_rating(uuid,uuid,uuid,uuid,text,text,text,bigint,jsonb,integer,boolean)',
+    'public.apply_study_rating(uuid,uuid,uuid,uuid,text,text,text,bigint,jsonb,integer,boolean,uuid)',
     'EXECUTE'
   ), 'anon can execute apply_study_rating';
   ASSERT NOT has_function_privilege(

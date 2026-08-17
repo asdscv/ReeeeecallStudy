@@ -145,8 +145,11 @@ BEGIN
   END IF;
   PERFORM public.finish_quiz_run(v_run);
 
-  -- Answering multiple choice is FREE. If this ever charges, the price table gained a
-  -- `grade_mcq` row it was deliberately built without.
+  -- Answering multiple choice is FREE, and stays free after 245.
+  --
+  -- 245 는 `grade_mcq` 를 가격표에 넣었지만 그것은 **해설**의 값입니다. 답을 제출하는 것 —
+  -- 정답 판정을 받는 것 — 은 여전히 한 푼도 들지 않습니다. 이 단언이 바로 그 경계입니다:
+  -- 여기서 잔액이 움직이면 채점이 유료가 된 것이고, 그건 제품 회귀입니다.
   SELECT balance INTO b0 FROM ai_credit_balance WHERE user_id = v_uid;
   IF b0 <> b1 THEN RAISE EXCEPTION 'FAIL[SMOKE]: multiple-choice grading was charged'; END IF;
 

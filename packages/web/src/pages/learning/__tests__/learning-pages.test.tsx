@@ -110,6 +110,16 @@ const baseState = (over: StoreState = {}): StoreState => ({
   insightsLoading: false,
   insightsGoalId: null,
   fetchInsights: vi.fn(),
+  // The diagnosis panel, added beside the accuracy line. `null` is the real store's initial
+  // state — the panel renders nothing until a read lands, which is what every test here is.
+  diagnosisEvidence: null,
+  diagnosisEvidenceGoalId: null,
+  diagnosisEvidenceLoading: false,
+  diagnosis: {},
+  diagnosisBusyGoalId: null,
+  diagnosisError: null,
+  fetchDiagnosisEvidence: vi.fn(),
+  requestDiagnosis: vi.fn().mockResolvedValue(true),
   ...over,
 })
 
@@ -764,8 +774,11 @@ describe('learning diagnostics', () => {
       planCards: { 'card-1': { id: 'card-1', deck_id: 'deck-7', field_values: { front: '猫' } } },
     })
 
+    // `goalId` is not decoration: the session carries it to `apply_study_rating`, which records
+    // the rating as evidence for this goal (mig 244). Without it the panel that CHOSE these
+    // cards never sees that they were studied and hands back the same list forever.
     expect(screen.getByRole('link', { name: /insights\.weakStudy/ }))
-      .toHaveAttribute('href', '/decks/deck-7/study?mode=srs&cards=card-1,card-2')
+      .toHaveAttribute('href', '/decks/deck-7/study?mode=srs&cards=card-1,card-2&goalId=goal-1')
     // The card's own text never appears.
     expect(screen.queryByText('猫')).not.toBeInTheDocument()
   })
@@ -784,8 +797,8 @@ describe('learning diagnostics', () => {
 
     const links = screen.getAllByRole('link', { name: /insights\.weakCount/ })
     expect(links.map((l) => l.getAttribute('href'))).toEqual([
-      '/decks/deck-7/study?mode=srs&cards=card-1',
-      '/decks/deck-9/study?mode=srs&cards=card-9',
+      '/decks/deck-7/study?mode=srs&cards=card-1&goalId=goal-1',
+      '/decks/deck-9/study?mode=srs&cards=card-9&goalId=goal-1',
     ])
   })
 

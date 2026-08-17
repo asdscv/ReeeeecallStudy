@@ -11,9 +11,9 @@
       "noDecks": "Mục tiêu này chưa có bộ thẻ nào, không có gì để lập kế hoạch.",
       "attachDecks": "Gắn bộ thẻ",
       "allCaughtUp": "Phần hôm nay đã xong.",
-      "backSoon": "Những thẻ bạn vừa trả lời sẽ quay lại sau khoảng {{count, number}} phút.",
-      "backSoon_one": "Những thẻ bạn vừa trả lời sẽ quay lại sau khoảng {{count, number}} phút.",
-      "backSoon_other": "Những thẻ bạn vừa trả lời sẽ quay lại sau khoảng {{count, number}} phút.",
+      "backSoon": "Những thẻ còn trong giai đoạn học sẽ quay lại sau khoảng {{count, number}} phút.",
+      "backSoon_one": "Những thẻ còn trong giai đoạn học sẽ quay lại sau khoảng {{count, number}} phút.",
+      "backSoon_other": "Những thẻ còn trong giai đoạn học sẽ quay lại sau khoảng {{count, number}} phút.",
       "nextReview": "Lần ôn tiếp theo: {{when}}.",
       "nothingScheduled": "Mục tiêu này chưa có lần ôn nào được lên lịch. Hãy thêm thẻ vào bộ thẻ."
     },
@@ -45,7 +45,7 @@
     "remaining_one": "Còn {{count, number}} thẻ hôm nay",
     "remaining_other": "Còn {{count, number}} thẻ hôm nay",
     "allDone": "Xong hôm nay!",
-    "allDoneNote": "Hôm nay thế là xong. Hẹn gặp lại ngày mai.",
+    "allDoneNote": "Bạn đã hoàn thành kế hoạch hôm nay. Còn một lúc nữa mới đến lần ôn tập tiếp theo. Nếu muốn, bạn có thể học tiếp ngay bây giờ.",
     "startStudy": "Bắt đầu học",
     "continueStudy": "Học tiếp",
     "studyNote": "Chấm điểm ở màn hình học sẽ đặt lịch ôn tiếp theo và đánh dấu vào kế hoạch hôm nay.",
@@ -65,9 +65,9 @@
     "itemsUnavailable": "Hiện không mở được {{count, number}} thẻ trong kế hoạch này. Có thể chúng đã bị xoá.",
     "itemsUnavailable_one": "Hiện không mở được {{count, number}} thẻ trong kế hoạch này. Có thể chúng đã bị xoá.",
     "itemsUnavailable_other": "Hiện không mở được {{count, number}} thẻ trong kế hoạch này. Có thể chúng đã bị xoá.",
-    "backSoonNote": "Hôm nay xong rồi. Những thẻ bạn vừa trả lời sẽ quay lại sau khoảng {{count, number}} phút.",
-    "backSoonNote_one": "Hôm nay xong rồi. Những thẻ bạn vừa trả lời sẽ quay lại sau khoảng {{count, number}} phút.",
-    "backSoonNote_other": "Hôm nay xong rồi. Những thẻ bạn vừa trả lời sẽ quay lại sau khoảng {{count, number}} phút.",
+    "backSoonNote": "Bạn đã hoàn thành kế hoạch hôm nay. Những thẻ còn trong giai đoạn học sẽ quay lại sau khoảng {{count, number}} phút. Nếu muốn, bạn có thể học tiếp ngay bây giờ.",
+    "backSoonNote_one": "Bạn đã hoàn thành kế hoạch hôm nay. Những thẻ còn trong giai đoạn học sẽ quay lại sau khoảng {{count, number}} phút. Nếu muốn, bạn có thể học tiếp ngay bây giờ.",
+    "backSoonNote_other": "Bạn đã hoàn thành kế hoạch hôm nay. Những thẻ còn trong giai đoạn học sẽ quay lại sau khoảng {{count, number}} phút. Nếu muốn, bạn có thể học tiếp ngay bây giờ.",
     "extendAhead": "Đã lấy trước {{count, number}} thẻ chưa đến lượt.",
     "extendAhead_one": "Đã lấy trước {{count, number}} thẻ chưa đến lượt.",
     "extendAhead_other": "Đã lấy trước {{count, number}} thẻ chưa đến lượt.",
@@ -198,7 +198,7 @@
     "accuracy": "Độ chính xác",
     "notScoredYet": "Chưa có lần nào được chấm điểm",
     "weakTitle": "Cần xem lại",
-    "weakHint": "Những thẻ bạn đã xem ít nhất hai lần và sai quá nửa.",
+    "weakHint": "Những thẻ bạn đã xem ít nhất hai lần, với điểm trung bình dưới 60%.",
     "weakEmpty": "Không có thẻ nào tụt lại.",
     "cardFallback": "(thẻ không có trong kế hoạch hôm nay)",
     "attemptCount": "{{count, number}} lần làm",
@@ -209,7 +209,7 @@
     "weakCount_one": "{{count, number}} thẻ",
     "weakCount_other": "{{count, number}} thẻ",
     "weakStudy": "Chỉ học những thẻ này",
-    "weakHintCapped": "{{shown, number}} thẻ yếu nhất trong {{total, number}} thẻ bạn đã xem hai lần và sai quá nửa."
+    "weakHintCapped": "{{shown, number}} thẻ yếu nhất trong {{total, number}} thẻ bạn đã xem ít nhất hai lần, với điểm trung bình dưới 60%."
   },
   "recommend": {
     "title": "Gợi ý",
@@ -322,5 +322,62 @@
     "failed": "Không tạo được giải thích. Vui lòng thử lại.",
     "reopen": "Xem lại phần giải thích",
     "inFlight": "Đang tạo phần giải thích, vui lòng đợi một chút."
+  },
+  "diagnosis": {
+    "evidenceTitle": "Bạn sai nhiều nhất ở đâu",
+    "count": "{{count, number}} lần",
+    "count_one": "{{count, number}} lần",
+    "count_other": "{{count, number}} lần",
+    "mcqTitle": "Trắc nghiệm:",
+    "shortTitle": "Trả lời ngắn:",
+    "essayTitle": "Tự luận:",
+    "trend": "7 ngày gần đây là {{recent}}%, so với {{window}}% của 30 ngày.",
+    "tagLine": "Ở thẻ “{{tag}}”, bạn đúng {{known}} trên {{answers}} câu.",
+    "themeTitle": "Vì sao dễ nhầm",
+    "stepsTitle": "Hãy thử cách này",
+    "buy": "Nhận chẩn đoán bằng AI",
+    "buying": "Đang phân tích…",
+    "priceNote": "AI đọc 30 ngày câu trả lời của bạn. Việc này dùng tín dụng.",
+    "flaw": {
+      "adjacent_sense": "chọn nghĩa gần giống",
+      "opposite": "chọn phương án ngược lại",
+      "overgeneral": "chọn phương án quá rộng",
+      "partial": "chọn phương án chỉ đúng một phần",
+      "plausible_form": "chọn phương án trông giống",
+      "right_category_wrong_item": "đúng loại nhưng sai mục",
+      "unrelated": "chọn phương án không liên quan"
+    },
+    "gap": {
+      "extra_claim": "thêm điều không có",
+      "missing_part": "thiếu một phần",
+      "spelling": "chính tả",
+      "too_vague": "quá chung chung",
+      "wrong_direction": "ngược chiều",
+      "wrong_language": "trả lời bằng ngôn ngữ khác"
+    },
+    "aspect": {
+      "covers_answer": "nêu đủ ý",
+      "explains_why": "giải thích lý do",
+      "gives_example": "nêu ví dụ",
+      "states_limits": "nêu giới hạn",
+      "structure": "bố cục",
+      "uses_key_terms": "dùng thuật ngữ chính"
+    },
+    "theme": {
+      "ambiguous_prompt": "{{n}} thẻ mà mặt trước không xác định được một đáp án duy nhất.",
+      "long_answer": "{{n}} thẻ có đáp án dài đến mức cái khó là nhớ nguyên văn.",
+      "multi_part": "{{n}} thẻ hỏi nhiều thứ cùng lúc, nên đúng một nửa vẫn tính là sai.",
+      "no_pattern": "Không tìm thấy điểm chung nào giữa các thẻ này.",
+      "similar_form": "{{n}} thẻ trông hoặc nghe giống nhau.",
+      "similar_meaning": "{{n}} thẻ có đáp án chồng lấn về nghĩa. Không phải bạn không biết — bạn chưa tách được chúng."
+    },
+    "step": {
+      "clarify_prompt": "Thêm chi tiết phân biệt vào mặt trước của {{n}} thẻ này.",
+      "drill_cards": "Hãy học lại riêng {{n}} thẻ này.",
+      "focus_topic": "Lỗi của bạn dồn vào một chủ đề. Hãy bắt đầu từ bộ thẻ hoặc thẻ tag đó.",
+      "quiz_short_answer": "Chọn đáp án không giúp bạn tách chúng ra. Hãy kiểm tra {{n}} thẻ này bằng trả lời ngắn.",
+      "slow_down": "Độ chính xác gần đây đang giảm. Hãy giảm bớt khối lượng mỗi ngày.",
+      "split_card": "{{n}} thẻ này hỏi nhiều thứ. Hãy tách ra, mỗi thẻ một câu hỏi."
+    }
   }
 }

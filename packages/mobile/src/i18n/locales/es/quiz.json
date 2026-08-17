@@ -33,7 +33,7 @@
     "untitled": "Cuestionario",
     "type": "Tipo de pregunta",
     "typeHint": {
-      "mcq": "Cuatro opciones. Se comprueba en cuanto respondes: sin IA, así que sin créditos.",
+      "mcq": "Cuatro opciones. Se corrige en cuanto respondes: gratis, y esa corrección no cambia. Si quieres, puedes comprar una explicación con IA.",
       "short": "Responde con una palabra o una frase. Corrige la IA y se cobra por respuesta.",
       "essay": "Escribe unas frases; se corrige con una rúbrica. Lo más exigente y lo más caro."
     },
@@ -69,6 +69,8 @@
     "next": "Siguiente",
     "finish": "Terminar",
     "grading": "Corrigiendo…",
+    "explain": "Explicar con IA",
+    "explaining": "Escribiendo la explicación…",
     "reference": "Respuesta: {{answer}}",
     "grade": "Corregir esta respuesta",
     "length": {
@@ -219,7 +221,7 @@
   },
   "pricing": {
     "gradeCost": "Corregir cuesta {{amount}}",
-    "retakeMcq": "Las mismas preguntas, con las opciones reordenadas. La opción múltiple se corrige sin IA, así que no consume créditos.",
+    "retakeMcq": "Las mismas preguntas, con las opciones barajadas. Repetir no cuesta nada; solo se cobra la explicación con IA, respuesta por respuesta.",
     "retakeWritten": "Las mismas preguntas otra vez. Las preguntas ya están pagadas, pero la corrección es una llamada nueva y se cobra cada vez.",
     "genAllFree": "Se crean con tus preguntas gratuitas. No se cobra nada.",
     "genAllPaid": "{{paid, number}} preguntas · {{amount}}",
@@ -242,9 +244,20 @@
       "generate_mcq": "Opción múltiple",
       "generate_short": "Respuesta corta",
       "generate_essay": "Ensayo",
+      "grade_mcq": "Explicación de opción múltiple",
       "grade_short": "Corrección corta",
       "grade_essay": "Corrección de ensayo",
       "quiz_answer_key": "Campo de respuesta"
     }
+  },
+  "mcqAxis": {
+    "category": "Pertenecen a materias completamente distintas.",
+    "component": "Cambia una parte: un término, un signo, una palabra.",
+    "condition": "Se aplican en condiciones distintas: ambas pueden ser ciertas.",
+    "direction": "La dirección es la contraria: quién hace qué a quién.",
+    "form": "Se parecen y significan cosas distintas.",
+    "order": "Los pasos van en otro orden.",
+    "quantity": "Cambia la cantidad o el grado.",
+    "scope": "Abarcan rangos distintos: una es más amplia."
   }
 }

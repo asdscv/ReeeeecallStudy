@@ -50,9 +50,9 @@ import {
   DEFAULT_DIFFICULTY, type QuizDifficulty,
   ESSAY_ASPECTS, ESSAY_LENGTH_BANDS, ESSAY_MAX_CRITERIA, ESSAY_MENTIONS_PER_CRITERION,
   ESSAY_MIN_CRITERIA, ESSAY_WEIGHT_TOTAL, MAX_DISTRACTOR_CHARS, MAX_QUESTION_CHARS, MAX_SPAN_CHARS,
-  MCQ_DISTRACTOR_FLAWS, MAX_GAPS_PER_GRADE, SHORT_ANSWER_ANGLES,
+  MCQ_DISTRACTOR_FLAWS, MCQ_EXPLANATION_AXES, MAX_GAPS_PER_GRADE, SHORT_ANSWER_ANGLES,
   SHORT_ANSWER_BANDS, SHORT_ANSWER_GAPS, SHORT_ANSWER_VERDICTS, ESSAY_LEVELS,
-  type EssayCriterion, type QuizCardSource, type QuizGradeInput,
+  type EssayCriterion, type McqExplanationInput, type QuizCardSource, type QuizGradeInput,
 } from './ai-quiz.ts'
 
 /**
@@ -230,11 +230,20 @@ export function buildMcqGenerationPrompt(
 
   const systemPrompt = `${GROUNDING}
 
-For each card, write exactly ${distractorCount} WRONG options (distractors) for a multiple-choice question.
+For each card, write a multiple-choice QUESTION and exactly ${distractorCount} WRONG options (distractors).
 You are NOT asked for the correct option and must not write it — the app inserts the card's own answer itself.
 
 Respond with a single JSON object:
-{ "items": [ { "cardId": "...", "distractors": [ { "text": "...", "flaw": "opposite" } ] } ] }
+{ "items": [ { "cardId": "...", "question": "...", "distractors": [ { "text": "...", "flaw": "opposite" } ] } ] }
+
+THE QUESTION IS A SENTENCE A LEARNER ANSWERS, not the card's title.
+${bullets([
+  'Ask something exactly one of the options answers. "다음 중 옳은 것은?" / "Which of these is correct?" is the shape; a bare topic is not a question.',
+  'Name the subject INSIDE the sentence, using the card\'s own words, so the learner knows what is being asked about. A card headed "인수분해 공식(1) - 완전제곱식" becomes "완전제곱식의 인수분해 공식으로 옳은 것은?" — not the heading on its own.',
+  'Never put the answer in the question. The question is checked against the answer and a leaked one is discarded.',
+  'Plain text. No HTML, no markdown — it is rendered as text and the learner would read the tags.',
+  `Under ${MAX_QUESTION_CHARS} characters, and readable on a phone.`,
+])}
 
 Every distractor names the ONE way it is wrong:
 ${flaws}
@@ -251,6 +260,7 @@ ${bullets([
   'Match the answer\'s register and length. An answer that is longer and more careful than every alternative is the giveaway, not the knowledge.',
   `Keep each distractor under ${MAX_DISTRACTOR_CHARS} characters.`,
   'Use each cardId exactly once, and only cardIds that were given to you.',
+  'Write the question in the same language as the card. A question in another language is a different card.',
   'Skip a card you cannot write three distinct wrong options for. A missing item is fine; a guessable one is not.',
   `Valid flaws: ${MCQ_DISTRACTOR_FLAWS.map((f) => `"${f}"`).join(', ')}.`,
 ])}`
@@ -479,6 +489,65 @@ Valid levels: ${ESSAY_LEVELS.map((l) => `"${l}"`).join(', ')}.`
     reference: input.reference,
     rubric: criteria.map((c) => ({ criterionId: c.id, aspect: c.aspect, weight: c.weight, mustMention: c.mustMention })),
     learnerResponse: input.learner,
+  })
+
+  return { systemPrompt, userPrompt }
+}
+
+/**
+ * Explain a multiple-choice answer the server has already scored.
+ *
+ * The correct option is IN the payload here, which is the opposite of every generation prompt in
+ * this file — those never let the model see the answer, because the model is writing what the
+ * learner will be tested on. This one is not generating a question; the learner has answered and
+ * been marked. Withholding the key would just make the model guess it.
+ *
+ * What it may return is still closed: an axis from a fixed list and character ranges into two
+ * strings the app already holds. No prose. The screen renders our translated sentence for the
+ * axis and highlights the ranges — which is why a model that writes an explanation instead has
+ * written something that gets dropped.
+ */
+export function buildMcqExplanationPrompt(input: McqExplanationInput) {
+  const axes = bullets([
+    '"direction" — who does what to whom, or which way it runs (貸す/借りる, 원고/피고, acid/base).',
+    '"scope" — one covers more cases than the other.',
+    '"condition" — both can be true, but under different conditions.',
+    '"form" — they look or sound alike and mean different things (affect/effect, 待つ/持つ).',
+    '"component" — one part differs: a term, a coefficient, a sign, one word of a definition.',
+    '"order" — the steps or stages come in a different order.',
+    '"quantity" — the same idea in a different amount, degree or count.',
+    '"category" — different subject areas entirely.',
+  ])
+
+  const systemPrompt = `You explain a multiple-choice answer that has ALREADY been marked. The mark is not yours to make
+and not yours to revise: \`correct\` states whether the learner was right, and it is decided by the card's own answer
+key. Never contradict it, never return a score.
+
+Name ONE axis — the thing the right option and the learner's option actually differ on. ${input.correct
+    ? 'The learner was RIGHT, so use the axis that separates the correct option from the CLOSEST of the alternatives:'
+      + ' what would they have had to hold on to in order to rule that one out?'
+    : 'The learner was WRONG, so use the axis that separates the correct option from the one they picked.'}
+
+Respond with a single JSON object:
+{ "axis": "component", "spans": [ { "from": "reference", "start": 0, "end": 18 } ] }
+
+Axes — a closed list:
+${axes}
+
+${SPANS}
+Point "reference" spans at the part of the correct option that carries the distinction, and "learner" spans at the
+part of their choice that breaks it. One or two spans; none at all is better than a range that does not make the point.
+
+Never write any other field. Explanations, corrections and encouragement are discarded — the app renders its own
+sentence for the axis, already translated into the learner's language, and highlights your ranges in text it already
+has. Valid axes: ${MCQ_EXPLANATION_AXES.map((a) => `"${a}"`).join(', ')}.`
+
+  const userPrompt = JSON.stringify({
+    question: input.question,
+    reference: input.reference,
+    learnerChoice: input.learner,
+    alternatives: input.alternatives,
+    correct: input.correct,
   })
 
   return { systemPrompt, userPrompt }

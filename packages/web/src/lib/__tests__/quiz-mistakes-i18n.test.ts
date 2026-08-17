@@ -147,7 +147,7 @@ describe.each(Object.keys(PLATFORMS) as (keyof typeof PLATFORMS)[])('%s', (platf
       expect(left).toContain('5')
       expect(left).not.toContain('{{')
 
-      // The two retake notes must not be the same sentence: multiple choice costs nothing
+      // The two retake notes must not be the same sentence: a multiple-choice retake costs nothing
       // because no model is called, written answers are charged per sitting.
       expect(tf('pricing.retakeMcq')).not.toBe(tf('pricing.retakeWritten'))
     })

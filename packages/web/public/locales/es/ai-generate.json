@@ -70,7 +70,7 @@
       "price_changed": "El precio cambió mientras elegías. Compruébalo e inténtalo de nuevo.",
       "failed": "No se pudo procesar. No se te ha cobrado nada.",
       "retry": "Reintentar",
-      "gradeYourself": "Puedes terminar el test igualmente y corregir esta pregunta tú, gratis."
+      "gradeYourself": "Puedes terminar el cuestionario tal cual. La opción múltiple ya está corregida, y corregir tú mismo una respuesta escrita es gratis."
     },
     "freeQuizOnly": "Te quedan {{free}} preguntas gratis hoy"
   },

@@ -93,6 +93,10 @@ const baseState = (over: StoreState = {}): StoreState => ({
   recordAttempt: vi.fn().mockResolvedValue(true), fetchAttempts: vi.fn(),
   insights: null, weakCardDecks: {}, insightsLoading: false, insightsGoalId: null,
   fetchInsights: vi.fn(),
+  // The diagnosis panel sits in the same section. `null` is the real store's initial state.
+  diagnosisEvidence: null, diagnosisEvidenceGoalId: null, diagnosisEvidenceLoading: false,
+  diagnosis: {}, diagnosisBusyGoalId: null, diagnosisError: null,
+  fetchDiagnosisEvidence: vi.fn(), requestDiagnosis: vi.fn().mockResolvedValue(true),
   planWeek: null, planWeekGoalId: null,
   recommendations: [], fetchRecommendations: vi.fn().mockResolvedValue(undefined),
   regeneratePlanCoach: vi.fn().mockResolvedValue(false),

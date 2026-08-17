@@ -265,7 +265,38 @@ export interface PlanCardRef {
  * Sending anything else is refused before the wallet is touched, so a wider union here would
  * only let a screen offer a button that always fails.
  */
-export type RemediationAction = 'explain' | 'hint' | 'compare'
+export type RemediationAction = 'explain' | 'hint' | 'compare' | 'diagnose'
+
+/**
+ * Counted evidence for one goal, from `get_learning_diagnosis_evidence` (mig 246).
+ *
+ * Every field is a COUNT of a closed-set label the app already writes while grading. The client
+ * may not read `quiz_questions` at all — RLS, no GRANT since mig 193 — so these numbers are the
+ * only way the flaw of the option a learner actually picked can ever reach a screen.
+ */
+export interface DiagnosisEvidence {
+  goal_id: string
+  days: number
+  attempts: number
+  scored: number
+  known: number
+  recent_scored: number
+  recent_known: number
+  /** `MCQ_DISTRACTOR_FLAWS` label → how many times the learner chose an option carrying it. */
+  mcq_flaws: Record<string, number>
+  short_gaps: Record<string, number>
+  short_verdicts: Record<string, number>
+  essay_aspects: Record<string, { met: number; partial: number; not_met: number }>
+  decks: Array<{ deck_id: string; deck_name: string; answers: number; known: number }>
+  tags: Array<{ tag: string; answers: number; known: number }>
+}
+
+/** What the paid half returns. Labels and card ids — never a sentence the model wrote. */
+export interface DiagnosisContent {
+  findings: Array<{ theme: string; cardIds: string[]; confidence: number }>
+  steps: Array<{ action: string; cardIds: string[] }>
+  evidence?: DiagnosisEvidence
+}
 
 export interface AttemptRow {
   id: string
@@ -621,6 +652,20 @@ interface LearningState {
    */
   insightsGoalId: string | null
   /**
+   * The free half of 학습 진단: counted labels for the selected goal.
+   *
+   * Kept beside `insights` rather than folded into it. `summarizeLearning` is a pure function
+   * over attempt rows and is unit-tested as one; this comes from a server RPC that reads tables
+   * the client cannot. Two sources, two fields.
+   */
+  diagnosisEvidence: DiagnosisEvidence | null
+  diagnosisEvidenceGoalId: string | null
+  diagnosisEvidenceLoading: boolean
+  /** The paid half, by goal id. Kept so 닫기 does not throw away something already bought. */
+  diagnosis: Record<string, DiagnosisContent>
+  diagnosisBusyGoalId: string | null
+  diagnosisError: { code: string } | null
+  /**
    * Deck id per weak card, so the "다시 볼 카드" button can start a session.
    *
    * A study session takes ONE deck (`finalize_study_session` refuses events spanning decks),
@@ -696,6 +741,10 @@ interface LearningState {
   /** Stamp the goal completed if it has earned it. Returns whether this call changed it. */
   completeGoalIfEarned: (goalId: string) => Promise<boolean>
   fetchInsights: (goalId: string) => Promise<void>
+  /** Free, and always safe to call: counts only, no model, no wallet. */
+  fetchDiagnosisEvidence: (goalId: string) => Promise<void>
+  /** Paid. `cardIds` are the failing cards the model is asked to group. */
+  requestDiagnosis: (input: { goalId: string; cardIds: string[]; uiLang: string }) => Promise<boolean>
   fetchRecommendations: (goalId: string) => Promise<void>
   regenerateRecommendations: (goalId: string) => Promise<boolean>
   resolveRecommendation: (id: string, status: 'accepted' | 'dismissed') => Promise<boolean>
@@ -769,6 +818,7 @@ interface LearningState {
  */
 let insightsRequestSeq = 0
 let recommendationsRequestSeq = 0
+let diagnosisEvidenceSeq = 0
 
 /**
  * Turn planner output into the row shape `save_daily_plan` / `append_daily_plan_items` accept.
@@ -1216,6 +1266,12 @@ export const useLearningStore = create<LearningState>((set, get) => ({
   insightsLoading: false,
   insightsGoalId: null,
   insightsError: null,
+  diagnosisEvidence: null,
+  diagnosisEvidenceGoalId: null,
+  diagnosisEvidenceLoading: false,
+  diagnosis: {},
+  diagnosisBusyGoalId: null,
+  diagnosisError: null,
   recommendations: [],
   recommendationsLoading: false,
   recommendationsGoalId: null,
@@ -2150,6 +2206,89 @@ export const useLearningStore = create<LearningState>((set, get) => ({
       })
     } finally {
       if (seq === insightsRequestSeq) set({ insightsLoading: false })
+    }
+  },
+
+  /**
+   * The free half of the diagnosis: counted labels, straight from the server.
+   *
+   * Free and model-free, so it loads with the panel rather than behind a button. It is also the
+   * part that answers the actual complaint — 무엇을 많이 틀리는가 — which one accuracy ratio
+   * never could. Every label it counts has been written on every graded answer since mig 193 and
+   * had no reader until now.
+   */
+  fetchDiagnosisEvidence: async (goalId) => {
+    const seq = ++diagnosisEvidenceSeq
+    set({ diagnosisEvidenceLoading: true })
+    try {
+      const { data, error } = await supabase.rpc('get_learning_diagnosis_evidence', {
+        p_goal_id: goalId, p_days: 30,
+      })
+      if (seq !== diagnosisEvidenceSeq) return
+      if (error) throw error
+      set({
+        diagnosisEvidence: (data ?? null) as DiagnosisEvidence | null,
+        diagnosisEvidenceGoalId: goalId,
+      })
+    } catch {
+      if (seq !== diagnosisEvidenceSeq) return
+      // Silent: this is an addition to a panel that already renders without it. A failed read
+      // must not put an error where the accuracy line used to be.
+      set({ diagnosisEvidence: null, diagnosisEvidenceGoalId: goalId })
+    } finally {
+      if (seq === diagnosisEvidenceSeq) set({ diagnosisEvidenceLoading: false })
+    }
+  },
+
+  /**
+   * The paid half: ask the model to group the failing cards and say what to do.
+   *
+   * The server refuses before it charges when the window is thin (`diagnosisGroundingError`) —
+   * a pattern found over three answers is a horoscope. The codes come back as
+   * `AI_DIAGNOSIS_NOT_ENOUGH_ANSWERS` / `_NOT_ENOUGH_MISSES` / `_NOT_ENOUGH_CARDS` /
+   * `_NO_PATTERN`, each with its own sentence, because "buy it later" and "study more first"
+   * are different instructions.
+   */
+  requestDiagnosis: async ({ goalId, cardIds, uiLang }) => {
+    if (get().diagnosisBusyGoalId) return false
+    set({ diagnosisBusyGoalId: goalId, diagnosisError: null })
+    try {
+      const result = await callServerAI({
+        kind: 'remediation',
+        action: 'diagnose',
+        uiLang,
+        goalId,
+        cardIds,
+      })
+      const content = (result.content ?? {}) as unknown as DiagnosisContent
+      // Re-checked at the boundary even though the server validated: this store is what the
+      // screen renders from, and one bad response must not become a blank panel the learner
+      // has already paid for.
+      const findings = Array.isArray(content.findings)
+        ? content.findings.filter((f) => f && typeof f.theme === 'string' && Array.isArray(f.cardIds))
+        : []
+      const steps = Array.isArray(content.steps)
+        ? content.steps.filter((st) => st && typeof st.action === 'string')
+        : []
+      if (findings.length === 0 && steps.length === 0) throw { code: 'AI_DIAGNOSIS_NO_PATTERN' }
+
+      set({
+        diagnosis: { ...get().diagnosis, [goalId]: { ...content, findings, steps } },
+        // The response carries the evidence it was computed from, so the panel and the finding
+        // can never describe two different windows.
+        ...(content.evidence
+          ? { diagnosisEvidence: content.evidence, diagnosisEvidenceGoalId: goalId }
+          : {}),
+      })
+      return true
+    } catch (e) {
+      const code = e instanceof Error && e.message ? e.message
+        : typeof (e as { code?: unknown })?.code === 'string' ? String((e as { code: string }).code)
+          : 'SERVER_ERROR'
+      set({ diagnosisError: { code } })
+      return false
+    } finally {
+      set({ diagnosisBusyGoalId: null })
     }
   },
 
