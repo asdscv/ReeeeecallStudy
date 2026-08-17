@@ -9,7 +9,7 @@ import {
 } from '@reeeeecall/shared/stores/quiz-store'
 import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
 import { minCardsForMcq } from '@reeeeecall/shared/lib/quiz-outcome'
-import { generateCostLine, freeLeftLine } from '@reeeeecall/shared/lib/quiz-pricing'
+import { generateCostLine, freeLeftLine, affordableQuestionCount } from '@reeeeecall/shared/lib/quiz-pricing'
 
 const TYPES: QuizQuestionType[] = ['mcq', 'short', 'essay']
 // Presets plus a free field up to MAX_COUNT. The presets stop where a learner's idea of "a
@@ -99,6 +99,13 @@ export function QuizSetupPage() {
   const tooFewForMcq = type === 'mcq' && eligible > 0 && eligible < mcqMinimum
   const canSubmit = Boolean(deckId) && eligible > 0 && !tooFewForMcq && !generating
     && priced !== null && priced.sufficient
+  /**
+   * How many of the requested questions are payable right now.
+   *
+   * Only meaningful when the quote says the full count is not — see `affordableQuestionCount`
+   * for why the screen has to be able to name this number at all.
+   */
+  const affordable = affordableQuestionCount(priced, count)
   const costLine = generateCostLine(priced)
   const freeLeft = freeLeftLine(priced)
 
@@ -311,8 +318,24 @@ export function QuizSetupPage() {
       )}
 
       {priced && !priced.sufficient && (
-        <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
+        <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-lg space-y-2">
           <p className="text-xs text-destructive">{t('error.AI_INSUFFICIENT_CREDITS')}</p>
+          {/* The number, and a way to take it.
+              This used to be the red line alone over a disabled button, which is where a learner
+              with five free questions left who asked for ten got NOTHING — not five. The reserve
+              is all-or-nothing by design (it agrees one price up front), so the only way to use
+              the free allowance was to guess the exact count. Now the screen says the count and
+              offers it in one tap. */}
+          {affordable > 0 && (
+            <button
+              type="button"
+              onClick={() => setCount(affordable)}
+              className="w-full rounded-lg border border-destructive/40 px-3 py-1.5 text-xs font-medium text-destructive transition-colors hover:bg-destructive/10"
+              data-testid="quiz-use-affordable"
+            >
+              {t('setup.makeAffordable', { count: affordable })}
+            </button>
+          )}
         </div>
       )}
 

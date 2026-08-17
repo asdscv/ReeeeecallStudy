@@ -53,7 +53,10 @@
     "generatingBatch": "Membuat… ({{done, number}}/{{total, number}})",
     "customCount": "Isi sendiri",
     "countEffective_one": "Buat {{count, number}} soal",
-    "countEffective_other": "Buat {{count, number}} soal"
+    "countEffective_other": "Buat {{count, number}} soal",
+    "makeAffordable": "Buat {{count, number}} soal saja",
+    "makeAffordable_one": "Buat {{count, number}} soal saja",
+    "makeAffordable_other": "Buat {{count, number}} soal saja"
   },
   "run": {
     "loading": "Memuat…",

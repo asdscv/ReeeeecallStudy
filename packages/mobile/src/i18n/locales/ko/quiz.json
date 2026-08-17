@@ -53,7 +53,10 @@
     "generatingBatch": "문제를 만드는 중… ({{done, number}}/{{total, number}})",
     "customCount": "직접 입력",
     "countEffective_one": "{{count, number}}문항 생성",
-    "countEffective_other": "{{count, number}}문항 생성"
+    "countEffective_other": "{{count, number}}문항 생성",
+    "makeAffordable": "{{count, number}}문항으로 만들기",
+    "makeAffordable_one": "{{count, number}}문항으로 만들기",
+    "makeAffordable_other": "{{count, number}}문항으로 만들기"
   },
   "run": {
     "loading": "불러오는 중…",

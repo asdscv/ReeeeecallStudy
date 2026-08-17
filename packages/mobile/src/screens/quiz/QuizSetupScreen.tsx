@@ -14,7 +14,7 @@ import { Screen, Button, ScreenHeader } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
 import type { QuizStackParamList } from '../../navigation/types'
-import { generateCostLine, freeLeftLine } from '@reeeeecall/shared/lib/quiz-pricing'
+import { generateCostLine, freeLeftLine, affordableQuestionCount } from '@reeeeecall/shared/lib/quiz-pricing'
 import { minCardsForMcq } from '@reeeeecall/shared/lib/quiz-outcome'
 
 type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizSetup'>
@@ -100,6 +100,8 @@ export function QuizSetupScreen() {
   const freeLeft = freeLeftLine(priced)
   const canSubmit = Boolean(deckId) && eligible > 0 && !tooFewForMcq && !generating
     && priced !== null && priced.sufficient
+  /** 지금 값을 치를 수 있는 문항 수. 전부 안 될 때만 의미가 있습니다. */
+  const affordable = affordableQuestionCount(priced, count)
 
   const submit = async () => {
     if (!priced || !deckId) return
@@ -297,6 +299,21 @@ export function QuizSetupScreen() {
             <Text style={[theme.typography.caption, { color: theme.colors.error }]}>
               {t('error.AI_INSUFFICIENT_CREDITS')}
             </Text>
+            {/* 숫자와, 그것을 집는 방법. 예약은 설계상 전부 아니면 전무라(값을 미리 합의하니까),
+                무료 5문항이 남은 학습자가 10문항을 고르면 5개도 못 받았습니다 — 정확히 5를
+                찍어야만 됐습니다. 이제 화면이 그 수를 말하고 한 번에 집어줍니다. */}
+            {affordable > 0 && (
+              <Pressable
+                onPress={() => setCount(affordable)}
+                style={{ marginTop: 8, alignSelf: 'flex-start' }}
+                accessibilityRole="button"
+                {...testProps('quiz-use-affordable')}
+              >
+                <Text style={[theme.typography.caption, { color: theme.colors.primary, fontWeight: '600' }]}>
+                  {t('setup.makeAffordable', { count: affordable })}
+                </Text>
+              </Pressable>
+            )}
           </View>
         )}
 

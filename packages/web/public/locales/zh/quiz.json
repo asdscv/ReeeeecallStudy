@@ -53,7 +53,10 @@
     "generatingBatch": "生成中… ({{done, number}}/{{total, number}})",
     "customCount": "自定义",
     "countEffective_one": "生成 {{count, number}} 题",
-    "countEffective_other": "生成 {{count, number}} 题"
+    "countEffective_other": "生成 {{count, number}} 题",
+    "makeAffordable": "改为生成 {{count, number}} 题",
+    "makeAffordable_one": "改为生成 {{count, number}} 题",
+    "makeAffordable_other": "改为生成 {{count, number}} 题"
   },
   "run": {
     "loading": "加载中…",

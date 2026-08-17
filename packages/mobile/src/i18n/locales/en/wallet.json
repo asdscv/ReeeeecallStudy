@@ -51,6 +51,6 @@
     "freeCount": "{{used, number}} / {{limit, number}} questions today",
     "trial_one": "{{count, number}} trial unit left",
     "trial_other": "{{count, number}} trial units left",
-    "note": "Multiple choice is marked free. Only an AI explanation is charged, per answer. Free questions count the same whatever the type."
+    "note": "Free questions count against one daily limit whatever the type. Past it, each question is charged."
   }
 }
