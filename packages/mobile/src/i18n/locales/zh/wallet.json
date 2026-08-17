@@ -51,6 +51,6 @@
     "freeCount": "今日 {{used, number}} / {{limit, number}} 道",
     "trial_one": "试用剩余 {{count, number}} 个单位",
     "trial_other": "试用剩余 {{count, number}} 个单位",
-    "note": "免费题目无论类型都计入同一每日额度。超出后按题扣费。"
+    "note": "免费题目无论类型都计入同一每日额度。选择题的解析已包含在出题费用中。"
   }
 }

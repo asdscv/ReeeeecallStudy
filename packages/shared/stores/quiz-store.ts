@@ -25,13 +25,14 @@ export type QuizScopeKind = 'deck' | 'tags' | 'cards'
 /**
  * Mirrors `ai_quiz_price_units.action`.
  *
- * `grade_mcq` buys an EXPLANATION, not a mark. Multiple-choice correctness is decided by
- * `submit_quiz_answer` in SQL the moment the answer lands — instantly, free, and final — and no
- * model result is allowed to overwrite it (mig 245). What the learner pays for is the axis the
- * right option and theirs differ on, and the line of their own card that settles it.
+ * Multiple choice has NO row here — neither a grade nor an explanation. Its mark is an index
+ * comparison in SQL on submit, and its explanation is written with the question, one axis per
+ * distractor (mig 252). `grade_mcq` existed for one day between 245 and 252, when the explanation
+ * was a second paid call keyed on the learner's choice; moving it into generation covers every
+ * choice in advance and costs nothing extra.
  */
 export type QuizAction = 'generate_mcq' | 'generate_short' | 'generate_essay'
-  | 'grade_mcq' | 'grade_short' | 'grade_essay'
+  | 'grade_short' | 'grade_essay'
 
 /**
  * Cards per generation call, mirroring `MAX_QUIZ_BATCH` in `ai-quiz-prompts.ts`.
@@ -65,14 +66,11 @@ export const QUIZ_GENERATE_ACTION: Record<QuizQuestionType, QuizAction> = {
   mcq: 'generate_mcq', short: 'generate_short', essay: 'generate_essay',
 }
 /**
- * What the AI call after an answer costs, per type.
- *
- * Multiple choice is the odd one: its entry buys an explanation of an answer already scored,
- * while the other two buy the score itself. That is why it is the cheapest — the hard part is
- * already done, in SQL, for free.
+ * What grading an answer costs, per type. Multiple choice is absent because nothing is bought
+ * after a multiple-choice answer — see `QuizAction`.
  */
-export const QUIZ_GRADE_ACTION: Record<QuizQuestionType, QuizAction> = {
-  mcq: 'grade_mcq', short: 'grade_short', essay: 'grade_essay',
+export const QUIZ_GRADE_ACTION: Record<Exclude<QuizQuestionType, 'mcq'>, QuizAction> = {
+  short: 'grade_short', essay: 'grade_essay',
 }
 
 export interface QuizQuote {
@@ -972,4 +970,21 @@ export function optionFlaws(item: QuizRunItem): (string | null)[] {
   const raw = item.meta?.flaws
   if (!Array.isArray(raw)) return []
   return raw.map((f) => (typeof f === 'string' ? f : null))
+}
+
+/**
+ * What separates each wrong option from the answer, in the order the options were served.
+ *
+ * Written with the question and revealed with the flaws (mig 252) — so the explanation for
+ * whichever option the learner picked is already on the device the moment they answer. It used to
+ * be a second, paid provider call keyed on their choice; that call could fail after they had
+ * already committed, and it cost $0.05 a question.
+ *
+ * Empty for questions written before 252, and for anything that is not a string. A missing axis
+ * costs a sentence, never the item.
+ */
+export function optionAxes(item: QuizRunItem): (string | null)[] {
+  const raw = item.meta?.axes
+  if (!Array.isArray(raw)) return []
+  return raw.map((a) => (typeof a === 'string' ? a : null))
 }

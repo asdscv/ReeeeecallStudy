@@ -51,6 +51,6 @@
     "freeCount": "Hari ini {{used, number}} / {{limit, number}} soal",
     "trial_one": "Sisa {{count, number}} unit percobaan",
     "trial_other": "Sisa {{count, number}} unit percobaan",
-    "note": "Soal gratis dihitung dalam satu batas harian apa pun jenisnya. Setelah itu, setiap soal dikenai biaya."
+    "note": "Soal gratis dihitung dalam satu batas harian apa pun jenisnya. Untuk pilihan ganda, penjelasan sudah termasuk dalam biaya soal."
   }
 }

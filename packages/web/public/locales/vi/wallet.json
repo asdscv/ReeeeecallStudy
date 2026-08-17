@@ -40,6 +40,6 @@
     "freeCount": "Hôm nay {{used, number}} / {{limit, number}} câu",
     "trial_one": "Còn {{count, number}} đơn vị dùng thử",
     "trial_other": "Còn {{count, number}} đơn vị dùng thử",
-    "note": "Câu hỏi miễn phí tính chung một hạn mức mỗi ngày bất kể loại nào. Vượt hạn mức thì tính phí theo từng câu."
+    "note": "Câu hỏi miễn phí tính chung một hạn mức mỗi ngày bất kể loại nào. Với câu trắc nghiệm, phần giải thích đã nằm trong phí tạo câu hỏi."
   }
 }
