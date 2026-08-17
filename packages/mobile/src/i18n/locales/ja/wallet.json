@@ -51,6 +51,6 @@
     "freeCount": "本日 {{used, number}} / {{limit, number}}問",
     "trial_one": "お試し残り{{count, number}}ユニット",
     "trial_other": "お試し残り{{count, number}}ユニット",
-    "note": "無料問題は種類に関係なく1日の上限で数えます。上限を超えると1問ごとに差し引かれます。"
+    "note": "無料問題は種類に関係なく1日の上限で数えます。選択問題は解説も問題の料金に含まれます。"
   }
 }

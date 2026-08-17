@@ -607,6 +607,18 @@ export interface QuizItemMultipleChoice {
   /** Parallel to `options`; null at `correctIndex`. Renders the post-answer explanation. */
   readonly flaws: ReadonlyArray<McqDistractorFlaw | null>
   /**
+   * What separates each wrong option from the answer. Parallel to `options`, null at
+   * `correctIndex`.
+   *
+   * Written HERE, with the question, rather than bought per answer afterwards. The axis depends
+   * on which option was picked, so 245 computed it after the fact — one extra provider call per
+   * answered question, at $0.05, with its own latency and its own way to fail after the learner
+   * had already committed. Writing one axis per distractor at generation time makes all four
+   * possible answers explained in advance: the learner picks, and the explanation is already
+   * there, free and instant. `grade_mcq` is gone with it.
+   */
+  readonly axes: ReadonlyArray<McqExplanationAxis | null>
+  /**
    * The near-miss count fell outside the band's advisory range.
    *
    * Recorded, not enforced — enforcing it dropped every item on the easy bands. It exists so
@@ -779,6 +791,8 @@ export function validateMultipleChoiceGeneration(
     const seen = new Set<string>([answerNorm])
     const texts: string[] = []
     const flaws: McqDistractorFlaw[] = []
+    /** One per accepted distractor, same index. `null` when the model gave none we recognise. */
+    const axes: Array<McqExplanationAxis | null> = []
 
     for (const d of entry.distractors) {
       if (texts.length >= distractorCount) break
@@ -840,6 +854,12 @@ export function validateMultipleChoiceGeneration(
       seen.add(norm)
       texts.push(text)
       flaws.push(effectiveFlaw)
+      // An unrecognised axis is dropped to null, NOT a reason to drop the option.
+      //
+      // The flaw label is what the item needs to be gradeable; the axis is the extra sentence.
+      // Refusing the whole distractor over a missing explanation would trade a working question
+      // for a nicer one, and `too_few_distractors` would then cost the learner the whole item.
+      axes.push(isMcqExplanationAxis(d.axis) ? d.axis : null)
     }
 
     // Fill the FAR slots the band left open from the deck, rather than from the model.
@@ -868,6 +888,9 @@ export function validateMultipleChoiceGeneration(
         // `right_category_wrong_item` means. It is also a FAR flaw, which is what makes the
         // band arithmetic come out right.
         flaws.push('right_category_wrong_item')
+        // And that is exactly the `category` axis: it belongs to a different item, so no model
+        // call is needed to know what separates it from this answer.
+        axes.push('category')
       }
     }
     if (texts.length < distractorCount) { drop(cardId, 'too_few_distractors'); continue }
@@ -929,16 +952,17 @@ export function validateMultipleChoiceGeneration(
     const correctIndex = correctOptionIndex(itemId, optionCount)
     const options: string[] = []
     const flawSlots: Array<McqDistractorFlaw | null> = []
+    const axisSlots: Array<McqExplanationAxis | null> = []
     let next = 0
     for (let slot = 0; slot < optionCount; slot++) {
-      if (slot === correctIndex) { options.push(card.answerText); flawSlots.push(null) }
-      else { options.push(texts[next]); flawSlots.push(flaws[next]); next++ }
+      if (slot === correctIndex) { options.push(card.answerText); flawSlots.push(null); axisSlots.push(null) }
+      else { options.push(texts[next]); flawSlots.push(flaws[next]); axisSlots.push(axes[next] ?? null); next++ }
     }
 
     used.add(cardId)
     items.push({
       type: 'multiple_choice', itemId, cardId,
-      question: stem, options, correctIndex, flaws: flawSlots, offBand,
+      question: stem, options, correctIndex, flaws: flawSlots, axes: axisSlots, offBand,
     })
   }
 
@@ -1396,8 +1420,9 @@ export const MCQ_EXPLANATION_AXES = [
 ] as const
 export type McqExplanationAxis = typeof MCQ_EXPLANATION_AXES[number]
 
-const isMcqAxis = (v: unknown): v is McqExplanationAxis =>
+export const isMcqExplanationAxis = (v: unknown): v is McqExplanationAxis =>
   typeof v === 'string' && (MCQ_EXPLANATION_AXES as readonly string[]).includes(v)
+const isMcqAxis = isMcqExplanationAxis
 
 export interface McqExplanation {
   readonly axis: McqExplanationAxis

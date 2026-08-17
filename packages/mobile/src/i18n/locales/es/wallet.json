@@ -51,6 +51,6 @@
     "freeCount": "Hoy {{used, number}} / {{limit, number}} preguntas",
     "trial_one": "Queda {{count, number}} unidad de prueba",
     "trial_other": "Quedan {{count, number}} unidades de prueba",
-    "note": "Las preguntas gratuitas cuentan en un mismo límite diario, sea cual sea el tipo. Pasado ese límite, se cobra cada pregunta."
+    "note": "Las preguntas gratuitas cuentan en un mismo límite diario, sea cual sea el tipo. En opción múltiple la explicación va incluida en la pregunta."
   }
 }

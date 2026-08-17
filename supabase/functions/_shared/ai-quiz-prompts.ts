@@ -228,13 +228,29 @@ export function buildMcqGenerationPrompt(
   const mix = difficulty.guidance
     ?? `Write distractors a learner who half-knows the answer could believe.`
 
+  // Written WITH the question, not bought per answer afterwards. 245 asked for the axis in a
+  // second call once the learner's choice was known — one provider call per answered question,
+  // priced, with its own latency and its own way to fail after they had already committed. One
+  // axis per distractor covers every choice they could make, in advance and for nothing.
+  const axes = bullets([
+    '"direction" — who does what to whom, or which way it runs (貸す/借りる, 원고/피고, acid/base).',
+    '"scope" — one covers more cases than the other.',
+    '"condition" — both can be true, but under different conditions.',
+    '"form" — they look or sound alike and mean different things (affect/effect, 待つ/持つ).',
+    '"component" — one part differs: a term, a coefficient, a sign, one word of a definition.',
+    '"order" — the steps or stages come in a different order.',
+    '"quantity" — the same idea in a different amount, degree or count.',
+    '"category" — different subject areas entirely.',
+  ])
+
   const systemPrompt = `${GROUNDING}
 
 For each card, write a multiple-choice QUESTION and exactly ${distractorCount} WRONG options (distractors).
 You are NOT asked for the correct option and must not write it — the app inserts the card's own answer itself.
 
 Respond with a single JSON object:
-{ "items": [ { "cardId": "...", "question": "...", "distractors": [ { "text": "...", "flaw": "opposite" } ] } ] }
+{ "items": [ { "cardId": "...", "question": "...",
+               "distractors": [ { "text": "...", "flaw": "opposite", "axis": "direction" } ] } ] }
 
 THE QUESTION IS A SENTENCE A LEARNER ANSWERS, not the card's title.
 ${bullets([
@@ -248,6 +264,11 @@ ${bullets([
 Every distractor names the ONE way it is wrong:
 ${flaws}
 
+And every distractor names the AXIS it differs from the answer on. "flaw" says what the option IS;
+"axis" says what a learner has to hold on to in order to rule it out. The app shows the axis for the
+option the learner actually picked, so write it as if explaining that specific mistake:
+${axes}
+
 DIFFICULTY: ${mix}${restricted}
 ${languageRule(uiLocale)}
 
@@ -256,6 +277,7 @@ ${bullets([
   `Exactly ${distractorCount} distractors per card. They may share a flaw label — three close neighbours of the answer is often the best set a card can have. What they must not share is substance: three ways of writing the same wrong idea is one distractor shown three times.`,
   'A distractor must be UNAMBIGUOUSLY WRONG for this card. If you cannot say which flaw it has, it is probably also correct — do not write it.',
   'Never write a distractor that restates the answer, contains the whole answer, or is contained by it (except "partial", above).',
+  `Give every distractor an "axis" from the closed list. An unrecognised axis is discarded and that option loses its explanation — the question still stands, so a guess costs the learner a sentence rather than the item. Valid axes: ${MCQ_EXPLANATION_AXES.map((a) => `"${a}"`).join(', ')}.`,
   'Write distractors in the same language and script as the `answer`. An option in another language is spotted without being read.',
   'Match the answer\'s register and length. An answer that is longer and more careful than every alternative is the giveaway, not the knowledge.',
   `Keep each distractor under ${MAX_DISTRACTOR_CHARS} characters.`,

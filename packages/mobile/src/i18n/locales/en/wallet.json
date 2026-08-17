@@ -51,6 +51,6 @@
     "freeCount": "{{used, number}} / {{limit, number}} questions today",
     "trial_one": "{{count, number}} trial unit left",
     "trial_other": "{{count, number}} trial units left",
-    "note": "Free questions count against one daily limit whatever the type. Past it, each question is charged."
+    "note": "Free questions count against one daily limit whatever the type. For multiple choice the explanation is included in the question."
   }
 }
