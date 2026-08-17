@@ -53,7 +53,10 @@
     "generatingBatch": "Đang tạo… ({{done, number}}/{{total, number}})",
     "customCount": "Tự nhập",
     "countEffective_one": "Tạo {{count, number}} câu",
-    "countEffective_other": "Tạo {{count, number}} câu"
+    "countEffective_other": "Tạo {{count, number}} câu",
+    "makeAffordable": "Tạo {{count, number}} câu thay vào đó",
+    "makeAffordable_one": "Tạo {{count, number}} câu thay vào đó",
+    "makeAffordable_other": "Tạo {{count, number}} câu thay vào đó"
   },
   "run": {
     "loading": "Đang tải…",
