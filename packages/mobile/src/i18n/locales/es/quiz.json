@@ -259,5 +259,19 @@
     "order": "Los pasos van en otro orden.",
     "quantity": "Cambia la cantidad o el grado.",
     "scope": "Abarcan rangos distintos: una es más amplia."
+  },
+  "rate": {
+    "prompt": "¿Qué tal esta pregunta?",
+    "good": "Buena",
+    "bad": "No muy buena",
+    "reason": {
+      "answer_wrong": "La respuesta parece incorrecta",
+      "explanation_unhelpful": "La explicación no ayudó",
+      "not_from_card": "No tiene que ver con mi tarjeta",
+      "options_confusing": "Las opciones eran confusas",
+      "question_unclear": "No entendí qué preguntaba",
+      "too_easy": "Demasiado fácil",
+      "too_hard": "Demasiado difícil"
+    }
   }
 }

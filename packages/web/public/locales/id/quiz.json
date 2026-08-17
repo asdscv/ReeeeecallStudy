@@ -259,5 +259,19 @@
     "order": "Urutan atau tahapannya berbeda.",
     "quantity": "Jumlah atau tingkatnya berbeda.",
     "scope": "Cakupannya berbeda — satu lebih luas."
+  },
+  "rate": {
+    "prompt": "Bagaimana soal ini?",
+    "good": "Bagus",
+    "bad": "Kurang bagus",
+    "reason": {
+      "answer_wrong": "Jawabannya sepertinya salah",
+      "explanation_unhelpful": "Penjelasannya tidak membantu",
+      "not_from_card": "Tidak berkaitan dengan kartuku",
+      "options_confusing": "Pilihannya membingungkan",
+      "question_unclear": "Tidak jelas apa yang ditanyakan",
+      "too_easy": "Terlalu mudah",
+      "too_hard": "Terlalu sulit"
+    }
   }
 }

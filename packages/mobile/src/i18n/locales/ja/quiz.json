@@ -259,5 +259,19 @@
     "order": "順序や段階が違います。",
     "quantity": "量や程度が違います。",
     "scope": "適用範囲が違います — 一方がより広いです。"
+  },
+  "rate": {
+    "prompt": "この問題はどうでしたか？",
+    "good": "良かった",
+    "bad": "よくなかった",
+    "reason": {
+      "answer_wrong": "正解が違う気がします",
+      "explanation_unhelpful": "解説が役に立たない",
+      "not_from_card": "自分のカードと関係ない",
+      "options_confusing": "選択肢が紛らわしい",
+      "question_unclear": "何を聞かれているのか分かりませんでした",
+      "too_easy": "簡単すぎる",
+      "too_hard": "難しすぎる"
+    }
   }
 }

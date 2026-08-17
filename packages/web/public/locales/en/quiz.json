@@ -259,5 +259,19 @@
     "order": "The steps come in a different order.",
     "quantity": "The amount or degree differs.",
     "scope": "They cover different ranges — one is broader."
+  },
+  "rate": {
+    "prompt": "How was this question?",
+    "good": "Good",
+    "bad": "Not good",
+    "reason": {
+      "answer_wrong": "The answer looks wrong",
+      "explanation_unhelpful": "The explanation did not help",
+      "not_from_card": "Not about my card",
+      "options_confusing": "The options were confusing",
+      "question_unclear": "I could not tell what it was asking",
+      "too_easy": "Too easy",
+      "too_hard": "Too hard"
+    }
   }
 }
