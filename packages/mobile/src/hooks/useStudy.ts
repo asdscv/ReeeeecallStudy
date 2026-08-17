@@ -50,6 +50,9 @@ export function useStudy() {
       mode: 'srs',
       batchSize: planSelection.cardIds.length,
       planSelection,
+      // Derived, not passed: the selection already knows its goal, and mobile's plan session used
+      // to end at StudySetup — the top of the deck stack — exactly like an ordinary deck session.
+      fromGoalId: planSelection.goalId,
     })
   }, [store])
 
@@ -60,12 +63,15 @@ export function useStudy() {
    * cramming modes move nothing (`modeFeedsSrsSchedule`). No plan item is completed, because
    * these cards were not on today's plan — that is why the ordinary queue never serves them.
    */
-  const startCardSession = useCallback(async (deckId: string, cardIds: string[]) => {
+  const startCardSession = useCallback(async (deckId: string, cardIds: string[], fromGoalId?: string) => {
     await store.initSession({
       deckId,
       mode: 'srs',
       batchSize: cardIds.length,
       cardSelection: cardIds,
+      // Carried so the summary can offer 플랜으로 돌아가기 instead of dropping the learner at
+      // the top of the deck stack. See `SessionConfig.fromGoalId`.
+      fromGoalId,
     })
   }, [store])
 

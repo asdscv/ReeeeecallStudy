@@ -787,7 +787,7 @@ export function LearningTodayScreen() {
   const studyWeak = useCallback(async (group: { deckId: string; cardIds: string[] }) => {
     setStarting(true)
     try {
-      await startCardSession(group.deckId, group.cardIds)
+      await startCardSession(group.deckId, group.cardIds, goalId ?? undefined)
       // Cross-stack, same shape `startDeck` uses: `StudySession` lives in the Study tab's
       // stack while this screen lives in Settings.
       const tabNav = navigation.getParent() as unknown as
@@ -798,7 +798,7 @@ export function LearningTodayScreen() {
     } finally {
       setStarting(false)
     }
-  }, [startCardSession, navigation, t])
+  }, [startCardSession, goalId, navigation, t])
 
   /**
    * The goal's decks, named — resolved against the deck store so a rename shows through and a
