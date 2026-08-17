@@ -31,7 +31,8 @@
     "inputModeTopicHint": "Jelaskan topik dan AI akan membuat kartunya untukmu.",
     "inputModeImageHint": "Unggah foto halaman buku, daftar kosakata, atau catatan — AI membacanya menjadi kartu. Kamu bisa memilih beberapa sekaligus.",
     "cardLimitExceeds": "Anda dapat menambahkan maksimal {{available}} kartu lagi — kurangi jumlah atau berlangganan.",
-    "cardLimitReached": "Anda telah mencapai batas kartu — hapus kartu atau berlangganan untuk menambah."
+    "cardLimitReached": "Anda telah mencapai batas kartu — hapus kartu atau berlangganan untuk menambah.",
+    "imageCostNote": "Membuat kartu dari foto dikenai $0.10 sekali jalan. Dari teks, 10 kartu pertama per hari gratis."
   },
   "deck": {
     "section": "PILIH DEK",

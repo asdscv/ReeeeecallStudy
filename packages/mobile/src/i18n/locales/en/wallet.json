@@ -18,7 +18,11 @@
     "title": "Usage history",
     "empty": "No usage yet.",
     "showAll": "Show all {{total}}",
-    "showLess": "Show less"
+    "showLess": "Show less",
+    "free": "Free",
+    "cards": "{{count, number}} cards",
+    "cards_one": "{{count, number}} card",
+    "cards_other": "{{count, number}} cards"
   },
   "reason": {
     "admin_adjustment": "Adjustment",

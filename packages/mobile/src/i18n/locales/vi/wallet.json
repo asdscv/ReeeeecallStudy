@@ -18,7 +18,11 @@
     "title": "Lịch sử sử dụng",
     "empty": "Chưa có mức sử dụng.",
     "showAll": "Xem tất cả {{total}}",
-    "showLess": "Thu gọn"
+    "showLess": "Thu gọn",
+    "free": "Miễn phí",
+    "cards": "{{count, number}} thẻ",
+    "cards_one": "{{count, number}} thẻ",
+    "cards_other": "{{count, number}} thẻ"
   },
   "reason": {
     "admin_adjustment": "Điều chỉnh",

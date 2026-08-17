@@ -18,7 +18,11 @@
     "title": "Historial de uso",
     "empty": "Aún no hay uso.",
     "showAll": "Ver los {{total}}",
-    "showLess": "Ver menos"
+    "showLess": "Ver menos",
+    "free": "Gratis",
+    "cards": "{{count, number}} tarjetas",
+    "cards_one": "{{count, number}} tarjeta",
+    "cards_other": "{{count, number}} tarjetas"
   },
   "reason": {
     "admin_adjustment": "Ajuste",

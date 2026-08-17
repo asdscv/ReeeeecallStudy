@@ -49,7 +49,8 @@
     "imageRemove": "Remove image",
     "inputModeTopicHint": "Describe a topic and AI writes the cards for you.",
     "inputModeImageHint": "Upload photos of a textbook page, vocab list, or notes — AI reads them into cards. You can pick several at once.",
-    "noOwnedDecks": "You don’t own any decks yet — create a deck first, then add AI cards to it."
+    "noOwnedDecks": "You don’t own any decks yet — create a deck first, then add AI cards to it.",
+    "imageCostNote": "Making cards from photos costs $0.10 per run. Making them from text is free for the first 10 cards a day."
   },
   "wallet": {
     "summary": "{{free}} free + {{credits}} paid cards available today",

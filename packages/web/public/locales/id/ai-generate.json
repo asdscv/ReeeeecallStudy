@@ -49,7 +49,8 @@
     "imageRemove": "Hapus gambar",
     "inputModeTopicHint": "Jelaskan topik dan AI akan membuat kartunya untukmu.",
     "inputModeImageHint": "Unggah foto halaman buku, daftar kosakata, atau catatan — AI membacanya menjadi kartu. Kamu bisa memilih beberapa sekaligus.",
-    "noOwnedDecks": "Kamu belum punya dek sendiri — buat dek dulu, lalu tambahkan kartu AI ke dalamnya."
+    "noOwnedDecks": "Kamu belum punya dek sendiri — buat dek dulu, lalu tambahkan kartu AI ke dalamnya.",
+    "imageCostNote": "Membuat kartu dari foto dikenai $0.10 sekali jalan. Dari teks, 10 kartu pertama per hari gratis."
   },
   "wallet": {
     "summary": "{{free}} kartu gratis + {{credits}} kartu berbayar tersedia hari ini",

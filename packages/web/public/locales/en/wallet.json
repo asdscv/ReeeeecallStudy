@@ -16,7 +16,11 @@
   },
   "history": {
     "title": "Usage history",
-    "empty": "No usage yet."
+    "empty": "No usage yet.",
+    "free": "Free",
+    "cards": "{{count, number}} cards",
+    "cards_one": "{{count, number}} card",
+    "cards_other": "{{count, number}} cards"
   },
   "reason": {
     "admin_adjustment": "Adjustment",

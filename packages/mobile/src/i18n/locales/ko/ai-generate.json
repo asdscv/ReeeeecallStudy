@@ -31,7 +31,8 @@
     "inputModeTopicHint": "주제를 입력하면 AI가 카드를 만들어 줍니다.",
     "inputModeImageHint": "교과서 페이지·단어 목록·필기 사진을 올리면 AI가 읽어 카드로 만듭니다. 여러 장을 한 번에 선택할 수 있어요.",
     "cardLimitExceeds": "최대 {{available}}장만 더 추가할 수 있어요 — 개수를 줄이거나 구독하세요.",
-    "cardLimitReached": "카드 한도에 도달했어요 — 카드를 지우거나 구독하면 더 추가할 수 있어요."
+    "cardLimitReached": "카드 한도에 도달했어요 — 카드를 지우거나 구독하면 더 추가할 수 있어요.",
+    "imageCostNote": "사진으로 만들면 한 번에 $0.10이 차감돼요. 글로 만들면 하루 10장까지 무료예요."
   },
   "wallet": {
     "summary": "오늘 무료 {{free}}장 + 유료 {{credits}}장",

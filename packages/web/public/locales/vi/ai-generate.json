@@ -49,7 +49,8 @@
     "imageRemove": "Xóa ảnh",
     "inputModeTopicHint": "Mô tả một chủ đề và AI sẽ viết thẻ cho bạn.",
     "inputModeImageHint": "Tải ảnh trang sách, danh sách từ vựng hoặc ghi chú — AI đọc và tạo thành thẻ. Bạn có thể chọn nhiều ảnh cùng lúc.",
-    "noOwnedDecks": "Bạn chưa sở hữu bộ thẻ nào — hãy tạo một bộ thẻ trước, rồi thêm thẻ AI vào đó."
+    "noOwnedDecks": "Bạn chưa sở hữu bộ thẻ nào — hãy tạo một bộ thẻ trước, rồi thêm thẻ AI vào đó.",
+    "imageCostNote": "Tạo thẻ từ ảnh tốn $0.10 mỗi lần. Tạo từ văn bản thì 10 thẻ đầu mỗi ngày là miễn phí."
   },
   "wallet": {
     "summary": "Hôm nay còn {{free}} thẻ miễn phí + {{credits}} thẻ trả phí",

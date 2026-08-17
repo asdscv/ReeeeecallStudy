@@ -18,7 +18,11 @@
     "title": "사용 내역",
     "empty": "아직 사용 내역이 없어요.",
     "showAll": "전체 {{total}}건 보기",
-    "showLess": "접기"
+    "showLess": "접기",
+    "free": "무료",
+    "cards": "{{count, number}}장",
+    "cards_one": "{{count, number}}장",
+    "cards_other": "{{count, number}}장"
   },
   "reason": {
     "admin_adjustment": "조정",
