@@ -53,7 +53,10 @@
     "generatingBatch": "Creando… ({{done, number}}/{{total, number}})",
     "customCount": "Personalizado",
     "countEffective_one": "Crear {{count, number}} pregunta",
-    "countEffective_other": "Crear {{count, number}} preguntas"
+    "countEffective_other": "Crear {{count, number}} preguntas",
+    "makeAffordable": "Crear {{count, number}} en su lugar",
+    "makeAffordable_one": "Crear {{count, number}} en su lugar",
+    "makeAffordable_other": "Crear {{count, number}} en su lugar"
   },
   "run": {
     "loading": "Cargando…",

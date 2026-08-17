@@ -130,3 +130,53 @@ export function freeLeftLine(
 export function retakeNoteKey(questionType: string | null | undefined): string {
   return questionType === 'mcq' ? 'pricing.retakeMcq' : 'pricing.retakeWritten'
 }
+
+/**
+ * How many questions the learner can actually make right now.
+ *
+ * The reserve is all-or-nothing on purpose: it agrees one price up front and refuses if the
+ * wallet cannot cover it (P0002). That is the right shape for a price agreement, but it left the
+ * screen saying only "크레딧이 부족해요" over a disabled button — and a learner with five free
+ * questions left who asked for ten got NOTHING. Not five. Measured against the real functions:
+ * quote for 10 at zero balance reports free 5 / paid 5 / $0.50 / sufficient false, and the
+ * reserve raises P0002. The free five were unusable unless the learner happened to pick exactly
+ * five.
+ *
+ * So the screen has to be able to say the number. This is that number, and it is deliberately
+ * derived from the QUOTE the server just gave rather than from a second opinion about the
+ * learner's balance:
+ *
+ *   free today  +  trial  +  however many the balance pays for
+ *
+ * Never more than `asked` — this answers "what can I get of what I wanted", not "what is the
+ * most I could buy". Returns `asked` unchanged when the quote already says it is affordable, so
+ * a caller can use it without first checking `sufficient`.
+ */
+export function affordableQuestionCount(
+  quote: QuizGenerateQuote & {
+    readonly units_each?: number
+    readonly unit_price_micro?: number
+    readonly balance_micro?: number
+    readonly free_items_remaining_today?: number
+    readonly trial_remaining?: number
+    readonly sufficient?: boolean
+  } | null | undefined,
+  asked: number,
+): number {
+  if (!quote) return 0
+  if (quote.sufficient) return asked
+
+  const free = Math.max(0, quote.free_items_remaining_today ?? 0)
+  // The trial is denominated in UNITS, not questions — a short answer is two units and an essay
+  // three, so the same trial buys fewer essays. Dividing by this question's own unit cost is what
+  // makes the number true for the type actually chosen.
+  const unitsEach = Math.max(1, quote.units_each ?? 1)
+  const trial = Math.floor(Math.max(0, quote.trial_remaining ?? 0) / unitsEach)
+
+  const perQuestion = unitsEach * Math.max(0, quote.unit_price_micro ?? 0)
+  const paid = perQuestion > 0
+    ? Math.floor(Math.max(0, quote.balance_micro ?? 0) / perQuestion)
+    : 0
+
+  return Math.max(0, Math.min(asked, free + trial + paid))
+}

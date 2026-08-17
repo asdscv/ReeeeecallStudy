@@ -51,6 +51,6 @@
     "freeCount": "今日 {{used, number}} / {{limit, number}} 道",
     "trial_one": "试用剩余 {{count, number}} 个单位",
     "trial_other": "试用剩余 {{count, number}} 个单位",
-    "note": "选择题判分免费。只有 AI 解析按题扣费。免费题目无论类型都计入每日额度。"
+    "note": "免费题目无论类型都计入同一每日额度。超出后按题扣费。"
   }
 }

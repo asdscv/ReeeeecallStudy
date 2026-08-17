@@ -53,7 +53,10 @@
     "generatingBatch": "กำลังสร้าง… ({{done, number}}/{{total, number}})",
     "customCount": "กำหนดเอง",
     "countEffective_one": "สร้าง {{count, number}} ข้อ",
-    "countEffective_other": "สร้าง {{count, number}} ข้อ"
+    "countEffective_other": "สร้าง {{count, number}} ข้อ",
+    "makeAffordable": "สร้าง {{count, number}} ข้อแทน",
+    "makeAffordable_one": "สร้าง {{count, number}} ข้อแทน",
+    "makeAffordable_other": "สร้าง {{count, number}} ข้อแทน"
   },
   "run": {
     "loading": "กำลังโหลด…",
