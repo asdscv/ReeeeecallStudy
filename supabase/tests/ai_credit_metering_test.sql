@@ -136,7 +136,9 @@ BEGIN
   ASSERT pr = 2 * public._ai_action_price('card'), format('C1 price %s', pr);
   ASSERT b1 = b0 - pr, format('C1 balance %s (from %s)', b1, b0);
   ASSERT ch = true, 'C1 charged';
-  SELECT count(*) INTO n FROM ai_credit_ledger WHERE ref=j_paid AND reason='spend' AND delta=-pr;
+  -- 250 부터 이유가 종류별입니다. 카드 생성은 `spend_cards` — 예전에는 카드도 설명도 이미지도
+  -- 전부 `spend` 라, 사용 내역이 카드 설명 구매를 "AI 카드 생성"이라고 불렀습니다.
+  SELECT count(*) INTO n FROM ai_credit_ledger WHERE ref=j_paid AND reason='spend_cards' AND delta=-pr;
   ASSERT n = 1, format('C1 spend ledger row %s', n);
 
   -- C2: idempotent — re-charge the same job is a no-op (balance unchanged). Note the token

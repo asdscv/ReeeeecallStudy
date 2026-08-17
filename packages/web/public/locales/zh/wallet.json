@@ -19,13 +19,16 @@
     "empty": "暂无使用记录。"
   },
   "reason": {
-    "purchase": "充值",
-    "spend": "AI 卡片生成",
-    "refund": "退款",
+    "admin_adjustment": "调整",
     "admin_grant": "额度发放",
-    "spend_cards": "AI 卡片",
+    "purchase": "充值",
+    "refund": "退款",
+    "spend": "AI 使用",
+    "spend_cards": "AI 卡片生成",
+    "spend_diagnosis": "AI 学习诊断",
     "spend_image": "AI 图片",
-    "admin_adjustment": "调整"
+    "spend_quiz": "AI 测验",
+    "spend_remediation": "AI 卡片讲解"
   },
   "cardPlanHint": "卡片上限方案在“卡片存储”中管理。",
   "quiz": {

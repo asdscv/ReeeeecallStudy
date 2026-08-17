@@ -63,7 +63,9 @@ DO $$ DECLARE j jsonb; jr text; b0 bigint; b1 bigint; paid int; nspend int; ncos
   PERFORM release_ai_job(auth.uid(), jr);
   SELECT balance INTO b1 FROM ai_credit_balance WHERE user_id=auth.uid();
   SELECT paid_cards_used INTO paid FROM ai_generation_usage WHERE user_id=auth.uid();
-  SELECT count(*) INTO nspend FROM ai_credit_ledger WHERE user_id=auth.uid() AND reason='spend';
+  -- 종류를 가리지 않고 **쓴 것**을 셉니다(250 부터 이유가 나뉘었고 옛 행은 'spend' 입니다).
+  SELECT count(*) INTO nspend FROM ai_credit_ledger
+   WHERE user_id=auth.uid() AND reason LIKE 'spend%';
   SELECT count(*) INTO ncost  FROM ai_cost_ledger    WHERE user_id=auth.uid();
   ASSERT b1 = b0, format('NET-ZERO wallet untouched (%s = %s)', b1, b0);
   ASSERT paid = 0, format('NET-ZERO paid counter reversed, got %s', paid);
