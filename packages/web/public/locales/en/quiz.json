@@ -33,7 +33,7 @@
     "untitled": "Quiz",
     "type": "Question type",
     "typeHint": {
-      "mcq": "Four options. Marked the moment you answer — free, and that mark stands. If you want, you can buy an AI explanation of why.",
+      "mcq": "Four options. Marked the moment you answer, with an explanation of why — both free.",
       "short": "A word or a phrase. Graded by AI, charged per answer.",
       "essay": "A few sentences, graded against a rubric. The most demanding, and the most expensive."
     },
@@ -72,8 +72,6 @@
     "next": "Next",
     "finish": "Finish",
     "grading": "Grading…",
-    "explain": "Explain this with AI",
-    "explaining": "Writing the explanation…",
     "reference": "Answer: {{answer}}",
     "grade": "Grade this answer",
     "length": {
@@ -224,7 +222,7 @@
   },
   "pricing": {
     "gradeCost": "Grading costs {{amount}}",
-    "retakeMcq": "The same questions, with the options reshuffled. Retaking costs nothing; only an AI explanation is charged, one answer at a time.",
+    "retakeMcq": "The same questions, with the options reshuffled. Nothing is charged.",
     "retakeWritten": "The same questions again. The questions are already paid for, but grading is a fresh call and is charged every time.",
     "genAllFree": "Made from your free questions. Nothing is charged.",
     "genAllPaid": "{{paid, number}} questions · {{amount}}",
@@ -247,7 +245,6 @@
       "generate_mcq": "Multiple choice",
       "generate_short": "Short answer",
       "generate_essay": "Essay",
-      "grade_mcq": "Multiple-choice explanation",
       "grade_short": "Short-answer grading",
       "grade_essay": "Essay grading",
       "quiz_answer_key": "Answer field"

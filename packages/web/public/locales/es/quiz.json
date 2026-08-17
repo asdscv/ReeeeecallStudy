@@ -33,7 +33,7 @@
     "untitled": "Cuestionario",
     "type": "Tipo de pregunta",
     "typeHint": {
-      "mcq": "Cuatro opciones. Se corrige en cuanto respondes: gratis, y esa corrección no cambia. Si quieres, puedes comprar una explicación con IA.",
+      "mcq": "Cuatro opciones. Se corrige en cuanto respondes, con una explicación del porqué: ambas gratis.",
       "short": "Responde con una palabra o una frase. Corrige la IA y se cobra por respuesta.",
       "essay": "Escribe unas frases; se corrige con una rúbrica. Lo más exigente y lo más caro."
     },
@@ -72,8 +72,6 @@
     "next": "Siguiente",
     "finish": "Terminar",
     "grading": "Corrigiendo…",
-    "explain": "Explicar con IA",
-    "explaining": "Escribiendo la explicación…",
     "reference": "Respuesta: {{answer}}",
     "grade": "Corregir esta respuesta",
     "length": {
@@ -224,7 +222,7 @@
   },
   "pricing": {
     "gradeCost": "Corregir cuesta {{amount}}",
-    "retakeMcq": "Las mismas preguntas, con las opciones barajadas. Repetir no cuesta nada; solo se cobra la explicación con IA, respuesta por respuesta.",
+    "retakeMcq": "Las mismas preguntas, con las opciones barajadas. No se cobra nada.",
     "retakeWritten": "Las mismas preguntas otra vez. Las preguntas ya están pagadas, pero la corrección es una llamada nueva y se cobra cada vez.",
     "genAllFree": "Se crean con tus preguntas gratuitas. No se cobra nada.",
     "genAllPaid": "{{paid, number}} preguntas · {{amount}}",
@@ -247,7 +245,6 @@
       "generate_mcq": "Opción múltiple",
       "generate_short": "Respuesta corta",
       "generate_essay": "Ensayo",
-      "grade_mcq": "Explicación de opción múltiple",
       "grade_short": "Corrección corta",
       "grade_essay": "Corrección de ensayo",
       "quiz_answer_key": "Campo de respuesta"

@@ -33,7 +33,7 @@
     "untitled": "Bài kiểm tra",
     "type": "Loại câu hỏi",
     "typeHint": {
-      "mcq": "Bốn lựa chọn. Chấm ngay khi bạn trả lời — miễn phí, và kết quả đó không thay đổi. Nếu muốn, bạn có thể mua phần giải thích bằng AI.",
+      "mcq": "Bốn lựa chọn. Chấm ngay khi bạn trả lời, kèm phần giải thích vì sao — cả hai đều miễn phí.",
       "short": "Trả lời bằng một từ hoặc cụm từ. AI chấm, tính phí theo từng câu.",
       "essay": "Viết vài câu, chấm theo tiêu chí. Khó nhất và đắt nhất."
     },
@@ -72,8 +72,6 @@
     "next": "Tiếp",
     "finish": "Kết thúc",
     "grading": "Đang chấm…",
-    "explain": "Nhờ AI giải thích câu này",
-    "explaining": "Đang viết phần giải thích…",
     "reference": "Đáp án: {{answer}}",
     "grade": "Chấm câu này",
     "length": {
@@ -224,7 +222,7 @@
   },
   "pricing": {
     "gradeCost": "Chấm bài tốn {{amount}}",
-    "retakeMcq": "Vẫn những câu hỏi đó, chỉ đảo thứ tự lựa chọn. Làm lại không mất phí; chỉ phần giải thích bằng AI mới tính theo từng câu.",
+    "retakeMcq": "Vẫn những câu hỏi đó, chỉ đảo thứ tự lựa chọn. Không tính phí gì.",
     "retakeWritten": "Làm lại đúng những câu hỏi đó. Câu hỏi đã được trả phí, nhưng chấm bài là lượt gọi mới và bị tính phí mỗi lần.",
     "genAllFree": "Tạo bằng số câu miễn phí. Không bị trừ.",
     "genAllPaid": "{{paid, number}} câu · {{amount}}",
@@ -247,7 +245,6 @@
       "generate_mcq": "Tạo trắc nghiệm",
       "generate_short": "Tạo tự luận ngắn",
       "generate_essay": "Tạo bài luận",
-      "grade_mcq": "Giải thích câu trắc nghiệm",
       "grade_short": "Chấm tự luận ngắn",
       "grade_essay": "Chấm bài luận",
       "quiz_answer_key": "Xác định ô đáp án"

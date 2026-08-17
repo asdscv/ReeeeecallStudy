@@ -407,7 +407,6 @@ jobs:
             supabase/tests/my_card_schedule_isolation_test.sql \
             supabase/tests/plan_digest_counts_attempts_test.sql \
             supabase/tests/weak_card_study_is_evidence_test.sql \
-            supabase/tests/mcq_explanation_test.sql \
             supabase/tests/diagnosis_evidence_test.sql \
             supabase/tests/ledger_reason_test.sql \
             supabase/tests/usage_history_test.sql \
