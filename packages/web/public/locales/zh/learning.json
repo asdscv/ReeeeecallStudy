@@ -325,7 +325,9 @@
   },
   "diagnosis": {
     "evidenceTitle": "最常错在哪里",
-    "count": "{{n}} 次",
+    "count": "{{count, number}} 次",
+    "count_one": "{{count, number}} 次",
+    "count_other": "{{count, number}} 次",
     "mcqTitle": "选择题：",
     "shortTitle": "简答题：",
     "essayTitle": "论述题：",

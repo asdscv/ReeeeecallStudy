@@ -36,9 +36,15 @@ const raw = (question: unknown) => ({
   }],
 })
 
+/**
+ * `card()` 는 이 파일이 쓰는 필드만 채운 최소 소스입니다. 검증기가 보는 것도 그 필드들뿐이라
+ * 전체 타입을 만족시키는 대신 unknown 을 한 번 거쳐 좁힙니다 — `as any` 는 eslint 가 막습니다.
+ */
+type Sources = Parameters<typeof validateMultipleChoiceGeneration>[1]
+
 const run = (question: unknown, over?: Record<string, unknown>) =>
-  // deno-lint-ignore no-explicit-any
-  validateMultipleChoiceGeneration(raw(question), [card(over)] as any, (c, i) => `${c}:${i}`)
+  validateMultipleChoiceGeneration(raw(question), [card(over)] as unknown as Sources,
+    (c, i) => `${c}:${i}`)
 
 describe('객관식 지문', () => {
   it('모델이 쓴 문제 문장을 쓴다', () => {
@@ -99,8 +105,7 @@ describe('덱메이트 보기 중복', () => {
       },
       // 첫 필러는 이미 있는 보기를 통째로 담고 있다 → 건너뛰고 다음 필러를 쓴다.
       // 두 번째 필러는 길이를 맞춘다 — 짧은 보기는 평균을 끌어내려 length_cue 로 문항이 버려진다.
-      // deno-lint-ignore no-explicit-any
-      [card({ fillers: ['a²−b²=(a+b)(a−b)\n(제곱)−(제곱)=(합)×(차)', 'x²+5x+6=(x+2)(x+3)'] })] as any,
+      [card({ fillers: ['a²−b²=(a+b)(a−b)\n(제곱)−(제곱)=(합)×(차)', 'x²+5x+6=(x+2)(x+3)'] })] as unknown as Sources,
       (c, i) => `${c}:${i}`,
     )
     expect(out.items).toHaveLength(1)

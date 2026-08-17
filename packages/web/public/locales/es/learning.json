@@ -325,7 +325,9 @@
   },
   "diagnosis": {
     "evidenceTitle": "En qué fallas más",
-    "count": "{{n}} veces",
+    "count": "{{count, number}} veces",
+    "count_one": "{{count, number}} vez",
+    "count_other": "{{count, number}} veces",
     "mcqTitle": "Opción múltiple:",
     "shortTitle": "Respuestas cortas:",
     "essayTitle": "Ensayos:",

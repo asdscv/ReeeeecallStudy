@@ -326,7 +326,9 @@
   },
   "diagnosis": {
     "evidenceTitle": "What you get wrong most",
-    "count": "{{n}}x",
+    "count": "{{count, number}}x",
+    "count_one": "{{count, number}}x",
+    "count_other": "{{count, number}}x",
     "mcqTitle": "Multiple choice:",
     "shortTitle": "Short answers:",
     "essayTitle": "Essays:",

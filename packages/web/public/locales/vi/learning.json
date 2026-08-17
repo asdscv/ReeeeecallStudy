@@ -325,7 +325,9 @@
   },
   "diagnosis": {
     "evidenceTitle": "Bạn sai nhiều nhất ở đâu",
-    "count": "{{n}} lần",
+    "count": "{{count, number}} lần",
+    "count_one": "{{count, number}} lần",
+    "count_other": "{{count, number}} lần",
     "mcqTitle": "Trắc nghiệm:",
     "shortTitle": "Trả lời ngắn:",
     "essayTitle": "Tự luận:",

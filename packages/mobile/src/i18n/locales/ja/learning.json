@@ -326,7 +326,9 @@
   },
   "diagnosis": {
     "evidenceTitle": "よく間違えるところ",
-    "count": "{{n}}回",
+    "count": "{{count, number}}回",
+    "count_one": "{{count, number}}回",
+    "count_other": "{{count, number}}回",
     "mcqTitle": "選択問題では",
     "shortTitle": "記述（短答）では",
     "essayTitle": "記述（論述）では",

@@ -370,7 +370,9 @@ function DiagnosisEvidencePanel({ goalId }: { goalId: string }) {
     return null
   }
 
-  const line = (label: string, count: number) => `${label} ${t('diagnosis.count', { n: count })}`
+  // `count` 라는 이름으로 넘깁니다 — i18next 는 그 이름일 때만 복수형을 고르고,
+  // 스페인어는 실제로 굴절합니다(1 vez / 3 veces).
+  const line = (label: string, count: number) => `${label} ${t('diagnosis.count', { count })}`
 
   return (
     <div className="mt-2 rounded-xl border border-border bg-card p-3" data-testid="diagnosis-evidence">

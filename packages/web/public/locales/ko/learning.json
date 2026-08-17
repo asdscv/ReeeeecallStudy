@@ -325,7 +325,9 @@
   },
   "diagnosis": {
     "evidenceTitle": "무엇을 많이 틀리나요",
-    "count": "{{n}}회",
+    "count": "{{count, number}}회",
+    "count_one": "{{count, number}}회",
+    "count_other": "{{count, number}}회",
     "mcqTitle": "객관식에서",
     "shortTitle": "단답에서",
     "essayTitle": "서술형에서",

@@ -326,7 +326,9 @@
   },
   "diagnosis": {
     "evidenceTitle": "Yang paling sering salah",
-    "count": "{{n}} kali",
+    "count": "{{count, number}} kali",
+    "count_one": "{{count, number}} kali",
+    "count_other": "{{count, number}} kali",
     "mcqTitle": "Pilihan ganda:",
     "shortTitle": "Jawaban singkat:",
     "essayTitle": "Esai:",

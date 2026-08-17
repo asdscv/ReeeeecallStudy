@@ -326,7 +326,9 @@
   },
   "diagnosis": {
     "evidenceTitle": "สิ่งที่ผิดบ่อยที่สุด",
-    "count": "{{n}} ครั้ง",
+    "count": "{{count, number}} ครั้ง",
+    "count_one": "{{count, number}} ครั้ง",
+    "count_other": "{{count, number}} ครั้ง",
     "mcqTitle": "ข้อปรนัย:",
     "shortTitle": "ข้อเขียนสั้น:",
     "essayTitle": "ข้อเขียนยาว:",
