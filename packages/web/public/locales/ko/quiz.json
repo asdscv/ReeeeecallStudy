@@ -259,5 +259,19 @@
     "order": "순서나 단계가 달라요.",
     "quantity": "양이나 정도가 달라요.",
     "scope": "적용 범위가 달라요 — 한쪽이 더 넓어요."
+  },
+  "rate": {
+    "prompt": "이 문항 어땠어요?",
+    "good": "좋았어요",
+    "bad": "별로였어요",
+    "reason": {
+      "answer_wrong": "정답이 틀린 것 같아요",
+      "explanation_unhelpful": "해설이 도움이 안 돼요",
+      "not_from_card": "내 카드와 상관없어요",
+      "options_confusing": "보기가 헷갈려요",
+      "question_unclear": "문제가 무슨 말인지 모르겠어요",
+      "too_easy": "너무 쉬워요",
+      "too_hard": "너무 어려워요"
+    }
   }
 }

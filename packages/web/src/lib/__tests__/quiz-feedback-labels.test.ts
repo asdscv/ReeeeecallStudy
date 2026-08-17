@@ -27,7 +27,9 @@ import { fileURLToPath } from 'node:url'
 import {
   QUIZ_VERDICTS, QUIZ_GAPS, QUIZ_LEVELS, QUIZ_ASPECTS, QUIZ_FLAWS, QUIZ_MCQ_AXES,
 } from '@reeeeecall/shared/lib/quiz-feedback'
-import { QUIZ_ERROR_CODES, QUIZ_GENERATE_ACTION } from '@reeeeecall/shared/stores/quiz-store'
+import {
+  QUIZ_ERROR_CODES, QUIZ_GENERATE_ACTION, QUIZ_FEEDBACK_REASONS,
+} from '@reeeeecall/shared/stores/quiz-store'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../../../..')
 const LOCALES = ['en', 'ko', 'ja', 'zh', 'vi', 'th', 'id', 'es'] as const
@@ -84,6 +86,18 @@ describe('every quiz grade label is translated', () => {
         // Rendered only when the grader declines part of an essay, which no fixture produces —
         // so it is the single likeliest string to be forgotten.
         if (typeof data.level?.unjudgeableNote !== 'string') missing.push('level.unjudgeableNote')
+        // 문항 평가의 이유. `t(\`rate.reason.${reason}\`)` — 계산된 키이고, 서버의 CHECK 가
+        // 진짜 목록입니다(mig 253). 번역이 없으면 학습자가 `options_confusing` 이라는 날
+        // 문자열을 칩으로 보게 됩니다.
+        for (const reason of QUIZ_FEEDBACK_REASONS) {
+          const value = (data.rate as unknown as { reason?: Record<string, string> } | undefined)?.reason?.[reason]
+          if (typeof value !== 'string' || value.trim() === '') missing.push(`rate.reason.${reason}`)
+        }
+        for (const key of ['prompt', 'good', 'bad']) {
+          if (typeof (data.rate as unknown as Record<string, string> | undefined)?.[key] !== 'string') {
+            missing.push(`rate.${key}`)
+          }
+        }
         for (const side of ['learner', 'reference']) {
           if (typeof data.span?.[side] !== 'string') missing.push(`span.${side}`)
         }
@@ -118,6 +132,19 @@ describe('every quiz grade label is translated', () => {
       })
     }
   }
+})
+
+describe('평가 이유는 서버의 CHECK 와 같아야 한다', () => {
+  // 이 목록의 진짜 출처는 마이그레이션 253 의 CHECK 입니다. 클라이언트가 더 많이 알면 서버가
+  // 거절하는 이유를 칩으로 내놓고, 적게 알면 학습자가 고를 수 없는 이유가 생깁니다.
+  it('mig 253', () => {
+    const sql = readFileSync(
+      join(ROOT, 'supabase/migrations/253_the_learner_can_say_the_question_was_bad.sql'), 'utf-8')
+    const block = sql.match(/reason\s+text CHECK \(reason IS NULL OR reason IN \(([\s\S]*?)\)\)/)
+    if (!block) throw new Error('reason CHECK not found in migration 253')
+    const server = [...block[1].matchAll(/'([a-z_]+)'/g)].map((m) => m[1])
+    expect([...QUIZ_FEEDBACK_REASONS].sort()).toEqual(server.sort())
+  })
 })
 
 describe('the render-side enums match the edge contract', () => {

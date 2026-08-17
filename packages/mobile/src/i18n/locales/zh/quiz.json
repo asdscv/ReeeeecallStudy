@@ -259,5 +259,19 @@
     "order": "顺序或步骤不同。",
     "quantity": "数量或程度不同。",
     "scope": "适用范围不同——一个更宽。"
+  },
+  "rate": {
+    "prompt": "这道题怎么样？",
+    "good": "不错",
+    "bad": "不太好",
+    "reason": {
+      "answer_wrong": "答案好像不对",
+      "explanation_unhelpful": "解析没帮助",
+      "not_from_card": "和我的卡片无关",
+      "options_confusing": "选项容易混淆",
+      "question_unclear": "看不懂在问什么",
+      "too_easy": "太简单",
+      "too_hard": "太难"
+    }
   }
 }
