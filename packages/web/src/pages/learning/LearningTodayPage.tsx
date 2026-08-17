@@ -257,7 +257,14 @@ function LearningDiagnostics({ goalId }: { goalId: string }) {
           {weakByDeck.map((group) => (
             <Link
               key={group.deckId}
-              to={`/decks/${group.deckId}/study?mode=srs&cards=${group.cardIds.join(',')}`}
+              // `goalId` so finishing returns to the PLAN, not to the deck.
+              //
+              // `StudySessionPage` decides where the session exits by reading this one parameter
+              // (`exitPath = goalId ? /learning/:goalId : /decks/:deckId`), and it also keys the
+              // completion screen's buttons off it. The plan's "오늘 학습 시작" link has always
+              // passed it; this one never did, so studying a weak card from the plan finished on
+              // the generic 학습 완료 screen and 덱으로 돌아가기 walked away from the plan.
+              to={`/decks/${group.deckId}/study?mode=srs&cards=${group.cardIds.join(',')}&goalId=${goalId}`}
               className="flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 text-sm text-foreground no-underline transition-colors hover:bg-accent"
             >
               <span className="min-w-0 truncate">

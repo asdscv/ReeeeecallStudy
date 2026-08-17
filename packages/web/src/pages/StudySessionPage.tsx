@@ -183,6 +183,11 @@ export function StudySessionPage() {
       crammingShuffle,
       planSelection: planSelection ?? undefined,
       cardSelection: cardSelection ?? undefined,
+      // Where the learner came from. `exitPath` above already uses it for the buttons; the
+      // store needs it too, so a rating on a card the plan does not name is still recorded as
+      // evidence for this goal (mig 244). Without it the diagnostics panel that picked the
+      // card can never see that the card was studied, and hands back the same list forever.
+      fromGoalId: goalId ?? undefined,
     })
 
     return () => {
