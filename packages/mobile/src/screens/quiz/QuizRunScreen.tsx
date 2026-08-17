@@ -7,7 +7,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
 import {
   useQuizStore, QuizError, QUIZ_GRADE_ACTION, type QuizSubmitResult, type QuizQuote,
-  optionFlaws, optionAxes,
+  optionFlaws, optionAxes, QUIZ_FEEDBACK_REASONS,
 } from '@reeeeecall/shared/stores/quiz-store'
 import { Screen, Button, EmptyState } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
@@ -43,10 +43,13 @@ export function QuizRunScreen() {
   const { runId } = useRoute<Rt>().params
   const {
     run, loading, loadRun, refreshRun, submit, gradeWithAi, quote, grading, finishRun,
+    rateItem, itemRatings,
   } = useQuizStore()
 
   const [index, setIndex] = useState(0)
   const [choice, setChoice] = useState<number | null>(null)
+  /** 이유 칩이 열려 있는지. 👎 를 누르면 열리고, 문항을 넘기면 닫힙니다. */
+  const [reasonsOpen, setReasonsOpen] = useState(false)
   const [text, setText] = useState('')
   const [result, setResult] = useState<QuizSubmitResult | null>(null)
   // Keyed by item: an essay costs four times a short answer, so an unkeyed price would quote
@@ -100,6 +103,7 @@ export function QuizRunScreen() {
     const nextItem = items[next]
     setIndex(next)
     setChoice(null)
+    setReasonsOpen(false)
     setText(nextItem ? (drafts.current[nextItem.item_id] ?? '') : '')
     setResult(null)
     setError(null)
@@ -333,6 +337,74 @@ export function QuizRunScreen() {
               the route out. This screen has `gestureEnabled: false` and no header, so its only
               exit abandons the run — a refusal here without a way to act on it stranded a
               learner who had already paid to have earlier answers graded. */}
+          {/* 이 문항이 괜찮았나요?
+              문항은 전부 모델이 씁니다. 그런데 하나가 나쁘게 나왔을 때 그걸 알 경로가 없었고,
+              그래서 다음에도 같은 프롬프트로 같은 문항이 나왔습니다. 👎 만으로 기록되고 이유는
+              선택입니다 — 필수로 만들면 두 번째 탭이 생기고, 그러면 첫 번째도 안 눌립니다. */}
+          {answered && (
+            <View
+              style={[styles.stem, {
+                backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border,
+                marginTop: 12,
+              }]}
+              {...testProps('quiz-item-rating', true)}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, flex: 1 }]}>
+                  {t('rate.prompt')}
+                </Text>
+                <View style={{ flexDirection: 'row', gap: 6 }}>
+                  {(['good', 'bad'] as const).map((verdict) => {
+                    const chosen = itemRatings[item.item_id]?.verdict === verdict
+                    return (
+                      <Pressable
+                        key={verdict}
+                        accessibilityRole="button"
+                        accessibilityLabel={t(`rate.${verdict}`)}
+                        accessibilityState={{ selected: chosen }}
+                        onPress={() => {
+                          void rateItem(item.item_id, verdict)
+                          setReasonsOpen(verdict === 'bad')
+                        }}
+                        style={{
+                          paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, borderWidth: 1,
+                          borderColor: chosen ? theme.colors.primary : theme.colors.border,
+                        }}
+                        {...testProps(`quiz-rate-${verdict}`)}
+                      >
+                        <Text style={{ fontSize: 16 }}>{verdict === 'good' ? '👍' : '👎'}</Text>
+                      </Pressable>
+                    )
+                  })}
+                </View>
+              </View>
+              {reasonsOpen && (
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+                  {QUIZ_FEEDBACK_REASONS.map((reason) => {
+                    const chosen = itemRatings[item.item_id]?.reason === reason
+                    return (
+                      <Pressable
+                        key={reason}
+                        accessibilityRole="button"
+                        onPress={() => void rateItem(item.item_id, 'bad', reason)}
+                        style={{
+                          paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, borderWidth: 1,
+                          borderColor: chosen ? theme.colors.primary : theme.colors.border,
+                        }}
+                      >
+                        <Text style={[theme.typography.caption, {
+                          color: chosen ? theme.colors.primary : theme.colors.textSecondary,
+                        }]}>
+                          {t(`rate.reason.${reason}`)}
+                        </Text>
+                      </Pressable>
+                    )
+                  })}
+                </View>
+              )}
+            </View>
+          )}
+
           <AiRefusalNotice
             code={error}
             actionId="quiz_grade"

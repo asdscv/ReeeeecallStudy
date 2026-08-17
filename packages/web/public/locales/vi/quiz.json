@@ -259,5 +259,19 @@
     "order": "Thứ tự hoặc các bước khác nhau.",
     "quantity": "Khác về lượng hoặc mức độ.",
     "scope": "Phạm vi khác nhau — một bên rộng hơn."
+  },
+  "rate": {
+    "prompt": "Câu hỏi này thế nào?",
+    "good": "Tốt",
+    "bad": "Chưa tốt",
+    "reason": {
+      "answer_wrong": "Đáp án có vẻ sai",
+      "explanation_unhelpful": "Phần giải thích không giúp được gì",
+      "not_from_card": "Không liên quan đến thẻ của tôi",
+      "options_confusing": "Các lựa chọn gây nhầm lẫn",
+      "question_unclear": "Không rõ câu hỏi muốn hỏi gì",
+      "too_easy": "Quá dễ",
+      "too_hard": "Quá khó"
+    }
   }
 }

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   useQuizStore, QuizError, QUIZ_GRADE_ACTION,
-  optionFlaws, optionAxes,
+  optionFlaws, optionAxes, QUIZ_FEEDBACK_REASONS,
   type QuizRunItem, type QuizSubmitResult, type QuizQuote,
 } from '@reeeeecall/shared/stores/quiz-store'
 import { QuizFeedback } from './QuizFeedback'
@@ -30,7 +30,10 @@ export function QuizRunPage() {
   const navigate = useNavigate()
   const {
     run, loading, loadRun, refreshRun, submit, gradeWithAi, quote, grading, finishRun,
+    rateItem, itemRatings,
   } = useQuizStore()
+  /** Which item's reason chips are open. One at a time; closed by choosing or by moving on. */
+  const [reasonsFor, setReasonsFor] = useState<string | null>(null)
 
   const [index, setIndex] = useState(0)
   const [choice, setChoice] = useState<number | null>(null)
@@ -85,6 +88,7 @@ export function QuizRunPage() {
 
   const goTo = (next: number) => {
     setIndex(next); setChoice(null); setText(''); setResult(null); setError(null)
+    setReasonsFor(null)
     setStartedAt(Date.now())
   }
 
@@ -318,6 +322,64 @@ export function QuizRunPage() {
           learnerText={item.question_type === 'mcq' ? (pickedOption ?? '') : text}
           referenceText={item.reference_answer}
         />
+      )}
+
+      {/* Was this question any good?
+          Every question here is written by a model, and until now nothing could tell us when one
+          came out badly — a learner met a broken question, shrugged, and the next generation used
+          the same prompt to write the same broken question. 👎 alone records it; the reasons are
+          optional, because requiring one adds a second tap and a second tap means nobody takes
+          the first. */}
+      {answered && (
+        <div className="rounded-lg border border-border bg-card p-3" data-testid="quiz-item-rating">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs text-content-tertiary">{t('rate.prompt')}</p>
+            <div className="flex shrink-0 gap-1.5">
+              {(['good', 'bad'] as const).map((verdict) => {
+                const chosen = itemRatings[item.item_id]?.verdict === verdict
+                return (
+                  <button
+                    key={verdict}
+                    type="button"
+                    aria-label={t(`rate.${verdict}`)}
+                    aria-pressed={chosen}
+                    onClick={() => {
+                      void rateItem(item.item_id, verdict)
+                      // Reasons only ever follow a 👎 — there is nothing to diagnose about a
+                      // question that worked.
+                      setReasonsFor(verdict === 'bad' ? item.item_id : null)
+                    }}
+                    className={`cursor-pointer rounded-lg border px-2.5 py-1 text-sm transition-colors ${
+                      chosen ? 'border-brand bg-brand/10 text-brand' : 'border-border text-content-tertiary hover:border-brand/40'
+                    }`}
+                    data-testid={`quiz-rate-${verdict}`}
+                  >
+                    {verdict === 'good' ? '👍' : '👎'}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+          {reasonsFor === item.item_id && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {QUIZ_FEEDBACK_REASONS.map((reason) => {
+                const chosen = itemRatings[item.item_id]?.reason === reason
+                return (
+                  <button
+                    key={reason}
+                    type="button"
+                    onClick={() => void rateItem(item.item_id, 'bad', reason)}
+                    className={`cursor-pointer rounded-full border px-2.5 py-0.5 text-xs transition-colors ${
+                      chosen ? 'border-brand bg-brand/10 text-brand' : 'border-border text-content-tertiary hover:border-brand/40'
+                    }`}
+                  >
+                    {t(`rate.reason.${reason}`)}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
       )}
 
       <AiRefusalNotice

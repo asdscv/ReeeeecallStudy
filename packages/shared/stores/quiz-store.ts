@@ -102,6 +102,19 @@ export interface QuizQuote {
   free_unit_kind: string
 }
 
+/**
+ * Why a learner marked a generated question bad. A CLOSED set, mirroring the CHECK in mig 253.
+ *
+ * Closed because free text arrives in eight languages and then needs a reader; a label aggregates.
+ * "밴드 3 객관식에서 `options_confusing` 이 몰린다" is a sentence that fixes a prompt, and three
+ * hundred paragraphs of "보기가 좀 이상해요" is not.
+ */
+export const QUIZ_FEEDBACK_REASONS = [
+  'question_unclear', 'answer_wrong', 'options_confusing', 'not_from_card',
+  'too_easy', 'too_hard', 'explanation_unhelpful',
+] as const
+export type QuizFeedbackReason = (typeof QUIZ_FEEDBACK_REASONS)[number]
+
 export interface QuizzableCount { total: number; eligible: number }
 
 /**
@@ -420,6 +433,15 @@ interface QuizState {
   loadRun: (runId: string) => Promise<void>
   submit: (itemId: string, response: Record<string, unknown>, durationMs?: number) => Promise<QuizSubmitResult>
   gradeWithAi: (itemId: string, answer: string, maxPriceMicro: number) => Promise<void>
+  /**
+   * Say whether a generated question was any good. Free, and the reason is optional.
+   *
+   * Optional on purpose: requiring one adds a second tap, and a second tap means nobody takes the
+   * first. 👎 alone is already a signal.
+   */
+  rateItem: (itemId: string, verdict: 'good' | 'bad', reason?: QuizFeedbackReason | null) => Promise<void>
+  /** Ratings this session, by run item id — so the row can show which way it was pressed. */
+  itemRatings: Record<string, { verdict: 'good' | 'bad'; reason: QuizFeedbackReason | null }>
   override: (itemId: string, score: number) => Promise<void>
   finishRun: (runId: string) => Promise<void>
 
@@ -483,6 +505,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   generating: false,
   generateProgress: null,
   grading: false,
+  itemRatings: {},
   mistakes: [],
 
   fetchSets: async () => {
@@ -826,6 +849,17 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     } finally {
       set({ grading: false })
     }
+  },
+
+  rateItem: async (itemId, verdict, reason) => {
+    // Optimistic, and deliberately so: this is a free opinion, not a purchase. Making the learner
+    // wait for a round trip to see their own thumb move is the kind of latency that stops people
+    // pressing it at all — and if the write fails the worst case is an opinion we did not record.
+    set({ itemRatings: { ...get().itemRatings, [itemId]: { verdict, reason: reason ?? null } } })
+    const { error } = await supabase.rpc('rate_quiz_item', {
+      p_run_item_id: itemId, p_verdict: verdict, p_reason: reason ?? null,
+    })
+    if (error) console.error('[quiz-store] rate_quiz_item failed:', error.message, error.code)
   },
 
   override: async (itemId, score) => {
