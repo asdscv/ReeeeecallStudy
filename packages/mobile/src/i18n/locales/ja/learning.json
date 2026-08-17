@@ -128,14 +128,14 @@
     "notScoredYet": "まだスコアのある試行がありません",
     "title": "学習診断",
     "weakEmpty": "遅れているカードはありません。",
-    "weakHint": "2回以上見て、半分以上まちがえたカードです。",
+    "weakHint": "2回以上見て、平均が60%未満のカードです。",
     "weakTitle": "もう一度確認",
     "accuracyValue": "直近30日 {{scored, number}}回中 {{known, number}}回正解（{{pct, number}}%）",
     "weakCount": "{{count, number}}枚",
     "weakCount_one": "{{count, number}}枚",
     "weakCount_other": "{{count, number}}枚",
-    "weakStudy": "このカードだけ学習",
-    "weakHintCapped": "2回以上見て半分以上間違えたカード{{total, number}}枚のうち、最も弱い{{shown, number}}枚です。"
+    "weakStudy": "これらのカードだけ学習",
+    "weakHintCapped": "2回以上見て平均が60%未満のカード{{total, number}}枚のうち、もっとも弱い{{shown, number}}枚です。"
   },
   "recommend": {
     "accept": "受け入れる",

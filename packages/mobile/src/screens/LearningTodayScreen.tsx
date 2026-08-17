@@ -30,7 +30,6 @@ import { useQuizStore, type DailyCheckCount } from '@reeeeecall/shared/stores/qu
 import type { PlanWeek, DayState } from '@reeeeecall/shared/learning/application/plan-week'
 import { useStudy } from '../hooks/useStudy'
 import type { AIStackParamList } from '../navigation/types'
-import { WEAK_LIMIT } from '@reeeeecall/shared/lib/learning-insights'
 import {
   MCQ_FLAW_LABELS, SHORT_GAP_LABELS, ESSAY_ASPECT_LABELS, topLabels,
   isWeakTheme, isDiagnosisAction,
@@ -952,6 +951,10 @@ export function LearningTodayScreen() {
       })
   }, [insights, t])
 
+  /** How many weak cards are actually pressable, after unresolvable decks are dropped. */
+  const shownWeakCount = useMemo(
+    () => weakByDeck.reduce((sum, group) => sum + group.cardIds.length, 0), [weakByDeck])
+
   const studyWeak = useCallback(async (group: { deckId: string; cardIds: string[] }) => {
     setStarting(true)
     try {
@@ -1736,9 +1739,13 @@ export function LearningTodayScreen() {
                       {/* The hint said only what a weak card IS. It never said the list is the
                           WORST TEN of however many there are, so a learner with 340 read the
                           count as their whole backlog. */}
-                      {insights.weakCardTotal > WEAK_LIMIT
+                      {/* Capped OR undercounted — both mean "fewer than qualify". A card whose
+                          deck could not be resolved is dropped above with a bare `continue`, so
+                          the visible number can fall below `weakCardTotal` with nothing saying
+                          so. Gated on the mismatch, not on the cap. */}
+                      {shownWeakCount < insights.weakCardTotal
                         ? t('insights.weakHintCapped', {
-                          shown: WEAK_LIMIT, total: insights.weakCardTotal,
+                          shown: shownWeakCount, total: insights.weakCardTotal,
                         })
                         : t('insights.weakHint')}
                     </Text>

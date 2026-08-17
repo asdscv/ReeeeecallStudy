@@ -198,7 +198,7 @@
     "accuracy": "ความถูกต้อง",
     "notScoredYet": "ยังไม่มีการทำที่ถูกให้คะแนน",
     "weakTitle": "ควรดูอีกครั้ง",
-    "weakHint": "การ์ดที่ดูอย่างน้อยสองครั้งแล้วผิดเกินครึ่ง",
+    "weakHint": "การ์ดที่ดูอย่างน้อยสองครั้ง และได้คะแนนเฉลี่ยต่ำกว่า 60%",
     "weakEmpty": "ไม่มีการ์ดที่ตามไม่ทัน",
     "cardFallback": "(การ์ดไม่อยู่ในแผนวันนี้)",
     "attemptCount": "{{count, number}} ครั้ง",
@@ -209,7 +209,7 @@
     "weakCount_one": "{{count, number}} ใบ",
     "weakCount_other": "{{count, number}} ใบ",
     "weakStudy": "เรียนเฉพาะใบเหล่านี้",
-    "weakHintCapped": "{{shown, number}} ใบที่อ่อนที่สุดจาก {{total, number}} ใบที่เคยเห็นสองครั้งขึ้นไปและผิดเกินครึ่ง"
+    "weakHintCapped": "การ์ดที่อ่อนที่สุด {{shown, number}} ใบ จาก {{total, number}} ใบที่ดูอย่างน้อยสองครั้งและได้คะแนนเฉลี่ยต่ำกว่า 60%"
   },
   "recommend": {
     "title": "คำแนะนำ",

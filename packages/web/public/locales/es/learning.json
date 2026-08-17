@@ -198,7 +198,7 @@
     "accuracy": "Precisión",
     "notScoredYet": "Nada puntuado aún",
     "weakTitle": "Vale otra mirada",
-    "weakHint": "Tarjetas que has visto al menos dos veces y fallado más de la mitad.",
+    "weakHint": "Tarjetas que has visto al menos dos veces, con una media inferior al 60%.",
     "weakEmpty": "Nada se está quedando atrás.",
     "cardFallback": "(tarjeta no incluida en el plan de hoy)",
     "attemptCount": "{{count, number}} intentos",
@@ -209,7 +209,7 @@
     "weakCount_one": "{{count, number}} tarjeta",
     "weakCount_other": "{{count, number}} tarjetas",
     "weakStudy": "Estudiar solo estas",
-    "weakHintCapped": "Las {{shown, number}} más flojas de {{total, number}} tarjetas vistas dos veces y falladas más de la mitad."
+    "weakHintCapped": "Las {{shown, number}} más débiles de {{total, number}} tarjetas vistas al menos dos veces, con una media inferior al 60%."
   },
   "recommend": {
     "title": "Recomendaciones",

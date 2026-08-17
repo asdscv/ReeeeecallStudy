@@ -198,7 +198,7 @@
     "accuracy": "Accuracy",
     "notScoredYet": "Nothing scored yet",
     "weakTitle": "Worth another look",
-    "weakHint": "Cards you have seen at least twice and got wrong more than half the time.",
+    "weakHint": "Cards you have seen at least twice, averaging under 60%.",
     "weakEmpty": "Nothing is falling behind.",
     "cardFallback": "(card not in today’s plan)",
     "attemptCount": "{{count, number}} attempts",
@@ -209,7 +209,7 @@
     "weakCount_one": "{{count, number}} card",
     "weakCount_other": "{{count, number}} cards",
     "weakStudy": "Study just these",
-    "weakHintCapped": "The {{shown, number}} weakest of {{total, number}} cards you have seen twice and missed more than half the time."
+    "weakHintCapped": "The {{shown, number}} weakest of {{total, number}} cards you have seen at least twice, averaging under 60%."
   },
   "recommend": {
     "title": "Recommendations",

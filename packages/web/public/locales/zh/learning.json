@@ -198,7 +198,7 @@
     "accuracy": "正确率",
     "notScoredYet": "尚无评分记录",
     "weakTitle": "值得再看",
-    "weakHint": "看过至少两次、错超过一半的卡片。",
+    "weakHint": "看过至少两次、平均分低于 60% 的卡片。",
     "weakEmpty": "没有落后的卡片。",
     "cardFallback": "（不在今日计划中）",
     "attemptCount": "{{count, number}} 次作答",
@@ -209,7 +209,7 @@
     "weakCount_one": "{{count, number}} 张",
     "weakCount_other": "{{count, number}} 张",
     "weakStudy": "只学这些卡片",
-    "weakHintCapped": "看过两次以上且错超一半的{{total, number}}张卡片中最薄弱的{{shown, number}}张。"
+    "weakHintCapped": "看过至少两次且平均分低于 60% 的 {{total, number}} 张卡片中最弱的 {{shown, number}} 张。"
   },
   "recommend": {
     "title": "推荐",

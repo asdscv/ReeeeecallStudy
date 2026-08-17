@@ -128,14 +128,14 @@
     "notScoredYet": "ยังไม่มีการทำที่ถูกให้คะแนน",
     "title": "วิเคราะห์การเรียน",
     "weakEmpty": "ไม่มีการ์ดที่ตามไม่ทัน",
-    "weakHint": "การ์ดที่ดูอย่างน้อยสองครั้งแล้วผิดเกินครึ่ง",
+    "weakHint": "การ์ดที่ดูอย่างน้อยสองครั้ง และได้คะแนนเฉลี่ยต่ำกว่า 60%",
     "weakTitle": "ควรดูอีกครั้ง",
     "accuracyValue": "30 วันล่าสุด ถูก {{known, number}} จาก {{scored, number}} ครั้ง ({{pct, number}}%)",
     "weakCount": "{{count, number}} ใบ",
     "weakCount_one": "{{count, number}} ใบ",
     "weakCount_other": "{{count, number}} ใบ",
     "weakStudy": "เรียนเฉพาะใบเหล่านี้",
-    "weakHintCapped": "{{shown, number}} ใบที่อ่อนที่สุดจาก {{total, number}} ใบที่เคยเห็นสองครั้งขึ้นไปและผิดเกินครึ่ง"
+    "weakHintCapped": "การ์ดที่อ่อนที่สุด {{shown, number}} ใบ จาก {{total, number}} ใบที่ดูอย่างน้อยสองครั้งและได้คะแนนเฉลี่ยต่ำกว่า 60%"
   },
   "recommend": {
     "accept": "ยอมรับ",

@@ -128,14 +128,14 @@
     "notScoredYet": "Belum ada yang dinilai",
     "title": "Analisis pembelajaran",
     "weakEmpty": "Tidak ada yang tertinggal.",
-    "weakHint": "Kartu yang sudah kamu lihat minimal dua kali dan lebih dari separuh salah.",
+    "weakHint": "Kartu yang sudah kamu lihat minimal dua kali, dengan rata-rata di bawah 60%.",
     "weakTitle": "Perlu dilihat lagi",
     "accuracyValue": "{{known, number}} benar dari {{scored, number}} dalam 30 hari terakhir ({{pct, number}}%)",
     "weakCount": "{{count, number}} kartu",
     "weakCount_one": "{{count, number}} kartu",
     "weakCount_other": "{{count, number}} kartu",
     "weakStudy": "Pelajari kartu ini saja",
-    "weakHintCapped": "{{shown, number}} terlemah dari {{total, number}} kartu yang sudah dilihat dua kali dan salah lebih dari separuh."
+    "weakHintCapped": "{{shown, number}} kartu terlemah dari {{total, number}} kartu yang sudah dilihat minimal dua kali, dengan rata-rata di bawah 60%."
   },
   "recommend": {
     "accept": "Terima",

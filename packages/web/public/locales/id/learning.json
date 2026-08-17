@@ -198,7 +198,7 @@
     "accuracy": "Akurasi",
     "notScoredYet": "Belum ada yang dinilai",
     "weakTitle": "Perlu dilihat lagi",
-    "weakHint": "Kartu yang sudah kamu lihat minimal dua kali dan lebih dari separuh salah.",
+    "weakHint": "Kartu yang sudah kamu lihat minimal dua kali, dengan rata-rata di bawah 60%.",
     "weakEmpty": "Tidak ada yang tertinggal.",
     "cardFallback": "(kartu tidak ada di rencana hari ini)",
     "attemptCount": "{{count, number}} percobaan",
@@ -209,7 +209,7 @@
     "weakCount_one": "{{count, number}} kartu",
     "weakCount_other": "{{count, number}} kartu",
     "weakStudy": "Pelajari kartu ini saja",
-    "weakHintCapped": "{{shown, number}} terlemah dari {{total, number}} kartu yang sudah dilihat dua kali dan salah lebih dari separuh."
+    "weakHintCapped": "{{shown, number}} kartu terlemah dari {{total, number}} kartu yang sudah dilihat minimal dua kali, dengan rata-rata di bawah 60%."
   },
   "recommend": {
     "title": "Rekomendasi",

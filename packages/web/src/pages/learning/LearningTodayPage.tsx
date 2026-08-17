@@ -24,7 +24,6 @@ import type { PlanWeek, DayState } from '@reeeeecall/shared/learning/application
 import { useDeckStore } from '../../stores/deck-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
 import { AiRefusalNotice } from '../../components/ai/AiRefusalNotice'
-import { WEAK_LIMIT } from '@reeeeecall/shared/lib/learning-insights'
 import {
   MCQ_FLAW_LABELS, SHORT_GAP_LABELS, ESSAY_ASPECT_LABELS, topLabels,
   isWeakTheme, isDiagnosisAction,
@@ -237,6 +236,9 @@ function LearningDiagnostics({ goalId }: { goalId: string }) {
    * now labelled — and the week strip above shows the same thing as seven days a learner can
    * count. Typical time is gone outright: nothing on this screen can act on it.
    */
+  /** How many weak cards are actually pressable, after unresolvable decks are dropped. */
+  const shownWeakCount = weakByDeck.reduce((sum, group) => sum + group.cardIds.length, 0)
+
   const stats = accuracy === null
     ? t('insights.notScoredYet')
     : t('insights.accuracyValue', {
@@ -288,8 +290,16 @@ function LearningDiagnostics({ goalId }: { goalId: string }) {
               however many there are — so a learner with 340 read "8장" as their whole backlog,
               and the ten never visibly changed because at scale the tiebreak is a UUID sort. */}
           <p className="text-[11px] text-content-tertiary">
-            {insights.weakCardTotal > WEAK_LIMIT
-              ? t('insights.weakHintCapped', { shown: WEAK_LIMIT, total: insights.weakCardTotal })
+            {/* Capped OR undercounted, and both say the same true thing: what you can press is
+                fewer than what qualifies. A card whose deck could not be resolved is dropped a
+                few lines up with a bare `continue` — deleted since the diagnostics were
+                computed — so the visible number can silently fall below `weakCardTotal` with
+                nothing on screen admitting it. Gated on the mismatch rather than on the cap
+                alone, so the "of N" sentence never appears when nothing was actually lost. */}
+            {shownWeakCount < insights.weakCardTotal
+              ? t('insights.weakHintCapped', {
+                shown: shownWeakCount, total: insights.weakCardTotal,
+              })
               : t('insights.weakHint')}
           </p>
 

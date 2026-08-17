@@ -128,14 +128,14 @@
     "notScoredYet": "Nothing scored yet",
     "title": "Learning insights",
     "weakEmpty": "Nothing is falling behind.",
-    "weakHint": "Cards you have seen at least twice and got wrong more than half the time.",
+    "weakHint": "Cards you have seen at least twice, averaging under 60%.",
     "weakTitle": "Worth another look",
     "accuracyValue": "{{known, number}} right out of {{scored, number}} over the last 30 days ({{pct, number}}%)",
     "weakCount": "{{count, number}} cards",
     "weakCount_one": "{{count, number}} card",
     "weakCount_other": "{{count, number}} cards",
     "weakStudy": "Study just these",
-    "weakHintCapped": "The {{shown, number}} weakest of {{total, number}} cards you have seen twice and missed more than half the time."
+    "weakHintCapped": "The {{shown, number}} weakest of {{total, number}} cards you have seen at least twice, averaging under 60%."
   },
   "recommend": {
     "accept": "Accept",
