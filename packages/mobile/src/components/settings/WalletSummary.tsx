@@ -4,8 +4,10 @@ import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../theme'
 import {
   getAiWalletSummary,
+  getAiUsageHistory,
   formatUsdMicro,
   type AiWalletSummary,
+  type WalletUsageRow,
 } from '@reeeeecall/shared/lib/ai/server-client'
 import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 import { Button } from '../ui'
@@ -27,6 +29,13 @@ export function WalletSummary() {
   const theme = useTheme()
   const { t, i18n } = useTranslation('wallet')
   const [summary, setSummary] = useState<AiWalletSummary | null>(null)
+  /**
+   * 사용 내역 — 잔액이 움직인 것 **과** 무료로 쓴 것.
+   *
+   * 요약 RPC 의 `ledger` 는 잔액 변동만 담습니다. 그래서 무료 10장 안에서 카드를 만든 학습자가
+   * 이 화면을 열면 아무것도 없었습니다. `get_ai_usage_history`(mig 251)가 둘을 합칩니다.
+   */
+  const [history, setHistory] = useState<WalletUsageRow[]>([])
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading')
   const [historyExpanded, setHistoryExpanded] = useState(false)
   // Withdrawal-right disclosure, required before the pack buttons unlock. Credits are
@@ -39,6 +48,9 @@ export function WalletSummary() {
     getAiWalletSummary().then((s) => {
       if (s) { setSummary(s); setState('ready') } else { setState('error') }
     })
+    // 별도 호출입니다. 요약이 실패해도 내역은 보여줄 수 있고, 반대도 마찬가지입니다 —
+    // 잔액을 못 읽었다고 "오늘 무엇을 했는지"까지 감출 이유는 없습니다.
+    getAiUsageHistory(undefined, 30).then(setHistory)
   }, [])
   useEffect(() => { load() }, [load])
 
@@ -199,28 +211,40 @@ export function WalletSummary() {
           server-capped at 30 (mig 117), so expanded is still bounded. */}
       <View style={{ paddingTop: 16, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: theme.colors.border }}>
         <Text style={[styles.subTitle, { color: theme.colors.text, marginBottom: 8 }]}>{t('history.title')}</Text>
-        {summary.ledger.length === 0 ? (
+        {history.length === 0 ? (
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center', paddingVertical: 8 }]}>{t('history.empty')}</Text>
         ) : (
           <>
-            {(historyExpanded ? summary.ledger : summary.ledger.slice(0, HISTORY_PREVIEW)).map((e, i) => {
+            {(historyExpanded ? history : history.slice(0, HISTORY_PREVIEW)).map((e, i) => {
               const positive = e.delta >= 0
+              const cards = e.freeCards + e.paidCards
               return (
                 <View
                   key={i}
                   style={[styles.ledgerRow, { borderTopColor: theme.colors.border, borderTopWidth: i === 0 ? 0 : StyleSheet.hairlineWidth }]}
                 >
                   <View style={{ flex: 1 }}>
-                    <Text style={[theme.typography.body, { color: theme.colors.text }]}>{t(`reason.${e.reason}`, { defaultValue: e.reason })}</Text>
+                    <Text style={[theme.typography.body, { color: theme.colors.text }]}>
+                      {t(`reason.${e.kind}`, { defaultValue: e.kind })}
+                      {cards > 0 ? ` · ${t('history.cards', { count: cards })}` : ''}
+                    </Text>
                     <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{fmtDate(e.createdAt)}</Text>
                   </View>
-                  <Text style={{ fontWeight: '600', color: positive ? theme.colors.success : theme.colors.error }}>
-                    {positive ? '+' : '−'}{formatUsdMicro(Math.abs(e.delta))}
-                  </Text>
+                  {/* "−$0.00" 이 아니라 "무료". 0원은 반올림 자국처럼 읽히고, 학습자가 알아야
+                      하는 것은 그게 하루 무료분에서 나갔다는 사실입니다. */}
+                  {e.isFree ? (
+                    <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, fontWeight: '600' }]}>
+                      {t('history.free')}
+                    </Text>
+                  ) : (
+                    <Text style={{ fontWeight: '600', color: positive ? theme.colors.success : theme.colors.error }}>
+                      {positive ? '+' : '−'}{formatUsdMicro(Math.abs(e.delta))}
+                    </Text>
+                  )}
                 </View>
               )
             })}
-            {summary.ledger.length > HISTORY_PREVIEW && (
+            {history.length > HISTORY_PREVIEW && (
               <TouchableOpacity
                 testID="wallet-history-toggle"
                 onPress={() => setHistoryExpanded((v) => !v)}
@@ -230,7 +254,7 @@ export function WalletSummary() {
                 <Text style={[theme.typography.caption, { color: theme.colors.primary, fontWeight: '600' }]}>
                   {historyExpanded
                     ? t('history.showLess')
-                    : t('history.showAll', { total: summary.ledger.length })}
+                    : t('history.showAll', { total: history.length })}
                 </Text>
               </TouchableOpacity>
             )}

@@ -49,7 +49,8 @@
     "imageRemove": "删除图片",
     "inputModeTopicHint": "输入主题，AI 会为你生成卡片。",
     "inputModeImageHint": "上传课本页面、单词表或笔记的照片，AI 会识别并生成卡片。可一次选择多张。",
-    "noOwnedDecks": "你还没有自己的卡组 — 请先创建一个卡组，再向其中添加 AI 卡片。"
+    "noOwnedDecks": "你还没有自己的卡组 — 请先创建一个卡组，再向其中添加 AI 卡片。",
+    "imageCostNote": "用照片生成每次扣 $0.10。用文字生成时，每天前 10 张免费。"
   },
   "wallet": {
     "summary": "今日可用 {{free}} 张免费卡片 + {{credits}} 张付费卡片",

@@ -16,7 +16,11 @@
   },
   "history": {
     "title": "使用履歴",
-    "empty": "まだ使用履歴がありません。"
+    "empty": "まだ使用履歴がありません。",
+    "free": "無料",
+    "cards": "{{count, number}}枚",
+    "cards_one": "{{count, number}}枚",
+    "cards_other": "{{count, number}}枚"
   },
   "reason": {
     "admin_adjustment": "調整",

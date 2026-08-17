@@ -18,7 +18,11 @@
     "title": "Riwayat penggunaan",
     "empty": "Belum ada penggunaan.",
     "showAll": "Lihat semua {{total}}",
-    "showLess": "Tampilkan lebih sedikit"
+    "showLess": "Tampilkan lebih sedikit",
+    "free": "Gratis",
+    "cards": "{{count, number}} kartu",
+    "cards_one": "{{count, number}} kartu",
+    "cards_other": "{{count, number}} kartu"
   },
   "reason": {
     "admin_adjustment": "Penyesuaian",

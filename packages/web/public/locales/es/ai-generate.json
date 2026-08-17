@@ -49,7 +49,8 @@
     "imageRemove": "Quitar imagen",
     "inputModeTopicHint": "Describe un tema y la IA escribe las tarjetas por ti.",
     "inputModeImageHint": "Sube fotos de una página de libro, lista de vocabulario o apuntes: la IA las convierte en tarjetas. Puedes elegir varias a la vez.",
-    "noOwnedDecks": "Aún no tienes mazos propios: crea un mazo primero y luego añádele tarjetas con IA."
+    "noOwnedDecks": "Aún no tienes mazos propios: crea un mazo primero y luego añádele tarjetas con IA.",
+    "imageCostNote": "Crear tarjetas desde fotos cuesta $0.10 por vez. Desde texto, las primeras 10 al día son gratis."
   },
   "wallet": {
     "summary": "{{free}} tarjetas gratuitas + {{credits}} de pago disponibles hoy",

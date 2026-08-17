@@ -18,7 +18,11 @@
     "title": "使用履歴",
     "empty": "まだ使用履歴がありません。",
     "showAll": "すべて表示（{{total}}件）",
-    "showLess": "閉じる"
+    "showLess": "閉じる",
+    "free": "無料",
+    "cards": "{{count, number}}枚",
+    "cards_one": "{{count, number}}枚",
+    "cards_other": "{{count, number}}枚"
   },
   "reason": {
     "admin_adjustment": "調整",

@@ -433,6 +433,12 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
                 ? t('config.imageAddMore', { count: imageDataUrls.length, max: MAX_IMAGES })
                 : t('config.imageUpload')}
             </button>
+            {/* 사진으로 만드는 쪽이 더 비쌉니다. 값이 아니라 **무료분**이 다르기 때문입니다:
+                글로 만들면 하루 열 장까지 공짜인데, 사진은 첫 장부터 지갑을 씁니다. 누르기
+                전에 말해야 하는 사실이고, 지금까지 어디에도 없었습니다. */}
+            <p className="mt-2 text-center text-xs text-content-tertiary" data-testid="image-cost-note">
+              {t('config.imageCostNote')}
+            </p>
             {imageDataUrls.length > 0 && (
               <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4">
                 {imageDataUrls.map((src, i) => (

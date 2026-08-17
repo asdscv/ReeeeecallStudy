@@ -410,6 +410,7 @@ jobs:
             supabase/tests/mcq_explanation_test.sql \
             supabase/tests/diagnosis_evidence_test.sql \
             supabase/tests/ledger_reason_test.sql \
+            supabase/tests/usage_history_test.sql \
             supabase/tests/quiz_set_history_test.sql \
             supabase/tests/remediation_replay_test.sql \
             supabase/tests/unpriced_model_test.sql; do
