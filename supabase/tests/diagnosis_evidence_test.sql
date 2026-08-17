@@ -160,9 +160,19 @@ BEGIN
   IF v_price IS NULL THEN
     RAISE EXCEPTION 'FAIL: diagnosis 값이 없다 — 예약이 0원으로 통과한다';
   END IF;
-  -- 카드 한 장 설명보다 비쌉니다. 이것은 목표 전체를 봅니다.
-  IF v_price <= (SELECT price_micro FROM ai_action_prices WHERE action = 'remediation_explain') THEN
-    RAISE EXCEPTION 'FAIL: 목표 전체 진단이 카드 한 장 설명보다 싸다 (%)', v_price;
+  -- 사다리 **안**에 있어야 합니다. 246 은 여기서 정확히 반대를 단언했습니다 — "목표 전체를
+  -- 보니까 카드 한 장 설명보다 비싸야 한다". 그건 일의 크기로 정한 값이고, 학습자가 보는 것은
+  -- 값들의 줄입니다. 나머지 전부가 $0.05~$0.50 인데 하나만 $1.00 이면 "특별하다"가 아니라
+  -- "여기 물건이 아니다"로 읽힙니다(248).
+  --
+  -- 그래서 이 단언은 위아래를 모두 잡습니다: 낱개 행동보다는 비싸고, 사다리 꼭대기를 넘지는
+  -- 않는다.
+  IF v_price <= (SELECT price_micro FROM ai_action_prices WHERE action = 'card') THEN
+    RAISE EXCEPTION 'FAIL: 진단이 카드 한 장 값 이하다 (%)', v_price;
+  END IF;
+  IF v_price > (SELECT max(price_micro) FROM ai_action_prices WHERE action <> 'diagnosis') THEN
+    RAISE EXCEPTION 'FAIL: 진단이 사다리 꼭대기를 넘었다 (% > %)',
+      v_price, (SELECT max(price_micro) FROM ai_action_prices WHERE action <> 'diagnosis');
   END IF;
 
   SELECT per_day INTO v_free FROM ai_free_allowances
