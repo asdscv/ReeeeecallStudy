@@ -18,7 +18,11 @@
     "title": "ประวัติการใช้งาน",
     "empty": "ยังไม่มีการใช้งาน",
     "showAll": "ดูทั้งหมด {{total}} รายการ",
-    "showLess": "ย่อ"
+    "showLess": "ย่อ",
+    "free": "ฟรี",
+    "cards": "{{count, number}} ใบ",
+    "cards_one": "{{count, number}} ใบ",
+    "cards_other": "{{count, number}} ใบ"
   },
   "reason": {
     "admin_adjustment": "การปรับยอด",

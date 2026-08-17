@@ -258,6 +258,50 @@ export interface WalletLedgerRow extends WalletLedgerEntry {
   id: number
 }
 
+/**
+ * One row of the wallet's 사용 내역 — a balance movement, OR a use that cost nothing.
+ *
+ * The two used to be different things and only the first was shown, so a learner who made cards
+ * inside the free daily ten opened the history and found it empty. `get_ai_usage_history`
+ * (mig 251) merges them; `isFree` is what tells the screen to write "무료" instead of an amount.
+ */
+export interface WalletUsageRow {
+  createdAt: string
+  kind: string
+  delta: number
+  isFree: boolean
+  freeCards: number
+  paidCards: number
+}
+
+/**
+ * Paged by TIMESTAMP, not id: the list is a union of two tables and their ids do not interleave.
+ * The cursor is the oldest row currently held.
+ */
+export async function getAiUsageHistory(
+  before?: string,
+  limit = 30,
+): Promise<WalletUsageRow[]> {
+  const { data, error } = await supabase.rpc('get_ai_usage_history', {
+    p_limit: limit,
+    p_before: before ?? null,
+  })
+  if (error || !data) return []
+  return (
+    data as Array<{
+      created_at: string; kind: string; delta: number
+      is_free: boolean; free_cards: number; paid_cards: number
+    }>
+  ).map((r) => ({
+    createdAt: String(r.created_at),
+    kind: String(r.kind),
+    delta: Number(r.delta),
+    isFree: Boolean(r.is_free),
+    freeCards: Number(r.free_cards ?? 0),
+    paidCards: Number(r.paid_cards ?? 0),
+  }))
+}
+
 export async function getAiCreditLedger(
   beforeId?: number,
   limit = 30,

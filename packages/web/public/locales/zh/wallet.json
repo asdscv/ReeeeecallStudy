@@ -16,7 +16,11 @@
   },
   "history": {
     "title": "使用记录",
-    "empty": "暂无使用记录。"
+    "empty": "暂无使用记录。",
+    "free": "免费",
+    "cards": "{{count, number}} 张",
+    "cards_one": "{{count, number}} 张",
+    "cards_other": "{{count, number}} 张"
   },
   "reason": {
     "admin_adjustment": "调整",

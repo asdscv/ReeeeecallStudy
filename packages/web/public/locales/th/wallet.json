@@ -16,7 +16,11 @@
   },
   "history": {
     "title": "ประวัติการใช้งาน",
-    "empty": "ยังไม่มีการใช้งาน"
+    "empty": "ยังไม่มีการใช้งาน",
+    "free": "ฟรี",
+    "cards": "{{count, number}} ใบ",
+    "cards_one": "{{count, number}} ใบ",
+    "cards_other": "{{count, number}} ใบ"
   },
   "reason": {
     "admin_adjustment": "การปรับยอด",

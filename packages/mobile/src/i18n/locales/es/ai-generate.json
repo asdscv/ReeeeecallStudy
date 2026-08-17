@@ -31,7 +31,8 @@
     "inputModeTopicHint": "Describe un tema y la IA escribe las tarjetas por ti.",
     "inputModeImageHint": "Sube fotos de una página de libro, lista de vocabulario o apuntes: la IA las convierte en tarjetas. Puedes elegir varias a la vez.",
     "cardLimitExceeds": "Puedes añadir como máximo {{available}} tarjeta(s) más — reduce la cantidad o suscríbete.",
-    "cardLimitReached": "Has alcanzado tu límite de tarjetas — elimina tarjetas o suscríbete para añadir más."
+    "cardLimitReached": "Has alcanzado tu límite de tarjetas — elimina tarjetas o suscríbete para añadir más.",
+    "imageCostNote": "Crear tarjetas desde fotos cuesta $0.10 por vez. Desde texto, las primeras 10 al día son gratis."
   },
   "deck": {
     "section": "SELECCIONAR MAZO",

@@ -14,6 +14,7 @@ import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
 import { useDecks, useAuthState } from '../hooks'
 import { useTheme, palette } from '../theme'
 import type { AIStackParamList } from '../navigation/types'
+import { testProps } from '../utils/testProps'
 
 // AI generation runs on our server key (metered free tier) — no provider/API
 // key selection on the client.
@@ -605,6 +606,16 @@ export function AIGenerateScreen() {
                       : t('content.imageUpload')}
                   </Text>
                 </TouchableOpacity>
+                {/* 사진 쪽이 더 비쌉니다 — 값이 아니라 무료분이 다릅니다. 글로 만들면 하루
+                    열 장까지 공짜인데 사진은 첫 장부터 지갑을 씁니다. */}
+                <Text
+                  style={[theme.typography.caption, {
+                    color: theme.colors.textTertiary, textAlign: 'center', marginTop: 8,
+                  }]}
+                  {...testProps('image-cost-note')}
+                >
+                  {t('content.imageCostNote')}
+                </Text>
                 {imageDataUrls.length > 0 && (
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
                     {imageDataUrls.map((src, i) => (
