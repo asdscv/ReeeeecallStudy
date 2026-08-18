@@ -84,6 +84,17 @@ export const DIAGNOSIS_MIN_CARDS = 2
 /** 처방은 세 개까지. 여섯 개는 목록이지 처방이 아닙니다. */
 export const DIAGNOSIS_MAX_STEPS = 3
 
+/**
+ * 프롬프트에 실어 보내는 카드 수와 카드당 글자 수의 상한.
+ *
+ * 값을 매긴 근거가 곧 이 상한입니다: 진단 1건 $0.05 는 실측 입력 1,348토큰(카드 6장) 기준
+ * 원가의 98배인데, 상한이 없으면 같은 $0.05 로 카드 50장 x 2,000자를 태울 수 있었습니다.
+ * 16장 x 200자면 최악이 실측의 6배 안쪽이고, 발견 하나에 최소 2장이니 여섯 가지 테마를
+ * 전부 채우고도 남습니다.
+ */
+export const DIAGNOSIS_MAX_PROMPT_CARDS = 16
+export const DIAGNOSIS_MAX_CARD_CHARS = 200
+
 export interface DiagnosisEvidence {
   readonly scored?: number
   readonly known?: number
@@ -254,9 +265,25 @@ renders its own sentence for every label, already translated into the learner's 
 back to us; we have it.
 Valid themes: ${WEAK_THEMES.map((t) => `"${t}"`).join(', ')}. Valid actions: ${DIAGNOSIS_ACTIONS.map((a) => `"${a}"`).join(', ')}.`
 
+  // 프롬프트에는 **상한이 있어야 합니다.**
+  //
+  // 이 자리는 `refs.cardIds` 를 그대로 직렬화했습니다. 그 목록은 50개까지 받고 카드 한 장은
+  // 2,000자까지 되므로(mig 259), 한 번의 진단이 10만 자를 모델에 밀어 넣을 수 있었습니다 —
+  // 실측한 보통 요청(카드 6장, 입력 1,348토큰)의 70배가 넘고, 값은 그대로입니다. 남의 실수가
+  // 아니라 그냥 긴 카드를 여러 장 고른 학습자면 도달합니다.
+  //
+  // 잘라도 되는 이유: 이 모델이 하는 일은 카드들이 **서로 닮았는지** 보는 것입니다. 앞 200자로
+  // 안 닮아 보이는 두 카드가 뒤쪽 1,800자에서 닮아 있을 일은 없고, 있더라도 그건 학습자가
+  // 헷갈리는 이유가 아닙니다. `remediation` 쪽은 이미 64KB 로 자르고 있습니다(ai-remediation.ts).
+  const cards = input.cards.slice(0, DIAGNOSIS_MAX_PROMPT_CARDS).map((c) => ({
+    id: c.id,
+    prompt: c.prompt.slice(0, DIAGNOSIS_MAX_CARD_CHARS),
+    answer: c.answer.slice(0, DIAGNOSIS_MAX_CARD_CHARS),
+  }))
+
   const userPrompt = JSON.stringify({
     evidence: input.evidence,
-    cards: input.cards,
+    cards,
   })
 
   return { systemPrompt, userPrompt }
