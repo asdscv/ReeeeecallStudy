@@ -95,7 +95,6 @@ related_prs: ['#495']    # 빈 리스트 허용
 |---|---|
 | YAML frontmatter 0/104, 메타 표기 4가지 혼재 | 신규 문서부터 §3 적용 |
 | `DOCS/TODO` 에 완료 문서가 남아 있음 | 10개 중 4개(1개는 "BOTH MERGED") |
-| 추적되지 않은(`??`) 핸드오프 문서 | `HANDOFF-2026-07-29-billing-ui-deploy.md` |
 | `.github/workflows/README.md` 가 ci.yml 과 어긋남 | → [`../07_TESTING/GATES.md §5`](../07_TESTING/GATES.md) |
 | 루트 `README.md` 가 Vite 스타터 템플릿 그대로 | 제품 설명이 없다 |
 | `DOCS/OPS-READINESS.md` 가 현재 상태와 이력을 한 표에 겹쳐 담음 | 취소선 + ✅ 덧칠 |
