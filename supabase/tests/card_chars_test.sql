@@ -25,11 +25,11 @@ BEGIN
   INSERT INTO decks (user_id, name, default_template_id) VALUES (v_uid, 'chars', v_tmpl)
     RETURNING id INTO v_deck;
 
-  -- ══ 1. 프로덕션 최대(2,188자)보다 큰 카드도 통과한다 ═════════════════════
+  -- ══ 1. 한도 안쪽의 큰 카드는 통과한다 ═══════════════════════════════════
   --
-  -- 한도는 사람을 막으려는 게 아닙니다. 오늘 멀쩡한 학습자가 내일 막히면 안 됩니다.
+  -- p99 가 331자이므로 1,800자는 사실상 모든 학습자보다 큽니다.
   INSERT INTO cards (deck_id, user_id, template_id, field_values)
-    VALUES (v_deck, v_uid, v_tmpl, jsonb_build_object('field_1', repeat('가', 3000)));
+    VALUES (v_deck, v_uid, v_tmpl, jsonb_build_object('field_1', repeat('가', 1800)));
 
   -- ══ 2. 한글이든 영어든 **같은 글자수**에서 막힌다 ════════════════════════
   --
@@ -37,13 +37,13 @@ BEGIN
   -- 3분의 1 지점에서 막힙니다.
   BEGIN
     INSERT INTO cards (deck_id, user_id, template_id, field_values)
-      VALUES (v_deck, v_uid, v_tmpl, jsonb_build_object('field_1', repeat('가', 4001)));
+      VALUES (v_deck, v_uid, v_tmpl, jsonb_build_object('field_1', repeat('가', 2001)));
     RAISE EXCEPTION 'FAIL: 한글 4,001자가 통과했다';
   EXCEPTION WHEN check_violation THEN NULL;
   END;
   BEGIN
     INSERT INTO cards (deck_id, user_id, template_id, field_values)
-      VALUES (v_deck, v_uid, v_tmpl, jsonb_build_object('field_1', repeat('a', 4001)));
+      VALUES (v_deck, v_uid, v_tmpl, jsonb_build_object('field_1', repeat('a', 2001)));
     RAISE EXCEPTION 'FAIL: 영문 4,001자가 통과했다 — 언어마다 한도가 다르다';
   EXCEPTION WHEN check_violation THEN NULL;
   END;
@@ -52,8 +52,8 @@ BEGIN
   BEGIN
     INSERT INTO cards (deck_id, user_id, template_id, field_values)
       VALUES (v_deck, v_uid, v_tmpl, jsonb_build_object(
-        'field_1', repeat('가', 1500), 'field_2', repeat('나', 1500),
-        'field_3', repeat('다', 1500)));
+        'field_1', repeat('가', 800), 'field_2', repeat('나', 800),
+        'field_3', repeat('다', 800)));
     RAISE EXCEPTION 'FAIL: 셋으로 쪼개니 통과했다 — 한도가 우회된다';
   EXCEPTION WHEN check_violation THEN NULL;
   END;
