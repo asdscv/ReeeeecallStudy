@@ -51,12 +51,16 @@ const MEASURED: Record<string, { in: number; out: number; label: string }> = {
 
 /** What each unit is actually sold for, micro-USD. 1 credit = 1,000 micro. */
 const PRICE: Record<keyof typeof MEASURED, number> = {
-  quizQuestion: 10_000,   // 2 units x quiz_unit_price_micro
-  essayQuestion: 15_000,  // 3 units
-  gradeShort: 10_000,     // 2 units
-  gradeEssay: 40_000,     // 8 units
-  remediation: 50_000,    // fixed price (was cost-following)
-  card: 10_000,           // fixed price (was cost-following)
+  quizQuestion: 100_000,  // 2 units x quiz_unit_price_micro (50,000 since mig 230)
+  essayQuestion: 150_000, // 3 units
+  // 254 brought both gradings down: measured cost is $0.00042 (short) and $0.00032 (essay), and
+  // $0.40 an answer was 1,233x — the top of the ladder by four times, on the type learners get
+  // the most out of. Essay GENERATION is expensive; essay GRADING is not, because the rubric is
+  // already stored with the question and the model only returns a level per criterion.
+  gradeShort: 50_000,     // 1 unit
+  gradeEssay: 100_000,    // 2 units
+  remediation: 500_000,   // fixed price, x10 in mig 230
+  card: 10_000,           // fixed price, back to a cent in mig 249
 }
 
 const FLOOR_MULTIPLE = 10
