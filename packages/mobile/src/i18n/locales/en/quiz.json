@@ -73,6 +73,7 @@
     "finish": "Finish",
     "grading": "Grading…",
     "reference": "Answer: {{answer}}",
+    "modelAnswer": "Model answer",
     "grade": "Grade this answer",
     "length": {
       "count": "{{chars, number}} / {{max, number}}",

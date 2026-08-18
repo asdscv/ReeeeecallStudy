@@ -73,6 +73,7 @@
     "finish": "Selesai",
     "grading": "Menilai…",
     "reference": "Jawaban: {{answer}}",
+    "modelAnswer": "Contoh jawaban",
     "grade": "Nilai jawaban ini",
     "length": {
       "count": "{{chars, number}} / {{max, number}} karakter",

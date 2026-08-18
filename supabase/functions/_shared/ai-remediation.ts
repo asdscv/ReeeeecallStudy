@@ -45,7 +45,9 @@ export type RemediationAction = typeof REMEDIATION_ACTIONS[number]
  *
  * Widen this ONLY together with the thing that makes the action honest.
  */
-export const SERVED_REMEDIATION_ACTIONS = ['explain', 'hint', 'compare', 'diagnose'] as const
+// 262: `hint` 를 뺐습니다. 화면에 누를 데가 한 번도 없었는데 인증된 호출자면 과금됐습니다 —
+// 값이 얼마든 그건 지갑에 난 구멍이고, 모범답안이 생긴 지금 존재 이유도 겹칩니다.
+export const SERVED_REMEDIATION_ACTIONS = ['explain', 'compare', 'diagnose'] as const
 
 export interface RemediationRefs {
   action: RemediationAction

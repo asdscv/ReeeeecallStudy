@@ -312,6 +312,18 @@ export const ESSAY_MENTIONS_PER_CRITERION = 3
 export const ESSAY_WEIGHT_TOTAL = 100
 
 export const MAX_QUESTION_CHARS = 400
+
+/**
+ * 모범답안의 상한.
+ *
+ * 채점이 끝난 뒤에만 보여 주는 글입니다. 서술형에서 학습자가 받는 것이 점수와 지적뿐이면
+ * "그럼 뭐라고 썼어야 하나"에 답할 것이 없고, 그 답을 다시 사게 만드는 것(해설 $0.03)은
+ * 이미 산 문항이 못 한 일을 또 파는 것입니다.
+ *
+ * 600자인 이유는 출력 예산입니다. 한 번의 호출이 서술형 3문항까지 만들고(`MAX_QUIZ_BATCH`),
+ * 문항당 600자면 최악이 1,800자 — 문항·루브릭까지 합쳐 `OUTPUT_CAP.quiz_generate` 안쪽입니다.
+ */
+export const MODEL_ANSWER_MAX_CHARS = 600
 export const MAX_DISTRACTOR_CHARS = 200
 /** A span covering the whole essay is not evidence of anything. */
 export const MAX_SPAN_CHARS = 200
@@ -696,6 +708,14 @@ export interface QuizItemEssay {
   readonly criteria: readonly EssayCriterion[]
   /** The card's answer. What the grader compares against; shown to the learner after they submit. */
   readonly reference: string
+  /**
+   * 모범답안. 채점 뒤에만 보여 줍니다.
+   *
+   * **없을 수 있습니다.** 모델이 못 쓰거나 검사를 통과 못 하면 이 필드만 버리고 문항은 그대로
+   * 살립니다 — 모범답안 하나 때문에 문항을 떨어뜨리면, 이 저장소가 이미 두 번 겪은
+   * "검증이 너무 빡세서 아무것도 안 남는" 실패를 세 번째로 만드는 것입니다.
+   */
+  readonly modelAnswer: string | null
 }
 
 export type QuizItem = QuizItemMultipleChoice | QuizItemShortAnswer | QuizItemEssay
@@ -1181,11 +1201,32 @@ export function validateEssayGeneration(
     items.push({
       type: 'essay', itemId, cardId, question, lengthBand: entry.lengthBand,
       reference: card.answerText,
+      // 모범답안은 **문항을 떨어뜨리지 않습니다.** 못 쓰거나 검사에 걸리면 null 로 두고 문항은
+      // 그대로 살립니다 — 있으면 좋은 것 하나 때문에 이미 값을 치를 만한 문항을 버릴 이유가
+      // 없습니다.
+      modelAnswer: essayModelAnswer(entry.modelAnswer),
       criteria: renormalizeWeights(kept).map((c, i) => ({ id: `${itemId}:${i}`, ...c })),
     })
   }
 
   return outcome(items, dropped, sources.length)
+}
+
+/**
+ * 모범답안으로 쓸 수 있는 글인가.
+ *
+ * 통과 못 하면 `null` 입니다 — 문항은 그대로 나갑니다. 검사는 셋뿐입니다: 문자열이고,
+ * 비어 있지 않고, 상한 안이고, 우리 JSON 을 베껴 쓰지 않았을 것. 카드에 대한 근거 검사는
+ * 일부러 하지 않습니다 — 모범답안은 카드를 **설명하는** 글이라 카드 문자열을 그대로 담고
+ * 있을 이유가 없고, 그걸 요구했다가 서술형이 통째로 비었던 적이 있습니다(`ungrounded_mention`).
+ */
+function essayModelAnswer(raw: unknown): string | null {
+  if (typeof raw !== 'string') return null
+  const text = raw.trim()
+  if (text === '') return null
+  if (text.length > MODEL_ANSWER_MAX_CHARS) return null
+  if (leaksSchemaWord(text)) return null
+  return text
 }
 
 /** Largest-remainder rescale to `ESSAY_WEIGHT_TOTAL`, so integer weights still sum exactly. */
