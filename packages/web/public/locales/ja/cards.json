@@ -17,5 +17,8 @@
   "saving": "保存中...",
   "edit": "編集",
   "add": "追加",
-  "addAnother": "保存して続けて追加"
+  "addAnother": "保存して続けて追加",
+  "form": {
+    "length": "{{chars, number}} / {{max, number}}文字"
+  }
 }

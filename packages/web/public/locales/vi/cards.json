@@ -17,5 +17,8 @@
   "saving": "Đang lưu...",
   "edit": "Sửa",
   "add": "Thêm",
-  "addAnother": "Lưu và tạo thẻ khác"
+  "addAnother": "Lưu và tạo thẻ khác",
+  "form": {
+    "length": "{{chars, number}} / {{max, number}} ký tự"
+  }
 }
