@@ -16,18 +16,21 @@ import { fileURLToPath } from 'node:url'
 const here = dirname(fileURLToPath(import.meta.url))
 const src = readFileSync(join(here, '../../../../../supabase/functions/ai-generate/index.ts'), 'utf8')
 
+/** 채우기 블록 전체. 끝은 그다음 주석 블록(`The drop reasons ARE`)이 시작하는 자리입니다. */
 const topUp = (() => {
   const i = src.indexOf('outcome.servable && outcome.items.length < sources.length')
   expect(i).toBeGreaterThan(-1)
-  return src.slice(i, i + 2600)
+  const end = src.indexOf('The drop reasons ARE', i)
+  expect(end).toBeGreaterThan(i)
+  return src.slice(i, end)
 })()
 
 describe('보충 호출', () => {
   it('빠진 카드만 다시 물어본다', () => {
     // 전부 다시 물어보면 이미 만든 문항까지 다시 만들고, 중복이 저장됩니다.
     expect(topUp).toMatch(/sources\.filter\(\(s\) => !done\.has\(s\.cardId\)\)/)
-    expect(topUp).toMatch(/promptFor\(missing\)/)
-    expect(topUp).toMatch(/validateFor\(g2\.json, missing\)/)
+    expect(topUp).toMatch(/promptFor\(subset\)/)
+    expect(topUp).toMatch(/validateFor\(g2\.json, subset\)/)
   })
 
   it('토큰을 합친다 — 두 번 부른 원가가 한 번으로 기록되면 마진이 거짓이 된다', () => {
@@ -42,15 +45,34 @@ describe('보충 호출', () => {
 
   it('보충이 실패해도 첫 판을 잃지 않는다', () => {
     // 덤으로 하는 일이 본체를 죽이면 안 됩니다.
-    expect(topUp).toMatch(/catch \(topUpError\)/)
-    expect(topUp).toMatch(/keeping the first pass/)
+    expect(topUp).toMatch(/catch \(fillError\)/)
+    expect(topUp).toMatch(/keeping what we have/)
   })
 
-  it('한 번만 한다', () => {
-    // 두 번째까지 못 만든 카드는 뽑기 운이 아니라 유형이 안 맞는 것이고, 그건 정직하게
-    // dropped 로 돌려주는 편이 맞습니다.
-    const loops = topUp.match(/\b(for|while)\s*\(/g) ?? []
-    expect(loops).toHaveLength(0)
+  it('두 단계다 — 같은 카드 재시도, 그다음 대체 카드', () => {
+    // 학습자가 고른 카드를 지키는 쪽이 먼저입니다. 그래도 안 되면 덱의 다른 적격 카드로
+    // 바꿉니다 — 어떤 카드는 그 유형에 정말 안 맞고(한 단어짜리 카드로 서술형 루브릭을
+    // 세울 수 없습니다), 그때 모자란 채로 내놓는 것은 학습자가 고른 수를 포기하는 것입니다.
+    expect(topUp).toMatch(/pass === 0/)
+    expect(topUp).toMatch(/quiz_substitute_cards/)
+    expect(topUp).toMatch(/pass < 2/)
+  })
+
+  it('적격성 규칙을 다시 쓰지 않는다', () => {
+    // 엣지에서 cards 를 직접 골라 오면 규칙의 두 번째 사본이 생기고, 갈라지는 날
+    // "견적에는 세어졌는데 생성에는 안 뽑히는 카드"가 나옵니다(mig 221).
+    expect(topUp).not.toMatch(/from\('cards'\)[\s\S]{0,200}deck_id/)
+  })
+
+  it('요청한 수를 넘기지 않는다', () => {
+    // 대체 카드를 넉넉히 받아 왔을 수 있습니다. 넘겨 만들면 학습자가 고른 수보다 많이
+    // 만들고 많이 청구합니다.
+    expect(topUp).toMatch(/slice\(0, room\)/)
+  })
+
+  it('덱에 남은 카드가 없으면 조용히 멈춘다', () => {
+    // 정직하게 모자란 채로 끝내는 편이, 던져서 이미 만든 문항까지 잃는 것보다 낫습니다.
+    expect(topUp).toMatch(/ids\.length === 0\) break/)
   })
 
   it('배달된 수만큼만 정산한다', () => {

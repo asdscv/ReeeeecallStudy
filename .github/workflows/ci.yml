@@ -413,6 +413,7 @@ jobs:
             supabase/tests/model_answer_test.sql \
             supabase/tests/ledger_reconciles_test.sql \
             supabase/tests/quiz_length_test.sql \
+            supabase/tests/quiz_substitutes_test.sql \
             supabase/tests/ledger_reason_test.sql \
             supabase/tests/usage_history_test.sql \
             supabase/tests/quiz_item_feedback_test.sql \
