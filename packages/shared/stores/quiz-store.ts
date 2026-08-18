@@ -231,6 +231,13 @@ export interface QuizRunItem {
   rubric: unknown[] | null
   reference_answer: string | null
   /**
+   * 서술형 모범답안. 채점 뒤에만 옵니다.
+   *
+   * NULL 이 정상입니다 — 서술형이 아니거나(다른 유형은 열 자체가 비어 있습니다), 모델이
+   * 쓰지 못했거나, 262 이전에 만들어진 문항이면 없습니다. 화면은 없는 것을 그리지 않습니다.
+   */
+  model_answer?: string | null
+  /**
    * The learner's own submission — `{ text }` for written answers, `{ choice }` for multiple
    * choice. Null until they answer.
    *

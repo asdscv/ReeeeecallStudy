@@ -73,6 +73,7 @@
     "finish": "完成",
     "grading": "批改中…",
     "reference": "答案：{{answer}}",
+    "modelAnswer": "参考答案",
     "grade": "批改这个答案",
     "length": {
       "count": "{{chars, number}} / {{max, number}} 字",

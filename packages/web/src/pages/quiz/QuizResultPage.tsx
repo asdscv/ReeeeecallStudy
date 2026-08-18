@@ -96,6 +96,15 @@ export function QuizResultPage() {
               <QuizVerdictBadge item={{ answered: item.answered, score: item.score }} size="sm" />
             </div>
 
+            {/* 모범답안. 채점 뒤에만 서버가 내려 줍니다(mig 262) — 점수와 지적만 받고
+                "그럼 뭐라고 썼어야 하나"를 못 보는 것이 서술형에서 가장 답답한 자리였습니다. */}
+            {item.model_answer && (
+              <div className="mt-2 p-2 rounded-lg bg-muted/40 border border-border">
+                <p className="text-xs font-medium text-content-secondary">{t('run.modelAnswer')}</p>
+                <p className="text-sm text-foreground whitespace-pre-wrap mt-0.5">{item.model_answer}</p>
+              </div>
+            )}
+
             {item.feedback && (
               <div className="mt-2">
                 <QuizFeedback

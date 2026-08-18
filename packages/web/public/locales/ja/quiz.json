@@ -73,6 +73,7 @@
     "finish": "終わる",
     "grading": "採点中…",
     "reference": "答え: {{answer}}",
+    "modelAnswer": "模範解答",
     "grade": "この解答を採点",
     "length": {
       "count": "{{chars, number}} / {{max, number}}文字",

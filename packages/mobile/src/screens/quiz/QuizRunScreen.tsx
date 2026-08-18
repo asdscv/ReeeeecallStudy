@@ -332,6 +332,17 @@ export function QuizRunScreen() {
                   {t('run.reference', { answer: item.reference_answer })}
                 </Text>
               )}
+              {/* 모범답안. 채점 뒤에만 옵니다(mig 262). */}
+              {item.model_answer && (
+                <View style={{ marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: theme.colors.border }}>
+                  <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, fontWeight: '600' }]}>
+                    {t('run.modelAnswer')}
+                  </Text>
+                  <Text style={[theme.typography.body, { color: theme.colors.text, marginTop: 2 }]}>
+                    {item.model_answer}
+                  </Text>
+                </View>
+              )}
             </View>
           )}
 

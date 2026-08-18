@@ -105,6 +105,17 @@ export function QuizResultScreen() {
                     {t('run.reference', { answer: item.reference_answer })}
                   </Text>
                 )}
+                {/* 모범답안. 채점 뒤에만 옵니다(mig 262). */}
+                {item.model_answer && (
+                  <View style={{ marginTop: 6 }}>
+                    <Text style={[theme.typography.caption, { color: theme.colors.textSecondary, fontWeight: '600' }]}>
+                      {t('run.modelAnswer')}
+                    </Text>
+                    <Text style={[theme.typography.body, { color: theme.colors.text, marginTop: 2 }]}>
+                      {item.model_answer}
+                    </Text>
+                  </View>
+                )}
               </View>
               {/* The verdict, not a percentage. `100%` and `0%` on a single item are a verdict
                   wearing a number's clothes. */}

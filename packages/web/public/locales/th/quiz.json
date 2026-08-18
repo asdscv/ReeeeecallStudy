@@ -73,6 +73,7 @@
     "finish": "จบ",
     "grading": "กำลังตรวจ…",
     "reference": "คำตอบ: {{answer}}",
+    "modelAnswer": "คำตอบตัวอย่าง",
     "grade": "ตรวจคำตอบนี้",
     "length": {
       "count": "{{chars, number}} / {{max, number}} ตัวอักษร",
