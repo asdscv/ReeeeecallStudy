@@ -113,7 +113,7 @@
     "QUIZ_NOT_ENOUGH_CARDS": "这个牌组可出题的卡片不够。",
     "AI_RATE_CAP": "已达今日请求上限。请明天再试。",
     "FORBIDDEN": "你没有访问权限。",
-    "AI_EMPTY_RESULT": "没有生成可用的题目，因此未扣费。请重试。",
+    "AI_EMPTY_RESULT": "未能生成题目。未产生任何费用。请再试一次。",
     "QUIZ_UNGRADEABLE": "无法批改这个答案——内容为空或过长。",
     "QUIZ_GRADE_REFUSED": "批改失败，未向你扣费。请重试。",
     "QUIZ_ITEM_GONE": "这道题已不存在。",

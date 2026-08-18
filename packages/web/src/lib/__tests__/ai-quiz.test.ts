@@ -478,7 +478,12 @@ const input = (over: Partial<QuizGradeInput> = {}): QuizGradeInput => ({
 describe('gradeGate', () => {
   it('grades nothing for free rather than paying a model to read an empty box', () => {
     expect(gradeGate('short_answer', '   ')).toEqual({ ok: false, refusal: 'empty_response' })
-    expect(gradeGate('essay', 'too short')).toEqual({ ok: false, refusal: 'empty_response' })
+    // 짧은 서술형 답안은 **거절하지 않습니다**. 40자 하한이 있었고, 그건 무엇이 답인지를
+    // 우리가 정한 것이었습니다. 그 하한이 실제로 한 일은 모델 호출 전 거절이었고, 화면에는
+    // "처리하지 못했어요 · 다시 시도"로 나와 같은 답으로는 영원히 실패했습니다. 세 단어짜리
+    // 답은 루브릭이 낮게 채점하면 될 진짜 답입니다.
+    expect(gradeGate('essay', 'too short')).toEqual({ ok: true })
+    expect(gradeGate('essay', '   ')).toEqual({ ok: false, refusal: 'empty_response' })
   })
 
   it('refuses an over-length response instead of truncating it', () => {

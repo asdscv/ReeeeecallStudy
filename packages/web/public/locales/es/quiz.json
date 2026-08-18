@@ -113,7 +113,7 @@
     "QUIZ_NOT_ENOUGH_CARDS": "Este mazo no tiene suficientes tarjetas que sirvan para preguntar.",
     "AI_RATE_CAP": "Has llegado al límite de peticiones de hoy. Inténtalo mañana.",
     "FORBIDDEN": "No tienes acceso a eso.",
-    "AI_EMPTY_RESULT": "Las preguntas no salieron utilizables, así que no se te cobró. Inténtalo otra vez.",
+    "AI_EMPTY_RESULT": "No pudimos crear las preguntas. No se ha cobrado nada. Inténtalo de nuevo.",
     "QUIZ_UNGRADEABLE": "Esta respuesta no se puede corregir: está vacía o es demasiado larga.",
     "QUIZ_GRADE_REFUSED": "La corrección falló y no se te cobró. Inténtalo otra vez.",
     "QUIZ_ITEM_GONE": "Esta pregunta ya no existe.",

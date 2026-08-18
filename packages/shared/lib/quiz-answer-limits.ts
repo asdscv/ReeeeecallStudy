@@ -28,10 +28,18 @@ export const MAX_ANSWER_CHARS: Readonly<Record<GradedQuizType, number>> = {
   essay: 2000,
 }
 
-/** Below this there is nothing to grade, and no model is called — so nothing is charged. */
+/**
+ * Below this there is nothing to grade, and no model is called — so nothing is charged.
+ *
+ * ONE character for both. Essay used to demand 40, which was us deciding what counts as an
+ * answer; it is not our call. The learner writes what they write and the rubric grades it — a
+ * three-word answer scores badly, which is information, and no length rule is needed to produce
+ * that verdict. Mirrors `MIN_GRADEABLE_CHARS` in `supabase/functions/_shared/ai-quiz.ts`, where
+ * the header records what the old floor actually did to people who wrote short true answers.
+ */
 export const MIN_ANSWER_CHARS: Readonly<Record<GradedQuizType, number>> = {
   short: 1,
-  essay: 40,
+  essay: 1,
 }
 
 /** How close to the ceiling before the count is worth drawing attention to. */

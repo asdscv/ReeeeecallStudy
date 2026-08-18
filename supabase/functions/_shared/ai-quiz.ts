@@ -319,15 +319,51 @@ export const MAX_GAPS_PER_GRADE = 3
 /** How many span candidates are examined before the rest are ignored. Bounds work, not quality. */
 export const MAX_SPANS_CONSIDERED = 16
 
-/** The learner controls this text, and therefore our token bill. Rejected over the cap, not truncated. */
+/**
+ * The learner controls this text, and therefore our token bill. Rejected over the cap, not
+ * truncated — grading the first 2,000 characters of a 4,000-character essay grades something
+ * they did not write, and charges them for it.
+ *
+ * The cap is what makes the FLAT price safe, so it is worth knowing what the worst case actually
+ * costs. Measured against the real grader (same prompt, same model, a three-criterion rubric,
+ * Korean text — the densest case, since Korean spends more tokens per character than English):
+ *
+ *        300 chars   input   860 / output 162 tokens   $0.000458
+ *      1,000 chars   input 1,180 / output 195          $0.000588
+ *      2,000 chars   input 1,634 / output 195          $0.000701   ← the cap
+ *      4,000 chars   input 2,543 / output 162          $0.000879
+ *
+ * At the cap the grade costs $0.0007 against a $0.10 price — 143x, where `price-floor.test.ts`
+ * demands 10x. Answer length barely moves it: the rubric, the question and the system prompt
+ * dominate, so doubling the cap would still leave 114x. The cap is therefore about bounding a
+ * pathological paste, not about the price.
+ */
 export const MAX_LEARNER_CHARS: Readonly<Record<Exclude<QuizType, 'multiple_choice'>, number>> = {
   short_answer: 300,
   essay: 2000,
 }
-/** Below this there is nothing to grade, and no model call is made. Zero cost, zero charge. */
+/**
+ * Below this there is nothing to grade, and no model call is made. Zero cost, zero charge.
+ *
+ * ONE character. Not forty.
+ *
+ * Essay used to require 40, and that was us deciding what counts as an answer. It is not our
+ * call: the learner writes what they write and the grader grades it. A three-word answer to a
+ * three-criterion rubric is a real answer that scores badly — which is information — and the
+ * rubric produces that verdict without any help from a length rule.
+ *
+ * What the 40 actually produced was worse than a low score. `gradeGate` refuses before the model
+ * is called, the refusal reached the screen as "처리하지 못했어요 · 다시 시도" (see `refusalFrom`),
+ * and the retry could never work because the answer was unchanged. A learner who wrote a short
+ * true answer was told the app was broken, forever.
+ *
+ * The floor stays at 1 so that an EMPTY submission still costs nothing: there is no answer to
+ * grade in an empty box, and that is a fact about the string rather than a judgement about the
+ * learner.
+ */
 export const MIN_GRADEABLE_CHARS: Readonly<Record<Exclude<QuizType, 'multiple_choice'>, number>> = {
   short_answer: 1,
-  essay: 40,
+  essay: 1,
 }
 
 /**

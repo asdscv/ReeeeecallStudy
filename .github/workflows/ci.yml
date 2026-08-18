@@ -412,6 +412,7 @@ jobs:
             supabase/tests/usage_history_test.sql \
             supabase/tests/quiz_item_feedback_test.sql \
             supabase/tests/empty_quiz_set_test.sql \
+            supabase/tests/card_size_test.sql \
             supabase/tests/quiz_set_history_test.sql \
             supabase/tests/remediation_replay_test.sql \
             supabase/tests/unpriced_model_test.sql; do
