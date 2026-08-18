@@ -113,7 +113,7 @@
     "QUIZ_NOT_ENOUGH_CARDS": "Bộ thẻ này không đủ thẻ để ra đề.",
     "AI_RATE_CAP": "Bạn đã đạt giới hạn yêu cầu hôm nay. Hãy thử lại vào ngày mai.",
     "FORBIDDEN": "Bạn không có quyền truy cập.",
-    "AI_EMPTY_RESULT": "Không tạo được câu hỏi dùng được nên bạn không bị tính phí. Hãy thử lại.",
+    "AI_EMPTY_RESULT": "Chúng tôi chưa tạo được câu hỏi. Bạn không bị tính phí. Vui lòng thử lại.",
     "QUIZ_UNGRADEABLE": "Không chấm được câu trả lời này — nó trống hoặc quá dài.",
     "QUIZ_GRADE_REFUSED": "Chấm bài không thành công và bạn không bị tính phí. Hãy thử lại.",
     "QUIZ_ITEM_GONE": "Câu hỏi này không còn nữa.",

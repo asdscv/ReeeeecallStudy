@@ -62,10 +62,18 @@ describe('what the learner is told while typing', () => {
     expect(r.gradeable).toBe(false)
   })
 
-  it('distinguishes too short from too long', () => {
-    // The exact failure of today's message, which says "비어 있거나 너무 길어요" for both.
-    expect(answerLength('짧음', 'essay').state).toBe('too_short')
+  it('짧다고 막지 않는다 — 답안 길이는 학습자가 정한다', () => {
+    // 서술형에 40자 하한이 있었습니다. 그건 무엇이 답인지를 우리가 정한 것이고, 우리 몫이
+    // 아닙니다. 세 단어짜리 답은 루브릭에서 낮은 점수를 받는 진짜 답이고, 그 판정에 길이
+    // 규칙은 필요 없습니다. 하한이 실제로 한 일은 채점 거절이었고, 그것이 화면에는
+    // "처리하지 못했어요 · 다시 시도"로 나와 같은 답으로 영원히 실패했습니다.
+    expect(answerLength('짧음', 'essay').state).not.toBe('too_short')
+    expect(answerLength('짧음', 'essay').gradeable).toBe(true)
+  })
+
+  it('너무 긴 것은 여전히 막는다 — 안 쓴 글을 채점하고 청구할 수는 없다', () => {
     expect(answerLength('x'.repeat(2001), 'essay').state).toBe('too_long')
+    expect(answerLength('x'.repeat(2001), 'essay').gradeable).toBe(false)
   })
 
   it('accepts the boundary values the server accepts', () => {

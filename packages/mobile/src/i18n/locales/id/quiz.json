@@ -113,7 +113,7 @@
     "QUIZ_NOT_ENOUGH_CARDS": "Dek ini tidak punya cukup kartu yang bisa dijadikan soal.",
     "AI_RATE_CAP": "Anda mencapai batas permintaan hari ini. Coba lagi besok.",
     "FORBIDDEN": "Anda tidak punya akses ke sana.",
-    "AI_EMPTY_RESULT": "Soal yang dihasilkan tidak layak pakai, jadi Anda tidak dikenakan biaya. Coba lagi.",
+    "AI_EMPTY_RESULT": "Kami tidak berhasil membuat soalnya. Tidak ada biaya yang dikenakan. Coba lagi.",
     "QUIZ_UNGRADEABLE": "Jawaban ini tidak bisa dinilai — kosong, atau terlalu panjang.",
     "QUIZ_GRADE_REFUSED": "Penilaian gagal dan Anda tidak dikenakan biaya. Coba lagi.",
     "QUIZ_ITEM_GONE": "Soal ini sudah tidak ada.",

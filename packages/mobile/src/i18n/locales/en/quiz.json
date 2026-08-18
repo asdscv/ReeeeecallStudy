@@ -113,7 +113,7 @@
     "QUIZ_NOT_ENOUGH_CARDS": "This deck does not have enough quizzable cards.",
     "AI_RATE_CAP": "You have reached today's request limit. Try again tomorrow.",
     "FORBIDDEN": "You do not have access to that.",
-    "AI_EMPTY_RESULT": "The questions did not come out usable, so you were not charged. Try again.",
+    "AI_EMPTY_RESULT": "We could not write the questions. Nothing was charged. Please try again.",
     "QUIZ_UNGRADEABLE": "This answer cannot be graded — it is empty, or too long.",
     "QUIZ_GRADE_REFUSED": "Grading did not work, and you were not charged. Try again.",
     "QUIZ_ITEM_GONE": "This question no longer exists.",
