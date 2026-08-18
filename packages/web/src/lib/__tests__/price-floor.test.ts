@@ -45,7 +45,10 @@ const MEASURED: Record<string, { in: number; out: number; label: string }> = {
   essayQuestion: { in: 353, out: 180, label: '서술형 문항 1개' },
   gradeShort: { in: 816, out: 42, label: '단답 채점 1건' },
   gradeEssay: { in: 945, out: 242, label: '서술형 채점 1건' },
-  remediation: { in: 977, out: 292, label: '설명 1건' },
+  // 261: 프로덕션 `ai_cost_ledger` 에서 다시 잰 값입니다(실제 계정으로 눌러 본 세 호출).
+  remediation: { in: 1168, out: 419, label: '해설 1건' },
+  remediationHint: { in: 620, out: 378, label: '힌트 1건' },
+  diagnosis: { in: 1348, out: 133, label: '진단 1건' },
   card: { in: 87, out: 136, label: '카드 1장' },
 }
 
@@ -62,7 +65,11 @@ const PRICE: Record<keyof typeof MEASURED, number> = {
   // already stored with the question and the model only returns a level per criterion.
   gradeShort: 10_000,     // 2 units x 5,000
   gradeEssay: 20_000,     // 4 units
-  remediation: 500_000,   // fixed price, x10 in mig 230
+  // 261 이 셋을 사다리 안으로 데려왔습니다. 230 이 값을 열 배로 올린 뒤 원가를 다시 잰 적이
+  // 없어서 해설 644배 · 힌트 858배 · 진단 588배로 떠 있었습니다(나머지 사다리는 29~143배).
+  remediation: 30_000,       // $0.50 → $0.03,  원가의 39배
+  remediationHint: 20_000,   // $0.50 → $0.02,  원가의 34배 — 해설보다 짧은 출력
+  diagnosis: 50_000,         // $0.30 → $0.05,  원가의 98배
   card: 10_000,           // fixed price, back to a cent in mig 249
 }
 
