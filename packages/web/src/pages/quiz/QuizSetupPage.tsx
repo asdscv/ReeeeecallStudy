@@ -19,7 +19,13 @@ const TYPES: QuizQuestionType[] = ['mcq', 'short', 'essay']
 // 그 위는 스키마가 아니라 생성 구조 이야기입니다 — 서술형 50문항은 17배치입니다.
 // `quiz-count-options.test.ts` 가 이 목록을 마이그레이션의 상한에 붙들어 둡니다.
 const COUNTS = [4, 6, 8, 10, 12, 16, 20]
-const MAX_COUNT = 50
+// 직접 입력의 상한. **칩과 같은 숫자여야 합니다.**
+//
+// 칩은 264 에서 20 까지로 맞췄는데 이 상자만 50 으로 남아 있었습니다 — 시뮬레이터에서 화면을
+// 보고 찾았습니다("직접 입력 1–50"). 21 을 타이핑하면 `create_quiz_set` 이 원시 제약 위반
+// (23514)으로 거절합니다. 칩에서 고친 defect 를 상자가 그대로 갖고 있었던 것입니다.
+// `quiz-count-options.test.ts` 가 이 값을 마이그레이션의 상한에 붙들어 둡니다.
+const MAX_COUNT = 20
 
 /**
  * Pick a scope and a type, see what it costs, confirm.
