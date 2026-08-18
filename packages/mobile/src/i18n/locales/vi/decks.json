@@ -152,7 +152,8 @@
     "errorTitle": "Lỗi",
     "emptyError": "Cần điền ít nhất một trường",
     "saveError": "Không thể lưu thẻ",
-    "noTemplateError": "Không có mẫu thẻ nào khả dụng."
+    "noTemplateError": "Không có mẫu thẻ nào khả dụng.",
+    "length": "{{chars, number}} / {{max, number}} ký tự"
   },
   "quickCreate": {
     "button": "Tạo nhanh",

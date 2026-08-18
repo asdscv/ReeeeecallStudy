@@ -152,7 +152,8 @@
     "errorTitle": "エラー",
     "emptyError": "少なくとも1つの項目を入力してください",
     "saveError": "カードの保存に失敗しました",
-    "noTemplateError": "利用可能なカードテンプレートがありません。"
+    "noTemplateError": "利用可能なカードテンプレートがありません。",
+    "length": "{{chars, number}} / {{max, number}}文字"
   },
   "quickCreate": {
     "button": "かんたん作成",

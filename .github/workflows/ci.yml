@@ -414,6 +414,7 @@ jobs:
             supabase/tests/empty_quiz_set_test.sql \
             supabase/tests/card_size_test.sql \
             supabase/tests/length_limits_test.sql \
+            supabase/tests/card_chars_test.sql \
             supabase/tests/quiz_set_history_test.sql \
             supabase/tests/remediation_replay_test.sql \
             supabase/tests/unpriced_model_test.sql; do

@@ -11,6 +11,8 @@ import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
 import { useCardStore } from '@reeeeecall/shared/stores/card-store'
 import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
 import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
+import { cardLength } from '@reeeeecall/shared/lib/card-content-limits'
+import { testProps } from '../utils/testProps'
 import type { CardTemplate } from '@reeeeecall/shared/types/database'
 import { getMobileSupabase } from '../adapters'
 import type { DecksStackParamList } from '../navigation/types'
@@ -107,6 +109,15 @@ export function CardEditScreen() {
   }
 
   const hasContent = Object.values(fieldValues).some((v) => v.trim())
+  /**
+   * 카드 전체 글자수 — 지금 몇 자 / 몇 자까지.
+   *
+   * 한도는 카드 한 장에 걸립니다(필드별이면 필드를 늘려 우회됩니다). 이미지 필드는 데이터
+   * URL 이라 혼자 수만 자이고 학습자가 쓴 글이 아니므로 세지 않습니다.
+   */
+  const cardChars = cardLength(
+    fields.filter((f) => f.type !== 'image').map((f) => fieldValues[f.key] ?? ''),
+  )
 
   /**
    * Resolve a non-empty template id for new cards (save-time fallback).
@@ -202,6 +213,19 @@ export function CardEditScreen() {
           </Text>
         )}
 
+        {/* 지금 몇 자 / 몇 자까지. 저장을 누른 뒤에 알게 되는 한도는 한도가 아닙니다. */}
+        <Text
+          style={[theme.typography.caption, {
+            textAlign: 'right',
+            color: cardChars.state === 'too_long' ? theme.colors.error
+              : cardChars.state === 'near_limit' ? theme.colors.warning
+                : theme.colors.textTertiary,
+          }]}
+          {...testProps('card-length')}
+        >
+          {t('cardEdit.length', { chars: cardChars.count, max: cardChars.max })}
+        </Text>
+
         {/* Dynamic fields from template */}
         {fields.length > 0 ? (
           fields
@@ -257,7 +281,7 @@ export function CardEditScreen() {
           title={isEditing ? t('cardEdit.save') : t('cardEdit.add')}
           onPress={handleSave}
           loading={saving}
-          disabled={!hasContent}
+          disabled={!hasContent || !cardChars.savable}
         />
 
         {/* Add another button (create mode only) */}
@@ -300,7 +324,7 @@ export function CardEditScreen() {
               }
             }}
             loading={saving}
-            disabled={!hasContent}
+            disabled={!hasContent || !cardChars.savable}
           />
         )}
 

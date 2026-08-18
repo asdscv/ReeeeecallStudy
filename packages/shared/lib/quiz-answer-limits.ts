@@ -77,6 +77,9 @@ export function answerLength(text: string, type: GradedQuizType): AnswerLength {
   const max = MAX_ANSWER_CHARS[type]
   const min = MIN_ANSWER_CHARS[type]
 
+  // `too_short` 는 이제 도달할 수 없는 상태입니다. 두 유형 모두 하한이 1이고, 0은 위에서
+  // `empty` 로 잡힙니다. 타입에는 남겨 둡니다 — 하한이 다시 생길 수 있고, 그때 이 한 줄이
+  // 다시 살아나는 편이 화면 쪽 분기를 되살리는 것보다 낫습니다.
   const state: AnswerLengthState = count === 0 ? 'empty'
     : count > max ? 'too_long'
       : count < min ? 'too_short'

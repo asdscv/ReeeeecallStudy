@@ -17,5 +17,8 @@
   "saving": "Guardando...",
   "edit": "Editar",
   "add": "Añadir",
-  "addAnother": "Guardar y crear otra"
+  "addAnother": "Guardar y crear otra",
+  "form": {
+    "length": "{{chars, number}} / {{max, number}} caracteres"
+  }
 }

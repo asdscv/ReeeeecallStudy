@@ -152,7 +152,8 @@
     "errorTitle": "오류",
     "emptyError": "최소 한 개의 필드를 입력해 주세요",
     "saveError": "카드 저장에 실패했습니다",
-    "noTemplateError": "사용 가능한 카드 템플릿이 없습니다."
+    "noTemplateError": "사용 가능한 카드 템플릿이 없습니다.",
+    "length": "{{chars, number}} / {{max, number}}자"
   },
   "quickCreate": {
     "button": "간편 만들기",

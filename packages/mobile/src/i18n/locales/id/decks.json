@@ -152,7 +152,8 @@
     "errorTitle": "Kesalahan",
     "emptyError": "Setidaknya satu bidang harus diisi",
     "saveError": "Gagal menyimpan kartu",
-    "noTemplateError": "Tidak ada templat kartu yang tersedia."
+    "noTemplateError": "Tidak ada templat kartu yang tersedia.",
+    "length": "{{chars, number}} / {{max, number}} karakter"
   },
   "quickCreate": {
     "button": "Buat Cepat",

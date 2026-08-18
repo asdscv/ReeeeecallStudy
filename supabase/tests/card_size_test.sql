@@ -1,14 +1,14 @@
 -- ============================================================================
--- 카드 한 장의 전체 텍스트에 상한이 있어야 한다.
+-- 바이트 한도는 글자수 한도 **뒤에** 서 있어야 한다.
 --
--- 카드는 프롬프트에 통째로 들어갑니다. 생성 한 번에 최대 열 장이니, 카드 크기가 곧 입력
--- 토큰이고 곧 원가입니다. 값은 문항당 고정이라 그 비용은 전부 우리 쪽입니다.
+-- 카드에는 두 한도가 있습니다. 학습자가 보는 것은 글자수(4,000)이고, 바이트(16,000)는 그
+-- 뒤에서 저장을 지킵니다. 순서가 중요합니다 — 바이트가 먼저 걸리면 한국어 학습자가 영어
+-- 학습자보다 3분의 1 지점에서 막히고, 화면이 보여준 숫자와 실제로 막히는 지점이 달라집니다.
 --
--- 한도는 카드 **전체**에 겁니다. 필드별로 걸면 필드를 늘려 우회되고, 앞/뒷면으로 나누면 어느
--- 필드가 어느 면인지를 템플릿 레이아웃이 정하므로 템플릿 편집만으로 한도를 넘나듭니다.
---
--- 프로덕션 377,099장 기준 평균 264B · p99 542B · 최대 3,132B · 4KB 초과 0장이라, 8,000 은
--- 오늘 아무도 걸리지 않는 숫자입니다.
+-- 텍스트만으로는 바이트가 먼저 걸릴 수 없습니다: 4,000자 × 최악 4바이트 = 16,000 이 정확히
+-- 상한입니다. 바이트 한도가 실제로 일하는 경우는 하나뿐이고, 이 파일이 그것을 봅니다 —
+-- **이미지 데이터 URL**. 글자수에서는 세지 않으므로(사진 한 장이 카드를 통째로 막으면 안
+-- 되니까) 저장 크기를 지킬 사람이 바이트 한도밖에 없습니다.
 -- ============================================================================
 \set ON_ERROR_STOP on
 BEGIN;
@@ -20,49 +20,49 @@ DO $$
 DECLARE
   v_uid  uuid := 'dc000000-0000-4000-8000-000000000001';
   v_tmpl uuid; v_deck uuid;
-  v_big  text;
 BEGIN
   SELECT id INTO v_tmpl FROM card_templates WHERE user_id = v_uid AND name = '영어 단어';
   IF v_tmpl IS NULL THEN RAISE EXCEPTION 'FAIL: mig 097 seeding did not run'; END IF;
   INSERT INTO decks (user_id, name, default_template_id) VALUES (v_uid, 'size deck', v_tmpl)
     RETURNING id INTO v_deck;
 
-  -- ══ 1. 평범한 카드는 통과한다 ════════════════════════════════════════════
+  -- ══ 1. 평범한 카드 ═══════════════════════════════════════════════════════
   INSERT INTO cards (deck_id, user_id, template_id, field_values)
     VALUES (v_deck, v_uid, v_tmpl,
             '{"field_1":"lend","field_2":"빌려주다","field_3":"lend","field_4":"I lend it"}'::jsonb);
 
-  -- ══ 2. 현존 최대(3,132B)보다 큰 카드도 통과한다 ══════════════════════════
+  -- ══ 2. 보통 크기의 이미지는 통과한다 ═════════════════════════════════════
   --
-  -- 한도는 사람을 막으려는 게 아닙니다. 실제로 있는 가장 큰 카드보다 두 배 넘게 여유가
-  -- 있어야 합니다 — 아니면 오늘 멀쩡한 학습자가 내일 막힙니다.
-  v_big := repeat('가', 2000);
+  -- 데이터 URL 은 글자수에서 안 세므로, 여기서 막히면 사진이 있는 카드가 전부 막힙니다.
   INSERT INTO cards (deck_id, user_id, template_id, field_values)
-    VALUES (v_deck, v_uid, v_tmpl, jsonb_build_object('field_1', 'x', 'field_2', v_big));
+    VALUES (v_deck, v_uid, v_tmpl, jsonb_build_object(
+      'field_1', 'lend', 'field_2', 'data:image/png;base64,' || repeat('A', 10000)));
 
-  -- ══ 3. 병적인 붙여넣기는 막는다 ══════════════════════════════════════════
+  -- ══ 3. 그런데 무한정은 아니다 — 바이트 한도가 그 자리를 지킨다 ═══════════
   --
-  -- 8,000 바이트 초과. 한글은 한 글자 3바이트라 4,000자면 12,000 바이트입니다.
-  BEGIN
-    INSERT INTO cards (deck_id, user_id, template_id, field_values)
-      VALUES (v_deck, v_uid, v_tmpl,
-              jsonb_build_object('field_1', 'x', 'field_2', repeat('가', 4000)));
-    RAISE EXCEPTION 'FAIL: 12KB 짜리 카드가 통과했다 — 생성 한 번에 그 열 장이 프롬프트로 간다';
-  EXCEPTION WHEN check_violation THEN NULL;
-  END;
-
-  -- ══ 4. 필드를 나눠도 합계로 막힌다 ═══════════════════════════════════════
-  --
-  -- 이 단언이 "필드별이 아니라 카드 전체"라는 결정 그 자체입니다. 필드별 한도였다면 여기가
-  -- 통과하고, 그게 곧 우회로입니다.
+  -- 글자수 검사는 이 값을 0자로 셉니다. 그러니 이 카드를 막는 것은 바이트 한도뿐이고,
+  -- 그것이 이 한도가 존재하는 이유 전체입니다.
   BEGIN
     INSERT INTO cards (deck_id, user_id, template_id, field_values)
       VALUES (v_deck, v_uid, v_tmpl, jsonb_build_object(
-        'field_1', repeat('가', 1000), 'field_2', repeat('나', 1000),
-        'field_3', repeat('다', 1000), 'field_4', repeat('라', 1000)));
-    RAISE EXCEPTION 'FAIL: 필드를 넷으로 쪼개니 통과했다 — 한도가 우회된다';
+        'field_1', 'lend', 'field_2', 'data:image/png;base64,' || repeat('A', 20000)));
+    RAISE EXCEPTION 'FAIL: 20KB 짜리 데이터 URL 이 통과했다 — 글자수는 이걸 세지 않는다';
   EXCEPTION WHEN check_violation THEN NULL;
   END;
+
+  -- ══ 4. 그리고 텍스트로는 바이트가 먼저 걸리지 않는다 ═════════════════════
+  --
+  -- 이것이 두 한도의 순서입니다. 4,001자 한글은 12,003바이트로 바이트 한도(16,000) 아래인데도
+  -- 막혀야 합니다 — 막는 주체가 글자수여야 하고, 그래야 화면이 보여준 숫자가 진실입니다.
+  BEGIN
+    INSERT INTO cards (deck_id, user_id, template_id, field_values)
+      VALUES (v_deck, v_uid, v_tmpl, jsonb_build_object('field_1', repeat('가', 4001)));
+    RAISE EXCEPTION 'FAIL: 4,001자가 통과했다';
+  EXCEPTION WHEN check_violation THEN NULL;
+  END;
+  IF octet_length(jsonb_build_object('field_1', repeat('가', 4001))::text) > 16000 THEN
+    RAISE EXCEPTION 'FAIL: 4,001자 한글이 바이트 한도를 넘는다 — 바이트가 먼저 걸린다';
+  END IF;
 
   RAISE NOTICE 'card_size_test: all assertions passed';
 END $$;

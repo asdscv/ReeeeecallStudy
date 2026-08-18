@@ -152,7 +152,8 @@
     "errorTitle": "ข้อผิดพลาด",
     "emptyError": "ต้องกรอกอย่างน้อยหนึ่งช่อง",
     "saveError": "บันทึกการ์ดไม่สำเร็จ",
-    "noTemplateError": "ไม่มีเทมเพลตการ์ดที่ใช้ได้"
+    "noTemplateError": "ไม่มีเทมเพลตการ์ดที่ใช้ได้",
+    "length": "{{chars, number}} / {{max, number}} ตัวอักษร"
   },
   "quickCreate": {
     "button": "สร้างด่วน",
