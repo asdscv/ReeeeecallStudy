@@ -51,6 +51,18 @@ import {
 const ENV = (k: string) => Deno.env.get(k)
 
 // ── Limits ──────────────────────────────────────────────────
+/**
+ * `clientRef` 는 **UUID 여야 합니다.**
+ *
+ * 멱등키로 그대로 `reserve_ai_quiz(p_client_ref uuid)` 에 넘어갑니다. 문자열이기만 하면
+ * 통과시켰더니 캐스트가 SQL 에서 터졌고, 잘못된 요청 하나가 500 AI_METER_ERROR 로 나갔습니다 —
+ * 400 이어야 할 자리입니다. 클라이언트는 `crypto.randomUUID()` 를 보내므로 이 검사로 잃는
+ * 정상 요청은 없습니다.
+ */
+const CLIENT_REF = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+const asClientRef = (v: unknown): string | null =>
+  typeof v === 'string' && CLIENT_REF.test(v) ? v : null
+
 const MAX_TOPIC_LEN = 2000
 const MAX_FIELDS = 12
 const MAX_CARDS_PER_CALL = 25 // matches the client batch size
@@ -450,7 +462,9 @@ const DEFAULT_TEMPERATURE = 0.8
 const OUTPUT_CAP: Record<string, number> = {
   // One field key and a sentence of reasoning. Nothing here should be long.
   quiz_answer_key: 400,
-  quiz_generate: 3000,
+  // 3000 이었습니다. 서술형 3문항이 각자 모범답안(최대 600자)을 더 쓰게 되어 올립니다 —
+  // 잘린 JSON 은 파싱에 실패하고, 그러면 문항이 통째로 안 나옵니다.
+  quiz_generate: 4000,
   // Essay grading writes a verdict, a per-criterion line and what the answer failed to
   // mention. 800 truncated that into the thin feedback the owner reported; measured output for
   // a full essay verdict is ~1,100 tokens.
@@ -1082,7 +1096,7 @@ Deno.serve(async (req) => {
 
     if (kind === 'quiz_generate') {
       const setId = typeof body.setId === 'string' ? body.setId : null
-      const clientRef = typeof body.clientRef === 'string' ? body.clientRef : null
+      const clientRef = asClientRef(body.clientRef)
       const maxPrice = typeof body.maxPriceMicro === 'number' ? body.maxPriceMicro : null
       const qType = body.questionType
       if (!setId || !clientRef || maxPrice === null
@@ -1141,6 +1155,26 @@ Deno.serve(async (req) => {
         return json({ error: 'Metering error', code: 'AI_METER_ERROR' }, 500, cors)
       }
       const meter = (reserveRaw ?? {}) as { job_ref?: string; replayed?: boolean }
+
+      // 이미 잡아 둔 예약입니다. **모델을 다시 부르지 않습니다.**
+      //
+      // `reserve_ai_quiz` 는 같은 `client_ref` 를 advisory lock 으로 직렬화하고 두 번째부터
+      // `replayed: true` 를 돌려줍니다. 그런데 이 자리가 그 값을 읽지 않아서, 같은 요청을
+      // 여러 번 보내면 예약만 한 번이고 생성은 매번 일어났습니다. 프로덕션에서 실측:
+      //
+      //       같은 clientRef 로 동시에 8번  →  청구 1회(20,000), 저장된 문항 16개, 모델 호출 8회
+      //
+      // 지갑은 지켜졌지만 두 가지가 망가집니다. 학습자가 2문항짜리로 만든 세트에 16문항이
+      // 들어가고, 우리는 한 번 받고 여덟 번 냅니다. 네트워크가 끊겨 재시도하는 정상 클라이언트도
+      // 같은 자리를 밟습니다 — 재시도는 잘못이 아니고, 그래서 `client_ref` 가 있는 것입니다.
+      if (meter.replayed === true) {
+        const already = await service.from('quiz_questions')
+          .select('id', { count: 'exact', head: true }).eq('set_id', setId)
+        return json({
+          setId, generated: already.count ?? 0, requested: cardIds.length,
+          dropped: 0, balance: null, replayed: true,
+        }, 200, cors)
+      }
 
       try {
         const cardsResult = await service.from('cards')
@@ -1331,6 +1365,9 @@ Write them again, obeying those rules exactly.`
             ...base,
             reference_answer: item.reference,
             rubric: item.criteria,
+            // 모범답안. `get_quiz_run_items` 가 답한 뒤에만 돌려줍니다 — 답하기 전에 보이면
+            // 그건 문항이 아니라 정답지입니다.
+            model_answer: item.modelAnswer,
             meta: { lengthBand: item.lengthBand },
           }
         })
@@ -1388,7 +1425,7 @@ Write them again, obeying those rules exactly.`
     // `ai_quiz_price_units`.
     if (kind === 'quiz_grade') {
       const itemId = typeof body.runItemId === 'string' ? body.runItemId : null
-      const clientRef = typeof body.clientRef === 'string' ? body.clientRef : null
+      const clientRef = asClientRef(body.clientRef)
       const maxPrice = typeof body.maxPriceMicro === 'number' ? body.maxPriceMicro : null
       const learner = typeof body.answer === 'string' ? body.answer : ''
       if (!itemId || !clientRef || maxPrice === null) {
@@ -1452,7 +1489,24 @@ Write them again, obeying those rules exactly.`
         console.error('[ai-generate] quiz grade reserve error:', reserveError.message)
         return json({ error: 'Metering error', code: 'AI_METER_ERROR' }, 500, cors)
       }
-      const meter = (reserveRaw ?? {}) as { job_ref?: string }
+      const meter = (reserveRaw ?? {}) as { job_ref?: string; replayed?: boolean }
+
+      // 생성 쪽과 같은 이유로 채점도 다시 부르지 않습니다. 같은 `client_ref` 로 두 번째가
+      // 오면 이미 매겨 둔 채점을 그대로 돌려줍니다 — 다시 채점하면 같은 답에 다른 점수가
+      // 나올 수 있고(모델은 결정적이지 않습니다), 그건 학습자가 새로고침 한 번으로 점수가
+      // 바뀌는 화면입니다.
+      if (meter.replayed === true) {
+        const prior = await service.from('answer_attempts')
+          .select('normalized_score, evaluator_result').eq('quiz_run_item_id', itemId).maybeSingle()
+        const stored = (prior.data ?? null) as
+          { normalized_score: number | null; evaluator_result: Record<string, unknown> | null } | null
+        return json({
+          itemId,
+          grade: stored?.evaluator_result ?? null,
+          score: stored?.normalized_score ?? null,
+          balance: null, replayed: true,
+        }, 200, cors)
+      }
 
       try {
         const gradeInput = {

@@ -334,6 +334,12 @@ export function QuizRunPage() {
               {t('run.reference', { answer: item.reference_answer })}
             </p>
           )}
+          {item.model_answer && (
+            <div className="mt-2 pt-2 border-t border-border">
+              <p className="text-xs font-medium text-content-secondary">{t('run.modelAnswer')}</p>
+              <p className="text-sm text-foreground whitespace-pre-wrap mt-0.5">{item.model_answer}</p>
+            </div>
+          )}
         </div>
       )}
 

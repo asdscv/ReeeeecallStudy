@@ -73,6 +73,7 @@
     "finish": "Kết thúc",
     "grading": "Đang chấm…",
     "reference": "Đáp án: {{answer}}",
+    "modelAnswer": "Bài làm mẫu",
     "grade": "Chấm câu này",
     "length": {
       "count": "{{chars, number}} / {{max, number}} ký tự",

@@ -73,6 +73,7 @@
     "finish": "Terminar",
     "grading": "Corrigiendo…",
     "reference": "Respuesta: {{answer}}",
+    "modelAnswer": "Respuesta modelo",
     "grade": "Corregir esta respuesta",
     "length": {
       "count": "{{chars, number}} / {{max, number}} caracteres",

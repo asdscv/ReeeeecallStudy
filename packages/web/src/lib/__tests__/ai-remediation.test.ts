@@ -32,7 +32,13 @@ describe('AI remediation contracts', () => {
     // `diagnose` joined in mig 246 with the thing that makes it honest, the way `compare` did:
     // counted evidence instead of one attempt, a refusal BEFORE the wallet when the window is
     // thin, and a closed-set output so nothing it returns can be wrong about the subject.
-    expect([...SERVED_REMEDIATION_ACTIONS]).toEqual(['explain', 'hint', 'compare', 'diagnose'])
+    // 262 가 `hint` 를 뺐습니다 — 화면에 누를 데가 한 번도 없었는데 인증된 호출자면 과금됐고,
+    // 서술형 모범답안이 생긴 지금 존재 이유도 겹칩니다.
+    expect([...SERVED_REMEDIATION_ACTIONS]).toEqual(['explain', 'compare', 'diagnose'])
+    // 그리고 서버가 실제로 거절해야 합니다 — 목록에서 뺐는데 파서가 통과시키면 값 없는
+    // 액션이 지갑에 닿습니다.
+    expect(parseRemediationRefs({ action: 'hint', goalId: '11111111-1111-4111-8111-111111111111' }))
+      .toBeNull()
     for (const action of SERVED_REMEDIATION_ACTIONS) {
       expect(parseRemediationRefs({ action, goalId: id }), action).not.toBeNull()
     }
@@ -153,7 +159,7 @@ describe('AI remediation contracts', () => {
   it('passes the same-card attempt history through to the model', () => {
     // The history is what turns one failure into a pattern; if it never reaches the payload
     // the feature is inert while still charging.
-    const refs = parseRemediationRefs({ action: 'hint', goalId: id })!
+    const refs = parseRemediationRefs({ action: 'explain', goalId: id })!
     const prompt = buildRemediationPrompt(refs, groundedContext({ normalized_score: 0 }, {
       attemptHistory: [
         { normalized_score: 0, created_at: '2026-07-30T00:00:00.000Z' },

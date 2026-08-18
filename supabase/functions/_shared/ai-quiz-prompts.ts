@@ -50,7 +50,8 @@ import {
   DEFAULT_DIFFICULTY, type QuizDifficulty,
   ESSAY_ASPECTS, ESSAY_LENGTH_BANDS, ESSAY_MAX_CRITERIA, ESSAY_MENTIONS_PER_CRITERION,
   ESSAY_MIN_CRITERIA, ESSAY_WEIGHT_TOTAL, MAX_DISTRACTOR_CHARS, MAX_QUESTION_CHARS, MAX_SPAN_CHARS,
-  MCQ_DISTRACTOR_FLAWS, MCQ_EXPLANATION_AXES, MAX_GAPS_PER_GRADE, SHORT_ANSWER_ANGLES,
+  MCQ_DISTRACTOR_FLAWS, MCQ_EXPLANATION_AXES, MAX_GAPS_PER_GRADE, MODEL_ANSWER_MAX_CHARS,
+  SHORT_ANSWER_ANGLES,
   SHORT_ANSWER_BANDS, SHORT_ANSWER_GAPS, SHORT_ANSWER_VERDICTS, ESSAY_LEVELS,
   type EssayCriterion, type McqExplanationInput, type QuizCardSource, type QuizGradeInput,
 } from './ai-quiz.ts'
@@ -361,7 +362,8 @@ Respond with a single JSON object:
   "cardId": "...",
   "question": "...",
   "lengthBand": "medium",
-  "criteria": [ { "aspect": "covers_answer", "weight": 60, "mustMention": ["..."] } ]
+  "criteria": [ { "aspect": "covers_answer", "weight": 60, "mustMention": ["..."] } ],
+  "modelAnswer": "..."
 } ] }
 
 Aspects — a closed list; anything else is discarded:
@@ -380,6 +382,10 @@ ${bullets([
   `"mustMention" holds 1-${ESSAY_MENTIONS_PER_CRITERION} terms COPIED from that card's prompt or answer. A term that does not appear in the card is discarded, and a criterion with no surviving term is discarded with it.`,
   `"lengthBand" is one of ${ESSAY_LENGTH_BANDS.map((b) => `"${b}"`).join(', ')}. Choose by how much the card's answer actually contains — a one-word answer is never a "long".`,
   'Do not write criteria the card cannot settle ("shows insight", "engages critically"). The grader cannot check them and the learner cannot act on them.',
+  // 모범답안. 채점이 끝난 뒤 학습자에게 보여 줍니다 — 점수와 지적만 받고 "그럼 뭐라고 썼어야
+  // 하나"는 못 보는 것이 서술형에서 가장 답답한 자리입니다.
+  `"modelAnswer" is a FULL answer to your own question, written the way a learner who earned every criterion would write it. ${MODEL_ANSWER_MAX_CHARS} characters at most. It is shown to the learner AFTER grading, never before.`,
+  'The model answer must satisfy every criterion you wrote, use the card\'s own terms, and add nothing the card does not contain. If you cannot write one from the card alone, omit the field rather than inventing material.',
   'Use each cardId exactly once, and only cardIds that were given to you.',
   `Valid aspects: ${ESSAY_ASPECTS.map((a) => `"${a}"`).join(', ')}.`,
 ])}`

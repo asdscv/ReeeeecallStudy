@@ -265,7 +265,9 @@ export interface PlanCardRef {
  * Sending anything else is refused before the wallet is touched, so a wider union here would
  * only let a screen offer a button that always fails.
  */
-export type RemediationAction = 'explain' | 'hint' | 'compare' | 'diagnose'
+// 262: `hint` 를 뺐습니다. 서버가 더 이상 받지 않습니다 — 누를 데가 없는 유료 액션이었고,
+// 서술형 모범답안이 생긴 지금 존재 이유도 겹칩니다.
+export type RemediationAction = 'explain' | 'compare' | 'diagnose'
 
 /**
  * Counted evidence for one goal, from `get_learning_diagnosis_evidence` (mig 246).

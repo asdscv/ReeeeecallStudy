@@ -12,7 +12,7 @@
 --      charge — and it returns the stored content, so the caller has something to render.
 --   2) Replay works with an EMPTY WALLET. The learner already paid; being locked out of what
 --      they own because the balance later hit zero would be the same bug wearing a hat.
---   3) A different action on the same attempt is NOT a replay. `hint` and `explain` are
+--   3) A different action on the same attempt is NOT a replay. `compare` and `explain` are
 --      different products.
 --   4) A NEW attempt on the same card IS charged. Missing it again is a new event with new
 --      grounding, and pretending otherwise would give the feature away.
@@ -105,11 +105,24 @@ BEGIN
   ASSERT (v_third->>'enrichment_id')::uuid = v_enrichment, 'replay must name the stored row';
 
   -- ── (3) A different product is a different purchase ──────────────────────
-  DECLARE v_hint jsonb;
+  --
+  -- 262 가 `hint` 를 없애서 `compare` 로 봅니다. 확인하려는 것은 액션 이름이 아니라 재사용 키가
+  -- (학습자, 시도, **액션**)이라는 것입니다 — 액션이 빠지면 다른 상품이 남의 결과를 돌려받습니다.
+  DECLARE v_compare jsonb;
   BEGIN
-    v_hint := reserve_ai_remediation('hint', NULL, NULL, v_attempt, ARRAY[v_card], '{}'::uuid[]);
-    ASSERT v_hint ? 'job_ref', format('hint must not replay an explain: %s', v_hint);
-    UPDATE ai_generation_jobs SET refunded = true WHERE id = v_hint->>'job_ref';
+    v_compare := reserve_ai_remediation('compare', NULL, NULL, v_attempt, ARRAY[v_card], '{}'::uuid[]);
+    ASSERT v_compare ? 'job_ref', format('compare must not replay an explain: %s', v_compare);
+    UPDATE ai_generation_jobs SET refunded = true WHERE id = v_compare->>'job_ref';
+  END;
+
+  -- 그리고 없앤 액션은 아예 못 삽니다.
+  DECLARE v_ok boolean := false;
+  BEGIN
+    BEGIN
+      PERFORM reserve_ai_remediation('hint', NULL, NULL, v_attempt, ARRAY[v_card], '{}'::uuid[]);
+    EXCEPTION WHEN invalid_parameter_value THEN v_ok := true;
+    END;
+    ASSERT v_ok, '없앤 hint 가 여전히 예약된다';
   END;
 
   -- ── (4) Missing the card again is a new event, and is charged ────────────
