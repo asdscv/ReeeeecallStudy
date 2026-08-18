@@ -1196,6 +1196,42 @@ Deno.serve(async (req) => {
         // that guess is inverted and would build the whole quiz around the wrong half.
         const sources: QuizCardSource[] = []
         const fingerprints = new Map<string, string>()
+
+        /**
+         * 카드 id 목록 → `QuizCardSource` 목록. 대체 카드를 불러올 때 같은 해석을 다시 씁니다.
+         *
+         * 아래 첫 루프와 같은 일을 합니다. 두 벌로 두면 대체 카드만 다른 규칙으로 해석되고,
+         * 그건 "견적에는 세어졌는데 생성에는 안 뽑히는 카드"가 생기는 방식입니다(mig 221).
+         */
+        const loadSources = async (ids: readonly string[]): Promise<QuizCardSource[]> => {
+          if (ids.length === 0) return []
+          const r = await service.from('cards')
+            .select('id, template_id, field_values').in('id', ids as string[]).eq('deck_id', quizSet.deck_id)
+          if (r.error) throw new Error(`CONTEXT_LOAD:${r.error.message}`)
+          const rows = (r.data ?? []) as Array<{ id: string; template_id: string; field_values: Record<string, string> }>
+          const tids = [...new Set(rows.map((c) => c.template_id))].filter((t) => !templateById.has(t))
+          if (tids.length > 0) {
+            const tr = await service.from('card_templates')
+              .select('id, fields, front_layout, back_layout, quiz_answer_key').in('id', tids)
+            if (tr.error) throw new Error(`CONTEXT_LOAD:${tr.error.message}`)
+            for (const t of (tr.data ?? []) as Array<Record<string, unknown>>) templateById.set(t.id as string, t)
+          }
+          const out: QuizCardSource[] = []
+          for (const card of rows) {
+            // deno-lint-ignore no-explicit-any
+            const template = templateById.get(card.template_id) as any
+            const prompt = quizPromptText(template, card)
+            const answer = quizReferenceAnswer(template, card)
+            if (!prompt || !answer) continue
+            const src = buildQuizCardSource(
+              card.id, prompt, answer, quizContextFields(template, card), fillers)
+            if (!src) continue
+            out.push(src)
+            fingerprints.set(card.id, await sha256Hex(`${prompt} ${answer}`))
+          }
+          return out
+        }
+
         for (const card of cards) {
           // deno-lint-ignore no-explicit-any
           const template = templateById.get(card.template_id) as any
@@ -1251,15 +1287,20 @@ Deno.serve(async (req) => {
         // `content_locale` is the UI language at creation time. It settles ONE thing: which
         // side of a cross-lingual card the question addresses the learner in.
         const uiLocale = quizSet.content_locale
-        const prompt = qType === 'mcq' ? buildMcqGenerationPrompt(sources, difficulty, uiLocale)
-          : qType === 'short' ? buildShortAnswerGenerationPrompt(sources, difficulty, uiLocale)
-          : buildEssayGenerationPrompt(sources, difficulty, uiLocale)
+        // 프롬프트와 검증을 **카드 부분집합**에 대해 다시 만들 수 있게 둡니다. 아래 보충
+        // 호출이 빠진 카드만 다시 물어보기 때문입니다.
+        const promptFor = (subset: typeof sources) => qType === 'mcq'
+          ? buildMcqGenerationPrompt(subset, difficulty, uiLocale)
+          : qType === 'short' ? buildShortAnswerGenerationPrompt(subset, difficulty, uiLocale)
+          : buildEssayGenerationPrompt(subset, difficulty, uiLocale)
         const makeItemId = (cardId: string, index: number) => `${setId}:${cardId}:${index}`
-        const validate = (json: Record<string, unknown>) => qType === 'mcq'
-          ? validateMultipleChoiceGeneration(json, sources, makeItemId, difficulty)
+        const validateFor = (json: Record<string, unknown>, subset: typeof sources) => qType === 'mcq'
+          ? validateMultipleChoiceGeneration(json, subset, makeItemId, difficulty)
           : qType === 'short'
-            ? validateShortAnswerGeneration(json, sources, makeItemId)
-            : validateEssayGeneration(json, sources, makeItemId)
+            ? validateShortAnswerGeneration(json, subset, makeItemId)
+            : validateEssayGeneration(json, subset, makeItemId)
+        const prompt = promptFor(sources)
+        const validate = (json: Record<string, unknown>) => validateFor(json, sources)
 
         /**
          * ONE corrective retry when the whole batch is unusable for a reason the model can fix.
@@ -1307,6 +1348,93 @@ ${reasons.map((r) => r === 'schema_word_leaked'
 Write them again, obeying those rules exactly.`
           generated = await generate(chain, corrective, prompt.userPrompt, undefined, DEFAULT_TEMPERATURE, outputCapFor('quiz_generate'))
           outcome = validate(generated.json)
+        }
+
+        /**
+         * 모자라면 **모자란 만큼만 다시 물어봅니다.**
+         *
+         * 위 재시도는 배치가 전멸했을 때만 돕니다. 그래서 "3문항 요청 → 2문항 도착" 은 그대로
+         * 통과했습니다. 학습자 입장에서 그건 조용한 실패입니다 — 요청한 수를 받지 못했는데
+         * 아무도 그렇다고 말해 주지 않습니다.
+         *
+         * 모델은 확률적이라 같은 카드가 두 번째 뽑기에서는 통과하는 일이 흔합니다. 빠진 카드만
+         * 추려 한 번 더 물어보고 결과를 합칩니다. 예약은 이미 잡혀 있으므로 **추가 청구는
+         * 없습니다** — 배달된 수만큼만 정산합니다(`settleQuiz`). 학습자가 손으로 다시 누르면
+         * 예약도 청구도 다시 일어납니다.
+         *
+         * 한 번만 합니다. 두 번째까지 못 만든 카드는 뽑기 운이 아니라 그 카드가 이 유형에
+         * 안 맞는 것이고, 그건 `dropped` 로 정직하게 돌려주는 편이 맞습니다.
+         */
+        if (outcome.servable && outcome.items.length < sources.length) {
+          /**
+           * 요청한 수를 **채웁니다.** 두 단계이고, 순서에 이유가 있습니다.
+           *
+           *   1) 빠진 카드를 그대로 한 번 더 물어봅니다. 모델은 확률적이라 같은 카드가 두 번째
+           *      뽑기에서 통과하는 일이 흔합니다. 학습자가 고른 카드를 지키는 쪽이 먼저입니다.
+           *   2) 그래도 안 되면 **덱의 다른 적격 카드로 바꿉니다.** 어떤 카드는 그 유형에 정말
+           *      안 맞습니다 — 한 단어짜리 카드로 서술형 루브릭을 세울 수 없습니다. 그때 2문항을
+           *      내놓는 것은, 덱에 적격 카드가 429장 있는데도 학습자가 고른 수를 포기하는 것입니다.
+           *
+           * 예약은 이미 잡혀 있어 **추가 청구가 없고**, 정산은 배달된 수만큼입니다. 손으로 다시
+           * 누르면 예약도 청구도 다시 일어납니다 — 그래서 여기서 채우는 편이 학습자에게 쌉니다.
+           *
+           * 두 번까지입니다. 그 뒤로는 뽑기 운이 아니라 덱과 유형이 안 맞는 것이고, 그건
+           * `dropped` 로 정직하게 돌려주는 편이 맞습니다.
+           */
+          const attempted = new Set(sources.map((s) => s.cardId))
+          for (let pass = 0; pass < 2; pass++) {
+            const done = new Set(outcome.items.map((i: QuizItem) => i.cardId))
+            const shortBy = sources.length - outcome.items.length
+            if (shortBy <= 0) break
+
+            let subset: QuizCardSource[]
+            if (pass === 0) {
+              subset = sources.filter((s) => !done.has(s.cardId))
+            } else {
+              // 대체 카드. 적격성은 `_quiz_eligible_cards` 그대로입니다(mig 265).
+              const sub = await service.rpc('quiz_substitute_cards', {
+                p_set_id: setId, p_exclude: [...attempted], p_limit: shortBy })
+              if (sub.error) {
+                console.warn('[ai-generate] substitutes unavailable:', sub.error.message)
+                break
+              }
+              const ids = ((sub.data ?? []) as Array<{ card_id: string }>).map((r) => r.card_id)
+              if (ids.length === 0) break   // 덱에 남은 적격 카드가 없습니다. 정직하게 모자란 채로.
+              subset = await loadSources(ids)
+              for (const s of subset) attempted.add(s.cardId)
+            }
+            if (subset.length === 0) break
+
+            console.warn(`[ai-generate] filling ${shortBy} missing (${pass === 0 ? 'retry' : 'substitute'})`)
+            try {
+              const p2 = promptFor(subset)
+              const g2 = await generate(chain, p2.systemPrompt, p2.userPrompt, undefined,
+                DEFAULT_TEMPERATURE, outputCapFor('quiz_generate'))
+              const o2 = validateFor(g2.json, subset)
+              // 토큰은 합칩니다 — 두 번 부른 원가가 한 번으로 기록되면 마진이 거짓이 됩니다.
+              if (generated.usage && g2.usage) {
+                generated = { ...generated, usage: {
+                  ...generated.usage,
+                  tokensIn: (generated.usage.tokensIn ?? 0) + (g2.usage.tokensIn ?? 0),
+                  tokensOut: (generated.usage.tokensOut ?? 0) + (g2.usage.tokensOut ?? 0),
+                } }
+              }
+              if (o2.items.length > 0) {
+                // 요청한 수를 넘기지 않습니다. 대체 카드를 넉넉히 받아 왔을 수 있습니다.
+                const room = sources.length - outcome.items.length
+                outcome = {
+                  ...outcome,
+                  items: [...outcome.items, ...o2.items.slice(0, room)],
+                  dropped: o2.dropped,
+                }
+              }
+            } catch (fillError) {
+              // 채우기는 **덤**입니다. 여기서 던지면 이미 만든 문항까지 잃습니다.
+              console.warn('[ai-generate] fill pass failed, keeping what we have:',
+                fillError instanceof Error ? fillError.message : 'unknown')
+              break
+            }
+          }
         }
 
         // The drop reasons ARE the prompt's report card; they are the only signal that would
@@ -1380,9 +1508,16 @@ Write them again, obeying those rules exactly.`
 
         // Charged for what shipped, not for what was asked for.
         const settled = await settleQuiz(userId, meter.job_ref, questions.length, generated.model, generated.usage)
+        // `dropped` 는 **끝내 문항이 안 나온 카드 수**입니다.
+        //
+        // 전에는 검증기가 버린 항목 수를 그대로 실었는데, 보충 호출이 그 카드를 채우고 나면
+        // "8개 요청 · 8개 생성 · 2개 탈락" 같은 앞뒤가 안 맞는 응답이 나갔습니다. 클라이언트가
+        // 판단해야 하는 것은 내부 시도 횟수가 아니라 **못 받은 카드가 있는가**입니다.
+        const madeIt = new Set(outcome.items.map((i: QuizItem) => i.cardId))
         return json({
           setId, generated: questions.length, requested: cardIds.length,
-          dropped: outcome.dropped.length, balance: settled?.balance ?? null,
+          dropped: cardIds.filter((id: string) => !madeIt.has(id)).length,
+          balance: settled?.balance ?? null,
         }, 200, cors)
       } catch (error) {
         const message = error instanceof Error ? error.message : 'UNKNOWN'
@@ -1688,7 +1823,14 @@ Write them again, obeying those rules exactly.`
       const fields = asFields(body.fields)
       if (!fields) return json({ error: 'Invalid fields', code: 'BAD_REQUEST' }, 400, cors)
       const reqCount = Number(body.cardCount)
-      if (!Number.isFinite(reqCount) || reqCount < 1) {
+      // 상한을 **넘으면 거절**합니다, 조용히 줄이지 않습니다.
+      //
+      // 예전에는 `Math.min(25, …)` 으로 clamp 만 했습니다. 그래서 `cardCount: 1e12` 가 200 으로
+      // 돌아오고 카드 25장 값($0.25)이 청구됐습니다 — 학습자가 본 적 없는 견적으로. 클라이언트는
+      // 25장씩 쪼개 보내므로(ai-generate-store) 정상 요청은 이 상한 근처에도 오지 않고,
+      // 1000 은 옛 번들이 보낼 수 있는 값까지 넉넉히 덮으면서 말이 안 되는 수는 거르는 선입니다.
+      const ABSURD_CARDS = 1000
+      if (!Number.isInteger(reqCount) || reqCount < 1 || reqCount > ABSURD_CARDS) {
         return json({ error: 'Invalid cardCount', code: 'BAD_REQUEST' }, 400, cors)
       }
       pCards = Math.min(MAX_CARDS_PER_CALL, Math.floor(reqCount))

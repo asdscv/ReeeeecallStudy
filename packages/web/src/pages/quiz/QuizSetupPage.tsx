@@ -14,7 +14,11 @@ import { generateCostLine, freeLeftLine, affordableQuestionCount } from '@reeeee
 const TYPES: QuizQuestionType[] = ['mcq', 'short', 'essay']
 // Presets plus a free field up to MAX_COUNT. The presets stop where a learner's idea of "a
 // quiz" usually stops; anything past that is deliberate and is typed.
-const COUNTS = [4, 6, 8, 10, 12, 20, 30, 50]
+// 서버가 실제로 받는 길이만 보여 줍니다. 30·50 은 스키마가 12 로 막고 있는 동안에도
+// 화면에 있었고, 고르면 원시 제약 위반(23514)이 돌아왔습니다. 264 가 20 까지 열었고,
+// 그 위는 스키마가 아니라 생성 구조 이야기입니다 — 서술형 50문항은 17배치입니다.
+// `quiz-count-options.test.ts` 가 이 목록을 마이그레이션의 상한에 붙들어 둡니다.
+const COUNTS = [4, 6, 8, 10, 12, 16, 20]
 const MAX_COUNT = 50
 
 /**
