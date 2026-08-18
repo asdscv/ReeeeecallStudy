@@ -28,7 +28,13 @@ const TYPES: QuizQuestionType[] = ['mcq', 'short', 'essay']
 // `quiz-count-options.test.ts` 가 이 목록을 마이그레이션의 상한에 붙들어 둡니다.
 const COUNTS = [4, 6, 8, 10, 12, 16, 20]
 /** Ceiling for the custom box. Matches web's MAX_COUNT and the server's per-set cap. */
-const MAX_COUNT = 50
+// 직접 입력의 상한. **칩과 같은 숫자여야 합니다.**
+//
+// 칩은 264 에서 20 까지로 맞췄는데 이 상자만 50 으로 남아 있었습니다 — 시뮬레이터에서 화면을
+// 보고 찾았습니다("직접 입력 1–50"). 21 을 타이핑하면 `create_quiz_set` 이 원시 제약 위반
+// (23514)으로 거절합니다. 칩에서 고친 defect 를 상자가 그대로 갖고 있었던 것입니다.
+// `quiz-count-options.test.ts` 가 이 값을 마이그레이션의 상한에 붙들어 둡니다.
+const MAX_COUNT = 20
 
 /**
  * Scope, type, count, price, confirm.
@@ -152,7 +158,8 @@ export function QuizSetupScreen() {
         <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>{t('setup.deck')}</Text>
         <View style={styles.row}>
           {decks.map((deck) => (
-            <Pressable key={deck.id} onPress={() => setDeckId(deck.id)} style={chip(deckId === deck.id)}>
+            <Pressable key={deck.id} onPress={() => setDeckId(deck.id)} style={chip(deckId === deck.id)}
+              {...testProps(`quiz-deck-${deck.id}`)}>
               <Text style={[theme.typography.caption, { color: deckId === deck.id ? '#fff' : theme.colors.text }]}>
                 {deck.name}
               </Text>
@@ -161,7 +168,8 @@ export function QuizSetupScreen() {
         </View>
 
         {shownCounts && (eligible === 0 ? (
-          <View style={[styles.warn, { borderColor: theme.colors.error }]}>
+          <View style={[styles.warn, { borderColor: theme.colors.error }]}
+            {...testProps('quiz-no-eligible')}>
             <Text style={[theme.typography.label, { color: theme.colors.error }]}>
               {t('setup.noEligible.title', { total: shownCounts.total })}
             </Text>
@@ -172,7 +180,8 @@ export function QuizSetupScreen() {
             </Text>
           </View>
         ) : (
-          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}>
+          <Text style={[theme.typography.caption, { color: theme.colors.textSecondary }]}
+            {...testProps('quiz-eligible-note')}>
             {t('setup.eligible', { eligible, total: shownCounts.total })}
           </Text>
         ))}
@@ -198,6 +207,8 @@ export function QuizSetupScreen() {
               key={option}
               onPress={() => setCount(option)}
               disabled={eligible > 0 && option > eligible}
+              // 실기 테스트가 "덱이 감당 못 하는 길이는 눌리지 않는다"를 확인하는 앵커입니다.
+              {...testProps(`quiz-count-${option}`)}
               style={[chip(count === option), { opacity: eligible > 0 && option > eligible ? 0.4 : 1 }]}
             >
               <Text style={[theme.typography.caption, { color: count === option ? '#fff' : theme.colors.text }]}>
