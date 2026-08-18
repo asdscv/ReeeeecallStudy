@@ -59,10 +59,11 @@ describe('the limits the client shows', () => {
     expect(Number(short[1])).toBe(MAX_ANSWER_CHARS.short)
   })
 
-  it('서술형 답안은 카드 한 장만큼 길 수 있다', () => {
-    // 4,000자짜리 카드에 대한 답이 2,000자에서 잘리면 학습자가 납득할 수 있는 규칙이
-    // 아닙니다. 원가로도 막을 이유가 없습니다 — 4,000자 채점이 $0.000879, 값의 114분의 1.
-    expect(MAX_ANSWER_CHARS.essay).toBe(CARD_MAX_CHARS)
+  it('서술형 답안은 적어도 카드 한 장만큼은 길 수 있다', () => {
+    // 카드에 담긴 것보다 짧게만 답할 수 있으면 납득할 수 있는 규칙이 아닙니다. 같을 필요는
+    // 없습니다 — 답은 카드에 있는 것을 설명하는 글이라 카드보다 길어질 수 있고, 원가로도 막을
+    // 이유가 없습니다(4,000자 채점이 $0.000879, 값의 100분의 1 아래).
+    expect(MAX_ANSWER_CHARS.essay).toBeGreaterThanOrEqual(CARD_MAX_CHARS)
   })
 
   it('agree on the minimum too', () => {
