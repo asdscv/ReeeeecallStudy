@@ -330,17 +330,19 @@ export const MAX_SPANS_CONSIDERED = 16
  *
  *        300 chars   input   860 / output 162 tokens   $0.000458
  *      1,000 chars   input 1,180 / output 195          $0.000588
- *      2,000 chars   input 1,634 / output 195          $0.000701   ← the cap
- *      4,000 chars   input 2,543 / output 162          $0.000879
+ *      2,000 chars   input 1,634 / output 195          $0.000701
+ *      4,000 chars   input 2,543 / output 162          $0.000879   ← the cap
  *
- * At the cap the grade costs $0.0007 against a $0.10 price — 143x, where `price-floor.test.ts`
+ * At the cap the grade costs $0.0009 against a $0.10 price — 114x, where `price-floor.test.ts`
  * demands 10x. Answer length barely moves it: the rubric, the question and the system prompt
- * dominate, so doubling the cap would still leave 114x. The cap is therefore about bounding a
- * pathological paste, not about the price.
+ * dominate. The cap is about bounding a pathological paste, not about the price.
  */
 export const MAX_LEARNER_CHARS: Readonly<Record<Exclude<QuizType, 'multiple_choice'>, number>> = {
   short_answer: 300,
-  essay: 2000,
+  // 카드 한 장이 4,000자까지인데(`CARD_MAX_CHARS`, mig 257) 그 카드에 대한 답이 2,000자에서
+  // 막히면 학습자가 납득할 수 있는 규칙이 아닙니다. 원가로도 막을 이유가 없습니다 — 위 표의
+  // 4,000자 줄이 $0.000879, 값 $0.10 의 114분의 1입니다.
+  essay: 4000,
 }
 /**
  * Below this there is nothing to grade, and no model call is made. Zero cost, zero charge.
