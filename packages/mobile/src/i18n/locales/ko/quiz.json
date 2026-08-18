@@ -63,6 +63,7 @@
     "empty": "이 세트의 문제가 사라졌어요. 문제를 만든 카드가 삭제됐어요.",
     "backToQuiz": "퀴즈 목록으로",
     "progress": "{{current, number}} / {{total, number}}",
+    "shortfall": "요청한 {{requested}}문항 중 {{made}}문항이 만들어졌어요. 덱에 쓸 수 있는 카드가 부족했거나, 일부 카드로는 이 유형의 문항을 만들지 못했어요.",
     "leave": "나가기",
     "placeholder": {
       "short": "답을 입력하세요",

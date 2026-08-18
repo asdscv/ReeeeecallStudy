@@ -63,6 +63,7 @@
     "empty": "The questions in this set are gone — the cards they came from were deleted.",
     "backToQuiz": "Back to quizzes",
     "progress": "{{current, number}} / {{total, number}}",
+    "shortfall": "{{made}} of the {{requested}} questions you asked for were made. The deck ran out of usable cards, or some cards could not carry this question type.",
     "leave": "Leave",
     "placeholder": {
       "short": "Type your answer",

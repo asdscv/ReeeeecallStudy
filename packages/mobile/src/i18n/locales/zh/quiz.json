@@ -63,6 +63,7 @@
     "empty": "这套题目已不存在——生成它们的卡片被删除了。",
     "backToQuiz": "返回测验",
     "progress": "{{current, number}} / {{total, number}}",
+    "shortfall": "你请求的 {{requested}} 道题中生成了 {{made}} 道。牌组中可用的卡片不足，或部分卡片无法生成该题型。",
     "leave": "离开",
     "placeholder": {
       "short": "输入你的答案",
