@@ -63,6 +63,14 @@ describe('퀴즈 길이 선택지', () => {
     expect(counts(SCREENS[0][1])).toEqual(counts(SCREENS[1][1]))
   })
 
+  it.each(SCREENS)('%s 화면의 직접 입력 상한도 서버 상한과 같다', (_label, file) => {
+    // 칩만 고치고 이 상자를 놓쳤던 적이 있습니다 — 시뮬레이터 화면에 "직접 입력 1–50" 이
+    // 남아 있었고, 21 을 타이핑하면 원시 제약 위반(23514)이 돌아왔습니다.
+    const m = /const MAX_COUNT = (\d+)/.exec(read(file))
+    if (!m) throw new Error(`MAX_COUNT not found in ${file}`)
+    expect(Number(m[1])).toBe(serverMax())
+  })
+
   it('상한 자체가 선택지에 있다', () => {
     // 열어 놓고 고를 수 없으면 연 것이 아닙니다.
     expect(counts(SCREENS[0][1])).toContain(serverMax())
