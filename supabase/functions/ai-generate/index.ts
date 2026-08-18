@@ -1244,18 +1244,32 @@ Deno.serve(async (req) => {
         let generated = await generate(chain, prompt.systemPrompt, prompt.userPrompt, undefined, DEFAULT_TEMPERATURE, outputCapFor('quiz_generate'))
         let outcome = validate(generated.json)
 
-        if (!outcome.servable && outcome.dropped.length > 0
-            && outcome.dropped.every((d) => FIXABLE.has(d.reason))) {
+        // Retry when NOTHING survived, whatever the reason — including no reason at all.
+        //
+        // The old condition needed at least one drop AND every drop to be fixable, so the two
+        // worst cases fell straight through to a refusal: malformed JSON (zero items, zero
+        // drops) and a mixed bag of reasons. Both are one bad roll of the same dice, and a
+        // learner who asked for ONE question has no margin at all — a single drop is the whole
+        // request. Measured on the reported deck, 10 single-item essay runs came back 10/10
+        // clean, which is what makes the failure they hit a coin flip rather than a deck problem.
+        //
+        // The retry is inside the same reservation, so it is charged once. The learner retrying
+        // by hand reserves and pays again.
+        if (!outcome.servable
+            && (outcome.dropped.length === 0
+                || outcome.dropped.every((d) => FIXABLE.has(d.reason)))) {
           const reasons = [...new Set(outcome.dropped.map((d) => d.reason))]
-          console.warn(`[ai-generate] retrying quiz batch once: every item dropped (${reasons.join(', ')})`)
+          console.warn(`[ai-generate] retrying quiz batch once: nothing servable (${reasons.join(', ') || 'no items parsed'})`)
           const corrective = `${prompt.systemPrompt}
 
-Your previous attempt was rejected in full. Every item broke one of these rules:
+Your previous attempt was rejected in full. ${reasons.length === 0
+  ? 'It could not be read as the JSON object described above — check the shape and return every field.'
+  : `Every item broke one of these rules:
 ${reasons.map((r) => r === 'schema_word_leaked'
     ? '- the question contained one of OUR field names (prompt, cardId, field_1, ...). Write the learner\'s subject matter, never the key names.'
     : r === 'answer_leaked_in_question'
       ? '- the question contained the card\'s ANSWER, so there was nothing left to answer. Quote only the card\'s question side.'
-      : '- the question did not quote the card\'s question side, so it was not anchored to the card.').join('\n')}
+      : '- the question did not quote the card\'s question side, so it was not anchored to the card.').join('\n')}`}
 Write them again, obeying those rules exactly.`
           generated = await generate(chain, corrective, prompt.userPrompt, undefined, DEFAULT_TEMPERATURE, outputCapFor('quiz_generate'))
           outcome = validate(generated.json)

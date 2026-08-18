@@ -735,6 +735,21 @@ export const useQuizStore = create<QuizState>((set, get) => ({
       // nothing at all was written there is no quiz to open. Anything later is
       // under-delivery, which the set list already discloses.
       if (delivered === 0 && firstError !== null) {
+        // And the set does not survive the failure.
+        //
+        // `create_quiz_set` writes the row BEFORE generation, so a generation that produced
+        // nothing left a set behind: `status = 'ready'`, `generated_count = 0`, showing in the
+        // list as a real quiz with the number of questions the learner ASKED for, and 풀기
+        // opening an empty run. Two of them were sitting in production. Nothing was charged, so
+        // there is no artifact to keep — deleting is the honest end.
+        //
+        // Best-effort: the throw below is what the learner sees either way, and a cleanup that
+        // itself fails must not replace the real reason with its own.
+        try {
+          await supabase.rpc('delete_quiz_set', { p_set_id: result.set_id })
+        } catch (cleanupError) {
+          console.error('[quiz-store] could not discard the empty set:', cleanupError)
+        }
         throw new QuizError(await quizErrorCode(firstError))
       }
 

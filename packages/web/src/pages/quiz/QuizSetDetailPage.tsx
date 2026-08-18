@@ -133,33 +133,19 @@ export function QuizSetDetailPage() {
         </div>
       </div>
 
-      {/* The shared Button, not hand-rolled classes. The take button was `flex-1` in a two-child
-          row, which is why it stretched across the page and squeezed 삭제 into a corner: a
-          primary action and a destructive one are not two halves of one control. */}
-      <div className="flex items-center gap-2">
-        <Button
-          onClick={() => void take()}
-          disabled={busy || empty}
-          data-testid="quiz-detail-take"
-          className="flex-1"
-        >
-          {busy ? t('home.starting') : (setRow.run_count ? t('result.retake') : t('home.take'))}
-        </Button>
-        {/* Any set, since mig 231 — with a confirm that names what the cascade takes. Ghost and
-            icon-only: it should be findable, not competing with the thing the page is for. */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => void remove()}
-          disabled={busy}
-          data-testid="quiz-detail-delete"
-          aria-label={t('home.remove')}
-          title={t('home.remove')}
-          className="text-content-tertiary hover:text-destructive hover:bg-destructive/10"
-        >
-          <Trash2 className="w-4 h-4" />
-        </Button>
-      </div>
+      {/* 이 페이지가 존재하는 이유는 하나입니다: 이 퀴즈를 푼다.
+          그 버튼을 폭 전체로 두는 것은 맞습니다. 틀렸던 것은 그 옆에 삭제를 붙여 놓은 것입니다 —
+          한 줄에 나란히 놓으면 파괴적인 동작이 주된 동작의 나머지 절반처럼 보이고, 실제로 화면
+          오른쪽 끝에 끼인 아이콘이 됐습니다. 주된 동작과 파괴적인 동작은 한 컨트롤의 두 쪽이
+          아닙니다. 삭제는 페이지 맨 아래로 내렸습니다. */}
+      <Button
+        onClick={() => void take()}
+        disabled={busy || empty}
+        data-testid="quiz-detail-take"
+        className="w-full"
+      >
+        {busy ? t('home.starting') : (setRow.run_count ? t('result.retake') : t('home.take'))}
+      </Button>
 
       {/* The first thing anyone wonders on seeing 다시 풀기: are these the same questions, and
           does it cost anything. Both, in one line, before they tap. Multiple choice says
@@ -210,6 +196,22 @@ export function QuizSetDetailPage() {
             })}
           </ul>
         )}
+      </div>
+
+      {/* 삭제는 여기, 페이지 끝. 231 이후로 어떤 세트든 지울 수 있고, 확인창이 무엇이 함께
+          사라지는지 이름을 댑니다. 찾을 수 있으면 되고, 이 페이지가 하려는 일과 자리를 다툴
+          이유는 없습니다. */}
+      <div className="border-t border-border pt-4">
+        <Button
+          variant="ghost"
+          onClick={() => void remove()}
+          disabled={busy}
+          data-testid="quiz-detail-delete"
+          className="text-content-tertiary hover:text-destructive hover:bg-destructive/10"
+        >
+          <Trash2 className="w-4 h-4 mr-1.5" />
+          {t('home.remove')}
+        </Button>
       </div>
     </div>
   )

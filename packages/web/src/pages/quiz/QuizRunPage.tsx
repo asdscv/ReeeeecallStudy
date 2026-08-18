@@ -24,6 +24,17 @@ import { gradeCostLine } from '@reeeeecall/shared/lib/quiz-pricing'
  * Those two are quoted and confirmed per answer, and neither is bought automatically on submit:
  * spending is always a gesture.
  */
+/**
+ * 학습자가 고칠 수 있는 실패들. 재시도 버튼이 아니라 **무엇을 하면 되는지**가 필요합니다.
+ *
+ * `refusalFrom` 은 모르는 코드를 `kind: 'failed', retryable: true` 로 떨어뜨립니다 — 지갑
+ * 문제에는 맞는 기본값이지만, "답안이 짧다"에는 틀린 답입니다. 같은 답으로 다시 시도하면
+ * 같은 자리에서 또 거절됩니다.
+ */
+const QUIZ_SPECIFIC_ERRORS = new Set([
+  'QUIZ_UNGRADEABLE', 'QUIZ_ITEM_GONE', 'QUIZ_NOT_ANSWERED', 'QUIZ_CARDS_TOO_SHORT',
+])
+
 export function QuizRunPage() {
   const { t } = useTranslation('quiz')
   const { runId } = useParams<{ runId: string }>()
@@ -101,9 +112,23 @@ export function QuizRunPage() {
         : { text: text.trim() }
       const submitted = await submit(item.item_id, payload as Record<string, unknown>, Date.now() - startedAt)
       setResult(submitted)
+      // 제출과 채점은 한 동작입니다.
+      //
+      // 예전에는 답을 내고 나서 채점을 한 번 더 눌러야 했습니다. 하나의 의도에 두 번의 탭이고,
+      // 그 사이에서 학습자는 "제출했는데 왜 점수가 없지"를 봅니다. 지출이 제스처여야 한다는
+      // 규칙은 여전히 지켜집니다 — 값은 제출 버튼 **아래에** 미리 적혀 있고, 유형을 고를 때도
+      // 한 번 말합니다. 이미 값을 보고 누른 제출이 그 제스처입니다.
+      //
+      // 객관식은 제출로 이미 채점이 끝나므로 여기 오지 않습니다.
+      if (item.question_type !== 'mcq' && submitted && submitted.graded !== true && shownPrice !== null) {
+        await gradeWithAi(item.item_id, text.trim(), shownPrice)
+      }
       if (runId) await loadRun(runId)
     } catch (e) {
       setError(e instanceof QuizError ? e.code : 'UNKNOWN')
+      // 채점이 거절돼도 답안은 이미 서버에 있습니다. 다시 읽어 두지 않으면 화면만 답하지 않은
+      // 상태로 남아, 학습자가 같은 답을 또 제출하게 됩니다.
+      if (runId) await loadRun(runId)
     }
   }
 
@@ -330,7 +355,10 @@ export function QuizRunPage() {
           the same prompt to write the same broken question. 👎 alone records it; the reasons are
           optional, because requiring one adds a second tap and a second tap means nobody takes
           the first. */}
-      {answered && (
+      {/* 채점이 끝난 뒤에만. `answered` 는 제출 직후를 포함하는데, 그때는 아직 점수도 해설도
+          없어서 학습자가 평가할 대상이 화면에 없습니다. 객관식은 제출이 곧 채점이라 즉시
+          나타나고, 서술형·주관식은 점수가 붙은 다음입니다. */}
+      {answered && item.score !== null && (
         <div className="rounded-lg border border-border bg-card p-3" data-testid="quiz-item-rating">
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs text-content-tertiary">{t('rate.prompt')}</p>
@@ -382,18 +410,37 @@ export function QuizRunPage() {
         </div>
       )}
 
-      <AiRefusalNotice
-        code={error}
-        actionId="quiz_grade"
-        onRetry={() => void requestGrade()}
-      />
+      {/* 정확한 이유가 있으면 그것을 말합니다.
+          `AiRefusalNotice` 는 모르는 코드를 전부 "처리하지 못했어요 · 다시 시도"로 뭉갭니다
+          (`refusalFrom` 의 default). 그래서 40자 미만이라 채점될 수 없는 답안이 우리 쪽 장애처럼
+          보였고, 다시 시도 버튼은 같은 답으로 영원히 실패했습니다. 정확한 문구는 처음부터
+          `quiz.json` 의 `error.*` 에 있었는데 이 화면에 닿지 못했을 뿐입니다. */}
+      {error && QUIZ_SPECIFIC_ERRORS.has(error) ? (
+        <div role="alert" className="rounded-lg border border-destructive/30 bg-destructive/10 p-3">
+          <p className="text-sm text-destructive">
+            {error === 'QUIZ_UNGRADEABLE'
+              ? t('run.length.tooShort', { min: length.min })
+              : t(`error.${error}`, { defaultValue: t('error.UNKNOWN') })}
+          </p>
+        </div>
+      ) : (
+        <AiRefusalNotice
+          code={error}
+          actionId="quiz_grade"
+          onRetry={() => void requestGrade()}
+        />
+      )}
 
       <div className="flex gap-2">
         {!answered ? (
           <button
             type="button"
             onClick={() => void submitAnswer()}
-            disabled={item.question_type === 'mcq' ? choice === null : text.trim() === ''}
+            // 제출이 곧 채점이므로, 채점될 수 없는 길이는 제출도 막습니다. 예전에는 열 글자
+            // 서술형도 제출됐다가 채점에서 거절됐고, 화면은 그것을 우리 잘못처럼 말했습니다.
+            disabled={item.question_type === 'mcq'
+              ? choice === null
+              : text.trim() === '' || length.state === 'too_short' || length.state === 'too_long'}
             className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50"
           >
             {t('run.submit')}
