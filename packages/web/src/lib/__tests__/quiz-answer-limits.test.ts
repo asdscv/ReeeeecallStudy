@@ -13,6 +13,7 @@
  * thing, and exists because a client count and a server cap once lived in separate packages
  * with no relationship expressed, both individually correct, while the feature was broken.
  */
+import { CARD_MAX_CHARS } from '@reeeeecall/shared/lib/card-content-limits'
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
@@ -44,6 +45,26 @@ describe('the limits the client shows', () => {
     expect(MAX_ANSWER_CHARS.essay).toBe(max.essay)
   })
 
+  it('그리고 SQL 도 같은 숫자를 쓴다', () => {
+    // 세 번째 사본입니다. `submit_quiz_answer` 는 **쓰는 자리**에서 막는데(mig 256), 그 숫자는
+    // 함수 본문에 박혀 있습니다. 셋이 갈라지면 "낼 수는 있는데 채점은 못 하는 답"이나 그 반대가
+    // 생기고, 둘 다 학습자가 고칠 수 없는 상태입니다.
+    const sql = readFileSync(
+      join(here, '../../../../../supabase/migrations/258_answers_match_cards_and_templates_have_bounds.sql'),
+      'utf-8')
+    const essay = sql.match(/question_type = 'essay'\s+AND char_length\(p_response->>'text'\) > (\d+)/)
+    const short = sql.match(/question_type <> 'essay' AND char_length\(p_response->>'text'\) > (\d+)/)
+    if (!essay || !short) throw new Error('length checks not found in migration 258')
+    expect(Number(essay[1])).toBe(MAX_ANSWER_CHARS.essay)
+    expect(Number(short[1])).toBe(MAX_ANSWER_CHARS.short)
+  })
+
+  it('서술형 답안은 카드 한 장만큼 길 수 있다', () => {
+    // 4,000자짜리 카드에 대한 답이 2,000자에서 잘리면 학습자가 납득할 수 있는 규칙이
+    // 아닙니다. 원가로도 막을 이유가 없습니다 — 4,000자 채점이 $0.000879, 값의 114분의 1.
+    expect(MAX_ANSWER_CHARS.essay).toBe(CARD_MAX_CHARS)
+  })
+
   it('agree on the minimum too', () => {
     // Below the minimum the server charges nothing and calls no model — so a learner who is
     // told "40 characters minimum" is being told something true about the money as well.
@@ -72,13 +93,13 @@ describe('what the learner is told while typing', () => {
   })
 
   it('너무 긴 것은 여전히 막는다 — 안 쓴 글을 채점하고 청구할 수는 없다', () => {
-    expect(answerLength('x'.repeat(2001), 'essay').state).toBe('too_long')
-    expect(answerLength('x'.repeat(2001), 'essay').gradeable).toBe(false)
+    expect(answerLength('x'.repeat(MAX_ANSWER_CHARS.essay + 1), 'essay').state).toBe('too_long')
+    expect(answerLength('x'.repeat(MAX_ANSWER_CHARS.essay + 1), 'essay').gradeable).toBe(false)
   })
 
   it('accepts the boundary values the server accepts', () => {
     // Off-by-one here means a counter that says "over" on an answer the server would grade.
-    expect(answerLength('x'.repeat(2000), 'essay').gradeable).toBe(true)
+    expect(answerLength('x'.repeat(MAX_ANSWER_CHARS.essay), 'essay').gradeable).toBe(true)
     expect(answerLength('x'.repeat(40), 'essay').gradeable).toBe(true)
     expect(answerLength('x'.repeat(300), 'short').gradeable).toBe(true)
     expect(answerLength('x', 'short').gradeable).toBe(true)
@@ -87,15 +108,18 @@ describe('what the learner is told while typing', () => {
   it('warns before the ceiling, not at it', () => {
     // A counter that only turns red at the limit tells you after the sentence you were
     // writing is already lost.
-    expect(answerLength('x'.repeat(1500), 'essay').state).toBe('ok')
-    expect(answerLength('x'.repeat(1750), 'essay').state).toBe('near_limit')
-    expect(answerLength('x'.repeat(1999), 'essay').gradeable).toBe(true)
+    // 상한에서 역산합니다. 숫자를 손으로 적으면 한도를 조정할 때마다 여기서 터집니다 —
+    // 실제로 2,000 → 4,000 에서 한 번 터졌습니다.
+    const max = MAX_ANSWER_CHARS.essay
+    expect(answerLength('x'.repeat(Math.floor(max * 0.5)), 'essay').state).toBe('ok')
+    expect(answerLength('x'.repeat(Math.floor(max * 0.9)), 'essay').state).toBe('near_limit')
+    expect(answerLength('x'.repeat(max - 1), 'essay').gradeable).toBe(true)
   })
 
   it('counts what the server counts', () => {
     // The server trims before measuring. A counter that includes trailing whitespace would
     // disagree with the refusal, which is worse than having no counter.
-    expect(answerLength('  ' + 'x'.repeat(2000) + '   \n', 'essay').state).not.toBe('too_long')
+    expect(answerLength('  ' + 'x'.repeat(MAX_ANSWER_CHARS.essay) + '   \n', 'essay').state).not.toBe('too_long')
     expect(answerLength('     ', 'essay').state).toBe('empty')
   })
 
