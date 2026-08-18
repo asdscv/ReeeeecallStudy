@@ -25,7 +25,10 @@ export type GradedQuizType = 'short' | 'essay'
 /** Longer than this and the server refuses rather than truncating. */
 export const MAX_ANSWER_CHARS: Readonly<Record<GradedQuizType, number>> = {
   short: 300,
-  essay: 2000,
+  // 카드 한도(`CARD_MAX_CHARS`)와 같은 숫자입니다. 4,000자짜리 카드에 대한 답이 2,000자에서
+  // 잘리면 학습자가 납득할 수 있는 규칙이 아닙니다. 원가로도 막을 이유가 없습니다 —
+  // 4,000자 채점이 $0.000879 로 값의 114분의 1입니다(측정값은 서버 상수 주석에).
+  essay: 4000,
 }
 
 /**
