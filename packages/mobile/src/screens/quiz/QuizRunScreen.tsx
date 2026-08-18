@@ -36,6 +36,11 @@ type Rt = RouteProp<QuizStackParamList, 'QuizRun'>
  * and returning. It does NOT survive the app being killed — that needs a storage dependency this
  * package does not have, and it is stated here rather than implied by silence.
  */
+/** 학습자가 고칠 수 있는 실패들 — 재시도가 아니라 무엇을 하면 되는지가 필요합니다. */
+const QUIZ_SPECIFIC_ERRORS = new Set([
+  'QUIZ_UNGRADEABLE', 'QUIZ_ITEM_GONE', 'QUIZ_NOT_ANSWERED', 'QUIZ_CARDS_TOO_SHORT',
+])
+
 export function QuizRunScreen() {
   const theme = useTheme()
   const { t } = useTranslation('quiz')
@@ -117,9 +122,18 @@ export function QuizRunScreen() {
       const payload = item.question_type === 'mcq' ? { choice } : { text: text.trim() }
       const submitted = await submit(item.item_id, payload as Record<string, unknown>, Date.now() - startedAt.current)
       setResult(submitted)
+      // 제출과 채점은 한 동작입니다. 예전에는 답을 내고 채점을 한 번 더 눌러야 했고, 그 사이에서
+      // 학습자는 "제출했는데 왜 점수가 없지"를 봤습니다. 값은 제출 버튼 아래에 미리 적혀 있으니
+      // 이미 값을 보고 누른 제출이 그 제스처입니다. 객관식은 제출로 채점이 끝나 여기 오지 않습니다.
+      if (item.question_type !== 'mcq' && submitted && submitted.graded !== true && shownPrice !== null) {
+        await gradeWithAi(item.item_id, text.trim(), shownPrice)
+      }
       await loadRun(runId)
     } catch (e) {
       setError(e instanceof QuizError ? e.code : 'UNKNOWN')
+      // 채점이 거절돼도 답안은 서버에 있습니다. 다시 읽지 않으면 화면만 답하지 않은 상태로 남아
+      // 같은 답을 또 제출하게 됩니다.
+      await loadRun(runId)
     }
   }
 
@@ -341,7 +355,9 @@ export function QuizRunScreen() {
               문항은 전부 모델이 씁니다. 그런데 하나가 나쁘게 나왔을 때 그걸 알 경로가 없었고,
               그래서 다음에도 같은 프롬프트로 같은 문항이 나왔습니다. 👎 만으로 기록되고 이유는
               선택입니다 — 필수로 만들면 두 번째 탭이 생기고, 그러면 첫 번째도 안 눌립니다. */}
-          {answered && (
+          {/* 채점이 끝난 뒤에만. `answered` 는 제출 직후를 포함하는데 그때는 점수도 해설도 아직
+              없습니다. 객관식은 제출이 곧 채점이라 즉시 나타납니다. */}
+          {answered && item.score !== null && (
             <View
               style={[styles.stem, {
                 backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border,
@@ -405,12 +421,26 @@ export function QuizRunScreen() {
             </View>
           )}
 
-          <AiRefusalNotice
-            code={error}
-            actionId="quiz_grade"
-            onRetry={() => void requestGrade()}
-            style={{ marginTop: 12 }}
-          />
+          {/* 정확한 이유가 있으면 그것을 말합니다. `refusalFrom` 의 default 는 모르는 코드를
+              전부 "처리하지 못했어요 · 다시 시도"로 뭉갭니다 — 40자 미만이라 채점될 수 없는
+              답안이 우리 쪽 장애처럼 보였고 재시도는 영원히 실패했습니다. */}
+          {error && QUIZ_SPECIFIC_ERRORS.has(error) ? (
+            <Text
+              style={[theme.typography.caption, { color: theme.colors.error, marginTop: 12 }]}
+              accessibilityRole="alert"
+            >
+              {error === 'QUIZ_UNGRADEABLE'
+                ? t('run.length.tooShort', { min: length.min })
+                : t(`error.${error}`, { defaultValue: t('error.UNKNOWN') })}
+            </Text>
+          ) : (
+            <AiRefusalNotice
+              code={error}
+              actionId="quiz_grade"
+              onRetry={() => void requestGrade()}
+              style={{ marginTop: 12 }}
+            />
+          )}
         </ScrollView>
 
         <View style={styles.footer}>
@@ -418,7 +448,11 @@ export function QuizRunScreen() {
             <Button
               title={t('run.submit')}
               onPress={() => void submitAnswer()}
-              disabled={item.question_type === 'mcq' ? choice === null : text.trim() === ''}
+              // 제출이 곧 채점이므로 채점될 수 없는 길이는 제출도 막습니다. 예전에는 열 글자
+              // 서술형도 제출됐다가 채점에서 거절됐고, 화면은 그걸 우리 잘못처럼 말했습니다.
+              disabled={item.question_type === 'mcq'
+                ? choice === null
+                : text.trim() === '' || length.state === 'too_short' || length.state === 'too_long'}
               {...testProps('quiz-submit')}
             />
           ) : (
