@@ -152,7 +152,8 @@
     "errorTitle": "Error",
     "emptyError": "Al menos un campo debe tener contenido",
     "saveError": "No se pudo guardar la tarjeta",
-    "noTemplateError": "No hay ninguna plantilla de tarjeta disponible."
+    "noTemplateError": "No hay ninguna plantilla de tarjeta disponible.",
+    "length": "{{chars, number}} / {{max, number}} caracteres"
   },
   "quickCreate": {
     "button": "Creación rápida",

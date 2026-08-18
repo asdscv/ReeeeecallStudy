@@ -17,5 +17,8 @@
   "saving": "กำลังบันทึก...",
   "edit": "แก้ไข",
   "add": "เพิ่ม",
-  "addAnother": "บันทึกและสร้างใบใหม่"
+  "addAnother": "บันทึกและสร้างใบใหม่",
+  "form": {
+    "length": "{{chars, number}} / {{max, number}} ตัวอักษร"
+  }
 }

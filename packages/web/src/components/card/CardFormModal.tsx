@@ -10,6 +10,7 @@ import {
 } from '../ui/dialog'
 import { useCardStore } from '../../stores/card-store'
 import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
+import { cardLength } from '@reeeeecall/shared/lib/card-content-limits'
 import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
 import { CardLimitBlock } from './CardLimitBlock'
 import { useAuthStore } from '../../stores/auth-store'
@@ -56,6 +57,21 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
     setUploadingField(null)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editCard, open])
+
+  /**
+   * 카드 전체 글자수 — 지금 몇 자인지, 그리고 몇 자까지인지.
+   *
+   * 한도는 카드 **한 장**에 걸립니다(필드별이면 필드를 늘려 우회되고, 앞/뒷면 구분은 템플릿
+   * 레이아웃이 정하는 것이라 편집만으로 넘나듭니다). 그래서 세는 것도 한 장 단위입니다.
+   *
+   * 이미지 필드는 데이터 URL 이라 혼자 수만 자입니다. 학습자가 쓴 글이 아니므로 세지
+   * 않습니다 — 아니면 사진 한 장이 카드를 통째로 막습니다.
+   */
+  const cardChars = cardLength(
+    fields
+      .filter((f) => f.type !== 'image')
+      .map((f) => fieldValues[f.key] ?? ''),
+  )
 
   const handleFieldChange = (key: string, value: string) => {
     setFieldValues((prev) => ({ ...prev, [key]: value }))
@@ -259,6 +275,19 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
               </div>
             )}
 
+            {/* 지금 몇 자 / 몇 자까지. 저장을 누른 뒤에 알게 되는 한도는 한도가 아닙니다. */}
+            <p
+              className={`text-right text-xs tabular-nums ${
+                cardChars.state === 'too_long' ? 'text-destructive'
+                  : cardChars.state === 'near_limit' ? 'text-amber-600'
+                    : 'text-content-tertiary'
+              }`}
+              data-testid="card-length"
+              data-state={cardChars.state}
+            >
+              {t('form.length', { chars: cardChars.count, max: cardChars.max })}
+            </p>
+
             {/* Dynamic fields */}
             {fields.map((field) => (
               <div key={field.key}>
@@ -426,7 +455,7 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
                 <button
                   type="button"
                   onClick={() => submitCard(true)}
-                  disabled={loading || uploadingField !== null}
+                  disabled={loading || uploadingField !== null || !cardChars.savable}
                   className="px-4 py-2 text-sm text-brand bg-brand/10 rounded-lg hover:bg-brand/20 disabled:opacity-50 cursor-pointer"
                 >
                   {t('addAnother')}
@@ -434,7 +463,9 @@ export function CardFormModal({ open, onClose, deckId, template, editCard }: Car
               )}
               <button
                 type="submit"
-                disabled={loading || uploadingField !== null}
+                // 한도를 넘긴 채 누르면 DB 제약이 그대로 올라옵니다. 숫자를 보여주는 것과
+                // 저장을 막는 것은 같은 약속의 두 쪽입니다.
+                disabled={loading || uploadingField !== null || !cardChars.savable}
                 className="px-4 py-2 text-sm text-white bg-brand rounded-lg hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {loading ? t('saving') : editCard ? t('edit') : t('add')}

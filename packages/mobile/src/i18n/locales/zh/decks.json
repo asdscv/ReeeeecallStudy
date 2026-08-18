@@ -152,7 +152,8 @@
     "errorTitle": "错误",
     "emptyError": "至少需要填写一个字段",
     "saveError": "保存卡片失败",
-    "noTemplateError": "没有可用的卡片模板。"
+    "noTemplateError": "没有可用的卡片模板。",
+    "length": "{{chars, number}} / {{max, number}} 字"
   },
   "quickCreate": {
     "button": "快速创建",

@@ -17,5 +17,8 @@
   "saving": "Menyimpan...",
   "edit": "Edit",
   "add": "Tambah",
-  "addAnother": "Simpan & Buat Lagi"
+  "addAnother": "Simpan & Buat Lagi",
+  "form": {
+    "length": "{{chars, number}} / {{max, number}} karakter"
+  }
 }

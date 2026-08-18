@@ -17,5 +17,8 @@
   "saving": "저장 중...",
   "edit": "편집",
   "add": "추가",
-  "addAnother": "추가하고 계속"
+  "addAnother": "추가하고 계속",
+  "form": {
+    "length": "{{chars, number}} / {{max, number}}자"
+  }
 }

@@ -17,5 +17,8 @@
   "saving": "Saving...",
   "edit": "Edit",
   "add": "Add",
-  "addAnother": "Add & Create Another"
+  "addAnother": "Add & Create Another",
+  "form": {
+    "length": "{{chars, number}} / {{max, number}} characters"
+  }
 }

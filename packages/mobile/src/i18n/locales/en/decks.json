@@ -152,7 +152,8 @@
     "errorTitle": "Error",
     "emptyError": "At least one field must have content",
     "saveError": "Failed to save card",
-    "noTemplateError": "No card template available."
+    "noTemplateError": "No card template available.",
+    "length": "{{chars, number}} / {{max, number}} characters"
   },
   "quickCreate": {
     "button": "Quick Create",
