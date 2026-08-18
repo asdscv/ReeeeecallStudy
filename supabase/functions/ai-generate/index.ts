@@ -1251,15 +1251,20 @@ Deno.serve(async (req) => {
         // `content_locale` is the UI language at creation time. It settles ONE thing: which
         // side of a cross-lingual card the question addresses the learner in.
         const uiLocale = quizSet.content_locale
-        const prompt = qType === 'mcq' ? buildMcqGenerationPrompt(sources, difficulty, uiLocale)
-          : qType === 'short' ? buildShortAnswerGenerationPrompt(sources, difficulty, uiLocale)
-          : buildEssayGenerationPrompt(sources, difficulty, uiLocale)
+        // 프롬프트와 검증을 **카드 부분집합**에 대해 다시 만들 수 있게 둡니다. 아래 보충
+        // 호출이 빠진 카드만 다시 물어보기 때문입니다.
+        const promptFor = (subset: typeof sources) => qType === 'mcq'
+          ? buildMcqGenerationPrompt(subset, difficulty, uiLocale)
+          : qType === 'short' ? buildShortAnswerGenerationPrompt(subset, difficulty, uiLocale)
+          : buildEssayGenerationPrompt(subset, difficulty, uiLocale)
         const makeItemId = (cardId: string, index: number) => `${setId}:${cardId}:${index}`
-        const validate = (json: Record<string, unknown>) => qType === 'mcq'
-          ? validateMultipleChoiceGeneration(json, sources, makeItemId, difficulty)
+        const validateFor = (json: Record<string, unknown>, subset: typeof sources) => qType === 'mcq'
+          ? validateMultipleChoiceGeneration(json, subset, makeItemId, difficulty)
           : qType === 'short'
-            ? validateShortAnswerGeneration(json, sources, makeItemId)
-            : validateEssayGeneration(json, sources, makeItemId)
+            ? validateShortAnswerGeneration(json, subset, makeItemId)
+            : validateEssayGeneration(json, subset, makeItemId)
+        const prompt = promptFor(sources)
+        const validate = (json: Record<string, unknown>) => validateFor(json, sources)
 
         /**
          * ONE corrective retry when the whole batch is unusable for a reason the model can fix.
@@ -1307,6 +1312,56 @@ ${reasons.map((r) => r === 'schema_word_leaked'
 Write them again, obeying those rules exactly.`
           generated = await generate(chain, corrective, prompt.userPrompt, undefined, DEFAULT_TEMPERATURE, outputCapFor('quiz_generate'))
           outcome = validate(generated.json)
+        }
+
+        /**
+         * 모자라면 **모자란 만큼만 다시 물어봅니다.**
+         *
+         * 위 재시도는 배치가 전멸했을 때만 돕니다. 그래서 "3문항 요청 → 2문항 도착" 은 그대로
+         * 통과했습니다. 학습자 입장에서 그건 조용한 실패입니다 — 요청한 수를 받지 못했는데
+         * 아무도 그렇다고 말해 주지 않습니다.
+         *
+         * 모델은 확률적이라 같은 카드가 두 번째 뽑기에서는 통과하는 일이 흔합니다. 빠진 카드만
+         * 추려 한 번 더 물어보고 결과를 합칩니다. 예약은 이미 잡혀 있으므로 **추가 청구는
+         * 없습니다** — 배달된 수만큼만 정산합니다(`settleQuiz`). 학습자가 손으로 다시 누르면
+         * 예약도 청구도 다시 일어납니다.
+         *
+         * 한 번만 합니다. 두 번째까지 못 만든 카드는 뽑기 운이 아니라 그 카드가 이 유형에
+         * 안 맞는 것이고, 그건 `dropped` 로 정직하게 돌려주는 편이 맞습니다.
+         */
+        if (outcome.servable && outcome.items.length < sources.length) {
+          const done = new Set(outcome.items.map((i: QuizItem) => i.cardId))
+          const missing = sources.filter((s) => !done.has(s.cardId))
+          if (missing.length > 0) {
+            console.warn(`[ai-generate] topping up ${missing.length}/${sources.length} missing items`)
+            try {
+              const p2 = promptFor(missing)
+              const g2 = await generate(chain, p2.systemPrompt, p2.userPrompt, undefined,
+                DEFAULT_TEMPERATURE, outputCapFor('quiz_generate'))
+              const o2 = validateFor(g2.json, missing)
+              if (o2.items.length > 0) {
+                // 토큰도 합칩니다 — 두 번 부른 원가가 한 번으로 기록되면 마진이 거짓이 됩니다.
+                if (generated.usage && g2.usage) {
+                  generated = { ...generated, usage: {
+                    ...generated.usage,
+                    tokensIn: (generated.usage.tokensIn ?? 0) + (g2.usage.tokensIn ?? 0),
+                    tokensOut: (generated.usage.tokensOut ?? 0) + (g2.usage.tokensOut ?? 0),
+                  } }
+                }
+                outcome = {
+                  ...outcome,
+                  items: [...outcome.items, ...o2.items],
+                  // 보충에서도 못 만든 카드만 남깁니다. 첫 판의 탈락 사유를 그대로 두면
+                  // 이미 채워진 카드가 실패로 보고됩니다.
+                  dropped: o2.dropped,
+                }
+              }
+            } catch (topUpError) {
+              // 보충은 **덤**입니다. 여기서 던지면 이미 만든 문항까지 잃습니다.
+              console.warn('[ai-generate] top-up failed, keeping the first pass:',
+                topUpError instanceof Error ? topUpError.message : 'unknown')
+            }
+          }
         }
 
         // The drop reasons ARE the prompt's report card; they are the only signal that would
@@ -1380,9 +1435,16 @@ Write them again, obeying those rules exactly.`
 
         // Charged for what shipped, not for what was asked for.
         const settled = await settleQuiz(userId, meter.job_ref, questions.length, generated.model, generated.usage)
+        // `dropped` 는 **끝내 문항이 안 나온 카드 수**입니다.
+        //
+        // 전에는 검증기가 버린 항목 수를 그대로 실었는데, 보충 호출이 그 카드를 채우고 나면
+        // "8개 요청 · 8개 생성 · 2개 탈락" 같은 앞뒤가 안 맞는 응답이 나갔습니다. 클라이언트가
+        // 판단해야 하는 것은 내부 시도 횟수가 아니라 **못 받은 카드가 있는가**입니다.
+        const madeIt = new Set(outcome.items.map((i: QuizItem) => i.cardId))
         return json({
           setId, generated: questions.length, requested: cardIds.length,
-          dropped: outcome.dropped.length, balance: settled?.balance ?? null,
+          dropped: cardIds.filter((id: string) => !madeIt.has(id)).length,
+          balance: settled?.balance ?? null,
         }, 200, cors)
       } catch (error) {
         const message = error instanceof Error ? error.message : 'UNKNOWN'
@@ -1688,7 +1750,14 @@ Write them again, obeying those rules exactly.`
       const fields = asFields(body.fields)
       if (!fields) return json({ error: 'Invalid fields', code: 'BAD_REQUEST' }, 400, cors)
       const reqCount = Number(body.cardCount)
-      if (!Number.isFinite(reqCount) || reqCount < 1) {
+      // 상한을 **넘으면 거절**합니다, 조용히 줄이지 않습니다.
+      //
+      // 예전에는 `Math.min(25, …)` 으로 clamp 만 했습니다. 그래서 `cardCount: 1e12` 가 200 으로
+      // 돌아오고 카드 25장 값($0.25)이 청구됐습니다 — 학습자가 본 적 없는 견적으로. 클라이언트는
+      // 25장씩 쪼개 보내므로(ai-generate-store) 정상 요청은 이 상한 근처에도 오지 않고,
+      // 1000 은 옛 번들이 보낼 수 있는 값까지 넉넉히 덮으면서 말이 안 되는 수는 거르는 선입니다.
+      const ABSURD_CARDS = 1000
+      if (!Number.isInteger(reqCount) || reqCount < 1 || reqCount > ABSURD_CARDS) {
         return json({ error: 'Invalid cardCount', code: 'BAD_REQUEST' }, 400, cors)
       }
       pCards = Math.min(MAX_CARDS_PER_CALL, Math.floor(reqCount))

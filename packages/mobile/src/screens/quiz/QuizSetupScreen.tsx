@@ -22,7 +22,11 @@ type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizSetup'>
 const TYPES: QuizQuestionType[] = ['mcq', 'short', 'essay']
 // Same presets as web. Mobile has no free-entry field: a numeric keyboard for a value that
 // is almost always one of these is worse than one more chip.
-const COUNTS = [4, 6, 8, 10, 12, 20, 30, 50]
+// 서버가 실제로 받는 길이만 보여 줍니다. 30·50 은 스키마가 12 로 막고 있는 동안에도
+// 화면에 있었고, 고르면 원시 제약 위반(23514)이 돌아왔습니다. 264 가 20 까지 열었고,
+// 그 위는 스키마가 아니라 생성 구조 이야기입니다 — 서술형 50문항은 17배치입니다.
+// `quiz-count-options.test.ts` 가 이 목록을 마이그레이션의 상한에 붙들어 둡니다.
+const COUNTS = [4, 6, 8, 10, 12, 16, 20]
 /** Ceiling for the custom box. Matches web's MAX_COUNT and the server's per-set cap. */
 const MAX_COUNT = 50
 

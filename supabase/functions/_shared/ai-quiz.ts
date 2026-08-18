@@ -435,11 +435,50 @@ export function normalizeAnswer(text: string): string {
  * every sentence, so an unguarded leak check would reject every question ever written for a kanji
  * deck. Below the floor the check abstains — it reports `false`, and the item is judged on its
  * other constraints — rather than pretending to a certainty it does not have.
+ *
+ * ── 이 함수를 근거 검사에 쓰지 마십시오 ────────────────────────────────────
+ *
+ * 여기서 `false` 는 "포함되지 않았다"가 아니라 **"판단하지 않았다"** 입니다. 유출 검사
+ * (`answer_leaked_in_question`)에서는 그 기권이 문항을 살리는 쪽으로 작동합니다 — 못 판단했으니
+ * 유출이라고 하지 않는다.
+ *
+ * 그런데 같은 `false` 가 근거 검사에서는 문항을 **죽입니다**: "카드에서 베꼈다는 이 용어가
+ * 카드에 없다". 그래서 한 글자 용어는 카드에 **있어도** 근거 없음으로 처리됐습니다. 중국어 덱
+ * 429장 중 140장(32.6%)이 한 글자 답이고, 그 카드들은 서술형 문항이 한 번도 나올 수
+ * 없었습니다. "요청은 3문항인데 2문항만 온다"의 정체가 이것입니다.
+ *
+ * 규칙: **판단 불가는 언제나 문항을 살리는 쪽으로.** 근거는 `mentionsTerm`, 앵커는
+ * `anchorSatisfied` 를 쓰십시오.
  */
 export function containsNormalized(haystack: string, needle: string, minChars = 2): boolean {
   const n = normalizeAnswer(needle)
   if (n.length < minChars) return false
   return normalizeAnswer(haystack).includes(n)
+}
+
+/**
+ * 모델이 "카드에서 베꼈다"고 한 용어가 **정말 카드에 있는가**.
+ *
+ * 길이 하한이 없습니다. 여기서 haystack 은 모델의 산문이 아니라 **우리 카드의 글**이라,
+ * 한 글자가 우연히 섞여 들 걱정이 없습니다 — 카드에 `吗` 가 있으면 그건 정말 그 카드의
+ * 내용입니다. 하한을 그대로 쓰면 한 글자 답을 가진 카드는 영원히 근거를 못 댑니다.
+ */
+export function mentionsTerm(cardText: string, term: string): boolean {
+  const t = normalizeAnswer(term)
+  if (t === '') return false
+  return normalizeAnswer(cardText).includes(t)
+}
+
+/**
+ * 문항이 카드의 질문면을 담고 있는가 — **판단할 수 있을 때만** 따집니다.
+ *
+ * 앵커가 한 글자면 "담겼는지"를 모델 산문 위에서 신뢰할 수 없습니다. 그때는 요구하지 않습니다.
+ * 못 판단한 것을 근거로 문항을 떨어뜨리면, 짧은 카드를 가진 학습자만 조용히 손해를 봅니다.
+ */
+export function anchorSatisfied(question: string, anchor: string): boolean {
+  const a = normalizeAnswer(anchor)
+  if (a.length < 2) return true
+  return normalizeAnswer(question).includes(a)
 }
 
 /** The separators human deck authors use inside a single answer field. */
@@ -1074,7 +1113,7 @@ export function validateShortAnswerGeneration(
     if (!grounding) { drop(cardId, 'bad_enum'); continue }
 
     if (containsNormalized(question, grounding.expected)) { drop(cardId, 'answer_leaked_in_question'); continue }
-    if (grounding.anchor && !containsNormalized(question, grounding.anchor)) {
+    if (grounding.anchor && !anchorSatisfied(question, grounding.anchor)) {
       drop(cardId, 'anchor_missing'); continue
     }
 
@@ -1135,7 +1174,7 @@ export function validateEssayGeneration(
     if (leaksSchemaWord(question)) { drop(cardId, 'schema_word_leaked'); continue }
     // An essay question may reword freely, but it must be about THIS card, and it must not hand
     // over the answer it is asking the learner to reconstruct.
-    if (!containsNormalized(question, card.promptText)) { drop(cardId, 'anchor_missing'); continue }
+    if (!anchorSatisfied(question, card.promptText)) { drop(cardId, 'anchor_missing'); continue }
     if (containsNormalized(question, card.answerText)) { drop(cardId, 'answer_leaked_in_question'); continue }
 
     if (!Array.isArray(entry.criteria)) { drop(cardId, 'bad_criteria'); continue }
@@ -1175,7 +1214,7 @@ export function validateEssayGeneration(
       for (const m of c.mustMention.slice(0, ESSAY_MENTIONS_PER_CRITERION)) {
         if (typeof m !== 'string') { bad = true; break }
         const term = m.trim()
-        if (term === '' || term.length > 40 || !containsNormalized(grounded, term)) { bad = true; break }
+        if (term === '' || term.length > 40 || !mentionsTerm(grounded, term)) { bad = true; break }
         if (!mentions.some((existing) => normalizeAnswer(existing) === normalizeAnswer(term))) mentions.push(term)
       }
       // A criterion whose terms are invented is dropped, and the fact is remembered: an item that
