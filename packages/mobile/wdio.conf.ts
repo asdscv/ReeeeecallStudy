@@ -69,7 +69,17 @@ export const config: WebdriverIO.Config = {
   // Login + navigate to Home before each spec file
   // Ensures clean state regardless of how previous spec ended
   before: async function () {
-    // Ensure app is in foreground on Android
+    /**
+     * 앱을 앞으로 가져옵니다.
+     *
+     * `terminateApp` + `activateApp` 로 화면 상태까지 확실히 되돌리는 안을 시도했다가 뺐습니다.
+     * 되돌리기는 잘 되지만, iOS 세션이 실행 중에 끊기는 현상(ECONNRESET, "session is either
+     * terminated or not started")을 **종료 없이도** 관측했기 때문에 원인으로 특정할 수 없었고,
+     * 원인을 모르는 채로 세션을 더 흔드는 동작을 매 스펙마다 넣을 이유가 없습니다.
+     *
+     * 화면 되돌리기는 아래 드로어 감지에 맡깁니다 — 그게 지금까지 동작하지 않은 이유는
+     * 셀렉터였습니다(아래 주석).
+     */
     if (!driver.isIOS) {
       try {
         await driver.activateApp('com.reeeeecall.study')
@@ -90,7 +100,12 @@ export const config: WebdriverIO.Config = {
       // Try pressing back to get out of nested stack screens
       for (let i = 0; i < 3; i++) {
         // Check if we're on a main screen (has drawer hamburger)
-        const hamburger = $('~Open menu')
+        //
+        // `~Open menu` 로 찾고 있었고, 그건 **한 번도 맞은 적이 없습니다.** 햄버거의
+        // accessibilityLabel 은 번역된 문자열("메뉴 열기")이라 영어 라벨로는 절대 안 잡힙니다 —
+        // 스위트 전체의 드로어 이동이 이것 때문에 죽어 있었고(PR #455), 같은 실수가 이 훅에
+        // 남아 있었습니다. 잡을 것은 testID 입니다.
+        const hamburger = $('~screen-header-menu')
         if (await hamburger.isDisplayed().catch(() => false)) break
 
         if (driver.isIOS) {
