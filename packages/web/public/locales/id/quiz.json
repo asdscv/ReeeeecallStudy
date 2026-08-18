@@ -63,6 +63,7 @@
     "empty": "Soal dalam set ini sudah hilang — kartu asalnya telah dihapus.",
     "backToQuiz": "Kembali ke kuis",
     "progress": "{{current, number}} / {{total, number}}",
+    "shortfall": "{{made}} dari {{requested}} soal yang kamu minta berhasil dibuat. Kartu yang dapat dipakai di dek habis, atau sebagian kartu tidak cocok untuk tipe soal ini.",
     "leave": "Keluar",
     "placeholder": {
       "short": "Ketik jawaban Anda",

@@ -63,6 +63,7 @@
     "empty": "Las preguntas de esta tanda ya no existen: se borraron las tarjetas de las que salían.",
     "backToQuiz": "Volver a cuestionarios",
     "progress": "{{current, number}} / {{total, number}}",
+    "shortfall": "Se crearon {{made}} de las {{requested}} preguntas que pediste. Al mazo le faltaron tarjetas utilizables, o algunas no admiten este tipo de pregunta.",
     "leave": "Salir",
     "placeholder": {
       "short": "Escribe tu respuesta",

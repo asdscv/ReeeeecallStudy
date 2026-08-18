@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
@@ -8,6 +8,7 @@ import {
 } from '@reeeeecall/shared/stores/quiz-store'
 import { QuizFeedback } from './QuizFeedback'
 import { AiRefusalNotice } from '../../components/ai/AiRefusalNotice'
+import { quizGrowth, QUIZ_GROWTH_POLL_MS } from '@reeeeecall/shared/lib/quiz-shortfall'
 import { answerLength } from '@reeeeecall/shared/lib/quiz-answer-limits'
 import { itemOutcome, tallyQuiz, tallyLine } from '@reeeeecall/shared/lib/quiz-outcome'
 import { gradeCostLine } from '@reeeeecall/shared/lib/quiz-pricing'
@@ -70,10 +71,28 @@ export function QuizRunPage() {
    * in whatever has landed since. Polled while the set is still short of what was asked for,
    * and stopped as soon as it is complete — an idle poll on a finished quiz is pure noise.
    */
-  const stillGrowing = !!run && run.item_count < (run.requested_count ?? run.item_count)
+  //
+  // 그리고 **영원히 못 채우는 경우**가 있습니다: 덱이 작아 카드를 다 썼거나, 그 카드들로는
+  // 그 유형의 문항을 만들 수 없을 때. 그때 예전에는 조회가 4초마다 끝없이 돌고, 학습자는
+  // 왜 5문항을 골랐는데 4문항인지 아무 설명도 못 받았습니다. `quizGrowth` 가 시간으로
+  // 가릅니다 — 20초 동안 한 문항도 안 늘면 생성이 끝난 것입니다.
+  const [idleTicks, setIdleTicks] = useState(0)
+  const seenCount = useRef(-1)
+  useEffect(() => {
+    if (!run) return
+    if (run.item_count !== seenCount.current) {
+      seenCount.current = run.item_count
+      setIdleTicks(0)
+    }
+  }, [run])
+  const growth = quizGrowth(run?.item_count ?? 0, run?.requested_count, idleTicks)
+  const stillGrowing = !!run && growth.polling
   useEffect(() => {
     if (!runId || !stillGrowing) return
-    const id = setInterval(() => { void refreshRun(runId) }, 4000)
+    const id = setInterval(() => {
+      void refreshRun(runId)
+      setIdleTicks((t) => t + 1)
+    }, QUIZ_GROWTH_POLL_MS)
     return () => clearInterval(id)
   }, [runId, stillGrowing, refreshRun])
 
@@ -214,6 +233,16 @@ export function QuizRunPage() {
           {t('run.leave')}
         </button>
       </div>
+      {/* 요청한 수를 못 채운 채로 생성이 끝났습니다.
+          덱이 작아 카드를 다 썼거나(카드 5장에 5문항, 한 장이 그 유형에 안 맞으면 4문항),
+          그 카드들로는 그 유형의 문항을 만들 수 없을 때입니다. 예전에는 이 상태에서 조회만
+          4초마다 끝없이 돌고 학습자는 아무 설명도 못 받았습니다. */}
+      {growth.cameUpShort && (
+        <p className="text-xs text-content-tertiary" data-testid="quiz-shortfall">
+          {t('run.shortfall', { requested: run?.requested_count ?? 0, made: items.length })}
+        </p>
+      )}
+
 
       <div className="p-4 bg-card rounded-xl border border-border">
         <p className="text-base text-foreground whitespace-pre-wrap">{item.stem}</p>

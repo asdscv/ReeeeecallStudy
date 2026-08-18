@@ -63,6 +63,7 @@
     "empty": "このセットの問題はなくなりました。元になったカードが削除されています。",
     "backToQuiz": "クイズ一覧へ",
     "progress": "{{current, number}} / {{total, number}}",
+    "shortfall": "リクエストした{{requested}}問のうち{{made}}問が作成されました。デッキに使えるカードが足りないか、一部のカードではこの形式の問題を作れませんでした。",
     "leave": "終了",
     "placeholder": {
       "short": "答えを入力",

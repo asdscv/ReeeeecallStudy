@@ -63,6 +63,7 @@
     "empty": "Các câu hỏi trong bài này không còn — những thẻ tạo ra chúng đã bị xoá.",
     "backToQuiz": "Về danh sách",
     "progress": "{{current, number}} / {{total, number}}",
+    "shortfall": "Đã tạo {{made}} trong số {{requested}} câu bạn yêu cầu. Bộ thẻ không còn thẻ dùng được, hoặc một số thẻ không tạo được dạng câu hỏi này.",
     "leave": "Thoát",
     "placeholder": {
       "short": "Nhập câu trả lời",
