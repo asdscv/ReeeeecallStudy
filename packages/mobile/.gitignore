@@ -45,3 +45,6 @@ yarn-error.*
 # Google Play service-account key (secret — never commit)
 google-service-account.json
 google-service-account*.json
+
+# e2e 디버그 캡처 — auth.ts:215 가 매 실행마다 새로 쓴다(쓰기 전용, 읽는 코드 없음)
+e2e-debug-auth-state.png
