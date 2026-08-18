@@ -5,7 +5,9 @@ import {
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
-import { quizGrowth, QUIZ_GROWTH_POLL_MS } from '@reeeeecall/shared/lib/quiz-shortfall'
+import {
+  quizGrowth, QUIZ_GROWTH_POLL_MS, QUIZ_GROWTH_IDLE_TICKS,
+} from '@reeeeecall/shared/lib/quiz-shortfall'
 import {
   useQuizStore, QuizError, QUIZ_GRADE_ACTION, type QuizSubmitResult, type QuizQuote,
   optionFlaws, optionAxes, QUIZ_FEEDBACK_REASONS,
@@ -81,25 +83,24 @@ export function QuizRunScreen() {
   // 그리고 **영원히 못 채우는 경우**가 있습니다: 덱이 작아 카드를 다 썼거나, 그 카드들로는
   // 그 유형의 문항을 만들 수 없을 때. 그때 예전에는 조회가 끝없이 돌고 학습자는 왜 5문항을
   // 골랐는데 4문항인지 아무 설명도 못 받았습니다.
-  const [idleTicks, setIdleTicks] = useState(0)
-  const seenCount = useRef(-1)
-  useEffect(() => {
-    if (!run) return
-    if (run.item_count !== seenCount.current) {
-      seenCount.current = run.item_count
-      setIdleTicks(0)
-    }
-  }, [run])
-  const growth = quizGrowth(run?.item_count ?? 0, run?.requested_count, idleTicks)
+  // 틱 카운터는 **타이머 안의 지역 변수**입니다. React 상태로 두면 문항이 늘 때마다
+  // effect 안에서 리셋해야 하고, 그건 렌더를 연쇄로 돌립니다. 상태로 남기는 것은
+  // "이 수에서 더 안 늘더라"는 사실 하나뿐이고, 문항이 더 도착하면 `itemCount` 가 달라져
+  // 저절로 다시 기다립니다.
+  const [stalledAt, setStalledAt] = useState<number | null>(null)
+  const itemCount = run?.item_count ?? 0
+  const growth = quizGrowth(itemCount, run?.requested_count, stalledAt)
   const stillGrowing = !!run && growth.polling
   useEffect(() => {
-    if (!stillGrowing) return
+    if (!runId || !stillGrowing) return
+    let ticks = 0
     const id = setInterval(() => {
       void refreshRun(runId)
-      setIdleTicks((t) => t + 1)
+      ticks += 1
+      if (ticks >= QUIZ_GROWTH_IDLE_TICKS) setStalledAt(itemCount)
     }, QUIZ_GROWTH_POLL_MS)
     return () => clearInterval(id)
-  }, [runId, stillGrowing, refreshRun])
+  }, [runId, stillGrowing, refreshRun, itemCount])
 
   const items = useMemo(() => run?.items ?? [], [run])
   const item = items[index]

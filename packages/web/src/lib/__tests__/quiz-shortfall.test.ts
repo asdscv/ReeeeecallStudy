@@ -10,45 +10,41 @@
  * 4문항인지 아무 설명도 못 받습니다.
  */
 import { describe, it, expect } from 'vitest'
-import {
-  quizGrowth, QUIZ_GROWTH_IDLE_TICKS,
-} from '@reeeeecall/shared/lib/quiz-shortfall'
+import { quizGrowth } from '@reeeeecall/shared/lib/quiz-shortfall'
 
 describe('생성 진행 판정', () => {
   it('다 찼으면 조회도 경고도 없다', () => {
-    expect(quizGrowth(20, 20, 0)).toEqual({ polling: false, cameUpShort: false, missing: 0 })
-    // 늘어난 지 한참 지나도 마찬가지입니다.
-    expect(quizGrowth(20, 20, 99).cameUpShort).toBe(false)
+    expect(quizGrowth(20, 20, null)).toEqual({ polling: false, cameUpShort: false, missing: 0 })
+    expect(quizGrowth(20, 20, 20).cameUpShort).toBe(false)
   })
 
-  it('모자라고 아직 늘고 있으면 조회만 한다', () => {
-    const g = quizGrowth(8, 20, 0)
+  it('모자라고 아직 포기 전이면 조회만 한다', () => {
+    const g = quizGrowth(8, 20, null)
     expect(g.polling).toBe(true)
     expect(g.cameUpShort).toBe(false)
     expect(g.missing).toBe(12)
   })
 
-  it('멈춘 채로 한계에 닿으면 조회를 그만두고 말한다', () => {
-    // 상한에서 역산합니다 — 손으로 적으면 조정할 때마다 여기서 터집니다.
-    const g = quizGrowth(4, 5, QUIZ_GROWTH_IDLE_TICKS)
+  it('그 수에서 포기했으면 조회를 그만두고 말한다', () => {
+    const g = quizGrowth(4, 5, 4)
     expect(g.polling).toBe(false)
     expect(g.cameUpShort).toBe(true)
     expect(g.missing).toBe(1)
   })
 
-  it('한계 직전까지는 아직 기다린다', () => {
-    expect(quizGrowth(4, 5, QUIZ_GROWTH_IDLE_TICKS - 1).polling).toBe(true)
-    expect(quizGrowth(4, 5, QUIZ_GROWTH_IDLE_TICKS - 1).cameUpShort).toBe(false)
+  it('포기한 뒤에 문항이 더 도착하면 다시 기다린다', () => {
+    // 4에서 포기했는데 5번째가 늦게 도착한 경우입니다. 그 자리에 "모자랍니다"가 남아
+    // 있으면 다 찬 퀴즈에 경고가 붙습니다.
+    expect(quizGrowth(6, 8, 4).polling).toBe(true)
+    expect(quizGrowth(6, 8, 4).cameUpShort).toBe(false)
   })
 
   it('요청 수를 모르면 아무 말도 하지 않는다', () => {
-    // 옛 회차에는 없을 수 있습니다. 없는 것을 근거로 경고를 붙이면 멀쩡한 퀴즈에
-    // "모자랍니다"가 뜹니다.
-    expect(quizGrowth(10, null, 99)).toEqual({ polling: false, cameUpShort: false, missing: 0 })
-    expect(quizGrowth(10, undefined, 99).cameUpShort).toBe(false)
+    expect(quizGrowth(10, null, 10)).toEqual({ polling: false, cameUpShort: false, missing: 0 })
+    expect(quizGrowth(10, undefined, 10).cameUpShort).toBe(false)
   })
 
   it('요청보다 많으면 모자란 것이 아니다', () => {
-    expect(quizGrowth(12, 10, 99).cameUpShort).toBe(false)
+    expect(quizGrowth(12, 10, 12).cameUpShort).toBe(false)
   })
 })

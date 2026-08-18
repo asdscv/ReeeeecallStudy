@@ -27,16 +27,26 @@ export interface QuizGrowthState {
   readonly missing: number
 }
 
+/**
+ * @param itemCount      지금 회차에 들어 있는 문항 수
+ * @param requestedCount 학습자가 요청한 수. 모르면 판단하지 않습니다
+ * @param stalledAt      **그 수에서 더 안 늘더라**고 포기한 문항 수. 아직이면 null
+ *
+ * `stalledAt` 이 상태인 이유: 틱 카운터를 React 상태로 두면 effect 안에서 리셋해야 하고,
+ * 그건 렌더를 연쇄로 돌립니다(lint 가 잡습니다). 카운터는 타이머 안의 지역 변수로 두고,
+ * **포기했다는 사실만** 한 번 남깁니다. 문항이 더 도착하면 `itemCount` 가 달라져
+ * `stalledAt` 과 어긋나므로 조회가 저절로 다시 시작됩니다.
+ */
 export function quizGrowth(
   itemCount: number,
   requestedCount: number | null | undefined,
-  idleTicks: number,
+  stalledAt: number | null,
 ): QuizGrowthState {
   // 요청 수를 모르면 판단하지 않습니다. 옛 회차에는 없을 수 있고, 없는 것을 근거로
   // "모자랍니다"라고 적으면 멀쩡한 퀴즈에 경고가 붙습니다.
   const target = requestedCount ?? itemCount
   const missing = Math.max(0, target - itemCount)
   if (missing === 0) return { polling: false, cameUpShort: false, missing: 0 }
-  const done = idleTicks >= QUIZ_GROWTH_IDLE_TICKS
-  return { polling: !done, cameUpShort: done, missing }
+  const gaveUp = stalledAt !== null && stalledAt === itemCount
+  return { polling: !gaveUp, cameUpShort: gaveUp, missing }
 }
