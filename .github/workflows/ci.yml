@@ -408,6 +408,7 @@ jobs:
             supabase/tests/plan_digest_counts_attempts_test.sql \
             supabase/tests/weak_card_study_is_evidence_test.sql \
             supabase/tests/diagnosis_evidence_test.sql \
+            supabase/tests/diagnosis_persists_test.sql \
             supabase/tests/ledger_reason_test.sql \
             supabase/tests/usage_history_test.sql \
             supabase/tests/quiz_item_feedback_test.sql \
