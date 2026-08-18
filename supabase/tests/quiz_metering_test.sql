@@ -307,12 +307,17 @@ BEGIN
   UPDATE ai_free_allowances SET per_day = 0, unit_kind = 'unit'
    WHERE tier = 'free' AND action_group = 'quiz_generate';
   UPDATE ai_quiz_trial SET units_remaining = 0 WHERE user_id = v_uid;
-  INSERT INTO ai_credit_balance (user_id, balance) VALUES (v_uid, 100000)
-    ON CONFLICT (user_id) DO UPDATE SET balance = 1000000;
+  -- 잔액을 **값에서 역산**합니다. 숫자를 손으로 적으면 값이 바뀔 때마다 여기서 터집니다 —
+  -- 230 이 값을 열 배로 올렸을 때 한 번, 259 가 열 배로 내렸을 때 또 한 번 그랬습니다.
+  --
+  -- 이 시나리오는 홀드가 잔액의 **대부분**일 때만 뜻이 있습니다. 8문항을 잡아 두고 4문항을
+  -- 더 살 수 없어야 하므로, 잔액은 8문항 값보다 조금 많고 12문항 값보다는 적어야 합니다.
+  SELECT 10 * units * (SELECT quiz_unit_price_micro FROM ai_pricing_settings WHERE id = 1)
+    INTO v_price FROM ai_quiz_price_units WHERE action = 'generate_mcq';
+  INSERT INTO ai_credit_balance (user_id, balance) VALUES (v_uid, v_price)
+    ON CONFLICT (user_id) DO UPDATE SET balance = v_price;
 
-  -- 8 mcq = 16 units = $0.80 of a $1.00 balance. Held, never delivered. Ten times what it was:
-  -- mig 230 multiplied the unit price, and this scenario only means anything while the hold is
-  -- MOST of the balance.
+  -- 8문항 = 잔액의 80%. 잡아만 두고 배달하지 않습니다.
   r1 := public.reserve_ai_quiz('generate_mcq', 8, gen_random_uuid(), 9999999, v_deck);
   q := public.get_ai_quiz_quote('generate_mcq', 4);
   IF (q->>'sufficient')::boolean IS NOT FALSE THEN

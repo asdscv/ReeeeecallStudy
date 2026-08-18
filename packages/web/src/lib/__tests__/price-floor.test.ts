@@ -51,14 +51,17 @@ const MEASURED: Record<string, { in: number; out: number; label: string }> = {
 
 /** What each unit is actually sold for, micro-USD. 1 credit = 1,000 micro. */
 const PRICE: Record<keyof typeof MEASURED, number> = {
-  quizQuestion: 100_000,  // 2 units x quiz_unit_price_micro (50,000 since mig 230)
-  essayQuestion: 150_000, // 3 units
+  // 259 가 유닛 단가를 $0.05 → $0.005 로 내리고 유형별로 값을 갈랐습니다. 문항 하나가
+  // 유형과 무관하게 $0.10 이었고, 주관식은 객관식의 3분의 1 출력으로 같은 값을 받고
+  // 있었습니다.
+  quizQuestion: 10_000,   // 객관식 2 units x 5,000
+  essayQuestion: 15_000,  // 서술형 3 units
   // 254 brought both gradings down: measured cost is $0.00042 (short) and $0.00032 (essay), and
   // $0.40 an answer was 1,233x — the top of the ladder by four times, on the type learners get
   // the most out of. Essay GENERATION is expensive; essay GRADING is not, because the rubric is
   // already stored with the question and the model only returns a level per criterion.
-  gradeShort: 50_000,     // 1 unit
-  gradeEssay: 100_000,    // 2 units
+  gradeShort: 10_000,     // 2 units x 5,000
+  gradeEssay: 20_000,     // 4 units
   remediation: 500_000,   // fixed price, x10 in mig 230
   card: 10_000,           // fixed price, back to a cent in mig 249
 }

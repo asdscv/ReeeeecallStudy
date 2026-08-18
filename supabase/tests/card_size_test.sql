@@ -52,16 +52,16 @@ BEGIN
 
   -- ══ 4. 그리고 텍스트로는 바이트가 먼저 걸리지 않는다 ═════════════════════
   --
-  -- 이것이 두 한도의 순서입니다. 4,001자 한글은 12,003바이트로 바이트 한도(16,000) 아래인데도
+  -- 이것이 두 한도의 순서입니다. 2,001자 한글은 6,003바이트로 바이트 한도(16,000) 아래인데도
   -- 막혀야 합니다 — 막는 주체가 글자수여야 하고, 그래야 화면이 보여준 숫자가 진실입니다.
   BEGIN
     INSERT INTO cards (deck_id, user_id, template_id, field_values)
-      VALUES (v_deck, v_uid, v_tmpl, jsonb_build_object('field_1', repeat('가', 4001)));
-    RAISE EXCEPTION 'FAIL: 4,001자가 통과했다';
+      VALUES (v_deck, v_uid, v_tmpl, jsonb_build_object('field_1', repeat('가', 2001)));
+    RAISE EXCEPTION 'FAIL: 2,001자가 통과했다';
   EXCEPTION WHEN check_violation THEN NULL;
   END;
-  IF octet_length(jsonb_build_object('field_1', repeat('가', 4001))::text) > 16000 THEN
-    RAISE EXCEPTION 'FAIL: 4,001자 한글이 바이트 한도를 넘는다 — 바이트가 먼저 걸린다';
+  IF octet_length(jsonb_build_object('field_1', repeat('가', 2001))::text) > 16000 THEN
+    RAISE EXCEPTION 'FAIL: 2,001자 한글이 바이트 한도를 넘는다 — 바이트가 먼저 걸린다';
   END IF;
 
   RAISE NOTICE 'card_size_test: all assertions passed';
