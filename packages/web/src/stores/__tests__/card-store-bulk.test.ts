@@ -167,7 +167,13 @@ describe('createCards (bulk)', () => {
     expect(useCardStore.getState().error).toBe('Rate limited')
   })
 
-  it('should record bulk count with guard.recordSuccess', async () => {
+  it('대량 생성도 속도 제한은 거친다', async () => {
+    // 이 자리는 원래 `recordSuccess('cards_total', 10)` 을 확인했습니다. 카드 **총량**은
+    // 이제 서버만 셉니다 — 클라이언트에 3,000 이 따로 적혀 있어서, 서버 한도를 5,000 으로
+    // 올린 뒤 3,001번째가 서버는 허용하는데 클라이언트가 막는 상태가 됐기 때문입니다.
+    // (`card-limit-single-source.test.ts`)
+    //
+    // 총량과 남용 방지는 다른 문제라, 분당 속도 제한은 남아 있어야 합니다.
     setupMocks()
 
     await useCardStore.getState().createCards({
@@ -176,7 +182,8 @@ describe('createCards (bulk)', () => {
       cards: makeCards(10),
     })
 
-    expect(mockGuard.recordSuccess).toHaveBeenCalledWith('cards_total', 10)
+    expect(mockGuard.check).toHaveBeenCalledWith('bulk_card_create')
+    expect(mockGuard.recordSuccess).not.toHaveBeenCalledWith('cards_total', 10)
   })
 
   it('should return 0 when not authenticated', async () => {
