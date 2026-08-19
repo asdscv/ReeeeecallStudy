@@ -151,7 +151,7 @@
     },
     "exploreMarket": {
       "title": "Explore the Marketplace",
-      "description": "Thousands of shared decks await! Browse decks from other learners or share your own creations.",
+      "description": "Khám phá các bộ thẻ do người học khác chia sẻ và lấy về bộ nào bạn thích. Bạn cũng có thể đăng bộ thẻ của mình lên chợ.",
       "action": "Browse Marketplace",
       "actionFinish": "Finish Setup"
     }

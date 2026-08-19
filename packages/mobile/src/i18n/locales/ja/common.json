@@ -112,7 +112,7 @@
     },
     "exploreMarket": {
       "title": "Explore the Marketplace",
-      "description": "Thousands of shared decks await! Browse decks from other learners or share your own creations.",
+      "description": "他の学習者が共有したデッキを見て、気に入ったものをそのまま取り込めます。自分のデッキをマーケットに公開することもできます。",
       "action": "Browse Marketplace"
     }
   },

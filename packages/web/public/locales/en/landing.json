@@ -108,50 +108,6 @@
     "6": "Detailed learning statistics and analysis",
     "7": "Personalized plans and adaptive remediation"
   },
-  "metrics": {
-    "efficiency": {
-      "label": "Learning Efficiency",
-      "value": "200%",
-      "change": "+150%"
-    },
-    "interval": {
-      "label": "Avg Review Interval",
-      "value": "15 days",
-      "change": "+8 days"
-    },
-    "accuracy": {
-      "label": "Accuracy Rate",
-      "value": "87%",
-      "change": "+23%"
-    },
-    "daily": {
-      "label": "Daily Study Cards",
-      "value": "45 cards",
-      "change": "+30 cards"
-    }
-  },
-  "stats": {
-    "0": {
-      "label": "Learning Efficiency",
-      "value": "200%",
-      "change": "+150%"
-    },
-    "1": {
-      "label": "Avg Review Interval",
-      "value": "15 days",
-      "change": "+8 days"
-    },
-    "2": {
-      "label": "Accuracy Rate",
-      "value": "87%",
-      "change": "+23%"
-    },
-    "3": {
-      "label": "Daily Study Cards",
-      "value": "45 cards",
-      "change": "+30 cards"
-    }
-  },
   "steps": {
     "title": "Start in 3 Simple Steps",
     "step1": {
@@ -195,7 +151,6 @@
     "features": "Features",
     "science": "Science",
     "results": "Results",
-    "reviews": "Reviews",
     "howItWorks": "How It Works",
     "faq": "FAQ",
     "dashboard": "Dashboard",
@@ -204,9 +159,11 @@
   "trustBadges": {
     "srs": "Smart SRS",
     "sharing": "Deck Sharing",
-    "languages": "7 Languages",
+    "languages": "{{count, number}} Languages",
     "allDevices": "All Devices",
-    "import": "CSV & JSON Import"
+    "import": "CSV & JSON Import",
+    "languages_one": "{{count, number}} Language",
+    "languages_other": "{{count, number}} Languages"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",
@@ -250,41 +207,6 @@
       "label": "Time Saved",
       "change": "-50%",
       "description": "Half the study time, same results"
-    },
-    "completion": {
-      "label": "Daily Completion",
-      "change": "+38%",
-      "description": "Users finish their daily reviews"
-    },
-    "learners": {
-      "label": "Active Learners",
-      "change": "+840 this month",
-      "description": "Growing community worldwide"
-    }
-  },
-  "socialProof": {
-    "title": "Trusted by Learners Worldwide",
-    "subtitle": "Join thousands of students studying smarter",
-    "liveActivity": "{{count, number}} people studying right now",
-    "userCountLabel": "Active Users",
-    "cardsStudiedLabel": "Cards Studied",
-    "decksCreatedLabel": "Decks Created",
-    "testimonials": {
-      "0": {
-        "quote": "ReeeeecallStudy helped me pass JLPT N2. The SRS algorithm is incredibly effective!",
-        "author": "Min-Jun Kim",
-        "role": "Language Learner"
-      },
-      "1": {
-        "quote": "The interface is so clean and intuitive. Studying is actually enjoyable now.",
-        "author": "Seo-Yun Lee",
-        "role": "Medical Student"
-      },
-      "2": {
-        "quote": "The deck sharing feature is amazing. I found decks for almost every subject.",
-        "author": "Yuki Park",
-        "role": "University Student"
-      }
     }
   },
   "science": {

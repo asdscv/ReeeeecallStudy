@@ -108,50 +108,6 @@
     "6": "詳細な学習統計と分析",
     "7": "パーソナライズされた計画と適応型補強学習"
   },
-  "metrics": {
-    "efficiency": {
-      "label": "学習効率",
-      "value": "200%",
-      "change": "+150%"
-    },
-    "interval": {
-      "label": "平均復習間隔",
-      "value": "15日",
-      "change": "+8日"
-    },
-    "accuracy": {
-      "label": "正答率",
-      "value": "87%",
-      "change": "+23%"
-    },
-    "daily": {
-      "label": "1日の学習カード数",
-      "value": "45枚",
-      "change": "+30枚"
-    }
-  },
-  "stats": {
-    "0": {
-      "label": "学習効率",
-      "value": "200%",
-      "change": "+150%"
-    },
-    "1": {
-      "label": "平均復習間隔",
-      "value": "15日",
-      "change": "+8日"
-    },
-    "2": {
-      "label": "正答率",
-      "value": "87%",
-      "change": "+23%"
-    },
-    "3": {
-      "label": "1日の学習カード数",
-      "value": "45枚",
-      "change": "+30枚"
-    }
-  },
   "steps": {
     "title": "簡単3ステップで開始",
     "step1": {
@@ -195,7 +151,6 @@
     "features": "機能",
     "science": "学習科学",
     "results": "実績",
-    "reviews": "レビュー",
     "howItWorks": "使い方",
     "faq": "FAQ",
     "dashboard": "ダッシュボード",
@@ -204,9 +159,11 @@
   "trustBadges": {
     "srs": "スマートSRS",
     "sharing": "デッキ共有",
-    "languages": "7言語対応",
+    "languages": "{{count, number}}言語対応",
     "allDevices": "全デバイス対応",
-    "import": "CSV & JSONインポート"
+    "import": "CSV & JSONインポート",
+    "languages_one": "{{count, number}}言語対応",
+    "languages_other": "{{count, number}}言語対応"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",
@@ -250,41 +207,6 @@
       "label": "学習時間の節約",
       "change": "-50%",
       "description": "半分の時間で同じ成果"
-    },
-    "completion": {
-      "label": "日次復習完了率",
-      "change": "+38%",
-      "description": "毎日の復習を最後まで完了するユーザー"
-    },
-    "learners": {
-      "label": "アクティブ学習者",
-      "change": "今月+840人",
-      "description": "世界中で成長するコミュニティ"
-    }
-  },
-  "socialProof": {
-    "title": "世界中の学習者に信頼されています",
-    "subtitle": "よりスマートに学ぶ数千人の学生に参加しましょう",
-    "liveActivity": "現在{{count, number}}人が学習中",
-    "userCountLabel": "アクティブユーザー",
-    "cardsStudiedLabel": "学習済みカード",
-    "decksCreatedLabel": "作成されたデッキ",
-    "testimonials": {
-      "0": {
-        "quote": "ReeeeecallStudyのおかげでJLPT N2に合格しました。SRSアルゴリズムが本当に効果的です！",
-        "author": "田中太郎",
-        "role": "語学学習者"
-      },
-      "1": {
-        "quote": "インターフェースがとてもクリーンで直感的です。学習が楽しくなりました。",
-        "author": "佐藤花子",
-        "role": "医学生"
-      },
-      "2": {
-        "quote": "デッキ共有機能がすごいです。ほぼすべての科目のデッキが見つかりました。",
-        "author": "鈴木一郎",
-        "role": "大学生"
-      }
     }
   },
   "science": {

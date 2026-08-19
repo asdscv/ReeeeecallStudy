@@ -112,7 +112,7 @@
     },
     "exploreMarket": {
       "title": "Explore the Marketplace",
-      "description": "Thousands of shared decks await! Browse decks from other learners or share your own creations.",
+      "description": "浏览其他学习者共享的卡组，喜欢就直接取用。你也可以把自己的卡组发布到市场。",
       "action": "Browse Marketplace"
     }
   },

@@ -151,7 +151,7 @@
     },
     "exploreMarket": {
       "title": "Explore the Marketplace",
-      "description": "Thousands of shared decks await! Browse decks from other learners or share your own creations.",
+      "description": "Explora los mazos que comparten otros estudiantes y llévate los que quieras. También puedes publicar los tuyos en el mercado.",
       "action": "Browse Marketplace",
       "actionFinish": "Finish Setup"
     }

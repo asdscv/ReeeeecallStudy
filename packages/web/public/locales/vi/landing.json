@@ -108,50 +108,6 @@
     "6": "Thống kê và phân tích học tập chi tiết",
     "7": "Kế hoạch cá nhân hóa và ôn tập thích ứng"
   },
-  "metrics": {
-    "efficiency": {
-      "label": "Hiệu quả học tập",
-      "value": "200%",
-      "change": "+150%"
-    },
-    "interval": {
-      "label": "Khoảng cách ôn tập TB",
-      "value": "15 ngày",
-      "change": "+8 ngày"
-    },
-    "accuracy": {
-      "label": "Tỷ lệ chính xác",
-      "value": "87%",
-      "change": "+23%"
-    },
-    "daily": {
-      "label": "Thẻ học hàng ngày",
-      "value": "45 thẻ",
-      "change": "+30 thẻ"
-    }
-  },
-  "stats": {
-    "0": {
-      "label": "Hiệu quả học tập",
-      "value": "200%",
-      "change": "+150%"
-    },
-    "1": {
-      "label": "Khoảng cách ôn tập TB",
-      "value": "15 ngày",
-      "change": "+8 ngày"
-    },
-    "2": {
-      "label": "Tỷ lệ chính xác",
-      "value": "87%",
-      "change": "+23%"
-    },
-    "3": {
-      "label": "Thẻ học hàng ngày",
-      "value": "45 thẻ",
-      "change": "+30 thẻ"
-    }
-  },
   "steps": {
     "title": "Bắt đầu trong 3 bước đơn giản",
     "step1": {
@@ -195,7 +151,6 @@
     "features": "Tính năng",
     "science": "Khoa học",
     "results": "Kết quả",
-    "reviews": "Đánh giá",
     "howItWorks": "Cách hoạt động",
     "faq": "Câu hỏi thường gặp",
     "dashboard": "Bảng điều khiển",
@@ -204,9 +159,11 @@
   "trustBadges": {
     "srs": "SRS thông minh",
     "sharing": "Chia sẻ bộ thẻ",
-    "languages": "7 Ngôn ngữ",
+    "languages": "{{count, number}} Ngôn ngữ",
     "allDevices": "Mọi thiết bị",
-    "import": "Nhập CSV & JSON"
+    "import": "Nhập CSV & JSON",
+    "languages_one": "{{count, number}} Ngôn ngữ",
+    "languages_other": "{{count, number}} Ngôn ngữ"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. Mọi quyền được bảo lưu.",
@@ -250,41 +207,6 @@
       "label": "Tiết kiệm thời gian",
       "change": "-50%",
       "description": "Một nửa thời gian học, cùng kết quả"
-    },
-    "completion": {
-      "label": "Hoàn thành hàng ngày",
-      "change": "+38%",
-      "description": "Người dùng hoàn thành bài ôn tập hàng ngày"
-    },
-    "learners": {
-      "label": "Người học đang hoạt động",
-      "change": "+840 tháng này",
-      "description": "Cộng đồng phát triển trên toàn thế giới"
-    }
-  },
-  "socialProof": {
-    "title": "Được tin dùng bởi người học trên toàn thế giới",
-    "subtitle": "Tham gia cùng hàng nghìn học sinh đang học thông minh hơn",
-    "liveActivity": "{{count, number}} người đang học ngay bây giờ",
-    "userCountLabel": "Người dùng hoạt động",
-    "cardsStudiedLabel": "Thẻ đã học",
-    "decksCreatedLabel": "Bộ thẻ đã tạo",
-    "testimonials": {
-      "0": {
-        "quote": "ReeeeecallStudy đã giúp tôi đỗ JLPT N2. Thuật toán SRS cực kỳ hiệu quả!",
-        "author": "Nguyễn Minh Tuấn",
-        "role": "Người học ngôn ngữ"
-      },
-      "1": {
-        "quote": "Giao diện rất sạch sẽ và trực quan. Việc học bây giờ thực sự thú vị.",
-        "author": "Trần Thị Mai",
-        "role": "Sinh viên y khoa"
-      },
-      "2": {
-        "quote": "Tính năng chia sẻ bộ thẻ tuyệt vời. Tôi tìm được bộ thẻ cho hầu hết mọi môn.",
-        "author": "Lê Hoàng Nam",
-        "role": "Sinh viên đại học"
-      }
     }
   },
   "science": {

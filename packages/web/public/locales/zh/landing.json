@@ -108,50 +108,6 @@
     "6": "详细的学习统计与分析",
     "7": "个性化计划与自适应补强学习"
   },
-  "metrics": {
-    "efficiency": {
-      "label": "学习效率",
-      "value": "200%",
-      "change": "+150%"
-    },
-    "interval": {
-      "label": "平均复习间隔",
-      "value": "15 天",
-      "change": "+8 天"
-    },
-    "accuracy": {
-      "label": "正确率",
-      "value": "87%",
-      "change": "+23%"
-    },
-    "daily": {
-      "label": "每日学习卡片",
-      "value": "45 张",
-      "change": "+30 张"
-    }
-  },
-  "stats": {
-    "0": {
-      "label": "学习效率",
-      "value": "200%",
-      "change": "+150%"
-    },
-    "1": {
-      "label": "平均复习间隔",
-      "value": "15 天",
-      "change": "+8 天"
-    },
-    "2": {
-      "label": "正确率",
-      "value": "87%",
-      "change": "+23%"
-    },
-    "3": {
-      "label": "每日学习卡片",
-      "value": "45 张",
-      "change": "+30 张"
-    }
-  },
   "steps": {
     "title": "3 步轻松开始",
     "step1": {
@@ -195,7 +151,6 @@
     "features": "功能",
     "science": "学习科学",
     "results": "成果",
-    "reviews": "评价",
     "howItWorks": "使用方法",
     "faq": "FAQ",
     "dashboard": "控制台",
@@ -204,9 +159,11 @@
   "trustBadges": {
     "srs": "智能SRS",
     "sharing": "牌组共享",
-    "languages": "7种语言",
+    "languages": "{{count, number}}种语言",
     "allDevices": "全设备支持",
-    "import": "CSV 与 JSON 导入"
+    "import": "CSV 与 JSON 导入",
+    "languages_one": "{{count, number}}种语言",
+    "languages_other": "{{count, number}}种语言"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",
@@ -250,41 +207,6 @@
       "label": "节省学习时间",
       "change": "-50%",
       "description": "一半时间，同样效果"
-    },
-    "completion": {
-      "label": "每日复习完成率",
-      "change": "+38%",
-      "description": "用户每天完成复习任务"
-    },
-    "learners": {
-      "label": "活跃学习者",
-      "change": "本月+840人",
-      "description": "全球持续增长的社区"
-    }
-  },
-  "socialProof": {
-    "title": "受到全球学习者的信赖",
-    "subtitle": "加入数千名更聪明地学习的学生行列",
-    "liveActivity": "正有{{count, number}}人在学习",
-    "userCountLabel": "活跃用户",
-    "cardsStudiedLabel": "已学卡片",
-    "decksCreatedLabel": "已创建牌组",
-    "testimonials": {
-      "0": {
-        "quote": "多亏了 ReeeeecallStudy，我通过了 JLPT N2。SRS 算法非常有效！",
-        "author": "王小明",
-        "role": "语言学习者"
-      },
-      "1": {
-        "quote": "界面很干净直观，学习变得更有趣了。",
-        "author": "李小红",
-        "role": "医学生"
-      },
-      "2": {
-        "quote": "牌组分享功能太棒了。几乎找到了所有科目的牌组。",
-        "author": "张三",
-        "role": "大学生"
-      }
     }
   },
   "science": {

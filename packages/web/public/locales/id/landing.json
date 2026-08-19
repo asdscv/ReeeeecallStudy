@@ -108,50 +108,6 @@
     "6": "Statistik dan analisis pembelajaran terperinci",
     "7": "Rencana personal dan remediasi adaptif"
   },
-  "metrics": {
-    "efficiency": {
-      "label": "Efisiensi Belajar",
-      "value": "200%",
-      "change": "+150%"
-    },
-    "interval": {
-      "label": "Interval Ulasan Rata-rata",
-      "value": "15 hari",
-      "change": "+8 hari"
-    },
-    "accuracy": {
-      "label": "Tingkat Akurasi",
-      "value": "87%",
-      "change": "+23%"
-    },
-    "daily": {
-      "label": "Kartu Belajar Harian",
-      "value": "45 kartu",
-      "change": "+30 kartu"
-    }
-  },
-  "stats": {
-    "0": {
-      "label": "Efisiensi Belajar",
-      "value": "200%",
-      "change": "+150%"
-    },
-    "1": {
-      "label": "Interval Ulasan Rata-rata",
-      "value": "15 hari",
-      "change": "+8 hari"
-    },
-    "2": {
-      "label": "Tingkat Akurasi",
-      "value": "87%",
-      "change": "+23%"
-    },
-    "3": {
-      "label": "Kartu Belajar Harian",
-      "value": "45 kartu",
-      "change": "+30 kartu"
-    }
-  },
   "steps": {
     "title": "Mulai dalam 3 Langkah Sederhana",
     "step1": {
@@ -195,7 +151,6 @@
     "features": "Fitur",
     "science": "Sains",
     "results": "Hasil",
-    "reviews": "Ulasan",
     "howItWorks": "Cara Kerja",
     "faq": "FAQ",
     "dashboard": "Dasbor",
@@ -204,9 +159,11 @@
   "trustBadges": {
     "srs": "SRS Cerdas",
     "sharing": "Berbagi Dek",
-    "languages": "7 Bahasa",
+    "languages": "{{count, number}} Bahasa",
     "allDevices": "Semua Perangkat",
-    "import": "Impor CSV & JSON"
+    "import": "Impor CSV & JSON",
+    "languages_one": "{{count, number}} Bahasa",
+    "languages_other": "{{count, number}} Bahasa"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. Hak cipta dilindungi.",
@@ -250,41 +207,6 @@
       "label": "Waktu Dihemat",
       "change": "-50%",
       "description": "Separuh waktu belajar, hasil sama"
-    },
-    "completion": {
-      "label": "Penyelesaian Harian",
-      "change": "+38%",
-      "description": "Pengguna menyelesaikan ulasan harian mereka"
-    },
-    "learners": {
-      "label": "Pelajar Aktif",
-      "change": "+840 bulan ini",
-      "description": "Komunitas yang berkembang di seluruh dunia"
-    }
-  },
-  "socialProof": {
-    "title": "Dipercaya oleh Pelajar di Seluruh Dunia",
-    "subtitle": "Bergabunglah dengan ribuan siswa yang belajar lebih cerdas",
-    "liveActivity": "{{count, number}} orang sedang belajar sekarang",
-    "userCountLabel": "Pengguna Aktif",
-    "cardsStudiedLabel": "Kartu Dipelajari",
-    "decksCreatedLabel": "Dek Dibuat",
-    "testimonials": {
-      "0": {
-        "quote": "ReeeeecallStudy membantu saya lulus JLPT N2. Algoritma SRS sangat efektif!",
-        "author": "Budi Santoso",
-        "role": "Pelajar Bahasa"
-      },
-      "1": {
-        "quote": "Antarmukanya sangat bersih dan intuitif. Belajar terasa menyenangkan sekarang.",
-        "author": "Siti Nurhaliza",
-        "role": "Mahasiswa Kedokteran"
-      },
-      "2": {
-        "quote": "Fitur berbagi dek luar biasa. Saya menemukan dek untuk hampir setiap mata pelajaran.",
-        "author": "Ravi Wijaya",
-        "role": "Mahasiswa Universitas"
-      }
     }
   },
   "science": {

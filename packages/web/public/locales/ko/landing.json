@@ -108,50 +108,6 @@
     "6": "상세한 학습 통계 및 분석",
     "7": "개인화 계획과 적응형 보강 학습"
   },
-  "metrics": {
-    "efficiency": {
-      "label": "학습 효율",
-      "value": "200%",
-      "change": "+150%"
-    },
-    "interval": {
-      "label": "평균 복습 간격",
-      "value": "15일",
-      "change": "+8일"
-    },
-    "accuracy": {
-      "label": "정답률",
-      "value": "87%",
-      "change": "+23%"
-    },
-    "daily": {
-      "label": "일일 학습 카드",
-      "value": "45장",
-      "change": "+30장"
-    }
-  },
-  "stats": {
-    "0": {
-      "label": "학습 효율",
-      "value": "200%",
-      "change": "+150%"
-    },
-    "1": {
-      "label": "평균 복습 간격",
-      "value": "15일",
-      "change": "+8일"
-    },
-    "2": {
-      "label": "정답률",
-      "value": "87%",
-      "change": "+23%"
-    },
-    "3": {
-      "label": "일일 학습 카드",
-      "value": "45장",
-      "change": "+30장"
-    }
-  },
   "steps": {
     "title": "간단한 3단계로 시작",
     "step1": {
@@ -195,7 +151,6 @@
     "features": "기능",
     "science": "학습 과학",
     "results": "결과",
-    "reviews": "리뷰",
     "howItWorks": "사용 방법",
     "faq": "FAQ",
     "dashboard": "대시보드",
@@ -204,9 +159,11 @@
   "trustBadges": {
     "srs": "스마트 SRS",
     "sharing": "덱 공유",
-    "languages": "7개 언어",
+    "languages": "{{count, number}}개 언어",
     "allDevices": "모든 기기",
-    "import": "CSV & JSON 업로드"
+    "import": "CSV & JSON 업로드",
+    "languages_one": "{{count, number}}개 언어",
+    "languages_other": "{{count, number}}개 언어"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",
@@ -250,41 +207,6 @@
       "label": "학습 시간 절약",
       "change": "-50%",
       "description": "절반의 시간으로 같은 성과"
-    },
-    "completion": {
-      "label": "일일 복습 완료율",
-      "change": "+38%",
-      "description": "매일 복습을 끝까지 완료하는 사용자"
-    },
-    "learners": {
-      "label": "활성 학습자",
-      "change": "이번 달 +840명",
-      "description": "전 세계에서 성장하는 커뮤니티"
-    }
-  },
-  "socialProof": {
-    "title": "전 세계 학습자들이 신뢰합니다",
-    "subtitle": "더 스마트하게 공부하는 수천 명의 학생에 합류하세요",
-    "liveActivity": "지금 {{count, number}}명이 공부 중입니다",
-    "userCountLabel": "활성 사용자",
-    "cardsStudiedLabel": "학습한 카드",
-    "decksCreatedLabel": "생성된 덱",
-    "testimonials": {
-      "0": {
-        "quote": "ReeeeecallStudy 덕분에 JLPT N2에 합격했습니다. SRS 알고리즘이 정말 효과적이에요!",
-        "author": "김민준",
-        "role": "어학 학습자"
-      },
-      "1": {
-        "quote": "인터페이스가 깔끔하고 직관적이에요. 학습이 정말 즐거워졌어요.",
-        "author": "이서윤",
-        "role": "의대생"
-      },
-      "2": {
-        "quote": "덱 공유 기능이 대단해요. 거의 모든 과목의 덱을 찾을 수 있었습니다.",
-        "author": "박유키",
-        "role": "대학생"
-      }
     }
   },
   "science": {
