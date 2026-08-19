@@ -33,6 +33,10 @@
     "limitReached": "カード上限に達しました — さらに追加するには購読してください。"
   },
   "deck": {
-    "rateLimitReached": "リクエスト上限に達しました。"
+    "rateLimitReached": "リクエスト上限に達しました。",
+    "limitReached": "デッキの上限に達しました — 追加するには購読してください。"
+  },
+  "template": {
+    "limitReached": "テンプレートの上限に達しました — 追加するには購読してください。"
   }
 }

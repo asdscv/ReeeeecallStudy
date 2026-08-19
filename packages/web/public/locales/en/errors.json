@@ -45,12 +45,14 @@
     "limitReached": "Card limit reached — subscribe to add more."
   },
   "deck": {
-    "rateLimitReached": "Request limit reached."
+    "rateLimitReached": "Request limit reached.",
+    "limitReached": "You've reached the deck limit — subscribe to add more."
   },
   "template": {
     "rateLimitReached": "Request limit reached.",
     "cannotDeleteDefault": "Default template cannot be deleted.",
-    "inUseByDecks": "Cannot delete — {{count, number}} deck(s) use this template."
+    "inUseByDecks": "Cannot delete — {{count, number}} deck(s) use this template.",
+    "limitReached": "You've reached the template limit — subscribe to add more."
   },
   "marketplace": {
     "listingNotFound": "Listing not found.",
