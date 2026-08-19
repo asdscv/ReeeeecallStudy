@@ -115,43 +115,43 @@
     "back": "Back",
     "finish": "Finish",
     "getStarted": "Get Started",
-    "stepOf": "Step {{current}} of {{total}}",
+    "stepOf": "Bước {{current}} / {{total}}",
     "restartOnboarding": "Restart Tutorial",
     "welcome": {
       "title": "Welcome to Reeeeecall!",
-      "description": "The smartest way to study with flashcards. Create decks, add cards, and let our spaced repetition algorithm optimize your learning.",
+      "description": "Cách học bằng thẻ thông minh nhất. Tạo bộ thẻ, thêm thẻ và để thuật toán lặp lại ngắt quãng tối ưu việc học cho bạn.",
       "action": "Get Started"
     },
     "createDeck": {
       "title": "Create Your First Deck",
-      "description": "We've prepared a sample deck for you. Click to create it!",
+      "description": "Chúng tôi đã chuẩn bị sẵn một bộ thẻ mẫu. Nhấn để tạo nhé!",
       "action": "Create This Deck",
       "creating": "Creating...",
       "created": "Deck created!"
     },
     "cardTemplate": {
       "title": "Your Card Templates",
-      "description": "These templates are already set up for you. Pick one for your cards.",
+      "description": "Các mẫu này đã được thiết lập sẵn. Hãy chọn một mẫu cho thẻ của bạn.",
       "fields": "{{count, number}} fields",
       "useTemplate": "Use This Template"
     },
     "addCards": {
       "title": "Sample Cards Ready!",
-      "description": "We've prepared sample cards for you. Add them to your deck with one click.",
+      "description": "Chúng tôi đã chuẩn bị thẻ mẫu. Thêm vào bộ thẻ chỉ với một cú nhấn.",
       "action": "Add These Cards",
       "adding": "Adding...",
       "added": "Cards added!"
     },
     "firstStudy": {
       "title": "You're Ready to Study!",
-      "description": "Your deck \"{{deckName}}\" has {{cardCount}} cards ready. Choose a study mode and start learning.",
+      "description": "Bộ thẻ \"{{deckName}}\" đã có {{cardCount}} thẻ. Chọn chế độ học và bắt đầu thôi.",
       "action": "Start Studying",
       "randomReview": "Ôn tập ngẫu nhiên",
       "sequential": "Tuần tự"
     },
     "exploreMarket": {
       "title": "Explore the Marketplace",
-      "description": "Thousands of shared decks await! Browse decks from other learners or share your own creations.",
+      "description": "Khám phá các bộ thẻ do người học khác chia sẻ và lấy về bộ nào bạn thích. Bạn cũng có thể đăng bộ thẻ của mình lên chợ.",
       "action": "Browse Marketplace",
       "actionFinish": "Finish Setup"
     }
@@ -164,7 +164,7 @@
     "progress": "Progress",
     "viewAll": "View All",
     "recent": "Recent",
-    "empty": "No achievements yet. Start studying to earn badges!",
+    "empty": "Chưa có thành tích nào. Bắt đầu học để nhận huy hiệu nhé!",
     "newUnlocked": "Achievement Unlocked!",
     "category": {
       "streak": "Streak",
@@ -253,12 +253,12 @@
       "cards_500": "Study 500 cards total",
       "cards_1000": "Study 1,000 cards total",
       "cards_5000": "Study 5,000 cards total",
-      "sessions_10": "Complete 10 study sessions",
-      "sessions_50": "Complete 50 study sessions",
-      "sessions_100": "Complete 100 study sessions",
+      "sessions_10": "Hoàn thành 10 buổi học",
+      "sessions_50": "Hoàn thành 50 buổi học",
+      "sessions_100": "Hoàn thành 100 buổi học",
       "deck_share": "Share your first deck",
-      "marketplace_pub": "Publish a deck to the marketplace",
-      "first_study": "Complete your first study session",
+      "marketplace_pub": "Đăng một bộ thẻ lên chợ",
+      "first_study": "Hoàn thành buổi học đầu tiên",
       "mastery_50": "Giữ nhớ 50 thẻ từ ba tuần trở lên"
     },
     "tabs": {
@@ -306,7 +306,7 @@
     "cardsStudied": "Cards Studied",
     "sessions": "Sessions",
     "you": "You",
-    "empty": "No leaderboard data yet. Be the first to study!"
+    "empty": "Chưa có dữ liệu bảng xếp hạng. Hãy là người học đầu tiên!"
   },
   "history": {
     "tabs": {
@@ -317,15 +317,15 @@
   "quests": {
     "title": "Daily Quests",
     "cards": "Study {{target}} cards",
-    "sessions": "Complete {{target}} sessions",
-    "time": "Study for {{target}} minutes",
+    "sessions": "Hoàn thành {{target}} buổi học",
+    "time": "Học {{target}} phút",
     "perfect": "Get a perfect score",
     "completed": "Completed!",
     "xpReward": "+{{xp}} XP"
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count, number}} available",
+    "available": "còn {{count, number}}",
     "used": "Streak protected today!",
     "earned": "Earned a streak freeze!"
   },

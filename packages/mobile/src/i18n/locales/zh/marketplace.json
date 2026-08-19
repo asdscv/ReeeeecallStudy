@@ -114,33 +114,33 @@
   },
   "publish": {
     "title": "Publish Deck",
-    "subtitle": "Share your deck with the community",
+    "subtitle": "把你的卡组分享给社区",
     "titleLabel": "Title",
     "titlePlaceholder": "Deck title on marketplace",
     "description": "Description",
     "descriptionPlaceholder": "What will learners study?",
     "tags": "Tags",
     "tagsPlaceholder": "comma, separated, tags",
-    "tagsHint": "Help others find your deck",
+    "tagsHint": "帮助别人更容易找到你的卡组",
     "category": "Category",
     "shareMode": "Share Mode",
     "shareModes": {
       "copy": {
         "label": "Copy",
-        "description": "Users get an editable copy"
+        "description": "对方获得可编辑的副本"
       },
       "subscribe": {
         "label": "Subscribe",
-        "description": "Users get read-only, auto-updated"
+        "description": "对方获得只读版本，并自动同步更新"
       },
       "snapshot": {
         "label": "Snapshot",
-        "description": "Users get read-only copy, no updates"
+        "description": "对方获得只读副本，不接收更新"
       }
     },
     "publishButton": "Publish to Marketplace",
     "titleRequired": "Title is required",
-    "published": "Your deck is now available on the marketplace.",
+    "published": "你的卡组已经上架市场。",
     "failed": "Failed to publish deck"
   },
   "learningLanguage": {

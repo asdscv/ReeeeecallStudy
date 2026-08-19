@@ -36,6 +36,8 @@ function Stat({ endValue, suffix, label, description, delay }: StatProps) {
 export function StatsSection() {
   const { t } = useTranslation('landing')
 
+  // 여기 남은 둘은 간격 반복 연구에 대한 주장입니다. 우리 사용자에 대한 주장이었던
+  // '일일 복습 완료율 92%'와 '활성 학습자 2,500명+'은 지웠습니다 — 실제 값이 아니었습니다.
   const stats = [
     {
       endValue: 95,
@@ -53,22 +55,6 @@ export function StatsSection() {
       descKey: 'statsSection.timeSaved.description',
       descFallback: 'Half the study time, same results',
     },
-    {
-      endValue: 92,
-      suffix: '%',
-      labelKey: 'statsSection.completion.label',
-      labelFallback: 'Daily Completion',
-      descKey: 'statsSection.completion.description',
-      descFallback: 'Users finish their daily reviews',
-    },
-    {
-      endValue: 2500,
-      suffix: '+',
-      labelKey: 'statsSection.learners.label',
-      labelFallback: 'Active Learners',
-      descKey: 'statsSection.learners.description',
-      descFallback: 'Growing community worldwide',
-    },
   ]
 
   return (
@@ -83,7 +69,7 @@ export function StatsSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 md:gap-12">
+        <div className="grid grid-cols-2 gap-8 sm:gap-10 md:gap-12 max-w-2xl mx-auto">
           {stats.map((stat, i) => (
             <Stat
               key={stat.labelKey}

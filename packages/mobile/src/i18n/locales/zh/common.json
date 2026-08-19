@@ -112,7 +112,7 @@
     },
     "exploreMarket": {
       "title": "Explore the Marketplace",
-      "description": "Thousands of shared decks await! Browse decks from other learners or share your own creations.",
+      "description": "浏览其他学习者共享的卡组，喜欢就直接取用。你也可以把自己的卡组发布到市场。",
       "action": "Browse Marketplace"
     }
   },
@@ -124,7 +124,7 @@
     "progress": "Progress",
     "viewAll": "View All",
     "recent": "Recent",
-    "empty": "No achievements yet. Start studying to earn badges!",
+    "empty": "还没有成就，开始学习来赢得徽章吧！",
     "newUnlocked": "Achievement Unlocked!",
     "category": {
       "streak": "Streak",
@@ -213,12 +213,12 @@
       "cards_500": "Study 500 cards total",
       "cards_1000": "Study 1,000 cards total",
       "cards_5000": "Study 5,000 cards total",
-      "sessions_10": "Complete 10 study sessions",
-      "sessions_50": "Complete 50 study sessions",
-      "sessions_100": "Complete 100 study sessions",
+      "sessions_10": "完成 10 次学习",
+      "sessions_50": "完成 50 次学习",
+      "sessions_100": "完成 100 次学习",
       "deck_share": "Share your first deck",
-      "marketplace_pub": "Publish a deck to the marketplace",
-      "first_study": "Complete your first study session",
+      "marketplace_pub": "把卡组发布到市场",
+      "first_study": "完成第一次学习",
       "mastery_50": "将 50 张卡片保持三周以上"
     },
     "tabs": {

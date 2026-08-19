@@ -35,9 +35,24 @@
       "desc": "Tối đa hóa trí nhớ dài hạn với lặp lại ngắt quãng đã được khoa học xác minh. Tự động điều chỉnh thời gian ôn tập với 4 mức đánh giá: Lại/Khó/Tốt/Dễ."
     },
     "modes": {
-      "title": "5 chế độ học",
-      "description": "Hỗ trợ SRS, Ngẫu nhiên, Tuần tự, Ôn tập tuần tự và Theo ngày — chế độ học cho mọi tình huống.",
-      "desc": "Hỗ trợ SRS, Ngẫu nhiên, Tuần tự, Ôn tập tuần tự và Theo ngày — chế độ học cho mọi tình huống."
+      "title": "6 chế độ học",
+      "description": "SRS, ôn tuần tự, ngẫu nhiên, tuần tự, theo ngày và học dồn — chọn kiểu hợp với bạn.",
+      "desc": "SRS, ôn tuần tự, ngẫu nhiên, tuần tự, theo ngày và học dồn — chọn kiểu hợp với bạn."
+    },
+    "aiCards": {
+      "title": "Tạo thẻ bằng AI",
+      "description": "Chỉ cần nhập chủ đề, AI dựng mẫu, bộ thẻ và thẻ trong một lượt. Mỗi ngày đều có hạn mức miễn phí.",
+      "desc": "Chỉ cần nhập chủ đề, AI dựng mẫu, bộ thẻ và thẻ trong một lượt. Mỗi ngày đều có hạn mức miễn phí."
+    },
+    "quiz": {
+      "title": "Trắc nghiệm & chấm điểm bằng AI",
+      "description": "Biến thẻ của bạn thành câu hỏi trắc nghiệm, trả lời ngắn và tự luận — AI chấm và giải thích chỗ sai.",
+      "desc": "Biến thẻ của bạn thành câu hỏi trắc nghiệm, trả lời ngắn và tự luận — AI chấm và giải thích chỗ sai."
+    },
+    "plan": {
+      "title": "Mục tiêu & kế hoạch hôm nay",
+      "description": "Đặt thời gian mục tiêu mỗi ngày và bộ thẻ, hệ thống lên kế hoạch bạn cần học gì hôm nay.",
+      "desc": "Đặt thời gian mục tiêu mỗi ngày và bộ thẻ, hệ thống lên kế hoạch bạn cần học gì hôm nay."
     },
     "stats": {
       "title": "Thống kê & Bảng điều khiển thời gian thực",
@@ -93,50 +108,6 @@
     "6": "Thống kê và phân tích học tập chi tiết",
     "7": "Kế hoạch cá nhân hóa và ôn tập thích ứng"
   },
-  "metrics": {
-    "efficiency": {
-      "label": "Hiệu quả học tập",
-      "value": "200%",
-      "change": "+150%"
-    },
-    "interval": {
-      "label": "Khoảng cách ôn tập TB",
-      "value": "15 ngày",
-      "change": "+8 ngày"
-    },
-    "accuracy": {
-      "label": "Tỷ lệ chính xác",
-      "value": "87%",
-      "change": "+23%"
-    },
-    "daily": {
-      "label": "Thẻ học hàng ngày",
-      "value": "45 thẻ",
-      "change": "+30 thẻ"
-    }
-  },
-  "stats": {
-    "0": {
-      "label": "Hiệu quả học tập",
-      "value": "200%",
-      "change": "+150%"
-    },
-    "1": {
-      "label": "Khoảng cách ôn tập TB",
-      "value": "15 ngày",
-      "change": "+8 ngày"
-    },
-    "2": {
-      "label": "Tỷ lệ chính xác",
-      "value": "87%",
-      "change": "+23%"
-    },
-    "3": {
-      "label": "Thẻ học hàng ngày",
-      "value": "45 thẻ",
-      "change": "+30 thẻ"
-    }
-  },
   "steps": {
     "title": "Bắt đầu trong 3 bước đơn giản",
     "step1": {
@@ -180,7 +151,6 @@
     "features": "Tính năng",
     "science": "Khoa học",
     "results": "Kết quả",
-    "reviews": "Đánh giá",
     "howItWorks": "Cách hoạt động",
     "faq": "Câu hỏi thường gặp",
     "dashboard": "Bảng điều khiển",
@@ -189,9 +159,11 @@
   "trustBadges": {
     "srs": "SRS thông minh",
     "sharing": "Chia sẻ bộ thẻ",
-    "languages": "7 Ngôn ngữ",
+    "languages": "{{count, number}} Ngôn ngữ",
     "allDevices": "Mọi thiết bị",
-    "import": "Nhập CSV & JSON"
+    "import": "Nhập CSV & JSON",
+    "languages_one": "{{count, number}} Ngôn ngữ",
+    "languages_other": "{{count, number}} Ngôn ngữ"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. Mọi quyền được bảo lưu.",
@@ -216,9 +188,9 @@
     "q1": "Lặp lại ngắt quãng (SRS) là gì?",
     "a1": "Lặp lại ngắt quãng là phương pháp học đã được khoa học chứng minh, lên lịch ôn tập theo khoảng thời gian tối ưu để tối đa hóa ghi nhớ dài hạn. ReeeeecallStudy sử dụng thuật toán SRS tiên tiến để tự động xác định thời điểm bạn nên ôn tập mỗi thẻ.",
     "q2": "ReeeeecallStudy có miễn phí không?",
-    "a2": "Có! ReeeeecallStudy miễn phí sử dụng. Đăng ký bằng email và mật khẩu để bắt đầu học ngay với tất cả tính năng cốt lõi bao gồm SRS, nhiều chế độ học và thống kê chi tiết.",
+    "a2": "Có, bạn có thể bắt đầu miễn phí. Chỉ cần đăng ký là dùng được SRS, cả sáu chế độ học, thống kê và chia sẻ bộ thẻ không giới hạn.\n\nGói miễn phí có giới hạn số thẻ được lưu, còn gói trả phí sẽ nâng giới hạn đó (con số cụ thể hiển thị ở phần bảng giá phía trên). Tạo thẻ bằng AI và trắc nghiệm AI có hạn mức miễn phí mỗi ngày; vượt quá sẽ trừ vào số dư đã nạp — và mức trừ luôn hiện ra trước khi bạn xác nhận.",
     "q3": "Có những chế độ học nào?",
-    "a3": "ReeeeecallStudy hỗ trợ 5 chế độ học: SRS (lặp lại ngắt quãng) để lên lịch ôn tập tối ưu, Ngẫu nhiên để luyện tập xáo trộn, Tuần tự để ôn tập theo thứ tự, Ôn tập tuần tự để ôn tập có hệ thống, và Theo ngày để sắp xếp theo thời gian.",
+    "a3": "ReeeeecallStudy hỗ trợ 6 chế độ học: SRS để xếp lịch ôn tối ưu, ôn tuần tự để ôn có hệ thống, ngẫu nhiên để luyện xáo trộn, tuần tự theo thứ tự, theo ngày để sắp xếp theo thời gian, và học dồn để lặp tập trung đến khi thuộc.",
     "q4": "Tôi có thể chia sẻ bộ thẻ không?",
     "a4": "Có! Bạn có thể chia sẻ bộ thẻ theo 3 chế độ: Sao chép (nhân bản cho người khác), Đăng ký theo dõi (đồng bộ cập nhật), và Bản chụp (phiên bản cố định). Duyệt và khám phá bộ thẻ của người dùng khác trong chợ cộng đồng."
   },
@@ -235,41 +207,6 @@
       "label": "Tiết kiệm thời gian",
       "change": "-50%",
       "description": "Một nửa thời gian học, cùng kết quả"
-    },
-    "completion": {
-      "label": "Hoàn thành hàng ngày",
-      "change": "+38%",
-      "description": "Người dùng hoàn thành bài ôn tập hàng ngày"
-    },
-    "learners": {
-      "label": "Người học đang hoạt động",
-      "change": "+840 tháng này",
-      "description": "Cộng đồng phát triển trên toàn thế giới"
-    }
-  },
-  "socialProof": {
-    "title": "Được tin dùng bởi người học trên toàn thế giới",
-    "subtitle": "Tham gia cùng hàng nghìn học sinh đang học thông minh hơn",
-    "liveActivity": "{{count, number}} người đang học ngay bây giờ",
-    "userCountLabel": "Người dùng hoạt động",
-    "cardsStudiedLabel": "Thẻ đã học",
-    "decksCreatedLabel": "Bộ thẻ đã tạo",
-    "testimonials": {
-      "0": {
-        "quote": "ReeeeecallStudy đã giúp tôi đỗ JLPT N2. Thuật toán SRS cực kỳ hiệu quả!",
-        "author": "Nguyễn Minh Tuấn",
-        "role": "Người học ngôn ngữ"
-      },
-      "1": {
-        "quote": "Giao diện rất sạch sẽ và trực quan. Việc học bây giờ thực sự thú vị.",
-        "author": "Trần Thị Mai",
-        "role": "Sinh viên y khoa"
-      },
-      "2": {
-        "quote": "Tính năng chia sẻ bộ thẻ tuyệt vời. Tôi tìm được bộ thẻ cho hầu hết mọi môn.",
-        "author": "Lê Hoàng Nam",
-        "role": "Sinh viên đại học"
-      }
     }
   },
   "science": {
@@ -339,12 +276,8 @@
     "note": "Thanh toán được thực hiện sau khi đăng ký, trong phần Cài đặt.",
     "plans": {
       "free": "Miễn phí",
-      "standard": "Tiêu chuẩn",
-      "pro": "Pro",
-      "unlimited": "Không giới hạn",
       "freeBlurb": "Gói miễn phí lý tưởng để bắt đầu",
-      "standardBlurb": "Mở rộng việc học với nhiều thẻ hơn",
-      "unlimitedBlurb": "Lưu trữ và học tập không giới hạn"
+      "standardBlurb": "Mở rộng việc học với nhiều thẻ hơn"
     }
   },
   "seo": {

@@ -225,6 +225,54 @@ export const GUIDE_SECTIONS: GuideSection[] = [
   },
 
   // ───────────────────────────────────────────────────
+  // 퀴즈는 유료 기능인데 사용법 페이지에 한 줄도 없었습니다.
+  {
+    id: 'quiz',
+    title: 'sections.quiz.title',
+    icon: '📝',
+    items: [
+      {
+        title: 'sections.quiz.items.what.title',
+        body: 'sections.quiz.items.what.body',
+      },
+      {
+        title: 'sections.quiz.items.create.title',
+        body: 'sections.quiz.items.create.body',
+      },
+      {
+        title: 'sections.quiz.items.take.title',
+        body: 'sections.quiz.items.take.body',
+      },
+      {
+        title: 'sections.quiz.items.mistakes.title',
+        body: 'sections.quiz.items.mistakes.body',
+      },
+    ],
+  },
+
+  // ───────────────────────────────────────────────────
+  // 학습 목표·오늘의 플랜도 마찬가지로 문서가 없었습니다.
+  {
+    id: 'learning',
+    title: 'sections.learning.title',
+    icon: '🎯',
+    items: [
+      {
+        title: 'sections.learning.items.goal.title',
+        body: 'sections.learning.items.goal.body',
+      },
+      {
+        title: 'sections.learning.items.today.title',
+        body: 'sections.learning.items.today.body',
+      },
+      {
+        title: 'sections.learning.items.coach.title',
+        body: 'sections.learning.items.coach.body',
+      },
+    ],
+  },
+
+  // ───────────────────────────────────────────────────
   {
     id: 'import-export',
     title: 'sections.import-export.title',

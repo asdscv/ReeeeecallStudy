@@ -88,7 +88,7 @@
     "enable": "Enable reminders",
     "time": "Reminder time",
     "days": "Reminder days",
-    "preview": "You'll receive reminders at {{time}} on {{days}}",
+    "preview": "将在{{days}} {{time}} 提醒你",
     "mon": "Mon",
     "tue": "Tue",
     "wed": "Wed",
@@ -174,14 +174,14 @@
   "privacy": {
     "title": "Privacy & data",
     "analyticsTitle": "Usage analytics",
-    "analyticsHint": "Help improve the app with anonymous usage data",
+    "analyticsHint": "通过匿名使用数据帮助改进应用",
     "trackingOn": "Allowed",
     "trackingOff": "Off",
     "deleteAccount": "Delete my account",
-    "deleteConfirm": "This permanently deletes your account, decks, cards, and study history. This cannot be undone.",
+    "deleteConfirm": "这会永久删除你的账号、卡组、卡片和学习记录，且无法撤销。",
     "deleteConfirmBtn": "Delete permanently",
     "cancel": "Cancel",
-    "deleteFailed": "Could not delete your account. Please try again."
+    "deleteFailed": "无法删除账号，请再试一次。"
   },
   "subscription": {
     "title": "订阅"

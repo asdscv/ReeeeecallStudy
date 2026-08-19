@@ -27,7 +27,7 @@
     "title": "学习热力图"
   },
   "gamification": {
-    "freezes": "{{count, number}} freezes left",
+    "freezes": "剩余 {{count, number}} 次冻结",
     "dailyGoal": "Daily Goal"
   },
   "level": {
@@ -42,19 +42,19 @@
   },
   "quests": {
     "title": "Daily Quests",
-    "cards": "Study {{count, number}} cards",
-    "sessions": "Complete {{count, number}} sessions",
-    "time": "Study for {{count, number}} minutes",
-    "perfect": "Get {{count, number}} perfect scores",
+    "cards": "学习 {{count, number}} 张卡片",
+    "sessions": "完成 {{count, number}} 次学习",
+    "time": "学习 {{count, number}} 分钟",
+    "perfect": "获得 {{count, number}} 次满分",
     "completed": "已完成"
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count, number}} available",
-    "motivational": "Keep going! You're doing great!"
+    "available": "剩余 {{count, number}} 个",
+    "motivational": "继续保持，做得很棒！"
   },
   "studyHistory": "Study History",
-  "studyHistoryDesc": "View sessions, stats, and progress",
+  "studyHistoryDesc": "查看学习记录、统计和进度",
   "streakDays": "{{count, number}}天",
   "quickStudy": {
     "title": "快速学习",

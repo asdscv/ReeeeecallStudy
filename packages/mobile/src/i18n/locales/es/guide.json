@@ -76,6 +76,46 @@
       },
       "icon": "📖"
     },
+    "quiz": {
+      "title": "Cuestionarios",
+      "icon": "📝",
+      "items": {
+        "what": {
+          "title": "¿Qué es un cuestionario?",
+          "body": "Un cuestionario convierte tus propias tarjetas en preguntas para comprobar qué se te quedó. Las preguntas salen de las tarjetas de tus mazos, no de un banco externo, así que solo se pregunta lo que estudiaste.\n\nHay tres tipos:\n• Opción múltiple: eliges una opción; los distractores se construyen con otras tarjetas del mismo mazo.\n• Respuesta corta: escribes una respuesta breve.\n• Ensayo: respondes con texto. Se generan una rúbrica y una respuesta modelo junto a la pregunta."
+        },
+        "create": {
+          "title": "Crear un cuestionario",
+          "body": "Ve a Cuestionarios → 'Nuevo cuestionario'.\n\n1. Elige un mazo. Puedes acotar por etiquetas o escoger tarjetas a mano (hasta 50).\n2. Elige el tipo de pregunta y la dificultad.\n3. Elige cuántas preguntas: de 1 a 20 por conjunto.\n4. El cargo estimado aparece antes de generar. Primero se usan tus preguntas gratuitas del día y solo el resto sale del saldo.\n\nSi una tarjeta no logra generar pregunta, el servidor la repone con otras automáticamente. Si el mazo tiene menos tarjetas de las que pediste, obtendrás tantas como permita el mazo."
+        },
+        "take": {
+          "title": "Responder y corregir",
+          "body": "Un conjunto se puede repetir cuantas veces quieras y cada intento queda registrado.\n\n• La opción múltiple se corrige en cuanto eliges. No llama a la IA, así que no hay cargo adicional.\n• Respuesta corta y ensayo los corrige la IA al pulsar Corregir, y el cargo se muestra antes.\n• Los ensayos vuelven puntuados por cada criterio de la rúbrica, junto con una respuesta modelo, que solo se abre después de enviar la tuya.\n\nLa corrección se paga desde la primera, porque cada respuesta implica otra llamada al modelo."
+        },
+        "mistakes": {
+          "title": "Errores y ayuda de IA",
+          "body": "Las respuestas falladas se reúnen en tu lista de errores.\n\n• Explicación de IA: por qué estuvo mal y qué faltó.\n• Comparar respuestas: la tuya junto a la correcta, con la diferencia señalada.\n• Diagnóstico: lee tus fallos en conjunto y nombra la debilidad que se repite.\n\nLas tres muestran el cargo antes de confirmar y ninguna tiene cupo gratis."
+        }
+      }
+    },
+    "learning": {
+      "title": "Metas y plan de estudio",
+      "icon": "🎯",
+      "items": {
+        "goal": {
+          "title": "Crear una meta",
+          "body": "Una meta guarda qué quieres aprender y para cuándo. Estudio → Metas → 'Nueva meta'.\n\n• Nombre de la meta (p. ej. 'Aprobar JLPT N2')\n• Mazos: elige al menos uno o no se puede crear el plan.\n• Fecha objetivo (opcional): si la fijas, se calcula cuántas tarjetas nuevas al día hacen falta.\n• Minutos diarios: si fijas el tiempo, se te dice cuándo terminarías aproximadamente.\n\nAmbas cifras son estimaciones y se recalculan cada día. Solo lo estudiado en modo SRS cuenta para el plan."
+        },
+        "today": {
+          "title": "El plan de hoy",
+          "body": "Estudio → Hoy y 'Crear el plan de hoy' toma la parte de hoy de los mazos vinculados a tu meta.\n\n• Primero los repasos; las tarjetas nuevas ocupan el tiempo restante.\n• Una barra de progreso muestra cuánto llevas hoy.\n• Al terminar la parte de hoy, se te indica cuándo vuelven los siguientes repasos.\n\nSaltarte un día entero no borra el trabajo: vuelve en el siguiente plan."
+        },
+        "coach": {
+          "title": "Ajuste automático y recomendaciones",
+          "body": "El plan observa cuánto terminas de verdad y propone ajustes.\n\n• Varios días por debajo de la mitad → propone menos tarjetas nuevas o un día más corto.\n• Terminar cada día → propone más tarjetas nuevas para llegar antes a la meta.\n• Una propuesta no cambia nada hasta que pulsas Aplicar.\n\nDiagnóstico reúne las tarjetas vistas al menos dos veces en las que sigues puntuando bajo. Aceptar una recomendación sube su prioridad en el próximo plan."
+        }
+      }
+    },
     "sharing": {
       "title": "Compartir mazos",
       "items": {

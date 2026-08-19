@@ -112,7 +112,7 @@
     },
     "exploreMarket": {
       "title": "Explore the Marketplace",
-      "description": "Thousands of shared decks await! Browse decks from other learners or share your own creations.",
+      "description": "เลือกดูเด็คที่ผู้เรียนคนอื่นแชร์ไว้ ชอบใบไหนก็หยิบไปใช้ได้เลย และคุณก็เผยแพร่เด็คของตัวเองขึ้นมาร์เก็ตได้เช่นกัน",
       "action": "Browse Marketplace"
     }
   },
@@ -124,7 +124,7 @@
     "progress": "Progress",
     "viewAll": "View All",
     "recent": "Recent",
-    "empty": "No achievements yet. Start studying to earn badges!",
+    "empty": "ยังไม่มีความสำเร็จ เริ่มเรียนเพื่อรับตราสัญลักษณ์เลย!",
     "newUnlocked": "Achievement Unlocked!",
     "category": {
       "streak": "Streak",
@@ -213,12 +213,12 @@
       "cards_500": "Study 500 cards total",
       "cards_1000": "Study 1,000 cards total",
       "cards_5000": "Study 5,000 cards total",
-      "sessions_10": "Complete 10 study sessions",
-      "sessions_50": "Complete 50 study sessions",
-      "sessions_100": "Complete 100 study sessions",
+      "sessions_10": "เรียนจบ 10 เซสชัน",
+      "sessions_50": "เรียนจบ 50 เซสชัน",
+      "sessions_100": "เรียนจบ 100 เซสชัน",
       "deck_share": "Share your first deck",
-      "marketplace_pub": "Publish a deck to the marketplace",
-      "first_study": "Complete your first study session",
+      "marketplace_pub": "เผยแพร่เด็คขึ้นมาร์เก็ต",
+      "first_study": "เรียนจบเซสชันแรกของคุณ",
       "mastery_50": "คงจำการ์ด 50 ใบไว้ตั้งแต่สามสัปดาห์ขึ้นไป"
     },
     "tabs": {

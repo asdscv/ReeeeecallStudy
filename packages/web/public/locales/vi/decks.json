@@ -159,7 +159,7 @@
     "pendingChanges": "{{count, number}} pending",
     "lastSynced": "Last synced: {{time}}",
     "neverSynced": "Never synced",
-    "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
+    "syncComplete": "Đồng bộ xong: thêm {{added}}, gỡ {{removed}}",
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed Deck"

@@ -132,6 +132,44 @@
         }
       }
     },
+    "quiz": {
+      "title": "クイズ",
+      "items": {
+        "what": {
+          "title": "クイズとは？",
+          "body": "クイズは自分のカードから問題を作り、身についたかを確認する機能です。外部の問題集ではなく手持ちのデッキのカードから出題されるので、学習した内容だけが問われます。\n\n問題形式は3種類です：\n• 選択式：選択肢から選びます。誤答の選択肢も同じデッキのカードから作られます。\n• 記述式：短い答えを入力します。\n• 論述式：文章で答えます。採点基準と模範解答が一緒に作られます。"
+        },
+        "create": {
+          "title": "クイズを作る",
+          "body": "クイズ →「新しいクイズ」から作成します。\n\n1. デッキを選びます。タグで絞る、カードを直接選ぶ（最大50枚）こともできます。\n2. 問題形式と難易度を選びます。\n3. 問題数を決めます。1セットは1〜20問です。\n4. 生成前に予想消費額が表示されます。毎日の無料分が先に使われ、超過分だけ残高から引かれます。\n\n要求した数に届かない場合はサーバーが別のカードで自動的に補います。デッキのカードが問題数より少なければ、作れる分だけ出ます。"
+        },
+        "take": {
+          "title": "解答と採点",
+          "body": "作ったセットは何度でも解けて、挑戦ごとに記録が残ります。\n\n• 選択式は選んだ瞬間に採点されます。AIを呼ばないので追加の消費はありません。\n• 記述式・論述式は「採点」を押すとAIが採点します。押す前に消費額が表示されます。\n• 論述式は採点基準ごとの評価と模範解答が表示されます。模範解答は答案を提出した後にだけ開きます。\n\n採点は1件目から有料です。答案ごとにモデルを呼ぶためです。"
+        },
+        "mistakes": {
+          "title": "復習リストとAIサポート",
+          "body": "間違えた問題は復習リストにまとまります。\n\n• AI解説：なぜ間違えたか、何を落としたかを説明します。\n• 解答の比較：自分の答案と正解を並べて違いを示します。\n• 学習診断：間違えた問題をまとめて読み、繰り返す弱点を指摘します。\n\n3つとも押す前に消費額が表示されます。無料分はありません。"
+        }
+      }
+    },
+    "learning": {
+      "title": "学習目標とプラン",
+      "items": {
+        "goal": {
+          "title": "学習目標を作る",
+          "body": "学習目標は「何を、いつまでに」を入れる器です。学習 → 学習目標 →「新しい目標」から作ります。\n\n• 目標名（例：JLPT N2 合格）\n• 学習するデッキ — 1つ以上選ばないとプランを作れません。\n• 目標日（任意） — 日付を決めると、1日に新しいカードを何枚始めればよいか計算します。\n• 1日の学習時間 — 時間を先に決めると、いつ頃終わるかを教えます。\n\nどちらも推定値で、毎日再計算されます。SRSモードで学習した分だけがプランに反映されます。"
+        },
+        "today": {
+          "title": "今日のプラン",
+          "body": "学習 → 今日のプランで「今日のプランを作る」を押すと、目標に紐づいたデッキから今日の分を出します。\n\n• 復習が先に入り、残り時間に新しいカードが入ります。\n• 進捗で今日どれだけ終えたかが分かります。\n• 今日の分を終えると、次の復習がいつ戻るかを知らせます。\n\n1日まるごと飛ばしても分量は消えません — 次のプランに戻ってきます。"
+        },
+        "coach": {
+          "title": "自動調整とおすすめ",
+          "body": "プランは実際に終えた量を見て、自分から調整を提案します。\n\n• 半分も終わらない日が続くと、新しいカードや1日の時間を減らす提案をします。\n• 毎日終えていれば、新しいカードを増やして完了日を早める提案をします。\n• 提案は「適用」するまで何も変えません。\n\n学習診断では、2回以上見たのに平均点が低いカードを「見直すカード」としてまとめます。おすすめを受け入れると、次のプランでそのカードの優先度が上がります。"
+        }
+      }
+    },
     "import-export": {
       "title": "インポートとエクスポート",
       "items": {
@@ -241,20 +279,20 @@
       "title": "AI Auto-Generate",
       "items": {
         "what": {
-          "title": "What is AI Auto-Generate?",
-          "body": "AI Auto-Generate lets you create flashcard templates, decks, and cards automatically using AI. Just enter a topic (e.g., 'JLPT N3 Japanese vocabulary') and AI will generate everything for you.\n\nNo API key or setup needed — generation runs on our servers. You get free AI cards every day; beyond that, generation is deducted from your credit balance."
+          "title": "AI自動生成とは？",
+          "body": "AI自動生成は、AIを使ってフラッシュカードのテンプレート・デッキ・カードを自動で作る機能です。トピックを入れるだけ（例：「JLPT N3 の語彙」）で、AIがすべて作ります。\n\nAPIキーの発行も設定も要りません — 生成はサーバー側で動きます。毎日無料のAIカードがあり、それを超えた分はチャージ残高から引かれます。"
         },
         "fullGenerate": {
-          "title": "Full Generation (Template + Deck + Cards)",
-          "body": "The easiest way to get started:\n\n1. Go to Decks page → Click 'AI Generate'\n2. Type a topic (e.g., 'Basic Korean greetings')\n3. Set the number of cards\n4. Click 'Start Generating'\n\nAI will create:\n• A card template with appropriate fields and TTS settings\n• A deck with name, description, icon, and color\n• The requested number of cards\n\nYou can review and edit everything before saving."
+          "title": "まとめて作る（テンプレート＋デッキ＋カード）",
+          "body": "いちばん簡単な始め方：\n\n1. デッキページ →「AIで作る」をクリック\n2. トピックを入力（例：「韓国語の基本のあいさつ」）\n3. カード枚数を決める\n4.「生成を開始」をクリック\n\nAIが作るもの：\n• 適切なフィールドとTTS設定が入ったカードテンプレート\n• 名前・説明・アイコン・色が入ったデッキ\n• 指定した枚数のカード\n\n保存する前にすべて確認して直せます。"
         },
         "addCards": {
-          "title": "Adding Cards to Existing Decks",
-          "body": "You can also add AI-generated cards to decks you already have:\n\n• Cards Only: On a deck detail page with no cards, click 'AI Cards' to generate cards using the deck's existing template.\n• Add More: On a deck with existing cards, click 'AI Cards' to add more cards. AI will avoid duplicating existing content.\n\nYou can also create a new deck from an existing template: on the Templates page, click 'AI Deck' on any template."
+          "title": "既存のデッキにカードを足す",
+          "body": "すでにあるデッキにAIのカードを足すこともできます：\n\n• カードだけ生成：カードが無いデッキの詳細ページで「AIカード」を押すと、そのデッキのテンプレートを使ってカードを作ります。\n• 追加生成：カードがあるデッキで「AIカード」を押すと、さらに追加します。AIは既存の内容と重複しないようにします。\n\n既存のテンプレートから新しいデッキを作ることもできます：テンプレートページで「AIデッキ」を押してください。"
         },
         "editResults": {
-          "title": "Reviewing & Editing Generated Content",
-          "body": "Before saving, you can review and edit everything AI generated:\n\n• Template: Change field names, TTS languages, layout styles, font sizes, and custom HTML\n• Deck: Edit name, description, icon, and color\n• Cards: Edit any field value inline, delete unwanted cards\n\nAfter saving, you can make more detailed edits:\n• Click 'Edit Template' on the completion screen to open the full template editor\n• Click 'View Deck' to manage cards individually\n• Click 'Add More Cards' to generate additional cards for the same deck"
+          "title": "生成結果の確認と修正",
+          "body": "保存の前に、AIが作ったものをすべて確認して直せます：\n\n• テンプレート：フィールド名、TTSの言語、レイアウト、フォントサイズ、カスタムHTML\n• デッキ：名前、説明、アイコン、色\n• カード：各フィールドをその場で編集、不要なカードは削除\n\n保存した後はさらに細かく直せます：\n• 完了画面の「テンプレートを編集」でテンプレート編集画面が開きます\n• 「デッキを見る」でカードを個別に管理できます\n• 「カードを追加」で同じデッキにさらに生成できます"
         }
       }
     },

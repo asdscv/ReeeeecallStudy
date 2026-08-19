@@ -2,7 +2,7 @@
   "title": "สำรับของฉัน",
   "createNew": "+ สำรับใหม่",
   "empty": "ยังไม่มีสำรับ สร้างสำรับใหม่เลย",
-  "emptyDescription": "Create your first deck to start learning",
+  "emptyDescription": "สร้างเด็คแรกของคุณเพื่อเริ่มเรียน",
   "createFirst": "+ สร้างสำรับแรก",
   "deleteDeck": "ลบสำรับ",
   "deleteConfirm": "สำรับ \"{{name}}\" และการ์ดทั้งหมดจะถูกลบ ไม่สามารถเลิกทำได้",
@@ -71,7 +71,7 @@
     "pendingChanges": "{{count, number}} pending",
     "lastSynced": "Last synced: {{time}}",
     "neverSynced": "Never synced",
-    "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
+    "syncComplete": "ซิงก์เสร็จแล้ว: เพิ่ม {{added}} ลบ {{removed}}",
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed Deck"

@@ -112,7 +112,7 @@
     },
     "exploreMarket": {
       "title": "Explore the Marketplace",
-      "description": "Discover shared decks from other users. Find study materials for any subject and start learning instantly.",
+      "description": "Browse decks shared by other learners and take any you like. You can publish your own decks to the market too.",
       "action": "Browse Marketplace"
     }
   },

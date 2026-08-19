@@ -27,7 +27,7 @@
     "title": "Peta Panas Belajar"
   },
   "gamification": {
-    "freezes": "{{count, number}} freezes left",
+    "freezes": "sisa {{count, number}} pembekuan",
     "dailyGoal": "Daily Goal"
   },
   "level": {
@@ -42,19 +42,19 @@
   },
   "quests": {
     "title": "Daily Quests",
-    "cards": "Study {{count, number}} cards",
-    "sessions": "Complete {{count, number}} sessions",
-    "time": "Study for {{count, number}} minutes",
-    "perfect": "Get {{count, number}} perfect scores",
+    "cards": "Pelajari {{count, number}} kartu",
+    "sessions": "Selesaikan {{count, number}} sesi",
+    "time": "Belajar selama {{count, number}} menit",
+    "perfect": "Dapatkan {{count, number}} skor sempurna",
     "completed": "Selesai"
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count, number}} available",
-    "motivational": "Keep going! You're doing great!"
+    "available": "tersisa {{count, number}}",
+    "motivational": "Terus lanjut! Kamu hebat!"
   },
   "studyHistory": "Study History",
-  "studyHistoryDesc": "View sessions, stats, and progress",
+  "studyHistoryDesc": "Lihat sesi, statistik, dan progres",
   "streakDays": "{{count, number}} hari",
   "quickStudy": {
     "title": "Belajar Cepat",

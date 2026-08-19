@@ -88,7 +88,7 @@
     "enable": "Enable reminders",
     "time": "Reminder time",
     "days": "Reminder days",
-    "preview": "You'll receive reminders at {{time}} on {{days}}",
+    "preview": "Recibirás recordatorios a las {{time}} los {{days}}",
     "mon": "Mon",
     "tue": "Tue",
     "wed": "Wed",
@@ -174,14 +174,14 @@
   "privacy": {
     "title": "Privacy & data",
     "analyticsTitle": "Usage analytics",
-    "analyticsHint": "Help improve the app with anonymous usage data",
+    "analyticsHint": "Ayuda a mejorar la app con datos de uso anónimos",
     "trackingOn": "Allowed",
     "trackingOff": "Off",
     "deleteAccount": "Delete my account",
-    "deleteConfirm": "This permanently deletes your account, decks, cards, and study history. This cannot be undone.",
+    "deleteConfirm": "Esto elimina de forma permanente tu cuenta, mazos, tarjetas e historial de estudio. No se puede deshacer.",
     "deleteConfirmBtn": "Delete permanently",
     "cancel": "Cancel",
-    "deleteFailed": "Could not delete your account. Please try again."
+    "deleteFailed": "No se pudo eliminar tu cuenta. Inténtalo de nuevo."
   },
   "subscription": {
     "title": "Suscripción"

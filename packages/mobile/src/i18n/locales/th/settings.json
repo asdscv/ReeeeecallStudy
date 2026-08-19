@@ -47,16 +47,16 @@
   },
   "srsConfig": {
     "title": "SRS Configuration",
-    "description": "Default SRS settings for new decks. Each deck can override these.",
-    "learningSteps": "Learning Steps (minutes, comma-separated)",
+    "description": "ค่าตั้งต้น SRS สำหรับเด็คใหม่ แต่ละเด็คตั้งค่าแทนที่ได้",
+    "learningSteps": "ขั้นการเรียน (นาที คั่นด้วยจุลภาค)",
     "goodInterval": "Good Interval (days)",
     "easyInterval": "Easy Interval (days)"
   },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",
-    "reminderDesc": "You'll be reminded daily at 9:00 AM to review your cards.",
-    "permissionRequired": "Enable notifications in device settings.",
+    "reminderDesc": "จะเตือนให้คุณทบทวนการ์ดทุกวันเวลา 9:00 น.",
+    "permissionRequired": "เปิดการแจ้งเตือนในการตั้งค่าอุปกรณ์",
     "permissionTitle": "ต้องการสิทธิ์"
   },
   "subscription": {

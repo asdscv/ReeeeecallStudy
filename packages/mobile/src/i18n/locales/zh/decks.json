@@ -2,7 +2,7 @@
   "title": "我的牌组",
   "createNew": "+ 新建牌组",
   "empty": "暂无牌组，创建一个新牌组吧。",
-  "emptyDescription": "Create your first deck to start learning",
+  "emptyDescription": "创建你的第一个卡组，开始学习吧",
   "createFirst": "+ 创建第一个牌组",
   "deleteDeck": "删除牌组",
   "deleteConfirm": "牌组「{{name}}」及其所有卡片将被删除，此操作不可撤销。",
@@ -71,7 +71,7 @@
     "pendingChanges": "{{count, number}} pending",
     "lastSynced": "Last synced: {{time}}",
     "neverSynced": "Never synced",
-    "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
+    "syncComplete": "同步完成：新增 {{added}} 项，移除 {{removed}} 项",
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed Deck"

@@ -88,7 +88,7 @@
     "enable": "Enable reminders",
     "time": "Reminder time",
     "days": "Reminder days",
-    "preview": "You'll receive reminders at {{time}} on {{days}}",
+    "preview": "Bạn sẽ được nhắc lúc {{time}} vào {{days}}",
     "mon": "Mon",
     "tue": "Tue",
     "wed": "Wed",
@@ -174,14 +174,14 @@
   "privacy": {
     "title": "Privacy & data",
     "analyticsTitle": "Usage analytics",
-    "analyticsHint": "Help improve the app with anonymous usage data",
+    "analyticsHint": "Giúp cải thiện ứng dụng bằng dữ liệu sử dụng ẩn danh",
     "trackingOn": "Allowed",
     "trackingOff": "Off",
     "deleteAccount": "Delete my account",
-    "deleteConfirm": "This permanently deletes your account, decks, cards, and study history. This cannot be undone.",
+    "deleteConfirm": "Thao tác này xóa vĩnh viễn tài khoản, bộ thẻ, thẻ và lịch sử học của bạn. Không thể hoàn tác.",
     "deleteConfirmBtn": "Delete permanently",
     "cancel": "Cancel",
-    "deleteFailed": "Could not delete your account. Please try again."
+    "deleteFailed": "Không thể xóa tài khoản. Vui lòng thử lại."
   },
   "subscription": {
     "title": "Đăng ký"

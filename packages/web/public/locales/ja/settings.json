@@ -88,7 +88,7 @@
     "enable": "Enable reminders",
     "time": "Reminder time",
     "days": "Reminder days",
-    "preview": "You'll receive reminders at {{time}} on {{days}}",
+    "preview": "{{days}}の{{time}}にお知らせします",
     "mon": "Mon",
     "tue": "Tue",
     "wed": "Wed",
@@ -174,14 +174,14 @@
   "privacy": {
     "title": "Privacy & data",
     "analyticsTitle": "Usage analytics",
-    "analyticsHint": "Help improve the app with anonymous usage data",
+    "analyticsHint": "匿名の利用データでアプリの改善に協力します",
     "trackingOn": "Allowed",
     "trackingOff": "Off",
     "deleteAccount": "Delete my account",
-    "deleteConfirm": "This permanently deletes your account, decks, cards, and study history. This cannot be undone.",
+    "deleteConfirm": "アカウント・デッキ・カード・学習履歴が完全に削除されます。元に戻せません。",
     "deleteConfirmBtn": "Delete permanently",
     "cancel": "Cancel",
-    "deleteFailed": "Could not delete your account. Please try again."
+    "deleteFailed": "アカウントを削除できませんでした。もう一度お試しください。"
   },
   "subscription": {
     "title": "サブスクリプション"

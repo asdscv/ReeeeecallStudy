@@ -47,16 +47,16 @@
   },
   "srsConfig": {
     "title": "SRS Configuration",
-    "description": "Default SRS settings for new decks. Each deck can override these.",
-    "learningSteps": "Learning Steps (minutes, comma-separated)",
+    "description": "Ajustes SRS por defecto para los mazos nuevos. Cada mazo puede cambiarlos.",
+    "learningSteps": "Pasos de aprendizaje (minutos, separados por comas)",
     "goodInterval": "Good Interval (days)",
     "easyInterval": "Easy Interval (days)"
   },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",
-    "reminderDesc": "You'll be reminded daily at 9:00 AM to review your cards.",
-    "permissionRequired": "Enable notifications in device settings.",
+    "reminderDesc": "Te recordaremos repasar tus tarjetas cada día a las 9:00.",
+    "permissionRequired": "Activa las notificaciones en los ajustes del dispositivo.",
     "permissionTitle": "Permiso requerido"
   },
   "subscription": {

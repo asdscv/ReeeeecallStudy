@@ -2,7 +2,7 @@
   "title": "Mis mazos",
   "createNew": "+ Nuevo mazo",
   "empty": "Sin mazos aún. Crea un nuevo mazo.",
-  "emptyDescription": "Create your first deck to start learning",
+  "emptyDescription": "Crea tu primer mazo para empezar a aprender",
   "createFirst": "+ Crear primer mazo",
   "deleteDeck": "Eliminar mazo",
   "deleteConfirm": "El mazo \"{{name}}\" y todas sus tarjetas serán eliminados. Esto no se puede deshacer.",
@@ -71,7 +71,7 @@
     "pendingChanges": "{{count, number}} pending",
     "lastSynced": "Last synced: {{time}}",
     "neverSynced": "Never synced",
-    "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
+    "syncComplete": "Sincronización completa: {{added}} añadidas, {{removed}} eliminadas",
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed Deck"
