@@ -17,6 +17,17 @@ export function isCardLimitError(err: { code?: string; hint?: string } | null | 
 }
 
 /**
+ * 덱·템플릿 총량 거절(mig 269 트리거)을 알아본다.
+ *
+ * 카드와 같은 SQLSTATE(PT402)를 쓰되 hint 가 `ROW_LIMIT_REACHED` 입니다. 클라이언트가 총량을
+ * 세지 않기로 한 이상, 서버 거절을 사람이 읽을 문장으로 바꾸는 것이 유일한 방어선입니다 —
+ * 그러지 않으면 학습자에게 Postgres 원문이 그대로 보입니다.
+ */
+export function isRowLimitError(err: { code?: string; hint?: string } | null | undefined): boolean {
+  return err?.code === 'PT402' || err?.hint === 'ROW_LIMIT_REACHED'
+}
+
+/**
  * Card mutations change the per-deck card/SRS counts surfaced by
  * get_deck_stats (deck list + Quick Study). The deck store caches stats with a
  * TTL, and consumers fetch on focus without `force`, so we must invalidate that

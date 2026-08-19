@@ -45,12 +45,14 @@
     "limitReached": "已达卡片上限 — 订阅以添加更多。"
   },
   "deck": {
-    "rateLimitReached": "已达请求限制。"
+    "rateLimitReached": "已达请求限制。",
+    "limitReached": "已达到牌组上限 — 订阅后可继续添加。"
   },
   "template": {
     "rateLimitReached": "已达请求限制。",
     "cannotDeleteDefault": "无法删除默认模板。",
-    "inUseByDecks": "无法删除 — 有 {{count, number}} 个牌组正在使用此模板。"
+    "inUseByDecks": "无法删除 — 有 {{count, number}} 个牌组正在使用此模板。",
+    "limitReached": "已达到模板上限 — 订阅后可继续添加。"
   },
   "marketplace": {
     "listingNotFound": "未找到该条目。",

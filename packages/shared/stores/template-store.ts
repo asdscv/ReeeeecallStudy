@@ -1,3 +1,4 @@
+import { isRowLimitError } from './card-store'
 import { create } from 'zustand'
 import i18next from 'i18next'
 import { supabase } from '../lib/supabase'
@@ -61,7 +62,8 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
   },
 
   createTemplate: async (input) => {
-    const check = guard.check('card_create', 'templates_total')
+    // 템플릿 총량도 서버가 셉니다(mig 269 트리거).
+    const check = guard.check('card_create')
     if (!check.allowed) { set({ error: check.message ?? 'errors:template.rateLimitReached' }); return null }
 
     const { data: { user } } = await supabase.auth.getUser()
@@ -84,7 +86,7 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
       .single()
 
     if (error) {
-      set({ error: error.message })
+      set({ error: isRowLimitError(error) ? 'errors:template.limitReached' : error.message })
       return null
     }
 

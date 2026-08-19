@@ -45,12 +45,14 @@
     "limitReached": "Límite de tarjetas alcanzado: suscríbete para añadir más."
   },
   "deck": {
-    "rateLimitReached": "Límite de solicitudes alcanzado."
+    "rateLimitReached": "Límite de solicitudes alcanzado.",
+    "limitReached": "Has alcanzado el límite de mazos: suscríbete para añadir más."
   },
   "template": {
     "rateLimitReached": "Límite de solicitudes alcanzado.",
     "cannotDeleteDefault": "La plantilla predeterminada no se puede eliminar.",
-    "inUseByDecks": "No se puede eliminar — {{count, number}} mazo(s) usan esta plantilla."
+    "inUseByDecks": "No se puede eliminar — {{count, number}} mazo(s) usan esta plantilla.",
+    "limitReached": "Has alcanzado el límite de plantillas: suscríbete para añadir más."
   },
   "marketplace": {
     "listingNotFound": "Publicación no encontrada.",

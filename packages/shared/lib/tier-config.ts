@@ -107,6 +107,26 @@ export function getRateLimit(tier: TierName, operation: OperationType): RateLimi
 // Avoids circular imports between tier-config and subscription-store.
 let _currentTier: TierName = 'free'
 
+/**
+ * 서버가 정한 한도를 덮어씁니다.
+ *
+ * 이 파일의 숫자들은 **기본값**입니다. 진짜 한도는 서버에 있고(`plan_entitlements` /
+ * 구독 스냅샷), `get_my_entitlements()` 한 번으로 옵니다. 로그인 뒤 그 값을 여기에 부어 두면
+ * 화면과 가드가 서버와 같은 숫자를 씁니다 — 값을 바꾸는 데 앱 배포가 필요 없어집니다.
+ *
+ * 이 주입이 없던 동안 무료 덱 한도가 코드에 5 로 적혀 있었고, 실제로 32개를 가진 계정이
+ * 프로덕션에 있었습니다. 숫자가 두 곳에 살면 반드시 갈라집니다.
+ */
+export function applyServerQuotas(quotas: Partial<Record<ResourceType, number>>): void {
+  for (const tier of Object.keys(TIER_CONFIGS) as TierName[]) {
+    for (const [resource, value] of Object.entries(quotas)) {
+      if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
+        TIER_CONFIGS[tier].quotas[resource as ResourceType] = value
+      }
+    }
+  }
+}
+
 export function setCurrentTier(tier: TierName): void {
   _currentTier = TIER_CONFIGS[tier] ? tier : 'free'
 }

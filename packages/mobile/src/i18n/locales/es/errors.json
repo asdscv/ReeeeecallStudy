@@ -33,6 +33,10 @@
     "limitReached": "Límite de tarjetas alcanzado: suscríbete para añadir más."
   },
   "deck": {
-    "rateLimitReached": "Límite de solicitudes alcanzado."
+    "rateLimitReached": "Límite de solicitudes alcanzado.",
+    "limitReached": "Has alcanzado el límite de mazos: suscríbete para añadir más."
+  },
+  "template": {
+    "limitReached": "Has alcanzado el límite de plantillas: suscríbete para añadir más."
   }
 }

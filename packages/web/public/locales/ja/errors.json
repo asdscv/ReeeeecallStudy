@@ -45,12 +45,14 @@
     "limitReached": "カード上限に達しました — さらに追加するには購読してください。"
   },
   "deck": {
-    "rateLimitReached": "リクエスト上限に達しました。"
+    "rateLimitReached": "リクエスト上限に達しました。",
+    "limitReached": "デッキの上限に達しました — 追加するには購読してください。"
   },
   "template": {
     "rateLimitReached": "リクエスト上限に達しました。",
     "cannotDeleteDefault": "デフォルトテンプレートは削除できません。",
-    "inUseByDecks": "削除できません — {{count, number}}個のデッキがこのテンプレートを使用しています。"
+    "inUseByDecks": "削除できません — {{count, number}}個のデッキがこのテンプレートを使用しています。",
+    "limitReached": "テンプレートの上限に達しました — 追加するには購読してください。"
   },
   "marketplace": {
     "listingNotFound": "リスティングが見つかりません。",

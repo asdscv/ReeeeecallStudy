@@ -33,6 +33,10 @@
     "limitReached": "Batas kartu tercapai — berlangganan untuk menambah lagi."
   },
   "deck": {
-    "rateLimitReached": "Batas permintaan tercapai."
+    "rateLimitReached": "Batas permintaan tercapai.",
+    "limitReached": "Kamu sudah mencapai batas dek — berlangganan untuk menambah."
+  },
+  "template": {
+    "limitReached": "Kamu sudah mencapai batas templat — berlangganan untuk menambah."
   }
 }
