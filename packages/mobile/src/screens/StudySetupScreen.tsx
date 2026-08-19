@@ -264,7 +264,16 @@ export function StudySetupScreen() {
 
       {/* Study Mode Modal — matches web: modal with steps */}
       <Modal visible={!!selectedDeckId} transparent animationType="fade" onRequestClose={closeModal}>
-        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={closeModal}>
+        // 배경은 **접근성 요소가 아닙니다.**
+        //
+        // `TouchableOpacity` 는 기본이 `accessible={true}` 라, 배경 하나가 접근성
+        // 요소가 되면서 그 안의 모든 것을 삼킵니다. 실제로 학습 모드 모달을 열고
+        // 접근성 트리를 떠 봤더니 `study-mode-*` 가 **하나도 없었습니다** — 화면에는
+        // 여섯 개가 멀쩡히 보이는데도요.
+        //
+        // 보이스오버 사용자에게는 모달 전체가 버튼 하나로 읽히고, 모드를 고를 수
+        // 없습니다. 배경은 "밖을 눌러 닫기"를 위한 것이지 읽을 것이 아닙니다.
+        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} accessible={false} onPress={closeModal}>
           <View
             style={[styles.modalCard, { backgroundColor: theme.colors.surfaceElevated }]}
             onStartShouldSetResponder={() => true}

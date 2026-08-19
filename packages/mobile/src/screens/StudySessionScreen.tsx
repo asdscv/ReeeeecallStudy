@@ -209,6 +209,38 @@ export function StudySessionScreen() {
     return { opacity, backgroundColor: color }
   })
 
+  const handleExit = () => {
+    Alert.alert(t('session.endSession'), t('session.endMessage'), [
+      { text: t('session.continue'), style: 'cancel' },
+      { text: t('session.end'), style: 'destructive', onPress: async () => {
+        if (sessionStats.cardsStudied > 0) {
+          await exitSession()
+          // exitSession sets phase='completed' → useEffect navigates to Summary
+        } else {
+          // No cards studied — just go back
+          navigation.goBack()
+        }
+      }},
+    ])
+  }
+
+  // The screen disables the iOS back-swipe (StudyStack gestureEnabled:false), but that
+  // does NOT stop the Android hardware back button — without this it would pop the
+  // session with no "end session?" confirm. Route it through handleExit instead.
+  //
+  // **조기 return 위에 있어야 합니다.** 아래 `if (!currentCard || phase !== 'studying')` 는
+  // 카드가 로드되기 전 렌더에서 빠져나갑니다. 이 훅이 그 아래에 있으면 첫 렌더에서는 실행되지
+  // 않고, 카드가 들어와 `studying` 이 되는 렌더에서 처음 실행됩니다 — React 가 세는 훅 수가
+  // 늘어나면서 "Rendered more hooks than during the previous render" 로 화면이 죽습니다.
+  // 시뮬레이터에서 학습 세션을 시작할 때마다 재현됐습니다(레드박스, StudySessionScreen.tsx:301).
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      handleExit()
+      return true // handled — don't pop
+    })
+    return () => sub.remove()
+  }, [handleExit])
+
   if (!currentCard || phase !== 'studying') {
     // The study store is in-memory only. If the user lands here without an
     // active session (cold restart after a crash / a stale nav-state restore
@@ -279,32 +311,6 @@ export function StudySessionScreen() {
     // when the undo actually lands.
     void undoLastRating()
   }
-
-  const handleExit = () => {
-    Alert.alert(t('session.endSession'), t('session.endMessage'), [
-      { text: t('session.continue'), style: 'cancel' },
-      { text: t('session.end'), style: 'destructive', onPress: async () => {
-        if (sessionStats.cardsStudied > 0) {
-          await exitSession()
-          // exitSession sets phase='completed' → useEffect navigates to Summary
-        } else {
-          // No cards studied — just go back
-          navigation.goBack()
-        }
-      }},
-    ])
-  }
-
-  // The screen disables the iOS back-swipe (StudyStack gestureEnabled:false), but that
-  // does NOT stop the Android hardware back button — without this it would pop the
-  // session with no "end session?" confirm. Route it through handleExit instead.
-  useEffect(() => {
-    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
-      handleExit()
-      return true // handled — don't pop
-    })
-    return () => sub.remove()
-  }, [handleExit])
 
   const tapGesture = Gesture.Tap()
     .withRef(cardTapRef)
@@ -429,20 +435,20 @@ export function StudySessionScreen() {
           <View style={[styles.ratingRow, { paddingHorizontal: 16, paddingBottom: Math.max(insets.bottom, 24) }]}>
             {config?.mode === 'srs' ? (
               <>
-                <RatingButton label={t('srsRating.again')} color={RATING_COLORS.again} onPress={() => handleRate('again')} disabled={isRating} />
-                <RatingButton label={t('srsRating.hard')} color={RATING_COLORS.hard} onPress={() => handleRate('hard')} disabled={isRating} />
-                <RatingButton label={t('srsRating.good')} color={RATING_COLORS.good} onPress={() => handleRate('good')} disabled={isRating} />
-                <RatingButton label={t('srsRating.easy')} color={RATING_COLORS.easy} onPress={() => handleRate('easy')} disabled={isRating} />
+                <RatingButton label={t('srsRating.again')} color={RATING_COLORS.again} onPress={() => handleRate('again')} disabled={isRating} rating="again" />
+                <RatingButton label={t('srsRating.hard')} color={RATING_COLORS.hard} onPress={() => handleRate('hard')} disabled={isRating} rating="hard" />
+                <RatingButton label={t('srsRating.good')} color={RATING_COLORS.good} onPress={() => handleRate('good')} disabled={isRating} rating="good" />
+                <RatingButton label={t('srsRating.easy')} color={RATING_COLORS.easy} onPress={() => handleRate('easy')} disabled={isRating} rating="easy" />
               </>
             ) : config?.mode === 'cramming' ? (
               <>
-                <RatingButton label={t('rating.missed')} color={RATING_COLORS.again} onPress={() => handleRate('missed')} disabled={isRating} />
-                <RatingButton label={t('rating.gotIt')} color={RATING_COLORS.good} onPress={() => handleRate('got_it')} disabled={isRating} />
+                <RatingButton label={t('rating.missed')} color={RATING_COLORS.again} onPress={() => handleRate('missed')} disabled={isRating} rating="missed" />
+                <RatingButton label={t('rating.gotIt')} color={RATING_COLORS.good} onPress={() => handleRate('got_it')} disabled={isRating} rating="got_it" />
               </>
             ) : (
               <>
-                <RatingButton label={t('rating.unknown')} color={RATING_COLORS.again} onPress={() => handleRate('unknown')} disabled={isRating} />
-                <RatingButton label={t('rating.known')} color={RATING_COLORS.good} onPress={() => handleRate('known')} disabled={isRating} />
+                <RatingButton label={t('rating.unknown')} color={RATING_COLORS.again} onPress={() => handleRate('unknown')} disabled={isRating} rating="unknown" />
+                <RatingButton label={t('rating.known')} color={RATING_COLORS.good} onPress={() => handleRate('known')} disabled={isRating} rating="known" />
               </>
             )}
           </View>
@@ -567,14 +573,23 @@ function CardFace({ content, theme, ttsSpeed = 0.9, scrollable = false, cardTapR
 }
 
 
-function RatingButton({ label, color, onPress, disabled }: {
-  label: string; color: string; onPress: () => void; disabled: boolean
+/**
+ * 평가 버튼.
+ *
+ * `rating` 은 화면에 보이는 라벨과 별개로 **무엇을 눌렀는지**를 나타냅니다. 라벨은 번역되고
+ * 모드마다 달라지므로(srs: again/hard/good/easy · cramming: missed/gotIt · 그 외: unknown/known)
+ * 라벨로는 붙잡을 수 없습니다. 학습 세션의 주 동작인데 testID 가 없어서 실기 테스트가
+ * 여기서 멈춰 있었습니다.
+ */
+function RatingButton({ label, color, onPress, disabled, rating }: {
+  label: string; color: string; onPress: () => void; disabled: boolean; rating: string
 }) {
   return (
     <TouchableOpacity
       onPress={onPress}
       disabled={disabled}
       activeOpacity={0.7}
+      {...testProps(`study-rate-${rating}`)}
       style={[styles.ratingBtn, { backgroundColor: color, opacity: disabled ? 0.5 : 1 }]}
     >
       <Text style={styles.ratingLabel} maxFontSizeMultiplier={1.3} numberOfLines={1}>{label}</Text>

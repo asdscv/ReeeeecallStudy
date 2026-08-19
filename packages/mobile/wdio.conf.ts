@@ -101,11 +101,16 @@ export const config: WebdriverIO.Config = {
       for (let i = 0; i < 3; i++) {
         // Check if we're on a main screen (has drawer hamburger)
         //
-        // `~Open menu` 로 찾고 있었고, 그건 **한 번도 맞은 적이 없습니다.** 햄버거의
-        // accessibilityLabel 은 번역된 문자열("메뉴 열기")이라 영어 라벨로는 절대 안 잡힙니다 —
-        // 스위트 전체의 드로어 이동이 이것 때문에 죽어 있었고(PR #455), 같은 실수가 이 훅에
-        // 남아 있었습니다. 잡을 것은 testID 입니다.
-        const hamburger = $('~screen-header-menu')
+        // `~Open menu` 로 찾고 있었습니다. 한국어 iOS 에서는 라벨이 "메뉴 열기" 라 절대 안
+        // 맞고, 못 찾으면 아래 루프가 **뒤로가기를 세 번 누릅니다** — Android 에서 그것은
+        // 루트에서 앱을 종료시킵니다. 실제로 그렇게 됐습니다: 앱이 30초 만에 런처로 나가고
+        // 그 뒤 모든 스펙이 "로그인 화면도 메인 화면도 없다"로 죽었습니다.
+        //
+        // 그리고 `~screen-header-menu` 로 바꾸는 것만으로는 부족합니다 — Android 에서 testID 는
+        // resource-id 로 가고 content-desc 에는 번역된 라벨이 실립니다. 두 플랫폼을 같은
+        // 헬퍼로 다룹니다.
+        const { byPlatformId } = await import('./__tests__/e2e/helpers/navigation')
+        const hamburger = byPlatformId('screen-header-menu')
         if (await hamburger.isDisplayed().catch(() => false)) break
 
         if (driver.isIOS) {
