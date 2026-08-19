@@ -325,7 +325,10 @@ export function SettingsScreen() {
         <GroupLabel theme={theme}>{t('groups.account')}</GroupLabel>
 
         {/* ── a) Profile — centered avatar like web ── */}
-        <CollapsibleSection title={t('profile.title')} icon="👤" tint="#3B82F6">
+        {/* 접힌 섹션이라 펼치기 전에는 이름 입력이 렌더되지 않습니다. 실기 테스트가
+            그걸 붙잡을 수 있게 섹션 헤더에 id 를 답니다. */}
+        <CollapsibleSection title={t('profile.title')} icon="👤" tint="#3B82F6"
+          testID="settings-section-profile">
           <View style={styles.profileCentered}>
             <View style={[styles.avatarCircle, { backgroundColor: theme.colors.primary }]}>
               <Text style={styles.avatarText}>{userInitial}</Text>
@@ -723,7 +726,16 @@ export function SettingsScreen() {
           </TouchableOpacity>
 
           <Modal visible={langDropdownOpen} transparent animationType="fade" onRequestClose={() => setLangDropdownOpen(false)}>
-            <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setLangDropdownOpen(false)}>
+            // 배경은 **접근성 요소가 아닙니다.**
+            //
+            // `TouchableOpacity` 는 기본이 `accessible={true}` 라, 배경 하나가 접근성
+            // 요소가 되면서 그 안의 모든 것을 삼킵니다. 실제로 학습 모드 모달을 열고
+            // 접근성 트리를 떠 봤더니 `study-mode-*` 가 **하나도 없었습니다** — 화면에는
+            // 여섯 개가 멀쩡히 보이는데도요.
+            //
+            // 보이스오버 사용자에게는 모달 전체가 버튼 하나로 읽히고, 모드를 고를 수
+            // 없습니다. 배경은 "밖을 눌러 닫기"를 위한 것이지 읽을 것이 아닙니다.
+            <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} accessible={false} onPress={() => setLangDropdownOpen(false)}>
               <View
               // Claims the touch responder so the overlay TouchableOpacity above cannot
               // fire from inside the sheet — a plain View let it win on every
