@@ -135,7 +135,16 @@ export const useCardStore = create<CardState>((set, get) => ({
   },
 
   createCard: async (input) => {
-    const check = guard.check('card_create', 'cards_total')
+    // 카드 **총량**은 클라이언트가 세지 않습니다.
+    //
+    // `tier-config` 에 무료 3,000 이 따로 적혀 있었고, 서버의 진짜 한도는
+    // `card_limit_settings`(무료) 와 구독 스냅샷(유료)입니다. 268 이 무료를 5,000 으로 올린
+    // 순간 두 숫자가 갈라져, 3,001번째 카드가 **서버는 허용하는데 클라이언트가 막는** 상태가
+    // 됐습니다. 한도를 데이터로 옮긴 이유가 사라집니다.
+    //
+    // 서버는 PT402/CARD_LIMIT_REACHED 로 정확히 거절하고 아래에서 이미 그 메시지를 띄웁니다.
+    // 분당 생성 속도 제한(card_create)은 그대로 둡니다 — 그건 총량이 아니라 남용 방지입니다.
+    const check = guard.check('card_create')
     if (!check.allowed) { set({ error: check.message ?? 'errors:card.rateLimitReached' }); return null }
 
     const { data: { user } } = await supabase.auth.getUser()
@@ -190,7 +199,6 @@ export const useCardStore = create<CardState>((set, get) => ({
 
     // (next_position 증가는 reserve_card_positions가 원자적으로 처리)
 
-    guard.recordSuccess('cards_total')
     invalidateDeckStats()
     refreshCardUsage()
     dropDeckCards(input.deck_id)
@@ -205,7 +213,8 @@ export const useCardStore = create<CardState>((set, get) => ({
     // fully-successful retry skip invalidateDeckStats/dropDeckCards, leaving the
     // deck list showing a stale card count (a freshly-created deck stuck at 0).
     set({ error: null })
-    const check = guard.check('bulk_card_create', 'cards_total')
+    // 위와 같은 이유로 총량은 서버가 셉니다.
+    const check = guard.check('bulk_card_create')
     if (!check.allowed) { set({ error: check.message ?? 'errors:card.rateLimitReached' }); return 0 }
 
     const { data: { user } } = await supabase.auth.getUser()
@@ -255,7 +264,6 @@ export const useCardStore = create<CardState>((set, get) => ({
 
     // (next_position 증가는 reserve_card_positions가 원자적으로 처리)
 
-    guard.recordSuccess('cards_total', totalInserted)
     // Refresh whenever ANY chunk committed — a mid-loop error (card-limit or transient)
     // still leaves earlier chunks persisted, so the meter / deck stats / card list must
     // reflect them. Gating on !error would strand a partial import as stale. The `error`
