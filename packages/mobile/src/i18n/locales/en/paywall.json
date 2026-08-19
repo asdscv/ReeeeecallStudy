@@ -27,7 +27,7 @@
   "welcomePro": "Your plan is active",
   "welcomeProDesc": "Your card limit is raised. Every study feature is available on every plan.",
   "restorePurchase": "Restore Purchase",
-  "restored": "Your Pro subscription has been restored.",
+  "restored": "Your subscription has been restored.",
   "noRestoreFound": "No previous subscription was found to restore.",
   "productsUnavailable": "Subscription products are currently unavailable. Please try again later.",
   "checkout": {
@@ -53,5 +53,6 @@
     "title": "Refund request",
     "submitted": "Your refund request was sent to Apple. Apple decides the outcome and will email you; if it is approved your access is removed automatically."
   },
-  "everythingElseFree": "All study modes, TTS, statistics and marketplace publishing are free on every plan."
+  "everythingElseFree": "All study modes, TTS, statistics and marketplace publishing are free on every plan.",
+  "paidPlan": "Paid plan"
 }

@@ -35,9 +35,24 @@
       "desc": "Maximize long-term memory with scientifically verified spaced repetition. Auto-adjust review timing with 4-level ratings: Again/Hard/Good/Easy."
     },
     "modes": {
-      "title": "5 Study Modes",
-      "description": "Supports SRS, Random, Sequential, Sequential Review, and By Date — study modes for every situation.",
-      "desc": "Supports SRS, Random, Sequential, Sequential Review, and By Date — study modes for every situation."
+      "title": "6 study modes",
+      "description": "SRS, sequential review, random, sequential, by date, and cramming — pick what fits the moment.",
+      "desc": "SRS, sequential review, random, sequential, by date, and cramming — pick what fits the moment."
+    },
+    "aiCards": {
+      "title": "AI card generation",
+      "description": "Give it a topic and AI builds the template, deck and cards in one pass. A free allowance every day.",
+      "desc": "Give it a topic and AI builds the template, deck and cards in one pass. A free allowance every day."
+    },
+    "quiz": {
+      "title": "AI quizzes & grading",
+      "description": "Turn your own cards into multiple-choice, short-answer and essay questions — AI grades them and explains what you missed.",
+      "desc": "Turn your own cards into multiple-choice, short-answer and essay questions — AI grades them and explains what you missed."
+    },
+    "plan": {
+      "title": "Goals & today's plan",
+      "description": "Set a daily time goal and the decks it covers, and get a plan for what to study today.",
+      "desc": "Set a daily time goal and the decks it covers, and get a plan for what to study today."
     },
     "stats": {
       "title": "Real-time Stats & Dashboard",
@@ -216,9 +231,9 @@
     "q1": "What is spaced repetition (SRS)?",
     "a1": "Spaced repetition is a scientifically proven learning method that schedules reviews at optimal intervals to maximize long-term memory retention. ReeeeecallStudy uses an advanced SRS algorithm to automatically determine when you should review each flashcard.",
     "q2": "Is ReeeeecallStudy free?",
-    "a2": "Yes! ReeeeecallStudy is free to use. Sign up with email and password to start learning immediately with all core features including SRS, multiple study modes, and detailed statistics.",
+    "a2": "Yes — you can start free. Signing up gives you SRS, all six study modes, statistics and deck sharing with no limits.\n\nThe free plan does cap how many cards you can store, and a paid plan raises that cap (the exact numbers are shown in the pricing section above). AI card generation and AI quizzes come with a free allowance every day; beyond that they draw on your prepaid balance — and the charge is always shown before you confirm.",
     "q3": "What study modes are available?",
-    "a3": "ReeeeecallStudy supports 5 study modes: SRS (spaced repetition) for optimal review scheduling, Random for mixed practice, Sequential for ordered review, Sequential Review for systematic revision, and By Date for time-based organization.",
+    "a3": "ReeeeecallStudy supports 6 study modes: SRS for optimal review scheduling, sequential review for systematic revision, random for shuffled practice, sequential for in-order study, by date for time-based sorting, and cramming for focused repetition until mastered.",
     "q4": "Can I share my flashcard decks?",
     "a4": "Yes! You can share decks in 3 modes: Copy (duplicate for others), Subscribe (sync updates), and Snapshot (frozen version). Browse and discover other users' decks in the community marketplace."
   },
@@ -339,12 +354,8 @@
     "note": "Checkout happens after sign-up, in Settings.",
     "plans": {
       "free": "Free",
-      "standard": "Standard",
-      "pro": "Pro",
-      "unlimited": "Unlimited",
       "freeBlurb": "A free plan that's perfect to get started",
-      "standardBlurb": "Expand your learning with more cards",
-      "unlimitedBlurb": "Store and study without any limits"
+      "standardBlurb": "Expand your learning with more cards"
     }
   },
   "seo": {

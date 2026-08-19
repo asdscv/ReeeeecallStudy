@@ -27,7 +27,7 @@
   "welcomePro": "Paketmu aktif",
   "welcomeProDesc": "Batas kartumu naik. Semua fitur belajar tersedia di setiap paket.",
   "restorePurchase": "Pulihkan Pembelian",
-  "restored": "Langganan Pro telah dipulihkan.",
+  "restored": "Langganan kamu telah dipulihkan.",
   "noRestoreFound": "Tidak ditemukan langganan sebelumnya.",
   "productsUnavailable": "Produk langganan saat ini tidak tersedia. Silakan coba lagi nanti.",
   "checkout": {
@@ -53,5 +53,6 @@
     "title": "Pengajuan refund",
     "submitted": "Pengajuan refund dikirim ke Apple. Apple yang memutuskan hasilnya dan akan mengirim email; jika disetujui, akses kamu dicabut otomatis."
   },
-  "everythingElseFree": "Semua mode belajar, TTS, statistik, dan publikasi marketplace gratis di paket mana pun."
+  "everythingElseFree": "Semua mode belajar, TTS, statistik, dan publikasi marketplace gratis di paket mana pun.",
+  "paidPlan": "Paket berbayar"
 }

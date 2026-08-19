@@ -132,6 +132,44 @@
         }
       }
     },
+    "quiz": {
+      "title": "Kuis",
+      "items": {
+        "what": {
+          "title": "Apa itu kuis?",
+          "body": "Kuis mengubah kartumu sendiri menjadi soal untuk menguji apa yang benar-benar melekat. Soal diambil dari kartu di dekmu, bukan dari bank soal luar, jadi yang ditanyakan hanya yang kamu pelajari.\n\nAda tiga jenis soal:\n• Pilihan ganda: pilih salah satu opsi. Pengecohnya dibuat dari kartu lain di dek yang sama.\n• Isian singkat: ketik jawaban pendek.\n• Esai: jawab dalam bentuk tulisan. Rubrik dan jawaban model dibuat bersama soalnya."
+        },
+        "create": {
+          "title": "Membuat kuis",
+          "body": "Buka Kuis → 'Kuis baru'.\n\n1. Pilih dek. Kamu bisa mempersempit dengan tag atau memilih kartu sendiri (maksimal 50).\n2. Pilih jenis soal dan tingkat kesulitan.\n3. Tentukan jumlah soal. Satu set berisi 1–20 soal.\n4. Perkiraan biaya tampil sebelum pembuatan. Jatah gratis harianmu dipakai lebih dulu, sisanya baru dipotong dari saldo.\n\nJika sebuah kartu gagal menghasilkan soal, server otomatis menggantinya dari kartu lain. Jika kartu di dek lebih sedikit dari jumlah yang diminta, kamu mendapat sebanyak yang bisa dibuat."
+        },
+        "take": {
+          "title": "Mengerjakan dan menilai",
+          "body": "Satu set bisa dikerjakan berulang kali dan setiap percobaan tersimpan.\n\n• Pilihan ganda dinilai begitu kamu memilih. Tidak memanggil AI, jadi tidak ada potongan tambahan.\n• Isian singkat dan esai dinilai AI saat kamu menekan Nilai, dan biayanya tampil sebelum ditekan.\n• Esai dikembalikan dengan penilaian per kriteria rubrik beserta jawaban model. Jawaban model baru terbuka setelah kamu mengirim jawabanmu.\n\nPenilaian berbayar sejak yang pertama, karena setiap jawaban berarti satu panggilan model lagi."
+        },
+        "mistakes": {
+          "title": "Catatan salah & bantuan AI",
+          "body": "Jawaban yang salah terkumpul di daftar kesalahan.\n\n• Penjelasan AI: kenapa salah dan apa yang terlewat.\n• Bandingkan jawaban: jawabanmu berdampingan dengan yang benar, lengkap dengan bedanya.\n• Diagnosis: membaca kesalahanmu secara menyeluruh dan menunjuk kelemahan yang berulang.\n\nKetiganya menampilkan biaya sebelum dikonfirmasi dan tidak punya jatah gratis."
+        }
+      }
+    },
+    "learning": {
+      "title": "Target & rencana belajar",
+      "items": {
+        "goal": {
+          "title": "Membuat target",
+          "body": "Target menyimpan apa yang ingin kamu pelajari dan sampai kapan. Belajar → Target → 'Target baru'.\n\n• Nama target (mis. 'Lulus JLPT N2')\n• Dek — pilih minimal satu, kalau tidak rencana tak bisa dibuat.\n• Tanggal target (opsional) — kalau diisi, dihitung berapa kartu baru per hari yang dibutuhkan.\n• Menit per hari — kalau waktunya yang diisi, kamu diberi tahu kira-kira kapan selesai.\n\nKeduanya perkiraan dan dihitung ulang setiap hari. Hanya belajar dengan mode SRS yang dihitung ke rencana."
+        },
+        "today": {
+          "title": "Rencana hari ini",
+          "body": "Belajar → Hari ini, lalu 'Buat rencana hari ini' mengambil jatah hari ini dari dek yang terhubung ke targetmu.\n\n• Tinjauan didahulukan; kartu baru mengisi sisa waktu.\n• Bar progres menunjukkan seberapa jauh kamu hari ini.\n• Setelah jatah hari ini selesai, kamu diberi tahu kapan tinjauan berikutnya kembali.\n\nMelewatkan satu hari penuh tidak menghapus jatahnya — ia kembali di rencana berikutnya."
+        },
+        "coach": {
+          "title": "Penyesuaian otomatis & rekomendasi",
+          "body": "Rencana melihat seberapa banyak yang benar-benar kamu selesaikan lalu mengusulkan penyesuaian.\n\n• Beberapa hari selesai kurang dari separuh → diusulkan mengurangi kartu baru atau memendekkan durasi harian.\n• Selesai setiap hari → diusulkan menambah kartu baru agar target tercapai lebih cepat.\n• Usulan tidak mengubah apa pun sampai kamu menekan Terapkan.\n\nDiagnosis mengumpulkan kartu yang sudah dilihat dua kali atau lebih tetapi nilainya masih rendah. Menerima rekomendasi menaikkan prioritas kartu itu di rencana berikutnya."
+        }
+      }
+    },
     "import-export": {
       "title": "Impor & Ekspor",
       "items": {

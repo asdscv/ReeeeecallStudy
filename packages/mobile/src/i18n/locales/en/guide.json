@@ -94,6 +94,46 @@
         }
       }
     },
+    "quiz": {
+      "title": "Quizzes",
+      "icon": "📝",
+      "items": {
+        "what": {
+          "title": "What is a quiz?",
+          "body": "A quiz turns your own cards into questions so you can check what actually stuck. Questions come from the cards in your decks — not from an outside question bank — so you are only asked about what you studied.\n\nThere are three question types:\n• Multiple choice: pick an option. The distractors are built from other cards in the same deck.\n• Short answer: type a brief answer.\n• Essay: write it out. A rubric and a model answer are generated with the question."
+        },
+        "create": {
+          "title": "Creating a quiz",
+          "body": "Go to Quiz → 'New quiz'.\n\n1. Pick a deck. You can narrow the scope by tags, or hand-pick cards (up to 50).\n2. Choose the question type and difficulty.\n3. Choose how many questions. A set holds 1–20.\n4. The estimated charge is shown before generation. Your daily free questions are used first; only the rest comes out of your balance.\n\nIf a card fails to produce a question, the server refills from other cards automatically. If the deck has fewer cards than the number you asked for, you get as many as the deck can support."
+        },
+        "take": {
+          "title": "Taking and grading",
+          "body": "A set can be taken again and again — every attempt is kept.\n\n• Multiple choice is graded the moment you pick. No AI call, so nothing extra is charged.\n• Short answer and essay are graded by AI when you press Grade, and the charge is shown before you press it.\n• Essays come back scored per rubric criterion, together with a model answer. The model answer only opens after you have submitted yours.\n\nGrading is paid from the very first one, because every answer means another model call."
+        },
+        "mistakes": {
+          "title": "Mistakes and AI help",
+          "body": "Wrong answers collect in your mistakes list.\n\n• AI explanation: why it was wrong and what was missed.\n• Compare answers: your answer next to the correct one, with the difference spelled out.\n• Diagnosis: reads your wrong answers together and names the weakness that keeps coming back.\n\nAll three show the charge before you confirm. None of them have a free allowance."
+        }
+      }
+    },
+    "learning": {
+      "title": "Goals & study plan",
+      "icon": "🎯",
+      "items": {
+        "goal": {
+          "title": "Creating a goal",
+          "body": "A goal holds what you want to learn and by when. Study → Goals → 'New goal'.\n\n• Goal name (e.g. 'Pass JLPT N2')\n• Decks — pick at least one, or no plan can be built.\n• Target date (optional) — set one and you are told how many new cards a day it takes.\n• Daily minutes — set the time instead and you are told roughly when you will finish.\n\nBoth numbers are estimates and are recalculated every day. Only study done in SRS mode counts toward the plan."
+        },
+        "today": {
+          "title": "Today's plan",
+          "body": "Study → Today, then 'Build today's plan' pulls today's share from the decks attached to your goal.\n\n• Reviews come first; new cards fill whatever time is left.\n• A progress line shows how much of today you have finished.\n• When today's share is done, you are told when the next reviews come back.\n\nSkipping a whole day does not delete the work — it comes back in the next plan."
+        },
+        "coach": {
+          "title": "Auto-adjust and recommendations",
+          "body": "The plan watches how much you actually finish and proposes adjustments.\n\n• Several days finishing under half → it suggests fewer new cards or a shorter day.\n• Finishing every day → it suggests more new cards to reach the goal sooner.\n• A suggestion changes nothing until you press Apply.\n\nInsights collects cards you have seen at least twice and still score low on. Accepting a recommendation raises those cards' priority in the next plan."
+        }
+      }
+    },
     "importExport": {
       "title": "Import & Export",
       "icon": "📦",

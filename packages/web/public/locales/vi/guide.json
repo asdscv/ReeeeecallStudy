@@ -132,6 +132,44 @@
         }
       }
     },
+    "quiz": {
+      "title": "Trắc nghiệm",
+      "items": {
+        "what": {
+          "title": "Trắc nghiệm là gì?",
+          "body": "Trắc nghiệm biến chính thẻ của bạn thành câu hỏi để kiểm tra xem bạn nhớ được bao nhiêu. Câu hỏi lấy từ thẻ trong bộ thẻ của bạn, không phải ngân hàng đề bên ngoài, nên chỉ hỏi những gì bạn đã học.\n\nCó ba dạng câu hỏi:\n• Trắc nghiệm: chọn một phương án; các đáp án nhiễu được dựng từ thẻ khác trong cùng bộ.\n• Trả lời ngắn: tự gõ câu trả lời ngắn.\n• Tự luận: viết thành đoạn. Thang chấm và đáp án mẫu được tạo cùng câu hỏi."
+        },
+        "create": {
+          "title": "Tạo bài trắc nghiệm",
+          "body": "Vào Trắc nghiệm → 'Bài mới'.\n\n1. Chọn bộ thẻ. Bạn có thể thu hẹp theo thẻ gắn nhãn hoặc tự chọn thẻ (tối đa 50).\n2. Chọn dạng câu hỏi và độ khó.\n3. Chọn số câu. Mỗi bài từ 1–20 câu.\n4. Mức trừ dự kiến hiện ra trước khi tạo. Hạn mức miễn phí trong ngày được dùng trước, phần vượt mới trừ vào số dư.\n\nNếu một thẻ không tạo được câu hỏi, máy chủ tự bù bằng thẻ khác. Nếu bộ thẻ có ít thẻ hơn số câu bạn yêu cầu, bạn sẽ nhận được đúng số câu tạo được."
+        },
+        "take": {
+          "title": "Làm bài và chấm điểm",
+          "body": "Một bài có thể làm lại nhiều lần và mỗi lượt đều được lưu.\n\n• Câu trắc nghiệm được chấm ngay khi bạn chọn. Không gọi AI nên không bị trừ thêm.\n• Trả lời ngắn và tự luận do AI chấm khi bạn bấm Chấm, mức trừ hiện ra trước khi bấm.\n• Bài tự luận được chấm theo từng tiêu chí kèm đáp án mẫu. Đáp án mẫu chỉ mở sau khi bạn đã nộp bài.\n\nChấm điểm tính phí ngay từ lần đầu, vì mỗi câu trả lời là một lần gọi mô hình."
+        },
+        "mistakes": {
+          "title": "Sổ lỗi sai và trợ giúp AI",
+          "body": "Các câu sai được gom vào sổ lỗi sai.\n\n• Giải thích của AI: sai ở đâu và thiếu điều gì.\n• So sánh câu trả lời: đặt bài của bạn cạnh đáp án đúng và chỉ ra khác biệt.\n• Chẩn đoán học tập: đọc toàn bộ câu sai và gọi tên điểm yếu lặp đi lặp lại.\n\nCả ba đều hiện mức trừ trước khi xác nhận và không có hạn mức miễn phí."
+        }
+      }
+    },
+    "learning": {
+      "title": "Mục tiêu & kế hoạch học",
+      "items": {
+        "goal": {
+          "title": "Tạo mục tiêu học",
+          "body": "Mục tiêu chứa bạn muốn học gì và đến khi nào. Học → Mục tiêu → 'Mục tiêu mới'.\n\n• Tên mục tiêu (ví dụ 'Đỗ JLPT N2')\n• Bộ thẻ — phải chọn ít nhất một, nếu không sẽ không lập được kế hoạch.\n• Ngày mục tiêu (tùy chọn) — đặt ngày thì hệ thống tính mỗi ngày cần bắt đầu bao nhiêu thẻ mới.\n• Số phút mỗi ngày — đặt thời gian trước thì hệ thống cho biết khoảng khi nào bạn học xong.\n\nCả hai đều là ước tính và được tính lại mỗi ngày. Chỉ phần học ở chế độ SRS mới được tính vào kế hoạch."
+        },
+        "today": {
+          "title": "Kế hoạch hôm nay",
+          "body": "Vào Học → Hôm nay rồi bấm 'Lập kế hoạch hôm nay', hệ thống lấy phần của hôm nay từ các bộ thẻ gắn với mục tiêu.\n\n• Thẻ cần ôn được xếp trước; thẻ mới lấp vào thời gian còn lại.\n• Thanh tiến độ cho biết hôm nay bạn đã làm được bao nhiêu.\n• Xong phần hôm nay, hệ thống báo khi nào đợt ôn tiếp theo quay lại.\n\nBỏ trọn một ngày cũng không mất phần đó — nó quay lại trong kế hoạch kế tiếp."
+        },
+        "coach": {
+          "title": "Tự điều chỉnh & gợi ý",
+          "body": "Kế hoạch theo dõi bạn thực sự hoàn thành bao nhiêu rồi đề xuất điều chỉnh.\n\n• Nhiều ngày liền chưa xong một nửa → đề xuất giảm thẻ mới hoặc rút ngắn thời gian mỗi ngày.\n• Ngày nào cũng xong → đề xuất tăng thẻ mới để về đích sớm hơn.\n• Đề xuất không đổi gì cho tới khi bạn bấm Áp dụng.\n\nChẩn đoán gom những thẻ bạn đã gặp từ hai lần trở lên mà điểm vẫn thấp. Chấp nhận gợi ý sẽ nâng ưu tiên của các thẻ đó trong kế hoạch kế tiếp."
+        }
+      }
+    },
     "import-export": {
       "title": "Nhập & Xuất",
       "items": {

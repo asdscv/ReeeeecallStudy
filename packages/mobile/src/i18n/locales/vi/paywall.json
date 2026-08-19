@@ -27,7 +27,7 @@
   "welcomePro": "Gói của bạn đang hoạt động",
   "welcomeProDesc": "Giới hạn thẻ của bạn đã tăng. Mọi tính năng học tập đều có ở mọi gói.",
   "restorePurchase": "Khoi phuc mua hang",
-  "restored": "Da khoi phuc goi Pro.",
+  "restored": "Đã khôi phục gói đăng ký của bạn.",
   "noRestoreFound": "Khong tim thay goi dang ky truoc do.",
   "productsUnavailable": "San pham dang ky hien khong kha dung. Vui long thu lai sau.",
   "checkout": {
@@ -53,5 +53,6 @@
     "title": "Yêu cầu hoàn tiền",
     "submitted": "Đã gửi yêu cầu hoàn tiền tới Apple. Apple quyết định kết quả và sẽ gửi email cho bạn; nếu được duyệt, quyền truy cập sẽ tự động bị thu hồi."
   },
-  "everythingElseFree": "Tất cả chế độ học, TTS, thống kê và đăng lên marketplace đều miễn phí ở mọi gói."
+  "everythingElseFree": "Tất cả chế độ học, TTS, thống kê và đăng lên marketplace đều miễn phí ở mọi gói.",
+  "paidPlan": "Gói trả phí"
 }

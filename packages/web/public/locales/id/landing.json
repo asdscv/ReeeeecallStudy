@@ -35,9 +35,24 @@
       "desc": "Maksimalkan memori jangka panjang dengan pengulangan berjarak yang terverifikasi secara ilmiah. Sesuaikan waktu ulasan otomatis dengan 4 tingkat penilaian: Ulangi/Sulit/Baik/Mudah."
     },
     "modes": {
-      "title": "5 Mode Belajar",
-      "description": "Mendukung SRS, Acak, Berurutan, Ulasan Berurutan, dan Berdasarkan Tanggal — mode belajar untuk setiap situasi.",
-      "desc": "Mendukung SRS, Acak, Berurutan, Ulasan Berurutan, dan Berdasarkan Tanggal — mode belajar untuk setiap situasi."
+      "title": "6 mode belajar",
+      "description": "SRS, tinjauan berurutan, acak, berurutan, per tanggal, dan sistem kebut — pilih yang paling cocok.",
+      "desc": "SRS, tinjauan berurutan, acak, berurutan, per tanggal, dan sistem kebut — pilih yang paling cocok."
+    },
+    "aiCards": {
+      "title": "Pembuatan kartu dengan AI",
+      "description": "Cukup masukkan topik, AI membuat templat, dek, dan kartu sekaligus. Ada jatah gratis setiap hari.",
+      "desc": "Cukup masukkan topik, AI membuat templat, dek, dan kartu sekaligus. Ada jatah gratis setiap hari."
+    },
+    "quiz": {
+      "title": "Kuis & penilaian AI",
+      "description": "Ubah kartumu jadi soal pilihan ganda, isian singkat, dan esai — AI menilai jawaban dan menjelaskan kesalahannya.",
+      "desc": "Ubah kartumu jadi soal pilihan ganda, isian singkat, dan esai — AI menilai jawaban dan menjelaskan kesalahannya."
+    },
+    "plan": {
+      "title": "Target & rencana hari ini",
+      "description": "Tentukan target waktu harian dan deknya, lalu terima rencana belajar untuk hari ini.",
+      "desc": "Tentukan target waktu harian dan deknya, lalu terima rencana belajar untuk hari ini."
     },
     "stats": {
       "title": "Statistik & Dasbor Real-time",
@@ -216,9 +231,9 @@
     "q1": "Apa itu pengulangan berjarak (SRS)?",
     "a1": "Pengulangan berjarak adalah metode pembelajaran yang terbukti secara ilmiah yang menjadwalkan ulasan pada interval optimal untuk memaksimalkan retensi memori jangka panjang. ReeeeecallStudy menggunakan algoritma SRS canggih untuk secara otomatis menentukan kapan Anda harus mengulas setiap kartu kilat.",
     "q2": "Apakah ReeeeecallStudy gratis?",
-    "a2": "Ya! ReeeeecallStudy gratis untuk digunakan. Daftar dengan email dan kata sandi untuk mulai belajar segera dengan semua fitur inti termasuk SRS, berbagai mode belajar, dan statistik terperinci.",
+    "a2": "Ya, kamu bisa mulai gratis. Cukup daftar dan SRS, keenam mode belajar, statistik, serta berbagi dek bisa dipakai tanpa batas.\n\nPaket gratis membatasi jumlah kartu yang bisa disimpan, dan paket berbayar menaikkan batas itu (angka pastinya tampil di bagian harga di atas). Pembuatan kartu dengan AI dan kuis AI punya jatah gratis setiap hari; selebihnya dipotong dari saldo isi ulang — dan biayanya selalu ditampilkan sebelum kamu mengonfirmasi.",
     "q3": "Mode belajar apa saja yang tersedia?",
-    "a3": "ReeeeecallStudy mendukung 5 mode belajar: SRS (pengulangan berjarak) untuk penjadwalan ulasan optimal, Acak untuk latihan campuran, Berurutan untuk ulasan teratur, Ulasan Berurutan untuk revisi sistematis, dan Berdasarkan Tanggal untuk organisasi berbasis waktu.",
+    "a3": "ReeeeecallStudy mendukung 6 mode belajar: SRS untuk penjadwalan tinjauan optimal, tinjauan berurutan untuk revisi sistematis, acak untuk latihan campur, berurutan sesuai urutan, per tanggal untuk penataan berbasis waktu, dan sistem kebut untuk pengulangan intensif sampai kuasai.",
     "q4": "Bisakah saya berbagi dek kartu kilat saya?",
     "a4": "Ya! Anda dapat berbagi dek dalam 3 mode: Salin (duplikat untuk orang lain), Berlangganan (sinkronisasi pembaruan), dan Snapshot (versi beku). Jelajahi dan temukan dek pengguna lain di marketplace komunitas."
   },
@@ -339,12 +354,8 @@
     "note": "Pembayaran dilakukan setelah mendaftar, di Pengaturan.",
     "plans": {
       "free": "Gratis",
-      "standard": "Standar",
-      "pro": "Pro",
-      "unlimited": "Tanpa Batas",
       "freeBlurb": "Paket gratis yang cocok untuk memulai",
-      "standardBlurb": "Perluas pembelajaran dengan lebih banyak kartu",
-      "unlimitedBlurb": "Simpan dan belajar tanpa batas"
+      "standardBlurb": "Perluas pembelajaran dengan lebih banyak kartu"
     }
   },
   "seo": {
