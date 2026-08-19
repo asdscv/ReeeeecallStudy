@@ -279,20 +279,20 @@
       "title": "AI Auto-Generate",
       "items": {
         "what": {
-          "title": "What is AI Auto-Generate?",
-          "body": "AI Auto-Generate lets you create flashcard templates, decks, and cards automatically using AI. Just enter a topic (e.g., 'JLPT N3 Japanese vocabulary') and AI will generate everything for you.\n\nNo API key or setup needed — generation runs on our servers. You get free AI cards every day; beyond that, generation is deducted from your credit balance."
+          "title": "AI自動生成とは？",
+          "body": "AI自動生成は、AIを使ってフラッシュカードのテンプレート・デッキ・カードを自動で作る機能です。トピックを入れるだけ（例：「JLPT N3 の語彙」）で、AIがすべて作ります。\n\nAPIキーの発行も設定も要りません — 生成はサーバー側で動きます。毎日無料のAIカードがあり、それを超えた分はチャージ残高から引かれます。"
         },
         "fullGenerate": {
-          "title": "Full Generation (Template + Deck + Cards)",
-          "body": "The easiest way to get started:\n\n1. Go to Decks page → Click 'AI Generate'\n2. Type a topic (e.g., 'Basic Korean greetings')\n3. Set the number of cards\n4. Click 'Start Generating'\n\nAI will create:\n• A card template with appropriate fields and TTS settings\n• A deck with name, description, icon, and color\n• The requested number of cards\n\nYou can review and edit everything before saving."
+          "title": "まとめて作る（テンプレート＋デッキ＋カード）",
+          "body": "いちばん簡単な始め方：\n\n1. デッキページ →「AIで作る」をクリック\n2. トピックを入力（例：「韓国語の基本のあいさつ」）\n3. カード枚数を決める\n4.「生成を開始」をクリック\n\nAIが作るもの：\n• 適切なフィールドとTTS設定が入ったカードテンプレート\n• 名前・説明・アイコン・色が入ったデッキ\n• 指定した枚数のカード\n\n保存する前にすべて確認して直せます。"
         },
         "addCards": {
-          "title": "Adding Cards to Existing Decks",
-          "body": "You can also add AI-generated cards to decks you already have:\n\n• Cards Only: On a deck detail page with no cards, click 'AI Cards' to generate cards using the deck's existing template.\n• Add More: On a deck with existing cards, click 'AI Cards' to add more cards. AI will avoid duplicating existing content.\n\nYou can also create a new deck from an existing template: on the Templates page, click 'AI Deck' on any template."
+          "title": "既存のデッキにカードを足す",
+          "body": "すでにあるデッキにAIのカードを足すこともできます：\n\n• カードだけ生成：カードが無いデッキの詳細ページで「AIカード」を押すと、そのデッキのテンプレートを使ってカードを作ります。\n• 追加生成：カードがあるデッキで「AIカード」を押すと、さらに追加します。AIは既存の内容と重複しないようにします。\n\n既存のテンプレートから新しいデッキを作ることもできます：テンプレートページで「AIデッキ」を押してください。"
         },
         "editResults": {
-          "title": "Reviewing & Editing Generated Content",
-          "body": "Before saving, you can review and edit everything AI generated:\n\n• Template: Change field names, TTS languages, layout styles, font sizes, and custom HTML\n• Deck: Edit name, description, icon, and color\n• Cards: Edit any field value inline, delete unwanted cards\n\nAfter saving, you can make more detailed edits:\n• Click 'Edit Template' on the completion screen to open the full template editor\n• Click 'View Deck' to manage cards individually\n• Click 'Add More Cards' to generate additional cards for the same deck"
+          "title": "生成結果の確認と修正",
+          "body": "保存の前に、AIが作ったものをすべて確認して直せます：\n\n• テンプレート：フィールド名、TTSの言語、レイアウト、フォントサイズ、カスタムHTML\n• デッキ：名前、説明、アイコン、色\n• カード：各フィールドをその場で編集、不要なカードは削除\n\n保存した後はさらに細かく直せます：\n• 完了画面の「テンプレートを編集」でテンプレート編集画面が開きます\n• 「デッキを見る」でカードを個別に管理できます\n• 「カードを追加」で同じデッキにさらに生成できます"
         }
       }
     },

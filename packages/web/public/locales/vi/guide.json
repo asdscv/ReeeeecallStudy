@@ -279,20 +279,20 @@
       "title": "AI Auto-Generate",
       "items": {
         "what": {
-          "title": "What is AI Auto-Generate?",
-          "body": "AI Auto-Generate lets you create flashcard templates, decks, and cards automatically using AI. Just enter a topic (e.g., 'JLPT N3 Japanese vocabulary') and AI will generate everything for you.\n\nNo API key or setup needed — generation runs on our servers. You get free AI cards every day; beyond that, generation is deducted from your credit balance."
+          "title": "Tạo tự động bằng AI là gì?",
+          "body": "Tạo tự động bằng AI sẽ dựng mẫu thẻ, bộ thẻ và thẻ giúp bạn. Chỉ cần nhập chủ đề (ví dụ 'từ vựng tiếng Nhật JLPT N3') và AI lo phần còn lại.\n\nKhông cần khóa API hay thiết lập gì — việc tạo chạy trên máy chủ của chúng tôi. Mỗi ngày bạn có hạn mức thẻ AI miễn phí; vượt quá sẽ trừ vào số dư đã nạp."
         },
         "fullGenerate": {
-          "title": "Full Generation (Template + Deck + Cards)",
-          "body": "The easiest way to get started:\n\n1. Go to Decks page → Click 'AI Generate'\n2. Type a topic (e.g., 'Basic Korean greetings')\n3. Set the number of cards\n4. Click 'Start Generating'\n\nAI will create:\n• A card template with appropriate fields and TTS settings\n• A deck with name, description, icon, and color\n• The requested number of cards\n\nYou can review and edit everything before saving."
+          "title": "Tạo trọn gói (mẫu + bộ thẻ + thẻ)",
+          "body": "Cách bắt đầu dễ nhất:\n\n1. Trang bộ thẻ → nhấn 'Tạo bằng AI'\n2. Nhập chủ đề (ví dụ 'chào hỏi cơ bản tiếng Hàn')\n3. Chọn số lượng thẻ\n4. Nhấn 'Bắt đầu tạo'\n\nAI sẽ tạo:\n• Mẫu thẻ với các trường phù hợp và thiết lập đọc tiếng\n• Bộ thẻ có tên, mô tả, biểu tượng và màu\n• Số thẻ đúng như bạn yêu cầu\n\nBạn có thể xem lại và chỉnh sửa tất cả trước khi lưu."
         },
         "addCards": {
-          "title": "Adding Cards to Existing Decks",
-          "body": "You can also add AI-generated cards to decks you already have:\n\n• Cards Only: On a deck detail page with no cards, click 'AI Cards' to generate cards using the deck's existing template.\n• Add More: On a deck with existing cards, click 'AI Cards' to add more cards. AI will avoid duplicating existing content.\n\nYou can also create a new deck from an existing template: on the Templates page, click 'AI Deck' on any template."
+          "title": "Thêm thẻ vào bộ thẻ có sẵn",
+          "body": "Bạn cũng có thể thêm thẻ do AI tạo vào bộ thẻ sẵn có:\n\n• Chỉ tạo thẻ: ở trang bộ thẻ chưa có thẻ nào, nhấn 'Thẻ AI' để tạo thẻ bằng chính mẫu của bộ đó.\n• Thêm nữa: ở bộ đã có thẻ, nhấn 'Thẻ AI' để thêm. AI sẽ tránh trùng lặp với nội dung đã có.\n\nBạn cũng có thể tạo bộ thẻ mới từ một mẫu sẵn có: ở trang mẫu, nhấn 'Bộ thẻ AI'."
         },
         "editResults": {
-          "title": "Reviewing & Editing Generated Content",
-          "body": "Before saving, you can review and edit everything AI generated:\n\n• Template: Change field names, TTS languages, layout styles, font sizes, and custom HTML\n• Deck: Edit name, description, icon, and color\n• Cards: Edit any field value inline, delete unwanted cards\n\nAfter saving, you can make more detailed edits:\n• Click 'Edit Template' on the completion screen to open the full template editor\n• Click 'View Deck' to manage cards individually\n• Click 'Add More Cards' to generate additional cards for the same deck"
+          "title": "Xem lại & chỉnh sửa kết quả",
+          "body": "Trước khi lưu, bạn có thể xem lại và sửa mọi thứ AI đã tạo:\n\n• Mẫu: tên trường, ngôn ngữ đọc tiếng, kiểu bố cục, cỡ chữ và HTML tùy chỉnh\n• Bộ thẻ: tên, mô tả, biểu tượng và màu\n• Thẻ: sửa trực tiếp giá trị từng trường, xóa thẻ không cần\n\nSau khi lưu vẫn chỉnh chi tiết hơn được:\n• Nhấn 'Sửa mẫu' ở màn hình hoàn tất để mở trình sửa mẫu đầy đủ\n• Nhấn 'Xem bộ thẻ' để quản lý từng thẻ\n• Nhấn 'Thêm thẻ' để tạo thêm thẻ cho cùng bộ đó"
         }
       }
     },

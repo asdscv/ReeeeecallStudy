@@ -124,7 +124,7 @@
     "progress": "Progress",
     "viewAll": "View All",
     "recent": "Recent",
-    "empty": "No achievements yet. Start studying to earn badges!",
+    "empty": "Belum ada pencapaian. Mulai belajar untuk mendapat lencana!",
     "newUnlocked": "Achievement Unlocked!",
     "category": {
       "streak": "Streak",
@@ -213,12 +213,12 @@
       "cards_500": "Study 500 cards total",
       "cards_1000": "Study 1,000 cards total",
       "cards_5000": "Study 5,000 cards total",
-      "sessions_10": "Complete 10 study sessions",
-      "sessions_50": "Complete 50 study sessions",
-      "sessions_100": "Complete 100 study sessions",
+      "sessions_10": "Selesaikan 10 sesi belajar",
+      "sessions_50": "Selesaikan 50 sesi belajar",
+      "sessions_100": "Selesaikan 100 sesi belajar",
       "deck_share": "Share your first deck",
-      "marketplace_pub": "Publish a deck to the marketplace",
-      "first_study": "Complete your first study session",
+      "marketplace_pub": "Terbitkan dek ke market",
+      "first_study": "Selesaikan sesi belajar pertamamu",
       "mastery_50": "Pertahankan 50 kartu selama tiga minggu atau lebih"
     },
     "tabs": {

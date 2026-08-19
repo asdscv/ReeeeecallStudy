@@ -279,20 +279,20 @@
       "title": "AI Auto-Generate",
       "items": {
         "what": {
-          "title": "What is AI Auto-Generate?",
-          "body": "AI Auto-Generate lets you create flashcard templates, decks, and cards automatically using AI. Just enter a topic (e.g., 'JLPT N3 Japanese vocabulary') and AI will generate everything for you.\n\nNo API key or setup needed — generation runs on our servers. You get free AI cards every day; beyond that, generation is deducted from your credit balance."
+          "title": "Apa itu pembuatan otomatis dengan AI?",
+          "body": "Pembuatan otomatis dengan AI membuat templat, dek, dan kartu untukmu. Cukup masukkan topik (misalnya 'kosakata Jepang JLPT N3') dan AI menyiapkan semuanya.\n\nTidak perlu kunci API atau pengaturan tambahan — pembuatan berjalan di server kami. Setiap hari kamu dapat jatah kartu AI gratis; selebihnya dipotong dari saldo isi ulangmu."
         },
         "fullGenerate": {
-          "title": "Full Generation (Template + Deck + Cards)",
-          "body": "The easiest way to get started:\n\n1. Go to Decks page → Click 'AI Generate'\n2. Type a topic (e.g., 'Basic Korean greetings')\n3. Set the number of cards\n4. Click 'Start Generating'\n\nAI will create:\n• A card template with appropriate fields and TTS settings\n• A deck with name, description, icon, and color\n• The requested number of cards\n\nYou can review and edit everything before saving."
+          "title": "Pembuatan penuh (templat + dek + kartu)",
+          "body": "Cara paling mudah untuk memulai:\n\n1. Halaman dek → klik 'Buat dengan AI'\n2. Masukkan topik (mis. 'sapaan dasar bahasa Korea')\n3. Tentukan jumlah kartu\n4. Klik 'Mulai buat'\n\nAI akan membuat:\n• Templat kartu dengan kolom yang sesuai dan pengaturan TTS\n• Dek lengkap dengan nama, deskripsi, ikon, dan warna\n• Kartu sebanyak yang kamu minta\n\nKamu bisa meninjau dan mengedit semuanya sebelum menyimpan."
         },
         "addCards": {
-          "title": "Adding Cards to Existing Decks",
-          "body": "You can also add AI-generated cards to decks you already have:\n\n• Cards Only: On a deck detail page with no cards, click 'AI Cards' to generate cards using the deck's existing template.\n• Add More: On a deck with existing cards, click 'AI Cards' to add more cards. AI will avoid duplicating existing content.\n\nYou can also create a new deck from an existing template: on the Templates page, click 'AI Deck' on any template."
+          "title": "Menambah kartu ke dek yang sudah ada",
+          "body": "Kamu juga bisa menambahkan kartu AI ke dek yang sudah ada:\n\n• Hanya kartu: di halaman dek yang belum punya kartu, klik 'Kartu AI' untuk membuat kartu memakai templat dek itu.\n• Tambah lagi: di dek yang sudah berisi kartu, klik 'Kartu AI' untuk menambah. AI akan menghindari duplikasi isi yang sudah ada.\n\nKamu juga bisa membuat dek baru dari templat yang ada: di halaman templat, klik 'Dek AI'."
         },
         "editResults": {
-          "title": "Reviewing & Editing Generated Content",
-          "body": "Before saving, you can review and edit everything AI generated:\n\n• Template: Change field names, TTS languages, layout styles, font sizes, and custom HTML\n• Deck: Edit name, description, icon, and color\n• Cards: Edit any field value inline, delete unwanted cards\n\nAfter saving, you can make more detailed edits:\n• Click 'Edit Template' on the completion screen to open the full template editor\n• Click 'View Deck' to manage cards individually\n• Click 'Add More Cards' to generate additional cards for the same deck"
+          "title": "Meninjau & mengedit hasil",
+          "body": "Sebelum menyimpan, kamu bisa meninjau dan mengedit semua hasil AI:\n\n• Templat: nama kolom, bahasa TTS, gaya tata letak, ukuran font, dan HTML khusus\n• Dek: nama, deskripsi, ikon, dan warna\n• Kartu: edit nilai kolom langsung di tempat, hapus kartu yang tak diinginkan\n\nSetelah disimpan, kamu masih bisa menyunting lebih detail:\n• Klik 'Edit templat' di layar selesai untuk membuka editor templat penuh\n• Klik 'Lihat dek' untuk mengelola kartu satu per satu\n• Klik 'Tambah kartu lagi' untuk membuat kartu tambahan di dek yang sama"
         }
       }
     },

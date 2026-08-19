@@ -202,8 +202,8 @@
   },
   "shortcuts": {
     "title": "Keyboard Shortcuts",
-    "description": "Available shortcuts during study sessions",
-    "rateCards": "Rate Again / Hard / Good / Easy",
+    "description": "学习过程中可用的快捷键",
+    "rateCards": "评分：Again / Hard / Good / Easy",
     "undoRating": "Undo last rating",
     "exitStudy": "Exit study",
     "toggleHelp": "Toggle this help",
@@ -212,7 +212,7 @@
     "missed": "Missed",
     "known": "Known",
     "unknown": "Unknown",
-    "swipeHint": "In swipe mode, swipe left/right to rate cards."
+    "swipeHint": "在滑动模式下，左右滑动即可评分。"
   },
   "multiDeck": {
     "title": "Multi-Deck Study",
@@ -222,10 +222,10 @@
     "selected": "{{count, number}} decks selected ({{cards}} cards)",
     "start": "Start Multi-Deck Study",
     "cards": "{{count, number}} cards",
-    "selectHint": "Select decks to study together",
+    "selectHint": "选择要一起学习的卡组",
     "decksUnit": " decks",
     "cardsUnit": " cards",
-    "swipeHint": "In swipe mode, swipe left/right to rate cards."
+    "swipeHint": "在滑动模式下，左右滑动即可评分。"
   },
   "subscriptionLocked": {
     "title": "学习锁定",

@@ -114,33 +114,33 @@
   },
   "publish": {
     "title": "Publish Deck",
-    "subtitle": "Share your deck with the community",
+    "subtitle": "デッキをコミュニティに共有しましょう",
     "titleLabel": "Title",
     "titlePlaceholder": "Deck title on marketplace",
     "description": "Description",
     "descriptionPlaceholder": "What will learners study?",
     "tags": "Tags",
     "tagsPlaceholder": "comma, separated, tags",
-    "tagsHint": "Help others find your deck",
+    "tagsHint": "他の人がデッキを見つけやすくなります",
     "category": "Category",
     "shareMode": "Share Mode",
     "shareModes": {
       "copy": {
         "label": "Copy",
-        "description": "Users get an editable copy"
+        "description": "編集できるコピーが渡ります"
       },
       "subscribe": {
         "label": "Subscribe",
-        "description": "Users get read-only, auto-updated"
+        "description": "読み取り専用で、更新が自動で反映されます"
       },
       "snapshot": {
         "label": "Snapshot",
-        "description": "Users get read-only copy, no updates"
+        "description": "読み取り専用のコピーで、更新は届きません"
       }
     },
     "publishButton": "Publish to Marketplace",
     "titleRequired": "Title is required",
-    "published": "Your deck is now available on the marketplace.",
+    "published": "デッキがマーケットに公開されました。",
     "failed": "Failed to publish deck"
   },
   "learningLanguage": {

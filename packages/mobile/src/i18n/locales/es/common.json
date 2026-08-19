@@ -124,7 +124,7 @@
     "progress": "Progress",
     "viewAll": "View All",
     "recent": "Recent",
-    "empty": "No achievements yet. Start studying to earn badges!",
+    "empty": "Aún no hay logros. ¡Empieza a estudiar para ganar insignias!",
     "newUnlocked": "Achievement Unlocked!",
     "category": {
       "streak": "Streak",
@@ -213,12 +213,12 @@
       "cards_500": "Study 500 cards total",
       "cards_1000": "Study 1,000 cards total",
       "cards_5000": "Study 5,000 cards total",
-      "sessions_10": "Complete 10 study sessions",
-      "sessions_50": "Complete 50 study sessions",
-      "sessions_100": "Complete 100 study sessions",
+      "sessions_10": "Completa 10 sesiones de estudio",
+      "sessions_50": "Completa 50 sesiones de estudio",
+      "sessions_100": "Completa 100 sesiones de estudio",
       "deck_share": "Share your first deck",
-      "marketplace_pub": "Publish a deck to the marketplace",
-      "first_study": "Complete your first study session",
+      "marketplace_pub": "Publica un mazo en el mercado",
+      "first_study": "Completa tu primera sesión de estudio",
       "mastery_50": "Retén 50 tarjetas durante tres semanas o más"
     },
     "tabs": {

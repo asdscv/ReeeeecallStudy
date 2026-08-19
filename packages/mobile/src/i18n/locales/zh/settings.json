@@ -47,16 +47,16 @@
   },
   "srsConfig": {
     "title": "SRS Configuration",
-    "description": "Default SRS settings for new decks. Each deck can override these.",
-    "learningSteps": "Learning Steps (minutes, comma-separated)",
+    "description": "新卡组的默认 SRS 设置，每个卡组都可以单独覆盖。",
+    "learningSteps": "学习步骤（分钟，用逗号分隔）",
     "goodInterval": "Good Interval (days)",
     "easyInterval": "Easy Interval (days)"
   },
   "notifications": {
     "title": "Notifications",
     "dailyReminder": "Daily Study Reminder",
-    "reminderDesc": "You'll be reminded daily at 9:00 AM to review your cards.",
-    "permissionRequired": "Enable notifications in device settings.",
+    "reminderDesc": "每天上午 9:00 提醒你复习卡片。",
+    "permissionRequired": "请在系统设置中开启通知。",
     "permissionTitle": "需要权限"
   },
   "subscription": {

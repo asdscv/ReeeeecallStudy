@@ -115,36 +115,36 @@
     "back": "Back",
     "finish": "Finish",
     "getStarted": "Get Started",
-    "stepOf": "Step {{current}} of {{total}}",
+    "stepOf": "Langkah {{current}} dari {{total}}",
     "restartOnboarding": "Restart Tutorial",
     "welcome": {
       "title": "Welcome to Reeeeecall!",
-      "description": "The smartest way to study with flashcards. Create decks, add cards, and let our spaced repetition algorithm optimize your learning.",
+      "description": "Cara tercerdas belajar dengan kartu. Buat dek, tambahkan kartu, dan biarkan algoritma pengulangan berjarak mengoptimalkan belajarmu.",
       "action": "Get Started"
     },
     "createDeck": {
       "title": "Create Your First Deck",
-      "description": "We've prepared a sample deck for you. Click to create it!",
+      "description": "Kami sudah menyiapkan dek contoh. Klik untuk membuatnya!",
       "action": "Create This Deck",
       "creating": "Creating...",
       "created": "Deck created!"
     },
     "cardTemplate": {
       "title": "Your Card Templates",
-      "description": "These templates are already set up for you. Pick one for your cards.",
+      "description": "Templat ini sudah disiapkan. Pilih satu untuk kartumu.",
       "fields": "{{count, number}} fields",
       "useTemplate": "Use This Template"
     },
     "addCards": {
       "title": "Sample Cards Ready!",
-      "description": "We've prepared sample cards for you. Add them to your deck with one click.",
+      "description": "Kami sudah menyiapkan kartu contoh. Tambahkan ke dekmu dengan sekali klik.",
       "action": "Add These Cards",
       "adding": "Adding...",
       "added": "Cards added!"
     },
     "firstStudy": {
       "title": "You're Ready to Study!",
-      "description": "Your deck \"{{deckName}}\" has {{cardCount}} cards ready. Choose a study mode and start learning.",
+      "description": "Dek \"{{deckName}}\" punya {{cardCount}} kartu siap. Pilih mode belajar dan mulai.",
       "action": "Start Studying",
       "randomReview": "Tinjauan Acak",
       "sequential": "Berurutan"
@@ -164,7 +164,7 @@
     "progress": "Progress",
     "viewAll": "View All",
     "recent": "Recent",
-    "empty": "No achievements yet. Start studying to earn badges!",
+    "empty": "Belum ada pencapaian. Mulai belajar untuk mendapat lencana!",
     "newUnlocked": "Achievement Unlocked!",
     "category": {
       "streak": "Streak",
@@ -253,12 +253,12 @@
       "cards_500": "Study 500 cards total",
       "cards_1000": "Study 1,000 cards total",
       "cards_5000": "Study 5,000 cards total",
-      "sessions_10": "Complete 10 study sessions",
-      "sessions_50": "Complete 50 study sessions",
-      "sessions_100": "Complete 100 study sessions",
+      "sessions_10": "Selesaikan 10 sesi belajar",
+      "sessions_50": "Selesaikan 50 sesi belajar",
+      "sessions_100": "Selesaikan 100 sesi belajar",
       "deck_share": "Share your first deck",
-      "marketplace_pub": "Publish a deck to the marketplace",
-      "first_study": "Complete your first study session",
+      "marketplace_pub": "Terbitkan dek ke market",
+      "first_study": "Selesaikan sesi belajar pertamamu",
       "mastery_50": "Pertahankan 50 kartu selama tiga minggu atau lebih"
     },
     "tabs": {
@@ -306,7 +306,7 @@
     "cardsStudied": "Cards Studied",
     "sessions": "Sessions",
     "you": "You",
-    "empty": "No leaderboard data yet. Be the first to study!"
+    "empty": "Belum ada data papan peringkat. Jadilah yang pertama belajar!"
   },
   "history": {
     "tabs": {
@@ -317,15 +317,15 @@
   "quests": {
     "title": "Daily Quests",
     "cards": "Study {{target}} cards",
-    "sessions": "Complete {{target}} sessions",
-    "time": "Study for {{target}} minutes",
+    "sessions": "Selesaikan {{target}} sesi",
+    "time": "Belajar selama {{target}} menit",
     "perfect": "Get a perfect score",
     "completed": "Completed!",
     "xpReward": "+{{xp}} XP"
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count, number}} available",
+    "available": "tersisa {{count, number}}",
     "used": "Streak protected today!",
     "earned": "Earned a streak freeze!"
   },

@@ -115,36 +115,36 @@
     "back": "Back",
     "finish": "Finish",
     "getStarted": "Get Started",
-    "stepOf": "Step {{current}} of {{total}}",
+    "stepOf": "第 {{current}} 步，共 {{total}} 步",
     "restartOnboarding": "Restart Tutorial",
     "welcome": {
       "title": "Welcome to Reeeeecall!",
-      "description": "The smartest way to study with flashcards. Create decks, add cards, and let our spaced repetition algorithm optimize your learning.",
+      "description": "用卡片学习最聪明的方式。创建卡组、添加卡片，间隔重复算法会帮你优化学习。",
       "action": "Get Started"
     },
     "createDeck": {
       "title": "Create Your First Deck",
-      "description": "We've prepared a sample deck for you. Click to create it!",
+      "description": "已经为你准备好示例卡组，点击即可创建！",
       "action": "Create This Deck",
       "creating": "Creating...",
       "created": "Deck created!"
     },
     "cardTemplate": {
       "title": "Your Card Templates",
-      "description": "These templates are already set up for you. Pick one for your cards.",
+      "description": "模板已经配置好了，挑一个用于你的卡片吧。",
       "fields": "{{count, number}} fields",
       "useTemplate": "Use This Template"
     },
     "addCards": {
       "title": "Sample Cards Ready!",
-      "description": "We've prepared sample cards for you. Add them to your deck with one click.",
+      "description": "已为你准备好示例卡片，一键即可加入卡组。",
       "action": "Add These Cards",
       "adding": "Adding...",
       "added": "Cards added!"
     },
     "firstStudy": {
       "title": "You're Ready to Study!",
-      "description": "Your deck \"{{deckName}}\" has {{cardCount}} cards ready. Choose a study mode and start learning.",
+      "description": "卡组「{{deckName}}」已有 {{cardCount}} 张卡片，选择一个学习模式开始吧。",
       "action": "Start Studying",
       "randomReview": "随机复习",
       "sequential": "顺序学习"
@@ -164,7 +164,7 @@
     "progress": "Progress",
     "viewAll": "View All",
     "recent": "Recent",
-    "empty": "No achievements yet. Start studying to earn badges!",
+    "empty": "还没有成就，开始学习来赢得徽章吧！",
     "newUnlocked": "Achievement Unlocked!",
     "category": {
       "streak": "Streak",
@@ -253,12 +253,12 @@
       "cards_500": "Study 500 cards total",
       "cards_1000": "Study 1,000 cards total",
       "cards_5000": "Study 5,000 cards total",
-      "sessions_10": "Complete 10 study sessions",
-      "sessions_50": "Complete 50 study sessions",
-      "sessions_100": "Complete 100 study sessions",
+      "sessions_10": "完成 10 次学习",
+      "sessions_50": "完成 50 次学习",
+      "sessions_100": "完成 100 次学习",
       "deck_share": "Share your first deck",
-      "marketplace_pub": "Publish a deck to the marketplace",
-      "first_study": "Complete your first study session",
+      "marketplace_pub": "把卡组发布到市场",
+      "first_study": "完成第一次学习",
       "mastery_50": "将 50 张卡片保持三周以上"
     },
     "tabs": {
@@ -306,7 +306,7 @@
     "cardsStudied": "Cards Studied",
     "sessions": "Sessions",
     "you": "You",
-    "empty": "No leaderboard data yet. Be the first to study!"
+    "empty": "还没有排行榜数据，来当第一个学习的人吧！"
   },
   "history": {
     "tabs": {
@@ -317,15 +317,15 @@
   "quests": {
     "title": "Daily Quests",
     "cards": "Study {{target}} cards",
-    "sessions": "Complete {{target}} sessions",
-    "time": "Study for {{target}} minutes",
+    "sessions": "完成 {{target}} 次学习",
+    "time": "学习 {{target}} 分钟",
     "perfect": "Get a perfect score",
     "completed": "Completed!",
     "xpReward": "+{{xp}} XP"
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count, number}} available",
+    "available": "剩余 {{count, number}} 个",
     "used": "Streak protected today!",
     "earned": "Earned a streak freeze!"
   },

@@ -88,7 +88,7 @@
     "enable": "Enable reminders",
     "time": "Reminder time",
     "days": "Reminder days",
-    "preview": "You'll receive reminders at {{time}} on {{days}}",
+    "preview": "Kamu akan diingatkan pukul {{time}} pada {{days}}",
     "mon": "Mon",
     "tue": "Tue",
     "wed": "Wed",
@@ -174,14 +174,14 @@
   "privacy": {
     "title": "Privacy & data",
     "analyticsTitle": "Usage analytics",
-    "analyticsHint": "Help improve the app with anonymous usage data",
+    "analyticsHint": "Bantu tingkatkan aplikasi lewat data penggunaan anonim",
     "trackingOn": "Allowed",
     "trackingOff": "Off",
     "deleteAccount": "Delete my account",
-    "deleteConfirm": "This permanently deletes your account, decks, cards, and study history. This cannot be undone.",
+    "deleteConfirm": "Ini menghapus permanen akun, dek, kartu, dan riwayat belajarmu. Tidak bisa dibatalkan.",
     "deleteConfirmBtn": "Delete permanently",
     "cancel": "Cancel",
-    "deleteFailed": "Could not delete your account. Please try again."
+    "deleteFailed": "Akun tidak bisa dihapus. Coba lagi."
   },
   "subscription": {
     "title": "Langganan"

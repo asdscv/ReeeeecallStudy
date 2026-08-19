@@ -114,33 +114,33 @@
   },
   "publish": {
     "title": "Publish Deck",
-    "subtitle": "Share your deck with the community",
+    "subtitle": "Bagikan dekmu ke komunitas",
     "titleLabel": "Title",
     "titlePlaceholder": "Deck title on marketplace",
     "description": "Description",
     "descriptionPlaceholder": "What will learners study?",
     "tags": "Tags",
     "tagsPlaceholder": "comma, separated, tags",
-    "tagsHint": "Help others find your deck",
+    "tagsHint": "Bantu orang lain menemukan dekmu",
     "category": "Category",
     "shareMode": "Share Mode",
     "shareModes": {
       "copy": {
         "label": "Copy",
-        "description": "Users get an editable copy"
+        "description": "Pengguna mendapat salinan yang bisa diedit"
       },
       "subscribe": {
         "label": "Subscribe",
-        "description": "Users get read-only, auto-updated"
+        "description": "Pengguna mendapat baca-saja yang diperbarui otomatis"
       },
       "snapshot": {
         "label": "Snapshot",
-        "description": "Users get read-only copy, no updates"
+        "description": "Pengguna mendapat salinan baca-saja, tanpa pembaruan"
       }
     },
     "publishButton": "Publish to Marketplace",
     "titleRequired": "Title is required",
-    "published": "Your deck is now available on the marketplace.",
+    "published": "Dekmu kini tersedia di market.",
     "failed": "Failed to publish deck"
   },
   "learningLanguage": {

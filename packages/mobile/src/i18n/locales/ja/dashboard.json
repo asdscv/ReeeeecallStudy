@@ -27,7 +27,7 @@
     "title": "学習ヒートマップ"
   },
   "gamification": {
-    "freezes": "{{count, number}} freezes left",
+    "freezes": "残り{{count, number}}個のフリーズ",
     "dailyGoal": "Daily Goal"
   },
   "level": {
@@ -42,19 +42,19 @@
   },
   "quests": {
     "title": "Daily Quests",
-    "cards": "Study {{count, number}} cards",
-    "sessions": "Complete {{count, number}} sessions",
-    "time": "Study for {{count, number}} minutes",
-    "perfect": "Get {{count, number}} perfect scores",
+    "cards": "カードを{{count, number}}枚学習する",
+    "sessions": "セッションを{{count, number}}回終える",
+    "time": "{{count, number}}分学習する",
+    "perfect": "満点を{{count, number}}回とる",
     "completed": "完了"
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count, number}} available",
-    "motivational": "Keep going! You're doing great!"
+    "available": "残り{{count, number}}個",
+    "motivational": "その調子！よくできています！"
   },
   "studyHistory": "Study History",
-  "studyHistoryDesc": "View sessions, stats, and progress",
+  "studyHistoryDesc": "セッション・統計・進み具合を見る",
   "streakDays": "{{count, number}}日",
   "quickStudy": {
     "title": "クイック学習",

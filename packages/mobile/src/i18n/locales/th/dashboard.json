@@ -27,7 +27,7 @@
     "title": "ฮีทแมปการเรียน"
   },
   "gamification": {
-    "freezes": "{{count, number}} freezes left",
+    "freezes": "เหลือฟรีซ {{count, number}} ครั้ง",
     "dailyGoal": "Daily Goal"
   },
   "level": {
@@ -42,19 +42,19 @@
   },
   "quests": {
     "title": "Daily Quests",
-    "cards": "Study {{count, number}} cards",
-    "sessions": "Complete {{count, number}} sessions",
-    "time": "Study for {{count, number}} minutes",
-    "perfect": "Get {{count, number}} perfect scores",
+    "cards": "เรียนการ์ด {{count, number}} ใบ",
+    "sessions": "เรียนให้ครบ {{count, number}} เซสชัน",
+    "time": "เรียนให้ครบ {{count, number}} นาที",
+    "perfect": "ทำคะแนนเต็ม {{count, number}} ครั้ง",
     "completed": "เสร็จแล้ว"
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count, number}} available",
-    "motivational": "Keep going! You're doing great!"
+    "available": "เหลือ {{count, number}} ชิ้น",
+    "motivational": "ทำต่อไปนะ คุณทำได้ดีมาก!"
   },
   "studyHistory": "Study History",
-  "studyHistoryDesc": "View sessions, stats, and progress",
+  "studyHistoryDesc": "ดูเซสชัน สถิติ และความคืบหน้า",
   "streakDays": "{{count, number}} วัน",
   "quickStudy": {
     "title": "เรียนแบบเร็ว",
