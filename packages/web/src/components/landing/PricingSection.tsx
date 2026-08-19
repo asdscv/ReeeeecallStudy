@@ -12,8 +12,14 @@ import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 // whose effective limit stays 2e9 (mig 139). Kept so an admin-facing surface still reads
 // "무제한" rather than a huge number.
 const UNLIMITED_THRESHOLD = 1_000_000_000
-// Free tier is static on the landing (from card_limit_settings; not a catalog row).
-const FREE_CARD_LIMIT = 1000
+// 무료 한도는 **서버에서 읽습니다.**
+//
+// 여기 1000 이 박혀 있었습니다. 268 이 무료 한도를 5,000 으로 올리는 순간 랜딩만 옛 숫자를
+// 광고하게 됩니다 — 값을 데이터로 옮긴 의미가 없어집니다. `get_plan_limits()` 는 anon 에게도
+// 열려 있고 모바일 Paywall 이 이미 그것을 씁니다(billing.ts).
+//
+// 못 읽으면 **줄을 아예 그리지 않습니다.** 틀린 한도를 보여 주는 것보다 낫습니다 — 돈을
+// 요구하는 화면에서 잘못된 숫자는 그 자체가 약속 위반입니다.
 // Existing landing signup/login flow — every landing CTA routes here.
 const SIGNUP_ROUTE = '/auth/login'
 
@@ -42,13 +48,19 @@ export function PricingSection() {
   const navigate = useNavigate()
   const prefersReduced = useReducedMotion()
   const [plans, setPlans] = useState<RawPublicPlan[]>([])
+  const [freeCardLimit, setFreeCardLimit] = useState<number | null>(null)
 
   useEffect(() => {
     let alive = true
     void (async () => {
-      const { data, error } = await supabase.rpc('get_public_plans')
-      if (!alive || error || !data) return
-      setPlans(data as RawPublicPlan[])
+      const [catalog, limits] = await Promise.all([
+        supabase.rpc('get_public_plans'),
+        supabase.rpc('get_plan_limits'),
+      ])
+      if (!alive) return
+      if (!catalog.error && catalog.data) setPlans(catalog.data as RawPublicPlan[])
+      const row = limits.data as { free_card_limit?: number | null } | null
+      if (!limits.error && row?.free_card_limit != null) setFreeCardLimit(Number(row.free_card_limit))
     })()
     return () => {
       alive = false
@@ -78,7 +90,7 @@ export function PricingSection() {
     key: 'free',
     name: t('pricing.plans.free'),
     price: t('pricing.freePrice'),
-    cardLimitLine: limitLine(FREE_CARD_LIMIT),
+    cardLimitLine: freeCardLimit == null ? '' : limitLine(freeCardLimit),
     blurb: t('pricing.plans.freeBlurb'),
     cta: t('pricing.ctaFree'),
     featured: false,
