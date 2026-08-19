@@ -35,6 +35,8 @@ describe('Phase 5 Features', () => {
         await browser.pause(400)
       }
       await browser.pause(500)
+      // 프로필 섹션은 접혀 있습니다 — 펼치기 전에는 입력이 렌더되지 않습니다.
+      await SettingsScreen.expandProfile()
       // Now check for display name — try multiple strategies
       let found = await SettingsScreen.displayName.isExisting().catch(() => false)
       if (!found) {

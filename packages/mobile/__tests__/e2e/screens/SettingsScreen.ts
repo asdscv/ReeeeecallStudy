@@ -10,6 +10,22 @@ class SettingsScreenPO {
     }
     return $('~settings-display-name')
   }
+
+  /**
+   * 프로필 섹션을 펼칩니다.
+   *
+   * 설정이 접이식 섹션들로 바뀌었고 프로필은 **닫힌 채로** 시작합니다. 그 안의 이름 입력은
+   * 펼치기 전에는 렌더 자체가 되지 않아, 스펙이 "입력이 없다"로 실패했습니다 — 화면이 아니라
+   * 접혀 있던 것입니다.
+   */
+  async expandProfile() {
+    if (await this.displayName.isExisting().catch(() => false)) return
+    const header = $('~settings-section-profile')
+    if (await header.isDisplayed().catch(() => false)) {
+      await header.click().catch(() => {})
+      await this.displayName.waitForExist({ timeout: 8000 }).catch(() => {})
+    }
+  }
   get ttsToggle() { return $('~settings-tts-toggle') }
   get logoutButton() { return $('~settings-logout') }
 
