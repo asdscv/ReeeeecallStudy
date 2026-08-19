@@ -171,11 +171,21 @@ DO $$
 DECLARE v_err text;
 BEGIN
   BEGIN
-    PERFORM public.create_payment_intent('sub_unlimited_monthly');
+    -- **판매 중인** 상품으로 겁니다. 267 이 Pro 를 내린 뒤로 이 자리에서 체크아웃은
+    -- "Unknown or inactive product" 로 먼저 막혀, 정작 확인하려던 포털 안내(P-H5)에
+    -- 닿지 못했습니다. 확인하려는 것은 상품이 아니라 **이미 구독 중인 사람의 플랜 전환**입니다.
+    PERFORM public.create_payment_intent('sub_5k_monthly');
     ASSERT false, 'expected a live-LS-subscriber plan-switch checkout to be rejected (P-H5)';
   EXCEPTION WHEN others THEN
     v_err := SQLERRM;
-    ASSERT v_err LIKE '%billing portal%', 'rejected with the portal message (P-H5): ' || v_err;
+    -- 확인하려는 것은 **거절된다**는 사실입니다.
+    --
+    -- 원래 문구는 "billing portal 로 가라"였고, 그건 플랜을 **바꾸려는** 구독자에게 나옵니다.
+    -- 267 이 구독을 하나로 줄이면서 바꿀 플랜이 없어졌고, 같은 사람이 같은 플랜을 다시 사려
+    -- 하면 "Already subscribed to this plan" 이 먼저 나옵니다. 둘 다 "이미 구독 중인 사람의
+    -- 체크아웃은 열리지 않는다"는 같은 규칙이고, 그것이 이 케이스가 지키려던 것입니다.
+    ASSERT v_err LIKE '%billing portal%' OR v_err LIKE '%Already subscribed%',
+      'a live subscriber must not get a checkout (P-H5): ' || v_err;
   END;
 END $$;
 
