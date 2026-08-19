@@ -48,6 +48,16 @@ SET session_replication_role = DEFAULT;
 SELECT set_config('request.jwt.claim.role','authenticated',false);
 SELECT set_config('request.jwt.claim.sub','f4000000-0000-0000-0000-0000000000b1',false);
 SELECT set_config('request.jwt.claim.role','authenticated',false);
+-- 한도 숫자는 **데이터에서 읽습니다.**
+--
+-- 5000(플랜)과 1000(무료)을 손으로 적어 두었더니 268 이 값을 100,000/5,000 으로 바꾸는 순간
+-- 이 파일이 다섯 군데서 터졌습니다. 확인하려는 것은 "5000 이다"가 아니라 **결제하면 오르고,
+-- 환불하면 무료 한도로 돌아온다**는 관계입니다. 관계를 확인하되 숫자는 카탈로그에서 읽습니다.
+CREATE OR REPLACE FUNCTION pg_temp._plan_cap() RETURNS integer LANGUAGE sql STABLE AS
+$fn$ SELECT card_limit FROM billing_products WHERE id = 'sub_5k_monthly' $fn$;
+CREATE OR REPLACE FUNCTION pg_temp._free_cap() RETURNS integer LANGUAGE sql STABLE AS
+$fn$ SELECT max_owned_cards FROM card_limit_settings WHERE id = 1 $fn$;
+
 DO $$
 DECLARE v_mu text; v_res json;
 BEGIN
@@ -57,17 +67,17 @@ BEGIN
   PERFORM set_config('request.jwt.claim.role','service_role',false);
   v_res := public.activate_subscription_from_intent(v_mu,'lemonsqueezy','LSSUB1', now()+interval '30 days');
   ASSERT (v_res->>'status') = 'active', 'activate → active';
-  ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b1'::uuid) = 5000, 'cap raised to 5000';
+  ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b1'::uuid) = pg_temp._plan_cap(), 'cap raised to the plan cap';
 
   PERFORM public.revoke_subscription('lemonsqueezy','LSSUB1');
-  ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b1'::uuid) = 1000, 'cap back to default after refund';
+  ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b1'::uuid) = pg_temp._free_cap(), 'cap back to the free cap after refund';
 
   -- redelivered first-grant must NOT resurrect the refunded row
   v_res := public.activate_subscription_from_intent(v_mu,'lemonsqueezy','LSSUB1', now()+interval '30 days');
   ASSERT (v_res->>'ok') = 'false' AND (v_res->>'reason') = 'terminal', 'redelivered activate → terminal (P-H2)';
   ASSERT (SELECT status FROM billing_subscriptions WHERE provider='lemonsqueezy' AND provider_subscription_id='LSSUB1') = 'refunded',
          'row stays refunded';
-  ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b1'::uuid) = 1000, 'cap NOT restored (P-H2)';
+  ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b1'::uuid) = pg_temp._free_cap(), 'cap NOT restored (P-H2)';
 END $$;
 
 -- ═══ P-H1: supersede retire lapses the period + entitled UPDATE conflict → ACK ═══
@@ -103,14 +113,14 @@ DECLARE v_res json;
 BEGIN
   -- b3 has ONLY a lapsed expired LS row (no active sibling).
   INSERT INTO billing_subscriptions (user_id, product_id, tier, status, card_limit, provider, provider_subscription_id, current_period_end)
-    VALUES ('f4000000-0000-0000-0000-0000000000b3','sub_5k_monthly','plan_5k','expired',5000,'lemonsqueezy','LSY3', now()-interval '1 day');
+    VALUES ('f4000000-0000-0000-0000-0000000000b3','sub_5k_monthly','plan_5k','expired',pg_temp._plan_cap(),'lemonsqueezy','LSY3', now()-interval '1 day');
   v_res := public.sync_subscription('lemonsqueezy','LSY3','active', now()+interval '30 days', false);
   ASSERT (v_res->>'ok') = 'true' AND (v_res->>'status') = 'active', 'expired + future renewal → reactivates (P-M2)';
-  ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b3'::uuid) = 5000, 'cap restored by the legit renewal';
+  ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b3'::uuid) = pg_temp._plan_cap(), 'cap restored by the legit renewal';
 
   -- but a REFUNDED row is never resurrected (P-H2 core)
   INSERT INTO billing_subscriptions (user_id, product_id, tier, status, card_limit, provider, provider_subscription_id, current_period_end)
-    VALUES ('f4000000-0000-0000-0000-0000000000b3','sub_5k_monthly','plan_5k','refunded',5000,'lemonsqueezy','LSR3', now()-interval '1 day');
+    VALUES ('f4000000-0000-0000-0000-0000000000b3','sub_5k_monthly','plan_5k','refunded',pg_temp._plan_cap(),'lemonsqueezy','LSR3', now()-interval '1 day');
   v_res := public.sync_subscription('lemonsqueezy','LSR3','active', now()+interval '30 days', false);
   ASSERT (v_res->>'ok') = 'false' AND (v_res->>'reason') = 'terminal', 'refunded never resurrected';
 END $$;
@@ -289,13 +299,13 @@ DECLARE v_res json;
 BEGIN
   PERFORM public.sync_subscription_by_user('f4000000-0000-0000-0000-0000000000b4'::uuid,'sub_5k_monthly','revenuecat','RC_A','active', now()+interval '30 days', false);
   PERFORM public.sync_subscription_by_user('f4000000-0000-0000-0000-0000000000b5'::uuid,'sub_unlimited_monthly','revenuecat','RC_B','active', now()+interval '30 days', false);
-  ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b4'::uuid) = 5000, 'b4 has RC_A cap';
+  ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b4'::uuid) = pg_temp._plan_cap(), 'b4 has RC_A cap';
 
   v_res := public.transfer_subscriptions_by_user('revenuecat','f4000000-0000-0000-0000-0000000000b4'::uuid,'f4000000-0000-0000-0000-0000000000b5'::uuid);
   ASSERT (v_res->>'moved')::int = 1, 'moved 1 row';
   ASSERT (SELECT user_id FROM billing_subscriptions WHERE provider='revenuecat' AND provider_subscription_id='RC_A') = 'f4000000-0000-0000-0000-0000000000b5',
          'RC_A now owned by b5 (P-L2)';
-  ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b4'::uuid) = 1000, 'b4 cap gone (transferred away)';
+  ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b4'::uuid) = pg_temp._free_cap(), 'b4 cap gone (transferred away)';
   ASSERT (SELECT count(*) FROM billing_subscriptions WHERE user_id='f4000000-0000-0000-0000-0000000000b5' AND status='active') = 1,
          'b5 has exactly one active (RC_A; RC_B retired)';
 END $$;
