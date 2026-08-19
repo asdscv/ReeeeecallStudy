@@ -45,12 +45,14 @@
     "limitReached": "Đã đạt giới hạn thẻ — đăng ký để thêm."
   },
   "deck": {
-    "rateLimitReached": "Đã đạt giới hạn yêu cầu."
+    "rateLimitReached": "Đã đạt giới hạn yêu cầu.",
+    "limitReached": "Bạn đã đạt giới hạn bộ thẻ — đăng ký để thêm."
   },
   "template": {
     "rateLimitReached": "Đã đạt giới hạn yêu cầu.",
     "cannotDeleteDefault": "Không thể xóa mẫu mặc định.",
-    "inUseByDecks": "Không thể xóa — {{count, number}} bộ thẻ đang sử dụng mẫu này."
+    "inUseByDecks": "Không thể xóa — {{count, number}} bộ thẻ đang sử dụng mẫu này.",
+    "limitReached": "Bạn đã đạt giới hạn mẫu — đăng ký để thêm."
   },
   "marketplace": {
     "listingNotFound": "Không tìm thấy danh sách.",

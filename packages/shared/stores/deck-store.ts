@@ -1,3 +1,4 @@
+import { isRowLimitError } from './card-store'
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { guard } from '../lib/rate-limit-instance'
@@ -245,7 +246,11 @@ export const useDeckStore = create<DeckState>((set, get) => ({
   },
 
   createDeck: async (input) => {
-    const check = guard.check('deck_create', 'decks_total')
+    // 덱 **총량**은 서버가 셉니다(mig 269 트리거). 여기 있던 클라이언트 쿼터는
+    // `tier-config` 의 무료 5 를 보고 있었는데, 실제로는 32개를 가진 계정이 프로덕션에
+    // 있었습니다 — 숫자가 유명무실했고 바꾸려면 배포가 필요했습니다.
+    // 분당 생성 속도 제한은 남깁니다. 총량과 남용 방지는 다른 문제입니다.
+    const check = guard.check('deck_create')
     if (!check.allowed) { set({ error: check.message ?? 'errors:deck.rateLimitReached' }); return null }
 
     const { data: { user } } = await supabase.auth.getUser()
@@ -284,11 +289,10 @@ export const useDeckStore = create<DeckState>((set, get) => ({
       .single()
 
     if (error) {
-      set({ error: error.message })
+      set({ error: isRowLimitError(error) ? 'errors:deck.limitReached' : error.message })
       return null
     }
 
-    guard.recordSuccess('decks_total')
     // force: the 'decks'/'stats' cache entries were just marked fresh, so a plain
     // fetch would short-circuit on the TTL cache and the new deck would not appear
     // until the cache expired or the user pull-to-refreshed.

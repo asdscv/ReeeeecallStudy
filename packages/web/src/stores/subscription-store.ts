@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { getDeviceId, getDeviceName } from '../lib/device-id'
 import { setCurrentTier } from '../lib/tier-config'
+import { loadEntitlements } from '@reeeeecall/shared/lib/entitlements'
 import type { PlanName, SubscriptionStatus } from '../lib/subscription-config'
 
 interface SessionInfo {
@@ -72,6 +73,13 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
         loading: false,
       })
       setCurrentTier(tier)
+      // 서버가 정한 한도를 받아 클라이언트 쿼터에 붓습니다.
+      //
+      // 티어만 세팅하면 한도는 `tier-config` 에 적힌 **코드의 숫자**가 그대로 쓰입니다.
+      // 무료 덱 5 가 그렇게 살아 있었고, 서버는 그것을 아예 막지 않아 32개를 가진 계정이
+      // 있었습니다. 값을 바꾸는 데 앱 배포가 필요 없게 하려면 이 한 줄이 있어야 합니다.
+      // 실패하면 기본값을 그대로 둡니다 — 총량은 어차피 서버가 다시 막습니다.
+      void loadEntitlements()
     } catch {
       set({ tier: 'free', status: 'none', loading: false })
         setCurrentTier('free')

@@ -33,6 +33,10 @@
     "limitReached": "Card limit reached — subscribe to add more."
   },
   "deck": {
-    "rateLimitReached": "Request limit reached."
+    "rateLimitReached": "Request limit reached.",
+    "limitReached": "You've reached the deck limit — subscribe to add more."
+  },
+  "template": {
+    "limitReached": "You've reached the template limit — subscribe to add more."
   }
 }

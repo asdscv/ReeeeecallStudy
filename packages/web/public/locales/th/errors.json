@@ -45,12 +45,14 @@
     "limitReached": "ถึงขีดจำกัดการ์ดแล้ว — สมัครสมาชิกเพื่อเพิ่ม"
   },
   "deck": {
-    "rateLimitReached": "ถึงขีดจำกัดคำขอแล้ว"
+    "rateLimitReached": "ถึงขีดจำกัดคำขอแล้ว",
+    "limitReached": "ถึงขีดจำกัดจำนวนเด็คแล้ว — สมัครสมาชิกเพื่อเพิ่ม"
   },
   "template": {
     "rateLimitReached": "ถึงขีดจำกัดคำขอแล้ว",
     "cannotDeleteDefault": "ไม่สามารถลบเทมเพลตเริ่มต้นได้",
-    "inUseByDecks": "ไม่สามารถลบได้ — มี {{count, number}} สำรับที่ใช้เทมเพลตนี้"
+    "inUseByDecks": "ไม่สามารถลบได้ — มี {{count, number}} สำรับที่ใช้เทมเพลตนี้",
+    "limitReached": "ถึงขีดจำกัดจำนวนเทมเพลตแล้ว — สมัครสมาชิกเพื่อเพิ่ม"
   },
   "marketplace": {
     "listingNotFound": "ไม่พบรายการ",

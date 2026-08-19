@@ -33,6 +33,10 @@
     "limitReached": "已达卡片上限 — 订阅以添加更多。"
   },
   "deck": {
-    "rateLimitReached": "已达请求限制。"
+    "rateLimitReached": "已达请求限制。",
+    "limitReached": "已达到牌组上限 — 订阅后可继续添加。"
+  },
+  "template": {
+    "limitReached": "已达到模板上限 — 订阅后可继续添加。"
   }
 }

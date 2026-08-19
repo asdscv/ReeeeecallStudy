@@ -33,6 +33,10 @@
     "limitReached": "Đã đạt giới hạn thẻ — đăng ký để thêm."
   },
   "deck": {
-    "rateLimitReached": "Đã đạt giới hạn yêu cầu."
+    "rateLimitReached": "Đã đạt giới hạn yêu cầu.",
+    "limitReached": "Bạn đã đạt giới hạn bộ thẻ — đăng ký để thêm."
+  },
+  "template": {
+    "limitReached": "Bạn đã đạt giới hạn mẫu — đăng ký để thêm."
   }
 }
