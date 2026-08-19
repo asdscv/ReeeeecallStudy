@@ -2,7 +2,7 @@
   "title": "Bộ thẻ của tôi",
   "createNew": "+ Bộ thẻ mới",
   "empty": "Chưa có bộ thẻ nào. Tạo bộ thẻ mới.",
-  "emptyDescription": "Create your first deck to start learning",
+  "emptyDescription": "Tạo bộ thẻ đầu tiên để bắt đầu học",
   "createFirst": "+ Tạo bộ thẻ đầu tiên",
   "deleteDeck": "Xóa bộ thẻ",
   "deleteConfirm": "Bộ thẻ \"{{name}}\" và tất cả thẻ sẽ bị xóa. Không thể hoàn tác.",
@@ -71,7 +71,7 @@
     "pendingChanges": "{{count, number}} pending",
     "lastSynced": "Last synced: {{time}}",
     "neverSynced": "Never synced",
-    "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
+    "syncComplete": "Đồng bộ xong: thêm {{added}}, gỡ {{removed}}",
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed Deck"

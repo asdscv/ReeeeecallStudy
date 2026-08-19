@@ -27,7 +27,7 @@
     "title": "Mapa de calor de estudio"
   },
   "gamification": {
-    "freezes": "{{count, number}} freezes left",
+    "freezes": "{{count, number}} congelaciones restantes",
     "dailyGoal": "Daily Goal"
   },
   "level": {
@@ -42,19 +42,19 @@
   },
   "quests": {
     "title": "Daily Quests",
-    "cards": "Study {{count, number}} cards",
-    "sessions": "Complete {{count, number}} sessions",
-    "time": "Study for {{count, number}} minutes",
-    "perfect": "Get {{count, number}} perfect scores",
+    "cards": "Estudia {{count, number}} tarjetas",
+    "sessions": "Completa {{count, number}} sesiones",
+    "time": "Estudia {{count, number}} minutos",
+    "perfect": "Consigue {{count, number}} puntuaciones perfectas",
     "completed": "Completado"
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count, number}} available",
-    "motivational": "Keep going! You're doing great!"
+    "available": "{{count, number}} disponibles",
+    "motivational": "¡Sigue así, lo estás haciendo genial!"
   },
   "studyHistory": "Study History",
-  "studyHistoryDesc": "View sessions, stats, and progress",
+  "studyHistoryDesc": "Consulta sesiones, estadísticas y progreso",
   "streakDays": "{{count, number}} días",
   "quickStudy": {
     "title": "Estudio rápido",

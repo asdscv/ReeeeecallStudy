@@ -202,8 +202,8 @@
   },
   "shortcuts": {
     "title": "Keyboard Shortcuts",
-    "description": "Available shortcuts during study sessions",
-    "rateCards": "Rate Again / Hard / Good / Easy",
+    "description": "学習中に使えるショートカット",
+    "rateCards": "Again / Hard / Good / Easy で評価",
     "undoRating": "Undo last rating",
     "exitStudy": "Exit study",
     "toggleHelp": "Toggle this help",
@@ -212,7 +212,7 @@
     "missed": "Missed",
     "known": "Known",
     "unknown": "Unknown",
-    "swipeHint": "In swipe mode, swipe left/right to rate cards."
+    "swipeHint": "スワイプモードでは左右にスワイプして評価します。"
   },
   "multiDeck": {
     "title": "Multi-Deck Study",
@@ -222,10 +222,10 @@
     "selected": "{{count, number}} decks selected ({{cards}} cards)",
     "start": "Start Multi-Deck Study",
     "cards": "{{count, number}} cards",
-    "selectHint": "Select decks to study together",
+    "selectHint": "一緒に学習するデッキを選んでください",
     "decksUnit": " decks",
     "cardsUnit": " cards",
-    "swipeHint": "In swipe mode, swipe left/right to rate cards."
+    "swipeHint": "スワイプモードでは左右にスワイプして評価します。"
   },
   "subscriptionLocked": {
     "title": "学習ロック",

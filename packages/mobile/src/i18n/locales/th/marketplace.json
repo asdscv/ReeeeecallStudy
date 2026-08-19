@@ -114,33 +114,33 @@
   },
   "publish": {
     "title": "Publish Deck",
-    "subtitle": "Share your deck with the community",
+    "subtitle": "แบ่งปันเด็คของคุณให้ชุมชน",
     "titleLabel": "Title",
     "titlePlaceholder": "Deck title on marketplace",
     "description": "Description",
     "descriptionPlaceholder": "What will learners study?",
     "tags": "Tags",
     "tagsPlaceholder": "comma, separated, tags",
-    "tagsHint": "Help others find your deck",
+    "tagsHint": "ช่วยให้คนอื่นค้นเจอเด็คของคุณ",
     "category": "Category",
     "shareMode": "Share Mode",
     "shareModes": {
       "copy": {
         "label": "Copy",
-        "description": "Users get an editable copy"
+        "description": "ผู้ใช้จะได้สำเนาที่แก้ไขได้"
       },
       "subscribe": {
         "label": "Subscribe",
-        "description": "Users get read-only, auto-updated"
+        "description": "ผู้ใช้จะได้แบบอ่านอย่างเดียวและอัปเดตอัตโนมัติ"
       },
       "snapshot": {
         "label": "Snapshot",
-        "description": "Users get read-only copy, no updates"
+        "description": "ผู้ใช้จะได้สำเนาแบบอ่านอย่างเดียว ไม่มีการอัปเดต"
       }
     },
     "publishButton": "Publish to Marketplace",
     "titleRequired": "Title is required",
-    "published": "Your deck is now available on the marketplace.",
+    "published": "เด็คของคุณขึ้นมาร์เก็ตแล้ว",
     "failed": "Failed to publish deck"
   },
   "learningLanguage": {

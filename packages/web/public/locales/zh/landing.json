@@ -35,9 +35,24 @@
       "desc": "通过科学验证的间隔重复最大化长期记忆。使用重来/困难/良好/简单四级评分自动调整复习时间。"
     },
     "modes": {
-      "title": "5 种学习模式",
-      "description": "支持 SRS、随机、顺序、顺序复习和按日期 — 适应各种场景的学习模式。",
-      "desc": "支持 SRS、随机、顺序、顺序复习和按日期 — 适应各种场景的学习模式。"
+      "title": "6 种学习模式",
+      "description": "SRS、顺序复习、随机、顺序、按日期、突击复习——按需选择。",
+      "desc": "SRS、顺序复习、随机、顺序、按日期、突击复习——按需选择。"
+    },
+    "aiCards": {
+      "title": "AI 自动生成卡片",
+      "description": "只需输入主题，AI 一次生成模板、卡组和卡片，每天都有免费额度。",
+      "desc": "只需输入主题，AI 一次生成模板、卡组和卡片，每天都有免费额度。"
+    },
+    "quiz": {
+      "title": "AI 测验与批改",
+      "description": "用你自己的卡片生成选择题、简答题和论述题，AI 批改答案并讲解错题。",
+      "desc": "用你自己的卡片生成选择题、简答题和论述题，AI 批改答案并讲解错题。"
+    },
+    "plan": {
+      "title": "学习目标与今日计划",
+      "description": "设定每日目标时长和卡组，系统为你安排今天该学多少。",
+      "desc": "设定每日目标时长和卡组，系统为你安排今天该学多少。"
     },
     "stats": {
       "title": "实时统计与仪表盘",
@@ -93,50 +108,6 @@
     "6": "详细的学习统计与分析",
     "7": "个性化计划与自适应补强学习"
   },
-  "metrics": {
-    "efficiency": {
-      "label": "学习效率",
-      "value": "200%",
-      "change": "+150%"
-    },
-    "interval": {
-      "label": "平均复习间隔",
-      "value": "15 天",
-      "change": "+8 天"
-    },
-    "accuracy": {
-      "label": "正确率",
-      "value": "87%",
-      "change": "+23%"
-    },
-    "daily": {
-      "label": "每日学习卡片",
-      "value": "45 张",
-      "change": "+30 张"
-    }
-  },
-  "stats": {
-    "0": {
-      "label": "学习效率",
-      "value": "200%",
-      "change": "+150%"
-    },
-    "1": {
-      "label": "平均复习间隔",
-      "value": "15 天",
-      "change": "+8 天"
-    },
-    "2": {
-      "label": "正确率",
-      "value": "87%",
-      "change": "+23%"
-    },
-    "3": {
-      "label": "每日学习卡片",
-      "value": "45 张",
-      "change": "+30 张"
-    }
-  },
   "steps": {
     "title": "3 步轻松开始",
     "step1": {
@@ -180,7 +151,6 @@
     "features": "功能",
     "science": "学习科学",
     "results": "成果",
-    "reviews": "评价",
     "howItWorks": "使用方法",
     "faq": "FAQ",
     "dashboard": "控制台",
@@ -189,9 +159,11 @@
   "trustBadges": {
     "srs": "智能SRS",
     "sharing": "牌组共享",
-    "languages": "7种语言",
+    "languages": "{{count, number}}种语言",
     "allDevices": "全设备支持",
-    "import": "CSV 与 JSON 导入"
+    "import": "CSV 与 JSON 导入",
+    "languages_one": "{{count, number}}种语言",
+    "languages_other": "{{count, number}}种语言"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",
@@ -216,9 +188,9 @@
     "q1": "什么是间隔重复（SRS）？",
     "a1": "间隔重复是一种经科学验证的学习方法，通过在最佳间隔安排复习来最大化长期记忆保持。ReeeeecallStudy 使用先进的 SRS 算法自动确定您应该何时复习每张闪卡。",
     "q2": "ReeeeecallStudy 是免费的吗？",
-    "a2": "是的！ReeeeecallStudy 可免费使用。使用邮箱和密码注册即可立即开始学习，包含 SRS、多种学习模式和详细统计在内的所有核心功能。",
+    "a2": "可以，免费即可开始。注册后即可无限制使用 SRS、六种学习模式、统计和卡组共享。\n\n免费方案对可保存的卡片数量有上限，升级付费方案可提高上限（具体数字见上方的价格方案）。AI 生成卡片和 AI 测验每天都有免费额度，超出部分从充值余额扣除——并且在你确认前一定会先显示扣费金额。",
     "q3": "有哪些学习模式？",
-    "a3": "ReeeeecallStudy 支持 5 种学习模式：SRS（间隔重复）用于最佳复习安排，随机模式用于混合练习，顺序模式用于按序复习，顺序复习用于系统性复习，按日期模式用于按时间组织。",
+    "a3": "ReeeeecallStudy 支持 6 种学习模式：SRS（间隔重复）安排最佳复习时间、顺序复习进行系统性复习、随机打乱练习、顺序逐张学习、按日期整理、突击复习集中重复直到掌握。",
     "q4": "我可以分享我的闪卡牌组吗？",
     "a4": "可以！您可以通过 3 种模式分享牌组：复制（为他人复制一份）、订阅（同步更新）和快照（冻结版本）。在社区市场中浏览和发现其他用户的牌组。"
   },
@@ -235,41 +207,6 @@
       "label": "节省学习时间",
       "change": "-50%",
       "description": "一半时间，同样效果"
-    },
-    "completion": {
-      "label": "每日复习完成率",
-      "change": "+38%",
-      "description": "用户每天完成复习任务"
-    },
-    "learners": {
-      "label": "活跃学习者",
-      "change": "本月+840人",
-      "description": "全球持续增长的社区"
-    }
-  },
-  "socialProof": {
-    "title": "受到全球学习者的信赖",
-    "subtitle": "加入数千名更聪明地学习的学生行列",
-    "liveActivity": "正有{{count, number}}人在学习",
-    "userCountLabel": "活跃用户",
-    "cardsStudiedLabel": "已学卡片",
-    "decksCreatedLabel": "已创建牌组",
-    "testimonials": {
-      "0": {
-        "quote": "多亏了 ReeeeecallStudy，我通过了 JLPT N2。SRS 算法非常有效！",
-        "author": "王小明",
-        "role": "语言学习者"
-      },
-      "1": {
-        "quote": "界面很干净直观，学习变得更有趣了。",
-        "author": "李小红",
-        "role": "医学生"
-      },
-      "2": {
-        "quote": "牌组分享功能太棒了。几乎找到了所有科目的牌组。",
-        "author": "张三",
-        "role": "大学生"
-      }
     }
   },
   "science": {
@@ -339,12 +276,8 @@
     "note": "注册并登录后可在设置中完成付款。",
     "plans": {
       "free": "免费",
-      "standard": "标准版",
-      "pro": "专业版",
-      "unlimited": "无限版",
       "freeBlurb": "轻松上手的免费方案",
-      "standardBlurb": "用更多卡片扩展你的学习",
-      "unlimitedBlurb": "不受限制，尽情存储与学习"
+      "standardBlurb": "用更多卡片扩展你的学习"
     }
   },
   "seo": {

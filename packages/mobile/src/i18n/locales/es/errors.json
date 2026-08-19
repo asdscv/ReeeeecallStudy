@@ -7,7 +7,7 @@
     "emailRateLimit": "Demasiadas solicitudes. Inténtalo más tarde.",
     "invalidEmailFormat": "Formato de correo inválido."
   },
-  "generic": "Something went wrong. Please try again.",
+  "generic": "Algo salió mal. Inténtalo de nuevo.",
   "marketplace": {
     "acquireFailed": "Error al obtener el mazo. Inténtalo de nuevo."
   },

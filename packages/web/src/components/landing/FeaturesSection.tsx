@@ -1,10 +1,14 @@
 import { useTranslation } from 'react-i18next'
-import { Brain, Layers, BarChart3, Share2, Globe, Smartphone } from 'lucide-react'
+import { Brain, Layers, Sparkles, ListChecks, Target, BarChart3, Share2, Globe, Smartphone } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 
 const FEATURES = [
   { icon: Brain, color: 'bg-blue-500/10 text-blue-600', key: 'srs' },
   { icon: Layers, color: 'bg-violet-500/10 text-violet-600', key: 'modes' },
+  // AI 생성·퀴즈·학습 플랜은 유료 기능인데도 소개에서 빠져 있었습니다.
+  { icon: Sparkles, color: 'bg-amber-500/10 text-amber-600', key: 'aiCards' },
+  { icon: ListChecks, color: 'bg-rose-500/10 text-rose-600', key: 'quiz' },
+  { icon: Target, color: 'bg-teal-500/10 text-teal-600', key: 'plan' },
   { icon: BarChart3, color: 'bg-emerald-500/10 text-emerald-600', key: 'stats' },
   { icon: Share2, color: 'bg-orange-500/10 text-orange-600', key: 'sharing' },
   { icon: Globe, color: 'bg-pink-500/10 text-pink-600', key: 'tts' },

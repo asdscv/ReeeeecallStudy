@@ -27,7 +27,7 @@
     "title": "Bản đồ nhiệt học tập"
   },
   "gamification": {
-    "freezes": "{{count, number}} freezes left",
+    "freezes": "còn {{count, number}} lượt đóng băng",
     "dailyGoal": "Daily Goal"
   },
   "level": {
@@ -42,19 +42,19 @@
   },
   "quests": {
     "title": "Daily Quests",
-    "cards": "Study {{count, number}} cards",
-    "sessions": "Complete {{count, number}} sessions",
-    "time": "Study for {{count, number}} minutes",
-    "perfect": "Get {{count, number}} perfect scores",
+    "cards": "Học {{count, number}} thẻ",
+    "sessions": "Hoàn thành {{count, number}} buổi học",
+    "time": "Học {{count, number}} phút",
+    "perfect": "Đạt {{count, number}} lần điểm tuyệt đối",
     "completed": "Hoàn thành"
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count, number}} available",
-    "motivational": "Keep going! You're doing great!"
+    "available": "còn {{count, number}}",
+    "motivational": "Cứ tiếp tục nhé, bạn đang làm rất tốt!"
   },
   "studyHistory": "Study History",
-  "studyHistoryDesc": "View sessions, stats, and progress",
+  "studyHistoryDesc": "Xem buổi học, thống kê và tiến độ",
   "streakDays": "{{count, number}} ngày",
   "quickStudy": {
     "title": "Học nhanh",

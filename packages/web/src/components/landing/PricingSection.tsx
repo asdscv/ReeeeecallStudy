@@ -83,9 +83,9 @@ export function PricingSection() {
       : t('pricing.upToCards', { count: cardLimit })
 
   // Free tier is static; paid tiers are fetched (data-driven — a new catalog row
-  // appears here automatically). Paid tiers are named by rank (first = Standard, higher
-  // = Pro) since the catalog now has two finite card-count plans (5,000 / 100,000) — no
-  // "unlimited" plan anymore; the card count itself is shown on the cardLimitLine.
+  // appears here automatically). 267 retired the second subscription, so the catalog
+  // currently holds exactly one paid plan; the section renders however many are active
+  // and every number on the card comes from the catalog, not from this file.
   const freeTier: Tier = {
     key: 'free',
     name: t('pricing.plans.free'),

@@ -27,7 +27,7 @@
   "welcomePro": "Tu plan está activo",
   "welcomeProDesc": "Tu límite de tarjetas ha aumentado. Todas las funciones de estudio están en todos los planes.",
   "restorePurchase": "Restaurar Compra",
-  "restored": "Tu suscripción Pro ha sido restaurada.",
+  "restored": "Se ha restaurado tu suscripción.",
   "noRestoreFound": "No se encontró ninguna suscripción anterior.",
   "productsUnavailable": "Los productos de suscripción no están disponibles actualmente. Inténtalo más tarde.",
   "checkout": {
@@ -53,5 +53,6 @@
     "title": "Solicitud de reembolso",
     "submitted": "Tu solicitud de reembolso se envió a Apple. Apple decide el resultado y te escribirá por correo; si se aprueba, tu acceso se retira automáticamente."
   },
-  "everythingElseFree": "Todos los modos de estudio, TTS, estadísticas y publicación en el mercado son gratis en cualquier plan."
+  "everythingElseFree": "Todos los modos de estudio, TTS, estadísticas y publicación en el mercado son gratis en cualquier plan.",
+  "paidPlan": "Plan de pago"
 }

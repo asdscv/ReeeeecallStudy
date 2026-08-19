@@ -27,7 +27,7 @@
   "welcomePro": "プランが有効になりました",
   "welcomeProDesc": "カード上限が増えました。学習機能はどのプランでも同じです。",
   "restorePurchase": "購入を復元",
-  "restored": "Proサブスクリプションが復元されました。",
+  "restored": "サブスクリプションが復元されました。",
   "noRestoreFound": "復元可能なサブスクリプションが見つかりません。",
   "productsUnavailable": "現在サブスクリプション商品をご利用いただけません。後ほどお試しください。",
   "checkout": {
@@ -53,5 +53,6 @@
     "title": "返金リクエスト",
     "submitted": "Apple に返金リクエストを送信しました。可否は Apple が判断し、メールで通知されます。承認された場合、アクセス権は自動的に取り消されます。"
   },
-  "everythingElseFree": "すべての学習モード・TTS・統計・マーケットプレイス公開は、どのプランでも無料です。"
+  "everythingElseFree": "すべての学習モード・TTS・統計・マーケットプレイス公開は、どのプランでも無料です。",
+  "paidPlan": "有料プラン"
 }

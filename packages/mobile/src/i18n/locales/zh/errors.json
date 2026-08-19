@@ -7,7 +7,7 @@
     "emailRateLimit": "请求过于频繁，请稍后再试。",
     "invalidEmailFormat": "邮箱格式无效。"
   },
-  "generic": "Something went wrong. Please try again.",
+  "generic": "出了点问题，请再试一次。",
   "marketplace": {
     "acquireFailed": "获取牌组失败，请重试。"
   },

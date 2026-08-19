@@ -115,43 +115,43 @@
     "back": "Back",
     "finish": "Finish",
     "getStarted": "Get Started",
-    "stepOf": "Step {{current}} of {{total}}",
+    "stepOf": "ขั้นที่ {{current}} จาก {{total}}",
     "restartOnboarding": "Restart Tutorial",
     "welcome": {
       "title": "Welcome to Reeeeecall!",
-      "description": "The smartest way to study with flashcards. Create decks, add cards, and let our spaced repetition algorithm optimize your learning.",
+      "description": "วิธีเรียนด้วยการ์ดที่ฉลาดที่สุด สร้างเด็ค เพิ่มการ์ด แล้วให้อัลกอริทึมการทบทวนแบบเว้นช่วงจัดการให้",
       "action": "Get Started"
     },
     "createDeck": {
       "title": "Create Your First Deck",
-      "description": "We've prepared a sample deck for you. Click to create it!",
+      "description": "เราเตรียมเด็คตัวอย่างไว้ให้แล้ว กดเพื่อสร้างได้เลย!",
       "action": "Create This Deck",
       "creating": "Creating...",
       "created": "Deck created!"
     },
     "cardTemplate": {
       "title": "Your Card Templates",
-      "description": "These templates are already set up for you. Pick one for your cards.",
+      "description": "เทมเพลตเหล่านี้ตั้งค่าไว้ให้แล้ว เลือกหนึ่งอันสำหรับการ์ดของคุณ",
       "fields": "{{count, number}} fields",
       "useTemplate": "Use This Template"
     },
     "addCards": {
       "title": "Sample Cards Ready!",
-      "description": "We've prepared sample cards for you. Add them to your deck with one click.",
+      "description": "เราเตรียมการ์ดตัวอย่างไว้ให้ เพิ่มเข้าเด็คได้ด้วยคลิกเดียว",
       "action": "Add These Cards",
       "adding": "Adding...",
       "added": "Cards added!"
     },
     "firstStudy": {
       "title": "You're Ready to Study!",
-      "description": "Your deck \"{{deckName}}\" has {{cardCount}} cards ready. Choose a study mode and start learning.",
+      "description": "เด็ค \"{{deckName}}\" มีการ์ดพร้อมแล้ว {{cardCount}} ใบ เลือกโหมดเรียนแล้วเริ่มได้เลย",
       "action": "Start Studying",
       "randomReview": "ทบทวนแบบสุ่ม",
       "sequential": "ตามลำดับ"
     },
     "exploreMarket": {
       "title": "Explore the Marketplace",
-      "description": "Thousands of shared decks await! Browse decks from other learners or share your own creations.",
+      "description": "เลือกดูเด็คที่ผู้เรียนคนอื่นแชร์ไว้ ชอบใบไหนก็หยิบไปใช้ได้เลย และคุณก็เผยแพร่เด็คของตัวเองขึ้นมาร์เก็ตได้เช่นกัน",
       "action": "Browse Marketplace",
       "actionFinish": "Finish Setup"
     }
@@ -164,7 +164,7 @@
     "progress": "Progress",
     "viewAll": "View All",
     "recent": "Recent",
-    "empty": "No achievements yet. Start studying to earn badges!",
+    "empty": "ยังไม่มีความสำเร็จ เริ่มเรียนเพื่อรับตราสัญลักษณ์เลย!",
     "newUnlocked": "Achievement Unlocked!",
     "category": {
       "streak": "Streak",
@@ -253,12 +253,12 @@
       "cards_500": "Study 500 cards total",
       "cards_1000": "Study 1,000 cards total",
       "cards_5000": "Study 5,000 cards total",
-      "sessions_10": "Complete 10 study sessions",
-      "sessions_50": "Complete 50 study sessions",
-      "sessions_100": "Complete 100 study sessions",
+      "sessions_10": "เรียนจบ 10 เซสชัน",
+      "sessions_50": "เรียนจบ 50 เซสชัน",
+      "sessions_100": "เรียนจบ 100 เซสชัน",
       "deck_share": "Share your first deck",
-      "marketplace_pub": "Publish a deck to the marketplace",
-      "first_study": "Complete your first study session",
+      "marketplace_pub": "เผยแพร่เด็คขึ้นมาร์เก็ต",
+      "first_study": "เรียนจบเซสชันแรกของคุณ",
       "mastery_50": "คงจำการ์ด 50 ใบไว้ตั้งแต่สามสัปดาห์ขึ้นไป"
     },
     "tabs": {
@@ -306,7 +306,7 @@
     "cardsStudied": "Cards Studied",
     "sessions": "Sessions",
     "you": "You",
-    "empty": "No leaderboard data yet. Be the first to study!"
+    "empty": "ยังไม่มีข้อมูลกระดานผู้นำ มาเป็นคนแรกที่เริ่มเรียนกันเถอะ!"
   },
   "history": {
     "tabs": {
@@ -317,15 +317,15 @@
   "quests": {
     "title": "Daily Quests",
     "cards": "Study {{target}} cards",
-    "sessions": "Complete {{target}} sessions",
-    "time": "Study for {{target}} minutes",
+    "sessions": "เรียนให้ครบ {{target}} เซสชัน",
+    "time": "เรียนให้ครบ {{target}} นาที",
     "perfect": "Get a perfect score",
     "completed": "Completed!",
     "xpReward": "+{{xp}} XP"
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count, number}} available",
+    "available": "เหลือ {{count, number}} ชิ้น",
     "used": "Streak protected today!",
     "earned": "Earned a streak freeze!"
   },

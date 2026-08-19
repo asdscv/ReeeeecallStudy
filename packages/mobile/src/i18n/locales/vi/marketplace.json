@@ -114,33 +114,33 @@
   },
   "publish": {
     "title": "Publish Deck",
-    "subtitle": "Share your deck with the community",
+    "subtitle": "Chia sẻ bộ thẻ của bạn với cộng đồng",
     "titleLabel": "Title",
     "titlePlaceholder": "Deck title on marketplace",
     "description": "Description",
     "descriptionPlaceholder": "What will learners study?",
     "tags": "Tags",
     "tagsPlaceholder": "comma, separated, tags",
-    "tagsHint": "Help others find your deck",
+    "tagsHint": "Giúp người khác tìm thấy bộ thẻ của bạn",
     "category": "Category",
     "shareMode": "Share Mode",
     "shareModes": {
       "copy": {
         "label": "Copy",
-        "description": "Users get an editable copy"
+        "description": "Người dùng nhận bản sao có thể chỉnh sửa"
       },
       "subscribe": {
         "label": "Subscribe",
-        "description": "Users get read-only, auto-updated"
+        "description": "Người dùng nhận bản chỉ đọc, tự động cập nhật"
       },
       "snapshot": {
         "label": "Snapshot",
-        "description": "Users get read-only copy, no updates"
+        "description": "Người dùng nhận bản chỉ đọc, không cập nhật"
       }
     },
     "publishButton": "Publish to Marketplace",
     "titleRequired": "Title is required",
-    "published": "Your deck is now available on the marketplace.",
+    "published": "Bộ thẻ của bạn đã có trên chợ.",
     "failed": "Failed to publish deck"
   },
   "learningLanguage": {

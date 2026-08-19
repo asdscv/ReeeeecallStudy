@@ -27,7 +27,7 @@
   "welcomePro": "方案已生效",
   "welcomeProDesc": "卡片上限已提高。学习功能在所有方案中完全相同。",
   "restorePurchase": "恢复购买",
-  "restored": "Pro订阅已恢复。",
+  "restored": "订阅已恢复。",
   "noRestoreFound": "未找到可恢复的订阅。",
   "productsUnavailable": "订阅产品当前不可用，请稍后重试。",
   "checkout": {
@@ -53,5 +53,6 @@
     "title": "退款申请",
     "submitted": "已向 Apple 提交退款申请。是否通过由 Apple 决定，并会通过邮件通知你。若获批准，访问权限将自动收回。"
   },
-  "everythingElseFree": "所有学习模式、TTS、统计和市场发布，在任何方案中都免费。"
+  "everythingElseFree": "所有学习模式、TTS、统计和市场发布，在任何方案中都免费。",
+  "paidPlan": "付费方案"
 }

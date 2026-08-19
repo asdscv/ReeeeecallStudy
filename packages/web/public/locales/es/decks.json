@@ -159,7 +159,7 @@
     "pendingChanges": "{{count, number}} pending",
     "lastSynced": "Last synced: {{time}}",
     "neverSynced": "Never synced",
-    "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
+    "syncComplete": "Sincronización completa: {{added}} añadidas, {{removed}} eliminadas",
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed Deck"

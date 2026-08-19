@@ -20,7 +20,6 @@ import { AppPreviewSection } from '../components/landing/AppPreviewSection'
 import { FeaturesSection } from '../components/landing/FeaturesSection'
 import { ScienceSection } from '../components/landing/ScienceSection'
 import { StatsSection } from '../components/landing/StatsSection'
-import { SocialProofSection } from '../components/landing/SocialProofSection'
 import { HowItWorksSection } from '../components/landing/HowItWorksSection'
 import { InsightsSection } from '../components/landing/InsightsSection'
 import { PricingSection } from '../components/landing/PricingSection'
@@ -94,7 +93,6 @@ export function LandingPage() {
       <Divider />
       <StatsSection />
       <Divider />
-      <SocialProofSection />
       <HowItWorksSection />
       <InsightsSection />
       {/* Pricing — gated: hidden until launch, appears when VITE_PAYMENTS_ENABLED === 'true' */}

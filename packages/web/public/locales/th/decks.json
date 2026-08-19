@@ -159,7 +159,7 @@
     "pendingChanges": "{{count, number}} pending",
     "lastSynced": "Last synced: {{time}}",
     "neverSynced": "Never synced",
-    "syncComplete": "Sync complete: {{added}} added, {{removed}} removed",
+    "syncComplete": "ซิงก์เสร็จแล้ว: เพิ่ม {{added}} ลบ {{removed}}",
     "noChanges": "Already up to date",
     "syncFailed": "Sync failed",
     "subscribed": "Subscribed Deck"

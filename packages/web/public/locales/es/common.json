@@ -115,43 +115,43 @@
     "back": "Back",
     "finish": "Finish",
     "getStarted": "Get Started",
-    "stepOf": "Step {{current}} of {{total}}",
+    "stepOf": "Paso {{current}} de {{total}}",
     "restartOnboarding": "Restart Tutorial",
     "welcome": {
       "title": "Welcome to Reeeeecall!",
-      "description": "The smartest way to study with flashcards. Create decks, add cards, and let our spaced repetition algorithm optimize your learning.",
+      "description": "La forma más inteligente de estudiar con tarjetas. Crea mazos, añade tarjetas y deja que el algoritmo de repetición espaciada optimice tu aprendizaje.",
       "action": "Get Started"
     },
     "createDeck": {
       "title": "Create Your First Deck",
-      "description": "We've prepared a sample deck for you. Click to create it!",
+      "description": "Hemos preparado un mazo de ejemplo. ¡Haz clic para crearlo!",
       "action": "Create This Deck",
       "creating": "Creating...",
       "created": "Deck created!"
     },
     "cardTemplate": {
       "title": "Your Card Templates",
-      "description": "These templates are already set up for you. Pick one for your cards.",
+      "description": "Estas plantillas ya están configuradas. Elige una para tus tarjetas.",
       "fields": "{{count, number}} fields",
       "useTemplate": "Use This Template"
     },
     "addCards": {
       "title": "Sample Cards Ready!",
-      "description": "We've prepared sample cards for you. Add them to your deck with one click.",
+      "description": "Hemos preparado tarjetas de ejemplo. Añádelas a tu mazo con un clic.",
       "action": "Add These Cards",
       "adding": "Adding...",
       "added": "Cards added!"
     },
     "firstStudy": {
       "title": "You're Ready to Study!",
-      "description": "Your deck \"{{deckName}}\" has {{cardCount}} cards ready. Choose a study mode and start learning.",
+      "description": "Tu mazo \"{{deckName}}\" tiene {{cardCount}} tarjetas listas. Elige un modo de estudio y empieza.",
       "action": "Start Studying",
       "randomReview": "Repaso aleatorio",
       "sequential": "Secuencial"
     },
     "exploreMarket": {
       "title": "Explore the Marketplace",
-      "description": "Thousands of shared decks await! Browse decks from other learners or share your own creations.",
+      "description": "Explora los mazos que comparten otros estudiantes y llévate los que quieras. También puedes publicar los tuyos en el mercado.",
       "action": "Browse Marketplace",
       "actionFinish": "Finish Setup"
     }
@@ -164,7 +164,7 @@
     "progress": "Progress",
     "viewAll": "View All",
     "recent": "Recent",
-    "empty": "No achievements yet. Start studying to earn badges!",
+    "empty": "Aún no hay logros. ¡Empieza a estudiar para ganar insignias!",
     "newUnlocked": "Achievement Unlocked!",
     "category": {
       "streak": "Streak",
@@ -253,12 +253,12 @@
       "cards_500": "Study 500 cards total",
       "cards_1000": "Study 1,000 cards total",
       "cards_5000": "Study 5,000 cards total",
-      "sessions_10": "Complete 10 study sessions",
-      "sessions_50": "Complete 50 study sessions",
-      "sessions_100": "Complete 100 study sessions",
+      "sessions_10": "Completa 10 sesiones de estudio",
+      "sessions_50": "Completa 50 sesiones de estudio",
+      "sessions_100": "Completa 100 sesiones de estudio",
       "deck_share": "Share your first deck",
-      "marketplace_pub": "Publish a deck to the marketplace",
-      "first_study": "Complete your first study session",
+      "marketplace_pub": "Publica un mazo en el mercado",
+      "first_study": "Completa tu primera sesión de estudio",
       "mastery_50": "Retén 50 tarjetas durante tres semanas o más"
     },
     "tabs": {
@@ -306,7 +306,7 @@
     "cardsStudied": "Cards Studied",
     "sessions": "Sessions",
     "you": "You",
-    "empty": "No leaderboard data yet. Be the first to study!"
+    "empty": "Aún no hay datos de clasificación. ¡Sé el primero en estudiar!"
   },
   "history": {
     "tabs": {
@@ -317,15 +317,15 @@
   "quests": {
     "title": "Daily Quests",
     "cards": "Study {{target}} cards",
-    "sessions": "Complete {{target}} sessions",
-    "time": "Study for {{target}} minutes",
+    "sessions": "Completa {{target}} sesiones",
+    "time": "Estudia {{target}} minutos",
     "perfect": "Get a perfect score",
     "completed": "Completed!",
     "xpReward": "+{{xp}} XP"
   },
   "streakFreeze": {
     "title": "Streak Freeze",
-    "available": "{{count, number}} available",
+    "available": "{{count, number}} disponibles",
     "used": "Streak protected today!",
     "earned": "Earned a streak freeze!"
   },

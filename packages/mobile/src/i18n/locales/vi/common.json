@@ -112,7 +112,7 @@
     },
     "exploreMarket": {
       "title": "Explore the Marketplace",
-      "description": "Thousands of shared decks await! Browse decks from other learners or share your own creations.",
+      "description": "Khám phá các bộ thẻ do người học khác chia sẻ và lấy về bộ nào bạn thích. Bạn cũng có thể đăng bộ thẻ của mình lên chợ.",
       "action": "Browse Marketplace"
     }
   },
@@ -124,7 +124,7 @@
     "progress": "Progress",
     "viewAll": "View All",
     "recent": "Recent",
-    "empty": "No achievements yet. Start studying to earn badges!",
+    "empty": "Chưa có thành tích nào. Bắt đầu học để nhận huy hiệu nhé!",
     "newUnlocked": "Achievement Unlocked!",
     "category": {
       "streak": "Streak",
@@ -213,12 +213,12 @@
       "cards_500": "Study 500 cards total",
       "cards_1000": "Study 1,000 cards total",
       "cards_5000": "Study 5,000 cards total",
-      "sessions_10": "Complete 10 study sessions",
-      "sessions_50": "Complete 50 study sessions",
-      "sessions_100": "Complete 100 study sessions",
+      "sessions_10": "Hoàn thành 10 buổi học",
+      "sessions_50": "Hoàn thành 50 buổi học",
+      "sessions_100": "Hoàn thành 100 buổi học",
       "deck_share": "Share your first deck",
-      "marketplace_pub": "Publish a deck to the marketplace",
-      "first_study": "Complete your first study session",
+      "marketplace_pub": "Đăng một bộ thẻ lên chợ",
+      "first_study": "Hoàn thành buổi học đầu tiên",
       "mastery_50": "Giữ nhớ 50 thẻ từ ba tuần trở lên"
     },
     "tabs": {

@@ -7,7 +7,7 @@
     "emailRateLimit": "Quá nhiều yêu cầu. Vui lòng thử lại sau.",
     "invalidEmailFormat": "Định dạng email không hợp lệ."
   },
-  "generic": "Something went wrong. Please try again.",
+  "generic": "Đã xảy ra lỗi. Vui lòng thử lại.",
   "marketplace": {
     "acquireFailed": "Không thể lấy bộ thẻ. Vui lòng thử lại."
   },

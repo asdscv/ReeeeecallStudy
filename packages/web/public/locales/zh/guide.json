@@ -132,6 +132,44 @@
         }
       }
     },
+    "quiz": {
+      "title": "测验",
+      "items": {
+        "what": {
+          "title": "什么是测验？",
+          "body": "测验会用你自己的卡片出题，检验你到底记住了多少。题目来自你卡组里的卡片，而不是外部题库，所以只考你学过的内容。\n\n共有三种题型：\n• 选择题：从选项中选择，干扰项同样取自这个卡组的卡片。\n• 简答题：直接写出简短答案。\n• 论述题：成段作答，出题时会一并生成评分标准和参考答案。"
+        },
+        "create": {
+          "title": "创建测验",
+          "body": "进入 测验 →「新测验」。\n\n1. 选择卡组，可用标签缩小范围，也可以手动挑选卡片（最多 50 张）。\n2. 选择题型和难度。\n3. 设定题目数量，一套为 1～20 题。\n4. 生成前会显示预计扣费。每天的免费题目会先用掉，超出部分才从余额扣。\n\n若某张卡片没能出题，服务器会自动用其他卡片补上。若卡组的卡片少于所需题数，则只出得到的数量。"
+        },
+        "take": {
+          "title": "答题与批改",
+          "body": "一套题可以反复练习，每次尝试都会记录。\n\n• 选择题在你点选的瞬间就判定，不调用 AI，因此不会额外扣费。\n• 简答题和论述题需点击「批改」才由 AI 批改，点击前会显示扣费金额。\n• 论述题会按评分标准逐项给出评价，并附上参考答案；参考答案只在你提交作答后才开放。\n\n批改从第一次起就要付费，因为每份作答都要调用模型。"
+        },
+        "mistakes": {
+          "title": "错题本与 AI 帮助",
+          "body": "答错的题目会汇集到错题本。\n\n• AI 讲解：说明错在哪里、漏了什么。\n• 答案对比：把你的答案与正确答案并排列出差异。\n• 学习诊断：综合你的错题，指出反复出现的薄弱环节。\n\n三项都会在确认前显示扣费金额，且没有免费额度。"
+        }
+      }
+    },
+    "learning": {
+      "title": "学习目标与计划",
+      "items": {
+        "goal": {
+          "title": "创建学习目标",
+          "body": "学习目标用来装「学什么、到什么时候」。学习 → 学习目标 →「新目标」。\n\n• 目标名称（例如「通过 JLPT N2」）\n• 学习的卡组 — 至少选一个，否则无法生成计划。\n• 目标日期（可选）— 设定后会算出每天要开始多少张新卡片。\n• 每日学习时长 — 先定时间，则会告诉你大约何时能学完。\n\n两个数字都是估算值，每天都会重新计算。只有用 SRS 模式学习的部分才计入计划。"
+        },
+        "today": {
+          "title": "今日计划",
+          "body": "学习 → 今日计划，点击「生成今日计划」，系统会从目标关联的卡组中取出今天的份额。\n\n• 先安排复习，剩余时间再放新卡片。\n• 进度条显示今天完成了多少。\n• 今天的份额完成后，会告诉你下一批复习何时回来。\n\n整天没学也不会丢掉份额 — 它会回到下一次计划里。"
+        },
+        "coach": {
+          "title": "自动调整与推荐",
+          "body": "计划会根据你实际完成的量，主动提出调整。\n\n• 连续几天完成不到一半，就建议减少新卡片或缩短每日时长。\n• 每天都能完成，就建议增加新卡片以提前达成目标。\n• 建议在你点击「应用」之前不会改动任何设置。\n\n学习诊断会把看过两次以上但平均分仍低的卡片归入「需要复习的卡片」。接受推荐后，这些卡片在下次计划中的优先级会提高。"
+        }
+      }
+    },
     "import-export": {
       "title": "导入和导出",
       "items": {
@@ -241,20 +279,20 @@
       "title": "AI Auto-Generate",
       "items": {
         "what": {
-          "title": "What is AI Auto-Generate?",
-          "body": "AI Auto-Generate lets you create flashcard templates, decks, and cards automatically using AI. Just enter a topic (e.g., 'JLPT N3 Japanese vocabulary') and AI will generate everything for you.\n\nNo API key or setup needed — generation runs on our servers. You get free AI cards every day; beyond that, generation is deducted from your credit balance."
+          "title": "什么是 AI 自动生成？",
+          "body": "AI 自动生成会用 AI 帮你自动创建卡片模板、卡组和卡片。只要输入一个主题（例如「JLPT N3 日语词汇」），AI 就会把一切准备好。\n\n无需申请 API 密钥，也不用额外设置——生成在服务器端运行。每天都有免费的 AI 卡片额度，超出部分从充值余额中扣除。"
         },
         "fullGenerate": {
-          "title": "Full Generation (Template + Deck + Cards)",
-          "body": "The easiest way to get started:\n\n1. Go to Decks page → Click 'AI Generate'\n2. Type a topic (e.g., 'Basic Korean greetings')\n3. Set the number of cards\n4. Click 'Start Generating'\n\nAI will create:\n• A card template with appropriate fields and TTS settings\n• A deck with name, description, icon, and color\n• The requested number of cards\n\nYou can review and edit everything before saving."
+          "title": "一次生成（模板 + 卡组 + 卡片）",
+          "body": "最简单的上手方式：\n\n1. 卡组页面 → 点击「用 AI 创建」\n2. 输入主题（例如「韩语基础问候语」）\n3. 设置卡片数量\n4. 点击「开始生成」\n\nAI 会生成：\n• 带有合适字段和语音设置的卡片模板\n• 含名称、说明、图标和颜色的卡组\n• 你要求数量的卡片\n\n保存前你可以检查并修改所有内容。"
         },
         "addCards": {
-          "title": "Adding Cards to Existing Decks",
-          "body": "You can also add AI-generated cards to decks you already have:\n\n• Cards Only: On a deck detail page with no cards, click 'AI Cards' to generate cards using the deck's existing template.\n• Add More: On a deck with existing cards, click 'AI Cards' to add more cards. AI will avoid duplicating existing content.\n\nYou can also create a new deck from an existing template: on the Templates page, click 'AI Deck' on any template."
+          "title": "为已有卡组添加卡片",
+          "body": "你也可以给已有的卡组添加 AI 生成的卡片：\n\n• 仅生成卡片：在没有卡片的卡组详情页点击「AI 卡片」，会使用该卡组已有的模板生成卡片。\n• 继续添加：在已有卡片的卡组点击「AI 卡片」即可再添加，AI 会避免与现有内容重复。\n\n你还可以用已有模板创建新卡组：在模板页面点击「AI 卡组」。"
         },
         "editResults": {
-          "title": "Reviewing & Editing Generated Content",
-          "body": "Before saving, you can review and edit everything AI generated:\n\n• Template: Change field names, TTS languages, layout styles, font sizes, and custom HTML\n• Deck: Edit name, description, icon, and color\n• Cards: Edit any field value inline, delete unwanted cards\n\nAfter saving, you can make more detailed edits:\n• Click 'Edit Template' on the completion screen to open the full template editor\n• Click 'View Deck' to manage cards individually\n• Click 'Add More Cards' to generate additional cards for the same deck"
+          "title": "检查与修改生成结果",
+          "body": "保存前，你可以检查并修改 AI 生成的所有内容：\n\n• 模板：字段名称、语音语言、版式、字号、自定义 HTML\n• 卡组：名称、说明、图标、颜色\n• 卡片：就地编辑任意字段，删除不需要的卡片\n\n保存之后还能做更细的调整：\n• 在完成页点击「编辑模板」打开完整的模板编辑器\n• 点击「查看卡组」可逐张管理卡片\n• 点击「继续添加卡片」为同一卡组生成更多卡片"
         }
       }
     },
