@@ -53,7 +53,8 @@
     "archived": {
       "badge": "Đã lưu trữ · khóa học tập",
       "note": "{{count, number}} thẻ bị lưu trữ do vượt giới hạn — bạn vẫn có thể xem. Đăng ký để học lại."
-    }
+    },
+    "moreActions": "Thêm thao tác"
   },
   "settings": {
     "deckName": "Tên bộ thẻ",

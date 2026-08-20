@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { Brain, Share2, Globe, Smartphone, Upload } from 'lucide-react'
+import { Brain, Share2, Globe, Smartphone, Sparkles } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 import { SUPPORTED_LOCALES } from '../../lib/locale-utils'
 
@@ -8,7 +8,7 @@ const BADGES = [
   { key: 'sharing', icon: Share2 },
   { key: 'languages', icon: Globe },
   { key: 'allDevices', icon: Smartphone },
-  { key: 'import', icon: Upload },
+  { key: 'aiGenerate', icon: Sparkles },
 ] as const
 
 export function TrustBadgesSection() {

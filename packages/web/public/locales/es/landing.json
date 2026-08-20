@@ -162,9 +162,9 @@
     "sharing": "Compartir Mazos",
     "languages": "{{count, number}} Idiomas",
     "allDevices": "Todos los Dispositivos",
-    "import": "Importar CSV y JSON",
     "languages_one": "{{count, number}} Idioma",
-    "languages_other": "{{count, number}} Idiomas"
+    "languages_other": "{{count, number}} Idiomas",
+    "aiGenerate": "Tarjetas con IA"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. Todos los derechos reservados.",

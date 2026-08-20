@@ -162,9 +162,9 @@
     "sharing": "デッキ共有",
     "languages": "{{count, number}}言語対応",
     "allDevices": "全デバイス対応",
-    "import": "CSV & JSONインポート",
     "languages_one": "{{count, number}}言語対応",
-    "languages_other": "{{count, number}}言語対応"
+    "languages_other": "{{count, number}}言語対応",
+    "aiGenerate": "AIカード生成"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",

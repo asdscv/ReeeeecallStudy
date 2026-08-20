@@ -53,7 +53,8 @@
     "archived": {
       "badge": "Archivada · estudio bloqueado",
       "note": "{{count, number}} tarjetas están archivadas por superar tu límite: aún puedes verlas. Suscríbete para volver a estudiarlas."
-    }
+    },
+    "moreActions": "Más acciones"
   },
   "settings": {
     "deckName": "Nombre del mazo",

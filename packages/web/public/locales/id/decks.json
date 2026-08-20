@@ -53,7 +53,8 @@
     "archived": {
       "badge": "Diarsipkan · belajar terkunci",
       "note": "{{count, number}} kartu diarsipkan karena melebihi batas — kamu masih bisa melihatnya. Berlangganan untuk mempelajarinya lagi."
-    }
+    },
+    "moreActions": "Aksi lainnya"
   },
   "settings": {
     "deckName": "Nama Dek",

@@ -15,6 +15,7 @@ import { SubscribeButton } from '../components/billing/SubscribeButton'
 import { CardFormModal } from '../components/card/CardFormModal'
 import { ConfirmDialog } from '../components/common/ConfirmDialog'
 import { ImportModal } from '../components/import-export/ImportModal'
+import { OverflowMenu } from '../components/ui/overflow-menu'
 import { ExportModal } from '../components/import-export/ExportModal'
 import { UploadDateTab } from '../components/deck/UploadDateTab'
 import { DeckStatsTab } from '../components/deck/DeckStatsTab'
@@ -437,22 +438,30 @@ export function DeckDetailPage() {
               {t('ai-generate:button.aiCards')}
             </button>
           )}
-          {!deck.is_readonly && (
-            <button
-              onClick={() => setShowImport(true)}
-              className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-card border border-border text-foreground rounded-lg text-sm font-medium hover:bg-muted transition cursor-pointer"
-            >
-              <Upload className="w-4 h-4" />
-              {t('decks:detail.import')}
-            </button>
-          )}
-          <button
-            onClick={() => setShowExport(true)}
-            className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-card border border-border text-foreground rounded-lg text-sm font-medium hover:bg-muted transition cursor-pointer"
-          >
-            <Download className="w-4 h-4" />
-            {t('decks:detail.export')}
-          </button>
+          {/* 가져오기·내보내기는 더보기로 내렸습니다. 카드를 채우는 주된 방법은 이제
+              AI 생성이고, 툴바에 버튼이 늘어날수록 그게 묻힙니다. 기능과 경로는 그대로라
+              쓰던 자료를 들고 오는 사람은 여전히 두 번 눌러 도달합니다. */}
+          <OverflowMenu
+            label={t('decks:detail.moreActions')}
+            items={[
+              ...(deck.is_readonly
+                ? []
+                : [
+                    {
+                      key: 'import',
+                      label: t('decks:detail.import'),
+                      icon: <Upload className="w-4 h-4" />,
+                      onSelect: () => setShowImport(true),
+                    },
+                  ]),
+              {
+                key: 'export',
+                label: t('decks:detail.export'),
+                icon: <Download className="w-4 h-4" />,
+                onSelect: () => setShowExport(true),
+              },
+            ]}
+          />
         </div>
       </div>
 
@@ -559,22 +568,17 @@ export function DeckDetailPage() {
                 >
                   {t('decks:detail.addFirstCard')}
                 </button>
+                {/* 빈 덱에서 권하는 두 번째 길도 AI 입니다. 예전에는 여기서 CSV 가져오기와
+                    양식 다운로드를 권했는데, 둘 다 위 더보기에 그대로 있습니다. */}
                 {!deck.is_readonly && (
                   <button
-                    onClick={() => setShowImport(true)}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-card border border-border text-foreground rounded-lg text-sm font-medium hover:bg-muted transition cursor-pointer"
+                    onClick={handleAICards}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-purple-50 border border-purple-300 text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-100 transition cursor-pointer"
                   >
-                    <Upload className="w-4 h-4" />
-                    {t('decks:detail.importCards')}
+                    <Sparkles className="w-4 h-4" />
+                    {t('ai-generate:button.aiCards')}
                   </button>
                 )}
-                <button
-                  onClick={() => setShowExport(true)}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-card border border-border text-foreground rounded-lg text-sm font-medium hover:bg-muted transition cursor-pointer"
-                >
-                  <Download className="w-4 h-4" />
-                  {t('decks:detail.downloadTemplate')}
-                </button>
               </div>
             </div>
           ) : filteredCards.length === 0 ? (

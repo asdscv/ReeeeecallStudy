@@ -53,7 +53,8 @@
     "archived": {
       "badge": "已归档 · 学习锁定",
       "note": "有 {{count, number}} 张卡片因超出上限被归档 — 你仍可查看。订阅后即可再次学习。"
-    }
+    },
+    "moreActions": "更多操作"
   },
   "settings": {
     "deckName": "牌组名称",
