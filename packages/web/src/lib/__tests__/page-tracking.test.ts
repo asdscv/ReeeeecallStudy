@@ -55,8 +55,11 @@ describe('shouldTrackPage', () => {
     expect(shouldTrackPage('/auth/callback')).toBe(false)
   })
 
-  it('does not track auth login', () => {
-    expect(shouldTrackPage('/auth/login')).toBe(false)
+  // 광고와 콘텐츠 CTA 가 착지하는 곳이라 추적해야 한다. 이걸 막아 뒀던 게
+  // page_views 의 utm_source 가 전부 NULL 이던 원인이다.
+  it('tracks auth login — 광고 착지 지점', () => {
+    expect(shouldTrackPage('/auth/login')).toBe(true)
+    expect(shouldTrackPage('/auth/signup')).toBe(true)
   })
 
   it('tracks marketplace', () => {
@@ -82,7 +85,7 @@ describe('shouldTrackPage', () => {
 
   it('handles trailing slash in excluded paths', () => {
     expect(shouldTrackPage('/admin/')).toBe(false)
-    expect(shouldTrackPage('/auth/login/')).toBe(false)
+    expect(shouldTrackPage('/auth/callback/')).toBe(false)
   })
 
   it('tracks paths that start with excluded prefix but are different segments', () => {
