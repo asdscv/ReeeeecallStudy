@@ -286,24 +286,16 @@
     "description": "基于科学验证的间隔重复（SRS）算法的智能闪卡学习平台。记得更快，记得更久。"
   },
   "proof": {
+    "eyebrow": "真实数据",
     "title": "用数字看 ReeeeecallStudy",
     "subtitle": "这是此刻服务里真实存在的数量。",
     "cards": {
       "label": "已创建卡片",
-      "hint": "由学习者自己创建和导入"
+      "hint": "由学习者自己创建和导入。"
     },
-    "listings": {
-      "label": "市场公开卡组",
-      "hint": "任何一个都能直接取用开始学习"
-    },
-    "languages": {
-      "label": "支持语言",
-      "hint": "界面、AI 生成与语音朗读"
-    },
-    "modes": {
-      "label": "学习模式",
-      "hint": "从 SRS 到突击复习"
-    },
-    "footnote": "由服务器统计，每小时刷新一次。"
+    "listings": "市场公开卡组",
+    "languages": "支持语言",
+    "modes": "学习模式",
+    "footnote": "由服务器统计，每小时刷新"
   }
 }

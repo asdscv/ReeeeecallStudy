@@ -286,24 +286,16 @@
     "description": "Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm. Remember faster and longer."
   },
   "proof": {
+    "eyebrow": "Live data",
     "title": "ReeeeecallStudy by the numbers",
     "subtitle": "What is actually in the service right now.",
     "cards": {
       "label": "Cards created",
-      "hint": "Made and imported by learners themselves"
+      "hint": "Made and imported by learners themselves."
     },
-    "listings": {
-      "label": "Decks on the market",
-      "hint": "Take any of them and start studying"
-    },
-    "languages": {
-      "label": "Languages",
-      "hint": "Interface, AI generation and text-to-speech"
-    },
-    "modes": {
-      "label": "Study modes",
-      "hint": "From SRS to cramming"
-    },
-    "footnote": "Counted on the server and refreshed every hour."
+    "listings": "Decks on the market",
+    "languages": "Languages",
+    "modes": "Study modes",
+    "footnote": "Counted on the server, refreshed hourly"
   }
 }

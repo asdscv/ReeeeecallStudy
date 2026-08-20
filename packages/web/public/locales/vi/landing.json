@@ -286,24 +286,16 @@
     "description": "Nền tảng học thẻ ghi nhớ thông minh với thuật toán lặp lại ngắt quãng (SRS) đã được khoa học chứng minh. Ghi nhớ nhanh hơn và lâu hơn."
   },
   "proof": {
+    "eyebrow": "Dữ liệu thật",
     "title": "ReeeeecallStudy qua các con số",
     "subtitle": "Đây là những gì thực sự có trong dịch vụ ngay lúc này.",
     "cards": {
       "label": "Thẻ đã tạo",
-      "hint": "Do chính người học tạo và nhập vào"
+      "hint": "Do chính người học tạo và nhập vào."
     },
-    "listings": {
-      "label": "Bộ thẻ trên chợ",
-      "hint": "Lấy bất kỳ bộ nào và học ngay"
-    },
-    "languages": {
-      "label": "Ngôn ngữ hỗ trợ",
-      "hint": "Giao diện, tạo bằng AI và đọc tiếng"
-    },
-    "modes": {
-      "label": "Chế độ học",
-      "hint": "Từ SRS đến học dồn"
-    },
-    "footnote": "Được đếm trên máy chủ và làm mới mỗi giờ."
+    "listings": "Bộ thẻ trên chợ",
+    "languages": "Ngôn ngữ",
+    "modes": "Chế độ học",
+    "footnote": "Đếm trên máy chủ, làm mới mỗi giờ"
   }
 }
