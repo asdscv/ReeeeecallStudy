@@ -154,7 +154,8 @@
     "howItWorks": "How It Works",
     "faq": "FAQ",
     "dashboard": "Dashboard",
-    "menu": "Menu"
+    "menu": "Menu",
+    "numbers": "Numbers"
   },
   "trustBadges": {
     "srs": "Smart SRS",
@@ -283,5 +284,26 @@
   "seo": {
     "title": "ReeeeecallStudy — Smart Flashcard Learning with Spaced Repetition",
     "description": "Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm. Remember faster and longer."
+  },
+  "proof": {
+    "title": "ReeeeecallStudy by the numbers",
+    "subtitle": "What is actually in the service right now.",
+    "cards": {
+      "label": "Cards created",
+      "hint": "Made and imported by learners themselves"
+    },
+    "listings": {
+      "label": "Decks on the market",
+      "hint": "Take any of them and start studying"
+    },
+    "languages": {
+      "label": "Languages",
+      "hint": "Interface, AI generation and text-to-speech"
+    },
+    "modes": {
+      "label": "Study modes",
+      "hint": "From SRS to cramming"
+    },
+    "footnote": "Counted on the server and refreshed every hour."
   }
 }

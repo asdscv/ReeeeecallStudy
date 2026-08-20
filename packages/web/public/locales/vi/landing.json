@@ -154,7 +154,8 @@
     "howItWorks": "Cách hoạt động",
     "faq": "Câu hỏi thường gặp",
     "dashboard": "Bảng điều khiển",
-    "menu": "Menu"
+    "menu": "Menu",
+    "numbers": "Con số"
   },
   "trustBadges": {
     "srs": "SRS thông minh",
@@ -283,5 +284,26 @@
   "seo": {
     "title": "ReeeeecallStudy — Học thẻ ghi nhớ thông minh với lặp lại ngắt quãng",
     "description": "Nền tảng học thẻ ghi nhớ thông minh với thuật toán lặp lại ngắt quãng (SRS) đã được khoa học chứng minh. Ghi nhớ nhanh hơn và lâu hơn."
+  },
+  "proof": {
+    "title": "ReeeeecallStudy qua các con số",
+    "subtitle": "Đây là những gì thực sự có trong dịch vụ ngay lúc này.",
+    "cards": {
+      "label": "Thẻ đã tạo",
+      "hint": "Do chính người học tạo và nhập vào"
+    },
+    "listings": {
+      "label": "Bộ thẻ trên chợ",
+      "hint": "Lấy bất kỳ bộ nào và học ngay"
+    },
+    "languages": {
+      "label": "Ngôn ngữ hỗ trợ",
+      "hint": "Giao diện, tạo bằng AI và đọc tiếng"
+    },
+    "modes": {
+      "label": "Chế độ học",
+      "hint": "Từ SRS đến học dồn"
+    },
+    "footnote": "Được đếm trên máy chủ và làm mới mỗi giờ."
   }
 }

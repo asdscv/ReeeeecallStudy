@@ -154,7 +154,8 @@
     "howItWorks": "Cómo Funciona",
     "faq": "Preguntas Frecuentes",
     "dashboard": "Panel",
-    "menu": "Menú"
+    "menu": "Menú",
+    "numbers": "Números"
   },
   "trustBadges": {
     "srs": "SRS Inteligente",
@@ -283,5 +284,26 @@
   "seo": {
     "title": "ReeeeecallStudy — Aprendizaje Inteligente con Tarjetas y Repetición Espaciada",
     "description": "Plataforma inteligente de aprendizaje con tarjetas y algoritmo de repetición espaciada (SRS) científicamente comprobado. Recuerda más rápido y por más tiempo."
+  },
+  "proof": {
+    "title": "ReeeeecallStudy en números",
+    "subtitle": "Lo que hay ahora mismo dentro del servicio.",
+    "cards": {
+      "label": "Tarjetas creadas",
+      "hint": "Creadas e importadas por los propios estudiantes"
+    },
+    "listings": {
+      "label": "Mazos en el mercado",
+      "hint": "Llévate cualquiera y empieza a estudiar"
+    },
+    "languages": {
+      "label": "Idiomas",
+      "hint": "Interfaz, generación con IA y lectura por voz"
+    },
+    "modes": {
+      "label": "Modos de estudio",
+      "hint": "Desde SRS hasta repaso intensivo"
+    },
+    "footnote": "Contado en el servidor y actualizado cada hora."
   }
 }

@@ -2,7 +2,8 @@ import type { CrammingFilter } from './cramming-queue'
 import { clampBatchSize } from './study-session-utils'
 import type { StudyMode } from '../types/database'
 
-const STUDY_MODES = [
+// 랜딩이 "6가지 학습 모드"를 이 배열에서 셉니다 — 문구가 코드보다 뒤처지지 않도록.
+export const STUDY_MODES = [
   'srs',
   'sequential_review',
   'random',

@@ -154,7 +154,8 @@
     "howItWorks": "사용 방법",
     "faq": "FAQ",
     "dashboard": "대시보드",
-    "menu": "메뉴"
+    "menu": "메뉴",
+    "numbers": "숫자"
   },
   "trustBadges": {
     "srs": "스마트 SRS",
@@ -283,5 +284,26 @@
   "seo": {
     "title": "ReeeeecallStudy — 간격 반복으로 스마트한 플래시카드 학습",
     "description": "과학적으로 검증된 간격 반복(SRS) 알고리즘으로 더 빠르고 오래 기억하는 플래시카드 학습 플랫폼."
+  },
+  "proof": {
+    "title": "숫자로 보는 ReeeeecallStudy",
+    "subtitle": "지금 이 순간 서비스에 실제로 들어 있는 값입니다.",
+    "cards": {
+      "label": "만들어진 카드",
+      "hint": "학습자들이 직접 만들고 불러온 카드"
+    },
+    "listings": {
+      "label": "마켓에 공개된 덱",
+      "hint": "누구나 가져가서 바로 학습할 수 있어요"
+    },
+    "languages": {
+      "label": "지원 언어",
+      "hint": "화면·AI 생성·음성 읽기 모두"
+    },
+    "modes": {
+      "label": "학습 모드",
+      "hint": "SRS부터 벼락치기까지"
+    },
+    "footnote": "서버에서 한 시간마다 다시 세어 표시합니다."
   }
 }
