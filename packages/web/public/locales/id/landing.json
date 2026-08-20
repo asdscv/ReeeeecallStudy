@@ -154,7 +154,8 @@
     "howItWorks": "Cara Kerja",
     "faq": "FAQ",
     "dashboard": "Dasbor",
-    "menu": "Menu"
+    "menu": "Menu",
+    "numbers": "Angka"
   },
   "trustBadges": {
     "srs": "SRS Cerdas",
@@ -283,5 +284,18 @@
   "seo": {
     "title": "ReeeeecallStudy — Pembelajaran Kartu Kilat Cerdas dengan Pengulangan Berjarak",
     "description": "Platform pembelajaran kartu kilat cerdas dengan algoritma pengulangan berjarak (SRS) yang terbukti secara ilmiah. Ingat lebih cepat dan lebih lama."
+  },
+  "proof": {
+    "eyebrow": "Data nyata",
+    "title": "ReeeeecallStudy dalam angka",
+    "subtitle": "Inilah yang benar-benar ada di layanan saat ini.",
+    "cards": {
+      "label": "Kartu dibuat",
+      "hint": "Dibuat dan diimpor sendiri oleh para pengguna."
+    },
+    "listings": "Dek di market",
+    "languages": "Bahasa",
+    "modes": "Mode belajar",
+    "footnote": "Dihitung di server, diperbarui tiap jam"
   }
 }

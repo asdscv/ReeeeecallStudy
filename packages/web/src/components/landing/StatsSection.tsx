@@ -69,17 +69,22 @@ export function StatsSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-8 sm:gap-10 md:gap-12 max-w-2xl mx-auto">
-          {stats.map((stat, i) => (
-            <Stat
-              key={stat.labelKey}
-              endValue={stat.endValue}
-              suffix={stat.suffix}
-              label={t(stat.labelKey, stat.labelFallback)}
-              description={t(stat.descKey, stat.descFallback)}
-              delay={i * 0.1}
-            />
-          ))}
+        {/* 아래 수치 섹션과 같은 판 언어로 묶습니다. 항목이 둘뿐이라 그냥 놓으면
+            넓은 여백에 떠 보였습니다. */}
+        <div className="max-w-3xl mx-auto overflow-hidden rounded-3xl border border-border bg-gradient-to-b from-card to-card/40 shadow-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border/60">
+            {stats.map((stat, i) => (
+              <div key={stat.labelKey} className="p-7 sm:p-9">
+                <Stat
+                  endValue={stat.endValue}
+                  suffix={stat.suffix}
+                  label={t(stat.labelKey, stat.labelFallback)}
+                  description={t(stat.descKey, stat.descFallback)}
+                  delay={i * 0.1}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -20,6 +20,7 @@ import { AppPreviewSection } from '../components/landing/AppPreviewSection'
 import { FeaturesSection } from '../components/landing/FeaturesSection'
 import { ScienceSection } from '../components/landing/ScienceSection'
 import { StatsSection } from '../components/landing/StatsSection'
+import { ProofSection } from '../components/landing/ProofSection'
 import { HowItWorksSection } from '../components/landing/HowItWorksSection'
 import { InsightsSection } from '../components/landing/InsightsSection'
 import { PricingSection } from '../components/landing/PricingSection'
@@ -92,6 +93,8 @@ export function LandingPage() {
       <ScienceSection />
       <Divider />
       <StatsSection />
+      <Divider />
+      <ProofSection />
       <Divider />
       <HowItWorksSection />
       <InsightsSection />

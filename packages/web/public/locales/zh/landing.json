@@ -154,7 +154,8 @@
     "howItWorks": "使用方法",
     "faq": "FAQ",
     "dashboard": "控制台",
-    "menu": "菜单"
+    "menu": "菜单",
+    "numbers": "数字"
   },
   "trustBadges": {
     "srs": "智能SRS",
@@ -283,5 +284,18 @@
   "seo": {
     "title": "ReeeeecallStudy — 基于间隔重复的智能闪卡学习",
     "description": "基于科学验证的间隔重复（SRS）算法的智能闪卡学习平台。记得更快，记得更久。"
+  },
+  "proof": {
+    "eyebrow": "真实数据",
+    "title": "用数字看 ReeeeecallStudy",
+    "subtitle": "这是此刻服务里真实存在的数量。",
+    "cards": {
+      "label": "已创建卡片",
+      "hint": "由学习者自己创建和导入。"
+    },
+    "listings": "市场公开卡组",
+    "languages": "支持语言",
+    "modes": "学习模式",
+    "footnote": "由服务器统计，每小时刷新"
   }
 }

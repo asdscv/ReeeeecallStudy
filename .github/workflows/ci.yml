@@ -423,6 +423,7 @@ jobs:
             supabase/tests/quiz_item_feedback_test.sql \
             supabase/tests/empty_quiz_set_test.sql \
             supabase/tests/card_size_test.sql \
+            supabase/tests/public_stats_test.sql \
             supabase/tests/length_limits_test.sql \
             supabase/tests/card_chars_test.sql \
             supabase/tests/template_limits_test.sql \
