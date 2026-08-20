@@ -43,6 +43,7 @@ import { useOnboardingStore } from './stores/onboarding-store'
 import { OnboardingOverlay } from './components/onboarding/OnboardingOverlay'
 import { LevelUpCelebration } from './components/common/LevelUpCelebration'
 import { GlobalConfirmDialog } from './components/common/GlobalConfirmDialog'
+import { captureAttribution } from './lib/attribution'
 
 /* ------------------------------------------------------------------ */
 /*  Lazy-loaded heavy pages                                           */
@@ -141,6 +142,11 @@ function LoadingFallback() {
 
 function PageTracker() {
   usePageTracking()
+  // 광고 파라미터는 착지 순간에만 URL 에 있다. 라우팅 한 번이면 사라지므로
+  // 첫 렌더에서 붙들어 둔다.
+  useEffect(() => {
+    captureAttribution()
+  }, [])
   return null
 }
 

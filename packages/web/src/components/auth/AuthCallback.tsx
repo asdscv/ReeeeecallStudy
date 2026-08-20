@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../../lib/supabase'
 import { capturedAuthHash } from '../../lib/auth-callback-hash'
+import { attachAttributionToProfile } from '../../lib/attribution'
 
 
 export function AuthCallback() {
@@ -43,6 +44,9 @@ export function AuthCallback() {
           // Hash-based fallback: SIGNED_IN fired but hash says recovery
           safeNavigate('/auth/reset-password')
         } else {
+          // 세션이 실제로 생긴 지점. 여기서 첫 접점을 계정에 새긴다 — 서버도
+          // write-once 라 재로그인마다 불려도 값이 바뀌지 않는다.
+          void attachAttributionToProfile()
           safeNavigate('/dashboard')
         }
       } else if (event === 'INITIAL_SESSION') {
@@ -51,6 +55,7 @@ export function AuthCallback() {
             safeNavigate('/auth/reset-password')
           } else {
             // OAuth PKCE flow: session already established via code exchange
+            void attachAttributionToProfile()
             safeNavigate('/dashboard')
           }
         }
