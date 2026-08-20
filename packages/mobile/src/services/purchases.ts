@@ -105,9 +105,18 @@ export const MERCHANT_UID_ATTRIBUTE = 'merchant_uid'
 // every purchase call no-ops, and a hardcoded `true` would render plan prices and a Select
 // CTA that can never transact — a dead end for the user and an Apple 2.1(b) problem.
 // Deriving the flag makes that impossible by construction: no SDK ⇒ no purchase UI.
+// …AND with "does this build actually have a key to talk to RevenueCat with". SDK 존재는
+// 키 존재를 뜻하지 않는다: 키는 EAS 환경변수로 들어오고, iOS 키만 있고 안드로이드 키가
+// 없는 상태가 실제로 있었다(로컬 .env 에는 iOS 키만 있다). 키가 비면 init() 이 조용히
+// return 하고 → getOfferings 가 null 이고 → 가격표와 구매 버튼은 그대로 그려진 채
+// 누르면 알럿만 뜬다. 그게 바로 애플 2.1(b) 로 걸리는 막다른 길이다.
+// 1.0.4 가 거절된 정황도 정확히 이 모양이었다.
 const OWNER_GO_LIVE_SWITCH = true
 const PURCHASES_SDK_PRESENT = Purchases != null
-export const SUBSCRIPTION_UI_ENABLED = OWNER_GO_LIVE_SWITCH && PURCHASES_SDK_PRESENT
+const PURCHASES_KEY_PRESENT =
+  (Platform.OS === 'ios' ? REVENUECAT_IOS_KEY : REVENUECAT_ANDROID_KEY).length > 0
+export const SUBSCRIPTION_UI_ENABLED =
+  OWNER_GO_LIVE_SWITCH && PURCHASES_SDK_PRESENT && PURCHASES_KEY_PRESENT
 
 /**
  * RevenueCat service — single entry point for all purchase operations.

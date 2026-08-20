@@ -16,6 +16,7 @@ import { Screen, Button, ScreenHeader } from '../components/ui'
 import { usePurchases } from '../hooks/usePurchases'
 import { purchaseService, SUBSCRIPTION_UI_ENABLED } from '../services/purchases'
 import { recordPurchaseConsent, getPlanLimits } from '../services/billing'
+import type { PurchasesPackage } from 'react-native-purchases'
 import type { BillingProduct, PlanLimits } from '../services/billing'
 import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 import { useTranslation } from 'react-i18next'
@@ -160,6 +161,25 @@ export function PaywallScreen() {
   // buttons; the actual store charge is matched to a RevenueCat package by id.
   const subscriptionProducts = products.filter((p) => p.kind === 'subscription')
 
+  // The store IAP id to purchase for this platform (billing_product_skus, mig 151);
+  // fall back to the internal id when no SKU row is registered yet.
+  const storeSku = (product: BillingProduct): string => product.storeProductId ?? product.id
+
+  /**
+   * 실제로 결제까지 갈 수 있는 것만. 서버 카탈로그에 있어도 스토어에 승인된 상품이 없으면
+   * RevenueCat 오퍼링에 패키지가 없고, 그 버튼은 눌러도 알럿으로 끝나는 막다른 길이다.
+   *
+   * 1.0.4 가 이것 때문에 거절됐다 — Guideline 2.1(b): "the app includes references to
+   * subscription but the associated In-App Purchase products have not been submitted for
+   * review". 살 수 없으면 언급조차 하지 않는 편이 맞다.
+   *
+   * 네트워크 실패로 오퍼링이 잠깐 비어도 숨겨진다. 그 방향의 실패가 반대(살 수 없는 버튼을
+   * 보여 주는 것)보다 안전하다.
+   */
+  const purchasableProducts = subscriptionProducts
+    .map((product) => ({ product, pkg: purchaseService.findPackageForProduct(offering, storeSku(product)) }))
+    .filter((entry): entry is { product: BillingProduct; pkg: PurchasesPackage } => entry.pkg != null)
+
   /**
    * The Pro card cap = the highest cap any active subscription grants, which is what the
    * "Pro" column of a Free-vs-Pro table means. Read from the catalog already in hand, so
@@ -222,10 +242,6 @@ export function PaywallScreen() {
     const price = formatProductPrice(product)
     return product.period === 'month' ? `${price}${t('catalog.perMonth')}` : price
   }
-
-  // The store IAP id to purchase for this platform (billing_product_skus, mig 151);
-  // fall back to the internal id when no SKU row is registered yet.
-  const storeSku = (product: BillingProduct): string => product.storeProductId ?? product.id
 
   const handlePurchaseProduct = async (product: BillingProduct) => {
     // Map the backend product -> the store package (by its store SKU) to actually charge.
@@ -323,7 +339,7 @@ export function PaywallScreen() {
         {/* Pre-purchase withdrawal-right disclosure. Required before the buy buttons
             unlock: KR 전자상거래법 and the EU/UK cooling-off rules only let us treat a
             used purchase as non-refundable if the buyer saw this BEFOREHAND. */}
-        {subscriptionProducts.length > 0 && (
+        {purchasableProducts.length > 0 && (
           <Pressable
             testID="paywall-consent"
             accessibilityRole="checkbox"
@@ -346,23 +362,23 @@ export function PaywallScreen() {
           </Pressable>
         )}
 
-        {/* Pricing — driven by the server catalog (get_billing_products) */}
+        {/* Pricing — 서버 카탈로그(get_billing_products) × 스토어에서 실제로 살 수 있는 것.
+            교집합만 그린다. 1.0.4 는 정확히 이 부분 때문에 거절당했다(2.1(b)):
+            인앱 상품을 심사에 제출하지 않은 채 구독을 '언급'하는 화면을 올렸고,
+            심사자는 살 수 없는 구매 버튼을 만났다. */}
         <View style={styles.pricing}>
-          {subscriptionProducts.map((product, i) => {
-            const pkg = purchaseService.findPackageForProduct(offering, storeSku(product))
-            return (
-              <Button
-                key={product.id}
-                testID={`paywall-product-${product.id}`}
-                title={`${product.title} — ${formatPrice(product, pkg)}`}
-                variant={i === 0 ? 'primary' : 'outline'}
-                onPress={() => handlePurchaseProduct(product)}
-                loading={purchasing}
-                disabled={!consented}
-              />
-            )
-          })}
-          {subscriptionProducts.length === 0 && (
+          {purchasableProducts.map(({ product, pkg }, i) => (
+            <Button
+              key={product.id}
+              testID={`paywall-product-${product.id}`}
+              title={`${product.title} — ${formatPrice(product, pkg)}`}
+              variant={i === 0 ? 'primary' : 'outline'}
+              onPress={() => handlePurchaseProduct(product)}
+              loading={purchasing}
+              disabled={!consented}
+            />
+          ))}
+          {purchasableProducts.length === 0 && (
             <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center', paddingVertical: 16 }]}>
               {t('productsUnavailable')}
             </Text>
