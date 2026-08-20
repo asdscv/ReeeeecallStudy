@@ -15,6 +15,11 @@
 \set ON_ERROR_STOP on
 BEGIN;
 
+-- 캐시가 실제로 캐시인지 보려면 도중에 덱 하나를 만들어야 합니다. 빈 CI DB 에서도
+-- 돌도록 주인을 직접 만듭니다.
+INSERT INTO auth.users (id) VALUES ('c0000000-0000-4000-8000-000000000001')
+ON CONFLICT (id) DO NOTHING;
+
 DO $$
 DECLARE
   v json;
@@ -23,7 +28,6 @@ DECLARE
   v_listings bigint;
   v_first    timestamptz;
   v_second   timestamptz;
-  v_priv     boolean;
 BEGIN
   -- 첫 호출은 반드시 센다 (기본값 '-infinity' 라서).
   v := public.get_public_stats();
@@ -48,8 +52,8 @@ BEGIN
 
   -- 캐시: 곧바로 다시 불러도 다시 세지 않아야 한다.
   v_first := (v->>'refreshed_at')::timestamptz;
-  INSERT INTO decks (owner_id, name)
-    SELECT id, 'stats-cache-probe' FROM auth.users LIMIT 1;
+  INSERT INTO decks (user_id, name)
+    VALUES ('c0000000-0000-4000-8000-000000000001', 'stats-cache-probe');
   v := public.get_public_stats();
   v_second := (v->>'refreshed_at')::timestamptz;
   IF v_second <> v_first THEN
