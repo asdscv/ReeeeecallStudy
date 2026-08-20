@@ -154,7 +154,8 @@
     "howItWorks": "使い方",
     "faq": "FAQ",
     "dashboard": "ダッシュボード",
-    "menu": "メニュー"
+    "menu": "メニュー",
+    "numbers": "数字"
   },
   "trustBadges": {
     "srs": "スマートSRS",
@@ -283,5 +284,18 @@
   "seo": {
     "title": "ReeeeecallStudy — 間隔反復によるスマートフラッシュカード学習",
     "description": "科学的に実証された間隔反復（SRS）アルゴリズムによるスマートフラッシュカード学習プラットフォーム。より速く、より長く記憶できます。"
+  },
+  "proof": {
+    "eyebrow": "実データ",
+    "title": "数字で見る ReeeeecallStudy",
+    "subtitle": "いま実際にサービスに入っている数です。",
+    "cards": {
+      "label": "作られたカード",
+      "hint": "学習者が自分で作り、取り込んだカードです。"
+    },
+    "listings": "マーケット公開デッキ",
+    "languages": "対応言語",
+    "modes": "学習モード",
+    "footnote": "サーバーで1時間ごとに数え直しています"
   }
 }
