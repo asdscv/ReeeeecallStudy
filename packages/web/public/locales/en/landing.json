@@ -162,9 +162,9 @@
     "sharing": "Deck Sharing",
     "languages": "{{count, number}} Languages",
     "allDevices": "All Devices",
-    "import": "CSV & JSON Import",
     "languages_one": "{{count, number}} Language",
-    "languages_other": "{{count, number}} Languages"
+    "languages_other": "{{count, number}} Languages",
+    "aiGenerate": "AI card generation"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",

@@ -162,9 +162,9 @@
     "sharing": "Berbagi Dek",
     "languages": "{{count, number}} Bahasa",
     "allDevices": "Semua Perangkat",
-    "import": "Impor CSV & JSON",
     "languages_one": "{{count, number}} Bahasa",
-    "languages_other": "{{count, number}} Bahasa"
+    "languages_other": "{{count, number}} Bahasa",
+    "aiGenerate": "Kartu dengan AI"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. Hak cipta dilindungi.",

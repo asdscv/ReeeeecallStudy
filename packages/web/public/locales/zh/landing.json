@@ -162,9 +162,9 @@
     "sharing": "牌组共享",
     "languages": "{{count, number}}种语言",
     "allDevices": "全设备支持",
-    "import": "CSV 与 JSON 导入",
     "languages_one": "{{count, number}}种语言",
-    "languages_other": "{{count, number}}种语言"
+    "languages_other": "{{count, number}}种语言",
+    "aiGenerate": "AI 生成卡片"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",

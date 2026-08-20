@@ -162,9 +162,9 @@
     "sharing": "덱 공유",
     "languages": "{{count, number}}개 언어",
     "allDevices": "모든 기기",
-    "import": "CSV & JSON 업로드",
     "languages_one": "{{count, number}}개 언어",
-    "languages_other": "{{count, number}}개 언어"
+    "languages_other": "{{count, number}}개 언어",
+    "aiGenerate": "AI 카드 생성"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",

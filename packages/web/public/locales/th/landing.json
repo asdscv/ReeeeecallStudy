@@ -162,9 +162,9 @@
     "sharing": "แชร์สำรับ",
     "languages": "{{count, number}} ภาษา",
     "allDevices": "ทุกอุปกรณ์",
-    "import": "นำเข้า CSV และ JSON",
     "languages_one": "{{count, number}} ภาษา",
-    "languages_other": "{{count, number}} ภาษา"
+    "languages_other": "{{count, number}} ภาษา",
+    "aiGenerate": "สร้างการ์ดด้วย AI"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. สงวนลิขสิทธิ์",
