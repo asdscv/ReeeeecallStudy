@@ -145,6 +145,18 @@ export function DeckDetailScreen() {
     void fetchArchiveState()
   }, [fetchArchiveState, cards.length])
 
+  // 덱 상세의 AI 카드 만들기 — 알약과 빈 상태가 같은 경로를 씁니다. 덱과 템플릿을 함께
+  // 넘겨야 마법사가 이 덱 위에서 열립니다(안 그러면 사용자가 덱을 다시 고르게 됩니다).
+  const openAiCards = useCallback(() => {
+    aiHubBus.emit({ type: 'ai_hub.generate_requested', mode: 'cards_only', source: 'deck_detail', deckId })
+    const tabNav = navigation.getParent()
+    if (!tabNav) return
+    tabNav.navigate('AITab', {
+      screen: 'AIGenerate',
+      params: { deckId, mode: 'cards_only', templateId: deck?.default_template_id ?? undefined },
+    })
+  }, [deckId, deck?.default_template_id, navigation])
+
   const handleSync = useCallback(async () => {
     setSyncMessage(null)
     const result = await syncSubscribedDeck(deckId)
@@ -558,31 +570,14 @@ export function DeckDetailScreen() {
           {!deck.is_readonly && (
           <TouchableOpacity
             style={[styles.actionPill, { borderColor: theme.colors.border }]}
-            onPress={() => {
-              aiHubBus.emit({ type: 'ai_hub.generate_requested', mode: 'cards_only', source: 'deck_detail', deckId })
-              const tabNav = navigation.getParent()
-              if (tabNav) {
-                // The deck is the whole point of this button — hand it over, plus the template
-                // the generated cards must match, so the wizard opens on THIS deck instead of
-                // making the user pick it again.
-                tabNav.navigate('AITab', {
-                  screen: 'AIGenerate',
-                  params: { deckId, mode: 'cards_only', templateId: deck.default_template_id ?? undefined },
-                })
-              }
-            }}
+            onPress={openAiCards}
             testID="deck-detail-ai-cards"
           >
             <Text style={[theme.typography.caption, { color: theme.colors.text }]}>{t('detail.aiCards')}</Text>
           </TouchableOpacity>
           )}
-          <TouchableOpacity
-            style={[styles.actionPill, { borderColor: theme.colors.border }]}
-            onPress={() => navigation.navigate('ImportExport', { deckId })}
-            testID="deck-detail-import"
-          >
-            <Text style={[theme.typography.caption, { color: theme.colors.text }]}>{t('detail.import')}</Text>
-          </TouchableOpacity>
+          {/* 가져오기 알약은 뺐습니다. 카드를 채우는 주된 방법은 AI 생성이고,
+              가져오기는 아래 내보내기가 여는 같은 화면 안에 그대로 있습니다. */}
           <TouchableOpacity
             style={[styles.actionPill, { borderColor: theme.colors.border }]}
             onPress={() => navigation.navigate('ImportExport', { deckId })}
@@ -802,11 +797,11 @@ export function DeckDetailScreen() {
                 onAction={() => navigation.navigate('CardEdit', { deckId })}
                 testID="deck-detail-empty"
               />
+              {/* 빈 덱에서 권하는 두 번째 길도 AI 입니다. CSV 가져오기와 양식 다운로드는
+                  없앤 게 아니라 ImportExport 화면에 그대로 있습니다. */}
               <View style={styles.emptyButtons}>
-                <Button title={t('detail.importCards')} variant="outline" size="sm"
-                  onPress={() => navigation.navigate('ImportExport', { deckId })} testID="deck-empty-import" />
-                <Button title={t('detail.downloadTemplate')} variant="outline" size="sm"
-                  onPress={() => navigation.navigate('ImportExport', { deckId })} testID="deck-empty-template" />
+                <Button title={t('detail.aiCards')} variant="outline" size="sm"
+                  onPress={openAiCards} testID="deck-empty-ai" />
               </View>
             </View>
           )

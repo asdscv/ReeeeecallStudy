@@ -53,7 +53,8 @@
     "archived": {
       "badge": "Archived · study locked",
       "note": "{{count, number}} cards are archived for going over your limit — you can still view them. Subscribe to study them again."
-    }
+    },
+    "moreActions": "More actions"
   },
   "sync": {
     "button": "Sync",

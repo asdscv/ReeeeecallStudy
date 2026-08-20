@@ -162,9 +162,9 @@
     "sharing": "Chia sẻ bộ thẻ",
     "languages": "{{count, number}} Ngôn ngữ",
     "allDevices": "Mọi thiết bị",
-    "import": "Nhập CSV & JSON",
     "languages_one": "{{count, number}} Ngôn ngữ",
-    "languages_other": "{{count, number}} Ngôn ngữ"
+    "languages_other": "{{count, number}} Ngôn ngữ",
+    "aiGenerate": "Tạo thẻ bằng AI"
   },
   "footer": {
     "copyright": "© 2026 ReeeeecallStudy. Mọi quyền được bảo lưu.",
