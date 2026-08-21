@@ -110,7 +110,9 @@
       "subscribe": "Học bộ thẻ của người đăng qua đăng ký theo dõi (với tiến độ của riêng bạn)",
       "copy": "Tạo bản sao của riêng bạn có thể chỉnh sửa",
       "snapshot": "Lấy bản sao chụp nhanh chỉ đọc"
-    }
+    },
+    "viewDeck": "Xem bộ thẻ",
+    "studyNow": "Học ngay"
   },
   "publish": {
     "title": "Publish Deck",

@@ -110,7 +110,9 @@
       "subscribe": "订阅并学习发布者的卡组（使用你自己的进度）",
       "copy": "创建一份你可以编辑的副本",
       "snapshot": "获取一份只读的快照副本"
-    }
+    },
+    "viewDeck": "查看卡组",
+    "studyNow": "立即学习"
   },
   "publish": {
     "title": "Publish Deck",

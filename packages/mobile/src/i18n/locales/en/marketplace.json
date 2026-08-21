@@ -110,7 +110,9 @@
       "subscribe": "Study the publisher's deck via a subscription (your own progress)",
       "copy": "Creates your own editable copy",
       "snapshot": "Gets a read-only snapshot copy"
-    }
+    },
+    "viewDeck": "View deck",
+    "studyNow": "Study now"
   },
   "publish": {
     "title": "Publish Deck",

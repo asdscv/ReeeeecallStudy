@@ -110,7 +110,9 @@
       "subscribe": "Estudia el mazo del editor mediante una suscripción (con tu propio progreso)",
       "copy": "Crea tu propia copia editable",
       "snapshot": "Obtiene una copia instantánea de solo lectura"
-    }
+    },
+    "viewDeck": "Ver mazo",
+    "studyNow": "Estudiar ahora"
   },
   "publish": {
     "title": "Publish Deck",
