@@ -54,6 +54,14 @@ export type AiHubMobileStack = 'AITab' | 'QuizTab'
 export interface AiHubEntry extends Identified {
   readonly id: string
   /** Rendered as-is. Use `{'\uXXXX'}` at the call site, never a JSX string-literal attribute. */
+  /**
+   * 아이콘의 **의미 이름**이다. 이모지가 아니다.
+   *
+   * 예전에는 '🎯' 같은 이모지를 그대로 넣었는데, 이모지는 플랫폼·폰트마다 다르게
+   * 그려지고 색을 못 따라간다(활성 상태를 표현할 수 없다). 여기에는 이름만 두고
+   * 웹은 lucide, 모바일은 @expo/vector-icons 의 Feather 로 각자 그린다 —
+   * 두 세트가 공통으로 갖는 이름만 쓴다(target · help-circle · cpu).
+   */
   readonly icon: string
   /** Ascending. `Registry.ids()` sorts alphabetically, which is not a menu order. */
   readonly order: number
