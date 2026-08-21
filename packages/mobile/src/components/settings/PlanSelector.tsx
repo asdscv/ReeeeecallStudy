@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import { usePurchases } from '../../hooks/usePurchases'
 import { useTheme } from '../../theme'
 import {
   getBillingProducts,
@@ -8,7 +9,7 @@ import {
   type BillingProduct,
   type MySubscription,
 } from '../../services/billing'
-import { SUBSCRIPTION_UI_ENABLED } from '../../services/purchases'
+import { purchaseService, SUBSCRIPTION_UI_ENABLED } from '../../services/purchases'
 import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 import { formatCount } from '@reeeeecall/shared/lib/ai/server-client'
 
@@ -39,6 +40,7 @@ export function PlanSelector({
 }) {
   const theme = useTheme()
   const { t } = useTranslation('settings')
+  const { offering } = usePurchases()
   const [plans, setPlans] = useState<BillingProduct[] | null>(null)
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading')
 
@@ -69,10 +71,21 @@ export function PlanSelector({
   const fmtLimit = (limit: number | null): string =>
     limit != null && limit >= UNLIMITED_CARD_LIMIT
       ? t('plans.unlimited')
-      : t('plans.cardLimit', { limit: formatCount(limit ?? 0) })
+      : t('plans.cardLimit', { limit: formatCount(limit ?? 0) })  // "카드 100,000장 저장" 
 
-  // Price is always USD (the store charges USD everywhere; ₩/Toss dropped).
-  const fmtPrice = (p: BillingProduct): string => formatProductPrice(p)
+  /**
+   * 스토어가 실제로 청구할 금액을 보여준다.
+   *
+   * 여기는 카탈로그의 USD 를 그대로 찍고 있었다. 그래서 한국 사용자가 설정에서는
+   * "$3.99/월" 을 보고 결제 화면에서는 "₩5,900" 을 보는 상태였다 — 같은 상품인데
+   * 한 앱 안에서 값이 두 개다. 스토어 패키지가 잡혀 있으면 그쪽(현지 통화·현지 세금
+   * 반영)을 쓰고, 아직 못 읽었을 때만 카탈로그로 물러난다. 이게 애플·구글이 요구하는
+   * 표기이기도 하다.
+   */
+  const fmtPrice = (p: BillingProduct): string => {
+    const pkg = purchaseService.findPackageForProduct(offering, p.storeProductId ?? p.id)
+    return pkg?.product?.priceString ?? formatProductPrice(p)
+  }
 
   const isCurrent = (p: BillingProduct): boolean =>
     subscription?.status === 'active' &&
@@ -106,6 +119,13 @@ export function PlanSelector({
 
   return (
     <View style={styles.container}>
+      {/* 값과 숫자만 있고 그게 무슨 뜻인지가 없었다. "Standard / 100,000장 / $3.99" 를
+          처음 보는 사람은 무엇을 사는지 알 수 없다.
+          무료로 이미 되는 것까지 함께 적는 이유: 이 구독이 늘리는 것은 저장 한도뿐이고
+          AI 생성량은 그대로다. 그걸 감추면 결제 후에 알게 되고, 그때는 환불 문의가 된다. */}
+      <Text style={[theme.typography.caption, styles.blurb, { color: theme.colors.textSecondary }]}>
+        {t('plans.blurb')}
+      </Text>
       {plans.map((p) => {
         const current = isCurrent(p)
         const popular = !current && (p.cardLimit ?? 0) === topLimit && plans.length > 1
@@ -184,6 +204,7 @@ export function PlanSelector({
 }
 
 const styles = StyleSheet.create({
+  blurb: { marginBottom: 10, lineHeight: 18 },
   container: { gap: 10, marginTop: 2 },
   center: { paddingVertical: 16, alignItems: 'center' },
   planRow: {

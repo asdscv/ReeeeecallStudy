@@ -169,14 +169,15 @@
   "plans": {
     "title": "Paket langganan",
     "unlimited": "Tak terbatas",
-    "cardLimit": "{{limit}} kartu",
+    "cardLimit": "Simpan {{limit}} kartu",
     "perMonth": "/bln",
     "select": "Pilih",
     "current": "Paket saat ini",
     "comingSoon": "Segera hadir",
     "empty": "Belum ada paket.",
     "loadError": "Gagal memuat paket.",
-    "popular": "POPULER"
+    "popular": "POPULER",
+    "blurb": "Langganan menaikkan batas jumlah kartu yang bisa kamu simpan. Selebihnya — kartu AI, kuis, semua mode belajar — sudah gratis."
   },
   "paymentHistory": {
     "title": "Riwayat pembayaran",

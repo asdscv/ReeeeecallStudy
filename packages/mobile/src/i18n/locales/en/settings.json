@@ -169,14 +169,15 @@
   "plans": {
     "title": "Subscription plans",
     "unlimited": "Unlimited",
-    "cardLimit": "{{limit}} cards",
+    "cardLimit": "Store {{limit}} cards",
     "perMonth": "/mo",
     "select": "Select",
     "current": "Current plan",
     "comingSoon": "Coming soon",
     "empty": "No plans available.",
     "loadError": "Couldn’t load plans.",
-    "popular": "POPULAR"
+    "popular": "POPULAR",
+    "blurb": "A subscription raises how many cards you can store. Everything else — AI cards, quizzes, all study modes — is already free."
   },
   "paymentHistory": {
     "title": "Payment history",

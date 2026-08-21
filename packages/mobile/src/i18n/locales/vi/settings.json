@@ -169,14 +169,15 @@
   "plans": {
     "title": "Gói đăng ký",
     "unlimited": "Không giới hạn",
-    "cardLimit": "{{limit}} thẻ",
+    "cardLimit": "Lưu {{limit}} thẻ",
     "perMonth": "/tháng",
     "select": "Chọn",
     "current": "Gói hiện tại",
     "comingSoon": "Sắp ra mắt",
     "empty": "Chưa có gói nào.",
     "loadError": "Không tải được gói.",
-    "popular": "PHỔ BIẾN"
+    "popular": "PHỔ BIẾN",
+    "blurb": "Gói đăng ký nâng số thẻ bạn có thể lưu. Mọi thứ còn lại — thẻ AI, trắc nghiệm, tất cả chế độ học — vốn đã miễn phí."
   },
   "paymentHistory": {
     "title": "Lịch sử thanh toán",
