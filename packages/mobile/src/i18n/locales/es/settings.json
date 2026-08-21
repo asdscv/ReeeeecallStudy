@@ -169,14 +169,15 @@
   "plans": {
     "title": "Planes de suscripción",
     "unlimited": "Ilimitado",
-    "cardLimit": "{{limit}} tarjetas",
+    "cardLimit": "Guarda {{limit}} tarjetas",
     "perMonth": "/mes",
     "select": "Seleccionar",
     "current": "Plan actual",
     "comingSoon": "Próximamente",
     "empty": "No hay planes disponibles.",
     "loadError": "No se pudieron cargar los planes.",
-    "popular": "POPULAR"
+    "popular": "POPULAR",
+    "blurb": "La suscripción amplía cuántas tarjetas puedes guardar. Todo lo demás —tarjetas con IA, cuestionarios y todos los modos de estudio— ya es gratis."
   },
   "paymentHistory": {
     "title": "Historial de pagos",
