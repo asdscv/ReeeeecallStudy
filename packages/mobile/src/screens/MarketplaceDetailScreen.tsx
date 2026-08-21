@@ -11,8 +11,13 @@ import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
 import { getMobileSupabase } from '../adapters'
 import { toast } from '../stores/toast-store'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import type { MarketplaceStackParamList } from '../navigation/types'
 import type { MarketplaceReview, ReviewSortBy } from '@reeeeecall/shared/types/database'
+
+// DeckDetailScreen 과 같은 방식으로 타입을 준다 — getParent() 로 스택을 건너뛰려면
+// 네비게이터 타입이 있어야 navigate 시그니처가 살아난다.
+type Nav = NativeStackNavigationProp<MarketplaceStackParamList, 'MarketplaceDetail'>
 
 type ReportCategory = 'inappropriate' | 'copyright' | 'spam' | 'misleading' | 'other'
 
@@ -149,7 +154,20 @@ function ReviewItem({
 export function MarketplaceDetailScreen() {
   const theme = useTheme()
   const { t } = useTranslation('marketplace')
-  const navigation = useNavigation()
+  const navigation = useNavigation<Nav>()
+
+  /**
+   * 받은 덱으로 이동. DeckDetail 은 DecksStack 소속이고 이 화면은 MarketplaceStack 이라
+   * 같은 스택 안에서는 갈 수 없다 — 드로어를 한 단계 올라가서 건너간다.
+   */
+  const goToDeck = (deckId: string) => {
+    const tabNav = navigation.getParent()
+    if (tabNav) {
+      tabNav.navigate('DecksTab', { screen: 'DeckDetail', params: { deckId } })
+    } else {
+      navigation.goBack()
+    }
+  }
   const route = useRoute<Route>()
   const { listingId } = route.params
 
@@ -304,10 +322,41 @@ export function MarketplaceDetailScreen() {
       if (result.wasNew) {
         await useDeckStore.getState().fetchDecks({ force: true })
       }
+      // 받은 덱으로 데려간다. 예전에는 goBack() 이라 마켓 목록으로 되돌아갔는데,
+      // 그러면 카드 1,500장을 받고도 학습으로 가는 길이 화면에 없다.
+      //
+      // 실제로 그렇게 됐다: 외부 사용자 5명이 공식 덱 7,500장을 설치했고 복습된 카드는
+      // 0장이었다. 설치와 학습 사이가 끊겨 있던 것이지 사람들이 안 쓴 게 아니다.
+      //
+      // 그래서 기본 행동을 '바로 학습'으로 두고, 덱만 보고 싶은 사람에게는 두 번째
+      // 버튼을 준다. 이미 갖고 있던 덱이면 학습을 권할 이유가 없으니 그대로 돌아간다.
+      const deckId = result.deckId
+      if (!result.wasNew) {
+        Alert.alert(t('detail.successTitle'), t('detail.alreadyHaveDeck'),
+          [{ text: t('detail.ok'), onPress: () => navigation.goBack() }])
+        return
+      }
       Alert.alert(
         t('detail.successTitle'),
-        result.wasNew ? t('detail.deckAdded') : t('detail.alreadyHaveDeck'),
-        [{ text: t('detail.ok'), onPress: () => navigation.goBack() }],
+        t('detail.deckAdded'),
+        [
+          {
+            text: t('detail.viewDeck'),
+            style: 'cancel',
+            onPress: () => goToDeck(deckId),
+          },
+          {
+            text: t('detail.studyNow'),
+            onPress: () => {
+              const tabNav = navigation.getParent()
+              if (tabNav) {
+                tabNav.navigate('StudyTab', { screen: 'StudySetup', params: { deckId } })
+              } else {
+                goToDeck(deckId)
+              }
+            },
+          },
+        ],
       )
     } finally {
       setAcquiring(false)
