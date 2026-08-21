@@ -22,8 +22,9 @@ BEGIN;
 
 -- 퇴역 상품을 하나 만들어 둔다. 실제 Pro 에 의존하면, 나중에 Pro 행을 정리하는 순간
 -- 이 테스트가 조용히 무의미해진다.
-INSERT INTO billing_products (id, kind, title, price_krw, price_usd_cents, card_limit, period, is_active)
-VALUES ('retired_probe_monthly', 'subscription', 'Retired Probe', 9900, 990, 50000, 'monthly', false);
+-- billing_products_kind_shape: 구독은 tier 와 card_limit 이 둘 다 있어야 한다.
+INSERT INTO billing_products (id, kind, title, price_krw, price_usd_cents, tier, card_limit, period, is_active)
+VALUES ('retired_probe_monthly', 'subscription', 'Retired Probe', 9900, 990, 'plan_5k', 50000, 'monthly', false);
 
 INSERT INTO billing_product_skus (platform, store_product_id, product_id, is_active)
 VALUES ('ios', 'retired_probe_ios', 'retired_probe_monthly', true);
