@@ -54,5 +54,6 @@
     "submitted": "Your refund request was sent to Apple. Apple decides the outcome and will email you; if it is approved your access is removed automatically."
   },
   "everythingElseFree": "All study modes, TTS, statistics and marketplace publishing are free on every plan.",
-  "paidPlan": "Paid plan"
+  "paidPlan": "Paid plan",
+  "freePlan": "Free"
 }

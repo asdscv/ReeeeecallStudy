@@ -303,22 +303,41 @@ export function PaywallScreen() {
 
         {/* Feature Comparison. "Free" / "Pro" column labels stay literal (plan names are
             proper nouns, not translated); the feature copy is i18n. */}
-        <View style={styles.features}>
-          {FEATURE_KEYS.map((key) => (
-            <View key={key} style={[styles.featureRow, { borderColor: theme.colors.border }]}>
+        <View style={[styles.features, { borderColor: theme.colors.border }]}>
+          {FEATURE_KEYS.map((key, i) => (
+            <View
+              key={key}
+              style={[
+                styles.featureRow,
+                // 마지막 행의 밑줄은 카드 테두리와 겹쳐 두 겹으로 보인다.
+                i === FEATURE_KEYS.length - 1
+                  ? { borderBottomWidth: 0 }
+                  : { borderColor: theme.colors.border },
+              ]}
+            >
               <Text style={styles.featureIcon}>{FEATURE_ICONS[key]}</Text>
               <View style={styles.featureInfo}>
                 <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t(`features.${key}.title`)}</Text>
-                <View style={styles.comparisonRow}>
+                {/* 두 플랜을 한 줄에 나란히 놓았더니 한국어에서 오른쪽이 잘렸다 —
+                    "Free: 하루 10장 · 크레딧 구매 가능" 과 "Standard: 무료와 동일 ·
+                    크레딧 구매 가능" 이 폰 너비를 넘는다. flexShrink 도 flexWrap 도
+                    없어서 두 번째 텍스트가 화면 밖으로 밀렸다.
+
+                    그래서 병렬을 버리고 두 행으로 쌓는다. 플랜 이름을 값과 같은 Text
+                    안에 중첩하면 줄바꿈이 자연스럽게 일어나서, 어느 언어로 번역하든
+                    잘리지 않는다(라벨 열 너비를 고정하는 방식은 언어마다 다시 깨진다). */}
+                <View style={styles.planLines}>
                   <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-                    Free: {featureValue(key, 'free')}
+                    <Text style={{ fontWeight: '600' }}>{t('freePlan')}</Text>
+                    {'  '}{featureValue(key, 'free')}
                   </Text>
                   {/* 유료 열의 이름은 **카탈로그가 정합니다.**
                       "Pro:" 가 코드에 박혀 있었는데, 267 이 Pro 를 내리고 남은 플랜은
                       "Standard" 입니다 — 팔지 않는 이름을 비교표에 계속 띄우고 있었습니다.
                       상품을 아직 못 읽었으면 이름 대신 중립적인 라벨을 씁니다. */}
-                  <Text style={[theme.typography.caption, { color: theme.colors.primary, fontWeight: '600' }]}>
-                    {(subscriptionProducts[0]?.title ?? t('paidPlan'))}: {featureValue(key, 'pro')}
+                  <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
+                    <Text style={{ fontWeight: '700' }}>{subscriptionProducts[0]?.title ?? t('paidPlan')}</Text>
+                    {'  '}{featureValue(key, 'pro')}
                   </Text>
                 </View>
               </View>
@@ -450,12 +469,12 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16, padding: 32 },
   emoji: { fontSize: 56 },
   header: { alignItems: 'center', gap: 8, paddingTop: 8, paddingBottom: 16 },
-  crown: { fontSize: 56, marginBottom: 8 },
-  features: { gap: 1 },
-  featureRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, borderBottomWidth: 1 },
+  crown: { fontSize: 44, marginBottom: 4 },
+  features: { gap: 1, borderWidth: 1, borderRadius: 14, paddingHorizontal: 14, marginTop: 4 },
+  featureRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, paddingVertical: 14, borderBottomWidth: 1 },
   featureIcon: { fontSize: 24, width: 36, textAlign: 'center' },
   featureInfo: { flex: 1, gap: 4 },
-  comparisonRow: { flexDirection: 'row', gap: 12 },
+  planLines: { gap: 3 },
   consent: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginTop: 24, padding: 12, borderWidth: 1, borderRadius: 12 },
   consentBox: { fontSize: 18, lineHeight: 20 },
   pricing: { gap: 10, marginTop: 12 },
