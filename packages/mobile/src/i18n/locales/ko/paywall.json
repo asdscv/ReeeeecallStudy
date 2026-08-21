@@ -55,5 +55,8 @@
   },
   "everythingElseFree": "모든 학습 모드·TTS·통계·마켓플레이스 게시는 어느 플랜에서나 무료입니다.",
   "paidPlan": "유료 플랜",
-  "freePlan": "무료"
+  "freePlan": "무료",
+  "perMonth": "/월",
+  "startPlan": "{{plan}} 시작하기",
+  "navTitle": "구독"
 }

@@ -55,5 +55,8 @@
   },
   "everythingElseFree": "Tất cả chế độ học, TTS, thống kê và đăng lên marketplace đều miễn phí ở mọi gói.",
   "paidPlan": "Gói trả phí",
-  "freePlan": "Miễn phí"
+  "freePlan": "Miễn phí",
+  "perMonth": "/tháng",
+  "startPlan": "Bắt đầu {{plan}}",
+  "navTitle": "Gói đăng ký"
 }

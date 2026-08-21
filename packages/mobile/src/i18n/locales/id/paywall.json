@@ -55,5 +55,8 @@
   },
   "everythingElseFree": "Semua mode belajar, TTS, statistik, dan publikasi marketplace gratis di paket mana pun.",
   "paidPlan": "Paket berbayar",
-  "freePlan": "Gratis"
+  "freePlan": "Gratis",
+  "perMonth": "/bulan",
+  "startPlan": "Mulai {{plan}}",
+  "navTitle": "Langganan"
 }

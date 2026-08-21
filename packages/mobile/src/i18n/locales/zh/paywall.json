@@ -55,5 +55,8 @@
   },
   "everythingElseFree": "所有学习模式、TTS、统计和市场发布，在任何方案中都免费。",
   "paidPlan": "付费方案",
-  "freePlan": "免费"
+  "freePlan": "免费",
+  "perMonth": "/月",
+  "startPlan": "开始 {{plan}}",
+  "navTitle": "订阅"
 }

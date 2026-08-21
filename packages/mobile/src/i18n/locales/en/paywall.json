@@ -55,5 +55,8 @@
   },
   "everythingElseFree": "All study modes, TTS, statistics and marketplace publishing are free on every plan.",
   "paidPlan": "Paid plan",
-  "freePlan": "Free"
+  "freePlan": "Free",
+  "perMonth": "/month",
+  "startPlan": "Start {{plan}}",
+  "navTitle": "Subscription"
 }

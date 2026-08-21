@@ -55,5 +55,8 @@
   },
   "everythingElseFree": "すべての学習モード・TTS・統計・マーケットプレイス公開は、どのプランでも無料です。",
   "paidPlan": "有料プラン",
-  "freePlan": "無料"
+  "freePlan": "無料",
+  "perMonth": "/月",
+  "startPlan": "{{plan}} を始める",
+  "navTitle": "サブスクリプション"
 }

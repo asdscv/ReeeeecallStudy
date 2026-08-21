@@ -55,5 +55,8 @@
   },
   "everythingElseFree": "Todos los modos de estudio, TTS, estadísticas y publicación en el mercado son gratis en cualquier plan.",
   "paidPlan": "Plan de pago",
-  "freePlan": "Gratis"
+  "freePlan": "Gratis",
+  "perMonth": "/mes",
+  "startPlan": "Empezar {{plan}}",
+  "navTitle": "Suscripción"
 }
