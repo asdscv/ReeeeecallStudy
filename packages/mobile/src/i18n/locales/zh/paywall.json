@@ -54,5 +54,9 @@
     "submitted": "已向 Apple 提交退款申请。是否通过由 Apple 决定，并会通过邮件通知你。若获批准，访问权限将自动收回。"
   },
   "everythingElseFree": "所有学习模式、TTS、统计和市场发布，在任何方案中都免费。",
-  "paidPlan": "付费方案"
+  "paidPlan": "付费方案",
+  "freePlan": "免费",
+  "perMonth": "/月",
+  "startPlan": "开始 {{plan}}",
+  "navTitle": "订阅"
 }

@@ -54,5 +54,9 @@
     "submitted": "Tu solicitud de reembolso se envió a Apple. Apple decide el resultado y te escribirá por correo; si se aprueba, tu acceso se retira automáticamente."
   },
   "everythingElseFree": "Todos los modos de estudio, TTS, estadísticas y publicación en el mercado son gratis en cualquier plan.",
-  "paidPlan": "Plan de pago"
+  "paidPlan": "Plan de pago",
+  "freePlan": "Gratis",
+  "perMonth": "/mes",
+  "startPlan": "Empezar {{plan}}",
+  "navTitle": "Suscripción"
 }
