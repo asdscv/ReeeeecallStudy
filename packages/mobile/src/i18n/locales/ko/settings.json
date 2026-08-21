@@ -169,14 +169,15 @@
   "plans": {
     "title": "구독 플랜",
     "unlimited": "무제한",
-    "cardLimit": "{{limit}}장",
+    "cardLimit": "카드 {{limit}}장 저장",
     "perMonth": "/월",
     "select": "선택",
     "current": "현재 플랜",
     "comingSoon": "준비 중",
     "empty": "이용 가능한 플랜이 없어요.",
     "loadError": "플랜을 불러오지 못했어요.",
-    "popular": "인기"
+    "popular": "인기",
+    "blurb": "구독하면 카드 저장 한도가 늘어납니다. AI 카드 생성·퀴즈·학습 모드 등 나머지 기능은 무료 플랜에서도 모두 쓸 수 있어요."
   },
   "paymentHistory": {
     "title": "결제 내역",

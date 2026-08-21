@@ -169,14 +169,15 @@
   "plans": {
     "title": "订阅方案",
     "unlimited": "无限制",
-    "cardLimit": "{{limit}} 张",
+    "cardLimit": "可保存 {{limit}} 张卡片",
     "perMonth": "/月",
     "select": "选择",
     "current": "当前方案",
     "comingSoon": "即将推出",
     "empty": "暂无可用方案。",
     "loadError": "无法加载方案。",
-    "popular": "热门"
+    "popular": "热门",
+    "blurb": "订阅可提高卡片保存上限。AI 生成卡片、测验、各种学习模式等其他功能，免费方案同样可用。"
   },
   "paymentHistory": {
     "title": "付款记录",
