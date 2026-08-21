@@ -402,6 +402,13 @@ Deno.serve(async (req) => {
       return json({ error: 'Unmapped product', code: 'BAD_REQUEST' }, 400)
     }
     // Server catalog decides kind + credit amount — never the webhook body.
+    //
+    // 여기에 `.eq('is_active', true)` 를 붙이고 싶어질 텐데, 붙이면 안 된다.
+    // is_active=false 는 "새로 팔지 않는다" 이지 "쓰던 사람 끊는다" 가 아니다. 필터를
+    // 걸면 판매 중지한 플랜의 기존 구독자가 갱신될 때 400 이 나가고, 스토어는 갱신 대금을
+    // 받아 간 채로 우리는 지급을 끊는다. 새 판매를 막는 일은 스토어(상품 비활성)와
+    // get_billing_products(카탈로그에서 제외)가 이미 하고 있다.
+    // 이 경계는 retired_plan_still_renews_test.sql 이 지킨다.
     const { data: prod, error: prodErr } = await sb
       .from('billing_products')
       // `select('*')`, not the column by name, so this survives mig 217's rename in BOTH
