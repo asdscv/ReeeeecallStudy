@@ -54,5 +54,9 @@
     "submitted": "Apple에 환불 요청을 보냈어요. 승인 여부는 Apple이 결정하며 이메일로 알려줍니다. 승인되면 이용 권한은 자동으로 회수돼요."
   },
   "everythingElseFree": "모든 학습 모드·TTS·통계·마켓플레이스 게시는 어느 플랜에서나 무료입니다.",
-  "paidPlan": "유료 플랜"
+  "paidPlan": "유료 플랜",
+  "freePlan": "무료",
+  "perMonth": "/월",
+  "startPlan": "{{plan}} 시작하기",
+  "navTitle": "구독"
 }

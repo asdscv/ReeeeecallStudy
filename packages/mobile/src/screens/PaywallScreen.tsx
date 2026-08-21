@@ -68,11 +68,6 @@ const FEATURE_KEYS = ['cardStorage', 'aiGeneration'] as const
  * and stays true under any quota — so it has nothing to fall back FROM.
  */
 const NUMERIC_CELLS = new Set(['cardStorage.free', 'cardStorage.pro', 'aiGeneration.free'])
-const FEATURE_ICONS: Record<(typeof FEATURE_KEYS)[number], string> = {
-  cardStorage: '🗂️',
-  aiGeneration: '🤖',
-}
-
 export function PaywallScreen() {
   const theme = useTheme()
   const { t } = useTranslation('paywall')
@@ -137,7 +132,10 @@ export function PaywallScreen() {
       <Screen testID="paywall-screen">
         <ScreenHeader title={t('youArePro')} mode="back" />
         <View style={styles.center}>
-          <Text style={styles.emoji}>✅</Text>
+          {/* ✅ 이모지였다. 결제 화면 본문과 같은 체크 뱃지로 맞춘다. */}
+          <View style={[styles.checkHero, { backgroundColor: theme.colors.primary }]}>
+            <Text style={[styles.checkHeroMark, { color: theme.colors.primaryText }]}>✓</Text>
+          </View>
           <Text style={[theme.typography.h2, { color: theme.colors.text }]}>{t('youArePro')}</Text>
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
             {t('proDesc')}
@@ -288,37 +286,86 @@ export function PaywallScreen() {
 
   return (
     <Screen safeArea padding={false} testID="paywall-screen">
-      <ScreenHeader title={t('title')} mode="back" />
+      {/* 상단 바와 h1 이 같은 문구면 같은 말을 두 번 읽게 된다. 바는 '여기가 어디'만
+          알려주고, 화면의 제목은 아래 h1 이 맡는다. */}
+      <ScreenHeader title={t('navTitle')} mode="back" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* Header */}
+        {/* 왕관 이모지(56px)가 화면의 첫인상이었다. 이모지 하나로 시작하는 결제 화면은
+            10년 전 앱처럼 보이고, 아이콘 라이브러리가 없다는 사정을 사용자에게 떠넘기는
+            것이기도 하다. 타이포로 세운다. */}
         <View style={styles.header}>
-          <Text style={styles.crown}>👑</Text>
-          <Text style={[theme.typography.h1, { color: theme.colors.text, textAlign: 'center' }]}>
-            {t('title')}
-          </Text>
-          <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
+          <Text style={[theme.typography.h1, { color: theme.colors.text }]}>{t('title')}</Text>
+          <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
             {t('subtitle')}
           </Text>
         </View>
 
+        {/* 가격 카드 — 파는 것을 화면의 주인공으로 올린다. 예전에는 가격이 버튼 라벨
+            안에("Standard — ₩5,900") 숨어 있었다. */}
+        {purchasableProducts.length > 0 && (
+          <View
+            style={[
+              styles.priceCard,
+              { borderColor: theme.colors.primary, backgroundColor: theme.colors.primaryLight },
+            ]}
+          >
+            <Text style={[styles.planEyebrow, { color: theme.colors.primary }]}>
+              {purchasableProducts[0].product.title.toUpperCase()}
+            </Text>
+            <View style={styles.priceLine}>
+              <Text style={[styles.priceValue, { color: theme.colors.text }]}>
+                {formatPrice(purchasableProducts[0].product, purchasableProducts[0].pkg)}
+              </Text>
+              {purchasableProducts[0].product.period === 'monthly' && (
+                <Text style={[theme.typography.body, { color: theme.colors.textSecondary }]}>
+                  {t('perMonth')}
+                </Text>
+              )}
+            </View>
+          </View>
+        )}
+
         {/* Feature Comparison. "Free" / "Pro" column labels stay literal (plan names are
             proper nouns, not translated); the feature copy is i18n. */}
-        <View style={styles.features}>
-          {FEATURE_KEYS.map((key) => (
-            <View key={key} style={[styles.featureRow, { borderColor: theme.colors.border }]}>
-              <Text style={styles.featureIcon}>{FEATURE_ICONS[key]}</Text>
+        <View style={[styles.features, { borderColor: theme.colors.border }]}>
+          {FEATURE_KEYS.map((key, i) => (
+            <View
+              key={key}
+              style={[
+                styles.featureRow,
+                // 마지막 행의 밑줄은 카드 테두리와 겹쳐 두 겹으로 보인다.
+                i === FEATURE_KEYS.length - 1
+                  ? { borderBottomWidth: 0 }
+                  : { borderColor: theme.colors.border },
+              ]}
+            >
+              {/* 폴더·로봇 이모지를 쓰던 자리. 체크 글리프(U+2713)는 이모지가 아니라
+                  글자라, 플랫폼마다 제멋대로 그려지지 않고 색도 테마를 따른다. */}
+              <View style={[styles.check, { backgroundColor: theme.colors.primary }]}>
+                <Text style={[styles.checkMark, { color: theme.colors.primaryText }]}>✓</Text>
+              </View>
               <View style={styles.featureInfo}>
                 <Text style={[theme.typography.label, { color: theme.colors.text }]}>{t(`features.${key}.title`)}</Text>
-                <View style={styles.comparisonRow}>
-                  <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-                    Free: {featureValue(key, 'free')}
-                  </Text>
+                {/* 두 플랜을 한 줄에 나란히 놓았더니 한국어에서 오른쪽이 잘렸다 —
+                    "Free: 하루 10장 · 크레딧 구매 가능" 과 "Standard: 무료와 동일 ·
+                    크레딧 구매 가능" 이 폰 너비를 넘는다. flexShrink 도 flexWrap 도
+                    없어서 두 번째 텍스트가 화면 밖으로 밀렸다.
+
+                    그래서 병렬을 버리고 두 행으로 쌓는다. 플랜 이름을 값과 같은 Text
+                    안에 중첩하면 줄바꿈이 자연스럽게 일어나서, 어느 언어로 번역하든
+                    잘리지 않는다(라벨 열 너비를 고정하는 방식은 언어마다 다시 깨진다). */}
+                <View style={styles.planLines}>
                   {/* 유료 열의 이름은 **카탈로그가 정합니다.**
                       "Pro:" 가 코드에 박혀 있었는데, 267 이 Pro 를 내리고 남은 플랜은
                       "Standard" 입니다 — 팔지 않는 이름을 비교표에 계속 띄우고 있었습니다.
                       상품을 아직 못 읽었으면 이름 대신 중립적인 라벨을 씁니다. */}
-                  <Text style={[theme.typography.caption, { color: theme.colors.primary, fontWeight: '600' }]}>
-                    {(subscriptionProducts[0]?.title ?? t('paidPlan'))}: {featureValue(key, 'pro')}
+                  <Text style={[theme.typography.caption, { color: theme.colors.primary }]}>
+                    <Text style={{ fontWeight: '700' }}>{subscriptionProducts[0]?.title ?? t('paidPlan')}</Text>
+                    {'  '}{featureValue(key, 'pro')}
+                  </Text>
+                  <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
+                    <Text style={{ fontWeight: '600' }}>{t('freePlan')}</Text>
+                    {'  '}{featureValue(key, 'free')}
                   </Text>
                 </View>
               </View>
@@ -371,7 +418,7 @@ export function PaywallScreen() {
             <Button
               key={product.id}
               testID={`paywall-product-${product.id}`}
-              title={`${product.title} — ${formatPrice(product, pkg)}`}
+              title={t('startPlan', { plan: product.title })}
               variant={i === 0 ? 'primary' : 'outline'}
               onPress={() => handlePurchaseProduct(product)}
               loading={purchasing}
@@ -448,14 +495,20 @@ export function PaywallScreen() {
 const styles = StyleSheet.create({
   scroll: { paddingHorizontal: 20, paddingBottom: 40 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16, padding: 32 },
-  emoji: { fontSize: 56 },
-  header: { alignItems: 'center', gap: 8, paddingTop: 8, paddingBottom: 16 },
-  crown: { fontSize: 56, marginBottom: 8 },
-  features: { gap: 1 },
-  featureRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, borderBottomWidth: 1 },
-  featureIcon: { fontSize: 24, width: 36, textAlign: 'center' },
+  checkHero: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center' },
+  checkHeroMark: { fontSize: 32, fontWeight: '700', lineHeight: 38 },
+  header: { gap: 6, paddingTop: 12, paddingBottom: 18 },
+
+  features: { gap: 1, borderWidth: 1, borderRadius: 16, paddingHorizontal: 16, marginTop: 14 },
+  featureRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, paddingVertical: 16, borderBottomWidth: 1 },
+  check: { width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center', marginTop: 2 },
+  checkMark: { fontSize: 13, fontWeight: '700', lineHeight: 16 },
+  priceCard: { borderWidth: 1, borderRadius: 16, paddingVertical: 18, paddingHorizontal: 18, gap: 4 },
+  planEyebrow: { fontSize: 11, fontWeight: '700', letterSpacing: 1.2 },
+  priceLine: { flexDirection: 'row', alignItems: 'baseline', gap: 6 },
+  priceValue: { fontSize: 34, fontWeight: '800', letterSpacing: -0.5 },
   featureInfo: { flex: 1, gap: 4 },
-  comparisonRow: { flexDirection: 'row', gap: 12 },
+  planLines: { gap: 4, marginTop: 4 },
   consent: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginTop: 24, padding: 12, borderWidth: 1, borderRadius: 12 },
   consentBox: { fontSize: 18, lineHeight: 20 },
   pricing: { gap: 10, marginTop: 12 },

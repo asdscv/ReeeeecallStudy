@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { Target, HelpCircle, Cpu } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { aiHubEntries } from '@reeeeecall/shared/lib/ai/hub/catalog'
@@ -15,6 +16,20 @@ import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
  * for per entry rather than stored: the learning plan lives in this menu but runs on the
  * device, and badging it would be a claim we do not make.
  */
+// 허브 항목의 아이콘 이름(shared 카탈로그)을 lucide 로 그린다. 모바일은 같은 이름을
+// Feather 로 그린다 — 이모지였을 때는 두 플랫폼이 같은 그림을 보장할 수 없었다.
+const HUB_ICONS: Record<string, typeof Target> = {
+  target: Target,
+  'help-circle': HelpCircle,
+  cpu: Cpu,
+}
+
+function HubIcon({ name }: { name: string }) {
+  const Icon = HUB_ICONS[name]
+  if (!Icon) return null
+  return <Icon className="w-6 h-6 text-brand shrink-0" aria-hidden="true" />
+}
+
 export function AIHubPage() {
   const { t } = useTranslation('ai-generate')
   const entries = aiHubEntries()
@@ -51,7 +66,7 @@ export function AIHubPage() {
             className="block p-4 bg-card rounded-xl border border-border no-underline transition hover:border-brand/40 hover:bg-accent/40"
           >
             <div className="flex items-start gap-3">
-              <span className="text-2xl leading-none" aria-hidden="true">{entry.icon}</span>
+              <HubIcon name={entry.icon} />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <h2 className="text-sm font-medium text-foreground">{t(entry.titleKey)}</h2>

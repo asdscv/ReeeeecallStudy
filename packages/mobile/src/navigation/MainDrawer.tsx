@@ -1,4 +1,13 @@
 import { useState, useEffect } from 'react'
+import { Feather } from '@expo/vector-icons'
+
+/**
+ * 드로어 아이콘은 이모지였다(⚡📊📚🤖…). 이모지는 플랫폼·폰트마다 다르게 그려지고
+ * 색을 못 따라가서 활성/비활성 상태를 표현하지 못한다 — 메뉴가 열려 있는데 아이콘만
+ * 회색이 아닌 원색으로 남는 식이다. Feather 는 이미 StudySessionScreen 이 쓰고 있어
+ * 새 의존성이 아니고, size/color 를 테마에서 받는다.
+ */
+type FeatherName = React.ComponentProps<typeof Feather>['name']
 import { View, Text, Image, TouchableOpacity, ScrollView, StyleSheet } from 'react-native'
 import { createDrawerNavigator, type DrawerContentComponentProps } from '@react-navigation/drawer'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -106,7 +115,7 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
       <ScrollView style={styles.drawerScroll} showsVerticalScrollIndicator={false}>
         {/* Quick Study */}
         <MenuItem
-          icon="⚡" label={t('nav.quickStudy')}
+          icon="zap" label={t('nav.quickStudy')}
           active={isActive('QuickStudy')}
           theme={theme}
           onPress={() => go('StudyTab', undefined, 'QuickStudy')}
@@ -115,7 +124,7 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
 
         {/* Dashboard */}
         <MenuItem
-          icon="📊" label={t('nav.dashboard')}
+          icon="bar-chart-2" label={t('nav.dashboard')}
           active={isActive('Dashboard')}
           theme={theme}
           onPress={() => go('HomeTab', 'Dashboard')}
@@ -130,7 +139,12 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
           testID="drawer-study-group"
           accessibilityLabel="drawer-study-group"
         >
-          <Text style={styles.menuIcon}>📚</Text>
+          <Feather
+            name="book-open"
+            size={18}
+            color={studyGroupOpen ? (theme.isDark ? palette.blue[300] : palette.blue[700]) : theme.colors.textSecondary}
+            style={styles.menuIcon}
+          />
           <Text style={[styles.menuLabel, { color: studyGroupOpen ? (theme.isDark ? palette.blue[400] : palette.blue[700]) : theme.colors.text, flex: 1 }]}>{t('nav.study')}</Text>
           <Text style={[styles.chevron, { color: theme.colors.textSecondary }]}>
             {studyGroupOpen ? '∧' : '∨'}
@@ -143,47 +157,47 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
                 Always expanded rather than a second collapse: the parent 학습 group already
                 starts closed on every mount, and nesting another toggle would put the newest
                 menu three taps from the drawer opening. */}
-            <SectionLabel label={t('nav.aiHub')} icon="🤖" theme={theme} active={isActive('AIHub')}
+            <SectionLabel label={t('nav.aiHub')} icon="cpu" theme={theme} active={isActive('AIHub')}
               onPress={() => go('AITab', 'AIHub')} testID="drawer-ai-hub"
               open={sectionOpen('ai')} onToggle={() => toggleSection('ai')} />
             {sectionOpen('ai') && aiHubEntries().map((entry) => (
-              <MenuItem key={entry.id} icon={entry.icon} label={t(entry.titleKey, { ns: 'ai-generate' })}
+              <MenuItem key={entry.id} icon={entry.icon as FeatherName} label={t(entry.titleKey, { ns: 'ai-generate' })}
                 indent indentLevel={2} active={isActive(entry.mobileScreen)} theme={theme}
                 onPress={() => go(entry.mobileStack, entry.mobileScreen)} testID={`drawer-ai-${entry.id}`} />
             ))}
             {/* `nav.cards` pointed at TemplatesList, whose own screen is titled 카드 템플릿, and
                 there is no card list on mobile either — cards live inside a deck. Renamed, and
                 paired with 덱 rather than standing beside it as if it were the other half. */}
-            <SectionLabel label={t('nav.deckAndCards')} icon="🗃️" theme={theme} testID="drawer-decks-section"
+            <SectionLabel label={t('nav.deckAndCards')} icon="layers" theme={theme} testID="drawer-decks-section"
               open={sectionOpen('decks')} onToggle={() => toggleSection('decks')} />
             {sectionOpen('decks') && (<>
-              <MenuItem icon="📚" label={t('nav.decks')} indent indentLevel={2} active={isActive('DecksTab')} theme={theme}
+              <MenuItem icon="book-open" label={t('nav.decks')} indent indentLevel={2} active={isActive('DecksTab')} theme={theme}
                 onPress={() => go('DecksTab', undefined, 'DecksTab')} testID="drawer-decks" />
-              <MenuItem icon="📋" label={t('nav.cardTemplates')} indent indentLevel={2} active={isActive('TemplatesList')} theme={theme}
+              <MenuItem icon="file-text" label={t('nav.cardTemplates')} indent indentLevel={2} active={isActive('TemplatesList')} theme={theme}
                 onPress={() => go('SettingsTab', 'TemplatesList')} testID="drawer-cards" />
             </>)}
 
-            <SectionLabel label={t('nav.explore')} icon="🧭" theme={theme} testID="drawer-explore-section"
+            <SectionLabel label={t('nav.explore')} icon="compass" theme={theme} testID="drawer-explore-section"
               open={sectionOpen('explore')} onToggle={() => toggleSection('explore')} />
             {sectionOpen('explore') && (<>
-              <MenuItem icon="🏪" label={t('nav.marketplace')} indent indentLevel={2} active={isActive('MarketplaceTab')} theme={theme}
+              <MenuItem icon="shopping-bag" label={t('nav.marketplace')} indent indentLevel={2} active={isActive('MarketplaceTab')} theme={theme}
                 onPress={() => go('MarketplaceTab', undefined, 'MarketplaceTab')} testID="drawer-marketplace" />
-              <MenuItem icon="📊" label={t('nav.publisherStats', { defaultValue: 'Publisher Stats' })} indent indentLevel={2} active={isActive('PublisherStats')} theme={theme}
+              <MenuItem icon="bar-chart-2" label={t('nav.publisherStats', { defaultValue: 'Publisher Stats' })} indent indentLevel={2} active={isActive('PublisherStats')} theme={theme}
                 onPress={() => go('SettingsTab', 'PublisherStats')} testID="drawer-publisher-stats" />
               {/* `nav.myShares`, not `settings:shares.title`: web needed the same row and had no
                   such key, and one menu label living in two namespaces drifts. */}
-              <MenuItem icon="🔗" label={t('nav.myShares')} indent indentLevel={2} active={isActive('MyShares')} theme={theme}
+              <MenuItem icon="link-2" label={t('nav.myShares')} indent indentLevel={2} active={isActive('MyShares')} theme={theme}
                 onPress={() => go('SettingsTab', 'MyShares')} testID="drawer-my-shares" />
             </>)}
 
             {/* 업적 was a top-level row while 기록 sat in here, splitting one question across two
                 menus. Same move as web. */}
-            <SectionLabel label={t('nav.myRecords')} icon="📜" theme={theme} testID="drawer-records-section"
+            <SectionLabel label={t('nav.myRecords')} icon="archive" theme={theme} testID="drawer-records-section"
               open={sectionOpen('records')} onToggle={() => toggleSection('records')} />
             {sectionOpen('records') && (<>
-              <MenuItem icon="📝" label={t('nav.studyHistory')} indent indentLevel={2} active={isActive('StudyHistory')} theme={theme}
+              <MenuItem icon="clock" label={t('nav.studyHistory')} indent indentLevel={2} active={isActive('StudyHistory')} theme={theme}
                 onPress={() => go('HomeTab', 'StudyHistory')} testID="drawer-history" />
-              <MenuItem icon="🏆" label={t('nav.achievements', { defaultValue: 'Achievements' })} indent indentLevel={2} active={isActive('Achievements')} theme={theme}
+              <MenuItem icon="award" label={t('nav.achievements', { defaultValue: 'Achievements' })} indent indentLevel={2} active={isActive('Achievements')} theme={theme}
                 onPress={() => go('SettingsTab', 'Achievements')} testID="drawer-achievements" />
             </>)}
           </View>
@@ -191,7 +205,7 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
 
         {/* Settings */}
         <MenuItem
-          icon="⚙️" label={t('nav.settings')}
+          icon="settings" label={t('nav.settings')}
           active={isActive('SettingsHome')}
           theme={theme}
           onPress={() => go('SettingsTab', 'SettingsHome')}
@@ -201,7 +215,7 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
         {/* Admin (conditional) */}
         {role === 'admin' && (
           <MenuItem
-            icon="🛡️" label={t('nav.admin')}
+            icon="shield" label={t('nav.admin')}
             active={isActive('Admin')}
             theme={theme}
             onPress={() => { setActiveItem('Admin'); navigation.closeDrawer() }}
@@ -213,7 +227,7 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
 
         {/* Guide */}
         <MenuItem
-          icon="📖" label={t('nav.guide')}
+          icon="help-circle" label={t('nav.guide')}
           active={isActive('Guide')}
           theme={theme}
           onPress={() => go('SettingsTab', 'Guide')}
@@ -248,7 +262,7 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
  * predictably.
  */
 function SectionLabel({ label, icon, theme, onPress, active, testID, open, onToggle }: {
-  label: string; icon: string; theme: ReturnType<typeof useTheme>
+  label: string; icon: FeatherName; theme: ReturnType<typeof useTheme>
   onPress?: () => void; active?: boolean; testID?: string
   open?: boolean; onToggle?: () => void
 }) {
@@ -257,7 +271,7 @@ function SectionLabel({ label, icon, theme, onPress, active, testID, open, onTog
     : theme.colors.textTertiary
   const content = (
     <>
-      <Text style={styles.sectionIcon}>{icon}</Text>
+      <Feather name={icon} size={16} color={color} style={styles.sectionIcon} />
       <Text style={[styles.sectionText, { color, flex: 1 }]}>{label}</Text>
     </>
   )
@@ -304,7 +318,7 @@ function SectionLabel({ label, icon, theme, onPress, active, testID, open, onTog
 }
 
 function MenuItem({ icon, label, active, theme, onPress, indent, indentLevel = 1, testID }: {
-  icon: string; label: string; active: boolean
+  icon: FeatherName; label: string; active: boolean
   theme: ReturnType<typeof useTheme>; onPress: () => void
   indent?: boolean; indentLevel?: 1 | 2; testID?: string
 }) {
@@ -320,7 +334,12 @@ function MenuItem({ icon, label, active, theme, onPress, indent, indentLevel = 1
         active && { backgroundColor: theme.isDark ? 'rgba(59,130,246,0.15)' : palette.blue[50] },
       ]}
     >
-      <Text style={styles.menuIcon}>{icon}</Text>
+      <Feather
+        name={icon}
+        size={18}
+        color={active ? (theme.isDark ? palette.blue[300] : palette.blue[700]) : theme.colors.textSecondary}
+        style={styles.menuIcon}
+      />
       <Text style={[
         styles.menuLabel,
         { color: active ? (theme.isDark ? palette.blue[400] : palette.blue[700]) : theme.colors.text },
@@ -335,9 +354,9 @@ function MenuItem({ icon, label, active, theme, onPress, indent, indentLevel = 1
 // ── Quick Tips — extensible: just add items to TIPS array ──
 // Navigation-oriented tips only; study-gesture hints belong in the study screen.
 const TIPS = [
-  { icon: '☰', textKey: 'drawerTips.hamburger' },
-  { icon: '📊', textKey: 'drawerTips.dashboard' },
-  { icon: '⚡', textKey: 'drawerTips.quickStudy' },
+  { icon: 'menu', textKey: 'drawerTips.hamburger' },
+  { icon: 'bar-chart-2', textKey: 'drawerTips.dashboard' },
+  { icon: 'zap', textKey: 'drawerTips.quickStudy' },
 ]
 
 function QuickTips({ theme }: { theme: ReturnType<typeof useTheme> }) {
@@ -351,7 +370,12 @@ function QuickTips({ theme }: { theme: ReturnType<typeof useTheme> }) {
       activeOpacity={0.7}
       style={[styles.tipContainer, { borderTopColor: theme.colors.border }]}
     >
-      <Text style={styles.tipIcon}>{tip.icon}</Text>
+      <Feather
+        name={tip.icon as FeatherName}
+        size={15}
+        color={theme.colors.textTertiary}
+        style={styles.tipIcon}
+      />
       <Text style={[styles.tipText, { color: theme.colors.textSecondary }]} numberOfLines={2}>
         {t(tip.textKey)}
       </Text>
@@ -411,9 +435,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 8,
     paddingLeft: 48, paddingRight: 16, paddingTop: 14, paddingBottom: 4, marginHorizontal: 8,
   },
-  sectionIcon: { fontSize: 13 },
+  sectionIcon: { width: 18, textAlign: 'center' },
   sectionText: { fontSize: 12, fontWeight: '600', letterSpacing: 0.3 },
-  menuIcon: { fontSize: 18 },
+  menuIcon: { width: 22, textAlign: 'center' },
   menuLabel: { fontSize: 15 },
   chevron: { fontSize: 18, fontWeight: '300' },
   divider: { borderTopWidth: 1, marginVertical: 8, marginHorizontal: 16 },
