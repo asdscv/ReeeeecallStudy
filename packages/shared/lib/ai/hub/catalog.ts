@@ -22,7 +22,7 @@ export function createDefaultAiHubRegistry(): Registry<AiHubEntry> {
   return new Registry<AiHubEntry>('AiHubRegistry')
     .register({
       id: AI_HUB_LEARNING_PLAN,
-      icon: '\u{1F3AF}', // 🎯
+      icon: 'target',
       order: 10,
       titleKey: 'hub.entries.learningPlan.title',
       descKey: 'hub.entries.learningPlan.desc',
@@ -35,7 +35,7 @@ export function createDefaultAiHubRegistry(): Registry<AiHubEntry> {
     })
     .register({
       id: AI_HUB_QUIZ,
-      icon: '❓', // ❓
+      icon: 'help-circle',
       order: 20,
       titleKey: 'hub.entries.quiz.title',
       descKey: 'hub.entries.quiz.desc',
@@ -51,7 +51,7 @@ export function createDefaultAiHubRegistry(): Registry<AiHubEntry> {
     })
     .register({
       id: AI_HUB_GENERATE,
-      icon: '\u{1F916}', // 🤖
+      icon: 'cpu',
       order: 30,
       titleKey: 'hub.entries.generate.title',
       descKey: 'hub.entries.generate.desc',

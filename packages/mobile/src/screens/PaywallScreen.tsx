@@ -132,7 +132,10 @@ export function PaywallScreen() {
       <Screen testID="paywall-screen">
         <ScreenHeader title={t('youArePro')} mode="back" />
         <View style={styles.center}>
-          <Text style={styles.emoji}>✅</Text>
+          {/* ✅ 이모지였다. 결제 화면 본문과 같은 체크 뱃지로 맞춘다. */}
+          <View style={[styles.checkHero, { backgroundColor: theme.colors.primary }]}>
+            <Text style={[styles.checkHeroMark, { color: theme.colors.primaryText }]}>✓</Text>
+          </View>
           <Text style={[theme.typography.h2, { color: theme.colors.text }]}>{t('youArePro')}</Text>
           <Text style={[theme.typography.body, { color: theme.colors.textSecondary, textAlign: 'center' }]}>
             {t('proDesc')}
@@ -492,7 +495,8 @@ export function PaywallScreen() {
 const styles = StyleSheet.create({
   scroll: { paddingHorizontal: 20, paddingBottom: 40 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16, padding: 32 },
-  emoji: { fontSize: 56 },
+  checkHero: { width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center' },
+  checkHeroMark: { fontSize: 32, fontWeight: '700', lineHeight: 38 },
   header: { gap: 6, paddingTop: 12, paddingBottom: 18 },
 
   features: { gap: 1, borderWidth: 1, borderRadius: 16, paddingHorizontal: 16, marginTop: 14 },

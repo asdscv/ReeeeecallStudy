@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from 'react'
+import { Feather } from '@expo/vector-icons'
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
@@ -70,7 +71,12 @@ export function AIHubScreen() {
             accessibilityHint={t('hub.openAction')}
             {...testProps(`ai-hub-entry-${entry.id}`)}
           >
-            <Text style={styles.icon}>{entry.icon}</Text>
+            <Feather
+              name={entry.icon as React.ComponentProps<typeof Feather>['name']}
+              size={22}
+              color={theme.colors.primary}
+              style={styles.icon}
+            />
             <View style={styles.body}>
               <View style={styles.titleRow}>
                 <Text style={[theme.typography.label, styles.title, { color: theme.colors.text }]}>

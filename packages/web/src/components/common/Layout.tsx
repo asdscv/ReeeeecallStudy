@@ -1,11 +1,47 @@
 import { useState, useRef, useEffect, type ReactElement } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Menu, X, ChevronDown, BookOpen } from 'lucide-react'
+import { Menu, X, ChevronDown, BookOpen, Zap, BarChart2, Cpu, Layers, FileText, Compass, Store, TrendingUp, Link2, Archive, Clock, Award, Settings as SettingsIcon, Shield, HelpCircle, Target, Hand, type LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { aiHubEntries } from '@reeeeecall/shared/lib/ai/hub/catalog'
 import { useAuthStore } from '../../stores/auth-store'
 import { useAiHubEventBridge } from '../../hooks/useAiHubEventBridge'
 import { AppDownload } from './AppDownload'
+
+/**
+ * 내비게이션 아이콘.
+ *
+ * 예전에는 이모지('📚','⚡'…)를 그대로 넣었다. 이모지는 OS·폰트마다 다르게 그려지고
+ * 색을 못 따라가서, 메뉴가 활성인데 아이콘만 원색으로 남는다. 이름만 두고 여기서
+ * lucide 로 그린다 — 모바일 드로어도 같은 이름을 Feather 로 그리므로 두 플랫폼의
+ * 메뉴가 같은 뜻의 아이콘을 쓴다(AI 허브 항목은 shared 카탈로그가 이름을 준다).
+ */
+const NAV_ICONS: Record<string, LucideIcon> = {
+  zap: Zap,
+  'bar-chart-2': BarChart2,
+  'book-open': BookOpen,
+  cpu: Cpu,
+  layers: Layers,
+  'file-text': FileText,
+  compass: Compass,
+  'shopping-bag': Store,
+  'trending-up': TrendingUp,
+  'link-2': Link2,
+  archive: Archive,
+  clock: Clock,
+  award: Award,
+  settings: SettingsIcon,
+  shield: Shield,
+  'help-circle': HelpCircle,
+  target: Target,
+  menu: Menu,
+  hand: Hand,
+}
+
+function NavIcon({ name, className }: { name: string; className?: string }) {
+  const Icon = NAV_ICONS[name]
+  if (!Icon) return null
+  return <Icon className={className ?? 'w-4 h-4'} aria-hidden="true" />
+}
 
 type NavLink = { kind: 'link'; path: string; label: string; icon: string }
 /** `children` is `NavItem[]`, so a submenu can hold a submenu. `path` makes the group's own
@@ -15,10 +51,10 @@ type NavItem = NavLink | NavGroup
 
 // ── Quick Tips — extensible: just add items to TIPS array ──
 const TIPS = [
-  { icon: '👆', text: 'Tap card to flip, swipe or click buttons to rate' },
-  { icon: '📊', text: 'Dashboard shows your study stats & streaks' },
-  { icon: '⚡', text: 'Quick Study starts a session instantly' },
-  { icon: '🎯', text: 'Set daily goals in Settings to stay motivated' },
+  { icon: 'hand', text: 'Tap card to flip, swipe or click buttons to rate' },
+  { icon: 'bar-chart-2', text: 'Dashboard shows your study stats & streaks' },
+  { icon: 'zap', text: 'Quick Study starts a session instantly' },
+  { icon: 'target', text: 'Set daily goals in Settings to stay motivated' },
 ]
 
 function QuickTip() {
@@ -29,7 +65,7 @@ function QuickTip() {
       onClick={() => setIdx((i) => (i + 1) % TIPS.length)}
       className="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-xs text-muted-foreground hover:bg-accent transition cursor-pointer border-none bg-transparent text-left"
     >
-      <span>{tip.icon}</span>
+      <NavIcon name={tip.icon} className="w-4 h-4 shrink-0" />
       <span className="flex-1">{tip.text}</span>
       <span className="text-[10px] opacity-60">{idx + 1}/{TIPS.length}</span>
     </button>
@@ -46,12 +82,12 @@ export function Layout() {
   useAiHubEventBridge()
 
   const navItems: NavItem[] = [
-    { kind: 'link', path: '/quick-study', label: t('nav.quickStudy'), icon: '⚡' },
-    { kind: 'link', path: '/dashboard', label: t('nav.dashboard'), icon: '📊' },
-    { kind: 'group', label: t('nav.study'), icon: '📚', children: [
+    { kind: 'link', path: '/quick-study', label: t('nav.quickStudy'), icon: 'zap' },
+    { kind: 'link', path: '/dashboard', label: t('nav.dashboard'), icon: 'bar-chart-2' },
+    { kind: 'group', label: t('nav.study'), icon: 'book-open', children: [
       // Derived, not listed: registering a fourth AI feature must add a menu item without
       // an edit here. The section header itself opens the hub.
-      { kind: 'group', label: t('nav.aiHub'), icon: '🤖', path: '/ai', children: aiHubEntries().map((entry) => ({
+      { kind: 'group', label: t('nav.aiHub'), icon: 'cpu', path: '/ai', children: aiHubEntries().map((entry) => ({
         kind: 'link' as const,
         path: entry.webPath,
         label: t(entry.titleKey, { ns: 'ai-generate' }),
@@ -60,27 +96,27 @@ export function Layout() {
       // `/templates` was labelled "카드" while its own page is titled "카드 템플릿", and there is
       // no card list anywhere — cards live inside a deck. Sitting next to 덱 it read as
       // "덱 = 묶음, 카드 = 낱장", so the name is corrected and the two are one section.
-      { kind: 'group', label: t('nav.deckAndCards'), icon: '🗃️', children: [
-        { kind: 'link', path: '/decks', label: t('nav.decks'), icon: '📚' },
-        { kind: 'link', path: '/templates', label: t('nav.cardTemplates'), icon: '📋' },
+      { kind: 'group', label: t('nav.deckAndCards'), icon: 'layers', children: [
+        { kind: 'link', path: '/decks', label: t('nav.decks'), icon: 'book-open' },
+        { kind: 'link', path: '/templates', label: t('nav.cardTemplates'), icon: 'file-text' },
       ]},
       // Finding and selling decks is not studying. Grouping them says so without hiding them.
-      { kind: 'group', label: t('nav.explore'), icon: '🧭', children: [
-        { kind: 'link', path: '/marketplace', label: t('nav.marketplace'), icon: '🏪' },
-        { kind: 'link', path: '/publisher', label: t('nav.publisher'), icon: '📈' },
+      { kind: 'group', label: t('nav.explore'), icon: 'compass', children: [
+        { kind: 'link', path: '/marketplace', label: t('nav.marketplace'), icon: 'shopping-bag' },
+        { kind: 'link', path: '/publisher', label: t('nav.publisher'), icon: 'trending-up' },
         // `/my-shares` has existed and been routable on web all along with nothing linking to
         // it — the drawer had the row, the web nav never did.
-        { kind: 'link', path: '/my-shares', label: t('nav.myShares'), icon: '🔗' },
+        { kind: 'link', path: '/my-shares', label: t('nav.myShares'), icon: 'link-2' },
       ]},
       // 업적 was a top-level link while 기록 sat in here, so "how much have I done" was split
       // across two menus. Same question, one place.
-      { kind: 'group', label: t('nav.myRecords'), icon: '📜', children: [
-        { kind: 'link', path: '/history', label: t('nav.studyHistory'), icon: '📝' },
-        { kind: 'link', path: '/achievements', label: t('nav.achievements'), icon: '🏆' },
+      { kind: 'group', label: t('nav.myRecords'), icon: 'archive', children: [
+        { kind: 'link', path: '/history', label: t('nav.studyHistory'), icon: 'clock' },
+        { kind: 'link', path: '/achievements', label: t('nav.achievements'), icon: 'award' },
       ]},
     ]},
-    { kind: 'link', path: '/settings', label: t('nav.settings'), icon: '⚙️' },
-    ...(role === 'admin' ? [{ kind: 'link' as const, path: '/admin', label: t('nav.admin'), icon: '🛡️' }] : []),
+    { kind: 'link', path: '/settings', label: t('nav.settings'), icon: 'settings' },
+    ...(role === 'admin' ? [{ kind: 'link' as const, path: '/admin', label: t('nav.admin'), icon: 'shield' }] : []),
   ]
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -173,7 +209,7 @@ export function Layout() {
             isActive(item.path) ? activeClass : inactiveClass
           }`}
         >
-          <span className="mr-2">{item.icon}</span>
+          <NavIcon name={item.icon} className="w-4 h-4 mr-2 shrink-0" />
           {item.label}
         </Link>
       )
@@ -183,7 +219,7 @@ export function Layout() {
     // The LABEL is the group's own page when it has one (AI 학습 opens the hub); the CHEVRON
     // toggles. Two targets in one row rather than one that does both, because a header that
     // navigates AND expands does neither predictably.
-    const header = <><span className="mr-2">{item.icon}</span>{item.label}</>
+    const header = <><NavIcon name={item.icon} className="w-4 h-4 mr-2 shrink-0" />{item.label}</>
     return (
       <div key={item.label} className="mt-1 pt-1 border-t border-border first:mt-0 first:pt-0 first:border-t-0">
         <div className="flex items-center">
@@ -233,7 +269,7 @@ export function Layout() {
             isActive(item.path) ? activeClass : inactiveClass
           }`}
         >
-          <span className="mr-2">{item.icon}</span>
+          <NavIcon name={item.icon} className="w-4 h-4 mr-2 shrink-0" />
           {item.label}
         </Link>
       )
@@ -243,7 +279,7 @@ export function Layout() {
     // The LABEL is the group's own page when it has one (AI 학습 opens the hub); the CHEVRON
     // toggles. Two targets in one row rather than one that does both, because a header that
     // navigates AND expands does neither predictably.
-    const header = <><span className="mr-2">{item.icon}</span>{item.label}</>
+    const header = <><NavIcon name={item.icon} className="w-4 h-4 mr-2 shrink-0" />{item.label}</>
     return (
       <div key={item.label} className="mt-1 pt-2 border-t border-border first:mt-0 first:pt-0 first:border-t-0">
         <div className="flex items-center">
@@ -308,7 +344,7 @@ export function Layout() {
                       isActive(item.path) ? activeClass : inactiveClass
                     }`}
                   >
-                    <span className="mr-1">{item.icon}</span>
+                    <NavIcon name={item.icon} className="w-4 h-4 mr-1 shrink-0" />
                     {item.label}
                   </Link>
                 )
@@ -324,7 +360,7 @@ export function Layout() {
                       isGroupActive(item) ? activeClass : inactiveClass
                     }`}
                   >
-                    <span className="mr-1">{item.icon}</span>
+                    <NavIcon name={item.icon} className="w-4 h-4 mr-1 shrink-0" />
                     {item.label}
                     <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
                   </button>
@@ -374,7 +410,7 @@ export function Layout() {
                         isActive(item.path) ? activeClass : inactiveClass
                       }`}
                     >
-                      <span className="mr-2">{item.icon}</span>
+                      <NavIcon name={item.icon} className="w-4 h-4 mr-2 shrink-0" />
                       {item.label}
                     </Link>
                   )
@@ -391,7 +427,7 @@ export function Layout() {
                       }`}
                     >
                       <span>
-                        <span className="mr-2">{item.icon}</span>
+                        <NavIcon name={item.icon} className="w-4 h-4 mr-2 shrink-0" />
                         {item.label}
                       </span>
                       <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
