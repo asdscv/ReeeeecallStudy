@@ -79,11 +79,11 @@ jobs:
         run: pnpm test:unit
 
   # ────────────────────────────────────────────────────────────────────
-  # 3. Plan validation — exactly 649 plans, zero parse failures
-  #    (322 forward word + 322 reverse word + 5 conversation)
+  # 3. Plan validation — exactly 663 plans, zero parse failures
+  #    (329 forward word + 329 reverse word + 5 conversation)
   # ────────────────────────────────────────────────────────────────────
   plan-validation:
-    name: Plan Validation (exact count == 649)
+    name: Plan Validation (exact count == 663)
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: [unit]
@@ -98,7 +98,7 @@ jobs:
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
 
-      - name: Generate CI fixtures (51 tiny CSVs matching real names)
+      - name: Generate CI fixtures (52 tiny CSVs matching real names)
         run: bash .github/scripts/generate-csv-fixtures.sh /tmp/study_data_fixtures
 
       - name: Generate plan JSON
@@ -107,11 +107,11 @@ jobs:
           STUDY_DATA_DIR: /tmp/study_data_fixtures
         run: pnpm --silent cli plan --dir ${STUDY_DATA_DIR} --json > /tmp/plan.json
 
-      - name: Assert plan count is exactly 649
+      - name: Assert plan count is exactly 663
         run: |
           count=$(jq 'length' /tmp/plan.json)
           echo "plan count = $count"
-          test "$count" = "649"
+          test "$count" = "663"
 
       - name: Assert all required language pairs present
         run: |
@@ -129,10 +129,10 @@ jobs:
             echo "$src-en: $n decks"
             test "$n" -gt 0
           done
-          # Korean → English total = 5 conversation + 46 reverse word = 51.
+          # Korean → English total = 5 conversation + 47 reverse word = 52.
           n=$(jq '[.[] | select(.source=="ko" and .target=="en")] | length' /tmp/plan.json)
           echo "ko-en total: $n decks"
-          test "$n" = "51"
+          test "$n" = "52"
 
       - name: Snapshot total card count to summary
         run: |
