@@ -26,7 +26,16 @@ export function RootNavigator() {
   const [prefetchProgress, setPrefetchProgress] = useState(0)
   const [showAuthGuard, setShowAuthGuard] = useState(false)
 
+  // Key session effects on the user ID, not the `user` object. `useAuthState`
+  // does `setUser(s?.user ?? null)` on EVERY auth event, and a TOKEN_REFRESHED
+  // hands back a freshly parsed session — a new object with the same id. Keyed on
+  // `user`, the register effect below therefore re-ran on every token refresh and
+  // silently evicted the other device. Registering must mean "the user opened the
+  // app / logged in", not "supabase-js rotated a JWT".
+  const userId = user?.id ?? null
+
   const registerSession = useSubscriptionStore((s) => s.registerSession)
+  const revalidateSession = useSubscriptionStore((s) => s.revalidateSession)
   const startHeartbeat = useSubscriptionStore((s) => s.startHeartbeat)
   const sessionValid = useSubscriptionStore((s) => s.sessionValid)
 
@@ -68,7 +77,7 @@ export function RootNavigator() {
   // register가 행을 INSERT하기 전에 heartbeat가 UPDATE를 실행하면 0행 → 오인 킥.
   // → 반드시 register 완료를 await한 뒤 heartbeat 시작.
   useEffect(() => {
-    if (!user) return
+    if (!userId) return
     let cleanup: (() => void) | undefined
     let cancelled = false
     ;(async () => {
@@ -80,24 +89,38 @@ export function RootNavigator() {
       cancelled = true
       cleanup?.()
     }
-  }, [user, registerSession, startHeartbeat])
+  }, [userId, registerSession, startHeartbeat])
 
-  // On return to foreground, re-register immediately. While backgrounded the JS
-  // runtime/heartbeat is suspended and the auth token may have refreshed; a clean
-  // re-register revalidates + recreates the session row right away instead of
-  // waiting up to 60s for the next heartbeat tick. (registerSession never kicks on
-  // a transient failure, so a slow resume can't trigger the false "another device".)
+  // On return to foreground, REVALIDATE — never re-register. `registerSession`
+  // evicts the other device of this platform, so re-registering on every resume
+  // made "coming back" mean "taking the session away", and the two phones
+  // ping-ponged: the phone you are actually using is already 'active' and so
+  // never fires a resume event to steal back, while the idle phone in your pocket
+  // fires one every time its screen wakes. Net effect was exactly backwards — the
+  // device in your hand got the "logged in on another device" screen.
+  //
+  // A heartbeat answers "is my row still there?" without touching anyone else's.
+  // Claiming the session stays where the user actually meant it: an explicit
+  // login, a cold start, or the SessionKicked screen's reclaim button.
+  //
+  // Only a REAL background→foreground counts. iOS (and only iOS — see
+  // AppState's `@platform ios` note) reports 'inactive' for the multitasking
+  // view, Notification Center and incoming calls, and a resume reads
+  // background→inactive→active, so we latch on 'background' rather than
+  // matching whatever state happened to precede 'active'.
   useEffect(() => {
-    if (!user) return
-    let prev = AppState.currentState
+    if (!userId) return
+    let wasBackgrounded = AppState.currentState === 'background'
     const sub = AppState.addEventListener('change', (next) => {
-      if (prev.match(/inactive|background/) && next === 'active') {
-        void registerSession()
+      if (next === 'background') {
+        wasBackgrounded = true
+      } else if (next === 'active' && wasBackgrounded) {
+        wasBackgrounded = false
+        void revalidateSession()
       }
-      prev = next
     })
     return () => sub.remove()
-  }, [user, registerSession])
+  }, [userId, revalidateSession])
 
   const handleReclaim = useCallback(async () => {
     await registerSession()
