@@ -72,11 +72,24 @@ BEGIN
   PERFORM public.revoke_subscription('lemonsqueezy','LSSUB1');
   ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b1'::uuid) = pg_temp._free_cap(), 'cap back to the free cap after refund';
 
-  -- redelivered first-grant must NOT resurrect the refunded row
+  -- redelivered first-grant must NOT resurrect the refunded row.
+  -- 274 부터 회수가 영수증까지 뒤집으므로, 이 재전송은 P-H2(구독 행 부활 금지) 이전에
+  -- P-L3(죽은 인텐트로는 지급하지 않는다)에 먼저 걸린다. 막히는 결과는 같고 이유만
+  -- 더 정확해진다. 아래에서 P-H2 도 따로 붙잡는다.
   v_res := public.activate_subscription_from_intent(v_mu,'lemonsqueezy','LSSUB1', now()+interval '30 days');
-  ASSERT (v_res->>'ok') = 'false' AND (v_res->>'reason') = 'terminal', 'redelivered activate → terminal (P-H2)';
+  ASSERT (v_res->>'ok') = 'false' AND (v_res->>'reason') = 'intent_refunded', 'redelivered activate → 죽은 인텐트에서 막힌다 (P-L3)';
   ASSERT (SELECT status FROM billing_subscriptions WHERE provider='lemonsqueezy' AND provider_subscription_id='LSSUB1') = 'refunded',
          'row stays refunded';
+  ASSERT (SELECT status FROM payment_intents WHERE merchant_uid = v_mu) = 'refunded',
+         '회수가 영수증까지 뒤집는다 (274)';
+  ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b1'::uuid) = pg_temp._free_cap(), 'cap NOT restored (P-H2)';
+
+  -- P-H2 는 계속 살아 있어야 한다. 영수증이 살아남는 회수 — 274 의 매칭이 걸리지 않는
+  -- 결제(레몬스퀴지가 주문 id 를 따로 적은 경우) — 에서는 인텐트가 'paid' 인 채로 남고,
+  -- 그때 재전송을 막는 것은 P-H2 뿐이다. 그 상태를 손으로 만들어 확인한다.
+  UPDATE payment_intents SET status = 'paid' WHERE merchant_uid = v_mu;
+  v_res := public.activate_subscription_from_intent(v_mu,'lemonsqueezy','LSSUB1', now()+interval '30 days');
+  ASSERT (v_res->>'ok') = 'false' AND (v_res->>'reason') = 'terminal', 'redelivered activate → terminal (P-H2)';
   ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b1'::uuid) = pg_temp._free_cap(), 'cap NOT restored (P-H2)';
 END $$;
 
