@@ -431,7 +431,8 @@ jobs:
             supabase/tests/template_limits_test.sql \
             supabase/tests/quiz_set_history_test.sql \
             supabase/tests/remediation_replay_test.sql \
-            supabase/tests/unpriced_model_test.sql; do
+            supabase/tests/unpriced_model_test.sql \
+            supabase/tests/refund_shows_up_as_a_refund_test.sql; do
             echo "==> $f"
             psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -f "$f"
           done

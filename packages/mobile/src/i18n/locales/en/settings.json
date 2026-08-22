@@ -177,7 +177,8 @@
     "empty": "No plans available.",
     "loadError": "Couldn’t load plans.",
     "popular": "POPULAR",
-    "blurb": "A subscription raises how many cards you can store. Everything else — AI cards, quizzes, all study modes — is already free."
+    "blurb": "A subscription raises how many cards you can store. Everything else — AI cards, quizzes, all study modes — is already free.",
+    "settling": "Confirming"
   },
   "paymentHistory": {
     "title": "Payment history",

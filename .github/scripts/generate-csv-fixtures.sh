@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Generate tiny STUDY_DATA fixtures for CI plan-validation.
-# Mirrors the real corpus layout (51 CSVs, three schemas) without needing the
+# Mirrors the real corpus layout (52 CSVs, three schemas) without needing the
 # gitignored full dataset. Each file gets exactly one data row.
 set -euo pipefail
 
@@ -14,6 +14,10 @@ for i in 1 2 3 4 5 6 7 8 9 10; do
   echo "$schemaA_row" > "$OUT/intermediate_batch${i}.csv"
   echo "$schemaA_row" > "$OUT/advanced_batch${i}.csv"
 done
+
+# Schema A, but exam-named: a themed IELTS list that carries no band level.
+# (inferCategoryFromFilename -> "ielts", inferLevelFromFilename -> null)
+echo "$schemaA_row" > "$OUT/ielts-law-politics.csv"
 
 # ─── Schema B — with header ──────────────────────────────────────────────────
 schemaB_header='english,example,ko_meaning,ko_example,ja_meaning,ja_example,zh_meaning,zh_example,es_meaning,es_example,vi_meaning,vi_example,th_meaning,th_example,id_meaning,id_example'
@@ -62,10 +66,10 @@ emit_C "real-conversation-일상.csv"
 emit_C "real-conversation-학습.csv"
 emit_C "real-conversation-회사.csv"
 
-# Quick sanity: should be exactly 51 CSV files
+# Quick sanity: should be exactly 52 CSV files
 count=$(ls "$OUT"/*.csv | wc -l | tr -d ' ')
 echo "Generated $count CSV fixtures in $OUT"
-if [ "$count" != "51" ]; then
-  echo "ERROR: expected 51 fixtures, got $count" >&2
+if [ "$count" != "52" ]; then
+  echo "ERROR: expected 52 fixtures, got $count" >&2
   exit 1
 fi

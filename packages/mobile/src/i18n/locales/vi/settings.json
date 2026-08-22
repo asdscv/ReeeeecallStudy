@@ -177,7 +177,8 @@
     "empty": "Chưa có gói nào.",
     "loadError": "Không tải được gói.",
     "popular": "PHỔ BIẾN",
-    "blurb": "Gói đăng ký nâng số thẻ bạn có thể lưu. Mọi thứ còn lại — thẻ AI, trắc nghiệm, tất cả chế độ học — vốn đã miễn phí."
+    "blurb": "Gói đăng ký nâng số thẻ bạn có thể lưu. Mọi thứ còn lại — thẻ AI, trắc nghiệm, tất cả chế độ học — vốn đã miễn phí.",
+    "settling": "Đang xác nhận"
   },
   "paymentHistory": {
     "title": "Lịch sử thanh toán",
