@@ -72,15 +72,25 @@ allowed_cidrs = ["0.0.0.0/0"]
 # Defaults to allow all IPv6 connections. Set empty array to block all IPs.
 allowed_cidrs_v6 = ["::/0"]
 
+# DISABLED — nothing subscribes. There is no `.channel(`, `postgres_changes` or
+# `removeChannel` call anywhere in packages/shared, packages/web/src or
+# packages/mobile/src; the app reads through PostgREST and RPCs only. Realtime
+# costs 239 MiB to serve zero subscribers. Flip to true the day a live-updating
+# screen is actually built, and delete this comment when you do.
 [realtime]
-enabled = true
+enabled = false
 # Bind realtime via either IPv4 or IPv6. (default: IPv4)
 # ip_version = "IPv6"
 # The maximum length in bytes of HTTP request headers. (default: 4096)
 # max_header_length = 4096
 
+# DISABLED — a browser convenience, not a dependency. Every consumer of the local
+# stack talks to 54321 (Kong) and 54322 (Postgres) and nothing else: the
+# integration suite, every script in supabase/tests, and both CI jobs that call
+# .github/scripts/supabase-up.sh. Use `supabase status` for keys and psql for
+# data. Flip to true for a session when you genuinely want to click around.
 [studio]
-enabled = true
+enabled = false
 # Port to use for Supabase Studio.
 port = 54323
 # External URL of the API server that frontend connects to.
@@ -90,8 +100,11 @@ openai_api_key = "env(OPENAI_API_KEY)"
 
 # Email testing server. Emails sent with the local dev setup are not actually sent - rather, they
 # are monitored, and you can view the emails that would have been sent from the web interface.
+# DISABLED — the stack never sends an email to catch. auth.email and auth.sms both
+# have enable_confirmations = false, and no test reads port 54324. Flip to true
+# together with a confirmation flow, never on its own.
 [inbucket]
-enabled = true
+enabled = false
 # Port to use for the email testing server web interface.
 port = 54324
 # Uncomment to expose additional ports for testing user applications that send emails.
@@ -385,8 +398,14 @@ deno_version = 2
 # AI_VISION_MODEL        = "env(AI_VISION_MODEL)"         # Phase 1 image-recognition model
 # AI_GENERATION_BASE_URL = "env(AI_GENERATION_BASE_URL)"  # override baseUrl (custom endpoint)
 
+# DISABLED — by far the most expensive container in the stack, and the one with no
+# reader. Measured on a fresh `db reset` (2026-08-21): logflare alone was 795 MiB
+# resident, and it drags the `vector` log shipper (282 MiB) up with it, so the two
+# were ~48% of the stack's 2,230 MiB. Nothing in this repository touches port
+# 54327; the hosted project has its own dashboard. Turning this off is the single
+# biggest reason `supabase start` no longer costs ~8 GB of host RAM.
 [analytics]
-enabled = true
+enabled = false
 port = 54327
 # Configure one of the supported backends: `postgres`, `bigquery`.
 backend = "postgres"

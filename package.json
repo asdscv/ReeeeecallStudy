@@ -8,7 +8,11 @@
     "test": "pnpm --filter @reeeeecall/web test",
     "lint": "pnpm --filter @reeeeecall/web lint",
     "dev:mobile": "pnpm --filter @reeeeecall/mobile start",
-    "test:worker": "vitest run --config worker-modules/vitest.config.js"
+    "test:worker": "vitest run --config worker-modules/vitest.config.js",
+    "test:integration": "bash scripts/local-supabase.sh with ./node_modules/.bin/vitest run --config tests/integration/vitest.config.ts tests/integration",
+    "db:verify": "bash scripts/local-supabase.sh with bash .github/scripts/supabase-up.sh reset-only",
+    "db:up": "bash scripts/local-supabase.sh up",
+    "db:down": "bash scripts/local-supabase.sh down"
   },
   "dependencies": {
     "expo": "~55.0.6",
