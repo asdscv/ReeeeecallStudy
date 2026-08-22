@@ -496,6 +496,27 @@ Deno.serve(async (req) => {
     })
     if (error) return rpcErrorResponse(`sync_subscription_by_user ${type}`, error.message)
     await tagSubscriptionPlatform()
+
+    // 영수증을 남긴다(mig 273). 이게 없으면 스토어 결제가 결제 내역에서 통째로 빠진다 —
+    // get_my_payment_history 는 payment_intents 의 확정된 행만 읽는데, 위의
+    // sync_subscription_by_user 는 구독만 upsert 하고 인텐트는 손대지 않기 때문이다.
+    // 2026-08-21 안드로이드 첫 실결제에서 실제로 그렇게 됐다(구독은 살아 있는데
+    // 사용자에게는 "돈 냈는데 기록이 없다").
+    //
+    // 실패해도 무시한다: 돈은 이미 받았고 구독은 이미 줬다. 여기서 500 을 내면
+    // RevenueCat 이 재전송하고, 재전송은 이미 성공한 지급을 다시 밟는다.
+    const { error: receiptErr } = await sb.rpc('record_store_payment', {
+      p_user_id: appUserId,
+      p_product_id: ourProductId,
+      p_store_order_id: subKey,
+      p_amount_krw: null,
+      p_platform: platform ?? null,
+      p_provider: PROVIDER,
+    })
+    if (receiptErr) {
+      console.error('[revenuecat-webhook] record_store_payment failed (grant stands):', receiptErr.message)
+    }
+
     return json({ received: true, type, kind: 'subscription', platform, environment, ...(data ?? {}) }, 200)
   }
 
