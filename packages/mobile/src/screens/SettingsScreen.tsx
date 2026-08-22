@@ -15,7 +15,7 @@ import { SUBSCRIPTION_UI_ENABLED } from '../services/purchases'
 // [SUBSCRIPTION-HIDDEN] 2026-04-15 — Apple Guideline 2.1(b) 리젝 대응
 // IAP products를 함께 submit 하기 전까지 구독 UI 전부 숨김.
 // 복원 시: usePurchases import 복구, isPro stub 제거, planBadge + Subscription 섹션 복원.
-import { useAuth, useAuthState } from '../hooks'
+import { useAuth, useAuthState, usePurchases } from '../hooks'
 // import { useAuth, useAuthState, usePurchases } from '../hooks'
 import { useTheme, palette } from '../theme'
 import { useThemeStore } from '../stores/theme-store'
@@ -73,6 +73,9 @@ export function SettingsScreen() {
   const theme = useTheme()
   const { t, i18n } = useTranslation('settings')
   const { t: tWallet } = useTranslation('wallet')
+  // 복원 문구는 Paywall 과 같은 말이어야 하므로 그 네임스페이스를 그대로 빌린다
+  // (8개 로케일에 이미 번역되어 있다). settings 쪽에 복사하면 둘이 갈라진다.
+  const { t: tPay } = useTranslation('paywall')
   const navigation = useNavigation<Nav>()
   const { user } = useAuthState()
   const { signOut } = useAuth()
@@ -97,8 +100,22 @@ export function SettingsScreen() {
     if (!user) { setSubscription(null); return }
     getMySubscription().then(setSubscription)
   }, [user?.id])
-  // [SUBSCRIPTION-HIDDEN] usePurchases 훅 호출 보류 — 복원 시 아래 stub 제거하고 원래 줄 복구
-  // const { isPro } = usePurchases()
+  // 구매 복원은 여기 있어야 한다. 앱 전체에서 복원 버튼은 PaywallScreen 한 곳뿐이고,
+  // 거기로 가는 유일한 문이 PlanSelector 의 "선택" 버튼인데 — 이미 구독 중이면 그 버튼이
+  // "현재 플랜" 배지로 바뀐다. 활성 플랜은 Standard 하나뿐이라, **구독자에게는 복원 버튼이
+  // 통째로 사라졌다.** 새 기기로 옮긴 사람이 정확히 복원이 필요한 상황인데도.
+  const { restore, purchasing } = usePurchases()
+  const handleRestore = async () => {
+    const result = await restore()
+    if (result.success) {
+      // 복원이 성공했으면 서버 구독도 다시 읽는다 — 안 그러면 "복원되었습니다" 만 뜨고
+      // 바로 아래 플랜 목록은 여전히 무료라고 말한다.
+      getMySubscription().then(setSubscription)
+      Alert.alert(tPay('welcomePro'), tPay('restored'))
+    } else {
+      Alert.alert(tPay('restorePurchase'), tPay('noRestoreFound'))
+    }
+  }
 
   const [profile, setProfile] = useState<ProfileData>({
     display_name: '',
@@ -454,6 +471,15 @@ export function SettingsScreen() {
             <PlanSelector
               subscription={subscription}
               onSelect={() => navigation.navigate('Paywall')}
+            />
+            {/* 플랜 목록이 배지로 바뀌든 버튼으로 남든, 복원은 항상 여기 있다. */}
+            <Button
+              testID="settings-restore-purchase"
+              title={tPay('restorePurchase')}
+              variant="ghost"
+              size="sm"
+              onPress={handleRestore}
+              loading={purchasing}
             />
           </CollapsibleSection>
         )}
