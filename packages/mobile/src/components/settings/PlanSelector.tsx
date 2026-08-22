@@ -40,7 +40,7 @@ export function PlanSelector({
 }) {
   const theme = useTheme()
   const { t } = useTranslation('settings')
-  const { offering } = usePurchases()
+  const { offering, isPro } = usePurchases()
   const [plans, setPlans] = useState<BillingProduct[] | null>(null)
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading')
 
@@ -90,6 +90,22 @@ export function PlanSelector({
   const isCurrent = (p: BillingProduct): boolean =>
     subscription?.status === 'active' &&
     (subscription.productId === p.id || (!!subscription.tier && subscription.tier === p.tier))
+
+  /**
+   * 스토어는 "샀다"는데 서버는 아직 모르는 구간.
+   *
+   * 이 목록은 서버(billing_subscriptions)만 보고, 결제 화면은 isPro(스토어 엔타이틀먼트
+   * 포함)를 봤다. 그래서 한 앱 안에서 목록은 "선택", 그 화면에 들어가면 "플랜이 적용
+   * 중입니다" 가 뜨는 상태가 됐다.
+   *
+   * 둘 중 서버가 최종 권한인 것은 맞다 — 카드 한도를 정하는 것은 서버다. 하지만 결제
+   * 직후에는 웹훅이 도착하기 전이라 스토어가 먼저 안다. 그 창에서 "선택" 을 그대로
+   * 보여주면 **같은 구독을 한 번 더 사게 된다**(스토어가 다르면 이중 청구까지 간다).
+   *
+   * 그래서 스토어가 이미 권한을 인정하는 동안에는 구매 버튼을 내리고 확인 중임을
+   * 알린다. 서버가 따라잡으면 자연스럽게 '현재 플랜' 으로 바뀐다.
+   */
+  const settlingAtStore = !!isPro && subscription?.status !== 'active'
 
   if (state === 'loading') {
     return (
@@ -166,6 +182,13 @@ export function PlanSelector({
               {current ? (
                 <View style={[styles.currentBadge, { backgroundColor: theme.colors.primary }]}>
                   <Text style={styles.currentBadgeText}>{t('plans.current')}</Text>
+                </View>
+              ) : settlingAtStore ? (
+                // 스토어는 인정했고 서버는 아직인 구간 — 구매 버튼을 내려 재구매를 막는다.
+                <View style={[styles.currentBadge, { backgroundColor: theme.colors.border }]}>
+                  <Text style={[styles.currentBadgeText, { color: theme.colors.textSecondary }]}>
+                    {t('plans.settling')}
+                  </Text>
                 </View>
               ) : (
                 <TouchableOpacity

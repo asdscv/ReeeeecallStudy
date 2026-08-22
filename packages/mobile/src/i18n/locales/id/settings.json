@@ -177,7 +177,8 @@
     "empty": "Belum ada paket.",
     "loadError": "Gagal memuat paket.",
     "popular": "POPULER",
-    "blurb": "Langganan menaikkan batas jumlah kartu yang bisa kamu simpan. Selebihnya — kartu AI, kuis, semua mode belajar — sudah gratis."
+    "blurb": "Langganan menaikkan batas jumlah kartu yang bisa kamu simpan. Selebihnya — kartu AI, kuis, semua mode belajar — sudah gratis.",
+    "settling": "Memeriksa"
   },
   "paymentHistory": {
     "title": "Riwayat pembayaran",
