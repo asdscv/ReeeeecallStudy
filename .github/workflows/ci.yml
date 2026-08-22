@@ -51,16 +51,16 @@ jobs:
       # silently return.
       - name: Web lint
         run: pnpm --filter @reeeeecall/web lint
-      - name: Mobile typecheck (regression guard for marketplace scope)
-        run: |
-          set +e
-          pnpm --filter @reeeeecall/mobile exec tsc --noEmit 2>&1 | tee /tmp/mobile-tsc.log
-          # Pre-existing baseline errors are tolerated; new marketplace/acquire scope errors are not.
-          if grep -E "(MarketplaceDetail|marketplace-store|acquireDeck|deck-store)" /tmp/mobile-tsc.log; then
-            echo "::error::TypeScript error introduced in marketplace/acquire scope"
-            exit 1
-          fi
-          exit 0
+      # Strict gate. It was scoped to marketplace-only while a baseline of unrelated
+      # errors existed; that baseline is now empty (`tsc --noEmit` → 0 errors), so the
+      # escape hatch comes off — same call as the web lint gate above.
+      #
+      # What it was letting through: 1.0.4 shipped a price table on the Dashboard whose
+      # "Select" button did nothing, because PlanSelector's `onSelect` was optional and
+      # CardUsageModal never passed it. `onSelect` is required now, so that shape is a
+      # compile error (TS2741) — but only if this step can actually fail.
+      - name: Mobile typecheck
+        run: pnpm --filter @reeeeecall/mobile exec tsc --noEmit
 
   # ─────────────────────────────────────────────────────────────────────
   # Job 1b: develop→main promotions must say their migrations were applied

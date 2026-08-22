@@ -36,7 +36,12 @@ export function PlanSelector({
   onSelect,
 }: {
   subscription: MySubscription | null
-  onSelect?: (product: BillingProduct) => void
+  /**
+   * 필수다. 옵셔널이던 시절, CardUsageModal 이 이걸 안 넘긴 채 가격표를 그렸고 그
+   * 화면의 "선택" 버튼은 눌러도 아무 일도 하지 않았다 — 대시보드가 첫 화면이므로
+   * 앱을 켜자마자 닿는 곳이었다. 가격을 띄우는 쪽은 갈 곳도 함께 대야 한다.
+   */
+  onSelect: (product: BillingProduct) => void
 }) {
   const theme = useTheme()
   const { t } = useTranslation('settings')
@@ -196,7 +201,7 @@ export function PlanSelector({
                   disabled={!SUBSCRIPTION_UI_ENABLED}
                   activeOpacity={0.85}
                   onPress={() => {
-                    if (SUBSCRIPTION_UI_ENABLED) onSelect?.(p)
+                    if (SUBSCRIPTION_UI_ENABLED) onSelect(p)
                   }}
                   style={[
                     styles.selectBtn,

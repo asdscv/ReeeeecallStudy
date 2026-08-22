@@ -148,12 +148,16 @@ export function usePurchases() {
       const result = await purchaseService.restore()
       if (result.success) {
         setIsPro(true)
+        // purchase() 와 같은 이유로 서버 행을 다시 읽는다. 여기서는 이게 빠져 있어서
+        // 복원에 성공해도 "구독이 복원되었습니다" 알럿만 뜨고, 카드 한도와 플랜 목록은
+        // 여전히 무료라고 말했다 — 복원이 안 된 것처럼 보이는 성공이었다.
+        await refreshSubscription()
       }
       return result
     } finally {
       setPurchasing(false)
     }
-  }, [])
+  }, [refreshSubscription])
 
   return {
     isPro,
