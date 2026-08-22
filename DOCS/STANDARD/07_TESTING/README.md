@@ -31,6 +31,8 @@
 
 **`packages/shared` 의 테스트도 `packages/web/src/**/__tests__/` 에 둔다.** shared 안에는 테스트 파일을 두지 않는다(러너가 없어 그냥 실행되지 않는다). 실측: shared 안 `*.test.*` 0개.
 
+**Docker 스택이 필요한 것은 `Supabase 통합` 한 줄뿐이고, 그것도 `pnpm test:integration` 으로만 돌린다.** 이 저장소의 `.env` 는 전부 호스팅 프로젝트를 가리키므로 `pnpm dev` / `build` / `test` / `dev:mobile` 은 Docker 와 무관하다. `pnpm test:integration` 과 `pnpm db:verify` 는 `scripts/local-supabase.sh` 를 거쳐 **스택을 띄우고, 돌리고, 반드시 내린다** — 자세한 이유는 6절.
+
 **vitest 스코프마다 별도 config 를 두고 include 를 그 디렉터리로 좁힌다.** 루트에서 `**/*.spec.ts` 를 돌리면 모바일 wdio spec 14개가 딸려와 전부 `describe is not defined` 로 죽는다.
 
 ## 2. 어디에 두나
@@ -83,6 +85,8 @@
 - **`packages/shared/lib/supabase.ts` 는 import 시점에 키가 없으면 throw 한다.** 이를 transitively import 하는 모든 스위트가 CI 에서만 죽었다 → `vite.config.ts` 의 `test.env` 가 더미 값을 주입한다.
 - **supabase mock 경로를 잘못 고르면 mock 이 안 먹는다**(웹 로컬 모듈 vs shared 모듈). 현재 두 방식이 공존한다.
 - **`download-file.test.ts` 가 스위트를 간헐적으로 빨갛게 만든다.** fake timer 없이 `downloadFile()` 을 부르는 4개 테스트가 실제 `setTimeout(…,100)` 을 남기고, `restoreAllMocks()` 이후 진짜 `removeChild` 가 터져 **다른 파일**에 uncaught exception 으로 귀속된다. 이 job 에는 재시도가 없으므로 무관한 PR 이 랜덤하게 빨개진다. → 실타이머를 남기는 테스트는 fake timer 로 감싼다.
+- **`supabase start` 가 만든 컨테이너는 `restart: unless-stopped` 다 — 한 번 띄우면 "계속 켜지는" 것이 정상 동작이다.** 이후 Docker 엔진이 뜨는 모든 순간(다른 프로젝트, 소켓 액티베이션이 잡아챈 `docker ps` 한 번)에 스택 전체가 되살아난다. 2026-08-21 에 이 저장소 컨테이너 11개가 아무도 안 쓰는 채로 40시간 상주해 있었다. 그래서 스택은 `pnpm test:integration` / `pnpm db:verify` 처럼 **끝나면 내려가는 명령으로만** 띄운다. 손으로 띄워야 하면 `pnpm db:up` 을 쓴다 — `supabase start` 와 달리 restart 정책을 `no` 로 되돌려 두므로 다음 엔진 기동 때 부활하지 않는다.
+- **컨테이너를 내려도 호스트 RAM 은 돌아오지 않는다.** macOS Virtualization VM 은 한 번 부풀면 상한(`MemoryMiB`, 기본 8GB)까지 잡은 메모리를 반납하지 않는다. 실측: 컨테이너 0개인데 VM 프로세스 RSS 8,446MB. 스택을 다 내렸는데도 RAM 이 안 줄면 그건 버그가 아니라 이것이니, **Docker Desktop 자체를 종료**해야 회수된다.
 - **Playwright 는 테스트마다 새로 로그인한다**(Supabase 는 사용자당 활성 세션 1개). `fullyParallel: false`, `workers: 1`. `e2e/auth.setup.ts` 는 정반대 전략의 **고아 파일**이니 그것을 규칙으로 오인하지 않는다.
 - **e2e 자격증명이 없으면 로그인을 조용히 건너뛴다** → 실패가 "설정 없음"이 아니라 "화면에 요소 없음"으로 나타난다.
 
