@@ -12,7 +12,8 @@
     "test:integration": "bash scripts/local-supabase.sh with ./node_modules/.bin/vitest run --config tests/integration/vitest.config.ts tests/integration",
     "db:verify": "bash scripts/local-supabase.sh with bash .github/scripts/supabase-up.sh reset-only",
     "db:up": "bash scripts/local-supabase.sh up",
-    "db:down": "bash scripts/local-supabase.sh down"
+    "db:down": "bash scripts/local-supabase.sh down",
+    "test:session-stress": "node scripts/session-stress-test.mjs"
   },
   "dependencies": {
     "expo": "~55.0.6",

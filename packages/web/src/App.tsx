@@ -161,7 +161,13 @@ function LoginRedirect() {
 
 function App() {
   const { initialize, user, loading } = useAuthStore()
+  // Key the session effects on the user ID, never the `user` object: a re-created
+  // user object with the same id must not count as a new login, or a token refresh
+  // silently re-registers and evicts the other client of this platform.
+  const userId = user?.id ?? null
+
   const registerSession = useSubscriptionStore((s) => s.registerSession)
+  const revalidateSession = useSubscriptionStore((s) => s.revalidateSession)
   const startHeartbeat = useSubscriptionStore((s) => s.startHeartbeat)
   const { showOnboarding, initialize: initOnboarding } = useOnboardingStore()
 
@@ -181,7 +187,7 @@ function App() {
   // register 완료를 await한 뒤 heartbeat를 시작해 INSERT↔UPDATE race로 인한
   // 오인 킥(session_expired)을 방지한다.
   useEffect(() => {
-    if (!user) return
+    if (!userId) return
     let cleanup: (() => void) | undefined
     let cancelled = false
     void registerSession().then(() => {
@@ -192,19 +198,24 @@ function App() {
       cancelled = true
       cleanup?.()
     }
-  }, [user, registerSession, startHeartbeat])
+  }, [userId, registerSession, startHeartbeat])
 
-  // When the tab becomes visible again, re-register immediately so a backgrounded
-  // tab whose session row/token went stale is revalidated right away rather than
-  // waiting for the next heartbeat. (registerSession never kicks on transient.)
+  // When the tab becomes visible again, REVALIDATE — never re-register.
+  // `registerSession` evicts the other client of this platform, so re-registering
+  // on every visibility change made "coming back" mean "taking the session away",
+  // and two clients ping-ponged: the one you are actually using stays visible and
+  // so never fires the event to steal back, while the idle one fires it every time
+  // its tab/window surfaces. A heartbeat revalidates without taking anything.
+  // Claiming stays with an explicit login, a fresh page load, or the kicked
+  // overlay's reclaim button.
   useEffect(() => {
-    if (!user) return
+    if (!userId) return
     const onVisible = () => {
-      if (document.visibilityState === 'visible') void registerSession()
+      if (document.visibilityState === 'visible') void revalidateSession()
     }
     document.addEventListener('visibilitychange', onVisible)
     return () => document.removeEventListener('visibilitychange', onVisible)
-  }, [user, registerSession])
+  }, [userId, revalidateSession])
 
   if (loading) {
     return (

@@ -1,10 +1,15 @@
 /**
  * Session validity machinery — the false "another device" kick fix.
  *
- * Core invariant: a TRANSIENT failure (network error, or token not yet refreshed
+ * Core invariant 1: a TRANSIENT failure (network error, or token not yet refreshed
  * on background→foreground) must NEVER flip sessionValid=false. Only a definitive
- * answer does: a genuine block (e.g. session_limit_exceeded) → false; a recoverable
- * `session_expired` is handled by re-registering, not by an immediate kick.
+ * answer does: a genuine block (e.g. session_limit_exceeded) → false.
+ *
+ * Core invariant 2 (the ping-pong fix): re-validating a session must never CLAIM
+ * it. `register_session` evicts the other device of this platform, so anything on
+ * a lifecycle path — resume, tab-visible, heartbeat tick — must go through
+ * `revalidateSession` (heartbeat only). Claiming is reserved for an explicit
+ * login, a cold start, and the SessionKicked reclaim button.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
@@ -52,11 +57,52 @@ describe('sendHeartbeat — transient never kicks', () => {
     expect(useSubscriptionStore.getState().sessionValid).toBe(true)
   })
 
-  it('session_expired → expired (row gone), left for re-register, not an immediate kick', async () => {
+  it('session_expired → expired (row gone); the raw heartbeat does not flip on its own', async () => {
     setHeartbeat({ data: { valid: false, reason: 'session_expired' }, error: null })
     expect(await useSubscriptionStore.getState().sendHeartbeat()).toBe('expired')
-    // sendHeartbeat itself does not flip — the tick re-registers first.
+    // sendHeartbeat reports; revalidateSession is what decides to show the kick.
     expect(useSubscriptionStore.getState().sessionValid).toBe(true)
+  })
+})
+
+describe('revalidateSession — revalidating must never claim the session', () => {
+  it('valid row → ok, and NO register_session (the other device keeps its session)', async () => {
+    setHeartbeat({ data: { valid: true }, error: null })
+    expect(await useSubscriptionStore.getState().revalidateSession()).toBe('ok')
+    expect(useSubscriptionStore.getState().sessionValid).toBe(true)
+    expect(mockRpc.mock.calls.some((c) => c[0] === 'register_session')).toBe(false)
+  })
+
+  it('session_expired → kick screen, and STILL no register_session (no steal-back)', async () => {
+    // This is the reported bug: the idle device used to re-register here, evicting
+    // the device the user was actually holding.
+    setHeartbeat({ data: { valid: false, reason: 'session_expired' }, error: null })
+    expect(await useSubscriptionStore.getState().revalidateSession()).toBe('expired')
+    expect(useSubscriptionStore.getState().sessionValid).toBe(false)
+    expect(mockRpc.mock.calls.some((c) => c[0] === 'register_session')).toBe(false)
+  })
+
+  it('transient (network) → no kick, no register', async () => {
+    setHeartbeat({ data: null, error: { message: 'net' } })
+    expect(await useSubscriptionStore.getState().revalidateSession()).toBe('transient')
+    expect(useSubscriptionStore.getState().sessionValid).toBe(true)
+    expect(mockRpc.mock.calls.some((c) => c[0] === 'register_session')).toBe(false)
+  })
+
+  it('not_authenticated (token not refreshed on resume) → no kick, no register', async () => {
+    setHeartbeat({ data: { valid: false, reason: 'not_authenticated' }, error: null })
+    expect(await useSubscriptionStore.getState().revalidateSession()).toBe('transient')
+    expect(useSubscriptionStore.getState().sessionValid).toBe(true)
+    expect(mockRpc.mock.calls.some((c) => c[0] === 'register_session')).toBe(false)
+  })
+
+  it('a device already showing the kick screen stays kicked on revalidate', async () => {
+    // Foregrounding a kicked device must not silently take the session back.
+    setHeartbeat({ data: { valid: false, reason: 'session_expired' }, error: null })
+    useSubscriptionStore.setState({ sessionValid: false })
+    await useSubscriptionStore.getState().revalidateSession()
+    expect(useSubscriptionStore.getState().sessionValid).toBe(false)
+    expect(mockRpc.mock.calls.some((c) => c[0] === 'register_session')).toBe(false)
   })
 })
 
