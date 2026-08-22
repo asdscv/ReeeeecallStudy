@@ -66,10 +66,10 @@ emit_C "real-conversation-일상.csv"
 emit_C "real-conversation-학습.csv"
 emit_C "real-conversation-회사.csv"
 
-# Quick sanity: should be exactly 51 CSV files
+# Quick sanity: should be exactly 52 CSV files
 count=$(ls "$OUT"/*.csv | wc -l | tr -d ' ')
 echo "Generated $count CSV fixtures in $OUT"
-if [ "$count" != "51" ]; then
-  echo "ERROR: expected 51 fixtures, got $count" >&2
+if [ "$count" != "52" ]; then
+  echo "ERROR: expected 52 fixtures, got $count" >&2
   exit 1
 fi
