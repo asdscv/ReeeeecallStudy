@@ -23,8 +23,8 @@ describe.skipIf(!STUDY_DATA)("Real STUDY_DATA fixtures", () => {
     csvList = await source.list();
   });
 
-  it("lists exactly 51 CSVs (excluding chinese-pronunciation + sidecars)", () => {
-    expect(csvList.length).toBe(51);
+  it("lists exactly 52 CSVs (excluding chinese-pronunciation + sidecars)", () => {
+    expect(csvList.length).toBe(52);
     expect(csvList).not.toContain("chinese-pronunciation.csv");
   });
 
@@ -36,14 +36,14 @@ describe.skipIf(!STUDY_DATA)("Real STUDY_DATA fixtures", () => {
     }
   });
 
-  it("total plan count across all CSVs equals 649 (322 forward + 322 reverse word + 5 conversation)", async () => {
+  it("total plan count across all CSVs equals 663 (329 forward + 329 reverse word + 5 conversation)", async () => {
     let total = 0;
     for (const name of csvList) {
       const csv = await source.read(name);
       const plans = buildPlansForCsv(csv, { skipMalformedRows: true });
       total += plans.length;
     }
-    expect(total).toBe(649);
+    expect(total).toBe(663);
   });
 
   it("beginner_batch1.csv produces 14 plans (forward + reverse), each with cards", async () => {
