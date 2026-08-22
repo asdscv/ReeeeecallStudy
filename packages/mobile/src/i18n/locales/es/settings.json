@@ -177,7 +177,8 @@
     "empty": "No hay planes disponibles.",
     "loadError": "No se pudieron cargar los planes.",
     "popular": "POPULAR",
-    "blurb": "La suscripción amplía cuántas tarjetas puedes guardar. Todo lo demás —tarjetas con IA, cuestionarios y todos los modos de estudio— ya es gratis."
+    "blurb": "La suscripción amplía cuántas tarjetas puedes guardar. Todo lo demás —tarjetas con IA, cuestionarios y todos los modos de estudio— ya es gratis.",
+    "settling": "Confirmando"
   },
   "paymentHistory": {
     "title": "Historial de pagos",
