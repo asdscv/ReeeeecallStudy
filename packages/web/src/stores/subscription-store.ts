@@ -28,6 +28,7 @@ interface SubscriptionState {
   fetchSubscription: () => Promise<void>
   registerSession: () => Promise<{ allowed: boolean; reason?: string }>
   sendHeartbeat: () => Promise<'ok' | 'expired' | 'transient'>
+  revalidateSession: () => Promise<'ok' | 'expired' | 'transient'>
   fetchSessions: () => Promise<void>
   revokeSession: (sessionId: string) => Promise<void>
   startHeartbeat: () => () => void  // returns cleanup function
@@ -141,6 +142,22 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
     }
   },
 
+  // Re-validate WITHOUT claiming. `registerSession` evicts the other device of
+  // this platform, so calling it on every tab-visible event turns "I came back"
+  // into "I steal the session" — the two clients then ping-pong and the one you
+  // are actually using is the one that gets kicked (it is already visible, so it
+  // never fires a visibility event to steal back, while the idle one does).
+  // A heartbeat asks "is my row still there?" and takes nothing from anyone.
+  revalidateSession: async () => {
+    const result = await get().sendHeartbeat()
+    // 'ok' → sendHeartbeat already set sessionValid true.
+    // 'transient' → network/token not ready; never kick on a blip.
+    // 'expired' → the row is genuinely gone: show the kick overlay and let the
+    //   user decide (SessionKicked reclaim → registerSession). Never auto-claim.
+    if (result === 'expired') set({ sessionValid: false })
+    return result
+  },
+
   fetchSessions: async () => {
     try {
       const { data, error } = await supabase.rpc('get_user_sessions')
@@ -165,17 +182,13 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   },
 
   startHeartbeat: () => {
-    const tick = async () => {
-      const result = await get().sendHeartbeat()
-      // 'ok' → sessionValid already true. 'transient' (network/auth not ready) →
-      // leave sessionValid as-is; never kick on a blip (the resume-race bug).
-      // 'expired' → the session row is gone: another device of this platform took
-      // over (one-session-per-platform), or the row was cleaned after 30 days.
-      // Show the kick screen. Do NOT auto re-register — that would ping-pong with
-      // the device that took over; the user reclaims via the SessionKicked screen
-      // (or simply returning to this tab re-registers and reclaims it).
-      if (result === 'expired') set({ sessionValid: false })
-    }
+    // The tick IS a revalidation: 'ok' keeps sessionValid true, 'transient'
+    // (network blip, or a token not refreshed yet) is ignored, and only a genuine
+    // session_expired — the row is gone, because another device of this platform
+    // took over or the 30-day cleanup removed it — shows the kick screen. It never
+    // re-registers: that would evict whoever took over and ping-pong with them.
+    // Reclaiming is the user's call, from the SessionKicked screen.
+    const tick = () => { void get().revalidateSession() }
 
     const intervalId = setInterval(tick, HEARTBEAT_INTERVAL)
     return () => clearInterval(intervalId)
