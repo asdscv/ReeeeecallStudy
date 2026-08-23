@@ -236,9 +236,13 @@ export function PaywallScreen() {
   const formatPrice = (product: BillingProduct, pkg: any): string => {
     // Prefer the store-localized price string when the IAP package is loaded
     // (Apple/Google want the store price shown); fall back to the catalog USD price.
+    //
+    // 금액만 돌려준다 — 기간은 호출부가 붙인다. 예전에는 여기서도 붙이려 했는데
+    // `product.period === 'month'` 로 비교했고 카탈로그의 실제 값은 'monthly' 라서
+    // 한 번도 실행되지 않았다. 죽어 있었기에 눈에 띄지 않았을 뿐, 누군가 카탈로그 값을
+    // 'month' 로 바꾸는 순간 호출부의 기간 표기와 겹쳐 "₩6,600/월/월" 이 된다.
     if (pkg?.product?.priceString) return pkg.product.priceString
-    const price = formatProductPrice(product)
-    return product.period === 'month' ? `${price}${t('catalog.perMonth')}` : price
+    return formatProductPrice(product)
   }
 
   const handlePurchaseProduct = async (product: BillingProduct) => {

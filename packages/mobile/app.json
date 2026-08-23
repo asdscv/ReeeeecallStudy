@@ -48,7 +48,12 @@
     },
     "owner": "asdscv",
     "plugins": [
-      "expo-secure-store",
+      [
+        "expo-secure-store",
+        {
+          "faceIDPermission": false
+        }
+      ],
       "expo-notifications",
       "expo-apple-authentication",
       "expo-updates",
@@ -64,7 +69,9 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos to create flashcards from an image."
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos to create flashcards from an image.",
+          "cameraPermission": false,
+          "microphonePermission": false
         }
       ]
     ]
