@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, AppState } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
@@ -11,6 +11,14 @@ import { useTemplateStore } from '@reeeeecall/shared/stores/template-store'
 import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
 import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
 import { CardLimitNotice } from '../components/CardLimitNotice'
+import {
+  clearQuickCreateDraft,
+  hasQuickCreateContent,
+  loadQuickCreateDraft,
+  reconcileQuickCreateDraft,
+  restoredDeckIsUsable,
+  saveQuickCreateDraft,
+} from '../utils/quick-create-draft'
 import {
   QUICK_PRESETS,
   presetFieldSpecs,
@@ -36,7 +44,7 @@ export function QuickCreateScreen() {
   const { t: tLimit } = useTranslation(['errors', 'settings'])
   const navigation = useNavigation<Nav>()
 
-  const { createDeck, deleteDeck } = useDeckStore()
+  const { decks, createDeck, deleteDeck } = useDeckStore()
   const { createCards } = useCardStore()
   const limit = useCardLimit()
   const { findOrCreatePresetTemplate } = useTemplateStore()
@@ -71,6 +79,69 @@ export function QuickCreateScreen() {
     setCreatedCardCount(0)
   }, [])
 
+  // ── 작성 중이던 덱 지키기 ───────────────────────────────────────────────
+  // 카드 입력 화면과 같은 유실입니다(`card-draft` 참고). 여기가 한 번에 가장 많이 치는
+  // 화면이라 잃는 것도 가장 큽니다: 덱 이름·설명·카드 여러 줄. 앱이 포그라운드를 떠날 때
+  // 적어 두고, 화면이 뜰 때 되돌려 넣고, 덱을 다 만들었거나 사용자가 스스로 나가면 버립니다.
+  //
+  // 되살린 '이미 만든 덱' 은 여기서 판단하지 않습니다 — 목록이 도착했는지에 좌우되므로,
+  // 정말 필요한 순간인 저장 직전에 `restoredDeckIsUsable` 로 한 번 묻습니다.
+  const userTyped = useRef(false)
+  const hydrated = useRef(false)
+  // 되살려 온 덱 id — 이번 세션에 직접 만든 덱과 구분해야 합니다(직접 만든 것은 방금 확인한
+  // 사실이라 다시 물을 필요가 없습니다).
+  const [restoredDeckId, setRestoredDeckId] = useState<string | null>(null)
+  useEffect(() => {
+    let active = true
+    ;(async () => {
+      const saved = await loadQuickCreateDraft()
+      if (!active) return
+      hydrated.current = true
+      if (!saved || userTyped.current) return
+      const draft = reconcileQuickCreateDraft(saved, {
+        presetExists: QUICK_PRESETS.some((p) => p.id === saved.presetId),
+      })
+      setDeckName(draft.deckName)
+      setDeckDescription(draft.deckDescription)
+      if (QUICK_PRESETS.some((p) => p.id === draft.presetId)) setPresetId(draft.presetId)
+      setRows(draft.rows.length > 0 ? draft.rows : emptyRows())
+      setCreatedDeckId(draft.createdDeckId)
+      setCreatedCardCount(draft.createdCardCount)
+      setRestoredDeckId(draft.createdDeckId)
+    })()
+    return () => {
+      active = false
+    }
+  }, [])
+
+  // AppState 리스너가 최신 입력을 보되 한 글자마다 구독을 새로 걸지 않도록.
+  const latestEntry = useRef({ deckName, deckDescription, presetId, rows, createdDeckId, createdCardCount })
+  latestEntry.current = { deckName, deckDescription, presetId, rows, createdDeckId, createdCardCount }
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (next) => {
+      if (next === 'active') return
+      // 프로세스가 실제로 끝나는 시점에는 실행될 JS 가 없습니다 — 나가는 길에 찍습니다.
+      const e = latestEntry.current
+      if (hasQuickCreateContent(e.deckName, e.deckDescription, e.rows)) {
+        void saveQuickCreateDraft({
+          deckName: e.deckName,
+          deckDescription: e.deckDescription,
+          presetId: e.presetId,
+          rows: e.rows,
+          createdDeckId: e.createdDeckId,
+          createdCardCount: e.createdCardCount,
+        })
+      } else if (hydrated.current) {
+        // 비운 폼은 되살릴 것이 없습니다. 단 읽어보기도 전이라면 손대지 않습니다 —
+        // 앱이 막 뜬 직후의 빈 폼을 근거로 지우면 저장해 둔 것을 앱이 지웁니다.
+        void clearQuickCreateDraft()
+      }
+    })
+    return () => sub.remove()
+  }, [])
+
+  const markTyped = () => { userTyped.current = true }
+
   const preset: QuickPreset = QUICK_PRESETS.find((p) => p.id === presetId) ?? QUICK_PRESETS[0]
   const specs: QuickFieldSpec[] = presetFieldSpecs(preset)
 
@@ -99,7 +170,13 @@ export function QuickCreateScreen() {
   // Android hardware back button pop the screen without it — clean up on any leave.
   // (no-op when the deck has cards, so a successful create is never deleted.)
   useEffect(() => {
-    const unsub = navigation.addListener('beforeRemove', () => { cleanupOrphanDeck() })
+    const unsub = navigation.addListener('beforeRemove', (e) => {
+      cleanupOrphanDeck()
+      // 뒤로 나가는 것만 "버리기"입니다. 화면이 앱 사정으로 치워지는 경우(내비게이션
+      // 복원·리셋)까지 버리면 구해 둔 글을 사용자가 아니라 앱이 지웁니다.
+      const type = e.data.action.type
+      if (type === 'GO_BACK' || type === 'POP' || type === 'POP_TO_TOP') void clearQuickCreateDraft()
+    })
     return unsub
   }, [navigation, createdDeckId, createdCardCount])
   const handleCancel = () => {
@@ -117,8 +194,10 @@ export function QuickCreateScreen() {
     setCreatedDeckId(null)
     setCreatedCardCount(0)
   }
-  const setCell = (rowIdx: number, key: string, value: string) =>
+  const setCell = (rowIdx: number, key: string, value: string) => {
+    markTyped()
     setRows((prev) => prev.map((r, i) => (i === rowIdx ? { ...r, [key]: value } : r)))
+  }
   const addRow = () => setRows((prev) => [...prev, {}])
   const removeRow = (idx: number) => setRows((prev) => prev.filter((_, i) => i !== idx))
 
@@ -181,6 +260,15 @@ export function QuickCreateScreen() {
 
       // 2. create the deck only once; a retry after a later failure reuses it.
       let deckId = createdDeckId
+      // 되살려 온 덱 흔적이라면 아직 그 덱이 있는지 여기서 한 번 확인합니다 — 하루 전에
+      // 만들어 둔 덱은 그새 지워졌을 수 있고, 없는 덱에 카드를 넣으려 하면 이 화면에서
+      // 빠져나올 수 없습니다.
+      if (deckId && deckId === restoredDeckId && !restoredDeckIsUsable(deckId, decks.map((d) => d.id))) {
+        deckId = null
+        setCreatedDeckId(null)
+        setCreatedCardCount(0)
+        setRestoredDeckId(null)
+      }
       if (!deckId) {
         const deck = await createDeck({
           name,
@@ -197,11 +285,13 @@ export function QuickCreateScreen() {
 
       // 3. insert ONLY the cards not already saved by a previous attempt, so a
       // retry after a partial insert never duplicates the already-saved cards.
-      const remaining = cards.slice(createdCardCount)
+      // 위에서 흔적을 버렸다면 처음부터 다시 넣습니다 (setState 는 아직 반영 전이라 deckId 로 판단).
+      const alreadyInserted = deckId === createdDeckId ? createdCardCount : 0
+      const remaining = cards.slice(alreadyInserted)
       const inserted = remaining.length
         ? await createCards({ deck_id: deckId, template_id: templateId, cards: remaining })
         : 0
-      const total = createdCardCount + inserted
+      const total = alreadyInserted + inserted
       setCreatedCardCount(total)
 
       if (total < cards.length) {
@@ -215,6 +305,7 @@ export function QuickCreateScreen() {
       // of falling back to a default-template shape.
       useDeckStore.getState().invalidate('templates')
       succeeded.current = true // guard the beforeRemove listener firing during replace
+      void clearQuickCreateDraft()
       navigation.replace('DeckDetail', { deckId })
     } finally {
       setLoading(false)
@@ -241,7 +332,7 @@ export function QuickCreateScreen() {
           label={t('decks:quickCreate.deckName')}
           placeholder={t('decks:quickCreate.deckNamePlaceholder')}
           value={deckName}
-          onChangeText={setDeckName}
+          onChangeText={(v) => { markTyped(); setDeckName(v) }}
           autoFocus
         />
 
@@ -251,7 +342,7 @@ export function QuickCreateScreen() {
           label={t('decks:quickCreate.deckDescription')}
           placeholder={t('decks:quickCreate.deckDescriptionPlaceholder')}
           value={deckDescription}
-          onChangeText={setDeckDescription}
+          onChangeText={(v) => { markTyped(); setDeckDescription(v) }}
         />
 
         {/* Card shape picker (by field count) */}
