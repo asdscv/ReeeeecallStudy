@@ -68,8 +68,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with: { version: 9.15.0 }
+      # Node 22, not 20: `eas-version: latest` pulls eas-cli 22.x, whose dependency
+      # @oclif/plugin-autocomplete declares engines.node >= 22, and yarn refuses to
+      # install it on 20 — the deploy died at "Found incompatible module" before a
+      # single line of app code was touched. The CLI version floats by design (so a
+      # deploy is never held back by a pinned CLI); the runtime under it has to keep up.
       - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: 'pnpm' }
+        with: { node-version: 22, cache: 'pnpm' }
       - run: pnpm install --frozen-lockfile
       - uses: expo/expo-github-action@v8
         with:
@@ -118,8 +123,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with: { version: 9.15.0 }
+      # Node 22, not 20: `eas-version: latest` pulls eas-cli 22.x, whose dependency
+      # @oclif/plugin-autocomplete declares engines.node >= 22, and yarn refuses to
+      # install it on 20 — the deploy died at "Found incompatible module" before a
+      # single line of app code was touched. The CLI version floats by design (so a
+      # deploy is never held back by a pinned CLI); the runtime under it has to keep up.
       - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: 'pnpm' }
+        with: { node-version: 22, cache: 'pnpm' }
       - run: pnpm install --frozen-lockfile
       - uses: expo/expo-github-action@v8
         with:
