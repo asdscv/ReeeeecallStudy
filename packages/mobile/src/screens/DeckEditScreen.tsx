@@ -16,6 +16,7 @@ import { LEARNING_LANGUAGES, NATIVE_LANGUAGES, STUDY_LEVELS } from '@reeeeecall/
 import { DEFAULT_SRS_SETTINGS } from '@reeeeecall/shared/types/database'
 import type { SrsSettings, Card } from '@reeeeecall/shared/types/database'
 import type { DecksStackParamList } from '../navigation/types'
+import { fetchAllRows, fetchRowsByIds } from '@reeeeecall/shared/lib/fetch-all-rows'
 
 type Nav = NativeStackNavigationProp<DecksStackParamList, 'DeckEdit'>
 type Route = RouteProp<DecksStackParamList, 'DeckEdit'>
@@ -79,13 +80,13 @@ export function DeckEditScreen() {
   useEffect(() => {
     if (!deckId) return
     const supabase = getMobileSupabase()
-    supabase
+    fetchAllRows<Card>(() => supabase
       .from('cards')
       .select('*')
       .eq('deck_id', deckId)
-      .then(({ data }) => {
-        if (data) setCards(data as Card[])
-      })
+      .order('id', { ascending: true }))
+      .then((data) => setCards(data))
+      .catch((e) => console.warn('[DeckEditScreen] cards fetch failed:', e))
   }, [deckId])
 
   const parseLearningSteps = (text: string): number[] => {

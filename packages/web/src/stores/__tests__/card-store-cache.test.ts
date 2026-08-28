@@ -8,10 +8,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const { mockFrom } = vi.hoisted(() => ({ mockFrom: vi.fn() }))
 
+// fetchCards pages through `fetchAllRows`, so the chain now ends at `.range(from, to)`
+// rather than resolving on `.order()`. A short first page ends the loop, which is what
+// keeps "one fetch per cache miss" the thing these tests actually measure.
 const cardsChain = {
   select: vi.fn().mockReturnThis(),
   eq: vi.fn().mockReturnThis(),
-  order: vi.fn().mockResolvedValue({ data: [{ id: 'c1', deck_id: 'd1' }], error: null }),
+  order: vi.fn().mockReturnThis(),
+  range: vi.fn().mockResolvedValue({ data: [{ id: 'c1', deck_id: 'd1' }], error: null }),
 }
 
 const mockSupabase = vi.hoisted(() => ({

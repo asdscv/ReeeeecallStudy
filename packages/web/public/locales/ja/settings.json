@@ -106,11 +106,11 @@
     "stats": "学習統計",
     "statsDesc": "学習成果の全体サマリー",
     "sessions": "学習セッション",
-    "sessionsDesc": "すべての学習セッション履歴（最大5,000件）",
+    "sessionsDesc": "すべての学習セッション履歴",
     "decks": "デッキ",
     "decksDesc": "すべてのデッキのメタデータ",
     "cards": "カード",
-    "cardsDesc": "SRSステータスを含む全カードデータ（最大10,000件）"
+    "cardsDesc": "SRSステータスを含む全カードデータ"
   },
   "quickActions": {
     "quickStudy": "クイック学習",

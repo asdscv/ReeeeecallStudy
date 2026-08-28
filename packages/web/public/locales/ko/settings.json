@@ -106,11 +106,11 @@
     "stats": "학습 통계",
     "statsDesc": "전체 학습 성과 요약",
     "sessions": "학습 세션",
-    "sessionsDesc": "전체 학습 세션 기록 (최대 5,000개)",
+    "sessionsDesc": "전체 학습 세션 기록",
     "decks": "덱",
     "decksDesc": "전체 덱 메타데이터",
     "cards": "카드",
-    "cardsDesc": "SRS 상태를 포함한 전체 카드 데이터 (최대 10,000개)"
+    "cardsDesc": "SRS 상태를 포함한 전체 카드 데이터"
   },
   "quickActions": {
     "quickStudy": "빠른 학습",

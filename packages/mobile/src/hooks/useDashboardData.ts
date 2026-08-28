@@ -9,6 +9,7 @@ import {
   getForecastReviews,
   filterLogsByPeriod,
 } from '@reeeeecall/shared/lib/stats'
+import { fetchAllRows } from '@reeeeecall/shared/lib/fetch-all-rows'
 import { periodToDays, shouldShowHeatmap } from '@reeeeecall/shared/lib/time-period'
 import type { TimePeriod } from '@reeeeecall/shared/lib/time-period'
 
@@ -56,41 +57,35 @@ export function useDashboardData(period: TimePeriod) {
     const supabase = getMobileSupabase()
     const days = periodToDays(period)
 
-    // Use Promise.resolve().then() pattern — proven to work in RN with Supabase
-    const logsPromise = Promise.resolve(
+    // PostgREST caps EVERY response at max_rows=1000 (project setting), and a client-side
+    // `.limit(5000)` does not lift it. Unpaginated, the dashboard computed its numbers from
+    // whatever 1000 rows came back first: at 2,200 cards the mastery rate rendered 100%.
+    // Paging needs a total order, so cards — which had no ORDER BY at all — sort by id.
+    const logsPromise = fetchAllRows<{ studied_at: string }>(() =>
       supabase
         .from('study_logs')
         .select('studied_at')
         .eq('user_id', user.id)
         .gte('studied_at', daysAgoUTC(180))
         .order('studied_at', { ascending: false })
-        .limit(5000),
+        .order('id', { ascending: true }),
     )
 
-    const cardsPromise = Promise.resolve(
+    const cardsPromise = fetchAllRows<{
+      srs_status: string
+      interval_days: number
+      next_review_at: string | null
+    }>(() =>
       supabase
         .from('cards')
-        .select('srs_status, interval_days, next_review_at')
-        .eq('user_id', user.id),
+        .select('srs_status, interval_days, next_review_at, id')
+        .eq('user_id', user.id)
+        .order('id', { ascending: true }),
     )
 
     Promise.all([logsPromise, cardsPromise])
-      .then(([logsRes, cardsRes]) => {
+      .then(([allLogs, cards]) => {
         if (!mountedRef.current) return
-
-        if (logsRes.error) {
-          console.warn('[useDashboardData] study_logs error:', logsRes.error.message)
-        }
-        if (cardsRes.error) {
-          console.warn('[useDashboardData] cards error:', cardsRes.error.message)
-        }
-
-        const allLogs = (logsRes.data ?? []) as { studied_at: string }[]
-        const cards = (cardsRes.data ?? []) as {
-          srs_status: string
-          interval_days: number
-          next_review_at: string | null
-        }[]
 
         const filteredLogs = filterLogsByPeriod(allLogs, days)
         console.log('[dashboard] logs:', allLogs.length, 'filtered:', filteredLogs.length)

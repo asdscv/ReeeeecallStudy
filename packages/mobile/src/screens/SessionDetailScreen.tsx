@@ -15,6 +15,7 @@ import {
 } from '@reeeeecall/shared/lib/study-history'
 import type { StudySession, StudyLog, Card } from '@reeeeecall/shared/types/database'
 import type { HomeStackParamList } from '../navigation/types'
+import { fetchAllRows, fetchRowsByIds } from '@reeeeecall/shared/lib/fetch-all-rows'
 
 type Route = RouteProp<HomeStackParamList, 'SessionDetail'>
 type LogWithCard = StudyLog & { card?: Card }
@@ -60,7 +61,7 @@ export function SessionDetailScreen() {
       const dayEnd = new Date(sessionDate)
       dayEnd.setHours(23, 59, 59, 999)
 
-      const { data: rawLogs } = await supabase
+      const rawLogs = await fetchAllRows<StudyLog>(() => supabase
         .from('study_logs')
         .select('*')
         .eq('deck_id', session.deck_id)
@@ -68,21 +69,21 @@ export function SessionDetailScreen() {
         .gte('studied_at', dayStart.toISOString())
         .lte('studied_at', dayEnd.toISOString())
         .order('studied_at', { ascending: true })
+        .order('id', { ascending: true }))
 
       if (!mountedRef.current) return
 
-      const matchedLogs = (rawLogs ?? []) as StudyLog[]
+      const matchedLogs = rawLogs
       const cardIds = [...new Set(matchedLogs.map((l) => l.card_id))]
 
       let cardMap = new Map<string, Card>()
       if (cardIds.length > 0) {
-        const { data: cards } = await supabase
+        const cards = await fetchRowsByIds<Card>(cardIds, (chunk) => supabase
           .from('cards')
           .select('*')
-          .in('id', cardIds)
-        if (cards) {
-          cardMap = new Map((cards as Card[]).map((c) => [c.id, c]))
-        }
+          .in('id', chunk)
+          .order('id', { ascending: true }))
+        cardMap = new Map(cards.map((c) => [c.id, c]))
       }
 
       if (mountedRef.current) {

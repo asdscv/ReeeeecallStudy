@@ -24,6 +24,7 @@ import { TimePeriodTabs } from '../components/common/TimePeriodTabs'
 import { DailyStudyChart } from '../components/dashboard/DailyStudyChart'
 import { StudyHeatmap } from '../components/dashboard/StudyHeatmap'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
+import { fetchAllRows } from '@reeeeecall/shared/lib/fetch-all-rows'
 
 const STATUS_COLORS: Record<string, string> = {
   new: '#3b82f6',
@@ -69,13 +70,18 @@ export function DeckEditPage() {
 
       const [deckRes, cardsRes, logsRes] = await Promise.all([
         supabase.from('decks').select('*').eq('id', deckId).single(),
-        supabase.from('cards').select('*').eq('deck_id', deckId),
-        supabase
+        fetchAllRows<Card>(() => supabase
+          .from('cards')
+          .select('*')
+          .eq('deck_id', deckId)
+          .order('id', { ascending: true })),
+        fetchAllRows<StudyLog>(() => supabase
           .from('study_logs')
           .select('*')
           .eq('deck_id', deckId)
           .gte('studied_at', daysAgoUTC(365))
-          .order('studied_at', { ascending: false }),
+          .order('studied_at', { ascending: false })
+          .order('id', { ascending: true })),
       ])
 
       if (cancelled) return
@@ -87,8 +93,8 @@ export function DeckEditPage() {
       }
 
       setDeck(deckData)
-      setCards((cardsRes.data ?? []) as Card[])
-      setStudyLogs((logsRes.data ?? []) as StudyLog[])
+      setCards(cardsRes)
+      setStudyLogs(logsRes)
 
       setFormValues({
         name: deckData.name,
