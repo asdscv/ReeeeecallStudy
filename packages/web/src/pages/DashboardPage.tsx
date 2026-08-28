@@ -5,6 +5,7 @@ import { useAuthStore } from '../stores/auth-store'
 import { useDeckStore } from '../stores/deck-store'
 import { supabase } from '../lib/supabase'
 import { daysAgoUTC } from '../lib/date-utils'
+import { fetchAllRows } from '@reeeeecall/shared/lib/fetch-all-rows'
 import {
   getForecastReviews,
   getHeatmapData,
@@ -54,28 +55,36 @@ export function DashboardPage() {
     const fetchDashboardData = async () => {
       setDataLoading(true)
 
-      // Fetch cards (only needed columns) and study logs in parallel
-      const [cardsRes, logsRes] = await Promise.all([
-        supabase
-          .from('cards')
-          .select('id, deck_id, srs_status, ease_factor, interval_days, next_review_at')
-          .eq('user_id', user.id),
-        supabase
-          .from('study_logs')
-          .select('id, card_id, deck_id, rating, studied_at')
-          .eq('user_id', user.id)
-          .gte('studied_at', daysAgoUTC(180))
-          .order('studied_at', { ascending: false })
-          .limit(5000),
-      ])
+      // PostgREST caps EVERY response at max_rows=1000 and a client `.limit(5000)` does not
+      // lift it, so both reads have to page — otherwise mastery rate and the review forecast
+      // are computed from whichever 1000 rows arrived first (2,200 cards rendered 100%).
+      // Cards had no ORDER BY, which paging needs to be stable: order by id.
+      try {
+        const [cards, logs] = await Promise.all([
+          fetchAllRows<Card>(() =>
+            supabase
+              .from('cards')
+              .select('id, deck_id, srs_status, ease_factor, interval_days, next_review_at')
+              .eq('user_id', user.id)
+              .order('id', { ascending: true })),
+          fetchAllRows<StudyLog>(() =>
+            supabase
+              .from('study_logs')
+              .select('id, card_id, deck_id, rating, studied_at')
+              .eq('user_id', user.id)
+              .gte('studied_at', daysAgoUTC(180))
+              .order('studied_at', { ascending: false })
+              .order('id', { ascending: true })),
+        ])
 
-      const cards = cardsRes.data
-      const logs = logsRes.data
-
-      if (!cancelled) {
-        setAllCards((cards ?? []) as Card[])
-        setStudyLogs((logs ?? []) as StudyLog[])
-        setDataLoading(false)
+        if (!cancelled) {
+          setAllCards(cards)
+          setStudyLogs(logs)
+        }
+      } catch (err) {
+        console.warn('[DashboardPage] fetch error:', err)
+      } finally {
+        if (!cancelled) setDataLoading(false)
       }
     }
 

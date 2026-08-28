@@ -52,3 +52,24 @@ export async function fetchAllRows<T>(
 
   throw new Error(`Row fetch exceeded the ${maxRows} row safety limit`)
 }
+
+/**
+ * Fetch rows for an explicit id list. `.in()` is bounded twice over — by `max_rows` on the
+ * response and by URL length on the request — so the ids are chunked and every chunk paged.
+ * `makeQuery` must build a fresh query for the chunk it is handed.
+ */
+export async function fetchRowsByIds<T>(
+  ids: readonly string[],
+  makeQuery: (chunk: string[]) => unknown,
+  chunkSize = 200,
+): Promise<T[]> {
+  if (!Number.isInteger(chunkSize) || chunkSize <= 0) {
+    throw new RangeError('chunkSize must be a positive integer')
+  }
+  const out: T[] = []
+  for (let i = 0; i < ids.length; i += chunkSize) {
+    const chunk = ids.slice(i, i + chunkSize)
+    out.push(...(await fetchAllRows<T>(() => makeQuery(chunk))))
+  }
+  return out
+}

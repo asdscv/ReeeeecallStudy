@@ -13,6 +13,7 @@ import { todayDateKey, utcToLocalDateKey, localDateToUTCRange } from '@reeeeecal
 import type { StudyStackParamList } from '../navigation/types'
 import type { StudyMode } from '@reeeeecall/shared/types/database'
 import type { CrammingFilter } from '@reeeeecall/shared/lib/cramming-queue'
+import { fetchAllRows, fetchRowsByIds } from '@reeeeecall/shared/lib/fetch-all-rows'
 
 type Nav = NativeStackNavigationProp<StudyStackParamList, 'StudySetup'>
 type Route = RouteProp<StudyStackParamList, 'StudySetup'>
@@ -86,12 +87,13 @@ export function StudySetupScreen() {
   useEffect(() => {
     if (!selectedDeckId) return
     const supabase = getMobileSupabase()
-    supabase
+    fetchAllRows<{ created_at: string }>(() => supabase
       .from('cards')
-      .select('created_at')
+      .select('created_at, id')
       .eq('deck_id', selectedDeckId)
       .neq('srs_status', 'suspended')
-      .then(({ data }) => {
+      .order('id', { ascending: true }))
+      .then((data) => {
         if (data) {
           const dates = new Set<string>()
           data.forEach((c: { created_at: string }) => {
