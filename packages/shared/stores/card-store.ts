@@ -4,6 +4,7 @@ import { guard } from '../lib/rate-limit-instance'
 import { useDeckStore, hasCardUsageDetailInterest } from './deck-store'
 import { createStaleCache } from '../lib/cache/stale-cache'
 import type { Card } from '../types/database'
+import { fetchAllRows } from '../lib/fetch-all-rows'
 
 /**
  * The owned-card limit guard (mig 116) raises SQLSTATE PT402 with hint
@@ -130,18 +131,22 @@ export const useCardStore = create<CardState>((set, get) => ({
       return
     }
     set({ loading: true, error: null })
-    const { data, error } = await supabase
-      .from('cards')
-      .select('*')
-      .eq('deck_id', deckId)
-      .order('sort_position', { ascending: true })
-
-    if (error) {
-      set({ error: error.message, loading: false })
-    } else {
-      const cards = (data ?? []) as Card[]
+    try {
+      // PostgREST caps a response at max_rows=1000, so an unpaginated read hid every card
+      // past the thousandth in a large deck — official decks ship 1,500-3,000 cards, and
+      // those cards could not be listed, edited or deleted. `sort_position` alone is not a
+      // total order (duplicates are possible), so `id` breaks the tie for stable paging.
+      const cards = await fetchAllRows<Card>(() =>
+        supabase
+          .from('cards')
+          .select('*')
+          .eq('deck_id', deckId)
+          .order('sort_position', { ascending: true })
+          .order('id', { ascending: true }))
       cacheDeckCards(deckId, cards)
       set({ cards, loading: false })
+    } catch (e) {
+      set({ error: e instanceof Error ? e.message : String(e), loading: false })
     }
   },
 

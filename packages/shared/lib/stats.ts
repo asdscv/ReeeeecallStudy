@@ -1,6 +1,7 @@
 import { supabase } from './supabase'
 import { utcToLocalDateKey, dateToLocalKey, parseUTC } from './date-utils'
 import type { StudyLog } from '../types/database'
+import { fetchAllRows } from './fetch-all-rows'
 
 // ─── Pure Functions (testable without Supabase) ──────────────────────
 
@@ -242,22 +243,23 @@ export async function fetchStudyLogs(
   userId: string,
   fromDate?: string,
 ): Promise<StudyLog[]> {
-  let query = supabase
-    .from('study_logs')
-    .select('*')
-    .eq('user_id', userId)
-    .order('studied_at', { ascending: false })
-
-  if (fromDate) {
-    query = query.gte('studied_at', fromDate)
-  }
-
-  const { data, error } = await query
-  if (error) {
+  // Paged: PostgREST caps a single response at max_rows=1000, so an active user's log
+  // history silently stopped at a thousand rows and every stat built on it was wrong.
+  try {
+    return await fetchAllRows<StudyLog>(() => {
+      let query = supabase
+        .from('study_logs')
+        .select('*')
+        .eq('user_id', userId)
+        .order('studied_at', { ascending: false })
+        .order('id', { ascending: true })
+      if (fromDate) query = query.gte('studied_at', fromDate)
+      return query
+    })
+  } catch (error) {
     console.error('fetchStudyLogs error:', error)
     return []
   }
-  return (data ?? []) as StudyLog[]
 }
 
 /**
@@ -267,20 +269,19 @@ export async function fetchDeckStudyLogs(
   deckId: string,
   fromDate?: string,
 ): Promise<StudyLog[]> {
-  let query = supabase
-    .from('study_logs')
-    .select('*')
-    .eq('deck_id', deckId)
-    .order('studied_at', { ascending: false })
-
-  if (fromDate) {
-    query = query.gte('studied_at', fromDate)
-  }
-
-  const { data, error } = await query
-  if (error) {
+  try {
+    return await fetchAllRows<StudyLog>(() => {
+      let query = supabase
+        .from('study_logs')
+        .select('*')
+        .eq('deck_id', deckId)
+        .order('studied_at', { ascending: false })
+        .order('id', { ascending: true })
+      if (fromDate) query = query.gte('studied_at', fromDate)
+      return query
+    })
+  } catch (error) {
     console.error('fetchDeckStudyLogs error:', error)
     return []
   }
-  return (data ?? []) as StudyLog[]
 }

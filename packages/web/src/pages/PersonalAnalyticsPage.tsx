@@ -8,6 +8,7 @@ import {
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../stores/auth-store'
 import { resolveRange, type DateRange, type TimePeriod } from '../lib/time-period'
+import { fetchAllRows } from '@reeeeecall/shared/lib/fetch-all-rows'
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
 
@@ -84,14 +85,14 @@ export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {})
   }
 
   async function loadWeakTopics(userId: string) {
-    const { data: logs } = await supabase
+    const logs = await fetchAllRows<{ deck_id: string; rating: string }>(() => supabase
       .from('study_logs')
       .select('deck_id, rating')
       .eq('user_id', userId)
       .gte('studied_at', fromIso ?? '1970-01-01T00:00:00.000Z')
       .lte('studied_at', toIso ?? '2999-01-01T00:00:00.000Z')
       .order('studied_at', { ascending: false })
-      .limit(2000)
+      .order('id', { ascending: true }))
     if (!logs || logs.length === 0) return
 
     const { data: decks } = await supabase
@@ -122,12 +123,13 @@ export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {})
   }
 
   async function loadTimeDistribution(userId: string) {
-    const { data: sessions } = await supabase
+    const sessions = await fetchAllRows<{ started_at: string; total_duration_ms: number }>(() => supabase
       .from('study_sessions')
       .select('started_at, total_duration_ms')
       .eq('user_id', userId)
       .gte('started_at', fromIso ?? '1970-01-01T00:00:00.000Z')
       .lte('started_at', toIso ?? '2999-01-01T00:00:00.000Z')
+      .order('id', { ascending: true }))
     if (!sessions) return
 
     const hourMap: Record<number, number> = {}
@@ -147,13 +149,13 @@ export function PersonalAnalyticsContent({ period, range }: AnalyticsProps = {})
   }
 
   async function loadModeEffectiveness(userId: string) {
-    const { data: logs } = await supabase
+    const logs = await fetchAllRows<{ study_mode: string; rating: string }>(() => supabase
       .from('study_logs')
       .select('study_mode, rating')
       .eq('user_id', userId)
       .gte('studied_at', fromIso ?? '1970-01-01T00:00:00.000Z')
       .lte('studied_at', toIso ?? '2999-01-01T00:00:00.000Z')
-      .limit(5000)
+      .order('id', { ascending: true }))
     if (!logs || logs.length === 0) return
 
     const modeStats: Record<string, { total: number; good: number }> = {}

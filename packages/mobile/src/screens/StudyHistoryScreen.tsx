@@ -36,6 +36,7 @@ import {
 import type { StudySession, StudyLog } from '@reeeeecall/shared/types/database'
 import type { HomeStackParamList } from '../navigation/types'
 import { AiActivityList } from '../components/history/AiActivityList'
+import { fetchAllRows, fetchRowsByIds } from '@reeeeecall/shared/lib/fetch-all-rows'
 
 /**
  * Matches web StudyHistoryPage:
@@ -73,17 +74,17 @@ export function StudyHistoryScreen() {
         .eq('user_id', user.id)
         .order('completed_at', { ascending: false })
         .limit(500),
-      supabase
+      fetchAllRows<StudyLog>(() => supabase
         .from('study_logs')
         .select('*')
         .eq('user_id', user.id)
         .order('studied_at', { ascending: false })
-        .limit(5000),
+        .order('id', { ascending: true })),
     ])
 
     if (mountedRef.current) {
       const realSessions = (sessionsRes.data ?? []) as StudySession[]
-      const logs = (logsRes.data ?? []) as StudyLog[]
+      const logs = logsRes
       setAllLogs(logs)
       const logSessions = aggregateLogsToSessions(logs)
       setAllSessions(mergeSessionsWithLogs(realSessions, logSessions))

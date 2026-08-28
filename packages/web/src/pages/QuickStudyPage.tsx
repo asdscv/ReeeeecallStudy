@@ -20,6 +20,7 @@ import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import { CardGridSkeleton } from '../components/common/Skeleton'
 import { MultiDeckSelector } from '../components/study/MultiDeckSelector'
 import type { Deck, StudyMode } from '../types/database'
+import { fetchAllRows } from '@reeeeecall/shared/lib/fetch-all-rows'
 
 export function QuickStudyPage() {
   const { t } = useTranslation(['study', 'common'])
@@ -51,11 +52,13 @@ export function QuickStudyPage() {
   useEffect(() => {
     if (!selectedDeck || selectedMode !== 'by_date') return
     const load = async () => {
-      const { data: cardDates } = await supabase
+      // A deck past 1,000 cards only offered dates from its first page (max_rows).
+      const cardDates = await fetchAllRows<{ created_at: string }>(() => supabase
         .from('cards')
-        .select('created_at')
+        .select('created_at, id')
         .eq('deck_id', selectedDeck.id)
         .neq('srs_status', 'suspended')
+        .order('id', { ascending: true }))
       if (cardDates) {
         const dates = new Set<string>()
         cardDates.forEach((c: { created_at: string }) => {

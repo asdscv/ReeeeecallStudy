@@ -106,11 +106,11 @@
     "stats": "Estadísticas de estudio",
     "statsDesc": "Resumen del rendimiento de estudio",
     "sessions": "Sesiones de estudio",
-    "sessionsDesc": "Todo el historial de sesiones (hasta 5000)",
+    "sessionsDesc": "Todo el historial de sesiones",
     "decks": "Barajas",
     "decksDesc": "Todos los metadatos de barajas",
     "cards": "Tarjetas",
-    "cardsDesc": "Todos los datos de tarjetas con estado SRS (hasta 10000)"
+    "cardsDesc": "Todos los datos de tarjetas con estado SRS"
   },
   "quickActions": {
     "quickStudy": "Estudio rápido",

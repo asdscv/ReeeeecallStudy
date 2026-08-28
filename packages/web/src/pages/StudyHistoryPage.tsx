@@ -40,6 +40,7 @@ import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import { ListSkeleton } from '../components/common/Skeleton'
 import type { StudySession, StudyLog, Card, Deck, DeckStudyState } from '../types/database'
 import { AiActivityList } from '../components/study-history/AiActivityList'
+import { fetchAllRows } from '@reeeeecall/shared/lib/fetch-all-rows'
 
 const PersonalAnalyticsContent = lazy(() =>
   import('./PersonalAnalyticsPage').then(m => ({ default: m.PersonalAnalyticsContent }))
@@ -96,16 +97,17 @@ export function StudyHistoryPage() {
           .eq('user_id', user.id)
           .order('completed_at', { ascending: false })
           .limit(500),
-        supabase
+        fetchAllRows<StudyLog>(() => supabase
           .from('study_logs')
           .select('*')
           .eq('user_id', user.id)
           .order('studied_at', { ascending: false })
-          .limit(5000),
-        supabase
+          .order('id', { ascending: true })),
+        fetchAllRows<Pick<Card, 'id' | 'deck_id' | 'srs_status'>>(() => supabase
           .from('cards')
           .select('id, deck_id, srs_status')
-          .eq('user_id', user.id),
+          .eq('user_id', user.id)
+          .order('id', { ascending: true })),
         supabase
           .from('deck_study_state')
           .select('*')
@@ -114,8 +116,8 @@ export function StudyHistoryPage() {
 
       if (!cancelled) {
         const realSessions = (sessionsRes.data ?? []) as StudySession[]
-        const logs = (logsRes.data ?? []) as StudyLog[]
-        const cards = (cardsRes.data ?? []) as Pick<Card, 'id' | 'deck_id' | 'srs_status'>[]
+        const logs = logsRes
+        const cards = cardsRes
         const studyStates = (studyStateRes.data ?? []) as DeckStudyState[]
 
         setAllLogs(logs)

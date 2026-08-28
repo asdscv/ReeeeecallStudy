@@ -4,6 +4,7 @@ import { Download, Loader2 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { exportToCsv } from '../../lib/csv-export'
 import { useAuthStore } from '../../stores/auth-store'
+import { fetchAllRows } from '@reeeeecall/shared/lib/fetch-all-rows'
 import { toast } from 'sonner'
 
 export function UserStatsExport() {
@@ -25,13 +26,15 @@ export function UserStatsExport() {
           break
         }
         case 'sessions': {
-          const { data, error } = await supabase
-            .from('study_sessions')
-            .select('id, deck_id, study_mode, cards_studied, total_cards, total_duration_ms, ratings, started_at, completed_at')
-            .eq('user_id', user.id)
-            .order('completed_at', { ascending: false })
-            .limit(5000)
-          if (error) throw error
+          // `.limit(5000)` never applied: PostgREST caps the response at max_rows=1000, so
+          // every export beyond a thousand rows silently dropped the rest. Page instead.
+          const data = await fetchAllRows<Record<string, unknown>>(() =>
+            supabase
+              .from('study_sessions')
+              .select('id, deck_id, study_mode, cards_studied, total_cards, total_duration_ms, ratings, started_at, completed_at')
+              .eq('user_id', user.id)
+              .order('completed_at', { ascending: false })
+              .order('id', { ascending: true }))
           if (!data || data.length === 0) {
             toast.info(t('export.noData', 'No data to export'))
             break
@@ -40,12 +43,13 @@ export function UserStatsExport() {
           break
         }
         case 'decks': {
-          const { data, error } = await supabase
-            .from('decks')
-            .select('id, name, description, color, icon, is_archived, created_at, updated_at')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-          if (error) throw error
+          const data = await fetchAllRows<Record<string, unknown>>(() =>
+            supabase
+              .from('decks')
+              .select('id, name, description, color, icon, is_archived, created_at, updated_at')
+              .eq('user_id', user.id)
+              .order('created_at', { ascending: false })
+              .order('id', { ascending: true }))
           if (!data || data.length === 0) {
             toast.info(t('export.noData', 'No data to export'))
             break
@@ -54,17 +58,17 @@ export function UserStatsExport() {
           break
         }
         case 'cards': {
-          const { data, error } = await supabase
-            .from('cards')
-            .select('id, deck_id, field_values, tags, srs_status, ease_factor, interval_days, repetitions, next_review_at, created_at')
-            .eq('user_id', user.id)
-            .limit(10000)
-          if (error) throw error
+          const data = await fetchAllRows<Record<string, unknown>>(() =>
+            supabase
+              .from('cards')
+              .select('id, deck_id, field_values, tags, srs_status, ease_factor, interval_days, repetitions, next_review_at, created_at')
+              .eq('user_id', user.id)
+              .order('id', { ascending: true }))
           if (!data || data.length === 0) {
             toast.info(t('export.noData', 'No data to export'))
             break
           }
-          exportToCsv('my-cards', data as unknown as Record<string, unknown>[])
+          exportToCsv('my-cards', data)
           break
         }
       }
@@ -79,9 +83,9 @@ export function UserStatsExport() {
 
   const exports = [
     { type: 'stats' as const, label: t('export.stats', 'Study Statistics'), desc: t('export.statsDesc', 'Overall study performance summary') },
-    { type: 'sessions' as const, label: t('export.sessions', 'Study Sessions'), desc: t('export.sessionsDesc', 'All study session history (up to 5,000)') },
+    { type: 'sessions' as const, label: t('export.sessions', 'Study Sessions'), desc: t('export.sessionsDesc', 'Every study session, start to finish') },
     { type: 'decks' as const, label: t('export.decks', 'Decks'), desc: t('export.decksDesc', 'All deck metadata') },
-    { type: 'cards' as const, label: t('export.cards', 'Cards'), desc: t('export.cardsDesc', 'All card data with SRS status (up to 10,000)') },
+    { type: 'cards' as const, label: t('export.cards', 'Cards'), desc: t('export.cardsDesc', 'Every card with its SRS status') },
   ]
 
   return (
