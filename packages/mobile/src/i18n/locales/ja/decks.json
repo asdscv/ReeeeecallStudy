@@ -6,8 +6,8 @@
   "createFirst": "+ 最初のデッキを作成",
   "deleteDeck": "デッキを削除",
   "deleteConfirm": "デッキ「{{name}}」とすべてのカードが削除されます。この操作は元に戻せません。",
-  "searchPlaceholder": "Search decks...",
-  "aiGenerate": "AI Generate",
+  "searchPlaceholder": "デッキを検索...",
+  "aiGenerate": "AI生成",
   "detail": {
     "backToList": "← デッキ一覧",
     "totalCards": "合計{{count, number}}枚",

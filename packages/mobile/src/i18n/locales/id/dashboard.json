@@ -28,20 +28,20 @@
   },
   "gamification": {
     "freezes": "sisa {{count, number}} pembekuan",
-    "dailyGoal": "Daily Goal"
+    "dailyGoal": "Target Harian"
   },
   "level": {
     "title": "Level {{level}}",
-    "levelUp": "Level Up!",
+    "levelUp": "Naik Level!",
     "xpLabel": "XP",
-    "allAchievements": "All Achievements",
-    "recent": "Recent:"
+    "allAchievements": "Semua Pencapaian",
+    "recent": "Terbaru:"
   },
   "goals": {
-    "title": "Next Goals"
+    "title": "Target Berikutnya"
   },
   "quests": {
-    "title": "Daily Quests",
+    "title": "Misi Harian",
     "cards": "Pelajari {{count, number}} kartu",
     "sessions": "Selesaikan {{count, number}} sesi",
     "time": "Belajar selama {{count, number}} menit",
@@ -49,11 +49,11 @@
     "completed": "Selesai"
   },
   "streakFreeze": {
-    "title": "Streak Freeze",
+    "title": "Pelindung Rentetan",
     "available": "tersisa {{count, number}}",
     "motivational": "Terus lanjut! Kamu hebat!"
   },
-  "studyHistory": "Study History",
+  "studyHistory": "Riwayat Belajar",
   "studyHistoryDesc": "Lihat sesi, statistik, dan progres",
   "streakDays": "{{count, number}} hari",
   "quickStudy": {

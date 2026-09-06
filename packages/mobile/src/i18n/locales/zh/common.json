@@ -15,7 +15,7 @@
     "settings": "设置",
     "admin": "管理",
     "guide": "指南",
-    "aiGenerate": "AI Generate",
+    "aiGenerate": "AI 生成",
     "aiHub": "AI 学习",
     "learningPlan": "学习计划",
     "achievements": "成就",
@@ -78,7 +78,7 @@
     "processing": "处理中...",
     "confirm": "确认"
   },
-  "guideHelp": "Help",
+  "guideHelp": "帮助",
   "onboarding": {
     "skip": "Skip for now",
     "next": "Next",
@@ -229,12 +229,12 @@
     "earned": " earned"
   },
   "goals": {
-    "title": "Next Goals",
-    "streak": "Streak",
-    "cards": "Cards Studied",
-    "sessions": "Sessions",
-    "time": "Study Time",
-    "mastery": "Cards Mastered",
+    "title": "下一个目标",
+    "streak": "连续学习",
+    "cards": "已学卡片",
+    "sessions": "学习次数",
+    "time": "学习时长",
+    "mastery": "已掌握卡片",
     "quizzes": "完成的测验",
     "ai_cards": "AI 生成的卡片",
     "graded": "AI 批改"

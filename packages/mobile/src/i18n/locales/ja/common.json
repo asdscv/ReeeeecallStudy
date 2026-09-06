@@ -15,7 +15,7 @@
     "settings": "設定",
     "admin": "管理者",
     "guide": "ガイド",
-    "aiGenerate": "AI Generate",
+    "aiGenerate": "AI生成",
     "aiHub": "AI学習",
     "learningPlan": "学習プラン",
     "achievements": "実績",
@@ -78,7 +78,7 @@
     "processing": "処理中...",
     "confirm": "確認"
   },
-  "guideHelp": "Help",
+  "guideHelp": "ヘルプ",
   "onboarding": {
     "skip": "Skip for now",
     "next": "Next",
@@ -229,12 +229,12 @@
     "earned": " earned"
   },
   "goals": {
-    "title": "Next Goals",
-    "streak": "Streak",
-    "cards": "Cards Studied",
-    "sessions": "Sessions",
-    "time": "Study Time",
-    "mastery": "Cards Mastered",
+    "title": "次の目標",
+    "streak": "連続学習",
+    "cards": "学習したカード",
+    "sessions": "学習セッション",
+    "time": "学習時間",
+    "mastery": "習得したカード",
     "quizzes": "解いたクイズ",
     "ai_cards": "AIで作ったカード",
     "graded": "AI採点"

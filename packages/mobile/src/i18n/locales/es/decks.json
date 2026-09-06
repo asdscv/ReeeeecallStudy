@@ -6,8 +6,8 @@
   "createFirst": "+ Crear primer mazo",
   "deleteDeck": "Eliminar mazo",
   "deleteConfirm": "El mazo \"{{name}}\" y todas sus tarjetas serán eliminados. Esto no se puede deshacer.",
-  "searchPlaceholder": "Search decks...",
-  "aiGenerate": "AI Generate",
+  "searchPlaceholder": "Buscar mazos...",
+  "aiGenerate": "Generar con IA",
   "detail": {
     "backToList": "← Lista de mazos",
     "totalCards": "Total {{count, number}} tarjetas",

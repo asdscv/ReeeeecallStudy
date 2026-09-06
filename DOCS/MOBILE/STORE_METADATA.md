@@ -519,8 +519,9 @@ Empieza hoy a estudiar de forma más inteligente. Descarga Recall Study gratis.
 |---|---|---|---|
 | Google Play 폰 | 1242×2688 | 10 (en-US·ko-KR·ja-JP·zh-CN·vi·th·id·es-ES·es-419·es-US) | 60 |
 | Google Play 피처 그래픽 | 1024×500 | 10 | 10 |
-| App Store iPhone 6.5" | 1242×2688 | 8 (en-US·ko·ja·zh-Hans·vi·th·id·es-ES) | 48 |
-| App Store iPad 13" | 2064×2752 | en-US (나머지는 기본 로케일 폴백) | 6 |
+| ~~App Store iPhone 6.5"~~ | ~~1242×2688~~ | 삭제됨 (2026-09-02, 아래 참조) | 0 |
+| **App Store iPhone 6.7"** | **1290×2796** | 8 (en-US·ko·ja·zh-Hans·vi·th·id·es-ES) | **48** |
+| **App Store iPad 13"** | **2064×2752** | en-US (나머지는 기본 로케일 폴백) | **6** |
 
 ### 다시 만들 때 (스크립트는 `~/Desktop/reeeeecall-store-images/_scripts/`)
 
@@ -548,6 +549,66 @@ Empieza hoy a estudiar de forma más inteligente. Descarga Recall Study gratis.
 - **에뮬레이터가 장시간 돌면 죽는다.** 죽은 뒤에도 `screencap` 은 **0바이트 PNG** 를 남기므로
   파일 개수만 세면 성공으로 보인다. 반드시 `Image.open().load()` 로 검증할 것 (태국어 6장이
   이렇게 통째로 비어 있었다).
+
+
+### 2026-09-02 — App Store 이미지는 **실제 iOS 시뮬레이터**로 다시 찍었다
+
+App Store 에 올라가 있던 48장은 안드로이드 에뮬레이터를 아이폰 크기로 맞춰 찍은 것이었다.
+머티리얼 컴포넌트와 안드로이드 폰트가 그대로 보이는 iOS 스토어 이미지였다는 뜻이다.
+지금은 **iPhone 15 Pro Max 시뮬레이터(1290×2796)** 에서 Appium 으로 직접 찍는다.
+
+```
+_scripts/iosdrive.py     raw W3C 드라이버 (webdriverio 는 node 26 에서 죽는다)
+_scripts/capture_ios.py  로케일 1개 = 6화면. 전부 testID 앵커
+_scripts/run_all.py      seed → 언어 전환 → 캡처 → PNG 디코딩·유일성 검증
+_scripts/compose_ios.py  캡션 합성 (1290×2796)
+_scripts/asc.py          ASC REST (openssl 로 ES256 직접 서명 — pyjwt 없음)
+_scripts/upload_asc_ios.py  APP_IPHONE_67 세트에 업로드, --drop-65 로 옛 세트 삭제
+```
+
+- 서버는 `APPIUM_HOME=$HOME/.appium appium --port 4723 --base-path /` 로 띄운다.
+- **1290×2796 은 6.5" 슬롯이 받지 않는다.** `APP_IPHONE_67`(6.7"/6.9") 에 올리고
+  안드로이드로 찍었던 6.5" 세트는 지웠다 — 작은 기기는 6.7" 를 축소해서 쓴다.
+- **언어 모달의 7·8번째 행(id·es)은 리스트 뷰포트 밖에 있는데 트리는 `visible=true` 로 답한다.**
+  (행 y 633~686, FlatList 는 321~655) 그 좌표를 누르면 오버레이에 맞아 모달만 닫히고
+  **직전 로케일 그대로 찍힌다** — 8월 안드로이드 런에서 es 가 인도네시아어로 나갔던 것과 같은 함정이다.
+  `mobile: scroll` 은 더 나쁘다: 엉뚱한 컨테이너를 굴려 **한국어를 골라 버렸다**.
+  리스트 박스를 찾아 그 **안쪽만** 스와이프하고, 전환 여부는 드롭다운 라벨로 **검증**한다.
+- 카드 `field_values` 에 템플릿에 없는 키(`kind` 등)를 넣으면 **학습 화면이 본문을 렌더하지 않는다.**
+  `seed_en.py` 가 그랬고, 4번 화면이 빈 카드로 찍혔다.
+- 6.5" 세트를 지웠어도 원본은 `phone/<loc>/` 에 그대로 있다.
+- **iPad 13" 세트는 이때 안 고쳤다.** 아래 참조 — 그대로 뒀으면 같은 사유로 다시 리젝됐다.
+
+### 2026-09-06 — iPad 13" 6장도 실제 iPad 시뮬레이터로 교체 (5.6 리젝의 나머지 절반)
+
+9/2 에 iPhone 48장만 갈고 **iPad 13" 6장(en-US)은 안드로이드 캡처 그대로 남겨 뒀었다.**
+en-US 는 모든 로케일의 폴백이라 아이패드 제품 페이지 전체가 그 이미지였다. 리젝 사유가
+스크린샷이었으므로 그 상태의 재제출은 같은 5.6 을 다시 받는 길이었다.
+
+```
+_scripts/drv.py          raw W3C 드라이버 (webdriverio 는 최신 node 에서 죽는다)
+_scripts/capture_ipad.py iPad Pro 13" (M4) iOS 17.5, 6화면, 전부 testID 앵커
+_scripts/compose.py      캡션 합성 (make(..., size=(2064,2752), fit=...))
+_scripts/upload_ipad.py  APP_IPAD_PRO_3GEN_129 세트 교체
+_scripts/seed_en.py + history.py + fix_states.py   데모 계정 영어 덱 + SRS 이력
+```
+
+- **시뮬레이터 언어는 부팅 전에 plist 로 박는다.** `simctl spawn ... defaults write` 는
+  꺼진 기기에 못 쓰고(`Bad or unknown session`) 켜진 기기에 쓰면 재부팅 전엔 안 먹는다.
+  `Devices/<UDID>/data/Library/Preferences/.GlobalPreferences.plist` 의 `AppleLanguages` 를
+  직접 고치고 부팅할 것.
+- **드로어는 한 번에 한 섹션만 펼쳐진다.** `drawer-study-group` → `drawer-<x>-section-toggle`
+  순서로 매번 다시 펼치고 자식 testID 로 검증한다(다른 토글을 누르면 앞 섹션이 접힌다).
+- **덱 목록의 `Study` 버튼은 모드 시트를 열지 않는다.** Study Setup 으로만 이동하므로
+  거기서 `study-deck-<id>` 타일을 한 번 더 눌러야 모드 시트가 뜬다.
+- **4번 화면은 카드를 뒤집어야 한다.** 캡션이 Again/Hard/Good/Easy 를 말하는데 평가 버튼은
+  `study-card-tap` 이후에만 나온다. 그리고 iPad 는 화면이 길어 하단 크롭이면 그 버튼이
+  잘려나간다 → 그 장만 `fit=True`(축소 배치).
+- **숙달률은 `srs_status='review' AND interval_days >= 21`**(`shared/lib/stats.ts`). 시드가
+  interval 을 21 미만으로 깔면 대시보드가 2% 로 찍힌다. iPhone 세트와 같은 58% 를 맞추려면
+  review 카드의 interval 을 21 이상으로 줘야 한다.
+- 촬영 계정은 **마지막에 찍은 로케일의 덱이 그대로 남아 있다.** en-US 를 찍기 전에
+  `seed_en.py` 를 다시 돌리지 않으면 영어 리스팅에 스페인어 덱이 찍힌다.
 
 ## 테스트 계정 (심사용)
 

@@ -28,20 +28,20 @@
   },
   "gamification": {
     "freezes": "剩余 {{count, number}} 次冻结",
-    "dailyGoal": "Daily Goal"
+    "dailyGoal": "每日目标"
   },
   "level": {
-    "title": "Level {{level}}",
-    "levelUp": "Level Up!",
+    "title": "等级 {{level}}",
+    "levelUp": "升级了！",
     "xpLabel": "XP",
-    "allAchievements": "All Achievements",
-    "recent": "Recent:"
+    "allAchievements": "全部成就",
+    "recent": "最近："
   },
   "goals": {
-    "title": "Next Goals"
+    "title": "下一个目标"
   },
   "quests": {
-    "title": "Daily Quests",
+    "title": "每日任务",
     "cards": "学习 {{count, number}} 张卡片",
     "sessions": "完成 {{count, number}} 次学习",
     "time": "学习 {{count, number}} 分钟",
@@ -49,11 +49,11 @@
     "completed": "已完成"
   },
   "streakFreeze": {
-    "title": "Streak Freeze",
+    "title": "连续学习保护",
     "available": "剩余 {{count, number}} 个",
     "motivational": "继续保持，做得很棒！"
   },
-  "studyHistory": "Study History",
+  "studyHistory": "学习记录",
   "studyHistoryDesc": "查看学习记录、统计和进度",
   "streakDays": "{{count, number}}天",
   "quickStudy": {
