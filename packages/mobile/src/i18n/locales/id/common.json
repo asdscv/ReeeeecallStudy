@@ -15,7 +15,7 @@
     "settings": "Pengaturan",
     "admin": "Admin",
     "guide": "Panduan",
-    "aiGenerate": "AI Generate",
+    "aiGenerate": "Buat dengan AI",
     "aiHub": "Belajar dengan AI",
     "learningPlan": "Rencana belajar",
     "achievements": "Pencapaian",
@@ -78,7 +78,7 @@
     "processing": "Memproses...",
     "confirm": "Konfirmasi"
   },
-  "guideHelp": "Help",
+  "guideHelp": "Bantuan",
   "onboarding": {
     "skip": "Skip for now",
     "next": "Next",
@@ -229,12 +229,12 @@
     "earned": " earned"
   },
   "goals": {
-    "title": "Next Goals",
-    "streak": "Streak",
-    "cards": "Cards Studied",
-    "sessions": "Sessions",
-    "time": "Study Time",
-    "mastery": "Cards Mastered",
+    "title": "Target Berikutnya",
+    "streak": "Rentetan Belajar",
+    "cards": "Kartu Dipelajari",
+    "sessions": "Sesi Belajar",
+    "time": "Waktu Belajar",
+    "mastery": "Kartu Dikuasai",
     "quizzes": "Kuis dikerjakan",
     "ai_cards": "Kartu buatan AI",
     "graded": "Penilaian AI"

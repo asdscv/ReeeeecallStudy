@@ -15,7 +15,7 @@
     "settings": "Cài đặt",
     "admin": "Quản trị",
     "guide": "Hướng dẫn",
-    "aiGenerate": "AI Generate",
+    "aiGenerate": "Tạo bằng AI",
     "aiHub": "Học với AI",
     "learningPlan": "Kế hoạch học",
     "achievements": "Thành tích",
@@ -78,7 +78,7 @@
     "processing": "Đang xử lý...",
     "confirm": "Xác nhận"
   },
-  "guideHelp": "Help",
+  "guideHelp": "Trợ giúp",
   "onboarding": {
     "skip": "Skip for now",
     "next": "Next",
@@ -229,12 +229,12 @@
     "earned": " earned"
   },
   "goals": {
-    "title": "Next Goals",
-    "streak": "Streak",
-    "cards": "Cards Studied",
-    "sessions": "Sessions",
-    "time": "Study Time",
-    "mastery": "Cards Mastered",
+    "title": "Mục tiêu tiếp theo",
+    "streak": "Chuỗi học tập",
+    "cards": "Thẻ đã học",
+    "sessions": "Phiên học",
+    "time": "Thời gian học",
+    "mastery": "Thẻ đã thành thạo",
     "quizzes": "Bài đã làm",
     "ai_cards": "Thẻ do AI tạo",
     "graded": "Lượt AI chấm"

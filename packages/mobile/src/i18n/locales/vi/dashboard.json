@@ -28,20 +28,20 @@
   },
   "gamification": {
     "freezes": "còn {{count, number}} lượt đóng băng",
-    "dailyGoal": "Daily Goal"
+    "dailyGoal": "Mục tiêu hằng ngày"
   },
   "level": {
-    "title": "Level {{level}}",
-    "levelUp": "Level Up!",
+    "title": "Cấp {{level}}",
+    "levelUp": "Lên cấp!",
     "xpLabel": "XP",
-    "allAchievements": "All Achievements",
-    "recent": "Recent:"
+    "allAchievements": "Tất cả thành tích",
+    "recent": "Gần đây:"
   },
   "goals": {
-    "title": "Next Goals"
+    "title": "Mục tiêu tiếp theo"
   },
   "quests": {
-    "title": "Daily Quests",
+    "title": "Nhiệm vụ hằng ngày",
     "cards": "Học {{count, number}} thẻ",
     "sessions": "Hoàn thành {{count, number}} buổi học",
     "time": "Học {{count, number}} phút",
@@ -49,11 +49,11 @@
     "completed": "Hoàn thành"
   },
   "streakFreeze": {
-    "title": "Streak Freeze",
+    "title": "Bảo vệ chuỗi học tập",
     "available": "còn {{count, number}}",
     "motivational": "Cứ tiếp tục nhé, bạn đang làm rất tốt!"
   },
-  "studyHistory": "Study History",
+  "studyHistory": "Lịch sử học",
   "studyHistoryDesc": "Xem buổi học, thống kê và tiến độ",
   "streakDays": "{{count, number}} ngày",
   "quickStudy": {

@@ -6,8 +6,8 @@
   "createFirst": "+ 创建第一个牌组",
   "deleteDeck": "删除牌组",
   "deleteConfirm": "牌组「{{name}}」及其所有卡片将被删除，此操作不可撤销。",
-  "searchPlaceholder": "Search decks...",
-  "aiGenerate": "AI Generate",
+  "searchPlaceholder": "搜索牌组...",
+  "aiGenerate": "AI 生成",
   "detail": {
     "backToList": "← 牌组列表",
     "totalCards": "共 {{count, number}} 张卡片",

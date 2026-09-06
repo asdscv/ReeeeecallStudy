@@ -6,8 +6,8 @@
   "createFirst": "+ Buat Dek Pertama",
   "deleteDeck": "Hapus Dek",
   "deleteConfirm": "Dek \"{{name}}\" dan semua kartu akan dihapus. Tindakan ini tidak dapat dibatalkan.",
-  "searchPlaceholder": "Search decks...",
-  "aiGenerate": "AI Generate",
+  "searchPlaceholder": "Cari dek...",
+  "aiGenerate": "Buat dengan AI",
   "detail": {
     "backToList": "← Daftar Dek",
     "totalCards": "Total {{count, number}} kartu",

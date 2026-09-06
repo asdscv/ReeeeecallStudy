@@ -15,7 +15,7 @@
     "settings": "ตั้งค่า",
     "admin": "ผู้ดูแล",
     "guide": "คู่มือ",
-    "aiGenerate": "AI Generate",
+    "aiGenerate": "สร้างด้วย AI",
     "aiHub": "การเรียนด้วย AI",
     "learningPlan": "แผนการเรียน",
     "achievements": "ความสำเร็จ",
@@ -78,7 +78,7 @@
     "processing": "กำลังดำเนินการ...",
     "confirm": "ยืนยัน"
   },
-  "guideHelp": "Help",
+  "guideHelp": "ช่วยเหลือ",
   "onboarding": {
     "skip": "Skip for now",
     "next": "Next",
@@ -229,12 +229,12 @@
     "earned": " earned"
   },
   "goals": {
-    "title": "Next Goals",
-    "streak": "Streak",
-    "cards": "Cards Studied",
-    "sessions": "Sessions",
-    "time": "Study Time",
-    "mastery": "Cards Mastered",
+    "title": "เป้าหมายถัดไป",
+    "streak": "สถิติเรียนต่อเนื่อง",
+    "cards": "การ์ดที่เรียนแล้ว",
+    "sessions": "เซสชันเรียน",
+    "time": "เวลาเรียน",
+    "mastery": "การ์ดที่ชำนาญแล้ว",
     "quizzes": "แบบทดสอบที่ทำ",
     "ai_cards": "การ์ดจาก AI",
     "graded": "การตรวจด้วย AI"
