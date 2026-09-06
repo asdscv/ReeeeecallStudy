@@ -28,20 +28,20 @@
   },
   "gamification": {
     "freezes": "เหลือฟรีซ {{count, number}} ครั้ง",
-    "dailyGoal": "Daily Goal"
+    "dailyGoal": "เป้าหมายรายวัน"
   },
   "level": {
-    "title": "Level {{level}}",
-    "levelUp": "Level Up!",
+    "title": "เลเวล {{level}}",
+    "levelUp": "เลเวลอัป!",
     "xpLabel": "XP",
-    "allAchievements": "All Achievements",
-    "recent": "Recent:"
+    "allAchievements": "ความสำเร็จทั้งหมด",
+    "recent": "ล่าสุด:"
   },
   "goals": {
-    "title": "Next Goals"
+    "title": "เป้าหมายถัดไป"
   },
   "quests": {
-    "title": "Daily Quests",
+    "title": "ภารกิจประจำวัน",
     "cards": "เรียนการ์ด {{count, number}} ใบ",
     "sessions": "เรียนให้ครบ {{count, number}} เซสชัน",
     "time": "เรียนให้ครบ {{count, number}} นาที",
@@ -49,11 +49,11 @@
     "completed": "เสร็จแล้ว"
   },
   "streakFreeze": {
-    "title": "Streak Freeze",
+    "title": "ป้องกันสถิติเรียนต่อเนื่อง",
     "available": "เหลือ {{count, number}} ชิ้น",
     "motivational": "ทำต่อไปนะ คุณทำได้ดีมาก!"
   },
-  "studyHistory": "Study History",
+  "studyHistory": "ประวัติการเรียน",
   "studyHistoryDesc": "ดูเซสชัน สถิติ และความคืบหน้า",
   "streakDays": "{{count, number}} วัน",
   "quickStudy": {

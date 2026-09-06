@@ -6,8 +6,8 @@
   "createFirst": "+ Tạo bộ thẻ đầu tiên",
   "deleteDeck": "Xóa bộ thẻ",
   "deleteConfirm": "Bộ thẻ \"{{name}}\" và tất cả thẻ sẽ bị xóa. Không thể hoàn tác.",
-  "searchPlaceholder": "Search decks...",
-  "aiGenerate": "AI Generate",
+  "searchPlaceholder": "Tìm kiếm bộ thẻ...",
+  "aiGenerate": "Tạo bằng AI",
   "detail": {
     "backToList": "← Danh sách bộ thẻ",
     "totalCards": "Tổng {{count, number}} thẻ",

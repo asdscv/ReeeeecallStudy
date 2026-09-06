@@ -6,8 +6,8 @@
   "createFirst": "+ สร้างสำรับแรก",
   "deleteDeck": "ลบสำรับ",
   "deleteConfirm": "สำรับ \"{{name}}\" และการ์ดทั้งหมดจะถูกลบ ไม่สามารถเลิกทำได้",
-  "searchPlaceholder": "Search decks...",
-  "aiGenerate": "AI Generate",
+  "searchPlaceholder": "ค้นหาสำรับ...",
+  "aiGenerate": "สร้างด้วย AI",
   "detail": {
     "backToList": "← รายการสำรับ",
     "totalCards": "ทั้งหมด {{count, number}} การ์ด",

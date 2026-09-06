@@ -28,20 +28,20 @@
   },
   "gamification": {
     "freezes": "{{count, number}} congelaciones restantes",
-    "dailyGoal": "Daily Goal"
+    "dailyGoal": "Objetivo diario"
   },
   "level": {
-    "title": "Level {{level}}",
-    "levelUp": "Level Up!",
+    "title": "Nivel {{level}}",
+    "levelUp": "¡Subiste de nivel!",
     "xpLabel": "XP",
-    "allAchievements": "All Achievements",
-    "recent": "Recent:"
+    "allAchievements": "Todos los logros",
+    "recent": "Reciente:"
   },
   "goals": {
-    "title": "Next Goals"
+    "title": "Próximos objetivos"
   },
   "quests": {
-    "title": "Daily Quests",
+    "title": "Misiones diarias",
     "cards": "Estudia {{count, number}} tarjetas",
     "sessions": "Completa {{count, number}} sesiones",
     "time": "Estudia {{count, number}} minutos",
@@ -49,11 +49,11 @@
     "completed": "Completado"
   },
   "streakFreeze": {
-    "title": "Streak Freeze",
+    "title": "Protección de racha",
     "available": "{{count, number}} disponibles",
     "motivational": "¡Sigue así, lo estás haciendo genial!"
   },
-  "studyHistory": "Study History",
+  "studyHistory": "Historial de estudio",
   "studyHistoryDesc": "Consulta sesiones, estadísticas y progreso",
   "streakDays": "{{count, number}} días",
   "quickStudy": {

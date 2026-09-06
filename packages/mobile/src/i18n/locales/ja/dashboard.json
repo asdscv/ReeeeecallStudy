@@ -28,20 +28,20 @@
   },
   "gamification": {
     "freezes": "残り{{count, number}}個のフリーズ",
-    "dailyGoal": "Daily Goal"
+    "dailyGoal": "デイリー目標"
   },
   "level": {
-    "title": "Level {{level}}",
-    "levelUp": "Level Up!",
+    "title": "レベル{{level}}",
+    "levelUp": "レベルアップ！",
     "xpLabel": "XP",
-    "allAchievements": "All Achievements",
-    "recent": "Recent:"
+    "allAchievements": "すべての実績",
+    "recent": "最近:"
   },
   "goals": {
-    "title": "Next Goals"
+    "title": "次の目標"
   },
   "quests": {
-    "title": "Daily Quests",
+    "title": "デイリークエスト",
     "cards": "カードを{{count, number}}枚学習する",
     "sessions": "セッションを{{count, number}}回終える",
     "time": "{{count, number}}分学習する",
@@ -49,11 +49,11 @@
     "completed": "完了"
   },
   "streakFreeze": {
-    "title": "Streak Freeze",
+    "title": "連続学習の保護",
     "available": "残り{{count, number}}個",
     "motivational": "その調子！よくできています！"
   },
-  "studyHistory": "Study History",
+  "studyHistory": "学習履歴",
   "studyHistoryDesc": "セッション・統計・進み具合を見る",
   "streakDays": "{{count, number}}日",
   "quickStudy": {
