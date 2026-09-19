@@ -40,7 +40,6 @@ const HEAVY = argv.includes('--heavy')
 const ONLY = (argv.find(a => a.startsWith('--only=')) || '').replace('--only=', '')
   .split(',').map(s => s.trim()).filter(Boolean)
 
-const FREE_TIER_AI_CARDS = 10   // ai_free_allowances(tier='free', action_group='card').per_day
 const RUN_ID = process.env.E2E_RUN_ID || `r${Date.now().toString(36)}`
 const PASSWORD = 'E2ePop!' + RUN_ID
 const EMAIL = (p) => `e2e+${RUN_ID}-${p.toLowerCase()}@reeeeecallstudy.xyz`
@@ -313,12 +312,14 @@ async function P2() {
   note('P2 엔타이틀먼트', JSON.stringify(e).slice(0, 240))
   check('INV-3', '엔타이틀먼트 tier 가 플랜을 반영', e?.tier === 'plan_5k', `tier=${e?.tier}`)
   check('INV-3', '엔타이틀먼트 cards_total 이 플랜 한도', Number(e?.cards_total) === 100000, `cards_total=${e?.cards_total}`)
-  if (Number(e?.free_ai_cards_per_day) === FREE_TIER_AI_CARDS) {
-    reproduced('INV-3', '유료 티어의 광고된 무료 AI 카드 수가 무료 티어와 동일',
-      `free_ai_cards_per_day=${e?.free_ai_cards_per_day} (무료 티어와 같음) — F-1 이 API 응답에 드러나는 지점`)
-  } else {
-    check('INV-3', '유료 티어가 더 많은 무료 AI 를 광고', true, `free_ai_cards_per_day=${e?.free_ai_cards_per_day}`)
-  }
+  // API 가 광고하는 값은 커널이 계산한 값과 같아야 한다. 두 숫자가 오늘 우연히 같은 것과,
+  // 같은 출처에서 나온 것은 다르다 — mig 276 이전에는 이 필드만 tier='free' 를 하드코딩해
+  // 표를 직접 찔렀고, plan_5k 행이 생기는 순간 혼자 뒤처질 상태였다.
+  const kernel = await sql(`select per_day from public._ai_free_allowance('${u.id}'::uuid,'card')`)
+  const kernelPerDay = Number(kernel?.[0]?.per_day)
+  check('INV-3', '엔타이틀먼트의 무료 AI 값이 커널 계산과 일치',
+    Number(e?.free_ai_cards_per_day) === kernelPerDay,
+    `API=${e?.free_ai_cards_per_day} 커널=${kernelPerDay}`)
 
   const sub = await rpc(u.jwt, 'get_my_subscription')
   check('INV-3', 'get_my_subscription 이 구독을 반영',
