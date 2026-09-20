@@ -413,6 +413,103 @@ async function seedCards(u, count, label) {
   return { deck, templateId }
 }
 
+/** P7 — 학습과 SRS (INV-10). 소유 덱은 SRS 가 cards 에 embedded 된다. */
+async function P7() {
+  head(`${C.c}P7${C.x} 학습 — SRS 기록 · 멱등 · 낙관적 동시성`)
+  const u = await newPersona('P7')
+  const { deck, templateId } = await seedCards(u, 5, 'P7')
+
+  const cardsRes = await http(`/rest/v1/cards?deck_id=eq.${deck.id}&select=id,srs_status,srs_revision&order=sort_position.asc`, { jwt: u.jwt })
+  const cards = Array.isArray(cardsRes.json) ? cardsRes.json : []
+  check('INV-10', '신규 카드는 srs_status=new · revision=0',
+    cards.length === 5 && cards.every(c => c.srs_status === 'new' && Number(c.srs_revision) === 0),
+    `${cards.length}장 · ${cards[0]?.srs_status}/${cards[0]?.srs_revision}`)
+
+  const sessionId = crypto.randomUUID()
+  const startedAt = new Date().toISOString()
+  const srsFor = (days) => ({
+    srs_status: 'review',
+    ease_factor: 2.5,
+    interval_days: days,
+    repetitions: 1,
+    next_review_at: new Date(Date.now() + days * 864e5).toISOString(),
+    last_reviewed_at: new Date().toISOString(),
+  })
+
+  // ── 1. 정상 기록 ────────────────────────────────────────────────────────
+  const eventId = crypto.randomUUID()
+  const payload = {
+    p_event_id: eventId, p_client_session_id: sessionId,
+    p_card_id: cards[0].id, p_deck_id: deck.id,
+    p_study_mode: 'srs', p_rating: 'good', p_srs_source: 'embedded',
+    p_expected_revision: 0, p_new_srs: srsFor(3), p_review_duration_ms: 4200,
+  }
+  const r1 = await rpc(u.jwt, 'apply_study_rating', payload)
+  check('INV-10', '학습 평가가 기록된다', r1.status < 300,
+    `status=${r1.status} ${JSON.stringify(r1.json).slice(0, 160)}`)
+
+  const after1 = await http(`/rest/v1/cards?id=eq.${cards[0].id}&select=srs_status,interval_days,repetitions,srs_revision,next_review_at`, { jwt: u.jwt })
+  const c1 = Array.isArray(after1.json) ? after1.json[0] : null
+  check('INV-10', 'SRS 가 카드에 실제로 반영된다',
+    c1?.srs_status === 'review' && Number(c1?.interval_days) === 3 && Number(c1?.repetitions) === 1,
+    `status=${c1?.srs_status} interval=${c1?.interval_days} reps=${c1?.repetitions}`)
+  check('INV-10', 'srs_revision 이 올라간다 (클라이언트 캐시 무효화 신호)',
+    Number(c1?.srs_revision) > 0, `revision 0 → ${c1?.srs_revision}`)
+
+  // ── 2. 멱등: 같은 event_id + 같은 페이로드 ───────────────────────────────
+  const r2 = await rpc(u.jwt, 'apply_study_rating', payload)
+  const after2 = await http(`/rest/v1/cards?id=eq.${cards[0].id}&select=srs_revision,interval_days`, { jwt: u.jwt })
+  const c2 = Array.isArray(after2.json) ? after2.json[0] : null
+  check('INV-5', '같은 평가 이벤트 재전송은 멱등 (두 번 적용되지 않음)',
+    r2.status < 300 && String(c2?.srs_revision) === String(c1?.srs_revision),
+    `status=${r2.status} revision ${c1?.srs_revision} → ${c2?.srs_revision}`)
+
+  // ── 3. 같은 event_id + 다른 페이로드 → 거부 ──────────────────────────────
+  const r3 = await rpc(u.jwt, 'apply_study_rating', { ...payload, p_rating: 'again', p_new_srs: srsFor(1) })
+  check('INV-5', '같은 event_id 에 다른 페이로드는 거부된다',
+    r3.status >= 400, `status=${r3.status} ${JSON.stringify(r3.json).slice(0, 120)}`)
+
+  // ── 4. 낡은 revision → 충돌 (다른 기기가 이미 앞서갔다) ──────────────────
+  const stale = await rpc(u.jwt, 'apply_study_rating', {
+    ...payload, p_event_id: crypto.randomUUID(),
+    p_expected_revision: 0, p_new_srs: srsFor(7),
+  })
+  check('INV-5', '낡은 revision 으로 쓰면 충돌로 거부된다',
+    stale.status >= 400, `status=${stale.status} ${JSON.stringify(stale.json).slice(0, 140)}`)
+
+  // ── 5. 동시성: 같은 카드 · 같은 revision · 서로 다른 event ───────────────
+  const fresh = Number(c1?.srs_revision)
+  const race = await burst(4, () => rpc(u.jwt, 'apply_study_rating', {
+    ...payload, p_event_id: crypto.randomUUID(),
+    p_card_id: cards[1].id, p_expected_revision: 0, p_new_srs: srsFor(5),
+  }))
+  const won = race.filter(r => r.status < 300).length
+  note('P7 동시 평가 응답', race.map(r => r.status).join(' '))
+  const after5 = await http(`/rest/v1/cards?id=eq.${cards[1].id}&select=srs_revision,interval_days`, { jwt: u.jwt })
+  const c5 = Array.isArray(after5.json) ? after5.json[0] : null
+  check('INV-5', '같은 카드에 동시 평가 4건 → 한 번만 전진',
+    Number(c5?.srs_revision) === 1, `revision=${c5?.srs_revision} (성공 ${won}건)`)
+
+  // ── 6. 세션 마감 · 통계 반영 ─────────────────────────────────────────────
+  const fin = await rpc(u.jwt, 'finalize_study_session', {
+    p_client_session_id: sessionId, p_deck_id: deck.id,
+    p_study_mode: 'srs', p_started_at: startedAt,
+  })
+  check('INV-10', '학습 세션이 마감된다', fin.status < 300,
+    `status=${fin.status} ${JSON.stringify(fin.json).slice(0, 140)}`)
+
+  const st = await rpc(u.jwt, 'get_deck_stats', { p_user_id: u.id })
+  const mine = (Array.isArray(st.json) ? st.json : []).find(x => x.deck_id === deck.id)
+  check('INV-10', '덱 통계에서 카드가 new 를 벗어난다',
+    Number(mine?.new_cards) < 5, `new=${mine?.new_cards} review=${mine?.review_cards} learning=${mine?.learning_cards}`)
+
+  const us = await rpc(u.jwt, 'get_user_study_stats', { p_user_id: u.id })
+  note('P7 학습 통계', JSON.stringify(us.json).slice(0, 200))
+  check('INV-10', '유저 학습 통계가 세션을 반영', us.status < 300, `status=${us.status}`)
+
+  return u
+}
+
 /** P4 — 1,000행 잘림 (INV-8). 프로덕션에서 실제로 터졌던 버그(#599/#600). */
 async function P4() {
   head(`${C.c}P4${C.x} 헤비 학습자 — 1,000행 잘림`)
@@ -781,6 +878,7 @@ async function main() {
     if (want('P3')) await P3()
     if (want('P4')) await P4()
     if (want('P5')) await P5()
+    if (want('P7')) await P7()
     if (want('P6')) {
       const victim = p1 || (await newPersona('PV'))
       await P6(victim)
@@ -804,12 +902,26 @@ async function main() {
   if (!KEEP) {
     await teardown()
     head(`${C.c}넷제로${C.x} 판정`)
+
+    // 판정은 두 겹이다. 전역 diff 하나만 보면 **다른 작업자가 있을 때 거짓말을 한다** —
+    // 실제로 이 실행 중에 내가 다른 창에서 계정을 하나 만들었고, 그것이 이 스위트의
+    // 잔여물로 보고됐다. 그래서 (1) 내 runId 흔적이 0인가(귀속 가능·하드 실패)와
+    // (2) 전역이 그대로인가(부수 피해 탐지·외부 활동이면 경고)를 나눠서 본다.
+    const own = await sql(
+      `select (select count(*) from auth.users where email like 'e2e+${RUN_ID}-%')::text u, ` +
+      `(select count(*) from decks where name like 'e2e-%-${RUN_ID}')::text d`)
+    const ownUsers = Number(own[0].u), ownDecks = Number(own[0].d)
+    check('NET-0', '이 실행이 남긴 흔적 0 (runId 귀속)',
+      ownUsers === 0 && ownDecks === 0, `유저 ${ownUsers} · 덱 ${ownDecks}`)
+
     const after = await snapshot()
     const drift = diffSnapshots(before, after)
     if (drift.length === 0) {
-      check('NET-0', '실행 전/후 스냅샷 완전 일치', true, '9개 테이블 · 잔여 0')
+      check('NET-0', '전역 스냅샷도 완전 일치', true, '9개 테이블 · 부수 변화 없음')
+    } else if (ownUsers === 0 && ownDecks === 0) {
+      note('NET-0 전역 diff', `${drift.join(' | ')} — 내 흔적은 0이므로 **다른 작업자의 활동**이다. 실패로 세지 않는다`)
     } else {
-      check('NET-0', '실행 전/후 스냅샷 일치', false, drift.join(' | '))
+      check('NET-0', '전역 스냅샷 일치', false, drift.join(' | '))
     }
   } else {
     note('정리', '--keep 으로 생략 — 넷제로 판정 없음')
