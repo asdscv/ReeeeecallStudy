@@ -786,6 +786,52 @@ async function R4_cardLimitRace() {
   return u
 }
 
+/** L0 — 가격표 정합성 (INV-11). 유저를 만들지 않는다. */
+async function checkPlanCatalog() {
+  head(`${C.c}L0${C.x} 가격표 — 비싼 플랜은 더 줘야 한다`)
+  const plans = await sql(
+    `select id, title, tier, coalesce(card_limit,0) card_limit, ` +
+    `coalesce(price_usd_cents,0) price, is_active ` +
+    `from billing_products where kind='subscription' order by price_usd_cents`)
+
+  for (const p of plans) {
+    note(`플랜 ${p.id}`, `${p.title} · $${(Number(p.price) / 100).toFixed(2)} · 카드 ${Number(p.card_limit).toLocaleString()} · ${p.is_active ? '판매중' : '판매중지'}`)
+  }
+
+  // 지배(domination) 검사: 더 비싼데 모든 차원에서 더 주지 못하는 플랜은 팔면 안 된다.
+  // 오늘 판매중인 플랜은 하나뿐이라 이 검사는 통과한다. 이것은 지금의 결함을 잡는
+  // 검사가 아니라, **되살릴 때 조용히 나가지 못하게 하는 덫**이다.
+  const active = plans.filter(p => p.is_active)
+  let dominated = []
+  for (const a of active) {
+    for (const b of active) {
+      if (a.id === b.id) continue
+      if (Number(a.price) > Number(b.price) && Number(a.card_limit) <= Number(b.card_limit)) {
+        dominated.push(`${a.id}($${Number(a.price) / 100}, 카드 ${a.card_limit}) ≤ ${b.id}($${Number(b.price) / 100}, 카드 ${b.card_limit})`)
+      }
+    }
+  }
+  check('INV-11', '판매중인 플랜 중 값만 비싸고 더 주지 않는 것이 없다',
+    dominated.length === 0, dominated.length ? dominated.join(' | ') : `판매중 ${active.length}개`)
+
+  // 판매중지 플랜의 잠재 문제는 실패로 세지 않되, 보이게 남긴다.
+  const inactive = plans.filter(p => !p.is_active)
+  for (const a of inactive) {
+    const cheaper = plans.find(b => b.id !== a.id && Number(b.price) < Number(a.price) && Number(b.card_limit) >= Number(a.card_limit))
+    if (cheaper) {
+      note('INV-11 잠재', `${a.id}($${Number(a.price) / 100}) 는 판매중지 상태다. 그대로 되살리면 ` +
+        `${cheaper.id}($${Number(cheaper.price) / 100}) 와 카드 한도가 같아(${a.card_limit}) 값만 비싼 플랜이 된다 — F-3`)
+    }
+  }
+
+  // 플랜이 말하는 한도와 코드가 돌려주는 한도가 같은가 (표 ↔ 커널)
+  for (const p of active) {
+    const probe = await sql(
+      `select per_day from public._ai_free_allowance_for_tier('${p.tier}','card')`)
+    note(`${p.tier} AI 무료 배분`, `${probe?.[0]?.per_day ?? '(행 없음 → free 폴백)'}/일`)
+  }
+}
+
 // ── 읽기 헬퍼 (SQL, 스냅샷/진단용) ──────────────────────────────────────────
 async function ownedCardLimit(userId) {
   const r = await sql(`select public._owned_card_limit('${userId}'::uuid)::text v`)
@@ -864,6 +910,8 @@ async function main() {
   if (!MGMT) throw new Error('SUPABASE_ACCESS_TOKEN 이 필요합니다')
 
   console.log(`${C.d}run=${RUN_ID} target=${URL_BASE} ai=${NO_AI ? 'off' : 'on'}${C.x}`)
+
+  await checkPlanCatalog()
 
   head(`${C.c}L0${C.x} 기준선`)
   const before = await snapshot()
