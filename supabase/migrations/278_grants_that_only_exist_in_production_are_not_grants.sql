@@ -1,0 +1,39 @@
+-- 278: 프로덕션에만 있는 권한은 권한이 아니다.
+--
+-- L3a(로컬 스택 용량 측정)를 돌리다 발견했다. `session-stress-test.mjs` 는 프로덕션에서
+-- 24/24 로 통과하는데, **마이그레이션만으로 세운 로컬 DB 에서는 시나리오 A 에서 죽는다**:
+--
+--   truth query failed: 403 permission denied for table user_sessions
+--
+-- 두 환경의 `user_sessions` 권한을 비교하면:
+--
+--   프로덕션  service_role: SELECT, INSERT, UPDATE, DELETE, REFERENCES, TRIGGER, TRUNCATE
+--   로컬      service_role:                          REFERENCES, TRIGGER, TRUNCATE
+--
+-- **어떤 마이그레이션도 이 테이블의 권한을 정하지 않는다.** 프로덕션의 권한은 테이블이
+-- 만들어지던 시점의 Supabase 기본 권한에서 흘러나온 것이고, 그 기본값이 달라진 뒤에
+-- 재구축하면 갈라진다. 즉 **재해 복구로 마이그레이션에서 DB 를 다시 세우면 지금과 다른
+-- 데이터베이스가 나온다.** 그것을 아무도 몰랐다는 것이 문제다.
+--
+-- 이 마이그레이션은 프로덕션에서 **무연산**이다(이미 같은 권한을 갖고 있다). 바꾸는 것은
+-- 재구축본뿐이고, 바꾸는 방향은 "프로덕션과 같아지게"다.
+--
+-- ── 보안상 안전한가 ──────────────────────────────────────────────────────────
+--
+-- 안전하다. 두 가지 이유다.
+--
+-- 1. `service_role` 은 애초에 RLS 를 우회하는 역할이다. 테이블 권한을 주고 말고가
+--    권한 경계를 바꾸지 않는다. Edge 함수가 이 역할로 붙는다.
+-- 2. 학습자에게 열리는 경로는 여전히 RLS 가 막는다 — 확인했다: `user_sessions` 는 RLS 가
+--    켜져 있고 정책이 **SELECT·DELETE(본인 행)** 둘뿐이다. **INSERT/UPDATE 정책이 없어서**
+--    `anon`/`authenticated` 가 테이블 권한을 갖고 있어도 직접 쓰기는 전부 거부된다.
+--    세션 쓰기는 `register_session`/`session_heartbeat` 같은 SECURITY DEFINER RPC 를
+--    반드시 거친다. 이 마이그레이션은 그 구조를 건드리지 않는다.
+--
+-- ── 왜 이 테이블만인가 ──────────────────────────────────────────────────────
+--
+-- 다른 테이블에도 같은 드리프트가 있을 수 있다. 여기서 한 테이블만 고치는 이유는,
+-- 실제로 테스트를 깨뜨린 것이 이것 하나이고 **관측하지 않은 것을 추측으로 손대지
+-- 않기** 위해서다. 전수 비교는 별도 과제로 남긴다(로컬/프로덕션 권한 diff).
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.user_sessions TO service_role;

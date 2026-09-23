@@ -40,15 +40,20 @@ BEGIN
   -- subscriptions — the mig-151 placeholders (sub_5k_monthly_v2 / sub_unlimited_monthly_v3) were
   -- RETIRED by mig 155, which activated clean ids that DIFFER PER PLATFORM on purpose: the tidy
   -- `sub_*_monthly` ids were created-then-deleted on App Store Connect and Apple reserves them
-  -- permanently, so iOS uses bare ids while Google uses `<sub>:<base-plan>`. Pin all four.
+  -- permanently, so iOS uses bare ids while Google uses `<sub>:<base-plan>`.
   ASSERT public.resolve_store_product('ios','standard_monthly') = 'sub_5k_monthly',
     'resolve ios standard_monthly → sub_5k_monthly (mig 155)';
-  ASSERT public.resolve_store_product('ios','pro_monthly') = 'sub_unlimited_monthly',
-    'resolve ios pro_monthly → sub_unlimited_monthly (mig 155)';
   ASSERT public.resolve_store_product('android','sub_standard_monthly:monthly') = 'sub_5k_monthly',
     'resolve android sub_standard_monthly:monthly → sub_5k_monthly (mig 155)';
-  ASSERT public.resolve_store_product('android','sub_pro_monthly:monthly') = 'sub_unlimited_monthly',
-    'resolve android sub_pro_monthly:monthly → sub_unlimited_monthly (mig 155)';
+
+  -- 280 deleted the Pro product and its SKU rows. The store ids themselves still exist as
+  -- dead shells (Apple reserves deleted ids forever; the Play base plan is INACTIVE), so the
+  -- thing worth pinning is that they resolve to NOTHING — a stray webhook carrying one must
+  -- not land on some other product.
+  ASSERT public.resolve_store_product('ios','pro_monthly') IS NULL,
+    'ios pro_monthly resolves to nothing after mig 280';
+  ASSERT public.resolve_store_product('android','sub_pro_monthly:monthly') IS NULL,
+    'android sub_pro_monthly:monthly resolves to nothing after mig 280';
 
   -- the retired placeholders must stay inactive (resolve excludes is_active=false)
   ASSERT public.resolve_store_product('ios','sub_5k_monthly_v2') IS NULL,

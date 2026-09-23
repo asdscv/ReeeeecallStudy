@@ -38,6 +38,17 @@ INSERT INTO profiles (id, role) VALUES
  ON CONFLICT (id) DO UPDATE SET role='user';
 UPDATE card_limit_settings SET max_owned_cards=1000, count_official_cards=false WHERE id=1;
 
+-- 이 파일은 "서로 다른 두 구독 상품"이 필요한 시나리오를 돕니다(관리자 무상 제공이 스토어
+-- 구독을 대체하는 P-H1 등). 예전에는 카탈로그의 Pro(`sub_unlimited_monthly`)를 빌려 썼는데,
+-- 280 이 그 상품을 지우면서 이 파일이 통째로 죽었습니다("Unknown product").
+--
+-- 테스트를 카탈로그 **내용**에 묶어 두면 상품 하나가 바뀔 때마다 깨집니다. 그래서 필요한
+-- 두 번째 상품을 여기서 만듭니다. 트랜잭션 안이라 ROLLBACK 과 함께 사라지고,
+-- `is_active=false` 라 "판매 중인 구독은 하나" 불변식도 건드리지 않습니다.
+INSERT INTO billing_products (id, kind, title, tier, card_limit, period, price_krw, price_usd_cents, is_active, sort_order)
+VALUES ('test_comp_monthly','subscription','Test Comp','plan_test', 100000,'monthly', 0, 0, false, 999)
+ON CONFLICT (id) DO NOTHING;
+
 SET session_replication_role = DEFAULT;
 
 -- Helper to run as service_role (webhook RPCs) / authenticated (create_payment_intent).
@@ -105,7 +116,7 @@ BEGIN
    WHERE user_id='f4000000-0000-0000-0000-0000000000b2' AND provider='lemonsqueezy' AND status='active';
 
   -- admin comp grant supersedes → the LS row must be retired to expired + period lapsed (P-H1).
-  PERFORM public.grant_subscription('f4000000-0000-0000-0000-0000000000b2'::uuid,'sub_unlimited_monthly','admin','COMP2', NULL);
+  PERFORM public.grant_subscription('f4000000-0000-0000-0000-0000000000b2'::uuid,'test_comp_monthly','admin','COMP2', NULL);
   ASSERT (SELECT status FROM billing_subscriptions WHERE provider='lemonsqueezy' AND provider_subscription_id='LSX2') = 'expired',
          'superseded LS row → expired';
   ASSERT (SELECT current_period_end FROM billing_subscriptions WHERE provider='lemonsqueezy' AND provider_subscription_id='LSX2') <= now(),
@@ -231,9 +242,12 @@ SELECT 'f4d00000-0000-0000-0000-000000000007', :b7,'f4000000-0000-0000-0000-0000
 FROM generate_series(1,5) g;
 SET session_replication_role = DEFAULT;
 DO $$ BEGIN
-  ASSERT (SELECT card_limit FROM billing_products WHERE id='sub_unlimited_monthly') = 100000,
+  -- "최상위 플랜"은 특정 id 가 아니라 **판매 중인 것 중 가장 큰 한도**입니다. 예전에는
+  -- Pro 의 id 를 박아 뒀는데, 그 상품이 사라지면 검사 자체가 사라집니다. mig 148 이 막으려던
+  -- 것은 "최상위 플랜이 2e9 무제한 시드를 들고 있는 상태"이므로 그렇게 셉니다.
+  ASSERT (SELECT max(card_limit) FROM billing_products WHERE kind='subscription' AND is_active) = 100000,
          'top-plan catalog row carries the finite mig-148 cap (not the retired 2e9 seed)';
-  PERFORM public.grant_subscription('f4000000-0000-0000-0000-0000000000b7'::uuid,'sub_unlimited_monthly','test','UNL7', now()+interval '30 days');
+  PERFORM public.grant_subscription('f4000000-0000-0000-0000-0000000000b7'::uuid,'sub_5k_monthly','test','UNL7', now()+interval '30 days');
   ASSERT (SELECT card_limit FROM billing_subscriptions
             WHERE user_id='f4000000-0000-0000-0000-0000000000b7' AND status='active') = 100000,
          'grant_subscription copies the product cap onto the subscription row (P-L4)';
@@ -311,7 +325,7 @@ DO $$
 DECLARE v_res json;
 BEGIN
   PERFORM public.sync_subscription_by_user('f4000000-0000-0000-0000-0000000000b4'::uuid,'sub_5k_monthly','revenuecat','RC_A','active', now()+interval '30 days', false);
-  PERFORM public.sync_subscription_by_user('f4000000-0000-0000-0000-0000000000b5'::uuid,'sub_unlimited_monthly','revenuecat','RC_B','active', now()+interval '30 days', false);
+  PERFORM public.sync_subscription_by_user('f4000000-0000-0000-0000-0000000000b5'::uuid,'test_comp_monthly','revenuecat','RC_B','active', now()+interval '30 days', false);
   ASSERT public._owned_card_limit('f4000000-0000-0000-0000-0000000000b4'::uuid) = pg_temp._plan_cap(), 'b4 has RC_A cap';
 
   v_res := public.transfer_subscriptions_by_user('revenuecat','f4000000-0000-0000-0000-0000000000b4'::uuid,'f4000000-0000-0000-0000-0000000000b5'::uuid);
