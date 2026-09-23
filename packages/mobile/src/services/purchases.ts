@@ -215,7 +215,11 @@ class PurchaseService {
   //   credits_5000                 | ai_credit_499     | ai_credit_499
   //   credits_10000                | ai_credit_999     | ai_credit_999
   //   sub_5k_monthly  (Standard)   | standard_monthly  | sub_standard_monthly:monthly
-  //   sub_unlimited_monthly (Pro)  | pro_monthly       | sub_pro_monthly:monthly
+  //
+  // The Pro row (`sub_unlimited_monthly` → iOS `pro_monthly` / Play
+  // `sub_pro_monthly:monthly`) is GONE as of mig 280 — never sold, and both stores had
+  // already stopped offering it (the iOS product does not exist; the Play base plan is
+  // INACTIVE). Its `billing_product_skus` mappings were deleted with it.
   //
   // WHY the iOS sub ids are `standard_monthly`/`pro_monthly` and NOT the tidy
   // `sub_standard_monthly`/`sub_pro_monthly` Google uses: those two iOS ids were

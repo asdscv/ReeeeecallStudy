@@ -10,11 +10,13 @@ import { PurchaseConsent } from './PurchaseConsent'
  *
  * The plan is DATA-DRIVEN: it's the first `kind === 'subscription' && isActive`
  * product from the billing catalog (get_billing_products), sorted by `sortOrder`.
- * We must NOT hardcode a product id — mig 124 retired the old `sub_pro_monthly`
- * placeholder (is_active=false) in favor of `sub_5k_monthly` / `sub_unlimited_monthly`,
- * and create_payment_intent rejects any inactive product ("Unknown or inactive
- * product"). Reading the catalog keeps this pointed at a real, active plan through
- * any future catalog edit. (The full plan list lives in PlanSelector on Settings;
+ * We must NOT hardcode a product id — the catalog has been edited repeatedly and
+ * every edit would have broken a hardcoded id: mig 124 retired the `sub_pro_monthly`
+ * placeholder, 267 deactivated `sub_unlimited_monthly` ("Pro"), and 280 deleted it
+ * outright, leaving `sub_5k_monthly` as the only active subscription. On top of that
+ * create_payment_intent rejects any inactive product ("Unknown or inactive product").
+ * Reading the catalog keeps this pointed at a real, active plan through any future
+ * catalog edit. (The full plan list lives in PlanSelector on Settings;
  * this is the compact single-CTA entry point used by the over-cap prompt.)
  *
  * When no provider is wired (VITE_PAYMENT_PROVIDER unset), `startCheckout` flips a

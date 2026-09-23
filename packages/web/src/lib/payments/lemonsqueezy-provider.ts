@@ -18,23 +18,27 @@ import type { PaymentProvider, PaymentIntent, CheckoutResult } from './provider'
 //
 // Because Lemon Squeezy is Merchant of Record, the PRICE lives on the LS
 // product/variant, NOT in this code. The owner MUST set each LS variant's price to
-// match our billing_products catalog (three credit packs + the two card-storage
-// subscriptions: sub_5k_monthly and sub_unlimited_monthly) — otherwise the buyer is
-// charged a figure that disagrees with what confirm_payment grants.
+// match our billing_products catalog (three credit packs + the single card-storage
+// subscription `sub_5k_monthly`) — otherwise the buyer is charged a figure that
+// disagrees with what confirm_payment grants.
+//
+// mig 280 removed the second subscription (`sub_unlimited_monthly`, "Pro") outright:
+// it was never sold, both stores already refused to sell it, and it carried the SAME
+// 100,000-card limit as the $3.99 plan at $19.99 — so leaving the row around meant a
+// single `is_active` flip would have shipped a strictly worse deal.
 //
 // ── OWNER GO-LIVE CHECKLIST (the only work left before this charges real money) ──
 //   1. Create a Lemon Squeezy STORE, then a PRODUCT + VARIANT per ACTIVE catalog entry
 //      (the store currency is USD; prices need not numerically equal the ₩ catalog —
 //      grants key off the variant→product map, never the amount):
 //        credits_1000 / credits_5000 / credits_10000  (one-time credit packs)
-//        sub_5k_monthly (5,000-card plan) / sub_unlimited_monthly (100,000-card plan)  (monthly subs)
+//        sub_5k_monthly (100,000-card plan)  (the only monthly sub)
 //   2. Set these WEB env vars (Cloudflare Pages project vars / .env — Vite exposes
 //      any `VITE_`-prefixed var to the client bundle at build time):
 //        VITE_LEMONSQUEEZY_STORE    = reeeeecall            (the store SUBDOMAIN only,
 //                                                            i.e. <store>.lemonsqueezy.com)
 //        VITE_LEMONSQUEEZY_VARIANTS = {"credits_1000":"<slug>","credits_5000":"<slug>",
-//                                      "credits_10000":"<slug>","sub_5k_monthly":"<slug>",
-//                                      "sub_unlimited_monthly":"<slug>"}
+//                                      "credits_10000":"<slug>","sub_5k_monthly":"<slug>"}
 //                                      (product_id → variant SLUG/UUID — the /checkout/buy/<slug>
 //                                       path; NOT the numeric variant id, which 404s)
 //        VITE_PAYMENT_PROVIDER      = lemonsqueezy          (selects THIS adapter)
