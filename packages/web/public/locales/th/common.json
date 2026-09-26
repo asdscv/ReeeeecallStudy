@@ -110,50 +110,59 @@
   },
   "guideHelp": "Help",
   "onboarding": {
-    "skip": "Skip for now",
-    "next": "Next",
-    "back": "Back",
-    "finish": "Finish",
-    "getStarted": "Get Started",
+    "skip": "ข้ามไปก่อน",
+    "next": "ถัดไป",
+    "back": "ย้อนกลับ",
+    "finish": "เสร็จสิ้น",
+    "getStarted": "เริ่มต้น",
     "stepOf": "ขั้นที่ {{current}} จาก {{total}}",
-    "restartOnboarding": "Restart Tutorial",
+    "restartOnboarding": "เริ่มบทแนะนำใหม่",
     "welcome": {
-      "title": "Welcome to Reeeeecall!",
-      "description": "วิธีเรียนด้วยการ์ดที่ฉลาดที่สุด สร้างเด็ค เพิ่มการ์ด แล้วให้อัลกอริทึมการทบทวนแบบเว้นช่วงจัดการให้",
-      "action": "Get Started"
+      "title": "ยินดีต้อนรับสู่ Reeeeecall!",
+      "description": "วิธีที่ฉลาดที่สุดในการเรียนด้วยบัตรคำ สร้างชุดการ์ด เพิ่มการ์ด แล้วให้อัลกอริทึมทบทวนแบบเว้นช่วงช่วยปรับการเรียนของคุณ",
+      "action": "เริ่มต้น"
+    },
+    "quickStart": {
+      "title": "เริ่มด้วยชุดการ์ดที่พร้อมใช้",
+      "description": "เลือกชุดหนึ่งแล้วเริ่มเรียนได้ในไม่กี่วินาที คุณสร้างชุดของตัวเองทีหลังได้",
+      "cardCount_one": "{{count, number}} ใบ",
+      "cardCount_other": "{{count, number}} ใบ",
+      "buildOwn": "ฉันอยากสร้างชุดการ์ดเอง",
+      "empty": "ยังไม่มีชุดการ์ดที่พร้อมใช้สำหรับภาษาของคุณ มาสร้างของคุณเองกันเถอะ",
+      "failed": "เพิ่มชุดการ์ดนี้ไม่ได้ ลองชุดอื่นหรือสร้างของคุณเอง"
     },
     "createDeck": {
-      "title": "Create Your First Deck",
-      "description": "เราเตรียมเด็คตัวอย่างไว้ให้แล้ว กดเพื่อสร้างได้เลย!",
-      "action": "Create This Deck",
-      "creating": "Creating...",
-      "created": "Deck created!"
+      "title": "สร้างชุดการ์ดชุดแรกของคุณ",
+      "description": "เราเตรียมชุดการ์ดตัวอย่างไว้ให้แล้ว แตะเพื่อสร้าง",
+      "action": "สร้างชุดการ์ดนี้",
+      "creating": "กำลังสร้าง...",
+      "created": "สร้างชุดการ์ดแล้ว"
     },
     "cardTemplate": {
-      "title": "Your Card Templates",
-      "description": "เทมเพลตเหล่านี้ตั้งค่าไว้ให้แล้ว เลือกหนึ่งอันสำหรับการ์ดของคุณ",
-      "fields": "{{count, number}} fields",
-      "useTemplate": "Use This Template"
+      "title": "เทมเพลตการ์ดของคุณ",
+      "description": "เทมเพลตพร้อมใช้แล้ว เลือกหนึ่งอันสำหรับการ์ดของคุณ",
+      "fields": "{{count, number}} ช่อง",
+      "useTemplate": "ใช้เทมเพลตนี้"
     },
     "addCards": {
-      "title": "Sample Cards Ready!",
-      "description": "เราเตรียมการ์ดตัวอย่างไว้ให้ เพิ่มเข้าเด็คได้ด้วยคลิกเดียว",
-      "action": "Add These Cards",
-      "adding": "Adding...",
-      "added": "Cards added!"
+      "title": "การ์ดตัวอย่างพร้อมแล้ว",
+      "description": "เราเตรียมการ์ดตัวอย่างไว้ให้ เพิ่มเข้าชุดการ์ดได้ในคลิกเดียว",
+      "action": "เพิ่มการ์ดเหล่านี้",
+      "adding": "กำลังเพิ่ม...",
+      "added": "เพิ่มการ์ดแล้ว"
     },
     "firstStudy": {
-      "title": "You're Ready to Study!",
-      "description": "เด็ค \"{{deckName}}\" มีการ์ดพร้อมแล้ว {{cardCount}} ใบ เลือกโหมดเรียนแล้วเริ่มได้เลย",
-      "action": "Start Studying",
+      "title": "พร้อมเรียนแล้ว",
+      "description": "ชุดการ์ด “{{deckName}}” มีการ์ด {{cardCount, number}} ใบ เลือกโหมดเรียนแล้วเริ่มได้เลย",
+      "action": "เริ่มเรียน",
       "randomReview": "ทบทวนแบบสุ่ม",
-      "sequential": "ตามลำดับ"
+      "sequential": "เรียนตามลำดับ"
     },
     "exploreMarket": {
-      "title": "Explore the Marketplace",
-      "description": "เลือกดูเด็คที่ผู้เรียนคนอื่นแชร์ไว้ ชอบใบไหนก็หยิบไปใช้ได้เลย และคุณก็เผยแพร่เด็คของตัวเองขึ้นมาร์เก็ตได้เช่นกัน",
-      "action": "Browse Marketplace",
-      "actionFinish": "Finish Setup"
+      "title": "สำรวจมาร์เก็ต",
+      "description": "ดูชุดการ์ดที่ผู้เรียนคนอื่นแบ่งปัน และรับชุดที่คุณชอบได้เลย คุณยังเผยแพร่ชุดการ์ดของคุณเองได้ด้วย",
+      "action": "สำรวจมาร์เก็ต",
+      "actionFinish": "เสร็จสิ้นการตั้งค่า"
     }
   },
   "achievements": {

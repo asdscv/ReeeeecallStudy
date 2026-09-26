@@ -110,50 +110,59 @@
   },
   "guideHelp": "Help",
   "onboarding": {
-    "skip": "Skip for now",
-    "next": "Next",
-    "back": "Back",
-    "finish": "Finish",
-    "getStarted": "Get Started",
+    "skip": "後で",
+    "next": "次へ",
+    "back": "戻る",
+    "finish": "完了",
+    "getStarted": "はじめる",
     "stepOf": "ステップ {{current}} / {{total}}",
-    "restartOnboarding": "Restart Tutorial",
+    "restartOnboarding": "チュートリアルをやり直す",
     "welcome": {
-      "title": "Welcome to Reeeeecall!",
-      "description": "フラッシュカード学習のいちばん賢いやり方。デッキを作り、カードを足せば、間隔反復アルゴリズムが学習を最適化します。",
-      "action": "Get Started"
+      "title": "Reeeeecall へようこそ！",
+      "description": "暗記カードで学ぶ、最もスマートな方法。デッキを作ってカードを追加すれば、間隔反復アルゴリズムが学習を最適化します。",
+      "action": "はじめる"
+    },
+    "quickStart": {
+      "title": "すぐ学習できるデッキを選びましょう",
+      "description": "選ぶだけで数秒後に学習が始まります。自分のデッキはそのあとで作れます。",
+      "cardCount_one": "{{count, number}} 枚",
+      "cardCount_other": "{{count, number}} 枚",
+      "buildOwn": "自分でデッキを作りたい",
+      "empty": "この言語に合う既成デッキはまだありません。自分で作ってみましょう。",
+      "failed": "このデッキを追加できませんでした。別のデッキを選ぶか、自分で作成してください。"
     },
     "createDeck": {
-      "title": "Create Your First Deck",
-      "description": "サンプルのデッキを用意しました。クリックして作成しましょう！",
-      "action": "Create This Deck",
-      "creating": "Creating...",
-      "created": "Deck created!"
+      "title": "最初のデッキを作りましょう",
+      "description": "サンプルデッキを用意しました。タップすると作成されます。",
+      "action": "このデッキを作成",
+      "creating": "作成中...",
+      "created": "デッキを作成しました"
     },
     "cardTemplate": {
-      "title": "Your Card Templates",
+      "title": "カードテンプレート",
       "description": "テンプレートは設定済みです。カードに使うものを選んでください。",
-      "fields": "{{count, number}} fields",
-      "useTemplate": "Use This Template"
+      "fields": "{{count, number}} 個のフィールド",
+      "useTemplate": "このテンプレートを使う"
     },
     "addCards": {
-      "title": "Sample Cards Ready!",
-      "description": "サンプルカードを用意しました。ワンクリックでデッキに追加できます。",
-      "action": "Add These Cards",
-      "adding": "Adding...",
-      "added": "Cards added!"
+      "title": "サンプルカードの準備完了",
+      "description": "サンプルカードを用意しました。ワンタップでデッキに追加できます。",
+      "action": "このカードを追加",
+      "adding": "追加中...",
+      "added": "カードを追加しました"
     },
     "firstStudy": {
-      "title": "You're Ready to Study!",
-      "description": "デッキ「{{deckName}}」にカードが{{cardCount}}枚あります。学習モードを選んで始めましょう。",
-      "action": "Start Studying",
+      "title": "学習の準備ができました",
+      "description": "デッキ「{{deckName}}」に {{cardCount, number}} 枚のカードがあります。学習モードを選んで始めましょう。",
+      "action": "学習を始める",
       "randomReview": "ランダム復習",
       "sequential": "順番に学習"
     },
     "exploreMarket": {
-      "title": "Explore the Marketplace",
-      "description": "他の学習者が共有したデッキを見て、気に入ったものをそのまま取り込めます。自分のデッキをマーケットに公開することもできます。",
-      "action": "Browse Marketplace",
-      "actionFinish": "Finish Setup"
+      "title": "マーケットを見る",
+      "description": "他の学習者が共有したデッキを見て、気に入ったものを取り込めます。自分のデッキを公開することもできます。",
+      "action": "マーケットを見る",
+      "actionFinish": "設定を完了"
     }
   },
   "achievements": {

@@ -80,40 +80,49 @@
   },
   "guideHelp": "Bantuan",
   "onboarding": {
-    "skip": "Skip for now",
-    "next": "Next",
-    "back": "Back",
-    "finish": "Finish",
-    "stepOf": "Step {{current}} of {{total}}",
+    "skip": "Nanti saja",
+    "next": "Lanjut",
+    "back": "Kembali",
+    "finish": "Selesai",
+    "stepOf": "{{current}} / {{total}}",
     "welcome": {
-      "title": "Welcome to Reeeeecall!",
-      "description": "The smartest way to study with flashcards. Create decks, add cards, and let our spaced repetition algorithm optimize your learning.",
-      "action": "Get Started"
+      "title": "Selamat datang di Reeeeecall!",
+      "description": "Cara paling cerdas belajar dengan kartu hafalan. Buat dek, tambahkan kartu, dan biarkan pengulangan berjarak mengoptimalkan belajarmu.",
+      "action": "Mulai"
+    },
+    "quickStart": {
+      "title": "Mulai dengan dek siap pakai",
+      "description": "Pilih satu dan kamu langsung belajar dalam hitungan detik. Dek buatanmu bisa dibuat setelahnya.",
+      "action": "Saya buat sendiri",
+      "cardCount_one": "1 kartu",
+      "cardCount_other": "{{count, number}} kartu",
+      "empty": "Belum ada dek siap pakai untuk bahasamu. Ayo buat dek sendiri.",
+      "failed": "Dek ini tidak dapat ditambahkan. Coba yang lain atau buat sendiri."
     },
     "createDeck": {
-      "title": "Create Your First Deck",
-      "description": "We've prepared a sample deck for you. Click to create it!",
-      "action": "Create This Deck"
+      "title": "Buat dek pertamamu",
+      "description": "Dek adalah kumpulan kartu untuk satu topik. Buat satu untuk mata pelajaran apa pun yang ingin kamu pelajari.",
+      "action": "Buat dek"
     },
     "cardTemplate": {
-      "title": "Your Card Templates",
-      "description": "These templates are already set up for you. Pick one for your cards.",
-      "action": "Berikutnya"
+      "title": "Pilih template kartu",
+      "description": "Template menentukan tampilan kartumu. Gunakan template depan/belakang bawaan, atau yang khusus untuk bahasa dan ujian.",
+      "action": "Lanjut"
     },
     "addCards": {
-      "title": "Sample Cards Ready!",
-      "description": "We've prepared sample cards for you. Add them to your deck with one click.",
-      "action": "Add These Cards"
+      "title": "Tambahkan kartu ke dekmu",
+      "description": "Tambahkan manual, impor dari CSV, atau pakai AI untuk membuat kartu otomatis dari topik apa pun.",
+      "action": "Tambahkan kartu"
     },
     "firstStudy": {
-      "title": "You're Ready to Study!",
-      "description": "Your deck \"{{deckName}}\" has {{cardCount}} cards ready. Choose a study mode and start learning.",
-      "action": "Start Studying"
+      "title": "Mulai belajar!",
+      "description": "Pilih SRS untuk ingatan jangka panjang, atau acak/berurutan untuk ulasan cepat. Beri nilai setiap kartu untuk melacak kemajuanmu.",
+      "action": "Mulai belajar"
     },
     "exploreMarket": {
-      "title": "Explore the Marketplace",
-      "description": "Jelajahi dek yang dibagikan pengguna lain dan ambil yang kamu suka. Kamu juga bisa menerbitkan dekmu sendiri ke market.",
-      "action": "Browse Marketplace"
+      "title": "Jelajahi pasar",
+      "description": "Lihat dek yang dibagikan pelajar lain dan ambil yang kamu suka. Kamu juga bisa menerbitkan dekmu sendiri.",
+      "action": "Jelajahi pasar"
     }
   },
   "achievements": {

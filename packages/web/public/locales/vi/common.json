@@ -110,50 +110,59 @@
   },
   "guideHelp": "Help",
   "onboarding": {
-    "skip": "Skip for now",
-    "next": "Next",
-    "back": "Back",
-    "finish": "Finish",
-    "getStarted": "Get Started",
+    "skip": "Để sau",
+    "next": "Tiếp tục",
+    "back": "Quay lại",
+    "finish": "Hoàn tất",
+    "getStarted": "Bắt đầu",
     "stepOf": "Bước {{current}} / {{total}}",
-    "restartOnboarding": "Restart Tutorial",
+    "restartOnboarding": "Xem lại hướng dẫn",
     "welcome": {
-      "title": "Welcome to Reeeeecall!",
-      "description": "Cách học bằng thẻ thông minh nhất. Tạo bộ thẻ, thêm thẻ và để thuật toán lặp lại ngắt quãng tối ưu việc học cho bạn.",
-      "action": "Get Started"
+      "title": "Chào mừng đến với Reeeeecall!",
+      "description": "Cách học bằng thẻ ghi nhớ thông minh nhất. Tạo bộ thẻ, thêm thẻ và để thuật toán lặp lại giãn cách tối ưu việc học của bạn.",
+      "action": "Bắt đầu"
+    },
+    "quickStart": {
+      "title": "Bắt đầu với một bộ thẻ có sẵn",
+      "description": "Chọn một bộ và bạn sẽ học ngay trong vài giây. Bạn có thể tự tạo bộ thẻ ngay sau đó.",
+      "cardCount_one": "{{count, number}} thẻ",
+      "cardCount_other": "{{count, number}} thẻ",
+      "buildOwn": "Tôi muốn tự tạo bộ thẻ",
+      "empty": "Chưa có bộ thẻ có sẵn phù hợp với ngôn ngữ của bạn. Hãy tự tạo một bộ nhé.",
+      "failed": "Không thể thêm bộ thẻ này. Hãy thử bộ khác hoặc tự tạo."
     },
     "createDeck": {
-      "title": "Create Your First Deck",
-      "description": "Chúng tôi đã chuẩn bị sẵn một bộ thẻ mẫu. Nhấn để tạo nhé!",
-      "action": "Create This Deck",
-      "creating": "Creating...",
-      "created": "Deck created!"
+      "title": "Tạo bộ thẻ đầu tiên",
+      "description": "Chúng tôi đã chuẩn bị một bộ thẻ mẫu. Nhấn để tạo!",
+      "action": "Tạo bộ thẻ này",
+      "creating": "Đang tạo...",
+      "created": "Đã tạo bộ thẻ!"
     },
     "cardTemplate": {
-      "title": "Your Card Templates",
-      "description": "Các mẫu này đã được thiết lập sẵn. Hãy chọn một mẫu cho thẻ của bạn.",
-      "fields": "{{count, number}} fields",
-      "useTemplate": "Use This Template"
+      "title": "Mẫu thẻ của bạn",
+      "description": "Các mẫu đã được thiết lập sẵn. Hãy chọn một mẫu cho thẻ của bạn.",
+      "fields": "{{count, number}} trường",
+      "useTemplate": "Dùng mẫu này"
     },
     "addCards": {
-      "title": "Sample Cards Ready!",
-      "description": "Chúng tôi đã chuẩn bị thẻ mẫu. Thêm vào bộ thẻ chỉ với một cú nhấn.",
-      "action": "Add These Cards",
-      "adding": "Adding...",
-      "added": "Cards added!"
+      "title": "Thẻ mẫu đã sẵn sàng!",
+      "description": "Chúng tôi đã chuẩn bị các thẻ mẫu. Thêm vào bộ thẻ chỉ với một lần nhấn.",
+      "action": "Thêm các thẻ này",
+      "adding": "Đang thêm...",
+      "added": "Đã thêm thẻ!"
     },
     "firstStudy": {
-      "title": "You're Ready to Study!",
-      "description": "Bộ thẻ \"{{deckName}}\" đã có {{cardCount}} thẻ. Chọn chế độ học và bắt đầu thôi.",
-      "action": "Start Studying",
+      "title": "Bạn đã sẵn sàng học!",
+      "description": "Bộ thẻ “{{deckName}}” có {{cardCount, number}} thẻ. Hãy chọn chế độ học và bắt đầu.",
+      "action": "Bắt đầu học",
       "randomReview": "Ôn tập ngẫu nhiên",
-      "sequential": "Tuần tự"
+      "sequential": "Theo thứ tự"
     },
     "exploreMarket": {
-      "title": "Explore the Marketplace",
-      "description": "Khám phá các bộ thẻ do người học khác chia sẻ và lấy về bộ nào bạn thích. Bạn cũng có thể đăng bộ thẻ của mình lên chợ.",
-      "action": "Browse Marketplace",
-      "actionFinish": "Finish Setup"
+      "title": "Khám phá chợ bộ thẻ",
+      "description": "Xem các bộ thẻ do người học khác chia sẻ và lấy bộ bạn thích. Bạn cũng có thể đăng bộ thẻ của mình.",
+      "action": "Khám phá chợ",
+      "actionFinish": "Hoàn tất thiết lập"
     }
   },
   "achievements": {

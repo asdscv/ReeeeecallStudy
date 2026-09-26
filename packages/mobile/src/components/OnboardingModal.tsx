@@ -1,15 +1,21 @@
-import { useState, useCallback } from 'react'
-import { View, Text, TouchableOpacity, Modal, StyleSheet, Dimensions, ScrollView } from 'react-native'
+import { useState, useCallback, useEffect } from 'react'
+import { View, Text, TouchableOpacity, Modal, StyleSheet, Dimensions, ScrollView, ActivityIndicator } from 'react-native'
 import { useNavigation, type NavigationProp } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
 import { getMobileSupabase } from '../adapters'
+import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
+import { fetchStarterDecks } from '@reeeeecall/shared/lib/starter-decks'
+import type { MarketplaceListing } from '@reeeeecall/shared/types/database'
 import type { MainTabParamList } from '../navigation/types'
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
 const STEPS = [
   { key: 'welcome', icon: '🎉' },
+  // Something studiable before any authoring chore — a new account owns nothing, and
+  // asking it to build a deck first is where most of them left.
+  { key: 'quickStart', icon: '⚡' },
   { key: 'createDeck', icon: '📚' },
   { key: 'cardTemplate', icon: '📋' },
   { key: 'addCards', icon: '✏️' },
@@ -24,11 +30,42 @@ interface OnboardingModalProps {
 
 export function OnboardingModal({ visible, onDismiss }: OnboardingModalProps) {
   const theme = useTheme()
-  const { t } = useTranslation('common')
+  const { t, i18n } = useTranslation('common')
   const navigation = useNavigation<NavigationProp<MainTabParamList>>()
+  const acquireDeck = useMarketplaceStore((s) => s.acquireDeck)
   const [step, setStep] = useState(0)
+  const [starters, setStarters] = useState<MarketplaceListing[] | null>(null)
+  const [busyId, setBusyId] = useState<string | null>(null)
+  const [pickFailed, setPickFailed] = useState(false)
 
   const current = STEPS[step]
+
+  // Load once the step is actually reachable, not on mount — most sessions never
+  // open this modal at all.
+  useEffect(() => {
+    if (current.key !== 'quickStart' || starters !== null) return
+    let alive = true
+    fetchStarterDecks(getMobileSupabase(), i18n.language, 3)
+      .then((d) => { if (alive) setStarters(d) })
+      .catch(() => { if (alive) setStarters([]) })
+    return () => { alive = false }
+  }, [current.key, starters, i18n.language])
+
+  const handlePickStarter = useCallback(async (listingId: string) => {
+    setBusyId(listingId)
+    setPickFailed(false)
+    const result = await acquireDeck(listingId)
+    if (!result) {
+      // Acquire can legitimately refuse (card-ownership limit). Leave them a way on
+      // rather than a dead row.
+      setBusyId(null)
+      setPickFailed(true)
+      return
+    }
+    Promise.resolve(getMobileSupabase().rpc('complete_onboarding_step', { p_step_key: 'quickStart' })).catch(() => {})
+    onDismiss()
+    navigation.navigate('StudyTab', { screen: 'StudySetup', params: { deckId: result.deckId } } as never)
+  }, [acquireDeck, onDismiss, navigation])
 
   const handleNext = useCallback(() => {
     if (step < STEPS.length - 1) {
@@ -49,6 +86,10 @@ export function OnboardingModal({ visible, onDismiss }: OnboardingModalProps) {
 
     switch (stepKey) {
       case 'welcome':
+        handleNext()
+        break
+      case 'quickStart':
+        // The deck rows are the real CTA; this button is the opt-out into authoring.
         handleNext()
         break
       case 'createDeck':
@@ -137,6 +178,51 @@ export function OnboardingModal({ visible, onDismiss }: OnboardingModalProps) {
             <Text style={[styles.description, { color: theme.colors.textSecondary }]}>
               {t(`onboarding.${current.key}.description`, '')}
             </Text>
+
+            {/* Ready-made decks — one tap to a first card */}
+            {current.key === 'quickStart' && (
+              <View style={styles.starterList} testID="onboarding-starters">
+                {starters === null && (
+                  <ActivityIndicator color={palette.blue[500]} style={styles.starterSpinner} />
+                )}
+
+                {starters !== null && starters.length === 0 && (
+                  <Text style={[styles.starterEmpty, { color: theme.colors.textSecondary }]}>
+                    {t('onboarding.quickStart.empty', '')}
+                  </Text>
+                )}
+
+                {starters?.map((deck) => (
+                  <TouchableOpacity
+                    key={deck.id}
+                    onPress={() => handlePickStarter(deck.id)}
+                    disabled={busyId !== null}
+                    testID={`onboarding-starter-${deck.id}`}
+                    style={[
+                      styles.starterRow,
+                      { borderColor: theme.colors.border, backgroundColor: theme.colors.surface },
+                      busyId !== null && styles.starterRowDisabled,
+                    ]}
+                  >
+                    <View style={styles.starterTextCol}>
+                      <Text style={[styles.starterTitle, { color: theme.colors.text }]} numberOfLines={2}>
+                        {deck.title}
+                      </Text>
+                      <Text style={[styles.starterMeta, { color: theme.colors.textSecondary }]}>
+                        {t('onboarding.quickStart.cardCount', { count: deck.card_count })}
+                      </Text>
+                    </View>
+                    {busyId === deck.id && <ActivityIndicator color={palette.blue[500]} />}
+                  </TouchableOpacity>
+                ))}
+
+                {pickFailed && (
+                  <Text style={[styles.starterEmpty, { color: theme.colors.error }]} testID="onboarding-starter-error">
+                    {t('onboarding.quickStart.failed', '')}
+                  </Text>
+                )}
+              </View>
+            )}
           </ScrollView>
 
           {/* Action buttons */}
@@ -187,6 +273,42 @@ export function OnboardingModal({ visible, onDismiss }: OnboardingModalProps) {
 }
 
 const styles = StyleSheet.create({
+  starterList: {
+    width: '100%',
+    marginTop: 8,
+    gap: 10,
+  },
+  starterSpinner: {
+    marginVertical: 20,
+  },
+  starterEmpty: {
+    fontSize: 14,
+    textAlign: 'center',
+    paddingVertical: 12,
+  },
+  starterRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+  },
+  starterRowDisabled: {
+    opacity: 0.6,
+  },
+  starterTextCol: {
+    flex: 1,
+  },
+  starterTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  starterMeta: {
+    fontSize: 13,
+    marginTop: 2,
+  },
   overlay: {
     flex: 1,
     justifyContent: 'center',

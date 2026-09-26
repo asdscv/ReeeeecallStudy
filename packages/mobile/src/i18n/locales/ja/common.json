@@ -80,40 +80,49 @@
   },
   "guideHelp": "ヘルプ",
   "onboarding": {
-    "skip": "Skip for now",
-    "next": "Next",
-    "back": "Back",
-    "finish": "Finish",
-    "stepOf": "Step {{current}} of {{total}}",
+    "skip": "後で",
+    "next": "次へ",
+    "back": "戻る",
+    "finish": "完了",
+    "stepOf": "{{current}} / {{total}}",
     "welcome": {
-      "title": "Welcome to Reeeeecall!",
-      "description": "The smartest way to study with flashcards. Create decks, add cards, and let our spaced repetition algorithm optimize your learning.",
-      "action": "Get Started"
+      "title": "Reeeeecall へようこそ！",
+      "description": "暗記カードで学ぶ、最もスマートな方法。デッキを作ってカードを追加すれば、間隔反復が学習を最適化します。",
+      "action": "はじめる"
+    },
+    "quickStart": {
+      "title": "すぐ学習できるデッキを選びましょう",
+      "description": "選ぶだけで数秒後に学習が始まります。自分のデッキはそのあとで作れます。",
+      "action": "自分で作る",
+      "cardCount_one": "{{count, number}} 枚",
+      "cardCount_other": "{{count, number}} 枚",
+      "empty": "この言語に合う既成デッキはまだありません。自分で作ってみましょう。",
+      "failed": "このデッキを追加できませんでした。別のデッキを選ぶか、自分で作成してください。"
     },
     "createDeck": {
-      "title": "Create Your First Deck",
-      "description": "We've prepared a sample deck for you. Click to create it!",
-      "action": "Create This Deck"
+      "title": "最初のデッキを作りましょう",
+      "description": "デッキはひとつのテーマのカードをまとめたものです。学びたい科目で作ってみましょう。",
+      "action": "デッキを作成"
     },
     "cardTemplate": {
-      "title": "Your Card Templates",
-      "description": "These templates are already set up for you. Pick one for your cards.",
+      "title": "カードテンプレートを選ぶ",
+      "description": "テンプレートはカードの見た目を決めます。標準の表／裏か、語学・試験向けの専用テンプレートを選べます。",
       "action": "次へ"
     },
     "addCards": {
-      "title": "Sample Cards Ready!",
-      "description": "We've prepared sample cards for you. Add them to your deck with one click.",
-      "action": "Add These Cards"
+      "title": "デッキにカードを追加",
+      "description": "手入力、CSV の読み込み、AI による自動生成のいずれでも追加できます。",
+      "action": "カードを追加"
     },
     "firstStudy": {
-      "title": "You're Ready to Study!",
-      "description": "Your deck \"{{deckName}}\" has {{cardCount}} cards ready. Choose a study mode and start learning.",
-      "action": "Start Studying"
+      "title": "学習を始めましょう",
+      "description": "長期記憶には SRS、素早い復習にはランダム／順番を選んでください。カードを評価すると進み具合が記録されます。",
+      "action": "学習を始める"
     },
     "exploreMarket": {
-      "title": "Explore the Marketplace",
-      "description": "他の学習者が共有したデッキを見て、気に入ったものをそのまま取り込めます。自分のデッキをマーケットに公開することもできます。",
-      "action": "Browse Marketplace"
+      "title": "マーケットを見る",
+      "description": "他の学習者が共有したデッキを見て、気に入ったものを取り込めます。自分のデッキを公開することもできます。",
+      "action": "マーケットを見る"
     }
   },
   "achievements": {

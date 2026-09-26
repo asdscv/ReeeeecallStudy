@@ -122,6 +122,15 @@
       "description": "플래시카드로 가장 스마트하게 공부하는 방법. 덱을 만들고, 카드를 추가하고, 간격 반복 알고리즘으로 학습을 최적화하세요.",
       "action": "시작하기"
     },
+    "quickStart": {
+      "title": "바로 학습할 덱을 골라보세요",
+      "description": "하나만 고르면 몇 초 안에 학습이 시작됩니다. 내 덱은 그다음에 만들어도 돼요.",
+      "cardCount_one": "{{count, number}}장",
+      "cardCount_other": "{{count, number}}장",
+      "buildOwn": "직접 덱을 만들고 싶어요",
+      "empty": "아직 이 언어에 맞는 준비된 덱이 없어요. 직접 만들어 볼까요?",
+      "failed": "이 덱을 추가할 수 없었어요. 다른 덱을 고르거나 직접 만들어 보세요."
+    },
     "createDeck": {
       "title": "첫 번째 덱 만들기",
       "description": "샘플 덱을 준비했어요. 클릭하면 바로 생성됩니다!",
@@ -144,7 +153,7 @@
     },
     "firstStudy": {
       "title": "학습 준비 완료!",
-      "description": "\"{{deckName}}\" 덱에 {{cardCount}}장의 카드가 준비되었습니다. 학습 모드를 선택하고 공부를 시작하세요.",
+      "description": "\"{{deckName}}\" 덱에 {{cardCount, number}}장의 카드가 준비되었습니다. 학습 모드를 선택하고 공부를 시작하세요.",
       "action": "학습 시작하기",
       "randomReview": "랜덤 복습",
       "sequential": "순차 학습"
