@@ -4,11 +4,14 @@ import { supabase } from '../lib/supabase'
 // Extensible step definitions — add/remove/reorder without code changes elsewhere
 export const ONBOARDING_STEPS = [
   { key: 'welcome', order: 0 },
-  { key: 'create_deck', order: 1 },
-  { key: 'card_template', order: 2 },
-  { key: 'add_cards', order: 3 },
-  { key: 'first_study', order: 4 },
-  { key: 'explore_market', order: 5 },
+  // Studiable content comes before deck-building: a new account owns nothing, and
+  // asking it to author cards first is where most of them left.
+  { key: 'quick_start', order: 1 },
+  { key: 'create_deck', order: 2 },
+  { key: 'card_template', order: 3 },
+  { key: 'add_cards', order: 4 },
+  { key: 'first_study', order: 5 },
+  { key: 'explore_market', order: 6 },
 ] as const
 
 export type OnboardingStepKey = typeof ONBOARDING_STEPS[number]['key']
@@ -19,6 +22,13 @@ interface OnboardingState {
   currentStep: number  // index into ONBOARDING_STEPS
   showOnboarding: boolean
   loading: boolean
+  /**
+   * Whether `get_onboarding_status` has answered yet. Separate from `isCompleted`
+   * because that one starts optimistically `true` to avoid a flash of the overlay,
+   * and an initialize() guard that reads it can never tell "not asked yet" from
+   * "asked, and they're done".
+   */
+  hydrated: boolean
 
   // Data created during onboarding flow
   sampleDeckId: string | null
@@ -42,13 +52,15 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
   currentStep: 0,
   showOnboarding: false,
   loading: false,
+  hydrated: false,
   sampleDeckId: null,
   sampleTemplateId: null,
 
   initialize: async () => {
-    // Skip if already loaded (avoid unnecessary RPC on every page)
-    if (get().loading) return
-    if (get().completedSteps.size > 0 || get().isCompleted) return
+    // Ask once per session, not on every page. Guarding on `isCompleted` instead —
+    // which starts `true` so the overlay doesn't flash — returned before the RPC was
+    // ever sent, so onboarding could not appear for anybody.
+    if (get().loading || get().hydrated) return
     set({ loading: true })
     try {
       const { data, error } = await supabase.rpc('get_onboarding_status')
@@ -62,10 +74,11 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
         completedSteps,
         showOnboarding: !result.completed,
         currentStep: findNextIncompleteStep(completedSteps),
+        hydrated: true,
       })
     } catch {
       // If RPC fails (e.g. column doesn't exist yet), just hide onboarding
-      set({ isCompleted: true, showOnboarding: false })
+      set({ isCompleted: true, showOnboarding: false, hydrated: true })
     } finally {
       set({ loading: false })
     }
@@ -147,6 +160,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
       currentStep: 0,
       showOnboarding: true,
       loading: false,
+      hydrated: true,   // keep initialize() from overwriting the restart we just did
       sampleDeckId: null,
       sampleTemplateId: null,
     })

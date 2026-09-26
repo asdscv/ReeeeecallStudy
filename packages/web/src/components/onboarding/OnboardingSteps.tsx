@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   BookOpen,
@@ -7,12 +7,16 @@ import {
   Brain,
   ShoppingBag,
   Sparkles,
+  Zap,
   Check,
   Loader2,
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useOnboardingStore } from '../../stores/onboarding-store'
 import { useTemplateStore } from '../../stores/template-store'
+import { useMarketplaceStore } from '../../stores/marketplace-store'
+import { fetchStarterDecks } from '@reeeeecall/shared/stores/starter-decks'
+import type { MarketplaceListing } from '../../types/database'
 import { getSampleDeck, getSampleCards } from '../../lib/onboarding-samples'
 
 export interface StepProps {
@@ -58,6 +62,100 @@ export function WelcomeStep({ onNext }: StepProps) {
         className="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors cursor-pointer"
       >
         {t('onboarding.welcome.action')}
+      </button>
+    </StepLayout>
+  )
+}
+
+// ─── Step 2: Quick Start ───────────────────────────────────
+//
+// The funnel used to lose most new accounts here: it asked for a deck, a template
+// and hand-typed cards before anything was studiable. The catalog already holds
+// hundreds of free official decks, so hand one over and go straight to study.
+
+export function QuickStartStep({ onNext, onAction }: StepProps) {
+  const { t, i18n } = useTranslation('common')
+  const acquireDeck = useMarketplaceStore((s) => s.acquireDeck)
+  const [decks, setDecks] = useState<MarketplaceListing[] | null>(null)
+  const [busyId, setBusyId] = useState<string | null>(null)
+  const [failed, setFailed] = useState(false)
+
+  useEffect(() => {
+    let alive = true
+    fetchStarterDecks(i18n.language, 3)
+      .then((d) => { if (alive) setDecks(d) })
+      .catch(() => { if (alive) setDecks([]) })
+    return () => { alive = false }
+  }, [i18n.language])
+
+  const handlePick = async (listingId: string) => {
+    setBusyId(listingId)
+    setFailed(false)
+    const result = await acquireDeck(listingId)
+    if (!result) {
+      // Acquire can legitimately refuse (card-ownership limit). Don't strand them
+      // on a dead button — let them fall through to building their own deck.
+      setBusyId(null)
+      setFailed(true)
+      return
+    }
+    onAction(`navigate:/decks/${result.deckId}/study/setup`)
+  }
+
+  const loading = decks === null
+
+  return (
+    <StepLayout
+      icon={<Zap className="w-10 h-10 text-indigo-600" />}
+      title={t('onboarding.quickStart.title')}
+      description={t('onboarding.quickStart.description')}
+    >
+      <div className="w-full max-w-sm space-y-3 mb-6" data-testid="quick-start-decks">
+        {loading && [0, 1, 2].map((i) => (
+          <div key={i} className="h-16 rounded-xl bg-muted animate-pulse" />
+        ))}
+
+        {!loading && decks.length === 0 && (
+          <p className="text-sm text-muted-foreground py-4">
+            {t('onboarding.quickStart.empty')}
+          </p>
+        )}
+
+        {!loading && decks.map((deck) => (
+          <button
+            key={deck.id}
+            onClick={() => handlePick(deck.id)}
+            disabled={busyId !== null}
+            data-testid={`quick-start-deck-${deck.id}`}
+            className="w-full flex items-center gap-3 bg-muted border border-border rounded-xl p-4 text-left hover:border-indigo-400 transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+          >
+            <div className="w-10 h-10 rounded-lg bg-brand flex items-center justify-center text-white shrink-0">
+              {busyId === deck.id
+                ? <Loader2 className="w-5 h-5 animate-spin" />
+                : <BookOpen className="w-5 h-5" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-foreground truncate">{deck.title}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('onboarding.quickStart.cardCount', { count: deck.card_count })}
+              </p>
+            </div>
+          </button>
+        ))}
+
+        {failed && (
+          <p className="text-sm text-destructive" data-testid="quick-start-error">
+            {t('onboarding.quickStart.failed')}
+          </p>
+        )}
+      </div>
+
+      <button
+        onClick={onNext}
+        className="text-sm text-muted-foreground hover:text-foreground underline transition-colors cursor-pointer"
+        data-testid="quick-start-build-own"
+      >
+        {t('onboarding.quickStart.buildOwn')}
       </button>
     </StepLayout>
   )

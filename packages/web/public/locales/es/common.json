@@ -110,50 +110,59 @@
   },
   "guideHelp": "Help",
   "onboarding": {
-    "skip": "Skip for now",
-    "next": "Next",
-    "back": "Back",
-    "finish": "Finish",
-    "getStarted": "Get Started",
+    "skip": "Omitir por ahora",
+    "next": "Siguiente",
+    "back": "Atrás",
+    "finish": "Finalizar",
+    "getStarted": "Empezar",
     "stepOf": "Paso {{current}} de {{total}}",
-    "restartOnboarding": "Restart Tutorial",
+    "restartOnboarding": "Reiniciar el tutorial",
     "welcome": {
-      "title": "Welcome to Reeeeecall!",
+      "title": "¡Bienvenido a Reeeeecall!",
       "description": "La forma más inteligente de estudiar con tarjetas. Crea mazos, añade tarjetas y deja que el algoritmo de repetición espaciada optimice tu aprendizaje.",
-      "action": "Get Started"
+      "action": "Empezar"
+    },
+    "quickStart": {
+      "title": "Empieza con un mazo listo para usar",
+      "description": "Elige uno y estarás estudiando en segundos. Podrás crear el tuyo justo después.",
+      "cardCount_one": "1 tarjeta",
+      "cardCount_other": "{{count, number}} tarjetas",
+      "buildOwn": "Prefiero crear mi propio mazo",
+      "empty": "Todavía no hay un mazo listo para tu idioma. Creemos el tuyo.",
+      "failed": "No se pudo añadir ese mazo. Prueba con otro o crea el tuyo."
     },
     "createDeck": {
-      "title": "Create Your First Deck",
-      "description": "Hemos preparado un mazo de ejemplo. ¡Haz clic para crearlo!",
-      "action": "Create This Deck",
-      "creating": "Creating...",
-      "created": "Deck created!"
+      "title": "Crea tu primer mazo",
+      "description": "Hemos preparado un mazo de ejemplo. ¡Pulsa para crearlo!",
+      "action": "Crear este mazo",
+      "creating": "Creando...",
+      "created": "¡Mazo creado!"
     },
     "cardTemplate": {
-      "title": "Your Card Templates",
-      "description": "Estas plantillas ya están configuradas. Elige una para tus tarjetas.",
-      "fields": "{{count, number}} fields",
-      "useTemplate": "Use This Template"
+      "title": "Tus plantillas de tarjeta",
+      "description": "Estas plantillas ya están listas. Elige una para tus tarjetas.",
+      "fields": "{{count, number}} campos",
+      "useTemplate": "Usar esta plantilla"
     },
     "addCards": {
-      "title": "Sample Cards Ready!",
-      "description": "Hemos preparado tarjetas de ejemplo. Añádelas a tu mazo con un clic.",
-      "action": "Add These Cards",
-      "adding": "Adding...",
-      "added": "Cards added!"
+      "title": "¡Tarjetas de ejemplo listas!",
+      "description": "Hemos preparado tarjetas de ejemplo. Añádelas a tu mazo con un solo toque.",
+      "action": "Añadir estas tarjetas",
+      "adding": "Añadiendo...",
+      "added": "¡Tarjetas añadidas!"
     },
     "firstStudy": {
-      "title": "You're Ready to Study!",
-      "description": "Tu mazo \"{{deckName}}\" tiene {{cardCount}} tarjetas listas. Elige un modo de estudio y empieza.",
-      "action": "Start Studying",
+      "title": "¡Listo para estudiar!",
+      "description": "Tu mazo «{{deckName}}» tiene {{cardCount, number}} tarjetas. Elige un modo de estudio y empieza.",
+      "action": "Empezar a estudiar",
       "randomReview": "Repaso aleatorio",
       "sequential": "Secuencial"
     },
     "exploreMarket": {
-      "title": "Explore the Marketplace",
-      "description": "Explora los mazos que comparten otros estudiantes y llévate los que quieras. También puedes publicar los tuyos en el mercado.",
-      "action": "Browse Marketplace",
-      "actionFinish": "Finish Setup"
+      "title": "Explora el mercado",
+      "description": "Mira los mazos que comparten otros estudiantes y llévate el que quieras. También puedes publicar los tuyos.",
+      "action": "Explorar el mercado",
+      "actionFinish": "Terminar configuración"
     }
   },
   "achievements": {

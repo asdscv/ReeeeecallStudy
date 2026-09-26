@@ -80,40 +80,49 @@
   },
   "guideHelp": "帮助",
   "onboarding": {
-    "skip": "Skip for now",
-    "next": "Next",
-    "back": "Back",
-    "finish": "Finish",
-    "stepOf": "Step {{current}} of {{total}}",
+    "skip": "稍后再说",
+    "next": "下一步",
+    "back": "上一步",
+    "finish": "完成",
+    "stepOf": "{{current}} / {{total}}",
     "welcome": {
-      "title": "Welcome to Reeeeecall!",
-      "description": "The smartest way to study with flashcards. Create decks, add cards, and let our spaced repetition algorithm optimize your learning.",
-      "action": "Get Started"
+      "title": "欢迎使用 Reeeeecall！",
+      "description": "用记忆卡片学习的最聪明方式。创建卡片集、添加卡片，间隔重复会帮你优化学习。",
+      "action": "开始使用"
+    },
+    "quickStart": {
+      "title": "选一个现成的卡片集开始",
+      "description": "选好后几秒内就能开始学习。你自己的卡片集可以稍后再做。",
+      "action": "我自己创建",
+      "cardCount_one": "{{count, number}} 张",
+      "cardCount_other": "{{count, number}} 张",
+      "empty": "暂时没有适合你语言的现成卡片集，先自己创建一个吧。",
+      "failed": "无法添加该卡片集。请换一个，或自己创建。"
     },
     "createDeck": {
-      "title": "Create Your First Deck",
-      "description": "We've prepared a sample deck for you. Click to create it!",
-      "action": "Create This Deck"
+      "title": "创建你的第一个卡片集",
+      "description": "卡片集是同一主题卡片的合集。为你想学的任何科目建一个吧。",
+      "action": "创建卡片集"
     },
     "cardTemplate": {
-      "title": "Your Card Templates",
-      "description": "These templates are already set up for you. Pick one for your cards.",
+      "title": "选择卡片模板",
+      "description": "模板决定卡片的样式。可用默认的正／反面模板，也可选语言和考试专用模板。",
       "action": "下一步"
     },
     "addCards": {
-      "title": "Sample Cards Ready!",
-      "description": "We've prepared sample cards for you. Add them to your deck with one click.",
-      "action": "Add These Cards"
+      "title": "向卡片集添加卡片",
+      "description": "可以手动添加、从 CSV 导入，或用 AI 根据任意主题自动生成。",
+      "action": "添加卡片"
     },
     "firstStudy": {
-      "title": "You're Ready to Study!",
-      "description": "Your deck \"{{deckName}}\" has {{cardCount}} cards ready. Choose a study mode and start learning.",
-      "action": "Start Studying"
+      "title": "开始学习",
+      "description": "长期记忆选 SRS，快速复习选随机／顺序。为每张卡片评分即可记录进度。",
+      "action": "开始学习"
     },
     "exploreMarket": {
-      "title": "Explore the Marketplace",
-      "description": "浏览其他学习者共享的卡组，喜欢就直接取用。你也可以把自己的卡组发布到市场。",
-      "action": "Browse Marketplace"
+      "title": "浏览市场",
+      "description": "看看其他学习者分享的卡片集，喜欢就直接获取。你也可以把自己的卡片集发布到市场。",
+      "action": "浏览市场"
     }
   },
   "achievements": {

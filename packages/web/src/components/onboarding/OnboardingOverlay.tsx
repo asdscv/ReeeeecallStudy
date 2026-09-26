@@ -9,6 +9,7 @@ import {
 import type { OnboardingStepKey } from '../../stores/onboarding-store'
 import {
   WelcomeStep,
+  QuickStartStep,
   CreateDeckStep,
   CardTemplateStep,
   AddCardsStep,
@@ -18,6 +19,7 @@ import {
 
 const STEP_COMPONENTS = [
   WelcomeStep,
+  QuickStartStep,
   CreateDeckStep,
   CardTemplateStep,
   AddCardsStep,

@@ -122,6 +122,15 @@
       "description": "The smartest way to study with flashcards. Create decks, add cards, and let our spaced repetition algorithm optimize your learning.",
       "action": "Get Started"
     },
+    "quickStart": {
+      "title": "Start with a ready-made deck",
+      "description": "Pick one and you're studying in seconds. You can build your own deck right after.",
+      "cardCount_one": "1 card",
+      "cardCount_other": "{{count, number}} cards",
+      "buildOwn": "I'd rather build my own deck",
+      "empty": "No ready-made deck fits your language yet. Let's build your own instead.",
+      "failed": "That deck couldn't be added. Try another, or build your own deck."
+    },
     "createDeck": {
       "title": "Create Your First Deck",
       "description": "We've prepared a sample deck for you. Click to create it!",
@@ -144,7 +153,7 @@
     },
     "firstStudy": {
       "title": "You're Ready to Study!",
-      "description": "Your deck \"{{deckName}}\" has {{cardCount}} cards ready. Choose a study mode and start learning.",
+      "description": "Your deck \"{{deckName}}\" has {{cardCount, number}} cards ready. Choose a study mode and start learning.",
       "action": "Start Studying",
       "randomReview": "Random Review",
       "sequential": "Sequential"
