@@ -2,11 +2,11 @@
  * What a brand-new account gets handed on its first screen.
  *
  * Onboarding used to ask for a deck, a template and hand-typed cards before anything
- * was studiable, and the funnel showed it: of 44 accounts, 19 built a deck and 8 ever
- * turned a card. Meanwhile 649 free official decks sat in the catalog with
- * `acquire_count = 0` — nobody was ever sent there.
+ * was studiable, and the funnel showed it: of the 16 external accounts that reached
+ * onboarding, 13 stopped at `createDeck` and none ever turned a card. Meanwhile 649
+ * free official decks sat in the catalog that only 7 people had ever taken.
  *
- * Two traps live in picking which deck to hand over, and both are silent:
+ * Three traps live in picking which deck to hand over, and all three are silent:
  *
  *   1. In this catalog the BEGINNER decks are the big ones (~300 cards) and the
  *      ADVANCED ones are small (~100). Sorting by card_count to "start easy" hands a
@@ -14,11 +14,27 @@
  *   2. Every official deck teaches English, so `learning_language` is the same value
  *      on all 649 rows and discriminates nothing. `native_language` is the axis that
  *      decides whether a Korean speaker gets the Korean deck or the Spanish one.
+ *   3. Decks ship as bidirectional pairs that share category, level and card_count.
+ *      Grouping on those merges genuinely different decks; only the direction tag
+ *      separates a pair from a pair of siblings.
  */
-import { describe, it, expect } from 'vitest'
-import type { SupabaseClient } from '@supabase/supabase-js'
-import { fetchStarterDecks, easiestFirst, preferRecognitionDirection } from '@reeeeecall/shared/lib/starter-decks'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import {
+  easiestFirst,
+  preferRecognitionDirection,
+  pickStarters,
+  normalizeLang,
+} from '@reeeeecall/shared/lib/starter-decks'
 import type { MarketplaceListing } from '@reeeeecall/shared/types/database'
+
+const from = vi.fn()
+vi.mock('@reeeeecall/shared/lib/supabase', () => ({
+  supabase: { from: (...a: unknown[]) => from(...a) },
+  getSupabase: () => ({ from: (...a: unknown[]) => from(...a) }),
+  initSupabase: vi.fn(),
+}))
+
+const { fetchStarterDecks } = await import('@reeeeecall/shared/stores/starter-decks')
 
 function listing(over: Partial<MarketplaceListing> & { id: string }): MarketplaceListing {
   return {
@@ -46,32 +62,28 @@ function listing(over: Partial<MarketplaceListing> & { id: string }): Marketplac
   } as MarketplaceListing
 }
 
-/**
- * Stands in for the query builder. Records the filters each call applied so a test can
- * assert *which* query ran, not just what came back.
- */
-function fakeClient(byLang: Record<string, MarketplaceListing[]>, fallback: MarketplaceListing[] = []) {
+/** Stands in for the query builder, recording which filters each call applied. */
+function stubRest(byLang: Record<string, MarketplaceListing[]>, fallback: MarketplaceListing[] = []) {
   const queries: Record<string, unknown>[] = []
-  const client = {
-    from() {
-      const eqs: Record<string, unknown> = {}
-      const builder: Record<string, unknown> = {}
-      Object.assign(builder, {
-        select: () => builder,
-        eq: (col: string, val: unknown) => { eqs[col] = val; return builder },
-        order: () => builder,
-        limit: () => {
-          queries.push({ ...eqs })
-          // No native_language filter → this is the fallback query.
-          if (!('native_language' in eqs)) return Promise.resolve({ data: fallback, error: null })
-          return Promise.resolve({ data: byLang[eqs.native_language as string] ?? [], error: null })
-        },
-      })
-      return builder
-    },
-  } as unknown as SupabaseClient
-  return { client, queries }
+  from.mockImplementation(() => {
+    const eqs: Record<string, unknown> = {}
+    const b: Record<string, unknown> = {}
+    Object.assign(b, {
+      select: () => b,
+      eq: (col: string, val: unknown) => { eqs[col] = val; return b },
+      order: () => b,
+      limit: () => {
+        queries.push({ ...eqs })
+        if (!('native_language' in eqs)) return Promise.resolve({ data: fallback, error: null })
+        return Promise.resolve({ data: byLang[eqs.native_language as string] ?? [], error: null })
+      },
+    })
+    return b
+  })
+  return queries
 }
+
+beforeEach(() => from.mockReset())
 
 describe('easiestFirst', () => {
   it('puts a 300-card beginner deck ahead of a 100-card advanced deck', () => {
@@ -93,86 +105,16 @@ describe('easiestFirst', () => {
   })
 })
 
-describe('fetchStarterDecks', () => {
-  it('hands a Korean speaker the Korean decks, easiest first', async () => {
-    const { client } = fakeClient({
-      ko: [
-        listing({ id: 'ko-advanced', study_level: 'advanced', card_count: 100 }),
-        listing({ id: 'ko-beginner', study_level: 'beginner', card_count: 300 }),
-      ],
-      es: [listing({ id: 'es-beginner', native_language: 'es' })],
-    })
-    const decks = await fetchStarterDecks(client, 'ko', 3)
-    expect(decks.map(d => d.id)).toEqual(['ko-beginner', 'ko-advanced'])
+describe('normalizeLang', () => {
+  it('reduces a regional locale to its base language', () => {
+    expect(normalizeLang('ko-KR')).toBe('ko')
   })
 
-  it('narrows the query by native_language, not learning_language', async () => {
-    const { client, queries } = fakeClient({ ko: [listing({ id: 'ko-1' })] })
-    await fetchStarterDecks(client, 'ko', 3)
-    expect(queries[0]).toMatchObject({
-      is_active: true,
-      owner_is_official: true,
-      is_paid: false,
-      native_language: 'ko',
-    })
-    expect(queries[0]).not.toHaveProperty('learning_language')
-  })
-
-  it('normalizes a regional locale to its base language', async () => {
-    const { client, queries } = fakeClient({ ko: [listing({ id: 'ko-1' })] })
-    await fetchStarterDecks(client, 'ko-KR', 3)
-    expect(queries[0].native_language).toBe('ko')
-  })
-
-  // Regression: the direction filter existed and was unit-tested, but nothing asserted
-  // fetchStarterDecks actually applied it — removing the call from the fetch path kept
-  // every test green. This is the shape the production list came back in.
-  it('does not spend two of three slots on both directions of one deck', async () => {
-    const { client } = fakeClient({
-      ko: [
-        listing({ id: 'b10-en-ko', title: '10탄 (영어 → 한국어)', card_count: 300, tags: ['source:en', 'target:ko'] }),
-        listing({ id: 'b2-en-ko', title: '2탄 (영어 → 한국어)', card_count: 301, tags: ['source:en', 'target:ko'] }),
-        listing({ id: 'b2-ko-en', title: '2탄 (한국어 → 영어)', card_count: 301, tags: ['source:ko', 'target:en'] }),
-        listing({ id: 'b3-en-ko', title: '3탄 (영어 → 한국어)', card_count: 302, tags: ['source:en', 'target:ko'] }),
-      ],
-    })
-    const decks = await fetchStarterDecks(client, 'ko', 3)
-    expect(decks.map(d => d.id)).toEqual(['b10-en-ko', 'b2-en-ko', 'b3-en-ko'])
-  })
-
-  it('respects the requested limit', async () => {
-    const { client } = fakeClient({
-      ko: [
-        listing({ id: 'a', study_level: 'beginner', card_count: 100 }),
-        listing({ id: 'b', study_level: 'beginner', card_count: 200 }),
-        listing({ id: 'c', study_level: 'beginner', card_count: 300 }),
-      ],
-    })
-    expect((await fetchStarterDecks(client, 'ko', 2)).map(d => d.id)).toEqual(['a', 'b'])
-  })
-
-  // The catalog has zero decks whose native_language is 'en' — every deck teaches
-  // English *to* someone else — so an English speaker hits this path on first run.
-  it('falls back to the catalog when the language has nothing', async () => {
-    const { client, queries } = fakeClient({}, [listing({ id: 'popular' })])
-    const decks = await fetchStarterDecks(client, 'en', 3)
-    expect(decks.map(d => d.id)).toEqual(['popular'])
-    expect(queries).toHaveLength(2)
-    expect(queries[1]).not.toHaveProperty('native_language')
-  })
-
-  it('returns empty rather than throwing when both queries come back empty', async () => {
-    const { client } = fakeClient({}, [])
-    expect(await fetchStarterDecks(client, 'en', 3)).toEqual([])
+  it('falls back to en for an empty locale', () => {
+    expect(normalizeLang('')).toBe('en')
   })
 })
 
-/**
- * The catalog ships each deck twice — once per direction — with identical category,
- * level and card_count. Production proved the cost: the top three starter slots for a
- * Korean speaker came back as 10탄, 2탄(영어→한국어) and 2탄(한국어→영어), so one of the
- * three choices was the same deck a second time.
- */
 describe('preferRecognitionDirection', () => {
   const enToKo = listing({ id: 'en-ko', tags: ['official', 'source:en', 'target:ko'] })
   const koToEn = listing({ id: 'ko-en', tags: ['official', 'source:ko', 'target:en'] })
@@ -197,8 +139,88 @@ describe('preferRecognitionDirection', () => {
   // A grouping key over (category, level, card_count) would have merged these, because
   // 229 of the 649 official listings carry no batch tag to tell them apart.
   it('never merges two different decks that share category, level and size', () => {
-    const t900 = listing({ id: 'toeic-900', title: 'TOEIC 900', category: 'toeic', study_level: 'advanced', card_count: 1500, tags: ['source:en', 'target:ko'] })
-    const t990 = listing({ id: 'toeic-990', title: 'TOEIC 990', category: 'toeic', study_level: 'advanced', card_count: 1500, tags: ['source:en', 'target:ko'] })
+    const t900 = listing({ id: 'toeic-900', category: 'toeic', study_level: 'advanced', card_count: 1500 })
+    const t990 = listing({ id: 'toeic-990', category: 'toeic', study_level: 'advanced', card_count: 1500 })
     expect(preferRecognitionDirection([t900, t990], 'ko').map(d => d.id)).toEqual(['toeic-900', 'toeic-990'])
+  })
+})
+
+describe('pickStarters', () => {
+  // This is the shape production actually returned: 10탄, 2탄(영어→한국어) and
+  // 2탄(한국어→영어) — one of the three choices was the same deck a second time.
+  it('does not spend two of three slots on both directions of one deck', () => {
+    const rows = [
+      listing({ id: 'b10', card_count: 300, tags: ['source:en', 'target:ko'] }),
+      listing({ id: 'b2-en-ko', card_count: 301, tags: ['source:en', 'target:ko'] }),
+      listing({ id: 'b2-ko-en', card_count: 301, tags: ['source:ko', 'target:en'] }),
+      listing({ id: 'b3', card_count: 302, tags: ['source:en', 'target:ko'] }),
+    ]
+    expect(pickStarters(rows, 'ko', 3).map(d => d.id)).toEqual(['b10', 'b2-en-ko', 'b3'])
+  })
+
+  it('respects the requested limit', () => {
+    const rows = [
+      listing({ id: 'a', card_count: 100 }),
+      listing({ id: 'b', card_count: 200 }),
+      listing({ id: 'c', card_count: 300 }),
+    ]
+    expect(pickStarters(rows, 'ko', 2).map(d => d.id)).toEqual(['a', 'b'])
+  })
+})
+
+describe('fetchStarterDecks', () => {
+  it('hands a Korean speaker the Korean decks, easiest first', async () => {
+    stubRest({
+      ko: [
+        listing({ id: 'ko-advanced', study_level: 'advanced', card_count: 100 }),
+        listing({ id: 'ko-beginner', study_level: 'beginner', card_count: 300 }),
+      ],
+    })
+    expect((await fetchStarterDecks('ko', 3)).map(d => d.id)).toEqual(['ko-beginner', 'ko-advanced'])
+  })
+
+  it('narrows the query by native_language, not learning_language', async () => {
+    const queries = stubRest({ ko: [listing({ id: 'ko-1' })] })
+    await fetchStarterDecks('ko', 3)
+    expect(queries[0]).toMatchObject({
+      is_active: true,
+      owner_is_official: true,
+      is_paid: false,
+      native_language: 'ko',
+    })
+    expect(queries[0]).not.toHaveProperty('learning_language')
+  })
+
+  it('normalizes a regional locale before querying', async () => {
+    const queries = stubRest({ ko: [listing({ id: 'ko-1' })] })
+    await fetchStarterDecks('ko-KR', 3)
+    expect(queries[0].native_language).toBe('ko')
+  })
+
+  // Regression: the direction filter existed and was unit-tested, but nothing asserted
+  // the fetch path applied it — removing the call kept every test green.
+  it('applies the pair filter on the way out of the fetch', async () => {
+    stubRest({
+      ko: [
+        listing({ id: 'b2-en-ko', card_count: 301, tags: ['source:en', 'target:ko'] }),
+        listing({ id: 'b2-ko-en', card_count: 301, tags: ['source:ko', 'target:en'] }),
+        listing({ id: 'b3', card_count: 302, tags: ['source:en', 'target:ko'] }),
+      ],
+    })
+    expect((await fetchStarterDecks('ko', 3)).map(d => d.id)).toEqual(['b2-en-ko', 'b3'])
+  })
+
+  // The catalog has zero decks whose native_language is 'en' — every deck teaches
+  // English *to* someone else — so an English speaker hits this path on first run.
+  it('falls back to the catalog when the language has nothing', async () => {
+    const queries = stubRest({}, [listing({ id: 'popular' })])
+    expect((await fetchStarterDecks('en', 3)).map(d => d.id)).toEqual(['popular'])
+    expect(queries).toHaveLength(2)
+    expect(queries[1]).not.toHaveProperty('native_language')
+  })
+
+  it('returns empty rather than throwing when both queries come back empty', async () => {
+    stubRest({}, [])
+    expect(await fetchStarterDecks('en', 3)).toEqual([])
   })
 })

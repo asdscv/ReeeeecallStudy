@@ -15,7 +15,7 @@ import { supabase } from '../../lib/supabase'
 import { useOnboardingStore } from '../../stores/onboarding-store'
 import { useTemplateStore } from '../../stores/template-store'
 import { useMarketplaceStore } from '../../stores/marketplace-store'
-import { fetchStarterDecks } from '@reeeeecall/shared/lib/starter-decks'
+import { fetchStarterDecks } from '@reeeeecall/shared/stores/starter-decks'
 import type { MarketplaceListing } from '../../types/database'
 import { getSampleDeck, getSampleCards } from '../../lib/onboarding-samples'
 
@@ -82,7 +82,7 @@ export function QuickStartStep({ onNext, onAction }: StepProps) {
 
   useEffect(() => {
     let alive = true
-    fetchStarterDecks(supabase, i18n.language, 3)
+    fetchStarterDecks(i18n.language, 3)
       .then((d) => { if (alive) setDecks(d) })
       .catch(() => { if (alive) setDecks([]) })
     return () => { alive = false }

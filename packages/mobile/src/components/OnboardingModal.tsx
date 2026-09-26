@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
 import { getMobileSupabase } from '../adapters'
 import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
-import { fetchStarterDecks } from '@reeeeecall/shared/lib/starter-decks'
+import { fetchStarterDecks } from '@reeeeecall/shared/stores/starter-decks'
 import type { MarketplaceListing } from '@reeeeecall/shared/types/database'
 import type { MainTabParamList } from '../navigation/types'
 
@@ -45,7 +45,7 @@ export function OnboardingModal({ visible, onDismiss }: OnboardingModalProps) {
   useEffect(() => {
     if (current.key !== 'quickStart' || starters !== null) return
     let alive = true
-    fetchStarterDecks(getMobileSupabase(), i18n.language, 3)
+    fetchStarterDecks(i18n.language, 3)
       .then((d) => { if (alive) setStarters(d) })
       .catch(() => { if (alive) setStarters([]) })
     return () => { alive = false }

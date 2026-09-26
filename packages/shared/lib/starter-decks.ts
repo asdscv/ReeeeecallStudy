@@ -1,21 +1,17 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
 import type { MarketplaceListing } from '../types/database'
 
 /**
- * Starter decks for a brand-new account.
+ * Which decks a brand-new account should be handed — the ranking half, with no I/O.
  *
  * A new account owns nothing, so onboarding used to make it build a deck, pick a
- * template and type cards before it could study anything — three chores before the
- * first card. These are the decks we hand someone instead: free, official, and
- * written for their own language.
- *
- * Takes the client rather than importing one: web runs two Supabase clients (its
- * own plus the shared singleton) and the caller knows which one holds its session.
+ * template and type cards before it could study anything. These functions decide
+ * what to offer instead. Fetching lives in `stores/starter-decks` — this layer is
+ * the pure domain and may not reach for the data adapter (tools/check-arch.ts).
  */
 
-// Every official deck teaches English, so `learning_language` never discriminates —
-// `native_language` is the axis that matters. A Korean speaker must not be handed
-// the Spanish→English deck.
+// Every official deck teaches English, so `learning_language` is the same value on
+// all 649 rows and discriminates nothing. `native_language` is the axis that
+// matters: a Korean speaker must not be handed the Spanish→English deck.
 const LEVEL_RANK: Record<string, number> = { beginner: 0, intermediate: 1, advanced: 2 }
 
 // Beginner decks are the BIG ones here (~300 cards vs ~100 for advanced), so
@@ -55,45 +51,11 @@ export function preferRecognitionDirection(
   return recognition.length > 0 ? recognition : listings
 }
 
-function baseQuery(client: SupabaseClient) {
-  return client
-    .from('marketplace_listings')
-    .select('*')
-    .eq('is_active', true)
-    .eq('owner_is_official', true)
-    .eq('is_paid', false)
-}
-
-/**
- * Free official decks in the viewer's own language, easiest first.
- *
- * Falls back to the most-acquired official decks when the catalog has nothing in
- * that language — true today for `en`, which has zero decks because every deck
- * teaches English *to* someone else. An empty first screen is worse than a deck
- * pointing the wrong way.
- */
-export async function fetchStarterDecks(
-  client: SupabaseClient,
-  locale: string,
-  limit = 3,
-): Promise<MarketplaceListing[]> {
-  const lang = normalizeLang(locale)
-
-  const { data, error } = await baseQuery(client)
-    .eq('native_language', lang)
-    .limit(60)
-
-  if (!error && data && data.length > 0) {
-    return preferRecognitionDirection(data as MarketplaceListing[], lang)
-      .sort(easiestFirst)
-      .slice(0, limit)
-  }
-
-  const { data: fallback, error: fallbackError } = await baseQuery(client)
-    .order('acquire_count', { ascending: false })
-    .order('id', { ascending: true })  // 640 of 649 listings sit at acquire_count 0 — without a tiebreak the page is arbitrary
-    .limit(limit)
-
-  if (fallbackError || !fallback) return []
-  return fallback as MarketplaceListing[]
+/** One side of each pair, easiest first, capped. */
+export function pickStarters(
+  listings: MarketplaceListing[],
+  lang: string,
+  limit: number,
+): MarketplaceListing[] {
+  return preferRecognitionDirection(listings, lang).sort(easiestFirst).slice(0, limit)
 }
