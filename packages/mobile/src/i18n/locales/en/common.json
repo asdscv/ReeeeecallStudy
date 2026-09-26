@@ -90,6 +90,15 @@
       "description": "The smartest way to study with flashcards. Create decks, add cards, and let spaced repetition optimize your learning.",
       "action": "Get Started"
     },
+    "quickStart": {
+      "title": "Start with a ready-made deck",
+      "description": "Pick one and you're studying in seconds. You can build your own deck right after.",
+      "action": "I'd rather build my own",
+      "cardCount_one": "1 card",
+      "cardCount_other": "{{count, number}} cards",
+      "empty": "No ready-made deck fits your language yet. Let's build your own instead.",
+      "failed": "That deck couldn't be added. Try another, or build your own deck."
+    },
     "createDeck": {
       "title": "Create Your First Deck",
       "description": "A deck is a collection of flashcards on a topic. Create one for any subject you want to study.",

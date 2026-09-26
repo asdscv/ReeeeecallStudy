@@ -110,50 +110,59 @@
   },
   "guideHelp": "Help",
   "onboarding": {
-    "skip": "Skip for now",
-    "next": "Next",
-    "back": "Back",
-    "finish": "Finish",
-    "getStarted": "Get Started",
-    "stepOf": "第 {{current}} 步，共 {{total}} 步",
-    "restartOnboarding": "Restart Tutorial",
+    "skip": "稍后再说",
+    "next": "下一步",
+    "back": "上一步",
+    "finish": "完成",
+    "getStarted": "开始使用",
+    "stepOf": "第 {{current}} 步 / 共 {{total}} 步",
+    "restartOnboarding": "重新查看引导",
     "welcome": {
-      "title": "Welcome to Reeeeecall!",
-      "description": "用卡片学习最聪明的方式。创建卡组、添加卡片，间隔重复算法会帮你优化学习。",
-      "action": "Get Started"
+      "title": "欢迎使用 Reeeeecall！",
+      "description": "用记忆卡片学习的最聪明方式。创建卡片集、添加卡片，间隔重复算法会帮你优化学习。",
+      "action": "开始使用"
+    },
+    "quickStart": {
+      "title": "选一个现成的卡片集开始",
+      "description": "选好后几秒内就能开始学习。你自己的卡片集可以稍后再做。",
+      "cardCount_one": "{{count, number}} 张",
+      "cardCount_other": "{{count, number}} 张",
+      "buildOwn": "我想自己创建卡片集",
+      "empty": "暂时没有适合你语言的现成卡片集，先自己创建一个吧。",
+      "failed": "无法添加该卡片集。请换一个，或自己创建。"
     },
     "createDeck": {
-      "title": "Create Your First Deck",
-      "description": "已经为你准备好示例卡组，点击即可创建！",
-      "action": "Create This Deck",
-      "creating": "Creating...",
-      "created": "Deck created!"
+      "title": "创建你的第一个卡片集",
+      "description": "我们准备了一个示例卡片集，点击即可创建。",
+      "action": "创建这个卡片集",
+      "creating": "创建中...",
+      "created": "卡片集已创建"
     },
     "cardTemplate": {
-      "title": "Your Card Templates",
-      "description": "模板已经配置好了，挑一个用于你的卡片吧。",
-      "fields": "{{count, number}} fields",
-      "useTemplate": "Use This Template"
+      "title": "卡片模板",
+      "description": "模板已为你设置好，选一个用于你的卡片。",
+      "fields": "{{count, number}} 个字段",
+      "useTemplate": "使用此模板"
     },
     "addCards": {
-      "title": "Sample Cards Ready!",
-      "description": "已为你准备好示例卡片，一键即可加入卡组。",
-      "action": "Add These Cards",
-      "adding": "Adding...",
-      "added": "Cards added!"
+      "title": "示例卡片已就绪",
+      "description": "我们准备了示例卡片，一键即可添加到卡片集。",
+      "action": "添加这些卡片",
+      "adding": "添加中...",
+      "added": "卡片已添加"
     },
     "firstStudy": {
-      "title": "You're Ready to Study!",
-      "description": "卡组「{{deckName}}」已有 {{cardCount}} 张卡片，选择一个学习模式开始吧。",
-      "action": "Start Studying",
+      "title": "可以开始学习了",
+      "description": "卡片集「{{deckName}}」中有 {{cardCount, number}} 张卡片。选择学习模式开始吧。",
+      "action": "开始学习",
       "randomReview": "随机复习",
       "sequential": "顺序学习"
     },
     "exploreMarket": {
-      "title": "Explore the Marketplace",
-      "description": "浏览其他学习者共享的卡组，喜欢就直接取用。你也可以把自己的卡组发布到市场。",
-      "action": "Browse Marketplace",
-      "actionFinish": "Finish Setup"
+      "title": "浏览市场",
+      "description": "看看其他学习者分享的卡片集，喜欢就直接获取。你也可以把自己的卡片集发布到市场。",
+      "action": "浏览市场",
+      "actionFinish": "完成设置"
     }
   },
   "achievements": {

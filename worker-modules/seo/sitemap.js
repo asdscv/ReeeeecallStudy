@@ -124,12 +124,27 @@ export async function handleSitemapListings(env) {
 
   if (anonKey) {
     try {
-      const listingRes = await fetch(
-        `${restUrl}/marketplace_listings?is_active=eq.true&select=id,updated_at&order=created_at.desc&limit=500`,
-        { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } },
-      )
-      const listingData = await listingRes.json()
-      const listings = listingData || []
+      // Page rather than take one slice. A flat `limit=500` silently dropped 150 of the
+      // 650 active decks — they were never submitted to any search engine — and simply
+      // raising the number does not fix it: PostgREST caps a response at max_rows (1000
+      // in production) and ignores anything larger, so the next 350 decks would vanish
+      // the same way. `created_at` is not unique across a bulk import, so it alone can
+      // repeat or skip rows across page boundaries; `id` breaks the tie.
+      const listings = []
+      const PAGE = 500
+      for (let offset = 0; ; offset += PAGE) {
+        const listingRes = await fetch(
+          `${restUrl}/marketplace_listings?is_active=eq.true&select=id,updated_at`
+            + `&order=created_at.desc,id.asc&offset=${offset}&limit=${PAGE}`,
+          { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } },
+        )
+        const page = (await listingRes.json()) || []
+        if (!Array.isArray(page) || page.length === 0) break
+        listings.push(...page)
+        if (page.length < PAGE) break
+        // Backstop: a sitemap file may hold 50,000 URLs, and a paging bug must not spin.
+        if (listings.length >= 50_000) break
+      }
 
       for (const l of listings) {
         const lastmod = l.updated_at ? new Date(l.updated_at).toISOString().split('T')[0] : ''

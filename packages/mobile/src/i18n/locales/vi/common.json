@@ -80,40 +80,49 @@
   },
   "guideHelp": "Trợ giúp",
   "onboarding": {
-    "skip": "Skip for now",
-    "next": "Next",
-    "back": "Back",
-    "finish": "Finish",
-    "stepOf": "Step {{current}} of {{total}}",
+    "skip": "Để sau",
+    "next": "Tiếp tục",
+    "back": "Quay lại",
+    "finish": "Hoàn tất",
+    "stepOf": "{{current}} / {{total}}",
     "welcome": {
-      "title": "Welcome to Reeeeecall!",
-      "description": "The smartest way to study with flashcards. Create decks, add cards, and let our spaced repetition algorithm optimize your learning.",
-      "action": "Get Started"
+      "title": "Chào mừng đến với Reeeeecall!",
+      "description": "Cách học bằng thẻ ghi nhớ thông minh nhất. Tạo bộ thẻ, thêm thẻ và để phương pháp lặp lại giãn cách tối ưu việc học của bạn.",
+      "action": "Bắt đầu"
+    },
+    "quickStart": {
+      "title": "Bắt đầu với một bộ thẻ có sẵn",
+      "description": "Chọn một bộ và bạn sẽ học ngay trong vài giây. Bạn có thể tự tạo bộ thẻ ngay sau đó.",
+      "action": "Tôi muốn tự tạo",
+      "cardCount_one": "{{count, number}} thẻ",
+      "cardCount_other": "{{count, number}} thẻ",
+      "empty": "Chưa có bộ thẻ có sẵn phù hợp với ngôn ngữ của bạn. Hãy tự tạo một bộ nhé.",
+      "failed": "Không thể thêm bộ thẻ này. Hãy thử bộ khác hoặc tự tạo."
     },
     "createDeck": {
-      "title": "Create Your First Deck",
-      "description": "We've prepared a sample deck for you. Click to create it!",
-      "action": "Create This Deck"
+      "title": "Tạo bộ thẻ đầu tiên",
+      "description": "Bộ thẻ là tập hợp các thẻ về một chủ đề. Hãy tạo một bộ cho môn bạn muốn học.",
+      "action": "Tạo bộ thẻ"
     },
     "cardTemplate": {
-      "title": "Your Card Templates",
-      "description": "These templates are already set up for you. Pick one for your cards.",
-      "action": "Tiếp theo"
+      "title": "Chọn mẫu thẻ",
+      "description": "Mẫu quyết định hình thức của thẻ. Dùng mẫu mặt trước/mặt sau mặc định, hoặc mẫu chuyên cho ngoại ngữ và kỳ thi.",
+      "action": "Tiếp tục"
     },
     "addCards": {
-      "title": "Sample Cards Ready!",
-      "description": "We've prepared sample cards for you. Add them to your deck with one click.",
-      "action": "Add These Cards"
+      "title": "Thêm thẻ vào bộ thẻ",
+      "description": "Thêm thủ công, nhập từ CSV, hoặc dùng AI để tạo thẻ tự động từ bất kỳ chủ đề nào.",
+      "action": "Thêm thẻ"
     },
     "firstStudy": {
-      "title": "You're Ready to Study!",
-      "description": "Your deck \"{{deckName}}\" has {{cardCount}} cards ready. Choose a study mode and start learning.",
-      "action": "Start Studying"
+      "title": "Bắt đầu học!",
+      "description": "Chọn SRS cho ghi nhớ dài hạn, hoặc ngẫu nhiên/theo thứ tự để ôn nhanh. Đánh giá từng thẻ để theo dõi tiến độ.",
+      "action": "Bắt đầu học"
     },
     "exploreMarket": {
-      "title": "Explore the Marketplace",
-      "description": "Khám phá các bộ thẻ do người học khác chia sẻ và lấy về bộ nào bạn thích. Bạn cũng có thể đăng bộ thẻ của mình lên chợ.",
-      "action": "Browse Marketplace"
+      "title": "Khám phá chợ bộ thẻ",
+      "description": "Xem các bộ thẻ do người học khác chia sẻ và lấy bộ bạn thích. Bạn cũng có thể đăng bộ thẻ của mình.",
+      "action": "Khám phá chợ"
     }
   },
   "achievements": {

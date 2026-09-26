@@ -110,50 +110,59 @@
   },
   "guideHelp": "Help",
   "onboarding": {
-    "skip": "Skip for now",
-    "next": "Next",
-    "back": "Back",
-    "finish": "Finish",
-    "getStarted": "Get Started",
+    "skip": "Nanti saja",
+    "next": "Lanjut",
+    "back": "Kembali",
+    "finish": "Selesai",
+    "getStarted": "Mulai",
     "stepOf": "Langkah {{current}} dari {{total}}",
-    "restartOnboarding": "Restart Tutorial",
+    "restartOnboarding": "Mulai ulang tutorial",
     "welcome": {
-      "title": "Welcome to Reeeeecall!",
-      "description": "Cara tercerdas belajar dengan kartu. Buat dek, tambahkan kartu, dan biarkan algoritma pengulangan berjarak mengoptimalkan belajarmu.",
-      "action": "Get Started"
+      "title": "Selamat datang di Reeeeecall!",
+      "description": "Cara paling cerdas belajar dengan kartu hafalan. Buat dek, tambahkan kartu, dan biarkan algoritme pengulangan berjarak mengoptimalkan belajarmu.",
+      "action": "Mulai"
+    },
+    "quickStart": {
+      "title": "Mulai dengan dek siap pakai",
+      "description": "Pilih satu dan kamu langsung belajar dalam hitungan detik. Dek buatanmu bisa dibuat setelahnya.",
+      "cardCount_one": "{{count, number}} kartu",
+      "cardCount_other": "{{count, number}} kartu",
+      "buildOwn": "Saya ingin membuat dek sendiri",
+      "empty": "Belum ada dek siap pakai untuk bahasamu. Ayo buat dek sendiri.",
+      "failed": "Dek ini tidak dapat ditambahkan. Coba yang lain atau buat sendiri."
     },
     "createDeck": {
-      "title": "Create Your First Deck",
-      "description": "Kami sudah menyiapkan dek contoh. Klik untuk membuatnya!",
-      "action": "Create This Deck",
-      "creating": "Creating...",
-      "created": "Deck created!"
+      "title": "Buat dek pertamamu",
+      "description": "Kami sudah menyiapkan dek contoh. Ketuk untuk membuatnya!",
+      "action": "Buat dek ini",
+      "creating": "Membuat...",
+      "created": "Dek dibuat!"
     },
     "cardTemplate": {
-      "title": "Your Card Templates",
-      "description": "Templat ini sudah disiapkan. Pilih satu untuk kartumu.",
-      "fields": "{{count, number}} fields",
-      "useTemplate": "Use This Template"
+      "title": "Template kartumu",
+      "description": "Template sudah disiapkan. Pilih satu untuk kartumu.",
+      "fields": "{{count, number}} bidang",
+      "useTemplate": "Gunakan template ini"
     },
     "addCards": {
-      "title": "Sample Cards Ready!",
-      "description": "Kami sudah menyiapkan kartu contoh. Tambahkan ke dekmu dengan sekali klik.",
-      "action": "Add These Cards",
-      "adding": "Adding...",
-      "added": "Cards added!"
+      "title": "Kartu contoh siap!",
+      "description": "Kami sudah menyiapkan kartu contoh. Tambahkan ke dekmu dengan sekali ketuk.",
+      "action": "Tambahkan kartu ini",
+      "adding": "Menambahkan...",
+      "added": "Kartu ditambahkan!"
     },
     "firstStudy": {
-      "title": "You're Ready to Study!",
-      "description": "Dek \"{{deckName}}\" punya {{cardCount}} kartu siap. Pilih mode belajar dan mulai.",
-      "action": "Start Studying",
-      "randomReview": "Tinjauan Acak",
+      "title": "Kamu siap belajar!",
+      "description": "Dek “{{deckName}}” punya {{cardCount, number}} kartu. Pilih mode belajar dan mulai.",
+      "action": "Mulai belajar",
+      "randomReview": "Ulasan acak",
       "sequential": "Berurutan"
     },
     "exploreMarket": {
-      "title": "Explore the Marketplace",
-      "description": "Jelajahi dek yang dibagikan pengguna lain dan ambil yang kamu suka. Kamu juga bisa menerbitkan dekmu sendiri ke market.",
-      "action": "Browse Marketplace",
-      "actionFinish": "Finish Setup"
+      "title": "Jelajahi pasar",
+      "description": "Lihat dek yang dibagikan pelajar lain dan ambil yang kamu suka. Kamu juga bisa menerbitkan dekmu sendiri.",
+      "action": "Jelajahi pasar",
+      "actionFinish": "Selesaikan pengaturan"
     }
   },
   "achievements": {
