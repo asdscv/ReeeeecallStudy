@@ -71,8 +71,17 @@ export const STARTER_SUBSCRIPTION_COUNT = 5
  * an unranked pick hands a first-timer an advanced deck and both halves of one pair.
  * `pickStarters` is the same ranking the onboarding picker uses.
  *
- * Idempotent and conservative: it does nothing for an account that already owns or
- * subscribes to anything, so it can be called on every launch.
+ * Tops up to `count` rather than asking "did we already do anything". Production
+ * showed why: the first launch subscribed one deck and the tab closed before the rest
+ * of the sequential calls landed, and a has-anything guard would have frozen that
+ * account at one deck forever. Acquiring is idempotent and the calls now go out
+ * together, so a cut-off run repairs itself on the next launch.
+ *
+ * Three things stop it: an account that authored or copied a deck of its own, a shelf
+ * that is already full, and an account that has begun studying. The last two together
+ * mean someone who unsubscribes a deck they were given gets it back only if they never
+ * studied anything — a narrow window, and the alternative is never repairing a
+ * half-finished shelf.
  */
 export async function ensureStarterSubscriptions(
   locale: string,
@@ -83,13 +92,19 @@ export async function ensureStarterSubscriptions(
   const userId = auth?.user?.id
   if (!userId) return 0
 
-  // Only ever furnish an empty account. Someone who already has a deck chose it.
-  const [owned, subscribed] = await Promise.all([
+  const [owned, shares, progress] = await Promise.all([
     supabase.from('decks').select('id').eq('user_id', userId).limit(1),
-    supabase.from('deck_shares').select('id').eq('recipient_id', userId).limit(1),
+    supabase.from('deck_shares').select('id').eq('recipient_id', userId).limit(count),
+    supabase.from('user_card_progress').select('card_id').eq('user_id', userId).limit(1),
   ])
-  if (owned.error || subscribed.error) return 0
-  if ((owned.data?.length ?? 0) > 0 || (subscribed.data?.length ?? 0) > 0) return 0
+  if (owned.error || shares.error || progress.error) return 0
+
+  // Authored or copied a deck of their own — they are past needing a shelf.
+  if ((owned.data?.length ?? 0) > 0) return 0
+  // Already studying: whatever they have is what they chose.
+  if ((progress.data?.length ?? 0) > 0) return 0
+  // Shelf is full.
+  if ((shares.data?.length ?? 0) >= count) return 0
 
   const starters = await fetchStarterDecks(locale, count)
   if (starters.length === 0) return 0
@@ -100,11 +115,11 @@ export async function ensureStarterSubscriptions(
   // one. Let the picker ask instead.
   if (taughtLanguages(starters, lang).length > 1) return 0
 
-  let added = 0
-  for (const listing of starters) {
-    const { error } = await supabase.rpc('acquire_listing', { p_listing_id: listing.id })
-    // One refusal (card limit, a deck pulled from the catalog) must not cost the rest.
-    if (!error) added++
-  }
-  return added
+  // Together, not one after another: a first launch must not depend on five sequential
+  // round trips surviving however long the visitor stays on the page.
+  const results = await Promise.all(
+    starters.map((listing) => supabase.rpc('acquire_listing', { p_listing_id: listing.id })),
+  )
+  // One refusal (card limit, a deck pulled from the catalog) must not cost the rest.
+  return results.filter((r) => !r.error).length
 }
