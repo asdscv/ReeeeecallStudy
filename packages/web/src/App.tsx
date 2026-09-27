@@ -40,6 +40,8 @@ import { TossReturnPage } from './pages/checkout/TossReturnPage'
 import { usePageTracking } from './hooks/usePageTracking'
 import { useTheme } from './hooks/useTheme'
 import { useOnboardingStore } from './stores/onboarding-store'
+import { ensureStarterSubscriptions } from '@reeeeecall/shared/stores/starter-decks'
+import i18n from './i18n'
 import { OnboardingOverlay } from './components/onboarding/OnboardingOverlay'
 import { LevelUpCelebration } from './components/common/LevelUpCelebration'
 import { GlobalConfirmDialog } from './components/common/GlobalConfirmDialog'
@@ -182,6 +184,14 @@ function App() {
   useEffect(() => {
     if (user) initOnboarding()
   }, [user, initOnboarding])
+
+  // Give a brand-new account a shelf of decks in its own language, so the first screen
+  // is something to study rather than "no decks yet". No-ops for anyone who already has
+  // a deck, and never blocks render — a failure here must not keep them out of the app.
+  useEffect(() => {
+    if (!user) return
+    void ensureStarterSubscriptions(i18n.language).catch(() => {})
+  }, [user])
 
   // Register session + start heartbeat when user is logged in.
   // register 완료를 await한 뒤 heartbeat를 시작해 INSERT↔UPDATE race로 인한

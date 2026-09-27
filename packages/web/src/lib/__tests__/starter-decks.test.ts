@@ -23,18 +23,27 @@ import {
   easiestFirst,
   preferRecognitionDirection,
   pickStarters,
+  taughtLanguages,
   normalizeLang,
 } from '@reeeeecall/shared/lib/starter-decks'
 import type { MarketplaceListing } from '@reeeeecall/shared/types/database'
 
 const from = vi.fn()
+const rpc = vi.fn()
+const getUser = vi.fn()
+const client = {
+  from: (...a: unknown[]) => from(...a),
+  rpc: (...a: unknown[]) => rpc(...a),
+  auth: { getUser: () => getUser() },
+}
 vi.mock('@reeeeecall/shared/lib/supabase', () => ({
-  supabase: { from: (...a: unknown[]) => from(...a) },
-  getSupabase: () => ({ from: (...a: unknown[]) => from(...a) }),
+  supabase: client,
+  getSupabase: () => client,
   initSupabase: vi.fn(),
 }))
 
-const { fetchStarterDecks } = await import('@reeeeecall/shared/stores/starter-decks')
+const { fetchStarterDecks, ensureStarterSubscriptions } =
+  await import('@reeeeecall/shared/stores/starter-decks')
 
 function listing(over: Partial<MarketplaceListing> & { id: string }): MarketplaceListing {
   return {
@@ -71,11 +80,13 @@ function stubRest(byLang: Record<string, MarketplaceListing[]>, fallback: Market
     Object.assign(b, {
       select: () => b,
       eq: (col: string, val: unknown) => { eqs[col] = val; return b },
+      contains: (col: string, val: unknown) => { eqs[col] = val; return b },
       order: () => b,
       limit: () => {
         queries.push({ ...eqs })
-        if (!('native_language' in eqs)) return Promise.resolve({ data: fallback, error: null })
-        return Promise.resolve({ data: byLang[eqs.native_language as string] ?? [], error: null })
+        const langs = eqs.native_languages as string[] | undefined
+        if (!langs) return Promise.resolve({ data: fallback, error: null })
+        return Promise.resolve({ data: byLang[langs[0]] ?? [], error: null })
       },
     })
     return b
@@ -83,7 +94,11 @@ function stubRest(byLang: Record<string, MarketplaceListing[]>, fallback: Market
   return queries
 }
 
-beforeEach(() => from.mockReset())
+beforeEach(() => {
+  from.mockReset(); rpc.mockReset(); getUser.mockReset()
+  getUser.mockResolvedValue({ data: { user: { id: 'u1' } } })
+  rpc.mockResolvedValue({ data: null, error: null })
+})
 
 describe('easiestFirst', () => {
   it('puts a 300-card beginner deck ahead of a 100-card advanced deck', () => {
@@ -168,6 +183,51 @@ describe('pickStarters', () => {
   })
 })
 
+/**
+ * An English speaker is the one audience with a choice to make.
+ *
+ * Every audience the catalog was built for has exactly one counterpart — a Korean
+ * speaker's decks all teach English. An English speaker's decks teach seven different
+ * languages, and nothing about a fresh signup says which one they came for.
+ */
+describe('a viewer whose decks span several languages', () => {
+  const en = (id: string, taught: string, cards: number) =>
+    listing({ id, card_count: cards, native_language: taught, tags: [`source:${taught}`, 'target:en'] })
+
+  it('counts one taught language for the audience the catalog was built for', () => {
+    const rows = [listing({ id: 'a' }), listing({ id: 'b' })]   // source:en target:ko
+    expect(taughtLanguages(rows, 'ko')).toEqual(['en'])
+  })
+
+  it('counts every counterpart for an English speaker', () => {
+    expect(taughtLanguages([en('k', 'ko', 300), en('j', 'ja', 301)], 'en')).toEqual(['ja', 'ko'])
+  })
+
+  // Three rows reading Korean / Japanese / Spanish are a language choice. Three batches
+  // of whichever language sorted first is a decision made for them.
+  it('leads with one deck per language instead of three batches of one', () => {
+    const rows = [
+      en('ko-1', 'ko', 300), en('ko-2', 'ko', 301), en('ko-3', 'ko', 302),
+      en('ja-1', 'ja', 303), en('es-1', 'es', 304),
+    ]
+    expect(pickStarters(rows, 'en', 3).map(d => d.id)).toEqual(['ko-1', 'ja-1', 'es-1'])
+  })
+
+  it('tops up from the ranked pool when there are fewer languages than slots', () => {
+    const rows = [en('ko-1', 'ko', 300), en('ko-2', 'ko', 301), en('ja-1', 'ja', 302)]
+    expect(pickStarters(rows, 'en', 3).map(d => d.id)).toEqual(['ko-1', 'ja-1', 'ko-2'])
+  })
+
+  it('leaves the single-language case exactly as it was', () => {
+    const rows = [
+      listing({ id: 'a', card_count: 300 }),
+      listing({ id: 'b', card_count: 301 }),
+      listing({ id: 'c', card_count: 302 }),
+    ]
+    expect(pickStarters(rows, 'ko', 2).map(d => d.id)).toEqual(['a', 'b'])
+  })
+})
+
 describe('fetchStarterDecks', () => {
   it('hands a Korean speaker the Korean decks, easiest first', async () => {
     stubRest({
@@ -179,22 +239,25 @@ describe('fetchStarterDecks', () => {
     expect((await fetchStarterDecks('ko', 3)).map(d => d.id)).toEqual(['ko-beginner', 'ko-advanced'])
   })
 
-  it('narrows the query by native_language, not learning_language', async () => {
+  it('narrows the query by mother tongue, not learning_language', async () => {
     const queries = stubRest({ ko: [listing({ id: 'ko-1' })] })
     await fetchStarterDecks('ko', 3)
     expect(queries[0]).toMatchObject({
       is_active: true,
       owner_is_official: true,
       is_paid: false,
-      native_language: 'ko',
+      native_languages: ['ko'],
     })
     expect(queries[0]).not.toHaveProperty('learning_language')
+    // The singular column only ever held the non-English side, so an English speaker
+    // matched nothing. Both audiences live in the array (migration 281).
+    expect(queries[0]).not.toHaveProperty('native_language')
   })
 
   it('normalizes a regional locale before querying', async () => {
     const queries = stubRest({ ko: [listing({ id: 'ko-1' })] })
     await fetchStarterDecks('ko-KR', 3)
-    expect(queries[0].native_language).toBe('ko')
+    expect(queries[0].native_languages).toEqual(['ko'])
   })
 
   // Regression: the direction filter existed and was unit-tested, but nothing asserted
@@ -216,11 +279,109 @@ describe('fetchStarterDecks', () => {
     const queries = stubRest({}, [listing({ id: 'popular' })])
     expect((await fetchStarterDecks('en', 3)).map(d => d.id)).toEqual(['popular'])
     expect(queries).toHaveLength(2)
-    expect(queries[1]).not.toHaveProperty('native_language')
+    expect(queries[1]).not.toHaveProperty('native_languages')
   })
 
   it('returns empty rather than throwing when both queries come back empty', async () => {
     stubRest({}, [])
     expect(await fetchStarterDecks('en', 3)).toEqual([])
+  })
+})
+
+/**
+ * Furnishing an empty account.
+ *
+ * A first screen reading "no decks yet" with nothing to do but author cards is where 13
+ * of 16 accounts stopped. This hands over a small shelf instead — but it must never
+ * touch an account that already chose something, and it runs on every launch, so the
+ * guard is the whole design.
+ */
+describe('ensureStarterSubscriptions', () => {
+  /** Routes the three table reads the function makes. */
+  function stubAccount(opts: { decks?: unknown[]; shares?: unknown[]; catalog?: MarketplaceListing[] }) {
+    from.mockImplementation((table: string) => {
+      if (table === 'decks') {
+        const b: Record<string, unknown> = {}
+        Object.assign(b, { select: () => b, eq: () => b, limit: () => Promise.resolve({ data: opts.decks ?? [], error: null }) })
+        return b
+      }
+      if (table === 'deck_shares') {
+        const b: Record<string, unknown> = {}
+        Object.assign(b, { select: () => b, eq: () => b, limit: () => Promise.resolve({ data: opts.shares ?? [], error: null }) })
+        return b
+      }
+      const b: Record<string, unknown> = {}
+      Object.assign(b, {
+        select: () => b, eq: () => b, contains: () => b, order: () => b,
+        limit: () => Promise.resolve({ data: opts.catalog ?? [], error: null }),
+      })
+      return b
+    })
+  }
+
+  const catalog = [
+    listing({ id: 'a', card_count: 300 }),
+    listing({ id: 'b', card_count: 301 }),
+    listing({ id: 'c', card_count: 302 }),
+  ]
+
+  it('subscribes the ranked starters for an empty account', async () => {
+    stubAccount({ catalog })
+    expect(await ensureStarterSubscriptions('ko', 3)).toBe(3)
+    expect(rpc).toHaveBeenCalledTimes(3)
+    expect(rpc.mock.calls.map((c) => c[1].p_listing_id)).toEqual(['a', 'b', 'c'])
+  })
+
+  it('leaves an account that already owns a deck completely alone', async () => {
+    stubAccount({ decks: [{ id: 'd1' }], catalog })
+    expect(await ensureStarterSubscriptions('ko', 3)).toBe(0)
+    expect(rpc).not.toHaveBeenCalled()
+  })
+
+  it('leaves an account that already subscribes to something alone', async () => {
+    stubAccount({ shares: [{ id: 's1' }], catalog })
+    expect(await ensureStarterSubscriptions('ko', 3)).toBe(0)
+    expect(rpc).not.toHaveBeenCalled()
+  })
+
+  it('does nothing when nobody is signed in', async () => {
+    getUser.mockResolvedValue({ data: { user: null } })
+    stubAccount({ catalog })
+    expect(await ensureStarterSubscriptions('ko', 3)).toBe(0)
+    expect(rpc).not.toHaveBeenCalled()
+  })
+
+  // One refusal must not cost the rest of the shelf.
+  it('keeps going when a single acquire is refused', async () => {
+    stubAccount({ catalog })
+    rpc.mockResolvedValueOnce({ data: null, error: new Error('card limit') })
+       .mockResolvedValue({ data: null, error: null })
+    expect(await ensureStarterSubscriptions('ko', 3)).toBe(2)
+    expect(rpc).toHaveBeenCalledTimes(3)
+  })
+
+  // Filling an English speaker's account with five languages is worse than leaving it
+  // empty — the picker can ask, an auto-subscribe cannot.
+  it('subscribes nothing when it cannot tell which language they came for', async () => {
+    stubAccount({ catalog: [
+      listing({ id: 'ko-1', card_count: 300, tags: ['source:ko', 'target:en'] }),
+      listing({ id: 'ja-1', card_count: 301, tags: ['source:ja', 'target:en'] }),
+    ] })
+    expect(await ensureStarterSubscriptions('en', 5)).toBe(0)
+    expect(rpc).not.toHaveBeenCalled()
+  })
+
+  it('still furnishes an audience with exactly one counterpart language', async () => {
+    stubAccount({ catalog: [
+      listing({ id: 'a', card_count: 300 }),
+      listing({ id: 'b', card_count: 301 }),
+    ] })
+    expect(await ensureStarterSubscriptions('ko', 5)).toBe(2)
+  })
+
+  it('reports nothing added when the catalog comes back empty', async () => {
+    stubAccount({ catalog: [] })
+    expect(await ensureStarterSubscriptions('ko', 3)).toBe(0)
+    expect(rpc).not.toHaveBeenCalled()
   })
 })

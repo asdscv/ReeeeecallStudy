@@ -13,6 +13,7 @@ import type { HomeStackParamList, MainTabParamList } from '../navigation/types'
 import type { TimePeriod } from '@reeeeecall/shared/lib/time-period'
 import { shouldShowHeatmap } from '@reeeeecall/shared/lib/time-period'
 import { OnboardingModal } from '../components/OnboardingModal'
+import { ensureStarterSubscriptions } from '@reeeeecall/shared/stores/starter-decks'
 import { CardUsageCard } from '../components/settings/CardUsageCard'
 import { getMobileSupabase } from '../adapters'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
@@ -21,7 +22,7 @@ type Nav = NativeStackNavigationProp<HomeStackParamList>
 
 export function DashboardScreen() {
   const theme = useTheme()
-  const { t } = useTranslation('dashboard')
+  const { t, i18n } = useTranslation('dashboard')
   const navigation = useNavigation<Nav>()
   const tabNav = navigation.getParent<NavigationProp<MainTabParamList>>()
 
@@ -42,6 +43,15 @@ export function DashboardScreen() {
       if (result && !result.completed) setShowOnboarding(true)
     }).catch(() => {})
   }, [])
+
+  // Give a brand-new account a shelf of decks in its own language, so the first screen
+  // is something to study rather than an empty deck list. No-ops once anything is owned
+  // or subscribed, and its failure must never keep the dashboard from rendering.
+  useEffect(() => {
+    ensureStarterSubscriptions(i18n.language)
+      .then((added) => { if (added > 0) void refresh() })
+      .catch(() => {})
+  }, [i18n.language, refresh])
 
   // Show level-up celebration only when level actually increases
   const prevLevelRef = useRef(0)

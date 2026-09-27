@@ -16,6 +16,7 @@ import { useOnboardingStore } from '../../stores/onboarding-store'
 import { useTemplateStore } from '../../stores/template-store'
 import { useMarketplaceStore } from '../../stores/marketplace-store'
 import { fetchStarterDecks } from '@reeeeecall/shared/stores/starter-decks'
+import { readDeckFacts, localizedOfficialTitle } from '@reeeeecall/shared/lib/deck-audience'
 import type { MarketplaceListing } from '../../types/database'
 import { getSampleDeck, getSampleCards } from '../../lib/onboarding-samples'
 
@@ -135,7 +136,11 @@ export function QuickStartStep({ onNext, onAction }: StepProps) {
                 : <BookOpen className="w-5 h-5" />}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-foreground truncate">{deck.title}</p>
+              <p className="font-semibold text-foreground truncate">
+                {/* Stored titles are written in the non-English side of the pair, so an
+                    English speaker would otherwise be handed a Korean or Thai heading. */}
+                {localizedOfficialTitle(readDeckFacts(deck.tags), i18n.language.split('-')[0]) ?? deck.title}
+              </p>
               <p className="text-sm text-muted-foreground">
                 {t('onboarding.quickStart.cardCount', { count: deck.card_count })}
               </p>
