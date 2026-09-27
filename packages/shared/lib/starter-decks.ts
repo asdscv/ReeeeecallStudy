@@ -1,4 +1,5 @@
 import type { MarketplaceListing } from '../types/database'
+import { readDeckFacts, taughtLanguage } from './deck-audience'
 
 /**
  * Which decks a brand-new account should be handed — the ranking half, with no I/O.
@@ -51,11 +52,51 @@ export function preferRecognitionDirection(
   return recognition.length > 0 ? recognition : listings
 }
 
-/** One side of each pair, easiest first, capped. */
+/**
+ * Which languages these decks would teach this viewer.
+ *
+ * One, for everyone the catalog was built for: a Korean speaker's decks all teach
+ * English. Seven, for an English speaker, because every deck is an en<->X pair and X
+ * varies. That difference decides whether a first screen can choose for them.
+ */
+export function taughtLanguages(listings: MarketplaceListing[], lang: string): string[] {
+  const seen = new Set<string>()
+  for (const l of listings) {
+    const taught = taughtLanguage(readDeckFacts(l.tags), lang)
+    if (taught) seen.add(taught)
+  }
+  return [...seen].sort()
+}
+
+/**
+ * One side of each pair, easiest first, capped.
+ *
+ * When the candidates span several taught languages — only English speakers today —
+ * the list leads with one deck per language instead of five batches of whichever
+ * language sorted first. Three rows reading Korean / Japanese / Spanish are a language
+ * choice; three batches of Vietnamese are a decision already made for them.
+ */
 export function pickStarters(
   listings: MarketplaceListing[],
   lang: string,
   limit: number,
 ): MarketplaceListing[] {
-  return preferRecognitionDirection(listings, lang).sort(easiestFirst).slice(0, limit)
+  const pool = preferRecognitionDirection(listings, lang).sort(easiestFirst)
+  if (taughtLanguages(pool, lang).length <= 1) return pool.slice(0, limit)
+
+  const firstOfEach: MarketplaceListing[] = []
+  const taken = new Set<string>()
+  for (const l of pool) {
+    const taught = taughtLanguage(readDeckFacts(l.tags), lang)
+    if (!taught || taken.has(taught)) continue
+    taken.add(taught)
+    firstOfEach.push(l)
+    if (firstOfEach.length === limit) break
+  }
+  // Short of `limit` languages: top up from the ranked pool rather than under-fill.
+  for (const l of pool) {
+    if (firstOfEach.length === limit) break
+    if (!firstOfEach.includes(l)) firstOfEach.push(l)
+  }
+  return firstOfEach
 }

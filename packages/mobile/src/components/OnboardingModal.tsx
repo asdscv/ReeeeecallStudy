@@ -6,6 +6,7 @@ import { useTheme, palette } from '../theme'
 import { getMobileSupabase } from '../adapters'
 import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
 import { fetchStarterDecks } from '@reeeeecall/shared/stores/starter-decks'
+import { readDeckFacts, localizedOfficialTitle } from '@reeeeecall/shared/lib/deck-audience'
 import type { MarketplaceListing } from '@reeeeecall/shared/types/database'
 import type { MainTabParamList } from '../navigation/types'
 
@@ -206,7 +207,8 @@ export function OnboardingModal({ visible, onDismiss }: OnboardingModalProps) {
                   >
                     <View style={styles.starterTextCol}>
                       <Text style={[styles.starterTitle, { color: theme.colors.text }]} numberOfLines={2}>
-                        {deck.title}
+                        {/* Stored titles speak the non-English side of the pair. */}
+                        {localizedOfficialTitle(readDeckFacts(deck.tags), i18n.language.split('-')[0]) ?? deck.title}
                       </Text>
                       <Text style={[styles.starterMeta, { color: theme.colors.textSecondary }]}>
                         {t('onboarding.quickStart.cardCount', { count: deck.card_count })}
