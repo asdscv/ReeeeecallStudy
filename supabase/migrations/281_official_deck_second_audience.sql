@@ -59,19 +59,32 @@ WHERE d.id = pair.deck_id
   AND array_length(pair.langs, 1) = 2
   AND d.native_languages IS DISTINCT FROM pair.langs;
 
--- An English speaker must now find decks. If this is 0 the migration did nothing and
--- the tags are not shaped the way we think.
+-- An English speaker must be able to find decks once this has run -- but only if there
+-- were decks to convert. A fresh database (CI, `supabase db reset`) has no official
+-- catalogue at all, and asserting against an empty table would fail every rebuild while
+-- production stayed green.
 DO $$
 DECLARE
-  v_en INTEGER;
+  v_official INTEGER;
+  v_en       INTEGER;
 BEGIN
+  SELECT count(*) INTO v_official
+  FROM marketplace_listings
+  WHERE is_active AND owner_is_official;
+
+  IF v_official = 0 THEN
+    RAISE NOTICE 'migration 281: no official catalogue in this database, nothing to relabel';
+    RETURN;
+  END IF;
+
   SELECT count(*) INTO v_en
   FROM marketplace_listings
   WHERE is_active AND owner_is_official AND 'en' = ANY(native_languages);
 
   IF v_en = 0 THEN
-    RAISE EXCEPTION 'migration 281 left zero official decks addressable to English speakers';
+    RAISE EXCEPTION
+      'migration 281 relabelled nothing: % official listings, none addressable to English speakers', v_official;
   END IF;
 
-  RAISE NOTICE 'migration 281: % official listings now list en as a mother tongue', v_en;
+  RAISE NOTICE 'migration 281: % of % official listings now list en as a mother tongue', v_en, v_official;
 END $$;
