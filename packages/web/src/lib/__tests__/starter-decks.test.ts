@@ -297,17 +297,21 @@ describe('fetchStarterDecks', () => {
  * guard is the whole design.
  */
 describe('ensureStarterSubscriptions', () => {
-  /** Routes the three table reads the function makes. */
-  function stubAccount(opts: { decks?: unknown[]; shares?: unknown[]; catalog?: MarketplaceListing[] }) {
+  /** Routes the four table reads the function makes. */
+  function stubAccount(opts: {
+    decks?: unknown[]; shares?: unknown[]; progress?: unknown[]; catalog?: MarketplaceListing[]
+  }) {
     from.mockImplementation((table: string) => {
-      if (table === 'decks') {
+      const rowsFor = (t: string) =>
+        t === 'decks' ? (opts.decks ?? [])
+        : t === 'deck_shares' ? (opts.shares ?? [])
+        : (opts.progress ?? [])
+      if (table === 'decks' || table === 'deck_shares' || table === 'user_card_progress') {
         const b: Record<string, unknown> = {}
-        Object.assign(b, { select: () => b, eq: () => b, limit: () => Promise.resolve({ data: opts.decks ?? [], error: null }) })
-        return b
-      }
-      if (table === 'deck_shares') {
-        const b: Record<string, unknown> = {}
-        Object.assign(b, { select: () => b, eq: () => b, limit: () => Promise.resolve({ data: opts.shares ?? [], error: null }) })
+        Object.assign(b, {
+          select: () => b, eq: () => b,
+          limit: () => Promise.resolve({ data: rowsFor(table), error: null }),
+        })
         return b
       }
       const b: Record<string, unknown> = {}
@@ -328,18 +332,44 @@ describe('ensureStarterSubscriptions', () => {
   it('subscribes the ranked starters for an empty account', async () => {
     stubAccount({ catalog })
     expect(await ensureStarterSubscriptions('ko', 3)).toBe(3)
-    expect(rpc).toHaveBeenCalledTimes(3)
-    expect(rpc.mock.calls.map((c) => c[1].p_listing_id)).toEqual(['a', 'b', 'c'])
+    expect(rpc.mock.calls.map((c) => c[1].p_listing_id).sort()).toEqual(['a', 'b', 'c'])
   })
 
-  it('leaves an account that already owns a deck completely alone', async () => {
+  // Production: the first launch subscribed one deck and the tab closed before the rest
+  // of the sequential calls landed. A has-anything guard freezes that account at one
+  // deck forever, so a half-filled shelf has to be repairable.
+  it('repairs a shelf that a closed tab left half-filled', async () => {
+    stubAccount({ shares: [{ id: 's1' }], catalog })
+    expect(await ensureStarterSubscriptions('ko', 3)).toBe(3)
+    expect(rpc).toHaveBeenCalledTimes(3)
+  })
+
+  it('sends the acquires together rather than one after another', async () => {
+    stubAccount({ catalog })
+    let inFlight = 0, peak = 0
+    rpc.mockImplementation(() => {
+      inFlight++; peak = Math.max(peak, inFlight)
+      return Promise.resolve({ data: null, error: null }).finally(() => { inFlight-- })
+    })
+    await ensureStarterSubscriptions('ko', 3)
+    expect(peak).toBeGreaterThan(1)
+  })
+
+  it('leaves an account that authored a deck of its own alone', async () => {
     stubAccount({ decks: [{ id: 'd1' }], catalog })
     expect(await ensureStarterSubscriptions('ko', 3)).toBe(0)
     expect(rpc).not.toHaveBeenCalled()
   })
 
-  it('leaves an account that already subscribes to something alone', async () => {
-    stubAccount({ shares: [{ id: 's1' }], catalog })
+  it('leaves a full shelf alone', async () => {
+    stubAccount({ shares: [{ id: 's1' }, { id: 's2' }, { id: 's3' }], catalog })
+    expect(await ensureStarterSubscriptions('ko', 3)).toBe(0)
+    expect(rpc).not.toHaveBeenCalled()
+  })
+
+  // Someone who has begun studying has made their choices; do not top them back up.
+  it('leaves an account that has started studying alone', async () => {
+    stubAccount({ shares: [{ id: 's1' }], progress: [{ card_id: 'c1' }], catalog })
     expect(await ensureStarterSubscriptions('ko', 3)).toBe(0)
     expect(rpc).not.toHaveBeenCalled()
   })
@@ -351,7 +381,6 @@ describe('ensureStarterSubscriptions', () => {
     expect(rpc).not.toHaveBeenCalled()
   })
 
-  // One refusal must not cost the rest of the shelf.
   it('keeps going when a single acquire is refused', async () => {
     stubAccount({ catalog })
     rpc.mockResolvedValueOnce({ data: null, error: new Error('card limit') })
@@ -372,10 +401,7 @@ describe('ensureStarterSubscriptions', () => {
   })
 
   it('still furnishes an audience with exactly one counterpart language', async () => {
-    stubAccount({ catalog: [
-      listing({ id: 'a', card_count: 300 }),
-      listing({ id: 'b', card_count: 301 }),
-    ] })
+    stubAccount({ catalog: [listing({ id: 'a', card_count: 300 }), listing({ id: 'b', card_count: 301 })] })
     expect(await ensureStarterSubscriptions('ko', 5)).toBe(2)
   })
 
