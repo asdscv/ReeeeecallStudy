@@ -98,6 +98,25 @@ export function getNativeLanguages(listing: MarketplaceListingData): string[] {
   return tag ? [tag.slice('source:'.length)] : []
 }
 
+/**
+ * Every language this deck can teach.
+ *
+ * The stored `learning_language` scalar answers for one audience only. Official decks
+ * are `en<->X` pairs shipped in both directions, and the importer wrote `en` on all of
+ * them because it treated the non-English speaker as the only audience — so filtering
+ * "I want to learn Korean" matched nothing, while 327 decks with Korean on the front
+ * sat in the catalog.
+ *
+ * A pair teaches either side, depending on which one the learner already speaks, so
+ * once both sides are recorded (migration 281) the pair itself is the answer. Decks
+ * that only ever named one side keep the scalar.
+ */
+export function getLearningLanguages(listing: MarketplaceListingData): string[] {
+  const pair = getNativeLanguages(listing)
+  if (pair.length >= 2) return pair
+  return listing.learning_language ? [listing.learning_language] : []
+}
+
 /** Primary native language (first of {@link getNativeLanguages}) or null. */
 export function getNativeLanguage(listing: MarketplaceListingData): string | null {
   return getNativeLanguages(listing)[0] ?? null
@@ -249,7 +268,18 @@ export function filterListings(
 
     if (filters.studyLevel && listing.study_level !== filters.studyLevel) return false
 
-    if (filters.learningLanguage && listing.learning_language !== filters.learningLanguage) return false
+    if (filters.learningLanguage) {
+      const teaches = getLearningLanguages(listing)
+      if (!teaches.includes(filters.learningLanguage)) return false
+      // Nobody learns the language they already speak. With a mother tongue also
+      // selected, the two have to be opposite sides of the same pair.
+      if (filters.nativeLanguages && filters.nativeLanguages.length > 0) {
+        const pairsUp = filters.nativeLanguages.some(
+          (n) => n !== filters.learningLanguage && teaches.includes(n),
+        )
+        if (!pairsUp) return false
+      }
+    }
 
     if (filters.dateRange && filters.dateRange !== 'all') {
       const ms = DATE_RANGE_MS[filters.dateRange]
