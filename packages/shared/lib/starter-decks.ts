@@ -10,9 +10,10 @@ import { readDeckFacts, taughtLanguage } from './deck-audience'
  * the pure domain and may not reach for the data adapter (tools/check-arch.ts).
  */
 
-// Every official deck teaches English, so `learning_language` is the same value on
-// all 649 rows and discriminates nothing. `native_language` is the axis that
-// matters: a Korean speaker must not be handed the Spanish→English deck.
+// The stored `learning_language` is the same value on all 649 official rows and
+// discriminates nothing — it answers for one audience only. The deck's language pair
+// is what matters: a Korean speaker must not be handed the Spanish→English deck, and
+// an English speaker must not be told these decks teach English to them.
 const LEVEL_RANK: Record<string, number> = { beginner: 0, intermediate: 1, advanced: 2 }
 
 // Beginner decks are the BIG ones here (~300 cards vs ~100 for advanced), so
