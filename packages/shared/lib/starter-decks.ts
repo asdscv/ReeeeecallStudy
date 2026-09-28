@@ -10,9 +10,10 @@ import { readDeckFacts, taughtLanguage } from './deck-audience'
  * the pure domain and may not reach for the data adapter (tools/check-arch.ts).
  */
 
-// Every official deck teaches English, so `learning_language` is the same value on
-// all 649 rows and discriminates nothing. `native_language` is the axis that
-// matters: a Korean speaker must not be handed the Spanish→English deck.
+// The stored `learning_language` is the same value on all 649 official rows and
+// discriminates nothing — it answers for one audience only. The deck's language pair
+// is what matters: a Korean speaker must not be handed the Spanish→English deck, and
+// an English speaker must not be told these decks teach English to them.
 const LEVEL_RANK: Record<string, number> = { beginner: 0, intermediate: 1, advanced: 2 }
 
 // Beginner decks are the BIG ones here (~300 cards vs ~100 for advanced), so
@@ -68,13 +69,20 @@ export function taughtLanguages(listings: MarketplaceListing[], lang: string): s
   return [...seen].sort()
 }
 
+/** Nobody should be scrolling a first screen; the catalog covers seven languages. */
+const MAX_LANGUAGE_CHOICES = 8
+
 /**
- * One side of each pair, easiest first, capped.
+ * One side of each pair, easiest first.
  *
- * When the candidates span several taught languages — only English speakers today —
- * the list leads with one deck per language instead of five batches of whichever
- * language sorted first. Three rows reading Korean / Japanese / Spanish are a language
- * choice; three batches of Vietnamese are a decision already made for them.
+ * With one taught language — every audience the catalog was built for — this is the
+ * easiest `limit` decks, and `limit` means what it says.
+ *
+ * With several, the list becomes a language menu: one deck per language, and **every**
+ * language, not the first `limit` of them. Capping at three showed an English speaker
+ * Indonesian, Vietnamese and Spanish, and silently hid Korean and Japanese — the two
+ * the catalog covers best — behind a sort order they cannot see or change. A menu that
+ * omits most of the menu is worse than a long one.
  */
 export function pickStarters(
   listings: MarketplaceListing[],
@@ -84,6 +92,7 @@ export function pickStarters(
   const pool = preferRecognitionDirection(listings, lang).sort(easiestFirst)
   if (taughtLanguages(pool, lang).length <= 1) return pool.slice(0, limit)
 
+  const cap = Math.min(Math.max(limit, taughtLanguages(pool, lang).length), MAX_LANGUAGE_CHOICES)
   const firstOfEach: MarketplaceListing[] = []
   const taken = new Set<string>()
   for (const l of pool) {
@@ -91,11 +100,11 @@ export function pickStarters(
     if (!taught || taken.has(taught)) continue
     taken.add(taught)
     firstOfEach.push(l)
-    if (firstOfEach.length === limit) break
+    if (firstOfEach.length === cap) break
   }
-  // Short of `limit` languages: top up from the ranked pool rather than under-fill.
+  // Fewer languages than slots: top up from the ranked pool rather than under-fill.
   for (const l of pool) {
-    if (firstOfEach.length === limit) break
+    if (firstOfEach.length === cap) break
     if (!firstOfEach.includes(l)) firstOfEach.push(l)
   }
   return firstOfEach

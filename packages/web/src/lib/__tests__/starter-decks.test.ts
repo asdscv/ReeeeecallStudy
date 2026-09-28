@@ -218,6 +218,24 @@ describe('a viewer whose decks span several languages', () => {
     expect(pickStarters(rows, 'en', 3).map(d => d.id)).toEqual(['ko-1', 'ja-1', 'ko-2'])
   })
 
+  // Capping the menu at `limit` showed an English speaker Indonesian, Vietnamese and
+  // Spanish, and silently dropped Korean and Japanese — the two the catalog covers best.
+  it('shows every language, not the first few, when there is a choice to make', () => {
+    const rows = [
+      en('id-1', 'id', 300), en('vi-1', 'vi', 300), en('es-1', 'es', 300),
+      en('ko-1', 'ko', 301), en('ja-1', 'ja', 301), en('th-1', 'th', 302), en('zh-1', 'zh', 302),
+    ]
+    const picked = pickStarters(rows, 'en', 3)
+    expect(picked).toHaveLength(7)
+    expect(picked.map((d) => d.id).sort())
+      .toEqual(['es-1', 'id-1', 'ja-1', 'ko-1', 'th-1', 'vi-1', 'zh-1'])
+  })
+
+  it('still stops before a first screen turns into a scroll', () => {
+    const rows = Array.from({ length: 12 }, (_, i) => en(`l${i}`, `l${i}`, 300 + i))
+    expect(pickStarters(rows, 'en', 3)).toHaveLength(8)
+  })
+
   it('leaves the single-language case exactly as it was', () => {
     const rows = [
       listing({ id: 'a', card_count: 300 }),
