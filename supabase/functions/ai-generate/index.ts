@@ -45,6 +45,7 @@ import {
   buildMcqGenerationPrompt, buildShortAnswerGenerationPrompt, buildEssayGenerationPrompt,
   buildShortAnswerGradePrompt, buildEssayGradePrompt, MAX_QUIZ_BATCH,
 } from '../_shared/ai-quiz-prompts.ts'
+import { gradeWithJev, JEV_PROVIDER } from '../_shared/ai-quiz-jev.ts'
 
 // Provider + model are resolved per request from the registry (env-driven) —
 // see _shared/ai-providers.ts. Switching provider/model needs no code change.
@@ -169,7 +170,7 @@ async function chargeGeneration(userId: string, jobRef: string | undefined, m: R
 // above: it must never mask a delivered 200.
 async function settleQuiz(
   userId: string, jobRef: string | undefined, delivered: number,
-  m: ResolvedModel, usage: TokenUsage | null,
+  m: Pick<ResolvedModel, 'provider' | 'model'>, usage: TokenUsage | null,
 ): Promise<{ price_micro?: number; balance?: number } | null> {
   if (!jobRef) return null
   for (let attempt = 0; attempt < 2; attempt++) {
@@ -1653,20 +1654,42 @@ Write them again, obeying those rules exactly.`
         const criteria = question.rubric ?? []
         if (quizType === 'essay' && criteria.length === 0) throw new Error('QUIZ_NO_RUBRIC')
 
-        const prompt = quizType === 'essay'
-          ? buildEssayGradePrompt(gradeInput, criteria)
-          : buildShortAnswerGradePrompt(gradeInput)
-        // Grading is the one call where variety is a defect: the same answer submitted twice
-        // must get the same mark, because `normalized_score` is written to the attempt and
-        // then read by the planner, the insights and the weak-card list. `QUIZ_TEMPERATURE`
-        // has said so since it was written and had no importer until now.
-        const generated = await generate(
-          chain, prompt.systemPrompt, prompt.userPrompt, undefined, QUIZ_TEMPERATURE.grade,
-          outputCapFor('quiz_grade'))
+        // Jev first: the grade IS a pick from a closed set (verdict, gaps, per-criterion level),
+        // and Jev returns that pick with its probabilities instead of typing it into JSON. The
+        // raw shape goes through the SAME validators, so bands and refusals are unchanged. See
+        // `ai-quiz-jev.ts`. No key, or Jev down → the LLM grader, exactly as before.
+        let graded: { json: unknown; model: Pick<ResolvedModel, 'provider' | 'model'>; usage: TokenUsage | null } | null = null
+        const jevKey = ENV('TYPESAFE_API_KEY')
+        if (jevKey) {
+          try {
+            const jev = await gradeWithJev(quizType, gradeInput, criteria, { apiKey: jevKey })
+            graded = {
+              json: jev.raw,
+              model: { provider: JEV_PROVIDER, model: jev.model },
+              usage: jev.usage ? { prompt_tokens: jev.usage.input_tokens, completion_tokens: jev.usage.output_tokens } : null,
+            }
+          } catch (jevError) {
+            console.warn('[ai-generate] jev grading failed, falling back to LLM:',
+              jevError instanceof Error ? jevError.message : jevError)
+          }
+        }
+        if (!graded) {
+          const prompt = quizType === 'essay'
+            ? buildEssayGradePrompt(gradeInput, criteria)
+            : buildShortAnswerGradePrompt(gradeInput)
+          // Grading is the one call where variety is a defect: the same answer submitted twice
+          // must get the same mark, because `normalized_score` is written to the attempt and
+          // then read by the planner, the insights and the weak-card list. `QUIZ_TEMPERATURE`
+          // has said so since it was written and had no importer until now.
+          const generated = await generate(
+            chain, prompt.systemPrompt, prompt.userPrompt, undefined, QUIZ_TEMPERATURE.grade,
+            outputCapFor('quiz_grade'))
+          graded = { json: generated.json, model: generated.model, usage: generated.usage }
+        }
 
         const verdict = quizType === 'essay'
-          ? validateEssayGrade(generated.json, criteria, gradeInput)
-          : validateShortAnswerGrade(generated.json, gradeInput)
+          ? validateEssayGrade(graded.json, criteria, gradeInput)
+          : validateShortAnswerGrade(graded.json, gradeInput)
 
         // A refusal is not a zero. Releasing means the learner is charged nothing and no
         // score is written — scoring them 0 because our grader returned nonsense would put
@@ -1684,11 +1707,11 @@ Write them again, obeying those rules exactly.`
           // Everything the screen renders: a label from a closed set, and spans into text
           // the learner already has. Not one character of model-written prose.
           p_feedback: grade,
-          p_evaluator_version: `${model.provider}:${model.model}`,
+          p_evaluator_version: `${graded.model.provider}:${graded.model.model}`,
         })
         if (applyError) throw new Error(`PERSISTENCE:${applyError.message}`)
 
-        const settled = await settleQuiz(userId, meter.job_ref, 1, generated.model, generated.usage)
+        const settled = await settleQuiz(userId, meter.job_ref, 1, graded.model, graded.usage)
         return json({ itemId, grade, balance: settled?.balance ?? null }, 200, cors)
       } catch (error) {
         const message = error instanceof Error ? error.message : 'UNKNOWN'
