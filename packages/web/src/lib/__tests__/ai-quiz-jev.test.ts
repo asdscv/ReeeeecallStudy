@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import {
   buildShortAnswerJevRequest, shortAnswerRawFromJev, buildEssayJevRequest, essayRawFromJev,
-  callJev, gradeWithJev, JEV_ENDPOINT, type JevAnswer,
+  callJev, gradeWithJev, wordSegments, sentenceSegments, JEV_ENDPOINT, NO_SPAN, type JevAnswer,
 } from '../../../../../supabase/functions/_shared/ai-quiz-jev.ts'
 import {
   validateShortAnswerGrade, validateEssayGrade, SHORT_ANSWER_GAPS, type EssayCriterion,
@@ -44,7 +44,7 @@ describe('shortAnswerRawFromJev → validateShortAnswerGrade', () => {
     const raw = shortAnswerRawFromJev({
       verdict: choice('different', { equivalent: 0.01, equivalent_with_error: 0.03, partial: 0.12, different: 0.84, empty: 0, unjudgeable: 0 }),
       gap_wrong_direction: noul(0.93), gap_missing_part: noul(0.2), gap_spelling: noul(0.05),
-    })
+    }, input)
     const out = validateShortAnswerGrade(raw, input)
     expect(out.graded).toBe(true)
     if (!out.graded) return
@@ -52,12 +52,11 @@ describe('shortAnswerRawFromJev → validateShortAnswerGrade', () => {
     expect(out.grade.score).toBeGreaterThanOrEqual(0)
     expect(out.grade.score).toBeLessThanOrEqual(0.3)
     expect(out.grade.gaps).toEqual(['wrong_direction'])
-    expect(out.grade.spans).toEqual([])
   })
 
   it('the score reflects how close the runner-up was: a near-partial "different" sits higher in its band', () => {
-    const sure = shortAnswerRawFromJev({ verdict: choice('different', { different: 1 }) })
-    const unsure = shortAnswerRawFromJev({ verdict: choice('different', { different: 0.55, partial: 0.45 }) })
+    const sure = shortAnswerRawFromJev({ verdict: choice('different', { different: 1 }) }, input)
+    const unsure = shortAnswerRawFromJev({ verdict: choice('different', { different: 0.55, partial: 0.45 }) }, input)
     const a = validateShortAnswerGrade(sure, input)
     const b = validateShortAnswerGrade(unsure, input)
     expect(a.graded && b.graded).toBe(true)
@@ -71,26 +70,90 @@ describe('shortAnswerRawFromJev → validateShortAnswerGrade', () => {
       verdict: choice('partial', { partial: 1 }),
       gap_missing_part: noul(0.7), gap_extra_claim: noul(0.9), gap_too_vague: noul(0.6), gap_spelling: noul(0.55),
       gap_wrong_language: noul(0.49),
-    })
+    }, input)
     expect(raw?.gaps).toEqual(['extra_claim', 'missing_part', 'too_vague'])
   })
 
   it('"unjudgeable" still refuses (and so refunds)', () => {
-    const out = validateShortAnswerGrade(shortAnswerRawFromJev({ verdict: choice('unjudgeable', { unjudgeable: 1 }) }), input)
+    const out = validateShortAnswerGrade(shortAnswerRawFromJev({ verdict: choice('unjudgeable', { unjudgeable: 1 }) }, input), input)
     expect(out).toEqual({ graded: false, refusal: 'model_declined' })
   })
 
   it('a missing or foreign verdict is invalid_result, not a default grade', () => {
-    expect(validateShortAnswerGrade(shortAnswerRawFromJev({}), input))
+    expect(validateShortAnswerGrade(shortAnswerRawFromJev({}, input), input))
       .toEqual({ graded: false, refusal: 'invalid_result' })
-    expect(validateShortAnswerGrade(shortAnswerRawFromJev({ verdict: choice('maybe', { maybe: 1 }) }), input))
+    expect(validateShortAnswerGrade(shortAnswerRawFromJev({ verdict: choice('maybe', { maybe: 1 }) }, input), input))
       .toEqual({ graded: false, refusal: 'invalid_result' })
   })
 
   it('the cross-lingual cap still applies to a Jev verdict', () => {
-    const raw = shortAnswerRawFromJev({ verdict: choice('equivalent', { equivalent: 1 }), gap_wrong_language: noul(0.9) })
+    const raw = shortAnswerRawFromJev({ verdict: choice('equivalent', { equivalent: 1 }), gap_wrong_language: noul(0.9) }, input)
     const out = validateShortAnswerGrade(raw, input)
     expect(out.graded && out.grade.verdict).toBe('partial')
+  })
+})
+
+describe('segments', () => {
+  it('words carry their exact offsets, including in scripts without spaces', () => {
+    for (const text of ['빌려 주다', 'the gravity of the sun', 'お金を借りること']) {
+      const segs = wordSegments(text)
+      expect(segs.length).toBeGreaterThan(1)
+      for (const s of segs) expect(text.slice(s.start, s.end)).toBe(s.text)
+    }
+  })
+
+  it('sentences over the span cap are cut at clauses, never truncated', () => {
+    const long = `${'가'.repeat(150)}, ${'나'.repeat(150)}. 짧은 문장.`
+    const segs = sentenceSegments(long)
+    expect(segs.map((s) => s.text)).toEqual(['가'.repeat(150) + ',', '나'.repeat(150) + '.', '짧은 문장.'])
+    for (const s of segs) expect(long.slice(s.start, s.end)).toBe(s.text)
+  })
+})
+
+describe('spans are picked from code-cut candidates', () => {
+  const answers = (extra: Record<string, JevAnswer>) => ({
+    verdict: choice('different', { different: 1 }), ...extra,
+  })
+
+  it('offers the learner\'s and the reference\'s words, each with an escape hatch', () => {
+    const req = buildShortAnswerJevRequest({ ...input, learner: '빌려 가다' })
+    const learnerOpts = Object.keys((req.questions.span_learner as { criteria: object }).criteria)
+    expect(learnerOpts).toEqual(['빌려', '가다', NO_SPAN])
+    expect(Object.keys((req.questions.span_reference as { criteria: object }).criteria)).toEqual(['빌려주다', NO_SPAN])
+  })
+
+  it('a pick becomes the offset of that word, in the right text', () => {
+    const i = { ...input, learner: '돈을 빌리다' }
+    const raw = shortAnswerRawFromJev(answers({
+      span_learner: choice('빌리다', { 빌리다: 1 }), span_reference: choice('빌려주다', { 빌려주다: 1 }),
+    }), i)
+    const out = validateShortAnswerGrade(raw, i)
+    expect(out.graded && out.grade.spans).toEqual([
+      { from: 'learner', start: 3, end: 6 }, { from: 'reference', start: 0, end: 4 },
+    ])
+  })
+
+  it('the escape hatch, or an option we never offered, is no span — never a guess', () => {
+    const raw = shortAnswerRawFromJev(answers({
+      span_learner: choice(NO_SPAN, { [NO_SPAN]: 1 }), span_reference: choice('invented', { invented: 1 }),
+    }), input)
+    expect(raw?.spans).toEqual([])
+  })
+
+  it('a correct answer gets no highlight even if a span was picked', () => {
+    const raw = shortAnswerRawFromJev({
+      verdict: choice('equivalent', { equivalent: 1 }), span_learner: choice('빌리다', { 빌리다: 1 }),
+    }, input)
+    expect(raw?.spans).toEqual([])
+  })
+
+  it('"spelling" is not reported beside "different" — a different word is not a typo', () => {
+    const raw = shortAnswerRawFromJev(answers({ gap_spelling: noul(0.9), gap_wrong_direction: noul(0.8) }), input)
+    expect(raw?.gaps).toEqual(['wrong_direction'])
+    const typo = shortAnswerRawFromJev({
+      verdict: choice('equivalent_with_error', { equivalent_with_error: 1 }), gap_spelling: noul(0.9),
+    }, input)
+    expect(typo?.gaps).toEqual(['spelling'])
   })
 })
 
@@ -102,14 +165,17 @@ describe('essay', () => {
 
   it('asks one Choice per criterion, carrying that criterion\'s requirement and terms', () => {
     const req = buildEssayJevRequest(input, criteria)
-    expect(Object.keys(req.questions)).toEqual(['criterion_0', 'criterion_1'])
+    expect(Object.keys(req.questions)).toEqual([
+      'criterion_0', 'criterion_0_evidence', 'criterion_0_missed',
+      'criterion_1', 'criterion_1_evidence', 'criterion_1_missed',
+    ])
     expect(JSON.stringify(req.questions.criterion_1)).toContain('돈')
   })
 
   it('levels map back to criterion ids and the SAME weight arithmetic derives the score', () => {
     const raw = essayRawFromJev({
       criterion_0: choice('met', { met: 1 }), criterion_1: choice('partial', { partial: 1 }),
-    }, criteria)
+    }, criteria, input)
     const out = validateEssayGrade(raw, criteria, input)
     expect(out.graded).toBe(true)
     if (!out.graded) return
@@ -117,8 +183,28 @@ describe('essay', () => {
     expect(out.grade.criteria.map((c) => c.level)).toEqual(['met', 'partial'])
   })
 
+  it('met points at the learner sentence that satisfies it; not_met at the reference part missed', () => {
+    const i = { ...input, learner: '친구에게 돈을 빌려줬다. 날씨가 좋다.', reference: '남에게 물건을 쓰게 하다. 나중에 돌려받는다.' }
+    const raw = essayRawFromJev({
+      criterion_0: choice('met', { met: 1 }),
+      criterion_0_evidence: choice('친구에게 돈을 빌려줬다.', { x: 1 }),
+      criterion_0_missed: choice('나중에 돌려받는다.', { x: 1 }),
+      criterion_1: choice('not_met', { not_met: 1 }),
+      criterion_1_evidence: choice('날씨가 좋다.', { x: 1 }),
+      criterion_1_missed: choice('나중에 돌려받는다.', { x: 1 }),
+    }, criteria, i)
+    const out = validateEssayGrade(raw, criteria, i)
+    expect(out.graded).toBe(true)
+    if (!out.graded) return
+    const [c0, c1] = out.grade.criteria
+    expect(i.learner.slice(c0.span!.start, c0.span!.end)).toBe('친구에게 돈을 빌려줬다.')
+    expect(c0.span!.from).toBe('learner')
+    expect(i.reference.slice(c1.span!.start, c1.span!.end)).toBe('나중에 돌려받는다.')
+    expect(c1.span!.from).toBe('reference')
+  })
+
   it('a criterion Jev did not answer is unjudgeable, and too much of that refuses', () => {
-    const out = validateEssayGrade(essayRawFromJev({ criterion_1: choice('met', { met: 1 }) }, criteria), criteria, input)
+    const out = validateEssayGrade(essayRawFromJev({ criterion_1: choice('met', { met: 1 }) }, criteria, input), criteria, input)
     expect(out).toEqual({ graded: false, refusal: 'model_declined' })
   })
 })

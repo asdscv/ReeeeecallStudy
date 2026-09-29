@@ -21,10 +21,15 @@
  * and every refusal (all of which refund) are enforced exactly as before. Jev is a different
  * source of the judgement, not a different definition of a grade.
  *
- * The one thing Jev does not supply is spans — it selects, it does not point at character offsets.
- * Spans were always optional (an out-of-range span was dropped alone), so a Jev grade renders the
- * verdict and gaps without highlights.
+ * ## Spans: code cuts, Jev picks
  *
+ * Jev does not write character offsets, and should not: an offset typed by a model is the one
+ * number in a grade that can be wrong without anyone noticing. So the code cuts the texts into
+ * candidates it already knows the offsets of — words of a short answer, sentences of an essay —
+ * and a Choice picks one, or `NO_SPAN` when none fits. The span is then the offset of a segment the
+ * code produced, so it cannot be out of range and cannot point at text the learner did not write.
+ *
+
  * ## Why this file imports only `ai-quiz.ts` and uses global `fetch`
  *
  * Same constraint as its neighbours: it is deployed with the edge function and unit-tested by
@@ -33,8 +38,9 @@
  */
 
 import {
-  SHORT_ANSWER_BANDS, SHORT_ANSWER_GAPS, SHORT_ANSWER_VERDICTS, MAX_GAPS_PER_GRADE,
-  type EssayAspect, type EssayCriterion, type QuizGradeInput, type ShortAnswerGap, type ShortAnswerVerdict,
+  SHORT_ANSWER_BANDS, SHORT_ANSWER_GAPS, SHORT_ANSWER_VERDICTS, MAX_GAPS_PER_GRADE, MAX_SPAN_CHARS,
+  type EssayAspect, type EssayCriterion, type QuizGradeInput, type QuizSpan, type ShortAnswerGap,
+  type ShortAnswerVerdict,
 } from './ai-quiz.ts'
 
 export const JEV_ENDPOINT = 'https://api.typesafe.ai/v1/systemone'
@@ -82,6 +88,105 @@ const REFERENCE_IS_AUTHORITY =
 
 function gradeState(input: QuizGradeInput): Record<string, unknown> {
   return { question: input.question, reference: input.reference, learner_response: input.learner }
+}
+
+// ─── Spans: candidates cut by code ──────────────────────────────────────────
+
+/** A piece of a text the server holds, with its offsets. What a span is made from. */
+export interface Segment {
+  readonly text: string
+  readonly start: number
+  readonly end: number
+}
+
+/** The escape hatch on every span Choice. Not a word any learner writes, so it cannot collide. */
+export const NO_SPAN = '(none of these)'
+
+/** A Choice allows 255 options; one is `NO_SPAN`. */
+const MAX_SPAN_CANDIDATES = 254
+
+/** Split a range at clause punctuation, for a sentence too long to be a span on its own. */
+const CLAUSE_BREAK = /[,;:、，；：]\s*/g
+
+function trimmed(text: string, start: number, end: number): Segment | null {
+  const raw = text.slice(start, end)
+  const lead = raw.length - raw.trimStart().length
+  const body = raw.trim()
+  if (body === '') return null
+  return { text: body, start: start + lead, end: start + lead + body.length }
+}
+
+/**
+ * Words, by the runtime's own ICU segmenter — so Japanese and Thai, which do not put spaces between
+ * words, still come apart into words rather than arriving as one unpickable block.
+ */
+export function wordSegments(text: string): Segment[] {
+  const out: Segment[] = []
+  for (const s of new Intl.Segmenter(undefined, { granularity: 'word' }).segment(text)) {
+    if (!s.isWordLike) continue
+    const seg = trimmed(text, s.index, s.index + s.segment.length)
+    if (seg) out.push(seg)
+  }
+  return out
+}
+
+/**
+ * Sentences, with any sentence longer than `MAX_SPAN_CHARS` broken at its clauses — a span that
+ * long is dropped by `validateSpan`, so offering it would only waste the pick. A clause still over
+ * the cap is left out rather than truncated: half a clause is not what the learner wrote.
+ */
+export function sentenceSegments(text: string): Segment[] {
+  const out: Segment[] = []
+  for (const s of new Intl.Segmenter(undefined, { granularity: 'sentence' }).segment(text)) {
+    const sentence = trimmed(text, s.index, s.index + s.segment.length)
+    if (!sentence) continue
+    if (sentence.text.length <= MAX_SPAN_CHARS) { out.push(sentence); continue }
+    let from = sentence.start
+    for (const m of sentence.text.matchAll(CLAUSE_BREAK)) {
+      const cut = sentence.start + (m.index ?? 0) + m[0].length
+      const clause = trimmed(text, from, cut)
+      if (clause && clause.text.length <= MAX_SPAN_CHARS) out.push(clause)
+      from = cut
+    }
+    const tail = trimmed(text, from, sentence.end)
+    if (tail && tail.text.length <= MAX_SPAN_CHARS) out.push(tail)
+  }
+  return out
+}
+
+/**
+ * The options of a span Choice: each distinct segment text once, in order of first appearance.
+ *
+ * A repeated word maps to its FIRST occurrence. The option is the text, so the model cannot say
+ * which of two identical words it meant, and either highlights the same thing to the learner.
+ */
+function spanCandidates(segments: readonly Segment[]): Map<string, Segment> {
+  const byText = new Map<string, Segment>()
+  for (const s of segments) {
+    if (byText.size >= MAX_SPAN_CANDIDATES) break
+    if (s.text === NO_SPAN || byText.has(s.text)) continue
+    byText.set(s.text, s)
+  }
+  return byText
+}
+
+function spanQuestion(
+  candidates: Map<string, Segment>, question: string, none: string, extra: Record<string, unknown> = {},
+): JevQuestion | null {
+  if (candidates.size === 0) return null
+  const criteria: Record<string, string | null> = {}
+  for (const text of candidates.keys()) criteria[text] = null
+  criteria[NO_SPAN] = none
+  return { type: 'choice', instructions: { rule: REFERENCE_IS_AUTHORITY, ...extra, question }, criteria }
+}
+
+/** The picked segment as a span, or null for `NO_SPAN`, a missing answer, or an unknown option. */
+function pickedSpan(
+  answer: JevAnswer | undefined, candidates: Map<string, Segment>, from: QuizSpan['from'],
+): QuizSpan | null {
+  if (!answer || answer.type !== 'choice' || answer.choice === NO_SPAN) return null
+  const seg = candidates.get(answer.choice)
+  return seg ? { from, start: seg.start, end: seg.end } : null
 }
 
 // ─── Short answer ───────────────────────────────────────────────────────────
@@ -144,8 +249,33 @@ export function buildShortAnswerJevRequest(input: QuizGradeInput): JevRequest {
       instructions: { rule: REFERENCE_IS_AUTHORITY, question: GAP_QUESTIONS[gap] },
     }
   }
+
+  // Asked in the same request as the verdict, speculatively: they cannot see its answer, and code
+  // uses them only when the verdict says something went wrong.
+  const candidates = shortAnswerCandidates(input)
+  const learnerSpan = spanQuestion(candidates.learner,
+    'Which word of `learner_response` is where it goes wrong compared with `reference`: the wrong, inverted,'
+    + ' misspelled, or extra word?',
+    'No single word of `learner_response` is wrong: it matches `reference`, or its only problem is what it leaves out.')
+  if (learnerSpan) questions.span_learner = learnerSpan
+  const referenceSpan = spanQuestion(candidates.reference,
+    'Which word of `reference` did `learner_response` leave out or get wrong?',
+    'Nothing in `reference` was left out or gotten wrong.')
+  if (referenceSpan) questions.span_reference = referenceSpan
+
   return { model: JEV_MODEL, state: gradeState(input), questions }
 }
+
+/** Short answers are a few words, so a word is the unit a highlight points at. */
+function shortAnswerCandidates(input: QuizGradeInput) {
+  return {
+    learner: spanCandidates(wordSegments(input.learner)),
+    reference: spanCandidates(wordSegments(input.reference)),
+  }
+}
+
+/** A verdict that says the answer is right — or not there — has nothing to point at. */
+const VERDICTS_WITHOUT_SPANS: ReadonlySet<string> = new Set(['equivalent', 'empty', 'unjudgeable'])
 
 /**
  * Turn Jev's answers into the raw shape `validateShortAnswerGrade` accepts.
@@ -154,7 +284,9 @@ export function buildShortAnswerJevRequest(input: QuizGradeInput): JevRequest {
  * malformed Jev response fails the same way a malformed LLM response did — `invalid_result`,
  * refund — instead of this module inventing a default.
  */
-export function shortAnswerRawFromJev(answers: Record<string, JevAnswer>): Record<string, unknown> | null {
+export function shortAnswerRawFromJev(
+  answers: Record<string, JevAnswer>, input: QuizGradeInput,
+): Record<string, unknown> | null {
   const verdict = answers.verdict
   if (!verdict || verdict.type !== 'choice') return null
   if (!(SHORT_ANSWER_VERDICTS as readonly string[]).includes(verdict.choice)) return null
@@ -176,11 +308,27 @@ export function shortAnswerRawFromJev(answers: Record<string, JevAnswer>): Recor
       return { gap, p: a && a.type === 'noul' && Number.isFinite(a.noul) ? a.noul : 0 }
     })
     .filter((g) => g.p >= JEV_GAP_THRESHOLD)
+    // `spelling` means "surface error only — the meaning arrived". Beside a `different` that is a
+    // contradiction, not a second finding: 빌리다 against 빌려주다 is a different word, and telling
+    // the learner it was a typo teaches them the wrong thing. The Noul answers "is there an error
+    // in the letters", which is true of any wrong word; the verdict decides whether it is the point.
+    .filter((g) => !(g.gap === 'spelling' && verdict.choice === 'different'))
     .sort((a, b) => b.p - a.p)
     .slice(0, MAX_GAPS_PER_GRADE)
     .map((g) => g.gap)
 
-  return { verdict: verdict.choice, score, gaps, spans: [], confidence: verdict.confidence }
+  const spans: QuizSpan[] = []
+  if (!VERDICTS_WITHOUT_SPANS.has(verdict.choice)) {
+    // Recomputed from the input rather than carried over from the request: segmentation is
+    // deterministic, and this keeps the raw function callable on a stored response.
+    const candidates = shortAnswerCandidates(input)
+    const learner = pickedSpan(answers.span_learner, candidates.learner, 'learner')
+    const reference = pickedSpan(answers.span_reference, candidates.reference, 'reference')
+    if (learner) spans.push(learner)
+    if (reference) spans.push(reference)
+  }
+
+  return { verdict: verdict.choice, score, gaps, spans, confidence: verdict.confidence }
 }
 
 // ─── Essay ──────────────────────────────────────────────────────────────────
@@ -203,36 +351,62 @@ const LEVEL_CRITERIA = {
 } as const
 
 const criterionKey = (i: number) => `criterion_${i}`
+const evidenceKey = (i: number) => `criterion_${i}_evidence`
+const missedKey = (i: number) => `criterion_${i}_missed`
+
+/** An essay is sentences, so a sentence (or a clause of a long one) is what a highlight points at. */
+function essayCandidates(input: QuizGradeInput) {
+  return {
+    learner: spanCandidates(sentenceSegments(input.learner)),
+    reference: spanCandidates(sentenceSegments(input.reference)),
+  }
+}
 
 export function buildEssayJevRequest(input: QuizGradeInput, criteria: readonly EssayCriterion[]): JevRequest {
   const questions: Record<string, JevQuestion> = {}
+  const candidates = essayCandidates(input)
   criteria.forEach((c, i) => {
+    const criterion = { requirement: ASPECT_MEANING[c.aspect], terms_from_the_card: c.mustMention }
     questions[criterionKey(i)] = {
       type: 'choice',
       instructions: {
         rule: REFERENCE_IS_AUTHORITY,
-        criterion: {
-          requirement: ASPECT_MEANING[c.aspect],
-          terms_from_the_card: c.mustMention,
-        },
+        criterion,
         notes: 'Judge only this `criterion`: do not lower a content criterion for grammar or a structure criterion for'
           + ' content. Length is not a criterion — a short response that satisfies it satisfies it.',
         question: 'Does `learner_response` satisfy `criterion` for the quiz `question`?',
       },
       criteria: { ...LEVEL_CRITERIA },
     }
+    // Both asked speculatively; the level decides which one is used — evidence for met/partial,
+    // what was missed for not_met. Same rule the LLM grader was given.
+    const evidence = spanQuestion(candidates.learner,
+      'Which sentence of `learner_response` best satisfies `criterion`?',
+      'No sentence of `learner_response` satisfies `criterion`.', { criterion })
+    if (evidence) questions[evidenceKey(i)] = evidence
+    const missed = spanQuestion(candidates.reference,
+      'Which part of `reference` does `learner_response` fail to cover for `criterion`?',
+      'Nothing in `reference` is missing from `learner_response` for `criterion`.', { criterion })
+    if (missed) questions[missedKey(i)] = missed
   })
   return { model: JEV_MODEL, state: gradeState(input), questions }
 }
 
 /** The raw shape `validateEssayGrade` accepts. A missing answer is left out → graded "unjudgeable". */
 export function essayRawFromJev(
-  answers: Record<string, JevAnswer>, criteria: readonly EssayCriterion[],
+  answers: Record<string, JevAnswer>, criteria: readonly EssayCriterion[], input: QuizGradeInput,
 ): Record<string, unknown> {
-  const out: Array<{ criterionId: string; level: string; confidence: number }> = []
+  const candidates = essayCandidates(input)
+  const out: Array<{ criterionId: string; level: string; confidence: number; span: QuizSpan | null }> = []
   criteria.forEach((c, i) => {
     const a = answers[criterionKey(i)]
-    if (a && a.type === 'choice') out.push({ criterionId: c.id, level: a.choice, confidence: a.confidence })
+    if (!a || a.type !== 'choice') return
+    const span = a.choice === 'met' || a.choice === 'partial'
+      ? pickedSpan(answers[evidenceKey(i)], candidates.learner, 'learner')
+      : a.choice === 'not_met'
+        ? pickedSpan(answers[missedKey(i)], candidates.reference, 'reference')
+        : null
+    out.push({ criterionId: c.id, level: a.choice, confidence: a.confidence, span })
   })
   return { criteria: out }
 }
@@ -316,7 +490,7 @@ export async function gradeWithJev(
     : buildShortAnswerJevRequest(input)
   const response = await callJev(request, opts)
   const raw = quizType === 'essay'
-    ? essayRawFromJev(response.answers, criteria)
-    : shortAnswerRawFromJev(response.answers)
+    ? essayRawFromJev(response.answers, criteria, input)
+    : shortAnswerRawFromJev(response.answers, input)
   return { raw, model: response.model, usage: response.usage }
 }
