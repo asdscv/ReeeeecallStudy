@@ -78,10 +78,11 @@ export const STARTER_SUBSCRIPTION_COUNT = 5
  * together, so a cut-off run repairs itself on the next launch.
  *
  * Three things stop it: an account that authored or copied a deck of its own, a shelf
- * that is already full, and an account that has begun studying. The last two together
- * mean someone who unsubscribes a deck they were given gets it back only if they never
- * studied anything — a narrow window, and the alternative is never repairing a
- * half-finished shelf.
+ * that is already full, and an account that has actually reviewed a card. That last one
+ * has to read `last_reviewed_at`, not the presence of a progress row: `acquire_listing`
+ * seeds one row per card on subscribe, so a row-existence check goes true the moment the
+ * first deck lands and the shelf is never finished. A real account shipped with one deck
+ * instead of five because of exactly that.
  */
 export async function ensureStarterSubscriptions(
   locale: string,
@@ -95,13 +96,21 @@ export async function ensureStarterSubscriptions(
   const [owned, shares, progress] = await Promise.all([
     supabase.from('decks').select('id').eq('user_id', userId).limit(1),
     supabase.from('deck_shares').select('id').eq('recipient_id', userId).limit(count),
-    supabase.from('user_card_progress').select('card_id').eq('user_id', userId).limit(1),
+    // `last_reviewed_at` is the studying signal, not the row. `acquire_listing` seeds a
+    // progress row per card on subscribe, so "has any progress" is true the instant one
+    // deck arrives — the guard would then refuse to finish the shelf it just started.
+    supabase
+      .from('user_card_progress')
+      .select('card_id')
+      .eq('user_id', userId)
+      .not('last_reviewed_at', 'is', null)
+      .limit(1),
   ])
   if (owned.error || shares.error || progress.error) return 0
 
   // Authored or copied a deck of their own — they are past needing a shelf.
   if ((owned.data?.length ?? 0) > 0) return 0
-  // Already studying: whatever they have is what they chose.
+  // Has actually reviewed a card: whatever they have is what they chose.
   if ((progress.data?.length ?? 0) > 0) return 0
   // Shelf is full.
   if ((shares.data?.length ?? 0) >= count) return 0
