@@ -317,18 +317,34 @@ describe('fetchStarterDecks', () => {
 describe('ensureStarterSubscriptions', () => {
   /** Routes the four table reads the function makes. */
   function stubAccount(opts: {
-    decks?: unknown[]; shares?: unknown[]; progress?: unknown[]; catalog?: MarketplaceListing[]
+    decks?: unknown[]
+    shares?: unknown[]
+    /** Rows with `last_reviewed_at` set — i.e. cards the account actually reviewed. */
+    reviewed?: unknown[]
+    /** Seeded rows an acquire wrote. Present for every subscribed card; never a study signal. */
+    seededProgress?: unknown[]
+    catalog?: MarketplaceListing[]
   }) {
     from.mockImplementation((table: string) => {
-      const rowsFor = (t: string) =>
-        t === 'decks' ? (opts.decks ?? [])
-        : t === 'deck_shares' ? (opts.shares ?? [])
-        : (opts.progress ?? [])
       if (table === 'decks' || table === 'deck_shares' || table === 'user_card_progress') {
+        let notReviewedFilter = false
         const b: Record<string, unknown> = {}
         Object.assign(b, {
-          select: () => b, eq: () => b,
-          limit: () => Promise.resolve({ data: rowsFor(table), error: null }),
+          select: () => b,
+          eq: () => b,
+          not: (col: string, op: string) => {
+            if (col === 'last_reviewed_at' && op === 'is') notReviewedFilter = true
+            return b
+          },
+          limit: () => {
+            const rows =
+              table === 'decks' ? (opts.decks ?? [])
+              : table === 'deck_shares' ? (opts.shares ?? [])
+              // Only the filtered read sees reviews; an unfiltered one would see the
+              // seeded rows too, which is the bug this stub has to be able to express.
+              : notReviewedFilter ? (opts.reviewed ?? []) : [...(opts.reviewed ?? []), ...(opts.seededProgress ?? [])]
+            return Promise.resolve({ data: rows, error: null })
+          },
         })
         return b
       }
@@ -387,9 +403,22 @@ describe('ensureStarterSubscriptions', () => {
 
   // Someone who has begun studying has made their choices; do not top them back up.
   it('leaves an account that has started studying alone', async () => {
-    stubAccount({ shares: [{ id: 's1' }], progress: [{ card_id: 'c1' }], catalog })
+    stubAccount({ shares: [{ id: 's1' }], reviewed: [{ card_id: 'c1' }], catalog })
     expect(await ensureStarterSubscriptions('ko', 3)).toBe(0)
     expect(rpc).not.toHaveBeenCalled()
+  })
+
+  // A real account shipped with one deck instead of five because of this: acquiring a
+  // deck seeds a progress row for every card in it, so a row-existence check reads as
+  // "already studying" the instant the first deck lands.
+  it('is not fooled by the progress rows the acquire itself wrote', async () => {
+    stubAccount({
+      shares: [{ id: 's1' }],
+      seededProgress: Array.from({ length: 300 }, (_, i) => ({ card_id: `seeded-${i}` })),
+      catalog,
+    })
+    expect(await ensureStarterSubscriptions('ko', 3)).toBe(3)
+    expect(rpc).toHaveBeenCalledTimes(3)
   })
 
   it('does nothing when nobody is signed in', async () => {
