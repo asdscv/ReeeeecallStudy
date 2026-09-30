@@ -11,13 +11,18 @@
  *
  * What was missing was the telling. The grade button reads "이 답안 채점" with no price on it —
  * that was a deliberate choice, a button is a decision and not a price tag — but nothing else said
- * anything either, so a learner tapped it with no idea what it would cost. And the retake button
+ * anything either, so a learner tapped it with no idea it charged at all. And the retake button
  * said nothing about the questions being identical, which is the first thing anyone wonders.
+ *
+ * What these lines say is deliberately qualitative — charged or free, and how many of each — never
+ * a dollar figure. A figure would need re-stating in every currency this app might ever bill in,
+ * ages the moment a price changes, and is not what a learner needs to decide: they need to know
+ * SOMETHING is about to be spent, not reconcile a number against their balance before tapping. The
+ * balance itself lives on the wallet screen; this is a warning, not a receipt.
  *
  * Both platforms build their copy from here, so the two cannot quietly start explaining the same
  * billing differently.
  */
-import { formatUsdMicro } from './ai/server-client'
 
 /** The parts of a quote these lines read. `get_ai_quiz_quote` returns all of them. */
 export interface QuizGradeQuote {
@@ -51,8 +56,7 @@ export function gradeCostLine(
   // promise that was removed from the ledger, and it is the sentence the owner asked to be gone.
   if (quote.price_micro <= 0) return null
 
-  // The wallet's own formatter, so a grade and a balance are never denominated differently.
-  return { key: 'pricing.gradeCost', params: { amount: formatUsdMicro(quote.price_micro) } }
+  return { key: 'pricing.gradeCost', params: {} }
 }
 
 /** What a GENERATION quote carries. `get_ai_quiz_quote` returns all of these since mig 239. */
@@ -90,11 +94,10 @@ export function generateCostLine(
   if (!quote) return null
   const free = Math.max(0, (quote.free_items ?? 0) + (quote.trial_items ?? 0))
   const paid = Math.max(0, quote.paid_items ?? 0)
-  const amount = formatUsdMicro(quote.price_micro)
 
   if (paid <= 0) return { key: 'pricing.genAllFree', params: { free } }
-  if (free <= 0) return { key: 'pricing.genAllPaid', params: { paid, amount } }
-  return { key: 'pricing.genPartlyFree', params: { free, paid, amount } }
+  if (free <= 0) return { key: 'pricing.genAllPaid', params: { paid } }
+  return { key: 'pricing.genPartlyFree', params: { free, paid } }
 }
 
 /**
