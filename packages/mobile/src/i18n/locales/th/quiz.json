@@ -223,12 +223,12 @@
     "historyTitle": "ประวัติการทำ"
   },
   "pricing": {
-    "gradeCost": "การตรวจคิด {{amount}}",
+    "gradeCost": "การตรวจมีค่าใช้จ่าย",
     "retakeMcq": "คำถามเดิม สลับลำดับตัวเลือก ไม่มีค่าใช้จ่ายใด ๆ",
     "retakeWritten": "ทำคำถามชุดเดิมอีกครั้ง คำถามจ่ายไปแล้ว แต่การตรวจเป็นการเรียกใหม่ จึงคิดค่าใช้จ่ายทุกครั้ง",
     "genAllFree": "สร้างจากโควตาฟรี ไม่มีการหักเครดิต",
-    "genAllPaid": "{{paid, number}} ข้อ · {{amount}}",
-    "genPartlyFree": "ฟรี {{free, number}} ข้อ + คิดเงิน {{paid, number}} ข้อ · {{amount}}",
+    "genAllPaid": "คิดเงิน {{paid, number}} ข้อ",
+    "genPartlyFree": "ฟรี {{free, number}} ข้อ + คิดเงิน {{paid, number}} ข้อ",
     "genFreeLeft": "วันนี้เหลือข้อฟรี {{left, number}}/{{limit, number}} ข้อ (ทุกรูปแบบ)"
   },
   "activity": {
