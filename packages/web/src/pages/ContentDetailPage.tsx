@@ -10,18 +10,14 @@ import { SEOHead } from '../components/content/SEOHead'
 import { FooterSection } from '../components/landing/FooterSection'
 import { buildArticleJsonLd, buildBreadcrumbJsonLd, buildHreflangAlternates, buildLearningResourceJsonLd } from '../lib/content-seo'
 import { SEO } from '../lib/seo-config'
+import { contentCanonicalUrl } from '@reeeeecall/shared/lib/content-canonical'
 
-function buildCanonicalUrl(slug: string, locale: string, customCanonical?: string | null) {
-  if (customCanonical) return customCanonical
-  const langSuffix = locale !== 'en' ? `?lang=${locale}` : ''
-  return `${SEO.SITE_URL}/insight/${slug}${langSuffix}`
-}
 
 export function ContentDetailPage() {
   const { slug } = useParams<{ slug: string }>()
-  const { t } = useTranslation('content')
+  const { t, i18n } = useTranslation('content')
   const {
-    currentArticle, detailLoading, detailError, fetchContentBySlug,
+    currentArticle, availableContentLocales, detailLoading, detailError, fetchContentBySlug,
     relatedArticles, fetchRelatedArticles,
   } = useContentStore()
 
@@ -31,7 +27,7 @@ export function ContentDetailPage() {
     if (slug) {
       fetchContentBySlug(slug)
     }
-  }, [slug, fetchContentBySlug])
+  }, [slug, fetchContentBySlug, i18n.language])
 
   useEffect(() => {
     if (currentArticle?.slug && currentArticle?.tags?.length > 0) {
@@ -75,19 +71,20 @@ export function ContentDetailPage() {
   return (
     <div className="min-h-screen bg-card">
       <SEOHead
+        lang={currentArticle.locale}
         title={currentArticle.meta_title || currentArticle.title}
         description={currentArticle.meta_description || currentArticle.subtitle || ''}
         ogImage={currentArticle.og_image_url || currentArticle.thumbnail_url || SEO.DEFAULT_OG_IMAGE}
         ogType="article"
         // Minor-language articles are served to users but not indexed (mirrors the worker).
         noIndex={!(SEO.INDEXABLE_LOCALES as readonly string[]).includes(currentArticle.locale)}
-        canonicalUrl={buildCanonicalUrl(currentArticle.slug, currentArticle.locale, currentArticle.canonical_url)}
+        canonicalUrl={contentCanonicalUrl(SEO.SITE_URL, currentArticle.slug, currentArticle.locale, currentArticle.canonical_url)}
         jsonLd={[
           buildArticleJsonLd(currentArticle, relatedArticles.map((r) => r.slug)),
           buildBreadcrumbJsonLd(currentArticle),
           buildLearningResourceJsonLd(currentArticle),
         ]}
-        hreflangAlternates={buildHreflangAlternates(currentArticle.slug)}
+        hreflangAlternates={buildHreflangAlternates(currentArticle.slug, availableContentLocales)}
         publishedTime={currentArticle.published_at}
         modifiedTime={currentArticle.updated_at}
         articleSection={currentArticle.tags?.[0]}

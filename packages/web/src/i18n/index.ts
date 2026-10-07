@@ -45,7 +45,8 @@ i18n
     },
 
     detection: {
-      order: ['localStorage', 'navigator'],
+      order: ['querystring', 'localStorage', 'navigator'],
+      lookupQuerystring: 'lang',
       lookupLocalStorage: 'reeeeecall-lang',
       caches: ['localStorage'],
     },

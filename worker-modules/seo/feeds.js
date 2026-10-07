@@ -1,6 +1,6 @@
 // RSS / Atom / JSON feed handler — extracted from worker.js handleRSSFeed
 import { SITE_URL, BRAND_NAME, DEFAULT_OG_IMAGE } from './constants.js'
-import { escapeHtml, getSupabaseRestUrl, getSupabaseAnonKey } from './helpers.js'
+import { escapeHtml, getSupabaseRestUrl, getSupabaseAnonKey, localizedUrl } from './helpers.js'
 
 export async function handleRSSFeed(env, format = 'rss', lang = 'en') {
   const restUrl = getSupabaseRestUrl(env)
@@ -18,16 +18,16 @@ export async function handleRSSFeed(env, format = 'rss', lang = 'en') {
     const jsonFeed = {
       version: 'https://jsonfeed.org/version/1.1',
       title: `${BRAND_NAME} — Learning Insights`,
-      home_page_url: `${SITE_URL}/insight`,
-      feed_url: `${SITE_URL}/feed.json`,
+      home_page_url: localizedUrl('/insight', lang),
+      feed_url: localizedUrl('/feed.json', lang),
       description: 'Science-backed learning strategies, spaced repetition tips, and study techniques.',
       icon: `${SITE_URL}/favicon.png`,
       favicon: `${SITE_URL}/favicon.png`,
-      language: 'en',
+      language: lang,
       authors: [{ name: BRAND_NAME, url: SITE_URL }],
       items: articles.map((a) => ({
-        id: `${SITE_URL}/insight/${a.slug}`,
-        url: `${SITE_URL}/insight/${a.slug}`,
+        id: localizedUrl(`/insight/${a.slug}`, lang),
+        url: localizedUrl(`/insight/${a.slug}`, lang),
         title: a.title,
         summary: a.meta_description || a.subtitle || '',
         date_published: a.published_at,
@@ -51,8 +51,8 @@ export async function handleRSSFeed(env, format = 'rss', lang = 'en') {
       const pubDate = a.published_at || new Date().toISOString()
       return `  <entry>
     <title>${escapeHtml(a.title)}</title>
-    <link href="${SITE_URL}/insight/${a.slug}" rel="alternate" type="text/html"/>
-    <id>${SITE_URL}/insight/${a.slug}</id>
+    <link href="${localizedUrl(`/insight/${a.slug}`, lang)}" rel="alternate" type="text/html"/>
+    <id>${localizedUrl(`/insight/${a.slug}`, lang)}</id>
     <published>${pubDate}</published>
     <updated>${a.updated_at || pubDate}</updated>
     <author><name>${escapeHtml(a.author_name || BRAND_NAME)}</name></author>
@@ -65,9 +65,9 @@ ${(a.tags || []).map((t) => `    <category term="${escapeHtml(t)}"/>`).join('\n'
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>${BRAND_NAME} — Learning Insights</title>
   <subtitle>Science-backed learning strategies, spaced repetition tips, and study techniques.</subtitle>
-  <link href="${SITE_URL}/feed.atom" rel="self" type="application/atom+xml"/>
-  <link href="${SITE_URL}/insight" rel="alternate" type="text/html"/>
-  <id>${SITE_URL}/insight</id>
+  <link href="${localizedUrl('/feed.atom', lang)}" rel="self" type="application/atom+xml"/>
+  <link href="${localizedUrl('/insight', lang)}" rel="alternate" type="text/html"/>
+  <id>${localizedUrl('/insight', lang)}</id>
   <updated>${updated}</updated>
   <author><name>${BRAND_NAME}</name></author>
   <icon>${SITE_URL}/favicon.png</icon>
@@ -90,14 +90,14 @@ ${entries}
     const pubDate = a.published_at ? new Date(a.published_at).toUTCString() : ''
     return `    <item>
       <title>${escapeHtml(a.title)}</title>
-      <link>${SITE_URL}/insight/${a.slug}</link>
-      <guid isPermaLink="true">${SITE_URL}/insight/${a.slug}</guid>
+      <link>${localizedUrl(`/insight/${a.slug}`, lang)}</link>
+      <guid isPermaLink="true">${localizedUrl(`/insight/${a.slug}`, lang)}</guid>
       <description>${escapeHtml(a.meta_description || a.subtitle || '')}</description>
       <pubDate>${pubDate}</pubDate>
       <author>admin@reeeeecallstudy.xyz (${escapeHtml(a.author_name || BRAND_NAME)})</author>
 ${(a.tags || []).map((t) => `      <category>${escapeHtml(t)}</category>`).join('\n')}
 ${a.thumbnail_url ? `      <enclosure url="${escapeHtml(a.thumbnail_url)}" type="image/jpeg" length="0"/>` : ''}
-      <source url="${SITE_URL}/feed.xml">${BRAND_NAME} Learning Insights</source>
+      <source url="${localizedUrl('/feed.xml', lang)}">${BRAND_NAME} Learning Insights</source>
     </item>`
   }).join('\n')
 
@@ -105,9 +105,9 @@ ${a.thumbnail_url ? `      <enclosure url="${escapeHtml(a.thumbnail_url)}" type=
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>${BRAND_NAME} — Learning Insights</title>
-    <link>${SITE_URL}/insight</link>
+    <link>${localizedUrl('/insight', lang)}</link>
     <description>Science-backed learning strategies, spaced repetition tips, and study techniques. Free articles to help you study smarter and remember longer.</description>
-    <language>en</language>
+    <language>${lang}</language>
     <lastBuildDate>${articles[0]?.published_at ? new Date(articles[0].published_at).toUTCString() : new Date().toUTCString()}</lastBuildDate>
     <managingEditor>admin@reeeeecallstudy.xyz (${BRAND_NAME})</managingEditor>
     <webMaster>admin@reeeeecallstudy.xyz (${BRAND_NAME})</webMaster>
@@ -125,7 +125,7 @@ ${a.thumbnail_url ? `      <enclosure url="${escapeHtml(a.thumbnail_url)}" type=
       <width>144</width>
       <height>144</height>
     </image>
-    <atom:link href="${SITE_URL}/feed.xml" rel="self" type="application/rss+xml"/>
+    <atom:link href="${localizedUrl('/feed.xml', lang)}" rel="self" type="application/rss+xml"/>
 ${items}
   </channel>
 </rss>`

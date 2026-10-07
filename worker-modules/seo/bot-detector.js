@@ -30,8 +30,8 @@ export const BOT_UA = new RegExp([
   'chatgpt-user',
   'gptbot',
   'oai-searchbot',
-  'perplexitybot',
-  'claudebot', 'claude-web',
+  'perplexitybot', 'perplexity-user',
+  'claudebot', 'claude-web', 'claude-searchbot', 'claude-user',
   'google-extended',
   'cohere-ai',
   'bytespider',               // TikTok/ByteDance

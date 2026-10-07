@@ -2,6 +2,7 @@ import { useSEO } from '../../hooks/useSEO'
 
 interface SEOHeadProps {
   title: string
+  lang?: string
   description: string
   ogImage?: string
   ogImageWidth?: number

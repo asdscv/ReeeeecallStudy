@@ -19,6 +19,7 @@ import {
   buildLearningResourceJsonLd,
 } from '../content-seo'
 import { SEO } from '../seo-config'
+import { contentCanonicalUrl } from '@reeeeecall/shared/lib/content-canonical'
 import type { ContentDetail } from '../../types/content-blocks'
 
 const mockArticle: ContentDetail = {
@@ -41,6 +42,28 @@ const mockArticle: ContentDetail = {
   created_at: '2025-01-01T00:00:00Z',
   updated_at: '2025-01-02T00:00:00Z',
 }
+
+describe('legacy multilingual canonicals', () => {
+  it('keeps Korean translations indexable when the stored canonical omits their language', () => {
+    const article = { ...mockArticle, locale: 'ko' }
+    const expected = `${SEO.SITE_URL}/insight/test-article?lang=ko`
+    expect(contentCanonicalUrl(SEO.SITE_URL, article.slug, article.locale, article.canonical_url)).toBe(expected)
+    expect(buildArticleJsonLd(article).mainEntityOfPage['@id']).toBe(expected)
+    expect(buildLearningResourceJsonLd(article).mainEntityOfPage['@id']).toBe(expected)
+  })
+
+  it('preserves a deliberate editorial canonical override', () => {
+    expect(contentCanonicalUrl(SEO.SITE_URL, 'test-article', 'ko', 'https://example.com/original')).toBe('https://example.com/original')
+  })
+
+  it('does not invent missing English and Korean translations', () => {
+    expect(buildHreflangAlternates('ko-only', ['ko'])).toEqual([
+      { lang: 'ko', href: `${SEO.SITE_URL}/insight/ko-only?lang=ko` },
+      { lang: 'x-default', href: `${SEO.SITE_URL}/insight/ko-only?lang=ko` },
+    ])
+    expect(buildHreflangAlternates('ja-only', ['ja'])).toEqual([])
+  })
+})
 
 describe('buildArticleJsonLd', () => {
   it('should include @type Article', () => {
@@ -73,9 +96,9 @@ describe('buildArticleJsonLd', () => {
     expect(result.publisher.logo['@type']).toBe('ImageObject')
   })
 
-  it('should include wordCount estimated from reading time', () => {
+  it('does not misrepresent reading time as a measured word count', () => {
     const result = buildArticleJsonLd(mockArticle)
-    expect(result.wordCount).toBe(1250) // 5 min * 250 wpm
+    expect(result.wordCount).toBeUndefined()
   })
 
   it('should include logo ImageObject with dimensions', () => {
@@ -327,11 +350,8 @@ describe('buildWebSiteJsonLd', () => {
     expect(result.url).toBe(SEO.SITE_URL)
   })
 
-  it('should include SearchAction for sitelinks searchbox', () => {
-    const result = buildWebSiteJsonLd()
-    expect(result.potentialAction['@type']).toBe('SearchAction')
-    expect(result.potentialAction.target).toContain(SEO.SITE_URL)
-    expect(result.potentialAction['query-input']).toBe('required name=search_term_string')
+  it('does not advertise a search action when the page has no search', () => {
+    expect(buildWebSiteJsonLd().potentialAction).toBeUndefined()
   })
 
   it('should derive inLanguage from SEO.INDEXABLE_LOCALES', () => {
@@ -487,7 +507,7 @@ describe('buildStaticHreflangAlternates', () => {
   it('should use correct URL pattern with lang query param', () => {
     const result = buildStaticHreflangAlternates('/')
     const defaultEntry = result.find((r) => r.lang === DEFAULT_LOCALE)
-    expect(defaultEntry?.href).toBe(`${SEO.SITE_URL}/?lang=${DEFAULT_LOCALE}`)
+    expect(defaultEntry?.href).toBe(`${SEO.SITE_URL}/`)
     const xDefault = result.find((r) => r.lang === 'x-default')
     expect(xDefault?.href).toBe(`${SEO.SITE_URL}/`)
   })

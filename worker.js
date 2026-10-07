@@ -12,7 +12,7 @@ import { handleSitemap, handleSitemapStatic, handleSitemapArticles, handleSitema
 import { handleRobots } from './worker-modules/seo/robots.js'
 import { handleRSSFeed } from './worker-modules/seo/feeds.js'
 import { getSupabaseAnonKey } from './worker-modules/seo/helpers.js'
-import { isUiLocale } from './worker-modules/locale-policy.js'
+import { isUiLocale, isIndexable } from './worker-modules/locale-policy.js'
 
 const SPA_BOT_PASSTHROUGH = new Set(['/privacy-policy', '/terms-of-service'])
 
@@ -122,6 +122,17 @@ export default {
     }
 
     // Static assets + SPA fallback
-    return env.ASSETS.fetch(request)
+    const response = await env.ASSETS.fetch(request)
+    if (response.headers.get('Content-Type')?.includes('text/html')) {
+      const headers = new Headers(response.headers)
+      const vary = headers.get('Vary')
+      headers.set('Vary', vary ? `${vary}, User-Agent` : 'User-Agent')
+      // These pages' locale is known without querying an article's fallback language.
+      if (/^\/(?:landing|insight)?$/.test(url.pathname) && isUiLocale(rawFeedLang) && !isIndexable(rawFeedLang)) {
+        headers.set('X-Robots-Tag', 'noindex, follow')
+      }
+      return new Response(response.body, { status: response.status, statusText: response.statusText, headers })
+    }
+    return response
   },
 }

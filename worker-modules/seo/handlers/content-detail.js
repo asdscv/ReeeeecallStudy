@@ -1,3 +1,4 @@
+import { contentCanonicalUrl } from '../../../packages/shared/lib/content-canonical.ts'
 // Content detail page bot handler — extracted from worker.js handleContentDetailBot
 import {
   SITE_URL, BRAND_NAME, DEFAULT_OG_IMAGE,
@@ -34,7 +35,7 @@ export async function handleContentDetailBot(slug, url, env) {
   try {
     const hdr = { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
     const localesRes = await fetch(
-      `${restUrl}/contents?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&select=locale`,
+      `${restUrl}/contents?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&select=locale&order=locale.asc`,
       { headers: hdr },
     )
     if (localesRes.ok) present = ((await localesRes.json()) || []).map((r) => r.locale)
@@ -86,7 +87,7 @@ export async function handleContentDetailBot(slug, url, env) {
   const articleSection = tags[0] || 'Education'
   const bodyHtml = renderBlocksToHtml(blocks)
 
-  const canonicalUrl = localizedUrl(`/insight/${slug}`, article.locale)
+  const canonicalUrl = contentCanonicalUrl(SITE_URL, slug, article.locale, article.canonical_url)
 
   // Build JSON-LD schemas
   const articleJsonLd = buildArticleJsonLd(article, slug)
@@ -125,7 +126,7 @@ ${feedLinks}
 ${hreflangTags}
 ${jsonLdScripts}`
 
-  const body = `<nav aria-label="breadcrumb"><ol><li><a href="${SITE_URL}">${BRAND_NAME}</a></li><li><a href="${SITE_URL}/insight">${LIST_TITLES[article.locale]?.split(' — ')[0] || 'Learning Insights'}</a></li><li>${escapeHtml(article.title)}</li></ol></nav>
+  const body = `<nav aria-label="breadcrumb"><ol><li><a href="${SITE_URL}">${BRAND_NAME}</a></li><li><a href="${localizedUrl('/insight', article.locale)}">${LIST_TITLES[article.locale]?.split(' — ')[0] || 'Learning Insights'}</a></li><li>${escapeHtml(article.title)}</li></ol></nav>
 <article data-speakable>
 <header>
 <h1>${escapeHtml(article.title)}</h1>
@@ -146,13 +147,13 @@ ${relatedArticles.length > 0 ? `<aside>
 <ul>
 ${relatedArticles.map((r) => {
   const rDate = r.published_at ? new Date(r.published_at).toISOString().split('T')[0] : ''
-  return `<li><a href="${SITE_URL}/insight/${escapeHtml(r.slug)}">${escapeHtml(r.title)}</a>${r.subtitle ? ` — ${escapeHtml(r.subtitle)}` : ''}${rDate ? ` <time datetime="${r.published_at}">(${rDate})</time>` : ''}</li>`
+  return `<li><a href="${localizedUrl(`/insight/${escapeHtml(r.slug)}`, article.locale)}">${escapeHtml(r.title)}</a>${r.subtitle ? ` — ${escapeHtml(r.subtitle)}` : ''}${rDate ? ` <time datetime="${r.published_at}">(${rDate})</time>` : ''}</li>`
 }).join('\n')}
 </ul>
 </aside>` : ''}
 <footer>
-<p><a href="${SITE_URL}/insight">← ${article.locale === 'ko' ? '더 많은 학습 인사이트' : 'More Learning Insights'}</a></p>
-<p><a href="${SITE_URL}/landing">${article.locale === 'ko' ? `${BRAND_NAME}에서 학습 시작하기` : `Start Learning with ${BRAND_NAME}`}</a></p>
+<p><a href="${localizedUrl('/insight', article.locale)}">← ${article.locale === 'ko' ? '더 많은 학습 인사이트' : 'More Learning Insights'}</a></p>
+<p><a href="${localizedUrl('/landing', article.locale)}">${article.locale === 'ko' ? `${BRAND_NAME}에서 학습 시작하기` : `Start Learning with ${BRAND_NAME}`}</a></p>
 </footer>`
 
   const html = buildHtmlDocument({ lang: article.locale, head, body, robots })

@@ -61,7 +61,7 @@ export async function handleContentListBot(url, env) {
   const articlesHtml = articles.map((a) => {
     const dateStr = a.published_at ? new Date(a.published_at).toISOString().split('T')[0] : ''
     return `<article>
-<h2><a href="${SITE_URL}/insight/${escapeHtml(a.slug)}">${escapeHtml(a.title)}</a></h2>
+<h2><a href="${localizedUrl(`/insight/${escapeHtml(a.slug)}`, lang)}">${escapeHtml(a.title)}</a></h2>
 ${a.subtitle ? `<p>${escapeHtml(a.subtitle)}</p>` : ''}
 <div>
 ${dateStr ? `<time datetime="${escapeHtml(a.published_at)}">${dateStr}</time>` : ''}

@@ -1,4 +1,5 @@
 import i18next from 'i18next'
+import { contentCanonicalUrl } from '@reeeeecall/shared/lib/content-canonical'
 import type { ContentDetail } from '../types/content-blocks'
 import { SEO } from './seo-config'
 import type {
@@ -46,7 +47,6 @@ export function buildArticleJsonLd(article: ContentDetail, relatedSlugs?: string
     },
     datePublished: article.published_at,
     dateModified: article.updated_at,
-    wordCount: Math.round(article.reading_time_minutes * 250),
     keywords: article.tags.join(', '),
     author: {
       '@type': 'Organization',
@@ -64,12 +64,12 @@ export function buildArticleJsonLd(article: ContentDetail, relatedSlugs?: string
         height: SEO.OG_IMAGE_HEIGHT,
       },
     },
-    url: insightUrl(article.slug, article.locale),
+    url: contentCanonicalUrl(SEO.SITE_URL, article.slug, article.locale, article.canonical_url),
     inLanguage: article.locale,
     isAccessibleForFree: true,
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': insightUrl(article.slug, article.locale),
+      '@id': contentCanonicalUrl(SEO.SITE_URL, article.slug, article.locale, article.canonical_url),
     },
   }
 
@@ -101,7 +101,7 @@ export function buildBreadcrumbJsonLd(article: ContentDetail): JsonLdBreadcrumbL
         '@type': 'ListItem',
         position: 3,
         name: article.title,
-        item: insightUrl(article.slug, article.locale),
+        item: contentCanonicalUrl(SEO.SITE_URL, article.slug, article.locale, article.canonical_url),
       },
     ],
   }
@@ -113,7 +113,7 @@ export function buildCollectionPageJsonLd(): JsonLdCollectionPage {
     '@type': 'CollectionPage',
     name: i18next.t('content:seo.listTitle'),
     description: i18next.t('content:seo.listDescription'),
-    url: `${SEO.SITE_URL}/insight`,
+    url: `${SEO.SITE_URL}/insight${i18next.language !== 'en' ? `?lang=${i18next.language}` : ''}`,
     image: {
       '@type': 'ImageObject',
       url: SEO.DEFAULT_OG_IMAGE,
@@ -134,7 +134,7 @@ export function buildCollectionPageJsonLd(): JsonLdCollectionPage {
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `${SEO.SITE_URL}/insight`,
+      '@id': `${SEO.SITE_URL}/insight${i18next.language !== 'en' ? `?lang=${i18next.language}` : ''}`,
     },
   }
 }
@@ -178,19 +178,20 @@ export function buildStaticHreflangAlternates(path: string): JsonLdHreflangAlter
   // Only indexable locales get hreflang — minor languages are noindex now.
   const alternates: JsonLdHreflangAlternate[] = SEO.INDEXABLE_LOCALES.map((locale) => ({
     lang: locale as string,
-    href: `${SEO.SITE_URL}${path}?lang=${locale}`,
+    href: `${SEO.SITE_URL}${path}${locale !== 'en' ? `?lang=${locale}` : ''}`,
   }))
   alternates.push({ lang: 'x-default', href: `${SEO.SITE_URL}${path}` })
   return alternates
 }
 
-export function buildHreflangAlternates(slug: string): JsonLdHreflangAlternate[] {
+export function buildHreflangAlternates(slug: string, availableLocales: readonly string[] = SEO.INDEXABLE_LOCALES): JsonLdHreflangAlternate[] {
   // Only indexable locales get hreflang — minor languages are noindex now.
-  const alternates: JsonLdHreflangAlternate[] = SEO.INDEXABLE_LOCALES.map((locale) => ({
+  const alternates: JsonLdHreflangAlternate[] = SEO.INDEXABLE_LOCALES.filter((locale) => availableLocales.includes(locale)).map((locale) => ({
     lang: locale as string,
-    href: `${SEO.SITE_URL}/insight/${slug}?lang=${locale}`,
+    href: insightUrl(slug, locale),
   }))
-  alternates.push({ lang: 'x-default', href: `${SEO.SITE_URL}/insight/${slug}` })
+  if (alternates.length === 0) return alternates
+  alternates.push({ lang: 'x-default', href: insightUrl(slug, availableLocales.includes('en') ? 'en' : alternates[0].lang) })
   return alternates
 }
 
@@ -229,11 +230,6 @@ export function buildWebSiteJsonLd(): JsonLdWebSite {
     url: SEO.SITE_URL,
     // inLanguage = indexable content languages only (mirrors the worker).
     inLanguage: [...SEO.INDEXABLE_LOCALES],
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: `${SEO.SITE_URL}/insight?q={search_term_string}`,
-      'query-input': 'required name=search_term_string',
-    },
   }
 }
 
@@ -313,7 +309,7 @@ export function buildLearningResourceJsonLd(article: ContentDetail): JsonLdLearn
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': insightUrl(article.slug, article.locale),
+      '@id': contentCanonicalUrl(SEO.SITE_URL, article.slug, article.locale, article.canonical_url),
     },
     speakable: {
       '@type': 'SpeakableSpecification',
