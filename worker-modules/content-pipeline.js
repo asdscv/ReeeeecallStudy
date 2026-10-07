@@ -1,3 +1,4 @@
+import { contentCanonicalUrl } from '../packages/shared/lib/content-canonical.ts'
 // Content generation pipeline orchestrator
 
 import { LOCALES, DEFAULT_LOCALE, PIPELINE_DEFAULTS } from './config.js'
@@ -234,7 +235,7 @@ async function generateForLocale(env, db, topic, locale, recentContent, sharedSl
     reading_time_minutes: article.reading_time_minutes || 5,
     thumbnail_url: thumbnailUrl || null,
     og_image_url: thumbnailUrl || null,
-    canonical_url: `${SITE_URL}/insight/${article.slug}`,
+    canonical_url: contentCanonicalUrl(SITE_URL, article.slug, locale),
     author_name: 'ReeeeecallStudy',
     is_published: true,
     published_at: new Date().toISOString(),

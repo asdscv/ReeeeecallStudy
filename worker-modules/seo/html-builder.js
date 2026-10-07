@@ -125,6 +125,7 @@ export function buildSeoResponse(html, { lang = 'en', cacheSeconds = 3600, robot
     'Content-Language': lang,
     'Cache-Control': `public, max-age=${cacheSeconds}, s-maxage=${cacheSeconds * 24}`,
     'X-Robots-Tag': robots,
+    'Vary': 'User-Agent',
   }
 
   if (lang) {

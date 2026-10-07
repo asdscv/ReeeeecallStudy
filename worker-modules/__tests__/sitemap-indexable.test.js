@@ -19,7 +19,7 @@ describe('handleSitemapArticles — indexable-only filtering', () => {
     const xml = await res.text()
 
     expect(xml).toContain('/insight/has-en</loc>')  // has en → included
-    expect(xml).toContain('/insight/ko-only</loc>')  // ko is indexable → included
+    expect(xml).toContain('/insight/ko-only?lang=ko</loc>')  // ko is indexable → included
     expect(xml).not.toContain('/insight/ja-only')    // ja-only → excluded entirely
 
     // hreflang for the multi-locale article: en yes, ja no (not indexable)

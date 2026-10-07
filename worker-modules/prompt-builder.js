@@ -57,14 +57,14 @@ Each block has "type" and "props":
 
 ## Rules
 
-- Generate 9 to 13 blocks total (aim high — thin articles do not rank)
+- Generate 9 to 13 blocks total
 - First block MUST be "hero", last block MUST be "cta"
 - Do NOT use "image", "blockquote", or "statistics" block types
 - **bold** and *italic* markdown is ONLY allowed inside "paragraph" blocks. All other block types must use plain text without any markdown formatting.
 - Mix different block types for visual variety
 - Use at least 3 different block types (besides hero and cta)
-- DEPTH REQUIREMENT (critical for ranking): the article MUST total at least 900 words of substantive body text. Every "paragraph" block must be 60-120 words of real explanation — never a single thin sentence. Every "numbered_list" / "feature_cards" item description must be a complete, specific sentence of 20+ words. Shallow, padded, or one-line content fails.
-- Include practical, actionable advice with CONCRETE specifics: a worked example, a step-by-step mini-scenario, a sample, or a do/don't comparison the reader can apply immediately. Generic advice that could apply to any topic is not acceptable.
+- DEPTH REQUIREMENT: the article MUST total at least 900 words of substantive body text. Every "paragraph" block must be 60-120 words of real explanation — never a single thin sentence. Every "numbered_list" / "feature_cards" item description must be a complete, specific sentence of 20+ words. Shallow, padded, or one-line content fails.
+- Include practical, actionable advice with CONCRETE specifics: a fully worked example with the input or question, the answer, and the reasoning, plus a step-by-step mini-scenario or do/don't comparison the reader can apply immediately. Clearly label illustrative practice as an example; never imply it is an official exam question. Generic advice that could apply to any topic is not acceptable.
 
 ## Content Reliability
 
@@ -75,9 +75,9 @@ Each block has "type" and "props":
 - Use general, qualitative descriptions instead of specific numbers (e.g., "research suggests significant improvement" instead of "studies show 85% improvement")
 - The CTA should naturally tie the article topic to ReeeeecallStudy's flashcard/SRS features
 
-## GEO Optimization (Generative Engine Optimization — CRITICAL for 2026 AI visibility)
+## Clear Answers and Reliable Explanations
 
-These techniques are proven by research (Princeton/Georgia Tech, KDD 2024) to increase AI citation rates by 40%+:
+Help readers understand and apply the topic. These writing choices do not guarantee search rankings or AI citations:
 
 1. **Question-first H2 headings**: Frame at least 2 section headings as questions that users might ask AI assistants (e.g., "Why Does Spaced Repetition Work?" instead of "How Spaced Repetition Works"). The first paragraph under each question heading MUST directly answer the question in under 40 words.
 
@@ -89,7 +89,7 @@ These techniques are proven by research (Princeton/Georgia Tech, KDD 2024) to in
 
 5. **Entity-centric writing**: Consistently name key concepts (e.g., always say "spaced repetition" not "this technique," always say "active recall" not "this method"). AI engines build knowledge graphs from consistent entity mentions.
 
-6. **Fluency optimization**: Write in clear, direct sentences. Avoid jargon without explanation. Each paragraph should convey ONE key idea. This improves AI extraction accuracy by 15-30%.
+6. **Fluency optimization**: Write in clear, direct sentences. Avoid jargon without explanation. Each paragraph should convey ONE key idea. Explain the topic accurately without claiming a measured improvement.
 
 ## SEO Guidelines
 

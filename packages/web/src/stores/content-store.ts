@@ -5,6 +5,7 @@ import i18n from '../i18n'
 import { toContentLocale, DEFAULT_LOCALE } from '../lib/locale-utils'
 
 const PAGE_SIZE = 12
+let detailRequestId = 0
 
 interface ContentState {
   // List
@@ -15,6 +16,7 @@ interface ContentState {
   cursor: { publishedAt: string; id: string } | null
 
   // Detail
+  availableContentLocales: string[]
   currentArticle: ContentDetail | null
   detailLoading: boolean
   detailError: string | null
@@ -36,6 +38,7 @@ export const useContentStore = create<ContentState>((set, get) => ({
   listError: null,
   cursor: null,
 
+  availableContentLocales: [],
   currentArticle: null,
   detailLoading: false,
   detailError: null,
@@ -94,39 +97,36 @@ export const useContentStore = create<ContentState>((set, get) => ({
   },
 
   fetchContentBySlug: async (slug: string) => {
-    set({ detailLoading: true, detailError: null, currentArticle: null })
-
+    const requestId = ++detailRequestId
+    set({ detailLoading: true, detailError: null, currentArticle: null, availableContentLocales: [] })
+    const { data: rows, error: localesError } = await supabase
+      .from('contents')
+      .select('locale')
+      .eq('slug', slug)
+      .eq('is_published', true)
+      .order('locale')
+    if (requestId !== detailRequestId) return
+    const availableContentLocales = (rows || []).map((row) => row.locale)
+    if (localesError || availableContentLocales.length === 0) {
+      set({ detailError: localesError?.message || 'Article not found', detailLoading: false })
+      return
+    }
     const currentLocale = toContentLocale(i18n.language)
-
-    // Try current locale first
-    let { data, error } = await supabase
+    const chosenLocale = availableContentLocales.includes(currentLocale) ? currentLocale
+      : availableContentLocales.includes(DEFAULT_LOCALE) ? DEFAULT_LOCALE : availableContentLocales[0]
+    const { data, error } = await supabase
       .from('contents')
       .select('*')
       .eq('slug', slug)
       .eq('is_published', true)
-      .eq('locale', currentLocale)
+      .eq('locale', chosenLocale)
       .single()
-
-    // Fallback to default locale if not found in current locale
-    if (error && currentLocale !== DEFAULT_LOCALE) {
-      const fallback = await supabase
-        .from('contents')
-        .select('*')
-        .eq('slug', slug)
-        .eq('is_published', true)
-        .eq('locale', DEFAULT_LOCALE)
-        .single()
-
-      data = fallback.data
-      error = fallback.error
-    }
-
+    if (requestId !== detailRequestId) return
     if (error) {
       set({ detailError: error.message, detailLoading: false })
       return
     }
-
-    set({ currentArticle: data as ContentDetail, detailLoading: false })
+    set({ currentArticle: data as ContentDetail, availableContentLocales, detailLoading: false })
   },
 
   fetchRelatedArticles: async (slug: string, tags: string[]) => {

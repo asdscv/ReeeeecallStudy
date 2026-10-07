@@ -1,6 +1,6 @@
 // Dynamic sitemap handler — sitemap index + sub-sitemaps
 import { SITE_URL, INDEXABLE_LOCALES } from './constants.js'
-import { escapeHtml, getSupabaseRestUrl, getSupabaseAnonKey } from './helpers.js'
+import { escapeHtml, getSupabaseRestUrl, getSupabaseAnonKey, localizedUrl } from './helpers.js'
 import { isIndexable } from '../locale-policy.js'
 
 const URLSET_HEADER = `<?xml version="1.0" encoding="UTF-8"?>
@@ -19,20 +19,16 @@ function xmlResponse(xml) {
 
 // Sitemap index — /sitemap.xml
 export async function handleSitemap() {
-  const today = new Date().toISOString().split('T')[0]
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
     <loc>${SITE_URL}/sitemap-static.xml</loc>
-    <lastmod>${today}</lastmod>
   </sitemap>
   <sitemap>
     <loc>${SITE_URL}/sitemap-articles.xml</loc>
-    <lastmod>${today}</lastmod>
   </sitemap>
   <sitemap>
     <loc>${SITE_URL}/sitemap-listings.xml</loc>
-    <lastmod>${today}</lastmod>
   </sitemap>
 </sitemapindex>`
   return xmlResponse(xml)
@@ -40,22 +36,12 @@ export async function handleSitemap() {
 
 // Static pages — /sitemap-static.xml
 export async function handleSitemapStatic() {
-  const xml = `${URLSET_HEADER}
-  <url>
-    <loc>${SITE_URL}/landing</loc>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-${INDEXABLE_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/landing?lang=${l}"/>`).join('\n')}
-    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/landing"/>
-  </url>
-  <url>
-    <loc>${SITE_URL}/insight</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-${INDEXABLE_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/insight?lang=${l}"/>`).join('\n')}
-    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/insight"/>
-  </url>
-</urlset>`
+  const entries = ['/landing', '/insight'].flatMap((path) => INDEXABLE_LOCALES.map((locale) => `  <url>
+    <loc>${escapeHtml(localizedUrl(path, locale))}</loc>
+${INDEXABLE_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${escapeHtml(localizedUrl(path, l))}"/>`).join('\n')}
+    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}${path}"/>
+  </url>`)).join('\n')
+  const xml = `${URLSET_HEADER}\n${entries}\n</urlset>`
   return xmlResponse(xml)
 }
 
@@ -66,26 +52,32 @@ export async function handleSitemapArticles(env) {
 
   let contentEntries = ''
 
+  if (!anonKey) return sitemapUnavailable()
   if (anonKey) {
     try {
-      const contentRes = await fetch(
-        `${restUrl}/contents?is_published=eq.true&select=slug,locale,updated_at,title,thumbnail_url,og_image_url&order=published_at.desc`,
-        { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } },
-      )
-      if (!contentRes.ok) {
-        console.error(`Sitemap articles fetch failed: ${contentRes.status}`)
-        return xmlResponse(`${URLSET_HEADER}\n</urlset>`)
+      // PostgREST caps each response at max_rows. Read bounded pages in a stable
+      // order, including every published indexable locale instead of just the newest slice.
+      const PAGE = 500
+      const articles = []
+      for (let offset = 0; ; offset += PAGE) {
+        const contentRes = await fetch(
+          `${restUrl}/contents?is_published=eq.true&locale=in.(${INDEXABLE_LOCALES.join(',')})`
+            + `&select=slug,locale,updated_at,title,thumbnail_url,og_image_url&order=published_at.desc,id.asc&offset=${offset}&limit=${PAGE}`,
+          { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } },
+        )
+        if (!contentRes.ok) throw new Error(`Sitemap articles fetch failed: ${contentRes.status}`)
+        const page = await contentRes.json()
+        if (!Array.isArray(page)) throw new Error('Invalid sitemap article response')
+        articles.push(...page)
+        if (page.length < PAGE) break
+        // Never replace a complete sitemap with a silently truncated one.
+        if (articles.length >= 50_000) throw new Error('Article sitemap needs partitioning')
       }
-      const contentData = await contentRes.json()
-      const articles = contentData || []
 
-      const slugMap = {}
+      const slugMap = Object.create(null)
       for (const a of articles) {
-        if (!slugMap[a.slug]) slugMap[a.slug] = { locales: {}, title: a.title, image: a.og_image_url || a.thumbnail_url }
-        slugMap[a.slug].locales[a.locale] = a.updated_at
-        if (!slugMap[a.slug].image && (a.og_image_url || a.thumbnail_url)) {
-          slugMap[a.slug].image = a.og_image_url || a.thumbnail_url
-        }
+        if (!slugMap[a.slug]) slugMap[a.slug] = { locales: {} }
+        slugMap[a.slug].locales[a.locale] = a
       }
 
       for (const [slug, info] of Object.entries(slugMap)) {
@@ -94,25 +86,38 @@ export async function handleSitemapArticles(env) {
         // for indexable locales only (minor languages are noindex now).
         const indexableLocales = existingLocales.filter(isIndexable)
         if (indexableLocales.length === 0) continue
-        const lastmod = Object.values(info.locales).sort().pop()
-        const imageTag = info.image
-          ? `\n    <image:image>\n      <image:loc>${escapeHtml(info.image)}</image:loc>\n      <image:title>${escapeHtml(info.title)}</image:title>\n    </image:image>`
-          : ''
-        contentEntries += `  <url>
-    <loc>${SITE_URL}/insight/${slug}</loc>
-    <lastmod>${new Date(lastmod).toISOString().split('T')[0]}</lastmod>
+        const path = `/insight/${encodeURIComponent(slug)}`
+        const defaultUrl = localizedUrl(path, indexableLocales.includes('en') ? 'en' : indexableLocales[0])
+        for (const locale of indexableLocales) {
+          const article = info.locales[locale]
+          const image = article.og_image_url || article.thumbnail_url
+          const imageTag = image
+            ? `\n    <image:image>\n      <image:loc>${escapeHtml(image)}</image:loc>\n      <image:title>${escapeHtml(article.title)}</image:title>\n    </image:image>`
+            : ''
+          contentEntries += `  <url>
+    <loc>${escapeHtml(localizedUrl(path, locale))}</loc>
+    <lastmod>${new Date(article.updated_at).toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>${imageTag}
-${indexableLocales.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${SITE_URL}/insight/${slug}?lang=${l}"/>`).join('\n')}
-    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/insight/${slug}"/>
+${indexableLocales.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${escapeHtml(localizedUrl(path, l))}"/>`).join('\n')}
+    <xhtml:link rel="alternate" hreflang="x-default" href="${escapeHtml(defaultUrl)}"/>
   </url>\n`
+        }
       }
     } catch (err) {
       console.error('Sitemap articles error:', err)
+      return sitemapUnavailable()
     }
   }
 
   return xmlResponse(`${URLSET_HEADER}\n${contentEntries}</urlset>`)
+}
+
+function sitemapUnavailable() {
+  return new Response('Sitemap temporarily unavailable', {
+    status: 503,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store', 'Retry-After': '60' },
+  })
 }
 
 // Marketplace listings — /sitemap-listings.xml

@@ -33,7 +33,7 @@ export interface JsonLdArticle {
   image: JsonLdImageObject
   datePublished: string
   dateModified: string
-  wordCount: number
+  wordCount?: number
   keywords: string
   author: JsonLdOrganization
   publisher: JsonLdOrganization & { logo: JsonLdImageObject }
@@ -118,7 +118,7 @@ export interface JsonLdWebSite {
   name: string
   url: string
   inLanguage: string[]
-  potentialAction: JsonLdSearchAction
+  potentialAction?: JsonLdSearchAction
 }
 
 export interface JsonLdAnswer {
