@@ -25,6 +25,22 @@ export function createSupabaseClient(env) {
     return res.json()
   }
 
+  // Newest first: prod caps a response at 1,000 rows, and an old query falling off the
+  // end is the cheapest thing to lose (its own page already earns its clicks by then).
+  async function getTargetedQueries() {
+    const url = `${restUrl}/contents?select=target_query&target_query=not.is.null&order=created_at.desc&limit=1000`
+    const res = await fetch(url, {
+      headers: {
+        apikey: config.serviceKey,
+        Authorization: `Bearer ${config.serviceKey}`,
+      },
+    })
+    if (!res.ok) {
+      throw new Error(`Failed to fetch targeted queries: ${res.status} - ${await res.text()}`)
+    }
+    return (await res.json()).map((r) => r.target_query)
+  }
+
   async function insertContent(article) {
     const url = `${restUrl}/contents`
     const res = await fetch(url, {
@@ -73,5 +89,5 @@ export function createSupabaseClient(env) {
     return publicUrl
   }
 
-  return { getRecentContent, insertContent, uploadImage }
+  return { getRecentContent, getTargetedQueries, insertContent, uploadImage }
 }

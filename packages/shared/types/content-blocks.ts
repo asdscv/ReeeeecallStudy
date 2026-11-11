@@ -1,6 +1,10 @@
 // Content block type definitions for the block-based content system
 // AI generates content as an array of these blocks
 
+import type { AppCtaBlock } from '../lib/content-drop-off'
+
+export type { AppCtaBlock }
+
 export type ContentBlock =
   | HeroBlock
   | ParagraphBlock
@@ -13,6 +17,7 @@ export type ContentBlock =
   | ImageBlock
   | DividerBlock
   | CtaBlock
+  | AppCtaBlock
 
 export interface HeroBlock {
   type: 'hero'

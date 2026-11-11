@@ -1,8 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-// 앱 스토어 링크 — 단일 출처
-export const APP_STORE_URL = 'https://apps.apple.com/kr/app/reeeeecallstudy/id6761741123'
-export const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.reeeeecall.study'
+import { APP_STORE_URL, PLAY_STORE_URL } from '@reeeeecall/shared/lib/app-store-links'
 
 function AppleIcon({ className }: { className?: string }) {
   return (
@@ -23,12 +21,13 @@ function GooglePlayIcon({ className }: { className?: string }) {
   )
 }
 
-function StoreBadge({ href, icon, line1, line2 }: { href: string; icon: React.ReactNode; line1: string; line2: string }) {
+function StoreBadge({ href, icon, line1, line2, onClick }: { href: string; icon: React.ReactNode; line1: string; line2: string; onClick?: () => void }) {
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={onClick}
       className="inline-flex items-center gap-2.5 rounded-xl bg-foreground px-4 py-2.5 text-background no-underline transition hover:opacity-90"
     >
       <span className="shrink-0">{icon}</span>
@@ -45,25 +44,38 @@ interface AppDownloadProps {
   showQr?: boolean
 }
 
-export function AppDownload({ showQr = false }: AppDownloadProps) {
-  const { t } = useTranslation('common')
+interface StoreBadgesProps {
+  appStoreHref?: string
+  playStoreHref?: string
+  onClick?: (store: 'ios' | 'android') => void
+}
 
-  const badges = (
+export function StoreBadges({ appStoreHref = APP_STORE_URL, playStoreHref = PLAY_STORE_URL, onClick }: StoreBadgesProps) {
+  const { t } = useTranslation('common')
+  return (
     <div className="flex flex-wrap gap-3">
       <StoreBadge
-        href={APP_STORE_URL}
+        href={appStoreHref}
         icon={<AppleIcon className="w-6 h-6" />}
         line1={t('appDownload.appStorePrefix', 'Download on the')}
         line2={t('appDownload.appStore', 'App Store')}
+        onClick={onClick && (() => onClick('ios'))}
       />
       <StoreBadge
-        href={PLAY_STORE_URL}
+        href={playStoreHref}
         icon={<GooglePlayIcon className="w-6 h-6" />}
         line1={t('appDownload.playStorePrefix', 'GET IT ON')}
         line2={t('appDownload.playStore', 'Google Play')}
+        onClick={onClick && (() => onClick('android'))}
       />
     </div>
   )
+}
+
+export function AppDownload({ showQr = false }: AppDownloadProps) {
+  const { t } = useTranslation('common')
+
+  const badges = <StoreBadges />
 
   if (!showQr) {
     return (

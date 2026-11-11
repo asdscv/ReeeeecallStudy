@@ -16,6 +16,7 @@ import {
   buildOrganizationJsonLd,
 } from '../json-ld.js'
 import { renderBlocksToHtml } from '../content-renderer.js'
+import { withDropOffCtas } from '../../../packages/shared/lib/content-drop-off.ts'
 import { buildHtmlDocument, buildMetaTags, buildSeoResponse, renderJsonLd } from '../html-builder.js'
 import { INDEXABLE_LOCALES, isIndexable, isUiLocale, DEFAULT_LOCALE } from '../../locale-policy.js'
 
@@ -85,7 +86,7 @@ export async function handleContentDetailBot(slug, url, env) {
   const ogImage = article.og_image_url || article.thumbnail_url || DEFAULT_OG_IMAGE
   const tags = article.tags || []
   const articleSection = tags[0] || 'Education'
-  const bodyHtml = renderBlocksToHtml(blocks)
+  const bodyHtml = renderBlocksToHtml(withDropOffCtas(blocks, slug))
 
   const canonicalUrl = contentCanonicalUrl(SITE_URL, slug, article.locale, article.canonical_url)
 

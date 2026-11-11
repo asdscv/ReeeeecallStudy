@@ -11,6 +11,7 @@ import { FooterSection } from '../components/landing/FooterSection'
 import { buildArticleJsonLd, buildBreadcrumbJsonLd, buildHreflangAlternates, buildLearningResourceJsonLd } from '../lib/content-seo'
 import { SEO } from '../lib/seo-config'
 import { contentCanonicalUrl } from '@reeeeecall/shared/lib/content-canonical'
+import { withDropOffCtas } from '@reeeeecall/shared/lib/content-drop-off'
 
 
 export function ContentDetailPage() {
@@ -98,7 +99,7 @@ export function ContentDetailPage() {
       />
 
       <article className="max-w-3xl mx-auto px-4 py-10 sm:py-16" data-speakable>
-        <BlockRenderer blocks={currentArticle.content_blocks} />
+        <BlockRenderer blocks={withDropOffCtas(currentArticle.content_blocks, currentArticle.slug)} />
       </article>
 
       {relatedArticles.length > 0 && (

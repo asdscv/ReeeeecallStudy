@@ -16,8 +16,13 @@
     "XAI_MODEL": "grok-3-mini",
     "XAI_BASE_URL": "https://api.x.ai/v1"
   },
-  // AI content generation: daily at 6:00 AM UTC
+  // AI content generation: daily at 6:00 AM UTC, one article (en + ko)
   // Secrets needed: wrangler secret put XAI_API_KEY / SUPABASE_SERVICE_KEY
+  // Keyword planner (topic = a Search Console query with impressions but no clicks). Without
+  // these the pipeline falls back to AI-invented topics:
+  //   wrangler secret put GSC_SERVICE_ACCOUNT_JSON   (service account key JSON; add its email as a user on the property)
+  //   wrangler secret put TYPESAFE_API_KEY           (Jev — judges which query to write about)
+  //   GSC_SITE_URL var only if the property is not sc-domain:reeeeecallstudy.xyz
   "triggers": {
     "crons": ["0 6 * * *"]
   },
