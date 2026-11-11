@@ -265,6 +265,17 @@ async function generateForLocale(env, db, topic, locale, recentContent, sharedSl
     ...(topic.targetQuery ? { target_query: topic.targetQuery } : {}),
   }
 
-  const inserted = await db.insertContent(record)
+  // Dedup only sees the latest 100 rows; an older (or pruned, unpublished) row can still own
+  // this slug+locale, and the unique index turns that into a lost article.
+  let inserted
+  try {
+    inserted = await db.insertContent(record)
+  } catch (err) {
+    if (!/insert failed: 409/.test(err.message)) throw err
+    record.slug = appendDateSuffix(record.slug)
+    record.canonical_url = contentCanonicalUrl(SITE_URL, record.slug, locale)
+    info('Slug taken by an older row, retrying with date suffix', { slug: record.slug, locale })
+    inserted = await db.insertContent(record)
+  }
   return inserted
 }
