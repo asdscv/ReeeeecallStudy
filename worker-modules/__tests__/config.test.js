@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { PIPELINE_DEFAULTS, LOCALES } from '../config.js'
 
 describe('PIPELINE_DEFAULTS', () => {
-  it('topicsPerRun is 5', () => {
-    expect(PIPELINE_DEFAULTS.topicsPerRun).toBe(5)
+  it('topicsPerRun is 1 — one article a day', () => {
+    expect(PIPELINE_DEFAULTS.topicsPerRun).toBe(1)
   })
 
   it('topicGenerationCount is 8', () => {

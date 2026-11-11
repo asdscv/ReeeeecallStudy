@@ -121,6 +121,31 @@ const LOCALE_INSTRUCTIONS = {
   es: 'Write the entire article in Spanish (Español). The slug must remain in English lowercase kebab-case. All other fields (title, subtitle, meta_title, meta_description, tags, and all content_blocks text) must be in Spanish. For SEO: use Spanish keywords that Spanish-speaking users would search on Google. meta_title and meta_description must be in Spanish.',
 }
 
+const FORMAT_INSTRUCTIONS = {
+  guide: 'Format: a step-by-step guide. Lead with the direct answer, then numbered steps the reader can follow today.',
+  comparison: 'Format: a comparison. Put the options the searcher is weighing side by side (methods, exams, levels, schedules), say which fits which kind of learner, and end with a clear recommendation. Never name or compare other apps, websites or companies — compare methods and approaches only.',
+  explainer: 'Format: an explainer. Define the thing plainly in the first two sentences, then explain how it works and how a learner applies it.',
+}
+
+// The page exists to answer one query Google already shows us for, so the query must be
+// unmistakable on the page — and the page must not drift into a generic study article.
+function searchQuerySection(topic, locale) {
+  if (!topic.targetQuery) return ''
+  const q = topic.targetQuery
+  const placement = topic.queryLocale === locale
+    ? `- Use the exact phrase "${q}" verbatim in the hero title, in meta_title (near the start), in the first paragraph, and in at least one H2.`
+    : `- The query is in another language. Write this edition for someone with the same need searching in this article's language: use the phrase a native speaker would actually type into Google, in the hero title, meta_title, first paragraph and one H2.`
+  return `\n\n## Search Query This Page Must Answer
+
+Real people typed this exact query into Google: "${q}". Google already shows our site for it, but none of our pages answers it, so nobody clicks. This article is that page.
+
+${placement}
+- The first paragraph must answer the query directly, in under 40 words.
+- Stay on this query from start to finish. Do not widen it into a general article about studying.
+
+${FORMAT_INSTRUCTIONS[topic.format] || FORMAT_INSTRUCTIONS.guide}`
+}
+
 export function buildPrompt(topic, locale, options = {}) {
   const { previousTitles = [] } = options
 
@@ -149,6 +174,6 @@ Write a unique, insightful article about "${topic.titleHint}" within the "${topi
 
   return {
     system: SYSTEM_PROMPT,
-    user: `${topicContext}${titleAvoidance}\n\n## Language\n\n${localeInstruction}`,
+    user: `${topicContext}${searchQuerySection(topic, locale)}${titleAvoidance}\n\n## Language\n\n${localeInstruction}`,
   }
 }

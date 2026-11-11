@@ -10,6 +10,7 @@ import { HighlightBoxBlock } from './HighlightBoxBlock'
 import { ImageBlock } from './ImageBlock'
 import { DividerBlock } from './DividerBlock'
 import { CtaBlock } from './CtaBlock'
+import { AppCtaBlock } from './AppCtaBlock'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const BLOCK_REGISTRY: Record<string, ComponentType<{ props: any }>> = {
@@ -24,4 +25,5 @@ export const BLOCK_REGISTRY: Record<string, ComponentType<{ props: any }>> = {
   image: ImageBlock,
   divider: DividerBlock,
   cta: CtaBlock,
+  app_cta: AppCtaBlock,
 }

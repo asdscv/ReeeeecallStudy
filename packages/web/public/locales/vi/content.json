@@ -22,5 +22,16 @@
     "listTitle": "Bài viết học tập | ReeeCall",
     "listDescription": "Khám phá chiến lược học tập dựa trên khoa học và mẹo lặp lại ngắt quãng.",
     "breadcrumbInsights": "Bài viết học tập"
+  },
+  "appCta": {
+    "answer": {
+      "title": "Đọc một lần, rồi sẽ quên nhanh",
+      "description": "Hãy biến hướng dẫn này thành thẻ ghi nhớ. Lặp lại ngắt quãng đưa mỗi thẻ quay lại ngay trước khi bạn quên — miễn phí trên iPhone, Android và web."
+    },
+    "wrap_up": {
+      "title": "Ghi nhớ thật lâu",
+      "description": "Đưa những gì bạn vừa đọc vào thẻ ghi nhớ và ôn vài phút mỗi ngày. Mỗi thẻ sẽ quay lại ngay trước khi bạn quên."
+    },
+    "web": "Bắt đầu miễn phí trên web"
   }
 }

@@ -1,4 +1,5 @@
 import { escapeHtml } from './helpers.js'
+import { APP_STORE_URL, playStoreUrlWithReferrer } from '../../packages/shared/lib/app-store-links.ts'
 
 export function renderBlocksToHtml(blocks, { articleTitle } = {}) {
   const parts = []
@@ -36,6 +37,11 @@ export function renderBlocksToHtml(blocks, { articleTitle } = {}) {
       case 'image': {
         const alt = p.alt || p.caption || articleTitle || ''
         parts.push(`<figure>${p.src ? `<img src="${escapeHtml(p.src)}" alt="${escapeHtml(alt)}" loading="lazy">` : ''}${p.caption ? `<figcaption>${escapeHtml(p.caption)}</figcaption>` : ''}</figure>`)
+        break
+      }
+      case 'app_cta': {
+        const play = playStoreUrlWithReferrer({ source: 'blog', medium: 'app_cta', campaign: p.campaign || '', content: p.position })
+        parts.push(`<aside><a href="${escapeHtml(APP_STORE_URL)}">App Store</a> · <a href="${escapeHtml(play)}">Google Play</a></aside>`)
         break
       }
       case 'cta':

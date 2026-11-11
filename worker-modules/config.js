@@ -8,8 +8,10 @@ import { GENERATED_LOCALES, DEFAULT_LOCALE as POLICY_DEFAULT_LOCALE } from './lo
 export const LOCALES = GENERATED_LOCALES
 export const DEFAULT_LOCALE = POLICY_DEFAULT_LOCALE
 
+// One article a day, on purpose: Google rewards a steady stream of pages that each answer
+// a real query far more than a flood of generated ones (see DOCS/GROWTH/2026-11-11-web-search-keyword-loop.md).
 export const PIPELINE_DEFAULTS = {
-  topicsPerRun: 5,
+  topicsPerRun: 1,
   maxExtraTopics: 3,
   maxBlocks: 13,
   minBlocks: 7,
@@ -17,6 +19,19 @@ export const PIPELINE_DEFAULTS = {
   recentContentLimit: 100,
   maxValidationRetries: 3,
   topicGenerationCount: 8,
+}
+
+// "Impressions but no clicks" over the last 28 finalized days of Search Console data.
+export const KEYWORD_PLANNER = {
+  windowDays: 28,
+  minImpressions: 20,
+  maxClicks: 0,
+  // Already near the top with zero clicks is a snippet problem, not a missing page.
+  minPosition: 8,
+  maxCandidates: 25,
+  // Writing an off-topic page costs a day's slot and site quality, so require a clear yes.
+  minFit: 0.6,
+  maxBrand: 0.5,
 }
 
 export const RETRY_DELAYS = [1000, 3000, 8000]

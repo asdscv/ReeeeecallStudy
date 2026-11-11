@@ -22,5 +22,16 @@
     "listTitle": "Learning Insights | ReeeCall",
     "listDescription": "Discover science-backed learning strategies and spaced repetition tips.",
     "breadcrumbInsights": "Learning Insights"
+  },
+  "appCta": {
+    "answer": {
+      "title": "Read it once, and it fades",
+      "description": "Turn this guide into flashcards. Spaced repetition brings each card back right before you'd forget it — free on iPhone, Android and the web."
+    },
+    "wrap_up": {
+      "title": "Make it stick",
+      "description": "Put what you just read into flashcards and review a few minutes a day. Each card comes back just before you'd forget it."
+    },
+    "web": "Start free on the web"
   }
 }

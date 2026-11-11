@@ -4,6 +4,7 @@ import { contentCanonicalUrl } from '../packages/shared/lib/content-canonical.ts
 import { LOCALES, DEFAULT_LOCALE, PIPELINE_DEFAULTS } from './config.js'
 import { createLogger, info, warn, error } from './logger.js'
 import { generateTopics } from './topic-generator.js'
+import { planKeywordTopic } from './keyword-planner.js'
 import { selectTopic } from './topic-registry.js'
 import { buildPrompt } from './prompt-builder.js'
 import { callAI, generateImage } from './ai-client.js'
@@ -41,27 +42,33 @@ export async function runContentPipeline(env, cron) {
       primaryTitles: [],
     }
 
-    // 2. Generate topics via AI (replaces static topic selection)
-    let topics
+    // 2. Today's topic: a real query Google already shows us for but nobody clicks
+    //    (Search Console). AI-generated topics only when there is none or it fails.
+    const topics = []
     try {
-      topics = await generateTopics(env, recentContent, PIPELINE_DEFAULTS.topicGenerationCount)
-      info('AI topics generated', { count: topics.length })
-    } catch (err) {
-      warn('Topic generation failed, using static fallback', { error: err.message })
-      const recentTags = recentContent.flatMap(c => c.tags || [])
-      const usedSubtopicIds = [...new Set(recentTags)]
-      topics = []
-      for (let i = 0; i < topicCount; i++) {
-        topics.push(selectTopic([...usedSubtopicIds, ...topics.map(t => t.id)]))
+      const planned = await planKeywordTopic(env, db)
+      if (planned) {
+        topics.push(planned)
+        info('Keyword topic planned', { query: planned.targetQuery, locale: planned.queryLocale, format: planned.format })
       }
+    } catch (err) {
+      warn('Keyword planner failed, falling back to AI topics', { error: err.message })
     }
 
     let topicsAttempted = 0
+    let aiTopicsLoaded = false
 
-    // Iterate over pre-generated topics
-    for (const topic of topics) {
+    for (let i = 0; ; i++) {
       const allMet = LOCALES.every(l => successCount[l] >= topicCount)
       if (allMet) break
+
+      if (i >= topics.length) {
+        if (aiTopicsLoaded) break
+        aiTopicsLoaded = true
+        topics.push(...await loadAiTopics(env, recentContent, topicCount))
+        if (i >= topics.length) break
+      }
+      const topic = topics[i]
 
       topicsAttempted++
 
@@ -166,6 +173,22 @@ export async function runContentPipeline(env, cron) {
   }
 }
 
+async function loadAiTopics(env, recentContent, topicCount) {
+  try {
+    const topics = await generateTopics(env, recentContent, PIPELINE_DEFAULTS.topicGenerationCount)
+    info('AI topics generated', { count: topics.length })
+    return topics
+  } catch (err) {
+    warn('Topic generation failed, using static fallback', { error: err.message })
+    const usedSubtopicIds = [...new Set(recentContent.flatMap(c => c.tags || []))]
+    const topics = []
+    for (let i = 0; i < topicCount; i++) {
+      topics.push(selectTopic([...usedSubtopicIds, ...topics.map(t => t.id)]))
+    }
+    return topics
+  }
+}
+
 function buildImagePrompt(topic) {
   return `A modern, clean editorial illustration for a blog article about "${topic.titleHint}" in the context of ${topic.category}. Abstract, minimal style with soft gradients and geometric shapes. No text, no letters, no words. Professional, educational tone. Vibrant but not overwhelming colors.`
 }
@@ -239,6 +262,7 @@ async function generateForLocale(env, db, topic, locale, recentContent, sharedSl
     author_name: 'ReeeeecallStudy',
     is_published: true,
     published_at: new Date().toISOString(),
+    ...(topic.targetQuery ? { target_query: topic.targetQuery } : {}),
   }
 
   const inserted = await db.insertContent(record)
