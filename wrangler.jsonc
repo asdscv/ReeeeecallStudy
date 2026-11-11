@@ -13,7 +13,7 @@
   // SUPABASE_ANON_KEY set via: wrangler secret put SUPABASE_ANON_KEY
   "vars": {
     "SUPABASE_URL": "https://ixdapelfikaneexnskfm.supabase.co",
-    "XAI_MODEL": "grok-3-mini",
+    "XAI_MODEL": "grok-4.20-non-reasoning",
     "XAI_BASE_URL": "https://api.x.ai/v1"
   },
   // AI content generation: daily at 6:00 AM UTC, one article (en + ko)
@@ -46,7 +46,7 @@
       },
       "vars": {
         "SUPABASE_URL": "https://ixdapelfikaneexnskfm.supabase.co",
-        "XAI_MODEL": "grok-3-mini",
+        "XAI_MODEL": "grok-4.20-non-reasoning",
         "XAI_BASE_URL": "https://api.x.ai/v1"
       },
       "triggers": {

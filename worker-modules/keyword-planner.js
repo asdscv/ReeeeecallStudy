@@ -40,7 +40,7 @@ export function findOpportunities(rows, alreadyTargeted, opts = KEYWORD_PLANNER)
     .filter((r) => normalizeQuery(r.query) !== '')
     .filter((r) => r.impressions >= opts.minImpressions && r.clicks <= opts.maxClicks && r.position >= opts.minPosition)
     .filter((r) => !seen.has(normalizeQuery(r.query)))
-    .sort((a, b) => b.impressions - a.impressions)
+    .sort((a, b) => b.impressions - a.impressions || a.position - b.position)
     .slice(0, opts.maxCandidates)
 }
 
@@ -105,13 +105,14 @@ export function chooseKeyword(candidates, answers, opts = KEYWORD_PLANNER) {
     .filter((j) => j.brand < opts.maxBrand)
     .filter((j) => GENERATED_LOCALES.includes(j.locale))
     .filter((j) => Object.hasOwn(ARTICLE_FORMATS, j.format))
-    .sort((a, b) => b.score - a.score)
+    // At one or two impressions per query, ties are common: prefer the page Google already ranks higher.
+    .sort((a, b) => b.score - a.score || a.position - b.position)
   return { pick: eligible[0] || null, judged }
 }
 
 export function topicFromKeyword(pick) {
   return {
-    id: slugify(pick.query) || `search-query-${Date.now()}`,
+    id: slugify(pick.query).replace(/^-+|-+$/g, '') || `search-query-${Date.now()}`,
     category: 'exam preparation and studying',
     titleHint: pick.query,
     keywords: [pick.query],

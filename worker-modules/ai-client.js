@@ -27,7 +27,8 @@ export async function callAI(env, systemPrompt, userPrompt) {
     ],
     response_format: { type: 'json_object' },
     temperature: 0.8,
-    max_tokens: 4096,
+    // An 18-block Korean guide is ~4k tokens of JSON; a cut-off reply fails to parse.
+    max_tokens: 8192,
   }
 
   let lastError = null
