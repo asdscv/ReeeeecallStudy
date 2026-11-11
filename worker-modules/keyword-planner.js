@@ -78,7 +78,22 @@ export function findOpportunities(rows, alreadyTargeted, opts = KEYWORD_PLANNER)
     .slice(0, opts.maxCandidates)
 }
 
-export function buildKeywordJevRequest(candidates) {
+/** Distinct queries and titles of pages the planner already wrote, newest first. */
+export function writtenPages(history, limit = KEYWORD_PLANNER.maxWrittenForComparison) {
+  const seen = new Set()
+  const out = []
+  for (const h of history) {
+    for (const text of [h.target_query, h.title]) {
+      const key = queryKey(text)
+      if (!key || seen.has(key)) continue
+      seen.add(key)
+      out.push(String(text).trim())
+    }
+  }
+  return out.slice(0, limit)
+}
+
+export function buildKeywordJevRequest(candidates, written = []) {
   const languageCriteria = {}
   for (const l of GENERATED_LOCALES) languageCriteria[l] = LANGUAGE_NAMES[l] || l
   languageCriteria.other = 'Any other language, or a mix with no clear main language.'
@@ -108,6 +123,27 @@ export function buildKeywordJevRequest(candidates) {
       instructions: `Which ready-made flashcard deck would directly give a person who typed ${q} what they are looking for?`,
       criteria: { ...DECK_TYPES },
     }
+    if (written.length > 0) {
+      questions[`dup_${i}`] = {
+        type: 'noul',
+        instructions: `Would a page written for ${q} answer the same search need as a page we have already published? \`written\` lists the target queries and titles of our published pages.`,
+        criteria: {
+          true: {
+            meaning: 'The same need as one of `written`, only worded differently.',
+            includes: ['the same need in another language (jlpt n2 grammar = jlpt n2 문법)', 'a synonym or rephrasing (toeic 800 words list = 토익 800점 단어)'],
+          },
+          false: {
+            meaning: 'A different need from every page in `written`.',
+            includes: [
+              'a different exam',
+              'a different score or level of the same exam (toeic 900 words ≠ toeic 800 words)',
+              'a different section or question type of the same exam (ielts map vocabulary ≠ ielts process diagram)',
+              'a different skill (writing vs vocabulary vs listening)',
+            ],
+          },
+        },
+      }
+    }
     questions[`format_${i}`] = {
       type: 'choice',
       instructions: `What kind of page would best answer ${q}?`,
@@ -117,7 +153,7 @@ export function buildKeywordJevRequest(candidates) {
 
   return {
     model: JEV_MODEL,
-    state: { site: SITE, candidates: candidates.map((c) => ({ query: c.query })) },
+    state: { site: SITE, candidates: candidates.map((c) => ({ query: c.query })), ...(written.length > 0 ? { written } : {}) },
     questions,
   }
 }
@@ -166,19 +202,22 @@ export function familyForQuery(deckType, query) {
 }
 
 /** Combine the numbers with Jev's judgments: impressions × fit, after the hard exclusions. */
-export function chooseKeyword(candidates, answers, opts = KEYWORD_PLANNER) {
+export function chooseKeyword(candidates, answers, opts = KEYWORD_PLANNER, { comparedWithWritten = false } = {}) {
   const judged = candidates.map((c, i) => {
     const fit = noulOf(answers[`fit_${i}`]) ?? 0
     const brand = noulOf(answers[`brand_${i}`]) ?? 1
+    // Asked but unanswered counts as a duplicate: a skipped day is cheaper than a second page.
+    const duplicate = comparedWithWritten ? (noulOf(answers[`dup_${i}`]) ?? 1) : 0
     const locale = choiceOf(answers[`lang_${i}`])
     const format = choiceOf(answers[`format_${i}`])
     const family = familyForQuery(choiceOf(answers[`deck_${i}`]), c.query)
     const deckFamily = family ? formatDeckFamily(family) : null
-    return { ...c, fit, brand, locale, format, deckFamily, score: c.impressions * fit * (deckFamily ? DECK_BOOST : 1) }
+    return { ...c, fit, brand, duplicate, locale, format, deckFamily, score: c.impressions * fit * (deckFamily ? DECK_BOOST : 1) }
   })
   const eligible = judged
     .filter((j) => j.fit >= opts.minFit)
     .filter((j) => j.brand < opts.maxBrand)
+    .filter((j) => j.duplicate < (opts.maxDuplicate ?? 0.5))
     .filter((j) => GENERATED_LOCALES.includes(j.locale))
     .filter((j) => Object.hasOwn(ARTICLE_FORMATS, j.format))
     // At one or two impressions per query, ties are common: prefer the page Google already ranks higher.
@@ -231,8 +270,11 @@ export const DECK_GUIDES = [
 
 /** The next deck guide not yet written, or null once every family has its page. */
 export async function planDeckTopic(db) {
-  const targeted = new Set((await db.getTargetedQueries()).map(queryKey))
-  const next = DECK_GUIDES.find((g) => !targeted.has(queryKey(g.query)))
+  const history = await db.getPlannedArticles()
+  const targeted = new Set(history.map((h) => queryKey(h.target_query)))
+  // A Search Console page may already lead to this deck — one page per deck family.
+  const covered = new Set(history.map((h) => h.deck_family).filter(Boolean))
+  const next = DECK_GUIDES.find((g) => !targeted.has(queryKey(g.query)) && !covered.has(g.family))
   if (!next) return null
   return {
     ...topicFromKeyword({ query: next.query, locale: next.queryLocale, format: 'guide', deckFamily: next.family }),
@@ -255,21 +297,22 @@ export async function planKeywordTopic(env, db, { now = new Date() } = {}) {
     return null
   }
 
-  const [rows, targeted] = await Promise.all([
+  const [rows, history] = await Promise.all([
     fetchSearchQueries(gsc, { now, days: KEYWORD_PLANNER.windowDays }),
-    db.getTargetedQueries(),
+    db.getPlannedArticles(),
   ])
-  const candidates = findOpportunities(rows, targeted)
-  info('Keyword planner: opportunities', { queries: rows.length, alreadyTargeted: targeted.length, candidates: candidates.length })
+  const candidates = findOpportunities(rows, history.map((h) => h.target_query))
+  const written = writtenPages(history)
+  info('Keyword planner: opportunities', { queries: rows.length, written: written.length, candidates: candidates.length })
   if (candidates.length === 0) return null
 
-  const res = await callJev(buildKeywordJevRequest(candidates), { apiKey: env.TYPESAFE_API_KEY })
-  const { pick, judged } = chooseKeyword(candidates, res.answers)
+  const res = await callJev(buildKeywordJevRequest(candidates, written), { apiKey: env.TYPESAFE_API_KEY })
+  const { pick, judged } = chooseKeyword(candidates, res.answers, KEYWORD_PLANNER, { comparedWithWritten: written.length > 0 })
   info('Keyword planner: judged', {
     model: res.model,
     top: [...judged].sort((a, b) => b.score - a.score).slice(0, 5).map((j) => ({
       query: j.query, impressions: j.impressions, position: Math.round(j.position),
-      fit: Number(j.fit.toFixed(2)), brand: Number(j.brand.toFixed(2)), locale: j.locale, format: j.format,
+      fit: Number(j.fit.toFixed(2)), brand: Number(j.brand.toFixed(2)), dup: Number(j.duplicate.toFixed(2)), locale: j.locale, format: j.format, deck: j.deckFamily,
     })),
     picked: pick?.query ?? null,
   })

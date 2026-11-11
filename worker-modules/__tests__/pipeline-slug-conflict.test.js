@@ -35,7 +35,7 @@ describe('pipeline insert when an older row owns the slug', () => {
     callAI.mockImplementation(async () => article('jlpt-n2-grammar-guide'))
     createSupabaseClient.mockReturnValue({
       getRecentContent: vi.fn().mockResolvedValue([]),
-      getTargetedQueries: vi.fn().mockResolvedValue([]),
+      getPlannedArticles: vi.fn().mockResolvedValue([]),
       uploadImage: vi.fn(),
       insertContent: vi.fn(async (record) => {
         inserts.push({ slug: record.slug, locale: record.locale, canonical: record.canonical_url, deck: record.deck_family, query: record.target_query })
@@ -71,7 +71,7 @@ describe('pipeline falls back to a deck guide when Search Console has nothing', 
     callAI.mockImplementation(async () => article('toeic-800-vocabulary'))
     createSupabaseClient.mockReturnValue({
       getRecentContent: vi.fn().mockResolvedValue([]),
-      getTargetedQueries: vi.fn().mockResolvedValue([]),
+      getPlannedArticles: vi.fn().mockResolvedValue([]),
       uploadImage: vi.fn(),
       insertContent: vi.fn(async (record) => { inserts.push({ locale: record.locale, deck: record.deck_family, query: record.target_query }); return { ...record, id: record.locale } }),
     })
@@ -80,5 +80,50 @@ describe('pipeline falls back to a deck guide when Search Console has nothing', 
       { locale: 'en', deck: 'toeic:800', query: '토익 800점 단어' },
       { locale: 'ko', deck: 'toeic:800', query: '토익 800점 단어' },
     ])
+  })
+})
+
+describe('one topic a day, even when an edition fails', () => {
+  it('does not pull in an AI-invented topic when the planned topic published one language', async () => {
+    vi.clearAllMocks()
+    const inserts = []
+    planKeywordTopic.mockResolvedValue({
+      id: 'q', category: 'c', titleHint: 'toeic part 6', keywords: ['toeic part 6'], tags: [], audience: 'a',
+      targetQuery: 'toeic part 6', queryLocale: 'en', format: 'guide', deckFamily: null,
+    })
+    generateImage.mockRejectedValue(new Error('no image in test'))
+    callAI.mockImplementation(async () => article('toeic-part-6-guide'))
+    createSupabaseClient.mockReturnValue({
+      getRecentContent: vi.fn().mockResolvedValue([]),
+      getPlannedArticles: vi.fn().mockResolvedValue([]),
+      uploadImage: vi.fn(),
+      insertContent: vi.fn(async (record) => {
+        if (record.locale === 'ko') throw new Error('Supabase insert failed: 500 - boom')
+        inserts.push(record.locale); return { ...record, id: record.locale }
+      }),
+    })
+    await runContentPipeline({}, '0 6 * * *')
+    expect(inserts).toEqual(['en'])
+    expect(callAI).toHaveBeenCalledTimes(2)
+  })
+
+  it('keeps the translation on the primary slug even when its title looks like a recent article', async () => {
+    vi.clearAllMocks()
+    const inserts = []
+    planKeywordTopic.mockResolvedValue({
+      id: 'q', category: 'c', titleHint: '토익 900점 단어', keywords: ['토익 900점 단어'], tags: [], audience: 'a',
+      targetQuery: '토익 900점 단어', queryLocale: 'ko', format: 'guide', deckFamily: 'toeic:900',
+    })
+    generateImage.mockRejectedValue(new Error('no image in test'))
+    callAI.mockImplementation(async () => ({ ...article('toeic-900-vocabulary'), title: '토익 900점 단어 완전 정복 가이드', tags: ['toeic'] }))
+    createSupabaseClient.mockReturnValue({
+      getRecentContent: vi.fn().mockResolvedValue([{ slug: 'toeic-800-vocabulary', locale: 'ko', title: '토익 800점 단어 완전 정복 가이드', tags: ['toeic'] }]),
+      getPlannedArticles: vi.fn().mockResolvedValue([]),
+      uploadImage: vi.fn(),
+      insertContent: vi.fn(async (record) => { inserts.push({ locale: record.locale, slug: record.slug }); return { ...record, id: record.locale } }),
+    })
+    await runContentPipeline({}, '0 6 * * *')
+    const slugs = new Set(inserts.map((i) => i.slug))
+    expect(slugs.size).toBe(1)
   })
 })

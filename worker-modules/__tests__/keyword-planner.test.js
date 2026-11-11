@@ -12,7 +12,7 @@ vi.mock('../../supabase/functions/_shared/jev-client.ts', () => ({
 
 import {
   findOpportunities, buildKeywordJevRequest, chooseKeyword, topicFromKeyword, planKeywordTopic, normalizeQuery,
-  familyForQuery, planDeckTopic, DECK_GUIDES,
+  familyForQuery, planDeckTopic, DECK_GUIDES, writtenPages,
 } from '../keyword-planner.js'
 import { getGscConfig, fetchSearchQueries } from '../search-console.js'
 import { callJev } from '../../supabase/functions/_shared/jev-client.ts'
@@ -139,6 +139,14 @@ describe('topicFromKeyword → prompt', () => {
     expect(user).toContain('a native speaker would actually type')
   })
 
+  it('promises the deck only in editions whose readers are shown one', () => {
+    const toeic = topicFromKeyword({ query: '토익 800점 단어', locale: 'ko', format: 'guide', deckFamily: 'toeic:800' })
+    expect(buildPrompt(toeic, 'ko').user).toContain('## The Deck This Page Leads To')
+    expect(buildPrompt(toeic, 'en').user).not.toContain('## The Deck This Page Leads To')
+    const talk = topicFromKeyword({ query: '여행 영어 회화 표현', locale: 'ko', format: 'guide', deckFamily: 'conversation:여행' })
+    expect(buildPrompt(talk, 'en').user).not.toContain('## The Deck This Page Leads To')
+  })
+
   it('keeps the original query out of the other edition\'s subject and keywords', () => {
     const ko = topicFromKeyword({ query: 'jlpt n2 문법', locale: 'ko', format: 'guide' })
     const { user } = buildPrompt(ko, 'en')
@@ -159,7 +167,7 @@ describe('topicFromKeyword → prompt', () => {
 })
 
 describe('planKeywordTopic', () => {
-  const db = { getTargetedQueries: vi.fn() }
+  const db = { getPlannedArticles: vi.fn() }
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -179,14 +187,14 @@ describe('planKeywordTopic', () => {
 
   it('does not call Jev when no query qualifies', async () => {
     fetchSearchQueries.mockResolvedValue([row('clicked', 100, 4)])
-    db.getTargetedQueries.mockResolvedValue([])
+    db.getPlannedArticles.mockResolvedValue([])
     expect(await planKeywordTopic({ TYPESAFE_API_KEY: 'k' }, db)).toBeNull()
     expect(callJev).not.toHaveBeenCalled()
   })
 
   it('returns a topic carrying the query, its language and format', async () => {
     fetchSearchQueries.mockResolvedValue([row('Toeic Part 5 Tips', 200)])
-    db.getTargetedQueries.mockResolvedValue([])
+    db.getPlannedArticles.mockResolvedValue([])
     callJev.mockResolvedValue({ model: 'jev-1', answers: answersFor([{ fit: 0.9, format: 'guide' }]), usage: null })
     const topic = await planKeywordTopic({ TYPESAFE_API_KEY: 'k' }, db)
     expect(topic).toMatchObject({ targetQuery: 'Toeic Part 5 Tips', queryLocale: 'en', format: 'guide', id: 'toeic-part-5-tips' })
@@ -237,13 +245,22 @@ describe('deck boost', () => {
 
 describe('planDeckTopic', () => {
   it('takes the first deck guide not yet written and carries its family', async () => {
-    const db = { getTargetedQueries: vi.fn().mockResolvedValue(['토익 800점 단어']) }
+    const db = { getPlannedArticles: vi.fn().mockResolvedValue([{ target_query: '토익 800점 단어', deck_family: 'toeic:800', title: 'TOEIC 800 Vocabulary', locale: 'en' }]) }
     const topic = await planDeckTopic(db)
     expect(topic).toMatchObject({ targetQuery: DECK_GUIDES[1].query, queryLocale: 'en', deckFamily: 'ielts:6.5', format: 'guide' })
   })
 
+  it('skips a deck family a Search Console page already leads to', async () => {
+    const db = { getPlannedArticles: vi.fn().mockResolvedValue([
+      { target_query: 'toeic 800 words', deck_family: 'toeic:800', title: 'TOEIC 800 Words', locale: 'en' },
+      { target_query: 'ielts band 6.5 vocabulary list', deck_family: null, title: 'x', locale: 'en' },
+    ]) }
+    const topic = await planDeckTopic(db)
+    expect(topic.deckFamily).toBe('toefl:100')
+  })
+
   it('returns null once every family has its page', async () => {
-    const db = { getTargetedQueries: vi.fn().mockResolvedValue(DECK_GUIDES.map((g) => g.query)) }
+    const db = { getPlannedArticles: vi.fn().mockResolvedValue(DECK_GUIDES.map((g) => ({ target_query: g.query, deck_family: g.family, title: g.query, locale: 'en' }))) }
     expect(await planDeckTopic(db)).toBeNull()
   })
 
@@ -257,5 +274,32 @@ describe('planDeckTopic', () => {
     const { user } = buildPrompt(topicFromKeyword({ query: '토익 800점 단어', locale: 'ko', format: 'guide', deckFamily: 'toeic:800' }), 'ko')
     expect(user).toContain('## The Deck This Page Leads To')
     expect(user).toContain('Do not state how many cards')
+  })
+})
+
+describe('same need as a page we already wrote', () => {
+  it('lists our planned queries and titles once each, newest first', () => {
+    expect(writtenPages([
+      { target_query: '토익 800점 단어', title: 'TOEIC 800 Vocabulary List' },
+      { target_query: '토익 800점 단어', title: '토익 800점 단어 완전 정복' },
+      { target_query: 'jlpt n2 문법', title: 'JLPT N2 Grammar' },
+    ])).toEqual(['토익 800점 단어', 'TOEIC 800 Vocabulary List', '토익 800점 단어 완전 정복', 'jlpt n2 문법', 'JLPT N2 Grammar'])
+  })
+
+  it('asks a duplicate question per candidate only when there is something to compare with', () => {
+    expect(Object.keys(buildKeywordJevRequest([row('a', 5)]).questions)).not.toContain('dup_0')
+    const req = buildKeywordJevRequest([row('toeic 800 vocabulary', 5)], ['토익 800점 단어', 'TOEIC 800 Vocabulary List'])
+    expect(req.state.written).toEqual(['토익 800점 단어', 'TOEIC 800 Vocabulary List'])
+    expect(req.questions.dup_0.instructions).toContain('`written`')
+  })
+
+  it('skips a candidate Jev judges to be the same need, and treats a missing answer as one', () => {
+    const answers = answersFor([{ fit: 0.9, deck: 'toeic' }, { fit: 0.9 }])
+    answers.dup_0 = { type: 'noul', noul: 0.92 }
+    answers.dup_1 = { type: 'noul', noul: 0.1 }
+    const { pick } = chooseKeyword([row('toeic 800 vocabulary', 9), row('toeic part 6', 2)], answers, undefined, { comparedWithWritten: true })
+    expect(pick.query).toBe('toeic part 6')
+    const { pick: none } = chooseKeyword([row('x', 9)], answersFor([{ fit: 0.9 }]), undefined, { comparedWithWritten: true })
+    expect(none).toBeNull()
   })
 })

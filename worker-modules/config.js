@@ -35,6 +35,11 @@ export const KEYWORD_PLANNER = {
   // Writing an off-topic page costs a day's slot and site quality, so require a clear yes.
   minFit: 0.6,
   maxBrand: 0.5,
+  // Same need as a page we already wrote (any language, any wording) → skip. Measured on jev-1.14:
+  // same need 0.73-0.96, a different level/section/exam 0.07-0.22.
+  maxDuplicate: 0.6,
+  // How many of our own planned queries/titles Jev compares each candidate against.
+  maxWrittenForComparison: 200,
 }
 
 export const RETRY_DELAYS = [1000, 3000, 8000]
