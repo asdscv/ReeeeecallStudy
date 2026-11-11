@@ -47,13 +47,33 @@ export function normalizeQuery(q) {
   return String(q || '').trim().toLowerCase().replace(/\s+/g, ' ')
 }
 
+// "toeic part6" and "toeic part 6", "n2문법" and "n2 문법" are one search need — and one page.
+export function queryKey(q) {
+  return normalizeQuery(q).replace(/\s+/g, '')
+}
+
 /** Queries Google shows us for that nobody clicks, minus ones we already wrote a page for. */
 export function findOpportunities(rows, alreadyTargeted, opts = KEYWORD_PLANNER) {
-  const seen = new Set(alreadyTargeted.map(normalizeQuery))
-  return rows
-    .filter((r) => normalizeQuery(r.query) !== '')
+  // Spacing variants become one candidate: impressions add up, clicks add up (any click
+  // disqualifies), and the best-ranked spelling is the one the page is written for.
+  const merged = new Map()
+  for (const r of rows) {
+    const key = queryKey(r.query)
+    if (!key) continue
+    const prev = merged.get(key)
+    if (!prev) { merged.set(key, { ...r }); continue }
+    const best = r.position < prev.position ? r : prev
+    merged.set(key, {
+      ...best,
+      impressions: prev.impressions + r.impressions,
+      clicks: prev.clicks + r.clicks,
+      position: Math.min(prev.position, r.position),
+    })
+  }
+  const seen = new Set(alreadyTargeted.map(queryKey))
+  return [...merged.values()]
     .filter((r) => r.impressions >= opts.minImpressions && r.clicks <= opts.maxClicks && r.position >= opts.minPosition)
-    .filter((r) => !seen.has(normalizeQuery(r.query)))
+    .filter((r) => !seen.has(queryKey(r.query)))
     .sort((a, b) => b.impressions - a.impressions || a.position - b.position)
     .slice(0, opts.maxCandidates)
 }
@@ -211,8 +231,8 @@ export const DECK_GUIDES = [
 
 /** The next deck guide not yet written, or null once every family has its page. */
 export async function planDeckTopic(db) {
-  const targeted = new Set((await db.getTargetedQueries()).map(normalizeQuery))
-  const next = DECK_GUIDES.find((g) => !targeted.has(normalizeQuery(g.query)))
+  const targeted = new Set((await db.getTargetedQueries()).map(queryKey))
+  const next = DECK_GUIDES.find((g) => !targeted.has(queryKey(g.query)))
   if (!next) return null
   return {
     ...topicFromKeyword({ query: next.query, locale: next.queryLocale, format: 'guide', deckFamily: next.family }),

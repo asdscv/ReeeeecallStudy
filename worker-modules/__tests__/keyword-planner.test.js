@@ -58,6 +58,18 @@ describe('findOpportunities', () => {
     expect(out.map((r) => r.query)).toEqual(['hsk 4 words'])
   })
 
+  it('merges spacing variants of one query into a single candidate', () => {
+    const out = findOpportunities([row('toeic part6', 1, 0, 48), row('toeic part 6', 1, 0, 56), row('n2 문법', 1, 0, 71), row('n2문법', 1, 0, 70)], [])
+    expect(out).toHaveLength(2)
+    expect(out.find((r) => r.query.startsWith('toeic'))).toMatchObject({ query: 'toeic part6', impressions: 2, position: 48 })
+    expect(out.find((r) => r.query.startsWith('n2'))).toMatchObject({ query: 'n2문법', impressions: 2, position: 70 })
+  })
+
+  it('drops a variant once any spelling earned a click, and once any spelling was written', () => {
+    expect(findOpportunities([row('toeic part6', 4, 0), row('toeic part 6', 1, 1)], [])).toEqual([])
+    expect(findOpportunities([row('toeic part6', 4, 0)], ['TOEIC Part 6'])).toEqual([])
+  })
+
   it('caps the shortlist at maxCandidates', () => {
     const rows = Array.from({ length: 40 }, (_, i) => row(`query ${i}`, 100 + i))
     expect(findOpportunities(rows, [])).toHaveLength(25)
