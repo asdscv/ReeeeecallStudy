@@ -124,6 +124,15 @@ describe('topicFromKeyword → prompt', () => {
     expect(user).toContain('a native speaker would actually type')
   })
 
+  it('keeps the original query out of the other edition\'s subject and keywords', () => {
+    const ko = topicFromKeyword({ query: 'jlpt n2 문법', locale: 'ko', format: 'guide' })
+    const { user } = buildPrompt(ko, 'en')
+    const assignment = user.split('## Search Query')[0]
+    expect(assignment).not.toContain('Subtopic: jlpt n2 문법')
+    expect(assignment).not.toContain('Keywords to incorporate: jlpt n2 문법')
+    expect(user).toContain('Never copy words or script from the original query')
+  })
+
   it('gives a mixed-script query a clean id', () => {
     expect(topicFromKeyword({ query: 'jlpt n2 문법', locale: 'ko', format: 'guide' }).id).toBe('jlpt-n2')
   })

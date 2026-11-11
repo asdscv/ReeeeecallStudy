@@ -57,7 +57,7 @@ Each block has "type" and "props":
 
 ## Rules
 
-- Generate 9 to 13 blocks total
+- Generate 10 to 15 blocks total
 - First block MUST be "hero", last block MUST be "cta"
 - Do NOT use "image", "blockquote", or "statistics" block types
 - **bold** and *italic* markdown is ONLY allowed inside "paragraph" blocks. All other block types must use plain text without any markdown formatting.
@@ -134,7 +134,7 @@ function searchQuerySection(topic, locale) {
   const q = topic.targetQuery
   const placement = topic.queryLocale === locale
     ? `- Use the exact phrase "${q}" verbatim in the hero title, in meta_title (near the start), in the first paragraph, and in at least one H2.`
-    : `- The query is in another language. Write this edition for someone with the same need searching in this article's language: use the phrase a native speaker would actually type into Google, in the hero title, meta_title, first paragraph and one H2.`
+    : `- The query is in another language. Write this edition for someone with the same need searching in this article's language: use the phrase a native speaker would actually type into Google, in the hero title, meta_title, first paragraph and one H2.\n- Never copy words or script from the original query into this edition (exam names like JLPT or TOEIC are fine).`
   return `\n\n## Search Query This Page Must Answer
 
 Real people typed this exact query into Google: "${q}". Google already shows our site for it, but none of our pages answers it, so nobody clicks. This article is that page.
@@ -149,15 +149,25 @@ ${FORMAT_INSTRUCTIONS[topic.format] || FORMAT_INSTRUCTIONS.guide}`
 export function buildPrompt(topic, locale, options = {}) {
   const { previousTitles = [] } = options
 
+  // Another language's edition of a search-query topic must not carry the original query's
+  // words — that is how "JLPT N2 문법 Mastery" ended up as an English title.
+  const translated = topic.targetQuery && topic.queryLocale && topic.queryLocale !== locale
+  const subtopic = translated
+    ? `the same need as the search query "${topic.targetQuery}", expressed the way a native speaker of this article's language would search for it`
+    : topic.titleHint
+  const keywords = translated
+    ? 'the natural search phrase in this article\'s language (not the original query text)'
+    : topic.keywords.join(', ')
+
   const topicContext = `## Topic Assignment
 
 Category: ${topic.category}
-Subtopic: ${topic.titleHint}
-Keywords to incorporate: ${topic.keywords.join(', ')}
+Subtopic: ${subtopic}
+Keywords to incorporate: ${keywords}
 Target audience: ${topic.audience}
 Suggested tags: ${topic.tags.join(', ')}
 
-Write a unique, insightful article about "${topic.titleHint}" within the "${topic.category}" domain. Focus on practical value for ${topic.audience}. Naturally mention how spaced repetition and flashcard-based tools can help with this topic where appropriate.`
+Write a unique, insightful article about ${translated ? 'that need' : `"${topic.titleHint}"`} within the "${topic.category}" domain. Focus on practical value for ${topic.audience}. Naturally mention how spaced repetition and flashcard-based tools can help with this topic where appropriate.`
 
   let titleAvoidance = ''
   if (previousTitles.length > 0) {

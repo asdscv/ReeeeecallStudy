@@ -15,7 +15,7 @@ describe('PIPELINE_DEFAULTS', () => {
   })
 
   it('retains other defaults unchanged', () => {
-    expect(PIPELINE_DEFAULTS.maxBlocks).toBe(13)
+    expect(PIPELINE_DEFAULTS.maxBlocks).toBe(22)
     expect(PIPELINE_DEFAULTS.minBlocks).toBe(7)
     expect(PIPELINE_DEFAULTS.maxRetries).toBe(3)
     expect(PIPELINE_DEFAULTS.recentContentLimit).toBe(100)

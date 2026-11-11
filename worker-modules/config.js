@@ -13,7 +13,8 @@ export const DEFAULT_LOCALE = POLICY_DEFAULT_LOCALE
 export const PIPELINE_DEFAULTS = {
   topicsPerRun: 1,
   maxExtraTopics: 3,
-  maxBlocks: 13,
+  // The deeper model overshoots the prompt's 10-15 by a few blocks; a longer guide is fine, a rejected one is not.
+  maxBlocks: 22,
   minBlocks: 7,
   maxRetries: 3,
   recentContentLimit: 100,
@@ -42,7 +43,7 @@ export function getXaiConfig(env) {
   return {
     apiKey: env.XAI_API_KEY || '',
     baseUrl: env.XAI_BASE_URL || 'https://api.x.ai/v1',
-    model: env.XAI_MODEL || 'grok-3-mini',
+    model: env.XAI_MODEL || 'grok-4.20-non-reasoning',
   }
 }
 
