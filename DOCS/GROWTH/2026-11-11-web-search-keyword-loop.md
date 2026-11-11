@@ -31,8 +31,8 @@
 
 **키워드 플래너** (`worker-modules/keyword-planner.js`, 매일 06:00 UTC 크론):
 
-1. `search-console.js` — 최근 확정 28일(오늘-3일까지) 검색어별 노출·클릭·순위.
-2. 코드가 숫자로 거른다: 노출 ≥ 20 · 클릭 0 · 평균순위 ≥ 8 · 이미 쓴 검색어 제외
+1. `search-console.js` — 최근 확정 180일(오늘-3일까지) 검색어별 노출·클릭·순위.
+2. 코드가 숫자로 거른다: 최근 180일 노출 ≥ 1 · 클릭 0 · 평균순위 ≥ 8 · 이미 쓴 검색어 제외
    (`contents.target_query`, 마이그레이션 284) → 노출 순 상위 25개.
 3. **Jev 1회 호출**로 후보마다 판정: 학습자 질문인가(Noul) · 다른 제품 이름인가(Noul) ·
    언어(Choice: en/ko/기타) · 글 형식(Choice: 가이드/비교/설명).
@@ -85,3 +85,17 @@ WHERE target_query IS NOT NULL ORDER BY published_at DESC LIMIT 10;
 - 전환: `analytics_events` 의 `app_cta_click` ÷ `content_views`. 지금 분모가 117 이라 비율은 아직 의미 없다.
 - 이탈 지점은 구조 기준(첫 답 직후 · 마지막 소제목 앞)이다. `content_views.scroll_depth_percent` 가
   수백 건 쌓이면 실제 이탈 분포로 다시 맞출 것.
+
+## 4. 연동 후 실측 (2026-11-11)
+
+서치콘솔 연결: 서비스 계정 `gsc-keyword-planner@reeeeecallstudy.iam.gserviceaccount.com`(GCP 프로젝트 `reeeeecallstudy`,
+Search Console API 사용 설정) → 서치콘솔 `sc-domain:reeeeecallstudy.xyz` 에 «제한적» 사용자로 추가(소유자 asdscv@gmail.com).
+
+**노출 자체가 거의 없다.** 2026-03~11 합계 노출 **208회 · 클릭 2회**, 10월 노출 5회. 글 약 3,300편 중
+한 번이라도 노출된 페이지 **117개**, 검색어 22개(평균순위 19~85). 영상 사례(키워드 하나에 노출 16,000회)와
+출발점이 다르다 — 28일·노출 20회 기준이면 후보가 0개라 계속 AI 주제로 빠졌다.
+
+그래서 기준을 이 사이트 규모로 낮췄다: **180일 · 노출 1회 이상**, 동점이면 순위가 높은(1페이지에 가까운) 검색어.
+실데이터 1회 실행: 후보 21개 → `jlpt n2 문법`(노출 3 · 68위 · 적합 0.93 · ko · 가이드) 선택,
+다음 후보 `process diagram ielts` · `jlpt n3 문법` · `integrated writing` · `toeic part 6`.
+후보 21개를 다 쓰면(약 3주) 새로 노출이 생길 때까지 AI 주제로 돌아간다. 트래픽이 늘면 기준을 다시 올릴 것.

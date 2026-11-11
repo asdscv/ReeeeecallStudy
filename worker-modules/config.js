@@ -21,10 +21,12 @@ export const PIPELINE_DEFAULTS = {
   topicGenerationCount: 8,
 }
 
-// "Impressions but no clicks" over the last 28 finalized days of Search Console data.
+// "Impressions but no clicks" in finalized Search Console data. Sized to this site: in
+// 2026-11 only 117 of ~3,300 pages had ever shown in Google (208 impressions in 8 months),
+// so a single impression is signal and the window is long. Raise both as traffic grows.
 export const KEYWORD_PLANNER = {
-  windowDays: 28,
-  minImpressions: 20,
+  windowDays: 180,
+  minImpressions: 1,
   maxClicks: 0,
   // Already near the top with zero clicks is a snippet problem, not a missing page.
   minPosition: 8,

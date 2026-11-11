@@ -36,10 +36,19 @@ describe('findOpportunities', () => {
       row('toeic part 5 tips', 120),
       row('ielts band 7 vocabulary', 300),
       row('already clicked', 500, 3),
-      row('too few impressions', 5),
       row('ranks third already', 400, 0, 3),
     ], [])
     expect(out.map((r) => r.query)).toEqual(['ielts band 7 vocabulary', 'toeic part 5 tips'])
+  })
+
+  it('counts a single impression at this site\'s scale, closer-to-page-one first on ties', () => {
+    const out = findOpportunities([row('jlpt n2 문법', 1, 0, 67), row('usmle 준비', 1, 0, 19), row('n2 독해', 3, 0, 43)], [])
+    expect(out.map((r) => r.query)).toEqual(['n2 독해', 'usmle 준비', 'jlpt n2 문법'])
+  })
+
+  it('applies a stricter impressions floor when one is configured', () => {
+    const out = findOpportunities([row('a', 5), row('b', 30)], [], { minImpressions: 20, maxClicks: 0, minPosition: 8, maxCandidates: 25 })
+    expect(out.map((r) => r.query)).toEqual(['b'])
   })
 
   it('skips queries we already wrote a page for, ignoring case and spacing', () => {
@@ -89,6 +98,11 @@ describe('chooseKeyword', () => {
     expect(pick).toBeNull()
   })
 
+  it('breaks a score tie toward the better-ranked query', () => {
+    const { pick } = chooseKeyword([row('far', 1, 0, 80), row('near', 1, 0, 19)], answersFor([{ fit: 0.9 }, { fit: 0.9 }]))
+    expect(pick.query).toBe('near')
+  })
+
   it('rejects a language the pipeline does not generate', () => {
     const { pick } = chooseKeyword([row('học từ vựng toeic', 100)], answersFor([{ fit: 0.9, lang: 'other' }]))
     expect(pick).toBeNull()
@@ -108,6 +122,10 @@ describe('topicFromKeyword → prompt', () => {
     const { user } = buildPrompt(topic, 'ko')
     expect(user).not.toContain('verbatim')
     expect(user).toContain('a native speaker would actually type')
+  })
+
+  it('gives a mixed-script query a clean id', () => {
+    expect(topicFromKeyword({ query: 'jlpt n2 문법', locale: 'ko', format: 'guide' }).id).toBe('jlpt-n2')
   })
 
   it('leaves AI-generated topics untouched', () => {
