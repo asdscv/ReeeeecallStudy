@@ -1416,8 +1416,8 @@ Write them again, obeying those rules exactly.`
               if (generated.usage && g2.usage) {
                 generated = { ...generated, usage: {
                   ...generated.usage,
-                  tokensIn: (generated.usage.tokensIn ?? 0) + (g2.usage.tokensIn ?? 0),
-                  tokensOut: (generated.usage.tokensOut ?? 0) + (g2.usage.tokensOut ?? 0),
+                  prompt_tokens: (generated.usage.prompt_tokens ?? 0) + (g2.usage.prompt_tokens ?? 0),
+                  completion_tokens: (generated.usage.completion_tokens ?? 0) + (g2.usage.completion_tokens ?? 0),
                 } }
               }
               if (o2.items.length > 0) {

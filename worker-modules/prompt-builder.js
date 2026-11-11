@@ -1,3 +1,5 @@
+import { parseDeckFamily, deckListingFilter } from '../packages/shared/lib/official-deck-family.ts'
+
 // 3-layer prompt builder for AI content generation
 
 const SYSTEM_PROMPT = `You are an expert educational content writer for ReeeeecallStudy, a smart flashcard learning platform that uses spaced repetition (SRS).
@@ -143,13 +145,16 @@ ${placement}
 - The first paragraph must answer the query directly, in under 40 words.
 - Stay on this query from start to finish. Do not widen it into a general article about studying.
 
-${FORMAT_INSTRUCTIONS[topic.format] || FORMAT_INSTRUCTIONS.guide}${deckSection(topic)}`
+${FORMAT_INSTRUCTIONS[topic.format] || FORMAT_INSTRUCTIONS.guide}${deckSection(topic, locale)}`
 }
 
 // The page's call to action opens our free official deck for this exam level, so the article
 // should teach the vocabulary itself and make the deck the obvious next step.
-function deckSection(topic) {
-  if (!topic.deckFamily) return ''
+// Only where this edition's readers are actually shown a deck: there is no English-native deck,
+// and conversation decks exist only for Korean readers.
+function deckSection(topic, locale) {
+  const family = parseDeckFamily(topic.deckFamily)
+  if (!family || !deckListingFilter(family, locale)) return ''
   return `
 
 ## The Deck This Page Leads To

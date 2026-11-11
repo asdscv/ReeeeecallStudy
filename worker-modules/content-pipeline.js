@@ -68,11 +68,14 @@ export async function runContentPipeline(env, cron) {
     }
 
     let topicsAttempted = 0
+    let topicsPublished = 0
     let aiTopicsLoaded = false
 
     for (let i = 0; ; i++) {
       const allMet = LOCALES.every(l => successCount[l] >= topicCount)
-      if (allMet) break
+      // A topic that published in any language is the day's topic; a failed edition must not
+      // pull in a whole AI-invented topic on top of it.
+      if (allMet || topicsPublished >= topicCount) break
 
       if (i >= topics.length) {
         if (aiTopicsLoaded) break
@@ -83,6 +86,7 @@ export async function runContentPipeline(env, cron) {
       const topic = topics[i]
 
       topicsAttempted++
+      const successesBefore = LOCALES.reduce((n, l) => n + successCount[l], 0)
 
       try {
         info('Topic selected', { index: topicsAttempted, category: topic.category, subtopic: topic.id || topic.titleHint })
@@ -146,6 +150,7 @@ export async function runContentPipeline(env, cron) {
       } catch (err) {
         error('Topic failed', { index: topicsAttempted, error: err.message })
       }
+      if (LOCALES.reduce((n, l) => n + successCount[l], 0) > successesBefore) topicsPublished++
     }
 
     info('Pipeline completed', { topicsAttempted, successCount, target: topicCount })
@@ -236,22 +241,26 @@ async function generateForLocale(env, db, topic, locale, recentContent, sharedSl
     throw new Error(`Failed to generate valid content after ${PIPELINE_DEFAULTS.maxValidationRetries} attempts`)
   }
 
+  // The primary edition owns the slug; a translation that re-ran dedup on its own title could
+  // land on a different slug and lose its hreflang pair. Only a real 409 moves it (below).
+  const ownsSlug = !(sharedSlug && locale !== DEFAULT_LOCALE)
+
   // Same-run dedup check
-  const sameRunCheck = checkSameRunDuplicate(
+  const sameRunCheck = ownsSlug && checkSameRunDuplicate(
     { slug: article.slug, title: article.title, tags: article.tags, locale },
     runState,
   )
-  if (sameRunCheck.isDuplicate) {
+  if (sameRunCheck && sameRunCheck.isDuplicate) {
     info('Same-run duplicate detected, adding date suffix', { reason: sameRunCheck.reason })
     article.slug = appendDateSuffix(article.slug)
   }
 
   // DB-level dedup check
-  const dupCheck = checkDuplicate(
+  const dupCheck = ownsSlug && checkDuplicate(
     { slug: article.slug, title: article.title, tags: article.tags, locale },
     recentContent,
   )
-  if (dupCheck.isDuplicate) {
+  if (dupCheck && dupCheck.isDuplicate) {
     info('Duplicate detected, adding date suffix', { reason: dupCheck.reason })
     article.slug = appendDateSuffix(article.slug)
   }

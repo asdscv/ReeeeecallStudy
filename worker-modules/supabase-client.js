@@ -25,10 +25,11 @@ export function createSupabaseClient(env) {
     return res.json()
   }
 
-  // Newest first: prod caps a response at 1,000 rows, and an old query falling off the
-  // end is the cheapest thing to lose (its own page already earns its clicks by then).
-  async function getTargetedQueries() {
-    const url = `${restUrl}/contents?select=target_query&target_query=not.is.null&order=created_at.desc&limit=1000`
+  // Every planned page (one row per language edition): the query it targets, its deck family,
+  // and its title — the translation's title is the only record of the phrase it was written for.
+  // Newest first: prod caps a response at 1,000 rows, and the oldest are the cheapest to lose.
+  async function getPlannedArticles() {
+    const url = `${restUrl}/contents?select=target_query,deck_family,title,locale&target_query=not.is.null&order=created_at.desc&limit=1000`
     const res = await fetch(url, {
       headers: {
         apikey: config.serviceKey,
@@ -36,9 +37,9 @@ export function createSupabaseClient(env) {
       },
     })
     if (!res.ok) {
-      throw new Error(`Failed to fetch targeted queries: ${res.status} - ${await res.text()}`)
+      throw new Error(`Failed to fetch planned articles: ${res.status} - ${await res.text()}`)
     }
-    return (await res.json()).map((r) => r.target_query)
+    return res.json()
   }
 
   async function insertContent(article) {
@@ -89,5 +90,5 @@ export function createSupabaseClient(env) {
     return publicUrl
   }
 
-  return { getRecentContent, getTargetedQueries, insertContent, uploadImage }
+  return { getRecentContent, getPlannedArticles, insertContent, uploadImage }
 }
