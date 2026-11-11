@@ -36,8 +36,18 @@ export function withDropOffCtas<T extends { type: string }>(
 
   // Key = index the CTA goes in front of.
   const insertBefore = new Map<number, DropOffPosition>()
-  if (answerEnd >= 0 && !isCta(blocks[answerEnd + 1])) insertBefore.set(answerEnd + 1, 'answer')
-  if (lastHeading > answerEnd + 2 && !isCta(blocks[lastHeading - 1])) insertBefore.set(lastHeading, 'wrap_up')
+  const answerAt = answerEnd + 1
+  if (answerEnd >= 0 && !isCta(blocks[answerAt])) insertBefore.set(answerAt, 'answer')
+
+  // The wrap-up starts at the last section when it sits in the back half; most generated
+  // articles have only two sections, so otherwise ~3/4 of the way through.
+  let wrapAt = lastHeading > blocks.length / 2 ? lastHeading : Math.round(blocks.length * 0.75)
+  if (blocks[wrapAt - 1]?.type === 'heading') wrapAt++
+  const roomAfterAnswer = answerEnd < 0 || wrapAt >= answerAt + 3
+  const roomBeforeEnd = wrapAt <= blocks.length - 2
+  if (roomAfterAnswer && roomBeforeEnd && !isCta(blocks[wrapAt - 1]) && !isCta(blocks[wrapAt])) {
+    insertBefore.set(wrapAt, 'wrap_up')
+  }
 
   const out: Array<T | AppCtaBlock> = []
   blocks.forEach((block, i) => {

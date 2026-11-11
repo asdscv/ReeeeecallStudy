@@ -41,6 +41,31 @@ describe('withDropOffCtas', () => {
     })
   })
 
+  // The three most common block sequences among the last 60 days of published en/ko articles.
+  it.each([
+    [
+      'hero,paragraph,heading,paragraph,numbered_list,heading,paragraph,feature_cards,highlight_box,paragraph,cta',
+      'hero,paragraph,heading,paragraph,app_cta,numbered_list,heading,paragraph,feature_cards,app_cta,highlight_box,paragraph,cta',
+    ],
+    [
+      'hero,paragraph,heading,paragraph,numbered_list,heading,paragraph,feature_cards,paragraph,highlight_box,paragraph,cta',
+      'hero,paragraph,heading,paragraph,app_cta,numbered_list,heading,paragraph,feature_cards,paragraph,app_cta,highlight_box,paragraph,cta',
+    ],
+    [
+      'hero,paragraph,heading,paragraph,numbered_list,heading,paragraph,feature_cards,highlight_box,paragraph,divider,cta',
+      'hero,paragraph,heading,paragraph,app_cta,numbered_list,heading,paragraph,feature_cards,highlight_box,app_cta,paragraph,divider,cta',
+    ],
+  ])('places both CTAs in a real two-section article: %s', (input, expected) => {
+    const blocks = input.split(',').map(b)
+    expect(types(withDropOffCtas(blocks, 's')).join(',')).toBe(expected)
+  })
+
+  it('never separates a heading from its first block', () => {
+    const blocks = 'hero,paragraph,heading,paragraph,numbered_list,paragraph,feature_cards,heading,paragraph,cta'.split(',').map(b)
+    const out = types(withDropOffCtas(blocks, 's'))
+    out.forEach((t, i) => { if (t === 'heading') expect(out[i + 1]).not.toBe('app_cta') })
+  })
+
   it('skips the wrap-up CTA when the article has one section', () => {
     const one = [b('hero'), b('paragraph'), b('heading'), b('paragraph'), b('feature_cards'), b('paragraph'), b('cta')]
     expect(types(withDropOffCtas(one, 's')).filter((t) => t === 'app_cta')).toHaveLength(1)
