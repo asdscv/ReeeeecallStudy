@@ -143,7 +143,18 @@ ${placement}
 - The first paragraph must answer the query directly, in under 40 words.
 - Stay on this query from start to finish. Do not widen it into a general article about studying.
 
-${FORMAT_INSTRUCTIONS[topic.format] || FORMAT_INSTRUCTIONS.guide}`
+${FORMAT_INSTRUCTIONS[topic.format] || FORMAT_INSTRUCTIONS.guide}${deckSection(topic)}`
+}
+
+// The page's call to action opens our free official deck for this exam level, so the article
+// should teach the vocabulary itself and make the deck the obvious next step.
+function deckSection(topic) {
+  if (!topic.deckFamily) return ''
+  return `
+
+## The Deck This Page Leads To
+
+Below the article, readers get our free official flashcard deck for this level (${topic.deckFamily}). Teach the vocabulary itself: what this level demands, 10-15 representative words or expressions with meanings and a short example sentence each (label them as examples, not an official list), and a daily review plan. Mention the free deck once, where a reader would want the full list. Do not state how many cards it has.`
 }
 
 export function buildPrompt(topic, locale, options = {}) {

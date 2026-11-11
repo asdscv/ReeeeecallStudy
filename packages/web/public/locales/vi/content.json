@@ -32,6 +32,11 @@
       "title": "Ghi nhớ thật lâu",
       "description": "Đưa những gì bạn vừa đọc vào thẻ ghi nhớ và ôn vài phút mỗi ngày. Mỗi thẻ sẽ quay lại ngay trước khi bạn quên."
     },
-    "web": "Bắt đầu miễn phí trên web"
+    "web": "Bắt đầu miễn phí trên web",
+    "deck": {
+      "button": "Học ngay với bộ thẻ này",
+      "meta_one": "Bộ thẻ chính thức miễn phí · {{count, number}} thẻ",
+      "meta_other": "Bộ thẻ chính thức miễn phí · {{count, number}} thẻ"
+    }
   }
 }

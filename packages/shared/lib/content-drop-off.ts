@@ -9,7 +9,7 @@ export type DropOffPosition = 'answer' | 'wrap_up'
 
 export interface AppCtaBlock {
   type: 'app_cta'
-  props: { position: DropOffPosition; campaign: string }
+  props: { position: DropOffPosition; campaign: string; deckFamily?: string }
 }
 
 const MIN_BLOCKS = 6
@@ -19,6 +19,7 @@ const isCta = (b: { type: string } | undefined) => b?.type === 'cta' || b?.type 
 export function withDropOffCtas<T extends { type: string }>(
   blocks: readonly T[],
   campaign: string,
+  deckFamily?: string | null,
 ): Array<T | AppCtaBlock> {
   if (blocks.length < MIN_BLOCKS) return [...blocks]
 
@@ -52,7 +53,7 @@ export function withDropOffCtas<T extends { type: string }>(
   const out: Array<T | AppCtaBlock> = []
   blocks.forEach((block, i) => {
     const position = insertBefore.get(i)
-    if (position) out.push({ type: 'app_cta', props: { position, campaign } })
+    if (position) out.push({ type: 'app_cta', props: { position, campaign, ...(deckFamily ? { deckFamily } : {}) } })
     out.push(block)
   })
   return out
