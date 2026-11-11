@@ -34,8 +34,11 @@ describe('보충 호출', () => {
   })
 
   it('토큰을 합친다 — 두 번 부른 원가가 한 번으로 기록되면 마진이 거짓이 된다', () => {
-    expect(topUp).toMatch(/tokensIn.*\+.*g2\.usage/s)
-    expect(topUp).toMatch(/tokensOut.*\+.*g2\.usage/s)
+    // TokenUsage 의 실제 칸(prompt_tokens / completion_tokens)이어야 합니다. 예전엔 없는 칸
+    // (tokensIn / tokensOut)에 더해서 정작 원가 장부에 가는 칸은 첫 호출 값 그대로였습니다.
+    expect(topUp).toMatch(/prompt_tokens: \(generated\.usage\.prompt_tokens \?\? 0\) \+ \(g2\.usage\.prompt_tokens \?\? 0\)/)
+    expect(topUp).toMatch(/completion_tokens: \(generated\.usage\.completion_tokens \?\? 0\) \+ \(g2\.usage\.completion_tokens \?\? 0\)/)
+    expect(topUp).not.toMatch(/tokensIn|tokensOut/)
   })
 
   it('추가 예약을 하지 않는다 — 예약은 이미 잡혀 있다', () => {
