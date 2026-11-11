@@ -150,4 +150,6 @@ export interface ContentDetail {
   published_at: string
   created_at: string
   updated_at: string
+  /** Official deck family the page leads to, e.g. 'toeic:800' (see official-deck-family.ts). */
+  deck_family?: string | null
 }

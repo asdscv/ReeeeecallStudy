@@ -12,6 +12,7 @@ vi.mock('../../supabase/functions/_shared/jev-client.ts', () => ({
 
 import {
   findOpportunities, buildKeywordJevRequest, chooseKeyword, topicFromKeyword, planKeywordTopic, normalizeQuery,
+  familyForQuery, planDeckTopic, DECK_GUIDES,
 } from '../keyword-planner.js'
 import { getGscConfig, fetchSearchQueries } from '../search-console.js'
 import { callJev } from '../../supabase/functions/_shared/jev-client.ts'
@@ -26,6 +27,7 @@ function answersFor(perQuery) {
     answers[`brand_${i}`] = { type: 'noul', noul: a.brand ?? 0.02 }
     answers[`lang_${i}`] = { type: 'choice', choice: a.lang ?? 'en', probabilities: {}, confidence: 0.9 }
     answers[`format_${i}`] = { type: 'choice', choice: a.format ?? 'guide', probabilities: {}, confidence: 0.9 }
+    answers[`deck_${i}`] = { type: 'choice', choice: a.deck ?? 'none', probabilities: {}, confidence: 0.9 }
   })
   return answers
 }
@@ -63,11 +65,12 @@ describe('findOpportunities', () => {
 })
 
 describe('buildKeywordJevRequest', () => {
-  it('asks four questions per candidate over shared state', () => {
+  it('asks five questions per candidate over shared state', () => {
     const req = buildKeywordJevRequest([row('a', 50), row('b', 40)])
     expect(Object.keys(req.questions).sort()).toEqual(
-      ['brand_0', 'brand_1', 'fit_0', 'fit_1', 'format_0', 'format_1', 'lang_0', 'lang_1'],
+      ['brand_0', 'brand_1', 'deck_0', 'deck_1', 'fit_0', 'fit_1', 'format_0', 'format_1', 'lang_0', 'lang_1'],
     )
+    expect(Object.keys(req.questions.deck_0.criteria)).toEqual(['toeic', 'ielts', 'toefl', 'conversation', 'general', 'none'])
     expect(req.state.candidates).toEqual([{ query: 'a' }, { query: 'b' }])
     expect(req.questions.fit_1.instructions).toContain('`candidates[1].query`')
     expect(Object.keys(req.questions.lang_0.criteria)).toEqual(['en', 'ko', 'other'])
@@ -176,5 +179,71 @@ describe('planKeywordTopic', () => {
     const topic = await planKeywordTopic({ TYPESAFE_API_KEY: 'k' }, db)
     expect(topic).toMatchObject({ targetQuery: 'Toeic Part 5 Tips', queryLocale: 'en', format: 'guide', id: 'toeic-part-5-tips' })
     expect(normalizeQuery(topic.targetQuery)).toBe('toeic part 5 tips')
+  })
+})
+
+describe('familyForQuery', () => {
+  it.each([
+    ['toeic', '토익 800점 단어', 'toeic:800'],
+    ['toeic', 'toeic 850 vocabulary', 'toeic:800'],
+    ['toeic', 'toeic part 6', 'toeic:800'],
+    ['ielts', 'ielts band 7 vocabulary', 'ielts:7.0'],
+    ['ielts', 'ielts 5.5 words', 'ielts:5.5'],
+    ['toefl', 'toefl 110 words', 'toefl:110'],
+    ['conversation', '여행 영어 회화', 'conversation:여행'],
+    ['conversation', 'business english phrases', 'conversation:회사'],
+    ['general', '기초 영어 단어', 'beginner:batch-1'],
+    ['general', 'english vocabulary list', 'intermediate:batch-1'],
+  ])('%s / %s → %s', (type, query, expected) => {
+    const f = familyForQuery(type, query)
+    expect(`${f.category}:${f.level}`).toBe(expected)
+  })
+
+  it('never sends a page that names one exam to another exam\'s deck', () => {
+    expect(familyForQuery('toeic', 'Crack TOEFL Vocab Questions with Context Clues')).toBeNull()
+    expect(familyForQuery('ielts', '토익 800점 단어')).toBeNull()
+    expect(familyForQuery('general', 'toefl vocabulary')).toBeNull()
+    expect(familyForQuery('toefl', 'toefl vocabulary')).toEqual({ category: 'toefl', level: '100' })
+  })
+
+  it('has no family for none or a missing answer', () => {
+    expect(familyForQuery('none', 'toeic 800')).toBeNull()
+    expect(familyForQuery(null, 'toeic 800')).toBeNull()
+  })
+})
+
+describe('deck boost', () => {
+  it('prefers a query one of our decks answers over a slightly bigger one it does not', () => {
+    const { pick } = chooseKeyword(
+      [row('toeic part 6 grammar', 3, 0, 40), row('toeic 900 words', 2, 0, 40)],
+      answersFor([{ fit: 0.9, deck: 'none' }, { fit: 0.9, deck: 'toeic' }]),
+    )
+    expect(pick).toMatchObject({ query: 'toeic 900 words', deckFamily: 'toeic:900' })
+    expect(topicFromKeyword(pick).deckFamily).toBe('toeic:900')
+  })
+})
+
+describe('planDeckTopic', () => {
+  it('takes the first deck guide not yet written and carries its family', async () => {
+    const db = { getTargetedQueries: vi.fn().mockResolvedValue(['토익 800점 단어']) }
+    const topic = await planDeckTopic(db)
+    expect(topic).toMatchObject({ targetQuery: DECK_GUIDES[1].query, queryLocale: 'en', deckFamily: 'ielts:6.5', format: 'guide' })
+  })
+
+  it('returns null once every family has its page', async () => {
+    const db = { getTargetedQueries: vi.fn().mockResolvedValue(DECK_GUIDES.map((g) => g.query)) }
+    expect(await planDeckTopic(db)).toBeNull()
+  })
+
+  it('names only real deck families', async () => {
+    const { parseDeckFamily } = await import('../../packages/shared/lib/official-deck-family.ts')
+    for (const g of DECK_GUIDES) expect(parseDeckFamily(g.family)).not.toBeNull()
+    expect(new Set(DECK_GUIDES.map((g) => g.family)).size).toBe(DECK_GUIDES.length)
+  })
+
+  it('asks the article to teach the level and point to the deck once', () => {
+    const { user } = buildPrompt(topicFromKeyword({ query: '토익 800점 단어', locale: 'ko', format: 'guide', deckFamily: 'toeic:800' }), 'ko')
+    expect(user).toContain('## The Deck This Page Leads To')
+    expect(user).toContain('Do not state how many cards')
   })
 })

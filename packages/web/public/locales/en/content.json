@@ -32,6 +32,11 @@
       "title": "Make it stick",
       "description": "Put what you just read into flashcards and review a few minutes a day. Each card comes back just before you'd forget it."
     },
-    "web": "Start free on the web"
+    "web": "Start free on the web",
+    "deck": {
+      "button": "Study this deck now",
+      "meta_one": "Free official deck · {{count, number}} card",
+      "meta_other": "Free official deck · {{count, number}} cards"
+    }
   }
 }

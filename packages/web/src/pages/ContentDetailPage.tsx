@@ -99,7 +99,7 @@ export function ContentDetailPage() {
       />
 
       <article className="max-w-3xl mx-auto px-4 py-10 sm:py-16" data-speakable>
-        <BlockRenderer blocks={withDropOffCtas(currentArticle.content_blocks, currentArticle.slug)} />
+        <BlockRenderer blocks={withDropOffCtas(currentArticle.content_blocks, currentArticle.slug, currentArticle.deck_family)} />
       </article>
 
       {relatedArticles.length > 0 && (

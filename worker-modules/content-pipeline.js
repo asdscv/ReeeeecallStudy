@@ -4,7 +4,7 @@ import { contentCanonicalUrl } from '../packages/shared/lib/content-canonical.ts
 import { LOCALES, DEFAULT_LOCALE, PIPELINE_DEFAULTS } from './config.js'
 import { createLogger, info, warn, error } from './logger.js'
 import { generateTopics } from './topic-generator.js'
-import { planKeywordTopic } from './keyword-planner.js'
+import { planKeywordTopic, planDeckTopic } from './keyword-planner.js'
 import { selectTopic } from './topic-registry.js'
 import { buildPrompt } from './prompt-builder.js'
 import { callAI, generateImage } from './ai-client.js'
@@ -43,16 +43,28 @@ export async function runContentPipeline(env, cron) {
     }
 
     // 2. Today's topic: a real query Google already shows us for but nobody clicks
-    //    (Search Console). AI-generated topics only when there is none or it fails.
+    //    (Search Console); else a page for an obvious query one of our official decks answers;
+    //    AI-generated topics only when both are exhausted or fail.
     const topics = []
     try {
       const planned = await planKeywordTopic(env, db)
       if (planned) {
         topics.push(planned)
-        info('Keyword topic planned', { query: planned.targetQuery, locale: planned.queryLocale, format: planned.format })
+        info('Keyword topic planned', { query: planned.targetQuery, locale: planned.queryLocale, format: planned.format, deck: planned.deckFamily })
       }
     } catch (err) {
-      warn('Keyword planner failed, falling back to AI topics', { error: err.message })
+      warn('Keyword planner failed, falling back to deck guides', { error: err.message })
+    }
+    if (topics.length === 0) {
+      try {
+        const deckTopic = await planDeckTopic(db)
+        if (deckTopic) {
+          topics.push(deckTopic)
+          info('Deck guide planned', { query: deckTopic.targetQuery, deck: deckTopic.deckFamily })
+        }
+      } catch (err) {
+        warn('Deck guide planner failed, falling back to AI topics', { error: err.message })
+      }
     }
 
     let topicsAttempted = 0
@@ -263,6 +275,7 @@ async function generateForLocale(env, db, topic, locale, recentContent, sharedSl
     is_published: true,
     published_at: new Date().toISOString(),
     ...(topic.targetQuery ? { target_query: topic.targetQuery } : {}),
+    ...(topic.deckFamily ? { deck_family: topic.deckFamily } : {}),
   }
 
   // Dedup only sees the latest 100 rows; an older (or pruned, unpublished) row can still own

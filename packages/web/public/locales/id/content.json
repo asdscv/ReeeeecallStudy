@@ -32,6 +32,11 @@
       "title": "Biar benar-benar ingat",
       "description": "Masukkan yang baru kamu baca ke kartu kilat dan ulangi beberapa menit sehari. Setiap kartu kembali tepat sebelum kamu lupa."
     },
-    "web": "Mulai gratis di web"
+    "web": "Mulai gratis di web",
+    "deck": {
+      "button": "Belajar dengan dek ini sekarang",
+      "meta_one": "Dek resmi gratis · {{count, number}} kartu",
+      "meta_other": "Dek resmi gratis · {{count, number}} kartu"
+    }
   }
 }

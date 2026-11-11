@@ -32,6 +32,11 @@
       "title": "Que se te quede de verdad",
       "description": "Pasa lo que acabas de leer a tarjetas de estudio y repásalas unos minutos al día. Cada tarjeta vuelve justo antes de que la olvides."
     },
-    "web": "Empieza gratis en la web"
+    "web": "Empieza gratis en la web",
+    "deck": {
+      "button": "Estudia este mazo ahora",
+      "meta_one": "Mazo oficial gratis · {{count, number}} tarjeta",
+      "meta_other": "Mazo oficial gratis · {{count, number}} tarjetas"
+    }
   }
 }
