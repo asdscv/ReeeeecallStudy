@@ -20,6 +20,7 @@ export function RoundSummary({ gameId, stats, onAgain }: { gameId: BrainGameId; 
   const { t } = useTranslation('brain')
   const theme = GAME_THEMES[gameId]
   const history = useBrainStore((s) => s.history)
+  const best = useBrainStore((s) => s.progress.bestRuns[gameId])
   const trend = gameHistory(history, gameId)
   const accuracy = stats.trials > 0 ? Math.round((stats.correct / stats.trials) * 100) : 0
   const stars = roundStars(stats.trials, stats.correct)
@@ -68,6 +69,10 @@ export function RoundSummary({ gameId, stats, onAgain }: { gameId: BrainGameId; 
             {formatCount(score)}
           </p>
           <p className="text-sm font-semibold uppercase tracking-wider text-white/60 mt-1">{t('summary.points')}</p>
+          {/* Compared only with the player's own past — and never in red. */}
+          {!stats.isNewBest && best !== undefined && best > stats.points && (
+            <p className="mt-2 text-base text-white/75" data-testid="brain-summary-best">{t('home.record', { value: formatCount(best) })}</p>
+          )}
         </div>
 
         {stats.isNewBest && (

@@ -9,8 +9,9 @@ import type { BrainFx } from '@reeeeecall/shared/hooks/useBrainFx'
  * and nothing plays while the setting is off or the tab is hidden.
  */
 
-// C major pentatonic from C4 — any two notes sound fine together, so overlapping taps never clash.
-const PENTA = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25, 587.33, 659.25, 783.99, 880.0, 1046.5, 1174.66, 1318.51, 1567.98, 1760.0, 2093.0]
+// C major pentatonic, C4 to E6 — any two notes sound fine together, so overlapping taps never
+// clash, and nothing goes above ~1.3kHz: high-frequency hearing is the first to go with age.
+const PENTA = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25, 587.33, 659.25, 783.99, 880.0, 1046.5, 1174.66, 1318.51]
 const note = (i: number) => PENTA[Math.max(0, Math.min(PENTA.length - 1, i))]
 
 type Wave = OscillatorType
@@ -65,11 +66,16 @@ class Sfx {
     osc.stop(t0 + dur + 0.02)
   }
 
-  /** A bell: the note plus a quiet octave above, which reads as "ding" rather than "beep". */
+  /**
+   * A bell: the note plus a quiet octave (above for low notes, which reads as "ding" rather than
+   * "beep"; below for high ones, so no partial climbs past ~2.5kHz).
+   */
   private bell(freq: number, at = 0, dur = 0.35, gain = 0.14) {
-    this.tone(freq, { at, dur, gain })
-    this.tone(freq * 2, { at, dur: dur * 0.6, gain: gain * 0.28 })
+    this.tone(freq, { at, dur, gain, wave: 'triangle' })
+    this.tone(freq < 1000 ? freq * 2 : freq / 2, { at, dur: dur * 0.6, gain: gain * 0.25 })
   }
+
+  private lastVerdict = 0
 
   /** Filtered noise: a card flip or a whoosh. */
   private noise({ at = 0, dur = 0.06, gain = 0.05, freq = 3000, q = 0.8, sweepTo }: { at?: number; dur?: number; gain?: number; freq?: number; q?: number; sweepTo?: number } = {}) {
@@ -109,17 +115,23 @@ class Sfx {
   }
 
   play(fx: BrainFx) {
+    // The tap that finishes a trial plays only its verdict, not a hit and then the verdict.
+    const now = performance.now()
+    if (fx.kind === 'correct' || fx.kind === 'wrong') this.lastVerdict = now
+    if (fx.kind === 'hit') {
+      setTimeout(() => {
+        if (performance.now() - this.lastVerdict > 40) this.bell(note(4 + Math.min(fx.step, 8)), 0, 0.22, 0.12)
+      }, 0)
+      return
+    }
     switch (fx.kind) {
       case 'reveal':
         this.noise({ dur: 0.35, gain: 0.04, freq: 600, sweepTo: 2400, q: 1.2 })
         break
       case 'flash':
         // A Simon tone per tile: the same cell always sings the same note.
-        this.tone(note(2 + (fx.cell % 11)), { dur: 0.42, gain: 0.13, attack: 0.012 })
-        this.tone(note(2 + (fx.cell % 11)) * 2, { dur: 0.25, gain: 0.03 })
-        break
-      case 'hit':
-        this.bell(note(4 + Math.min(fx.step, 11)), 0, 0.22, 0.12)
+        this.tone(note(2 + (fx.cell % 9)), { dur: 0.42, gain: 0.13, attack: 0.012 })
+        this.tone(note(2 + (fx.cell % 9)) * 2, { dur: 0.25, gain: 0.03 })
         break
       case 'flip':
         this.noise({ dur: 0.05, gain: 0.05, freq: 3500, q: 0.7 })
@@ -132,7 +144,7 @@ class Sfx {
         break
       case 'correct': {
         // The chime climbs with the run (a semitone-ish pentatonic step per answer, capped).
-        const base = 5 + Math.min(fx.streak - 1, 7)
+        const base = 5 + Math.min(fx.streak - 1, 5)
         this.bell(note(base), 0, 0.3, 0.13)
         this.bell(note(base + 2), 0.07, 0.38, 0.12)
         break

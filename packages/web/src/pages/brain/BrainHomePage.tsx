@@ -179,7 +179,8 @@ export function BrainHomePage() {
                   </div>
                   <div className="relative mt-3 flex items-end justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      {played && (
+                      {/* Span games move a whole length at a time: no part-way bar for them. */}
+                      {played && game.group !== 'span' && (
                         <div className="h-1.5 rounded-full bg-white/25 overflow-hidden" aria-hidden="true">
                           <div className="h-full rounded-full bg-white" style={{ width: `${Math.max(4, frac * 100)}%` }} />
                         </div>
