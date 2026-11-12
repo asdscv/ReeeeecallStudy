@@ -289,7 +289,7 @@ function LearningDiagnostics({ goalId }: { goalId: string }) {
           {/* The hint said only what a weak card IS. It never said the list is the WORST TEN of
               however many there are — so a learner with 340 read "8장" as their whole backlog,
               and the ten never visibly changed because at scale the tiebreak is a UUID sort. */}
-          <p className="text-[11px] text-content-tertiary">
+          <p className="text-xs text-content-tertiary">
             {/* Capped OR undercounted, and both say the same true thing: what you can press is
                 fewer than what qualifies. A card whose deck could not be resolved is dropped a
                 few lines up with a bare `continue` — deleted since the diagnostics were
@@ -479,7 +479,7 @@ function GoalDiagnosis({ goalId, cardIds }: { goalId: string; cardIds: readonly 
           </button>
           {/* 값을 버튼에 쓰지 않습니다 — 버튼은 결정이지 가격표가 아닙니다 — 대신 바로 아래
               한 줄로 말합니다. 이 화면의 다른 유료 버튼과 같은 규칙입니다. */}
-          <p className="mt-1.5 text-center text-[11px] text-content-tertiary">
+          <p className="mt-1.5 text-center text-xs text-content-tertiary">
             {t('diagnosis.priceNote')}
           </p>
         </>
@@ -562,7 +562,7 @@ function WeakCardExplain({ goalId, cardIds }: { goalId: string; cardIds: readonl
           {/* The model's own reservations, when it had any. Dropping them would present a
               hedged answer as a confident one. */}
           {shown.warnings.map((warning, i) => (
-            <p key={`w${i}`} className="mt-1.5 text-[11px] text-amber-600">{warning}</p>
+            <p key={`w${i}`} className="mt-1.5 text-xs text-amber-600">{warning}</p>
           ))}
           <button
             type="button"
@@ -603,7 +603,7 @@ function WeakCardExplain({ goalId, cardIds }: { goalId: string; cardIds: readonl
           >
             {busy ? t('explain.asking') : t('explain.ask')}
           </button>
-          <p className="mt-2 text-[11px] text-content-tertiary">{t('explain.note')}</p>
+          <p className="mt-2 text-xs text-content-tertiary">{t('explain.note')}</p>
         </>
       )}
       {/* One rendering for every paid refusal in the app. This block used to be a ternary
@@ -702,7 +702,7 @@ function GoalProgress({ knowledge, newCardsPerDay, done }: {
         <div className="h-full bg-brand" style={{ width: `${maturePercent}%` }} />
       </div>
       {detail && (
-        <p className="mt-1.5 text-[11px] text-content-tertiary" data-testid="progress-detail">
+        <p className="mt-1.5 text-xs text-content-tertiary" data-testid="progress-detail">
           {detail}
         </p>
       )}
@@ -717,7 +717,7 @@ function GoalProgress({ knowledge, newCardsPerDay, done }: {
           {t('completion.done')}
         </p>
       ) : (
-        <p className="mt-2 text-[11px] text-content-tertiary" data-testid="goal-completion">
+        <p className="mt-2 text-xs text-content-tertiary" data-testid="goal-completion">
           {/* The population is named in the same sentence as the target. "24장 중 14장 정착"
               one line under "배운 29장" made the deck look like it had shrunk from 29 to 24 —
               24 is not a set of cards, it is 80% of 29 rounded up. */}
@@ -1037,7 +1037,7 @@ export function LearningTodayPage() {
               >
                 {planGenerating ? t('today.generating') : t('today.studyAhead')}
               </button>
-              <p className="mt-2 text-[11px] text-content-tertiary">{t('today.studyAheadNote')}</p>
+              <p className="mt-2 text-xs text-content-tertiary">{t('today.studyAheadNote')}</p>
             </>
           )}
         </div>
@@ -1088,7 +1088,7 @@ export function LearningTodayPage() {
                 </Link>
                 {/* The rating in there does both halves at once. Said here because the old
                     screen's own small print told learners the opposite about its buttons. */}
-                <p className="mt-2 text-center text-[11px] text-content-tertiary">
+                <p className="mt-2 text-center text-xs text-content-tertiary">
                   {t('today.studyNote')}
                 </p>
               </>
@@ -1493,7 +1493,7 @@ function PlanWeekStrip({ week }: { week: PlanWeek }) {
           className="flex flex-col items-center gap-1"
           data-testid={`plan-week-day-${day.state}`}
         >
-          <span className="text-[10px] text-content-tertiary">
+          <span className="text-xs text-content-tertiary">
             {t(`week.dow.${day.weekday}`)}
           </span>
           <span
@@ -1501,7 +1501,7 @@ function PlanWeekStrip({ week }: { week: PlanWeek }) {
             aria-label={`${day.date} · ${t(`week.legend.${day.state}`)}`}
             // Capped, not stretched: on a wide screen a `w-full` cell becomes a long pill and
             // the strip stops reading as seven days.
-            className={`flex h-9 w-full max-w-[3rem] items-center justify-center rounded-md border text-[11px] tabular-nums ${fill[day.state]} ${
+            className={`flex h-9 w-full max-w-[3rem] items-center justify-center rounded-md border text-xs tabular-nums ${fill[day.state]} ${
               i === week.days.length - 1 ? 'ring-1 ring-brand/40 ring-offset-1 ring-offset-card' : ''
             }`}
           >

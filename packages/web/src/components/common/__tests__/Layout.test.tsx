@@ -5,12 +5,12 @@ import { MemoryRouter } from 'react-router-dom'
 import { Layout } from '../Layout'
 
 // ─── Mocks ──────────────────────────────────────────────────
-const mockSignOut = vi.fn()
+let mockRole = 'user'
 vi.mock('../../../stores/auth-store', () => ({
-  useAuthStore: () => ({
-    user: { email: 'test@example.com' },
-    signOut: mockSignOut,
-  }),
+  useAuthStore: (selector?: (s: unknown) => unknown) => {
+    const state = { user: { email: 'test@example.com' }, role: mockRole, signOut: vi.fn() }
+    return selector ? selector(state) : state
+  },
 }))
 
 const renderLayout = (initialPath = '/dashboard') =>
@@ -20,404 +20,111 @@ const renderLayout = (initialPath = '/dashboard') =>
     </MemoryRouter>,
   )
 
+const sidebar = () => screen.getByTestId('sidebar')
+
 beforeEach(() => {
   vi.clearAllMocks()
-})
-
-// ─── Cycle 1: 기본 렌더링 ─────────────────────────────────────
-describe('기본 렌더링', () => {
-  it('탑레벨 링크 3개가 렌더된다 (빠른학습, 대시보드, 설정)', () => {
-    renderLayout()
-    const nav = screen.getAllByRole('navigation')[0] // desktop nav
-
-    expect(within(nav).getByText('nav.quickStudy')).toBeInTheDocument()
-    expect(within(nav).getByText('nav.dashboard')).toBeInTheDocument()
-    expect(within(nav).getByText('nav.settings')).toBeInTheDocument()
-  })
-
-  it('마켓과 학습기록은 탑레벨 링크가 아니다', () => {
-    renderLayout()
-    const nav = screen.getAllByRole('navigation')[0]
-
-    // These should not be top-level links; they're inside the study group
-    const topLinks = within(nav).getAllByRole('link')
-    const topLinkTexts = topLinks.map(l => l.textContent)
-    expect(topLinkTexts.join('')).not.toContain('nav.marketplace')
-    expect(topLinkTexts.join('')).not.toContain('nav.studyHistory')
-  })
-
-  it('학습 그룹 버튼이 렌더된다', () => {
-    renderLayout()
-    const nav = screen.getAllByRole('navigation')[0]
-
-    expect(within(nav).getByRole('button', { name: /nav\.study/ })).toBeInTheDocument()
-  })
-
-  it('그룹 자식(덱, 카드, 마켓, 학습기록)은 기본적으로 숨겨진다', () => {
-    renderLayout()
-    const nav = screen.getAllByRole('navigation')[0]
-
-    expect(within(nav).queryByText('nav.decks')).not.toBeInTheDocument()
-    expect(within(nav).queryByText('nav.cards')).not.toBeInTheDocument()
-    expect(within(nav).queryByText('nav.marketplace')).not.toBeInTheDocument()
-    expect(within(nav).queryByText('nav.studyHistory')).not.toBeInTheDocument()
-  })
-})
-
-// ─── Cycle 2: 데스크톱 드롭다운 열기/닫기 ─────────────────────
-describe('데스크톱 드롭다운', () => {
-  it('학습 그룹 클릭 시 네 섹션과 그 자식이 모두 표시된다', async () => {
-    const user = userEvent.setup()
-    renderLayout()
-    const nav = screen.getAllByRole('navigation')[0]
-
-    await openAllSections(user, nav)
-
-    // The four sections the 학습 menu is now made of. AI 학습 is asserted by its own tests;
-    // these three are the ones this restructure created.
-    for (const section of ['nav.deckAndCards', 'nav.explore', 'nav.myRecords']) {
-      expect(within(nav).getByText(section), section).toBeInTheDocument()
-    }
-    for (const child of [
-      'nav.decks', 'nav.cardTemplates', 'nav.marketplace', 'nav.publisher', 'nav.myShares',
-      'nav.studyHistory', 'nav.achievements',
-    ]) {
-      expect(within(nav).getByText(child), child).toBeInTheDocument()
-    }
-  })
-
-  it('업적은 더 이상 탑레벨이 아니다 — 기록과 같은 섹션에 있다', () => {
-    // It used to be a top-level link while 기록 sat inside 학습, so "how much have I done"
-    // was answered from two different menus.
-    renderLayout()
-    const nav = screen.getAllByRole('navigation')[0]
-    expect(within(nav).queryByText('nav.achievements')).not.toBeInTheDocument()
-  })
-
-  it('같은 그룹 재클릭 시 닫힌다', async () => {
-    const user = userEvent.setup()
-    renderLayout()
-    const nav = screen.getAllByRole('navigation')[0]
-
-    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
-    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
-
-    expect(within(nav).queryByText('nav.decks')).not.toBeInTheDocument()
-  })
-
-  it('외부 클릭 시 드롭다운이 닫힌다', async () => {
-    const user = userEvent.setup()
-    renderLayout()
-    const nav = screen.getAllByRole('navigation')[0]
-
-    await openAllSections(user, nav)
-    expect(within(nav).getByText('nav.decks')).toBeInTheDocument()
-
-    // 외부 (body) 클릭
-    await user.click(document.body)
-
-    expect(within(nav).queryByText('nav.decks')).not.toBeInTheDocument()
-  })
+  mockRole = 'user'
 })
 
 /**
- * Open the 학습 dropdown and every section inside it.
- *
- * The four sections used to render expanded, all at once — fifteen rows dropped on the screen the
- * moment 학습 opened, which is a list to scan rather than a menu to choose from. They collapse
- * now, so a test that wants a child has to open its section first, exactly as a learner does.
+ * Every destination is one click from the sidebar. The old top bar hid decks, AI, explore and
+ * records two levels deep inside a "학습" dropdown; nothing is behind a toggle any more.
  */
-async function openAllSections(user: ReturnType<typeof userEvent.setup>, nav: HTMLElement) {
-  await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
-  for (const toggle of within(nav).getAllByTestId(/^nav-section-toggle-/)) {
-    if (toggle.getAttribute('aria-expanded') !== 'true') await user.click(toggle)
-  }
-}
-
-// ─── Cycle 3: 활성 상태 하이라이트 ────────────────────────────
-describe('활성 상태', () => {
-  it('현재 경로의 링크가 활성 스타일을 갖는다', () => {
-    renderLayout('/quick-study')
-    const nav = screen.getAllByRole('navigation')[0]
-    const link = within(nav).getByText('nav.quickStudy').closest('a')
-
-    expect(link).toHaveClass('bg-brand/10')
-    expect(link).toHaveClass('text-brand')
+describe('sidebar', () => {
+  it('shows every destination at once, with no toggles', () => {
+    renderLayout()
+    const nav = sidebar()
+    for (const label of [
+      'nav.quickStudy', 'nav.dashboard', 'nav.brainTraining', 'nav.decks', 'nav.cardTemplates',
+      'nav.aiHubHome', 'nav.marketplace', 'nav.publisher', 'nav.myShares', 'nav.studyHistory',
+      'nav.achievements', 'nav.guide', 'nav.settings',
+    ]) {
+      expect(within(nav).getByText(label), label).toBeInTheDocument()
+    }
+    expect(within(nav).queryByRole('button')).not.toBeInTheDocument()
   })
 
-  it('/decks 경로에서 학습 그룹 버튼이 활성 스타일을 갖는다', () => {
-    renderLayout('/decks')
-    const nav = screen.getAllByRole('navigation')[0]
-    const btn = within(nav).getByRole('button', { name: /nav\.study/ })
-
-    expect(btn).toHaveClass('bg-brand/10')
-    expect(btn).toHaveClass('text-brand')
+  it('links point at their routes', () => {
+    renderLayout()
+    const nav = sidebar()
+    const href = (label: string) => within(nav).getByText(label).closest('a')?.getAttribute('href')
+    expect(href('nav.quickStudy')).toBe('/quick-study')
+    expect(href('nav.brainTraining')).toBe('/brain')
+    expect(href('nav.decks')).toBe('/decks')
+    expect(href('nav.cardTemplates')).toBe('/templates')
+    expect(href('nav.aiHubHome')).toBe('/ai')
+    expect(href('nav.marketplace')).toBe('/marketplace')
+    expect(href('nav.studyHistory')).toBe('/history')
+    expect(href('nav.achievements')).toBe('/achievements')
   })
 
-  it('중첩 경로(/decks/abc)에서도 학습 그룹 버튼이 활성된다', () => {
+  it('marks the current page, on a segment boundary', () => {
     renderLayout('/decks/abc')
-    const nav = screen.getAllByRole('navigation')[0]
-    const btn = within(nav).getByRole('button', { name: /nav\.study/ })
-
-    expect(btn).toHaveClass('bg-brand/10')
+    const nav = sidebar()
+    expect(within(nav).getByText('nav.decks').closest('a')).toHaveAttribute('aria-current', 'page')
+    expect(within(nav).getByText('nav.dashboard').closest('a')).not.toHaveAttribute('aria-current')
   })
 
-  it('/templates 경로에서 학습 그룹이 활성된다', () => {
+  it("does not light the AI hub on its sibling '/ai-generate'", () => {
+    renderLayout('/ai-generate')
+    expect(within(sidebar()).getByText('nav.aiHubHome').closest('a')).not.toHaveAttribute('aria-current')
+  })
+
+  it('shows admin only to admins', () => {
+    renderLayout()
+    expect(within(sidebar()).queryByText('nav.admin')).not.toBeInTheDocument()
+    mockRole = 'admin'
+    renderLayout()
+    expect(screen.getAllByText('nav.admin').length).toBeGreaterThan(0)
+  })
+})
+
+describe('bottom tabs (phone and tablet)', () => {
+  it('has the four main places and a menu button', () => {
+    renderLayout()
+    const tabs = screen.getByTestId('bottom-tabs')
+    expect(within(tabs).getByTestId('tab-home')).toHaveAttribute('href', '/dashboard')
+    expect(within(tabs).getByTestId('tab-study')).toHaveAttribute('href', '/quick-study')
+    expect(within(tabs).getByTestId('tab-decks')).toHaveAttribute('href', '/decks')
+    expect(within(tabs).getByTestId('tab-brain')).toHaveAttribute('href', '/brain')
+    expect(within(tabs).getByTestId('tab-menu')).toBeInTheDocument()
+  })
+
+  it('lights the decks tab on templates too', () => {
     renderLayout('/templates')
-    const nav = screen.getAllByRole('navigation')[0]
-    const btn = within(nav).getByRole('button', { name: /nav\.study/ })
-
-    expect(btn).toHaveClass('bg-brand/10')
+    expect(screen.getByTestId('tab-decks')).toHaveAttribute('aria-current', 'page')
   })
 
-  it('/marketplace 경로에서 학습 그룹이 활성된다', () => {
+  it('lights the menu tab on a page that is not one of the four', () => {
     renderLayout('/marketplace')
-    const nav = screen.getAllByRole('navigation')[0]
-    const btn = within(nav).getByRole('button', { name: /nav\.study/ })
-
-    expect(btn).toHaveClass('bg-brand/10')
-  })
-
-  it('/history 경로에서 학습 그룹이 활성된다', () => {
-    renderLayout('/history')
-    const nav = screen.getAllByRole('navigation')[0]
-    const btn = within(nav).getByRole('button', { name: /nav\.study/ })
-
-    expect(btn).toHaveClass('bg-brand/10')
+    const menu = screen.getByTestId('tab-menu')
+    expect(menu.className).toContain('text-brand-active')
+    expect(screen.getByTestId('tab-home')).not.toHaveAttribute('aria-current')
   })
 })
 
-// ─── Cycle 4: 모바일 아코디언 ──────────────────────────────────
-describe('모바일 아코디언', () => {
-  it('햄버거 클릭 시 모바일 메뉴가 표시된다', async () => {
+describe('menu sheet', () => {
+  it('opens from the tab bar with every destination, and closes on Escape', async () => {
     const user = userEvent.setup()
     renderLayout()
+    expect(screen.queryByTestId('menu-sheet')).not.toBeInTheDocument()
 
-    const hamburger = screen.getByRole('button', { name: /menu/ })
-    await user.click(hamburger)
+    await user.click(screen.getByTestId('tab-menu'))
+    const sheet = screen.getByTestId('menu-sheet')
+    expect(within(sheet).getByText('nav.marketplace')).toBeInTheDocument()
+    expect(within(sheet).getByText('nav.achievements')).toBeInTheDocument()
 
-    const mobileNav = screen.getAllByRole('navigation')[1]
-    expect(within(mobileNav).getByRole('button', { name: /nav\.study/ })).toBeInTheDocument()
+    await user.keyboard('{Escape}')
+    expect(screen.queryByTestId('menu-sheet')).not.toBeInTheDocument()
   })
 
-  it('모바일 그룹 자식은 기본 숨김이다', async () => {
+  it('opens from the header button and closes when a row is followed', async () => {
     const user = userEvent.setup()
     renderLayout()
-
-    await user.click(screen.getByRole('button', { name: /menu/ }))
-
-    const mobileNav = screen.getAllByRole('navigation')[1]
-    expect(within(mobileNav).queryByText('nav.decks')).not.toBeInTheDocument()
-    expect(within(mobileNav).queryByText('nav.marketplace')).not.toBeInTheDocument()
-  })
-
-  it('모바일 학습 그룹 클릭 시 4개 자식이 확장된다', async () => {
-    const user = userEvent.setup()
-    renderLayout()
-
-    await user.click(screen.getByRole('button', { name: /menu/ }))
-    const mobileNav = screen.getAllByRole('navigation')[1]
-
-    await openAllSections(user, mobileNav)
-
-    expect(within(mobileNav).getByText('nav.decks')).toBeInTheDocument()
-    expect(within(mobileNav).getByText('nav.cardTemplates')).toBeInTheDocument()
-    expect(within(mobileNav).getByText('nav.marketplace')).toBeInTheDocument()
-    expect(within(mobileNav).getByText('nav.studyHistory')).toBeInTheDocument()
-    expect(within(mobileNav).getByText('nav.achievements')).toBeInTheDocument()
-  })
-
-  it('모바일 그룹 재클릭 시 자식이 축소된다', async () => {
-    const user = userEvent.setup()
-    renderLayout()
-
-    await user.click(screen.getByRole('button', { name: /menu/ }))
-    const mobileNav = screen.getAllByRole('navigation')[1]
-
-    await user.click(within(mobileNav).getByRole('button', { name: /nav\.study/ }))
-    await user.click(within(mobileNav).getByRole('button', { name: /nav\.study/ }))
-
-    expect(within(mobileNav).queryByText('nav.decks')).not.toBeInTheDocument()
-  })
-
-  it('모바일 자식 링크 클릭 시 메뉴가 닫힌다', async () => {
-    const user = userEvent.setup()
-    renderLayout()
-
-    await user.click(screen.getByRole('button', { name: /menu/ }))
-    const mobileNav = screen.getAllByRole('navigation')[1]
-    await openAllSections(user, mobileNav)
-
-    await user.click(within(mobileNav).getByText('nav.decks'))
-
-    // 모바일 메뉴가 닫혀서 두 번째 nav가 없어야 함
-    expect(screen.getAllByRole('navigation')).toHaveLength(1)
-  })
-})
-
-// ─── Cycle 5: 링크 정확성 ─────────────────────────────────────
-describe('링크 정확성', () => {
-  it('학습 그룹 자식의 href가 올바르다', async () => {
-    const user = userEvent.setup()
-    renderLayout()
-    const nav = screen.getAllByRole('navigation')[0]
-
-    await openAllSections(user, nav)
-    expect(within(nav).getByText('nav.decks').closest('a')).toHaveAttribute('href', '/decks')
-    // The label must say what the page is: `/templates` is titled 카드 템플릿, and calling it
-    // "카드" next to 덱 promised a card list that does not exist anywhere in the app.
-    expect(within(nav).getByText('nav.cardTemplates').closest('a')).toHaveAttribute('href', '/templates')
-    expect(within(nav).getByText('nav.achievements').closest('a')).toHaveAttribute('href', '/achievements')
-    expect(within(nav).getByText('nav.marketplace').closest('a')).toHaveAttribute('href', '/marketplace')
-    expect(within(nav).getByText('nav.studyHistory').closest('a')).toHaveAttribute('href', '/history')
-  })
-
-  it('데스크톱 자식 클릭 시 드롭다운이 닫힌다', async () => {
-    const user = userEvent.setup()
-    renderLayout()
-    const nav = screen.getAllByRole('navigation')[0]
-
-    await openAllSections(user, nav)
-    await user.click(within(nav).getByText('nav.decks'))
-
-    expect(within(nav).queryByText('nav.cards')).not.toBeInTheDocument()
-  })
-})
-
-// ─── Cycle 6: 사용법 가이드 버튼 ───────────────────────────────
-describe('사용법 가이드 버튼', () => {
-  it('데스크톱에서 사용법 가이드 링크가 표시된다', () => {
-    renderLayout()
-    const guideLink = screen.getAllByText('nav.guide')[0]
-    expect(guideLink.closest('a')).toHaveAttribute('href', '/guide')
-  })
-
-  it('데스크톱에서 이메일이 표시되지 않는다', () => {
-    renderLayout()
-    expect(screen.queryByText('test@example.com')).not.toBeInTheDocument()
-  })
-
-  it('모바일 메뉴에서 사용법 가이드 링크가 표시된다', async () => {
-    const user = userEvent.setup()
-    renderLayout()
-
-    await user.click(screen.getByRole('button', { name: /menu/ }))
-    const mobileNav = screen.getAllByRole('navigation')[1]
-    const guideLink = within(mobileNav).getByText('nav.guide')
-    expect(guideLink.closest('a')).toHaveAttribute('href', '/guide')
-  })
-
-  it('데스크톱에서 가이드 링크가 렌더된다', () => {
-    renderLayout()
-    // Layout should render navigation links
-    const nav = screen.getAllByRole('navigation')[0]
-    expect(nav).toBeInTheDocument()
-  })
-})
-
-// ─── Cycle 7: 엣지 케이스 ─────────────────────────────────────
-describe('엣지 케이스', () => {
-  it('데스크톱과 모바일 그룹 상태가 독립적이다', async () => {
-    const user = userEvent.setup()
-    renderLayout()
-
-    // 데스크톱에서 학습 그룹 열기
-    const desktopNav = screen.getAllByRole('navigation')[0]
-    await openAllSections(user, desktopNav)
-    expect(within(desktopNav).getByText('nav.decks')).toBeInTheDocument()
-
-    // 모바일 메뉴 열기
-    await user.click(screen.getByRole('button', { name: /menu/ }))
-    const mobileNav = screen.getAllByRole('navigation')[1]
-
-    // 모바일에서는 자식이 안 보여야 함 (독립 상태)
-    expect(within(mobileNav).queryByText('nav.decks')).not.toBeInTheDocument()
-  })
-
-  it('그룹 버튼이 button 엘리먼트다', () => {
-    renderLayout()
-    const nav = screen.getAllByRole('navigation')[0]
-
-    const studyBtn = within(nav).getByRole('button', { name: /nav\.study/ })
-    expect(studyBtn.tagName).toBe('BUTTON')
-  })
-
-  it('ChevronDown 아이콘이 그룹 버튼에 렌더된다', () => {
-    renderLayout()
-    const nav = screen.getAllByRole('navigation')[0]
-
-    const studyBtn = within(nav).getByRole('button', { name: /nav\.study/ })
-    expect(studyBtn.querySelector('svg')).toBeInTheDocument()
-  })
-})
-
-// ─── Cycle 9: 섹션은 눌러야 열린다 ─────────────────────────────
-//
-// They rendered expanded, all four at once, so opening 학습 dropped fifteen rows on the screen —
-// a list to scan rather than a menu to choose from. A section is a promise that its contents are
-// related, and showing every promise at once keeps none of them.
-describe('하위 섹션 접기', () => {
-  it('학습을 열어도 섹션 자식은 바로 보이지 않는다', async () => {
-    const user = userEvent.setup()
-    renderLayout('/dashboard')
-    const nav = screen.getAllByRole('navigation')[0]
-
-    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
-
-    // The section headers are there — they are the menu. Their children are not.
-    expect(within(nav).getByText('nav.deckAndCards')).toBeInTheDocument()
-    expect(within(nav).queryByText('nav.decks')).not.toBeInTheDocument()
-    expect(within(nav).queryByText('nav.achievements')).not.toBeInTheDocument()
-  })
-
-  it('섹션 토글을 누르면 그 섹션만 열린다', async () => {
-    const user = userEvent.setup()
-    renderLayout('/dashboard')
-    const nav = screen.getAllByRole('navigation')[0]
-    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
-
-    await user.click(within(nav).getByTestId('nav-section-toggle-nav.deckAndCards'))
-
-    expect(within(nav).getByText('nav.decks')).toBeInTheDocument()
-    // The other three stay shut: opening one section is not opening the menu again.
-    expect(within(nav).queryByText('nav.marketplace')).not.toBeInTheDocument()
-    expect(within(nav).queryByText('nav.achievements')).not.toBeInTheDocument()
-  })
-
-  it('다시 누르면 닫힌다', async () => {
-    const user = userEvent.setup()
-    renderLayout('/dashboard')
-    const nav = screen.getAllByRole('navigation')[0]
-    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
-
-    const toggle = within(nav).getByTestId('nav-section-toggle-nav.explore')
-    await user.click(toggle)
-    expect(within(nav).getByText('nav.marketplace')).toBeInTheDocument()
-    await user.click(toggle)
-    expect(within(nav).queryByText('nav.marketplace')).not.toBeInTheDocument()
-  })
-
-  it('현재 페이지가 든 섹션은 처음부터 열려 있다', async () => {
-    // Arriving from /achievements and finding 내 기록 shut would make the learner guess their
-    // way back to where they already are.
-    const user = userEvent.setup()
-    renderLayout('/achievements')
-    const nav = screen.getAllByRole('navigation')[0]
-
-    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
-
-    expect(within(nav).getByText('nav.achievements')).toBeInTheDocument()
-    expect(within(nav).queryByText('nav.decks')).not.toBeInTheDocument()
-  })
-
-  it('AI 학습 헤더는 여전히 허브로 가는 링크다', async () => {
-    // The label navigates and the chevron expands: a header that did both would do neither
-    // predictably.
-    const user = userEvent.setup()
-    renderLayout('/dashboard')
-    const nav = screen.getAllByRole('navigation')[0]
-    await user.click(within(nav).getByRole('button', { name: /nav\.study/ }))
-
-    expect(within(nav).getByText('nav.aiHub').closest('a')).toHaveAttribute('href', '/ai')
+    await user.click(screen.getByTestId('header-menu'))
+    const sheet = screen.getByTestId('menu-sheet')
+    await user.click(within(sheet).getByText('nav.decks'))
+    expect(screen.queryByTestId('menu-sheet')).not.toBeInTheDocument()
   })
 })

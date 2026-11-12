@@ -111,7 +111,7 @@ export function AchievementsPage() {
                   <div className="w-full bg-accent rounded-full h-2 mb-1">
                     <div className="h-2 rounded-full bg-brand transition-all" style={{ width: `${Math.min(100, goal.progress)}%` }} />
                   </div>
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     {formatValue(goal.category, goal.current)} / {formatValue(goal.category, goal.target)}
                   </p>
                 </div>
@@ -136,7 +136,7 @@ export function AchievementsPage() {
                 <p className="text-xs font-medium text-foreground truncate">
                   {t(`achievements.badge.${ach.id}`, { n: ach.required_value, defaultValue: ach.id.replace(/_/g, ' ') })}
                 </p>
-                <p className="text-[10px] text-content-tertiary mt-1">
+                <p className="text-xs text-content-tertiary mt-1">
                   {ach.earned_at ? new Date(ach.earned_at).toLocaleDateString() : ''}
                 </p>
               </div>
@@ -195,7 +195,7 @@ export function AchievementsPage() {
                         <p className="text-xs font-medium text-foreground truncate">
                           {t(`achievements.badge.${ach.id}`, { n: ach.required_value, defaultValue: ach.id.replace(/_/g, ' ') })}
                         </p>
-                        <span className="text-[10px] text-warning">+{ach.xp_reward} XP</span>
+                        <span className="text-xs text-warning">+{ach.xp_reward} XP</span>
                       </div>
                     ))}
 
@@ -210,7 +210,7 @@ export function AchievementsPage() {
                         </p>
                         <div className="flex items-center justify-center gap-1 mt-1">
                           <Lock className="w-3 h-3 text-content-tertiary" />
-                          <span className="text-[10px] text-content-tertiary">+{nextLocked.xp_reward} XP</span>
+                          <span className="text-xs text-content-tertiary">+{nextLocked.xp_reward} XP</span>
                         </div>
                       </div>
                     )}

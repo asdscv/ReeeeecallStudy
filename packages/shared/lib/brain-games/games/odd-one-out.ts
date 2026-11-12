@@ -47,8 +47,8 @@ const ROTATABLE = ['F', 'R', 'G', 'J', 'L', 'P', '4', '7', '➜', '☂', '♞', 
 
 export const oddOneOut: BrainGameDef<OddOneOutState> = {
   id: 'oddOneOut',
-  create(level, rng) {
-    const n = level < 3 ? 3 : level < 7 ? 4 : level < 12 ? 5 : level < 18 ? 6 : 7
+  create(level, rng, ctx) {
+    const n = Math.min(level < 3 ? 3 : level < 7 ? 4 : level < 12 ? 5 : level < 18 ? 6 : 7, Math.max(3, ctx.maxCols))
     const rotateRound = level >= 4 && rng.chance(0.35)
     let common: string
     let odd: string

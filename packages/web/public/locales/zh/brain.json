@@ -1,37 +1,71 @@
 {
   "title": "大脑训练",
-  "subtitle": "记忆力·专注力·反应力·推理力 — 每一轮都是新生成的题目，按你的水平出题。",
-  "note": "用于日常大脑锻炼的游戏，并非医疗服务。",
-  "mix": {
-    "title": "混合训练",
-    "desc": "游戏会自动切换，并更多地练习你较弱的能力。想玩多久都可以。",
-    "start": "开始"
+  "subtitle": "用专注与记忆小游戏，养成规律的动脑习惯",
+  "disclaimer": "本功能不是医疗器械，不用于诊断、治疗、治愈或预防任何疾病。",
+  "worry": "如果担心自己的记忆力，与其多玩游戏，不如咨询医生或当地的医疗卫生服务机构。",
+  "training": {
+    "title": "今日训练",
+    "desc": "快眼和3个游戏 · 约{{minutes}}分钟",
+    "start": "开始今日训练",
+    "week": "本周 {{done}}/{{goal}}次",
+    "weekDone": "已达成本周目标",
+    "course": "基础课程 {{done}}/{{total}}",
+    "booster": "复习课程 {{done}}/{{total}}",
+    "boosterNext": "下次复习课程: {{date}}",
+    "minutes": "累计 {{value}} 分钟",
+    "dose": "计划是每周约3次、每次20分钟左右。多玩也没关系，但不会有额外奖励。",
+    "slot": "游戏 {{index}}/{{total}}",
+    "next": "下一个游戏",
+    "continue": "继续",
+    "doneTitle": "今日训练完成",
+    "doneBody": "辛苦了。休息一两天再进行下一次也没关系。",
+    "quitTitle": "训练已停止",
+    "quitBody": "目前的记录已保存。因为没有完成，不计入已完成的训练。",
+    "backHome": "返回大脑训练"
   },
   "home": {
-    "games": "游戏",
+    "freePlay": "自由练习",
+    "freePlayHint": "选一个游戏来练习。3次机会用完，本轮结束。",
     "level": "Lv. {{level}}",
     "best": "最高 Lv. {{level}}",
     "new": "新",
-    "streak_one": "连续{{count}}天",
-    "streak_other": "连续{{count}}天",
-    "today": "今天 {{value}} 轮",
-    "totalPoints": "累计得分 {{value}}",
-    "howItWorks": "每一轮题目都是新生成的。答对了下一轮会稍难一点，答错了就变简单，所以难度始终保持在“稍有挑战”。"
+    "quickEyeLevel": "第{{stage}}阶段 · 速度 {{speed}}/12",
+    "record": "最高 {{value}} 分",
+    "settings": "设置",
+    "research": "研究依据",
+    "howItWorks": "每道题都是新生成的。答对了下一题会稍难一点，答错了就会变简单。等级只代表你在这个游戏中的水平，并不衡量记忆力或大脑健康。"
+  },
+  "settings": {
+    "title": "大脑训练设置",
+    "timing": "宽松计时",
+    "timingHelp": "可以延长限时游戏的时间，或者取消限时。在延长的模式下，超时不会扣除机会。",
+    "timing_1": "标准",
+    "timing_1_5": "1.5倍",
+    "timing_2": "2倍",
+    "timing_0": "不限时",
+    "centerOnly": "快眼: 只答中间",
+    "centerOnlyHelp": "如果边缘的星星不容易看清，可以打开此项。只需回答中间的图案。",
+    "flash": "快眼中的图案只会极短暂地出现。如果你对闪光敏感，请不要勉强。",
+    "close": "关闭"
   },
   "skills": {
-    "memory": "记忆力",
-    "attention": "专注力",
-    "speed": "反应力",
-    "reasoning": "推理力"
+    "memory": "记忆",
+    "attention": "注意",
+    "speed": "速度",
+    "reasoning": "推理"
   },
   "games": {
+    "quickEye": {
+      "name": "快眼",
+      "desc": "中间的图案和边缘的星星只出现一瞬间，看完后说出是什么、在哪里。"
+    },
     "memoryGrid": {
       "name": "瞬间记忆",
-      "desc": "记住亮过的格子，然后点出来。"
+      "desc": "空间记忆练习：记住亮过的格子，然后点出来。"
     },
     "sequence": {
       "name": "顺序记忆",
-      "desc": "看方块闪烁的顺序，然后按相同顺序点击。"
+      "desc": "顺序记忆练习：按方块闪烁的顺序点击。"
     },
     "pairs": {
       "name": "翻牌配对",
@@ -39,7 +73,7 @@
     },
     "schulte": {
       "name": "数字寻找",
-      "desc": "按顺序尽快点击散落的数字。"
+      "desc": "按顺序找到并点击散落的数字。"
     },
     "oddOneOut": {
       "name": "找不同",
@@ -47,11 +81,11 @@
     },
     "stroop": {
       "name": "颜色文字",
-      "desc": "选择文字的颜色，而不是文字的意思。"
+      "desc": "选择文字的颜色，而不是读到的字。"
     },
     "math": {
       "name": "快速计算",
-      "desc": "在时间内算出答案。"
+      "desc": "算一算，选出答案。"
     },
     "series": {
       "name": "数字规律",
@@ -74,24 +108,60 @@
     "pickWord": "选择文字的「意思」",
     "solve": "选出答案",
     "nextNumber": "下一个数是？",
-    "correct": "正确！",
+    "correct": "正确",
     "wrong": "差一点",
     "timeUp": "时间到",
-    "levelUp": "升级！Lv. {{level}}",
+    "timeUpForgiven": "时间到 · 不扣机会",
+    "void": "画面卡了一下，再显示一次",
     "points": "+{{value}}",
+    "levelUp": "升级 · Lv. {{level}}",
+    "lives": "剩余机会 {{value}}",
+    "livesSpan": "此长度剩余机会 {{value}}",
+    "practice": "练习 {{done}}/{{total}}",
+    "practiceHint": "这是练习，不扣机会，也不计分。",
+    "practiceDone": "练习结束，正式开始",
+    "trial": "{{done}}/{{total}}",
     "score": "得分",
     "streak": "连对",
+    "pause": "暂停",
+    "paused": "已暂停",
+    "resume": "继续",
     "stop": "结束",
-    "mixBadge": "混合"
+    "stopConfirm": "要在这里结束吗？目前的记录会保存。"
+  },
+  "quickEye": {
+    "watch": "看中间",
+    "what": "中间是什么？",
+    "where": "星星在哪个方向？",
+    "sameOrDifferent": "中间的两个图案一样吗？",
+    "same": "一样",
+    "different": "不一样",
+    "circle": "圆形",
+    "square": "方形",
+    "stage": "第{{stage}}阶段",
+    "dir": {
+      "0": "上",
+      "1": "右上",
+      "2": "右",
+      "3": "右下",
+      "4": "下",
+      "5": "左下",
+      "6": "左",
+      "7": "左上"
+    }
   },
   "summary": {
-    "title": "辛苦了",
-    "rounds": "完成轮数",
+    "livesOut": "本轮结束",
+    "cleared": "本轮通过",
+    "stopped": "先到这里吧",
+    "trials": "题数",
     "accuracy": "正确率",
     "points": "得分",
     "bestStreak": "最高连对",
-    "levels": "等级变化",
-    "again": "继续",
+    "levelChange": "Lv. {{from}} → {{to}}",
+    "improved": "你在这个游戏中的成绩提高了",
+    "newBest": "个人最高分",
+    "again": "再玩一次",
     "home": "全部游戏"
   },
   "colors": {

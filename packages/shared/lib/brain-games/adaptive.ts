@@ -1,43 +1,33 @@
-import type { RoundOutcome } from './types'
-
 /**
- * Adaptive difficulty — the reason the games do not end.
- *
- * Level is a float with no ceiling. A right answer nudges it up, a miss drops it further than a
- * hit raises it, so it settles where the player gets roughly three in four right: hard enough to
- * work, easy enough to keep going. (Up 0.3 vs down 0.8 balances at p ≈ 0.73.)
+ * Display and scoring. The level itself moves by the staircase in rules.ts.
  */
 export const MIN_LEVEL = 1
-const UP = 0.3
-const UP_FAST = 0.45
-const DOWN = 0.8
 
-/** A fast answer used less than this share of the time limit. */
-const FAST_SHARE = 0.4
-
-export function nextLevel(level: number, outcome: RoundOutcome, usedShare: number): number {
-  if (outcome.correct) return round2(level + (usedShare <= FAST_SHARE ? UP_FAST : UP))
-  // A near miss (most of the grid right) costs less than a blank.
-  const drop = DOWN * (1 - outcome.accuracy * 0.5)
-  return Math.max(MIN_LEVEL, round2(level - drop))
-}
-
-/** The whole number the player sees. */
+/**
+ * The level as the player sees it, to one decimal. Steps are small (+0.15 at 85%), so a whole
+ * number would sit still for seven right answers in a row; "5.2 → 6.0" says the practice is moving.
+ */
 export function displayLevel(level: number): number {
-  return Math.max(MIN_LEVEL, Math.floor(level))
+  return Math.max(0, Math.floor(level * 10) / 10)
 }
 
 /**
- * Points for one round: level-weighted, a bonus for speed and for a running streak. A miss
- * scores nothing — but never takes points away, so stopping is never punished.
+ * Points for one trial: level-weighted, a bonus when faster than the player's OWN recent median
+ * (never an absolute millisecond bar — choice reaction time slows with age), and a running-streak
+ * bonus. A miss scores nothing but never takes points away.
  */
-export function roundPoints(level: number, outcome: RoundOutcome, usedShare: number, streak: number): number {
-  if (!outcome.correct) return 0
-  const speed = 1 + Math.max(0, 1 - usedShare) * 0.5
+export function roundPoints(level: number, correct: boolean, fast: boolean, streak: number): number {
+  if (!correct) return 0
+  const speed = fast ? 1.25 : 1
   const combo = 1 + Math.min(streak, 10) * 0.1
-  return Math.round(10 * displayLevel(level) * speed * combo)
+  return Math.round(10 * Math.max(1, level) * speed * combo)
 }
 
-function round2(v: number): number {
-  return Math.round(v * 100) / 100
+/** Median of the last `n` values (the player's recent correct reaction times). */
+export function recentMedian(values: readonly number[], n = 20): number | null {
+  const tail = values.slice(-n)
+  if (tail.length < 5) return null
+  const sorted = tail.slice().sort((a, b) => a - b)
+  const mid = sorted.length >> 1
+  return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2
 }

@@ -136,16 +136,16 @@ export function PaymentHistory() {
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="truncate text-sm text-foreground">{r.title}</p>
-                  <span className="shrink-0 rounded-full bg-accent px-2 py-0.5 text-[11px] text-muted-foreground">
+                  <span className="shrink-0 rounded-full bg-accent px-2 py-0.5 text-xs text-muted-foreground">
                     {t(`paymentHistory.kind.${r.kind}`, { defaultValue: r.kind })}
                   </span>
                   {reasonBadge && (
-                    <span className="shrink-0 rounded-full bg-brand/15 px-2 py-0.5 text-[11px] text-brand">
+                    <span className="shrink-0 rounded-full bg-brand/15 px-2 py-0.5 text-xs text-brand">
                       {reasonBadge}
                     </span>
                   )}
                   {r.status === 'refunded' && (
-                    <span className="shrink-0 rounded-full bg-destructive/15 px-2 py-0.5 text-[11px] text-destructive">
+                    <span className="shrink-0 rounded-full bg-destructive/15 px-2 py-0.5 text-xs text-destructive">
                       {t('paymentHistory.refunded')}
                     </span>
                   )}

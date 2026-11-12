@@ -32,7 +32,7 @@ function StoreBadge({ href, icon, line1, line2, onClick }: { href: string; icon:
     >
       <span className="shrink-0">{icon}</span>
       <span className="flex flex-col leading-tight text-left">
-        <span className="text-[10px] opacity-80">{line1}</span>
+        <span className="text-xs opacity-80">{line1}</span>
         <span className="text-sm font-semibold">{line2}</span>
       </span>
     </a>

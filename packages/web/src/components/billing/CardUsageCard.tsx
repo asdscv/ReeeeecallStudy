@@ -57,12 +57,12 @@ export function CardUsageCard() {
           <CreditCard className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-medium text-foreground">{t('cardUsage.detail.title', 'Card storage')}</span>
           {atLimit && (
-            <span className="ml-1 px-2 py-0.5 text-[10px] font-medium rounded-full bg-destructive/10 text-destructive">
+            <span className="ml-1 px-2 py-0.5 text-xs font-medium rounded-full bg-destructive/10 text-destructive">
               {t('cardUsage.detail.atLimit', 'Limit reached')}
             </span>
           )}
           {nearLimit && (
-            <span className="ml-1 px-2 py-0.5 text-[10px] font-medium rounded-full bg-warning/10 text-warning">
+            <span className="ml-1 px-2 py-0.5 text-xs font-medium rounded-full bg-warning/10 text-warning">
               {t('cardUsage.detail.nearLimit', 'Approaching limit')}
             </span>
           )}
@@ -90,7 +90,7 @@ export function CardUsageCard() {
         )}
 
         {detail.archivedTotal > 0 && (
-          <p className="mt-2 flex items-center gap-1 text-[11px] text-warning">
+          <p className="mt-2 flex items-center gap-1 text-xs text-warning">
             <Archive className="h-3 w-3" />
             {t('cardUsage.detail.archivedCount', '{{count, number}} archived', { count: detail.archivedTotal })}
           </p>

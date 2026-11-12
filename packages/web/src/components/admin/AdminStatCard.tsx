@@ -49,7 +49,7 @@ export function AdminStatCard({ label, value, icon, color = 'blue', subtitle, tr
             )}
           </div>
           {subtitle && (
-            <p className="text-[11px] text-content-tertiary truncate mt-0.5">{subtitle}</p>
+            <p className="text-xs text-content-tertiary truncate mt-0.5">{subtitle}</p>
           )}
         </div>
       </div>

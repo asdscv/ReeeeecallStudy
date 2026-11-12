@@ -22,7 +22,16 @@
     "achievements": "ความสำเร็จ",
     "publisherStats": "สถิติผู้เผยแพร่",
     "wallet": "กระเป๋าเงิน",
-    "quiz": "แบบทดสอบ"
+    "quiz": "แบบทดสอบ",
+    "aiHubHome": "หน้าหลัก AI",
+    "tabsLabel": "แท็บหลัก",
+    "short": {
+      "home": "หน้าแรก",
+      "study": "เรียน",
+      "decks": "สำรับ",
+      "brain": "สมอง",
+      "more": "เมนู"
+    }
   },
   "actions": {
     "save": "บันทึก",

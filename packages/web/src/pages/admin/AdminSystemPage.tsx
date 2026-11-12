@@ -452,7 +452,7 @@ function GrowthLeversPanel() {
         </LeverRow>
       </div>
 
-      <p className="text-[11px] text-content-tertiary mt-3">
+      <p className="text-xs text-content-tertiary mt-3">
         {t('system.levers.updated', {
           ai: updatedAt(levers.ai_settings_updated_at),
           cards: updatedAt(levers.card_limit_updated_at),

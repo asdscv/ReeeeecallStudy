@@ -19,7 +19,7 @@ const REPO_ROOT = join(__dirname, '../../../../..')
 
 /** The four surfaces that render the AI 학습 menu. Each must read it from the registry. */
 const MENU_SURFACES = [
-  'packages/web/src/components/common/Layout.tsx',
+  'packages/web/src/components/common/nav-model.ts',
   'packages/web/src/pages/ai/AIHubPage.tsx',
   'packages/mobile/src/navigation/MainDrawer.tsx',
   'packages/mobile/src/screens/ai/AIHubScreen.tsx',

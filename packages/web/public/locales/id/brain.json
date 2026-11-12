@@ -1,37 +1,71 @@
 {
   "title": "Latihan Otak",
-  "subtitle": "Memori, fokus, kecepatan, dan penalaran — teka-teki baru setiap ronde, sesuai levelmu.",
-  "note": "Latihan otak sehari-hari untuk hiburan. Bukan layanan medis.",
-  "mix": {
-    "title": "Latihan campuran",
-    "desc": "Permainan berganti sendiri dan lebih sering melatih kemampuan terlemahmu. Main selama yang kamu mau.",
-    "start": "Mulai"
+  "subtitle": "Permainan fokus dan memori untuk kebiasaan aktivitas otak yang rutin",
+  "disclaimer": "Fitur ini bukan perangkat medis dan tidak dimaksudkan untuk mendiagnosis, mengobati, menyembuhkan, atau mencegah kondisi medis apa pun.",
+  "worry": "Jika kamu khawatir tentang daya ingatmu, bicarakan dengan dokter atau layanan kesehatan setempat, alih-alih bermain lebih banyak.",
+  "training": {
+    "title": "Latihan hari ini",
+    "desc": "Mata Cepat dan 3 permainan · sekitar {{minutes}} menit",
+    "start": "Mulai latihan hari ini",
+    "week": "Minggu ini {{done}}/{{goal}}",
+    "weekDone": "Target mingguan tercapai",
+    "course": "Kursus inti {{done}}/{{total}}",
+    "booster": "Penyegaran {{done}}/{{total}}",
+    "boosterNext": "Penyegaran berikutnya: {{date}}",
+    "minutes": "Total {{value}} menit",
+    "dose": "Rencananya sekitar tiga sesi 20 menit per minggu. Boleh main lebih banyak, tapi tidak ada tambahan apa pun.",
+    "slot": "Permainan {{index}}/{{total}}",
+    "next": "Permainan berikutnya",
+    "continue": "Lanjutkan",
+    "doneTitle": "Latihan hari ini selesai",
+    "doneBody": "Kerja bagus. Istirahat sehari atau dua hari sebelum sesi berikutnya juga tidak apa-apa.",
+    "quitTitle": "Latihan dihentikan",
+    "quitBody": "Catatanmu sejauh ini sudah tersimpan. Karena belum selesai, sesi ini tidak dihitung sebagai sesi yang tuntas.",
+    "backHome": "Kembali ke Latihan Otak"
   },
   "home": {
-    "games": "Permainan",
+    "freePlay": "Latihan bebas",
+    "freePlayHint": "Pilih satu permainan untuk dilatih. Ronde berakhir saat 3 kesempatanmu habis.",
     "level": "Lv. {{level}}",
     "best": "Terbaik Lv. {{level}}",
     "new": "Baru",
-    "streak_one": "{{count}} hari beruntun",
-    "streak_other": "{{count}} hari beruntun",
-    "today": "Ronde hari ini: {{value}}",
-    "totalPoints": "Total poin: {{value}}",
-    "howItWorks": "Setiap ronde dibuat baru. Benar, ronde berikutnya sedikit lebih sulit; salah, jadi lebih mudah — jadi selalu cukup menantang."
+    "quickEyeLevel": "Tahap {{stage}} · kecepatan {{speed}}/12",
+    "record": "Terbaik {{value}} poin",
+    "settings": "Pengaturan",
+    "research": "Dasar penelitian",
+    "howItWorks": "Setiap teka-teki dibuat baru. Jawab benar, berikutnya sedikit lebih sulit; salah, jadi lebih mudah. Level hanya menunjukkan kemampuanmu di permainan itu — bukan ukuran daya ingat atau kesehatan otak."
+  },
+  "settings": {
+    "title": "Pengaturan Latihan Otak",
+    "timing": "Waktu santai",
+    "timingHelp": "Beri lebih banyak waktu pada permainan berwaktu, atau hapus batas waktunya. Di mode yang lebih lama, kehabisan waktu tidak mengurangi kesempatan.",
+    "timing_1": "Standar",
+    "timing_1_5": "1,5×",
+    "timing_2": "2×",
+    "timing_0": "Tanpa batas",
+    "centerOnly": "Mata Cepat: tengah saja",
+    "centerOnlyHelp": "Aktifkan jika bintang di tepi sulit terlihat. Kamu hanya menjawab gambar di tengah.",
+    "flash": "Mata Cepat menampilkan gambar dengan sangat singkat. Jika kamu sensitif terhadap cahaya berkedip, mainlah dengan santai.",
+    "close": "Tutup"
   },
   "skills": {
     "memory": "Memori",
-    "attention": "Fokus",
+    "attention": "Perhatian",
     "speed": "Kecepatan",
     "reasoning": "Penalaran"
   },
   "games": {
+    "quickEye": {
+      "name": "Mata Cepat",
+      "desc": "Lihat sekilas gambar di tengah dan bintang di tepi, lalu jawab apa dan di mana."
+    },
     "memoryGrid": {
       "name": "Kotak Kilat",
-      "desc": "Ingat kotak yang menyala, lalu ketuk."
+      "desc": "Latihan mengingat posisi: ingat kotak yang menyala, lalu ketuk."
     },
     "sequence": {
       "name": "Urutan",
-      "desc": "Lihat urutan kotak berkedip dan ulangi."
+      "desc": "Latihan mengingat urutan: ketuk kotak sesuai urutan kedipnya."
     },
     "pairs": {
       "name": "Cari Pasangan",
@@ -39,7 +73,7 @@
     },
     "schulte": {
       "name": "Buru Angka",
-      "desc": "Ketuk angka secara berurutan secepat mungkin."
+      "desc": "Temukan dan ketuk angka yang tersebar secara berurutan."
     },
     "oddOneOut": {
       "name": "Yang Berbeda",
@@ -47,11 +81,11 @@
     },
     "stroop": {
       "name": "Warna Kata",
-      "desc": "Pilih warna tulisannya, bukan arti katanya."
+      "desc": "Pilih warna tulisannya, bukan kata yang kamu baca."
     },
     "math": {
       "name": "Hitung Cepat",
-      "desc": "Selesaikan sebelum waktu habis."
+      "desc": "Hitung lalu pilih jawabannya."
     },
     "series": {
       "name": "Pola Angka",
@@ -74,24 +108,60 @@
     "pickWord": "Pilih ARTI kata",
     "solve": "Pilih jawabannya",
     "nextNumber": "Angka berikutnya?",
-    "correct": "Benar!",
-    "wrong": "Hampir",
+    "correct": "Benar",
+    "wrong": "Belum tepat",
     "timeUp": "Waktu habis",
-    "levelUp": "Naik level! Lv. {{level}}",
+    "timeUpForgiven": "Waktu habis · kesempatan tidak berkurang",
+    "void": "Layar tersendat — kita tampilkan lagi",
     "points": "+{{value}}",
+    "levelUp": "Naik level · Lv. {{level}}",
+    "lives": "Sisa kesempatan {{value}}",
+    "livesSpan": "Sisa kesempatan di panjang ini {{value}}",
+    "practice": "Pemanasan {{done}}/{{total}}",
+    "practiceHint": "Pemanasan — tidak ada kesempatan atau poin yang dipertaruhkan.",
+    "practiceDone": "Pemanasan selesai — ayo mulai",
+    "trial": "{{done}}/{{total}}",
     "score": "Skor",
     "streak": "Beruntun",
+    "pause": "Jeda",
+    "paused": "Dijeda",
+    "resume": "Lanjutkan",
     "stop": "Selesai",
-    "mixBadge": "Campuran"
+    "stopConfirm": "Berhenti di sini? Catatanmu sejauh ini tetap tersimpan."
+  },
+  "quickEye": {
+    "watch": "Lihat ke tengah",
+    "what": "Apa yang ada di tengah?",
+    "where": "Ke arah mana bintangnya?",
+    "sameOrDifferent": "Apakah dua gambar di tengah sama?",
+    "same": "Sama",
+    "different": "Beda",
+    "circle": "Lingkaran",
+    "square": "Persegi",
+    "stage": "Tahap {{stage}}",
+    "dir": {
+      "0": "Atas",
+      "1": "Kanan atas",
+      "2": "Kanan",
+      "3": "Kanan bawah",
+      "4": "Bawah",
+      "5": "Kiri bawah",
+      "6": "Kiri",
+      "7": "Kiri atas"
+    }
   },
   "summary": {
-    "title": "Kerja bagus",
-    "rounds": "Ronde",
+    "livesOut": "Ronde selesai",
+    "cleared": "Ronde berhasil",
+    "stopped": "Waktu yang pas untuk berhenti",
+    "trials": "Teka-teki",
     "accuracy": "Akurasi",
     "points": "Poin",
     "bestStreak": "Beruntun terbaik",
-    "levels": "Perubahan level",
-    "again": "Lanjut",
+    "levelChange": "Lv. {{from}} → {{to}}",
+    "improved": "Rekormu di permainan ini meningkat",
+    "newBest": "Skor terbaik pribadi",
+    "again": "Main lagi",
     "home": "Semua permainan"
   },
   "colors": {

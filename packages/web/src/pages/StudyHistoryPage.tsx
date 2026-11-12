@@ -537,7 +537,7 @@ function DeckProgressCard({ progress: p }: { progress: DeckProgress }) {
       </div>
 
       {/* Status breakdown */}
-      <div className="flex items-center gap-2 mt-2 text-[11px]">
+      <div className="flex items-center gap-2 mt-2 text-xs">
         {p.newCards > 0 && (
           <span className="text-brand">{t('deckProgress.notStudied', { count: p.newCards })}</span>
         )}
@@ -629,7 +629,7 @@ function SessionCard({
                       />
                     ))}
                   </div>
-                  <span className="text-[10px] text-content-tertiary shrink-0 hidden sm:inline">
+                  <span className="text-xs text-content-tertiary shrink-0 hidden sm:inline">
                     {ratingEntries.map(([r, c]) => `${getRatingLabel(r)} ${c}`).join(' / ')}
                   </span>
                 </div>

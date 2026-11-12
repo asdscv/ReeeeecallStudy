@@ -302,7 +302,7 @@ export function AdminContentPage() {
                         style={{ width: `${pct}%`, backgroundColor: SHARE_MODE_COLORS[s.mode] ?? '#6b7280' }}
                       />
                     </div>
-                    <p className="text-[11px] text-content-tertiary mt-1">{pct}%</p>
+                    <p className="text-xs text-content-tertiary mt-1">{pct}%</p>
                   </div>
                 )
               })}

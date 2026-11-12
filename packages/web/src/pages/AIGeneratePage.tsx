@@ -219,7 +219,7 @@ export function AIGeneratePage() {
                     {isComplete ? '✓' : i + 1}
                   </div>
                   <span
-                    className={`text-[10px] sm:text-xs mt-1 whitespace-nowrap ${
+                    className={`text-xs sm:text-xs mt-1 whitespace-nowrap ${
                       isActive ? 'text-brand font-semibold' : 'text-content-tertiary'
                     }`}
                   >
@@ -345,7 +345,7 @@ function InfoCard({ icon, title, desc }: { icon: string; title: string; desc: st
       <span className="text-lg shrink-0">{icon}</span>
       <div>
         <p className="text-xs font-medium text-foreground">{title}</p>
-        <p className="text-[10px] text-content-tertiary mt-0.5">{desc}</p>
+        <p className="text-xs text-content-tertiary mt-0.5">{desc}</p>
       </div>
     </div>
   )

@@ -42,18 +42,18 @@ export function DoneStep({
       <div className="flex justify-center gap-3">
         {templateName && (
           <div className="px-3 py-2 bg-purple-500/10 rounded-lg text-center">
-            <p className="text-[10px] uppercase text-purple-500 font-semibold">{t('done.template')}</p>
+            <p className="text-xs uppercase text-purple-500 font-semibold">{t('done.template')}</p>
             <p className="text-sm font-medium text-foreground mt-0.5">{templateName}</p>
           </div>
         )}
         {deckName && (
           <div className="px-3 py-2 bg-brand/10 rounded-lg text-center">
-            <p className="text-[10px] uppercase text-brand font-semibold">{t('done.deck')}</p>
+            <p className="text-xs uppercase text-brand font-semibold">{t('done.deck')}</p>
             <p className="text-sm font-medium text-foreground mt-0.5">{deckName}</p>
           </div>
         )}
         <div className="px-3 py-2 bg-success/10 rounded-lg text-center">
-          <p className="text-[10px] uppercase text-success font-semibold">{t('done.cards')}</p>
+          <p className="text-xs uppercase text-success font-semibold">{t('done.cards')}</p>
           <p className="text-sm font-medium text-foreground mt-0.5">{cardCount}</p>
         </div>
       </div>

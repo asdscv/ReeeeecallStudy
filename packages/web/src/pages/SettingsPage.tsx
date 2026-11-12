@@ -530,7 +530,7 @@ export function SettingsPage() {
                     >
                       <div className="text-sm font-semibold text-foreground">{t('tts.edgeTts')}</div>
                       <div className="text-xs text-muted-foreground mt-0.5">{t('tts.edgeTtsDesc')}</div>
-                      <div className="text-[11px] text-warning mt-1">{t('tts.edgeTtsNote')}</div>
+                      <div className="text-xs text-warning mt-1">{t('tts.edgeTtsNote')}</div>
                     </button>
                   </div>
                 </div>

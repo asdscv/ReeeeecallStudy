@@ -1,22 +1,52 @@
 {
   "title": "Entrenamiento mental",
-  "subtitle": "Memoria, atención, rapidez y razonamiento: un reto nuevo en cada ronda, ajustado a tu nivel.",
-  "note": "Ejercicio mental cotidiano para divertirse. No es un servicio médico.",
-  "mix": {
-    "title": "Entrenamiento mixto",
-    "desc": "Los juegos cambian solos y se centran en tu punto más débil. Sigue todo el tiempo que quieras.",
-    "start": "Empezar"
+  "subtitle": "Juegos de concentración y memoria para un hábito regular de actividad mental",
+  "disclaimer": "Esta función no es un dispositivo médico y no está destinada a diagnosticar, tratar, curar ni prevenir ninguna afección médica.",
+  "worry": "Si te preocupa tu memoria, en lugar de jugar más, habla con un médico o con un servicio de salud de tu zona.",
+  "training": {
+    "title": "Entrenamiento de hoy",
+    "desc": "Ojo rápido y 3 juegos · unos {{minutes}} min",
+    "start": "Empezar el entrenamiento de hoy",
+    "week": "Esta semana {{done}}/{{goal}}",
+    "weekDone": "Objetivo semanal cumplido",
+    "course": "Curso básico {{done}}/{{total}}",
+    "booster": "Repaso {{done}}/{{total}}",
+    "boosterNext": "Próximo repaso: {{date}}",
+    "minutes": "{{value}} min en total",
+    "dose": "El plan son unas tres sesiones de 20 minutos por semana. Puedes jugar más, pero no suma nada extra.",
+    "slot": "Juego {{index}}/{{total}}",
+    "next": "Siguiente juego",
+    "continue": "Continuar",
+    "doneTitle": "Entrenamiento de hoy completado",
+    "doneBody": "Buen trabajo. Puedes descansar uno o dos días antes del siguiente.",
+    "quitTitle": "Entrenamiento detenido",
+    "quitBody": "Tus registros hasta ahora se han guardado. Como no lo terminaste, no cuenta como sesión completada.",
+    "backHome": "Volver a Entrenamiento mental"
   },
   "home": {
-    "games": "Juegos",
+    "freePlay": "Práctica libre",
+    "freePlayHint": "Elige un juego para practicar. La ronda termina cuando usas tus 3 oportunidades.",
     "level": "Nv. {{level}}",
     "best": "Mejor Nv. {{level}}",
     "new": "Nuevo",
-    "streak_one": "Racha de {{count}} día",
-    "streak_other": "Racha de {{count}} días",
-    "today": "Rondas hoy: {{value}}",
-    "totalPoints": "Puntos totales: {{value}}",
-    "howItWorks": "Cada ronda se genera desde cero. Si aciertas, la siguiente es un poco más difícil; si fallas, se suaviza. Así siempre es un reto justo."
+    "quickEyeLevel": "Etapa {{stage}} · velocidad {{speed}}/12",
+    "record": "Mejor: {{value}} pts",
+    "settings": "Ajustes",
+    "research": "Estudios de referencia",
+    "howItWorks": "Cada reto se crea desde cero. Si aciertas, el siguiente es un poco más difícil; si fallas, se suaviza. El nivel solo muestra tu habilidad en ese juego: no mide la memoria ni la salud cerebral."
+  },
+  "settings": {
+    "title": "Ajustes de Entrenamiento mental",
+    "timing": "Tiempo relajado",
+    "timingHelp": "Da más tiempo a los juegos con límite, o quítalo del todo. En los modos más largos, quedarte sin tiempo no te cuesta una oportunidad.",
+    "timing_1": "Estándar",
+    "timing_1_5": "1,5×",
+    "timing_2": "2×",
+    "timing_0": "Sin límite",
+    "centerOnly": "Ojo rápido: solo el centro",
+    "centerOnlyHelp": "Actívalo si te cuesta ver la estrella de los bordes. Solo responderás la imagen del centro.",
+    "flash": "Ojo rápido muestra imágenes durante muy poco tiempo. Si eres sensible a las luces intermitentes, tómatelo con calma.",
+    "close": "Cerrar"
   },
   "skills": {
     "memory": "Memoria",
@@ -25,25 +55,29 @@
     "reasoning": "Razonamiento"
   },
   "games": {
+    "quickEye": {
+      "name": "Ojo rápido",
+      "desc": "Ve durante un instante una imagen en el centro y una estrella en el borde, y di qué era y dónde estaba."
+    },
     "memoryGrid": {
       "name": "Cuadrícula flash",
-      "desc": "Recuerda qué casillas se iluminaron y tócalas."
+      "desc": "Práctica de memoria espacial: recuerda las casillas que se iluminaron y tócalas."
     },
     "sequence": {
       "name": "Secuencia",
-      "desc": "Mira el orden en que parpadean y repítelo."
+      "desc": "Práctica de memoria de orden: toca las fichas en el orden en que parpadearon."
     },
     "pairs": {
       "name": "Parejas",
-      "desc": "Voltea dos cartas a la vez para encontrar las parejas."
+      "desc": "Voltea dos cartas a la vez para encontrar imágenes iguales."
     },
     "schulte": {
       "name": "Caza de números",
-      "desc": "Toca los números en orden lo más rápido posible."
+      "desc": "Encuentra y toca en orden los números dispersos."
     },
     "oddOneOut": {
       "name": "El diferente",
-      "desc": "Todos son iguales menos uno. Encuéntralo."
+      "desc": "Todos iguales menos uno. Encuéntralo."
     },
     "stroop": {
       "name": "Color y palabra",
@@ -51,7 +85,7 @@
     },
     "math": {
       "name": "Cálculo rápido",
-      "desc": "Resuélvelo antes de que se acabe el tiempo."
+      "desc": "Resuélvelo y elige la respuesta."
     },
     "series": {
       "name": "Patrón numérico",
@@ -74,24 +108,60 @@
     "pickWord": "Elige lo que DICE la palabra",
     "solve": "Elige la respuesta",
     "nextNumber": "¿Qué número sigue?",
-    "correct": "¡Correcto!",
+    "correct": "Correcto",
     "wrong": "Casi",
     "timeUp": "Se acabó el tiempo",
-    "levelUp": "¡Subes de nivel! Nv. {{level}}",
+    "timeUpForgiven": "Se acabó el tiempo · no pierdes oportunidad",
+    "void": "La pantalla se trabó; te lo mostramos otra vez",
     "points": "+{{value}}",
+    "levelUp": "Subes de nivel · Nv. {{level}}",
+    "lives": "Oportunidades: {{value}}",
+    "livesSpan": "Oportunidades en esta longitud: {{value}}",
+    "practice": "Práctica {{done}}/{{total}}",
+    "practiceHint": "Práctica: no te juegas oportunidades ni puntos.",
+    "practiceDone": "Práctica terminada. ¡Vamos allá!",
+    "trial": "{{done}}/{{total}}",
     "score": "Puntos",
     "streak": "Racha",
+    "pause": "Pausa",
+    "paused": "En pausa",
+    "resume": "Reanudar",
     "stop": "Terminar",
-    "mixBadge": "Mixto"
+    "stopConfirm": "¿Terminar aquí? Tus registros hasta ahora quedan guardados."
+  },
+  "quickEye": {
+    "watch": "Mira el centro",
+    "what": "¿Qué había en el centro?",
+    "where": "¿En qué dirección estaba la estrella?",
+    "sameOrDifferent": "¿Eran iguales las dos imágenes del centro?",
+    "same": "Iguales",
+    "different": "Diferentes",
+    "circle": "Círculo",
+    "square": "Cuadrado",
+    "stage": "Etapa {{stage}}",
+    "dir": {
+      "0": "Arriba",
+      "1": "Arriba a la derecha",
+      "2": "Derecha",
+      "3": "Abajo a la derecha",
+      "4": "Abajo",
+      "5": "Abajo a la izquierda",
+      "6": "Izquierda",
+      "7": "Arriba a la izquierda"
+    }
   },
   "summary": {
-    "title": "¡Buen trabajo!",
-    "rounds": "Rondas",
+    "livesOut": "Ronda terminada",
+    "cleared": "Ronda superada",
+    "stopped": "Buen momento para parar",
+    "trials": "Retos",
     "accuracy": "Aciertos",
     "points": "Puntos",
     "bestStreak": "Mejor racha",
-    "levels": "Niveles",
-    "again": "Seguir",
+    "levelChange": "Nv. {{from}} → {{to}}",
+    "improved": "Tu récord en este juego ha mejorado",
+    "newBest": "Mejor puntuación personal",
+    "again": "Jugar otra vez",
     "home": "Todos los juegos"
   },
   "colors": {

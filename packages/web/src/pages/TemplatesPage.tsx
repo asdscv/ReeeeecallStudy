@@ -214,7 +214,7 @@ function TemplateCard({
         </div>
 
         {/* Layout preview */}
-        <div className="flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-0.5 text-[10px] sm:text-xs text-content-tertiary mb-3">
+        <div className="flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-0.5 text-xs sm:text-xs text-content-tertiary mb-3">
           <span>{t('frontFields', { count: template.front_layout.length })}</span>
           <span>{t('backFields', { count: template.back_layout.length })}</span>
           <span>{t('created', { date: formatLocalDate(template.created_at, dateLocale) })}</span>

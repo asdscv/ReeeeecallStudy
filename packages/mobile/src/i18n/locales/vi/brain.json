@@ -1,37 +1,71 @@
 {
   "title": "Luyện trí não",
-  "subtitle": "Trí nhớ, tập trung, phản xạ và suy luận — mỗi lượt là một câu đố mới, theo đúng trình độ của bạn.",
-  "note": "Trò chơi rèn luyện trí não hằng ngày để giải trí, không phải dịch vụ y tế.",
-  "mix": {
-    "title": "Luyện tập tổng hợp",
-    "desc": "Trò chơi tự đổi và ưu tiên kỹ năng yếu nhất của bạn. Chơi bao lâu tùy thích.",
-    "start": "Bắt đầu"
+  "subtitle": "Trò chơi tập trung và ghi nhớ cho thói quen hoạt động trí não đều đặn",
+  "disclaimer": "Tính năng này không phải là thiết bị y tế và không nhằm mục đích chẩn đoán, điều trị, chữa khỏi hoặc phòng ngừa bất kỳ bệnh lý nào.",
+  "worry": "Nếu bạn lo lắng về trí nhớ của mình, hãy trao đổi với bác sĩ hoặc cơ sở y tế tại địa phương thay vì chơi thêm.",
+  "training": {
+    "title": "Bài luyện hôm nay",
+    "desc": "Nhanh mắt và 3 trò chơi · khoảng {{minutes}} phút",
+    "start": "Bắt đầu bài luyện hôm nay",
+    "week": "Tuần này {{done}}/{{goal}}",
+    "weekDone": "Đã đạt mục tiêu tuần",
+    "course": "Khóa cơ bản {{done}}/{{total}}",
+    "booster": "Ôn lại {{done}}/{{total}}",
+    "boosterNext": "Lần ôn lại tiếp theo: {{date}}",
+    "minutes": "Tổng cộng {{value}} phút",
+    "dose": "Kế hoạch là khoảng 3 buổi mỗi tuần, mỗi buổi 20 phút. Chơi nhiều hơn cũng được, nhưng không được thêm gì.",
+    "slot": "Trò chơi {{index}}/{{total}}",
+    "next": "Trò chơi tiếp theo",
+    "continue": "Tiếp tục",
+    "doneTitle": "Đã xong bài luyện hôm nay",
+    "doneBody": "Làm tốt lắm. Nghỉ một hai ngày rồi mới luyện tiếp cũng không sao.",
+    "quitTitle": "Đã dừng bài luyện",
+    "quitBody": "Kết quả đến giờ đã được lưu. Vì chưa làm hết nên buổi này không được tính là đã hoàn thành.",
+    "backHome": "Quay lại Luyện trí não"
   },
   "home": {
-    "games": "Trò chơi",
+    "freePlay": "Luyện tự do",
+    "freePlayHint": "Chọn một trò chơi để luyện. Lượt chơi kết thúc khi bạn dùng hết 3 cơ hội.",
     "level": "Cấp {{level}}",
     "best": "Cao nhất cấp {{level}}",
     "new": "Mới",
-    "streak_one": "Chuỗi {{count}} ngày",
-    "streak_other": "Chuỗi {{count}} ngày",
-    "today": "Hôm nay {{value}} lượt",
-    "totalPoints": "Tổng điểm {{value}}",
-    "howItWorks": "Mỗi lượt đều được tạo mới. Đúng thì lượt sau khó hơn một chút, sai thì dễ hơn — nên luôn ở mức «hơi thử thách»."
+    "quickEyeLevel": "Màn {{stage}} · tốc độ {{speed}}/12",
+    "record": "Cao nhất {{value}} điểm",
+    "settings": "Cài đặt",
+    "research": "Cơ sở nghiên cứu",
+    "howItWorks": "Mỗi câu đố đều được tạo mới. Đúng thì câu sau khó hơn một chút, sai thì dễ hơn. Cấp độ chỉ cho thấy kỹ năng của bạn ở trò chơi đó — không phải thước đo trí nhớ hay sức khỏe não bộ."
+  },
+  "settings": {
+    "title": "Cài đặt Luyện trí não",
+    "timing": "Thời gian thoải mái",
+    "timingHelp": "Tăng thời gian cho các trò chơi có giới hạn giờ, hoặc bỏ hẳn giới hạn. Ở các chế độ dài hơn, hết giờ sẽ không bị mất cơ hội.",
+    "timing_1": "Tiêu chuẩn",
+    "timing_1_5": "1,5×",
+    "timing_2": "2×",
+    "timing_0": "Không giới hạn",
+    "centerOnly": "Nhanh mắt: chỉ ở giữa",
+    "centerOnlyHelp": "Bật lên nếu khó nhìn thấy ngôi sao ở rìa. Bạn chỉ cần trả lời hình ở giữa.",
+    "flash": "Nhanh mắt hiện hình ảnh trong thời gian rất ngắn. Nếu bạn nhạy cảm với ánh sáng nhấp nháy, hãy chơi vừa sức.",
+    "close": "Đóng"
   },
   "skills": {
     "memory": "Trí nhớ",
-    "attention": "Tập trung",
-    "speed": "Phản xạ",
+    "attention": "Chú ý",
+    "speed": "Tốc độ",
     "reasoning": "Suy luận"
   },
   "games": {
+    "quickEye": {
+      "name": "Nhanh mắt",
+      "desc": "Nhìn thoáng qua một hình ở giữa và một ngôi sao ở rìa, rồi cho biết đó là gì và ở đâu."
+    },
     "memoryGrid": {
       "name": "Ô sáng",
-      "desc": "Nhớ các ô vừa sáng lên rồi chạm vào chúng."
+      "desc": "Luyện nhớ vị trí: ghi nhớ các ô vừa sáng rồi chạm vào chúng."
     },
     "sequence": {
       "name": "Nhớ thứ tự",
-      "desc": "Xem các ô nhấp nháy rồi chạm lại đúng thứ tự."
+      "desc": "Luyện nhớ thứ tự: chạm các ô theo đúng thứ tự chúng nhấp nháy."
     },
     "pairs": {
       "name": "Lật hình",
@@ -39,7 +73,7 @@
     },
     "schulte": {
       "name": "Tìm số",
-      "desc": "Chạm các số theo thứ tự nhanh nhất có thể."
+      "desc": "Tìm và chạm các số nằm rải rác theo thứ tự."
     },
     "oddOneOut": {
       "name": "Tìm điểm khác",
@@ -47,11 +81,11 @@
     },
     "stroop": {
       "name": "Màu và chữ",
-      "desc": "Chọn màu của chữ, không phải nghĩa của chữ."
+      "desc": "Chọn màu của chữ, không phải chữ bạn đọc được."
     },
     "math": {
       "name": "Tính nhanh",
-      "desc": "Tính xong trước khi hết giờ."
+      "desc": "Tính ra rồi chọn đáp án."
     },
     "series": {
       "name": "Quy luật số",
@@ -74,24 +108,60 @@
     "pickWord": "Chọn NGHĨA của chữ",
     "solve": "Chọn đáp án",
     "nextNumber": "Số tiếp theo là gì?",
-    "correct": "Chính xác!",
-    "wrong": "Tiếc quá",
+    "correct": "Chính xác",
+    "wrong": "Chưa đúng",
     "timeUp": "Hết giờ",
-    "levelUp": "Lên cấp! Cấp {{level}}",
+    "timeUpForgiven": "Hết giờ · không mất cơ hội",
+    "void": "Màn hình bị giật — mình hiện lại nhé",
     "points": "+{{value}}",
+    "levelUp": "Lên cấp · Cấp {{level}}",
+    "lives": "Còn {{value}} cơ hội",
+    "livesSpan": "Cơ hội ở độ dài này: {{value}}",
+    "practice": "Luyện thử {{done}}/{{total}}",
+    "practiceHint": "Đây là luyện thử — không mất cơ hội, không tính điểm.",
+    "practiceDone": "Xong phần luyện thử — bắt đầu nào",
+    "trial": "{{done}}/{{total}}",
     "score": "Điểm",
     "streak": "Chuỗi",
+    "pause": "Tạm dừng",
+    "paused": "Đang tạm dừng",
+    "resume": "Tiếp tục",
     "stop": "Kết thúc",
-    "mixBadge": "Tổng hợp"
+    "stopConfirm": "Dừng ở đây nhé? Kết quả đến giờ sẽ được lưu."
+  },
+  "quickEye": {
+    "watch": "Nhìn vào giữa",
+    "what": "Ở giữa có gì?",
+    "where": "Ngôi sao ở hướng nào?",
+    "sameOrDifferent": "Hai hình ở giữa có giống nhau không?",
+    "same": "Giống",
+    "different": "Khác",
+    "circle": "Hình tròn",
+    "square": "Hình vuông",
+    "stage": "Màn {{stage}}",
+    "dir": {
+      "0": "Trên",
+      "1": "Trên bên phải",
+      "2": "Phải",
+      "3": "Dưới bên phải",
+      "4": "Dưới",
+      "5": "Dưới bên trái",
+      "6": "Trái",
+      "7": "Trên bên trái"
+    }
   },
   "summary": {
-    "title": "Làm tốt lắm",
-    "rounds": "Số lượt",
+    "livesOut": "Kết thúc lượt",
+    "cleared": "Hoàn thành lượt",
+    "stopped": "Điểm dừng hợp lý",
+    "trials": "Số câu",
     "accuracy": "Tỉ lệ đúng",
     "points": "Điểm",
     "bestStreak": "Chuỗi dài nhất",
-    "levels": "Thay đổi cấp",
-    "again": "Chơi tiếp",
+    "levelChange": "Cấp {{from}} → {{to}}",
+    "improved": "Thành tích của bạn ở trò chơi này đã tốt hơn",
+    "newBest": "Điểm cao nhất của bạn",
+    "again": "Chơi lại",
     "home": "Tất cả trò chơi"
   },
   "colors": {

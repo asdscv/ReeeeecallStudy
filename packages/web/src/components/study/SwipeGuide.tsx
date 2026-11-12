@@ -58,7 +58,7 @@ export function SwipeGuide({ directions, visible }: SwipeGuideProps) {
             style={{ opacity: show ? 0.25 : 0, color: getActionColor(action, 1) }}
           >
             <span className="text-base sm:text-lg font-bold">{arrow}</span>
-            <span className="hidden sm:inline text-[10px] font-semibold uppercase">{label}</span>
+            <span className="hidden sm:inline text-xs font-semibold uppercase">{label}</span>
           </div>
         )
       })}

@@ -5,7 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* ── Synced with shared/design-tokens ── */
+  /* ── Synced with shared/design-tokens ──
+     Text tokens were raised to WCAG AA (4.5:1) in the brain-training v2 audit: tertiary text
+     (#9CA3AF, 2.5:1 on white), success (2.3:1) and warning (1.9:1) failed on every screen. */
   --font-size: 16px;
   --background: #FFFFFF;
   --foreground: #111827;
@@ -18,10 +20,10 @@
   --secondary: #F3F4F6;
   --secondary-foreground: #111827;
   --muted: #F3F4F6;
-  --muted-foreground: #6B7280;
+  --muted-foreground: #4B5563;
   --accent: #E5E7EB;
   --accent-foreground: #111827;
-  --destructive: #EF4444;
+  --destructive: #B91C1C;
   --destructive-foreground: #FFFFFF;
   --border: #E5E7EB;
   --input: #E5E7EB;
@@ -30,17 +32,17 @@
   --font-weight-medium: 500;
   --font-weight-normal: 400;
   --ring: #3B82F6;
-  --brand: #2563EB;
-  --brand-hover: #1D4ED8;
-  --brand-active: #1E40AF;
+  --brand: #1D4ED8;
+  --brand-hover: #1E40AF;
+  --brand-active: #1E3A8A;
   --brand-foreground: #FFFFFF;
-  --destructive-hover: #DC2626;
-  --destructive-active: #B91C1C;
-  --success: #22C55E;
+  --destructive-hover: #991B1B;
+  --destructive-active: #7F1D1D;
+  --success: #15803D;
   --success-foreground: #FFFFFF;
-  --warning: #EAB308;
+  --warning: #B45309;
   --warning-foreground: #FFFFFF;
-  --content-tertiary: #9CA3AF;
+  --content-tertiary: #5F6672;
   --chart-1: #E97451;
   --chart-2: #2BADA0;
   --chart-3: #3B6894;
@@ -70,7 +72,7 @@
   --secondary: #1F2937;
   --secondary-foreground: #F9FAFB;
   --muted: #1F2937;
-  --muted-foreground: #9CA3AF;
+  --muted-foreground: #BAC2CE;
   --accent: #1F2937;
   --accent-foreground: #F9FAFB;
   --destructive: #F87171;
@@ -89,7 +91,7 @@
   --success-foreground: #052E16;
   --warning: #FACC15;
   --warning-foreground: #451A03;
-  --content-tertiary: #6B7280;
+  --content-tertiary: #9CA3AF;
   --input-background: #111827;
   --switch-background: #475569;
   --chart-1: #3B82F6;

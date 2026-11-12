@@ -6,12 +6,18 @@ import type { BrainGameDef, CellView } from '../types'
  * Board sizes are fixed to ones that fill a rectangle (no empty slots). Past the largest board
  * the preview shrinks to nothing, the pictures come from one look-alike family, and the miss
  * budget tightens — so the level keeps meaning something.
+ *
+ * Turning over a card nobody has seen yet is exploring the board, not a mistake: a mismatch only
+ * counts against the budget when it goes against what the player had already seen. A board is one trial —
+ * finishing it within the budget is right, running out is one life.
  */
 export interface PairsState {
   cols: number
   rows: number
   cards: string[]
   matched: boolean[]
+  /** Cards that have been face up at least once (after the preview). */
+  seen: boolean[]
   open: number[]
   phase: 'preview' | 'play' | 'mismatch' | 'done'
   previewMs: number
@@ -40,8 +46,9 @@ const FAMILIES: readonly string[][] = [
 
 export const pairs: BrainGameDef<PairsState> = {
   id: 'pairs',
-  create(level, rng) {
-    const board = BOARDS[Math.min(BOARDS.length - 1, Math.floor((level - 1) / 3))]
+  create(level, rng, ctx) {
+    const fits = BOARDS.filter((b) => b.cols <= Math.max(3, ctx.maxCols))
+    const board = fits[Math.min(fits.length - 1, Math.floor((level - 1) / 3))]
     // Low levels mix families (easy to tell apart); high levels draw from a single one.
     const pool =
       level >= 10 ? rng.pick(FAMILIES) : rng.shuffle(FAMILIES.flat())
@@ -53,6 +60,7 @@ export const pairs: BrainGameDef<PairsState> = {
       rows: board.rows,
       cards,
       matched: cards.map(() => false),
+      seen: cards.map(() => previewMs > 0),
       open: [],
       phase: previewMs > 0 ? 'preview' : 'play',
       previewMs,
@@ -80,12 +88,18 @@ export const pairs: BrainGameDef<PairsState> = {
     const open = [...s.open, i]
     if (open.length < 2) return { ...s, open }
     const [a, b] = open
+    // A mistake is a choice made against what the player had seen: the second card was already
+    // known (and is not the partner), or the first card's partner had been seen and was passed over.
+    const partnerKnown = s.cards.some((c, j) => j !== a && c === s.cards[a] && s.seen[j] && !s.matched[j])
+    const informed = s.seen[b] || partnerKnown
+    const seen = s.seen.slice()
+    seen[a] = seen[b] = true
     if (s.cards[a] === s.cards[b]) {
       const matched = s.matched.slice()
       matched[a] = matched[b] = true
-      return { ...s, matched, open: [], phase: matched.every(Boolean) ? 'done' : 'play' }
+      return { ...s, matched, seen, open: [], phase: matched.every(Boolean) ? 'done' : 'play' }
     }
-    return { ...s, open, misses: s.misses + 1, phase: 'mismatch' }
+    return { ...s, open, seen, misses: s.misses + (informed ? 1 : 0), phase: 'mismatch' }
   },
   timeout: (s) => (s.phase === 'done' ? s : { ...s, timedOut: true, open: [], phase: 'done' }),
   outcome(s) {

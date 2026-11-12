@@ -1,47 +1,46 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
-import { isBrainGameId } from '@reeeeecall/shared/lib/brain-games'
-import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
-import type { BrainMode, SessionStats } from '@reeeeecall/shared/hooks/useBrainSession'
+import { isBrainGameId, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
+import type { RoundStats } from '@reeeeecall/shared/hooks/useBrainRound'
 import { Screen } from '../../components/ui'
-import { useAuthState } from '../../hooks'
-import { BrainSessionView } from '../../components/brain/BrainSessionView'
-import { BrainSummaryView } from '../../components/brain/BrainSummaryView'
-import { brainStorageFor } from '../../components/brain/brain-ui'
+import { RoundView } from '../../components/brain/RoundView'
+import { RoundSummary } from '../../components/brain/RoundSummary'
+import { useBrainHydrated } from '../../components/brain/useBrainHydrated'
 import type { BrainStackParamList } from '../../navigation/types'
 
-/** One game by id, or `mix`. Leaving at any point is safe: every round is saved as it ends. */
+/**
+ * Free practice of one game: a round until the chances run out, the round's cap, or "Finish" —
+ * then its summary. Every trial is saved the moment it is judged, so leaving at any point loses
+ * nothing.
+ */
 export function BrainPlayScreen() {
   const navigation = useNavigation()
   const { params } = useRoute<RouteProp<BrainStackParamList, 'BrainPlay'>>()
-  const { user } = useAuthState()
-  const hydrate = useBrainStore((s) => s.hydrate)
-  const storageKey = useBrainStore((s) => s.storageKey)
-  const [finished, setFinished] = useState<SessionStats | null>(null)
+  const ready = useBrainHydrated()
+  const [finished, setFinished] = useState<RoundStats | null>(null)
   const [run, setRun] = useState(0)
-  const mode: BrainMode | null = params.mode === 'mix' || isBrainGameId(params.mode) ? (params.mode as BrainMode) : null
+  const gameId: BrainGameId | null = isBrainGameId(params.mode) ? params.mode : null
 
   useEffect(() => {
-    if (user) hydrate(brainStorageFor(user.id))
-  }, [user, hydrate])
+    if (!gameId) navigation.goBack()
+  }, [gameId, navigation])
 
-  useEffect(() => {
-    if (!mode) navigation.goBack()
-  }, [mode, navigation])
-
-  // The session reads the player's levels when it starts, so it waits for them.
-  const ready = mode !== null && user !== null && storageKey === brainStorageFor(user.id).key
+  const onOver = useCallback((stats: RoundStats) => setFinished(stats), [])
 
   return (
     <Screen padding={false}>
-      {!ready ? null : finished ? (
-        <BrainSummaryView
+      {!ready || !gameId ? null : finished ? (
+        <RoundSummary
+          gameId={gameId}
           stats={finished}
-          onAgain={() => { setFinished(null); setRun((r) => r + 1) }}
+          onAgain={() => {
+            setFinished(null)
+            setRun((r) => r + 1)
+          }}
           onHome={() => navigation.goBack()}
         />
       ) : (
-        <BrainSessionView key={run} mode={mode} onFinish={setFinished} />
+        <RoundView key={run} gameId={gameId} onOver={onOver} />
       )}
     </Screen>
   )

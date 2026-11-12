@@ -1,7 +1,13 @@
 import { clamp, range } from '../rng'
 import type { BrainGameDef, CellView } from '../types'
 
-/** Cells light up for a moment; tap the ones that were lit. Visual-spatial working memory. */
+/**
+ * Cells light up for a moment; tap the ones that were lit. Spatial memory span practice.
+ *
+ * A span task: the level IS the length (level 1 = 3 cells) and moves by the Corsi rule in
+ * rules.ts. The grid grows only up to the widest one that keeps cells ≥ 56dp on this screen —
+ * difficulty never comes from shrinking cells, so past that the show time shortens instead.
+ */
 export interface MemoryGridState {
   n: number
   targets: number[]
@@ -14,12 +20,13 @@ export interface MemoryGridState {
 
 export const memoryGrid: BrainGameDef<MemoryGridState> = {
   id: 'memoryGrid',
-  create(level, rng) {
-    const wanted = 3 + Math.floor((level - 1) * 0.6)
-    const n = clamp(Math.ceil(Math.sqrt(wanted * 2.6)), 3, 7)
+  create(level, rng, ctx) {
+    const wanted = 2 + Math.max(1, Math.round(level))
+    const n = clamp(Math.ceil(Math.sqrt(wanted * 2.6)), 3, Math.max(3, Math.min(7, ctx.maxCols)))
     const k = Math.min(wanted, Math.floor(n * n * 0.45))
-    // Past the largest grid the only lever left is time, so it keeps shrinking with level.
-    const showMs = Math.max(700, 900 + k * 230 - (level - 1) * 25)
+    // Past the largest grid the only lever left is time, so it keeps shrinking with the level.
+    const overflow = Math.max(0, wanted - k)
+    const showMs = Math.max(1000, 1200 + k * 250 - overflow * 120)
     return {
       n,
       targets: rng.sample(range(n * n), k).sort((a, b) => a - b),

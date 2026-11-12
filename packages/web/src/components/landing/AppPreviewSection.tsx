@@ -191,7 +191,7 @@ export function AppPreviewSection() {
                       <p className="text-xs sm:text-sm text-white/70 mt-1.5 relative">
                         {t('preview.mockMeaning', 'Hello (French)')}
                       </p>
-                      <p className="text-[10px] sm:text-xs text-white/50 mt-1 relative italic">
+                      <p className="text-xs sm:text-xs text-white/50 mt-1 relative italic">
                         {t('preview.mockExample', '"Bonjour, comment allez-vous?"')}
                       </p>
                     </div>

@@ -1,4 +1,4 @@
-import type { BrainGameDef, ChoiceView, PromptView } from '../types'
+import type { BrainGameDef, ChoiceView, CreateContext, PromptView } from '../types'
 import type { Rng } from '../rng'
 
 /** The part every pick-one-answer game shares: options, the right one, the pick. */
@@ -15,7 +15,7 @@ export interface ChoiceState {
 
 export function choiceGame(
   id: BrainGameDef<ChoiceState>['id'],
-  create: (level: number, rng: Rng) => ChoiceState,
+  create: (level: number, rng: Rng, ctx: CreateContext) => ChoiceState,
 ): BrainGameDef<ChoiceState> {
   const done = (s: ChoiceState) => s.picked !== null || s.timedOut
   return {

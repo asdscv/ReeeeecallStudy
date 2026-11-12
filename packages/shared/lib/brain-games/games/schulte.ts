@@ -1,7 +1,13 @@
 import { range } from '../rng'
 import type { BrainGameDef, CellView } from '../types'
 
-/** Numbers scattered on a grid; tap them in order. Visual search and sustained attention. */
+/**
+ * Numbers scattered on a grid; tap them in order. Visual search and sustained attention.
+ *
+ * One grid is one trial, but lives are spent per wrong TAP inside it (a tap on a number that is
+ * not the next one), not per grid: a slow, clean grid costs nothing, and the grid stops as soon as
+ * the round's remaining lives are gone.
+ */
 export interface SchulteState {
   n: number
   /** cell index → number shown */
@@ -11,12 +17,13 @@ export interface SchulteState {
   shuffleEach: boolean
   found: number
   mistakes: number
+  /** Wrong taps this grid can absorb — the round's lives left when it was made. */
+  maxMistakes: number
   flashWrong: number | null
   timedOut: boolean
   seed: number
 }
 
-const MAX_MISTAKES = 3
 
 function nextValue(s: SchulteState): number {
   return s.order === 'asc' ? s.found + 1 : s.n * s.n - s.found
@@ -40,8 +47,8 @@ function reshuffle(values: number[], seed: number): number[] {
 
 export const schulte: BrainGameDef<SchulteState> = {
   id: 'schulte',
-  create(level, rng) {
-    let n = level < 4 ? 3 : level < 9 ? 4 : level < 16 ? 5 : 6
+  create(level, rng, ctx) {
+    let n = Math.min(level < 4 ? 3 : level < 9 ? 4 : level < 16 ? 5 : 6, Math.max(3, ctx.maxCols))
     const shuffleEach = level >= 12 && rng.chance(0.25)
     if (shuffleEach) n = Math.max(3, n - 1)
     return {
@@ -51,6 +58,7 @@ export const schulte: BrainGameDef<SchulteState> = {
       shuffleEach,
       found: 0,
       mistakes: 0,
+      maxMistakes: Math.max(1, ctx.livesLeft),
       flashWrong: null,
       timedOut: false,
       seed: rng.int(1, 0x7ffffff),
@@ -71,8 +79,8 @@ export const schulte: BrainGameDef<SchulteState> = {
   timeout: (s) => ({ ...s, timedOut: true }),
   outcome(s) {
     const total = s.n * s.n
-    if (s.found === total) return { correct: true, accuracy: 1 }
-    if (s.mistakes >= MAX_MISTAKES || s.timedOut) return { correct: false, accuracy: s.found / total }
+    if (s.found === total) return { correct: true, accuracy: 1, livesSpent: s.mistakes }
+    if (s.mistakes >= s.maxMistakes || s.timedOut) return { correct: false, accuracy: s.found / total, livesSpent: s.mistakes }
     return null
   },
   timeLimitMs: (s) => 2000 + s.n * s.n * (s.shuffleEach ? 2200 : 1500),
@@ -93,7 +101,7 @@ export const schulte: BrainGameDef<SchulteState> = {
         params: {
           next: s.found < total ? nextValue(s) : total,
           max: total,
-          lives: MAX_MISTAKES - s.mistakes,
+          lives: s.maxMistakes - s.mistakes,
         },
       },
     }

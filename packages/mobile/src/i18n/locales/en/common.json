@@ -22,7 +22,16 @@
     "publisherStats": "Publisher Stats",
     "achievements": "Achievements",
     "wallet": "Wallet",
-    "quiz": "Quiz"
+    "quiz": "Quiz",
+    "aiHubHome": "AI Learning home",
+    "tabsLabel": "Main tabs",
+    "short": {
+      "home": "Home",
+      "study": "Study",
+      "decks": "Decks",
+      "brain": "Brain",
+      "more": "Menu"
+    }
   },
   "guideHelp": "Help",
   "actions": {

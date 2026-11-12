@@ -63,5 +63,5 @@ export function TimePeriodSelector({ value, onChange, testID }: TimePeriodSelect
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', borderRadius: 8, borderWidth: 1, overflow: 'hidden', alignSelf: 'flex-start' },
-  chip: { paddingHorizontal: 12, paddingVertical: 10, minHeight: 36 },
+  chip: { paddingHorizontal: 12, paddingVertical: 10, minHeight: 48, minWidth: 48, justifyContent: 'center', alignItems: 'center' },
 })

@@ -113,7 +113,7 @@ export function DailyQuestsWidget() {
                     style={{ width: `${pct}%` }}
                   />
                 </div>
-                <p className="text-[10px] text-muted-foreground mt-0.5">
+                <p className="text-xs text-muted-foreground mt-0.5">
                   {quest.current_value} / {quest.target_value}
                 </p>
               </div>
