@@ -145,7 +145,7 @@ ${placement}
 - The first paragraph must answer the query directly, in under 40 words.
 - Stay on this query from start to finish. Do not widen it into a general article about studying.
 
-${FORMAT_INSTRUCTIONS[topic.format] || FORMAT_INSTRUCTIONS.guide}${deckWordsSection(deckWords, locale)}${deckSection(topic, locale, deckWords)}`
+${FORMAT_INSTRUCTIONS[topic.format] || FORMAT_INSTRUCTIONS.guide}${deckWordsSection(deckWords)}${deckSection(topic, locale, deckWords)}`
 }
 
 // The page's call to action opens our free official deck for this exam level, so the article
@@ -153,17 +153,16 @@ ${FORMAT_INSTRUCTIONS[topic.format] || FORMAT_INSTRUCTIONS.guide}${deckWordsSect
 // Only where this edition's readers are actually shown a deck: there is no English-native deck,
 // and conversation decks exist only for Korean readers.
 // Real cards from the deck the page leads to — the article's examples must be words the reader
-// will actually find in that deck. Meanings are given only to the edition in the deck's language.
+// will actually find in that deck. An edition gets meanings only from its own language's deck.
 const DECK_WORDS_IN_PROMPT = 15
-const DECK_WORDS_LOCALE = 'ko'
 
-function deckWordsSection(deckWords, locale) {
+function deckWordsSection(deckWords) {
   if (!Array.isArray(deckWords) || deckWords.length === 0) return ''
   const n = Math.min(DECK_WORDS_IN_PROMPT, deckWords.length)
   const picked = Array.from({ length: n }, (_, i) => deckWords[Math.floor((i * deckWords.length) / n)])
   const lines = picked.map((w) => {
     const parts = [w.term]
-    if (locale === DECK_WORDS_LOCALE && w.meaning) parts.push(w.meaning)
+    if (w.meaning) parts.push(w.meaning)
     if (w.example) parts.push(w.example)
     return `- ${parts.join(' — ')}`
   })

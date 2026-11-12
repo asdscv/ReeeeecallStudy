@@ -76,10 +76,8 @@ describe('pipeline falls back to a deck guide when Search Console has nothing', 
       insertContent: vi.fn(async (record) => { inserts.push({ locale: record.locale, deck: record.deck_family, query: record.target_query }); return { ...record, id: record.locale } }),
     })
     await runContentPipeline({}, '0 6 * * *')
-    expect(inserts).toEqual([
-      { locale: 'en', deck: 'toeic:800', query: '토익 800점 단어' },
-      { locale: 'ko', deck: 'toeic:800', query: '토익 800점 단어' },
-    ])
+    expect(inserts.map((i) => i.locale).sort()).toEqual(['en', 'ja', 'ko', 'vi'])
+    expect(inserts.every((i) => i.deck === 'toeic:800' && i.query === '토익 800점 단어')).toBe(true)
   })
 })
 
@@ -103,8 +101,8 @@ describe('one topic a day, even when an edition fails', () => {
       }),
     })
     await runContentPipeline({}, '0 6 * * *')
-    expect(inserts).toEqual(['en'])
-    expect(callAI).toHaveBeenCalledTimes(2)
+    expect(inserts.sort()).toEqual(['en', 'ja', 'vi'])
+    expect(callAI).toHaveBeenCalledTimes(4)
   })
 
   it('keeps the translation on the primary slug even when its title looks like a recent article', async () => {
@@ -129,7 +127,7 @@ describe('one topic a day, even when an edition fails', () => {
 })
 
 describe('deck guide prompt carries the deck words', () => {
-  it('loads the Korean deck once per topic and passes its words to both editions', async () => {
+  it('gives each edition its own deck\'s meanings, and the English edition the words without meanings', async () => {
     vi.clearAllMocks()
     planKeywordTopic.mockResolvedValue(null)
     planDeckTopic.mockResolvedValue({
@@ -138,7 +136,11 @@ describe('deck guide prompt carries the deck words', () => {
     })
     generateImage.mockRejectedValue(new Error('no image in test'))
     callAI.mockImplementation(async () => article('toeic-800-vocabulary'))
-    const getOfficialDeckWords = vi.fn().mockResolvedValue([{ term: 'adjudicate', meaning: '판결하다', example: 'The committee will adjudicate.', exampleNote: '' }])
+    const meaning = { ko: '판결하다', ja: '裁定する', vi: 'phân xử' }
+    // There is no English deck: the real lookup returns no words for 'en'.
+    const getOfficialDeckWords = vi.fn(async (_family, locale) => (meaning[locale]
+      ? [{ term: 'adjudicate', meaning: meaning[locale], example: 'The committee will adjudicate.', exampleNote: '' }]
+      : []))
     createSupabaseClient.mockReturnValue({
       getRecentContent: vi.fn().mockResolvedValue([]),
       getPlannedArticles: vi.fn().mockResolvedValue([]),
@@ -147,11 +149,16 @@ describe('deck guide prompt carries the deck words', () => {
       insertContent: vi.fn(async (record) => ({ ...record, id: record.locale })),
     })
     await runContentPipeline({}, '0 6 * * *')
-    expect(getOfficialDeckWords).toHaveBeenCalledTimes(1)
-    expect(getOfficialDeckWords).toHaveBeenCalledWith('toeic:800', 'ko')
+    expect(getOfficialDeckWords).toHaveBeenCalledTimes(4) // once per edition, once per topic
     const prompts = callAI.mock.calls.map((c) => c[2])
-    expect(prompts).toHaveLength(2)
+    const promptIn = (marker) => prompts.find((p) => p.includes(marker))
+    expect(prompts).toHaveLength(4)
     expect(prompts.every((p) => p.includes('- adjudicate'))).toBe(true)
-    expect(prompts.some((p) => p.includes('판결하다'))).toBe(true)
+    expect(promptIn('Korean (한국어)')).toContain('- adjudicate — 판결하다')
+    expect(promptIn('Japanese (日本語)')).toContain('- adjudicate — 裁定する')
+    expect(promptIn('Vietnamese (Tiếng Việt)')).toContain('- adjudicate — phân xử')
+    const en = promptIn('Write the entire article in English')
+    expect(en).toContain('- adjudicate — The committee will adjudicate.')
+    expect(en).not.toMatch(/판결하다|裁定する|phân xử/)
   })
 })

@@ -2,8 +2,9 @@
 import {
   SITE_URL, BRAND_NAME, DEFAULT_OG_IMAGE,
   LANDING_TITLES, LANDING_DESCS, LANDING_FAQ, LANDING_HOWTO, LANDING_COPY,
-  ROBOTS_INDEX, ROBOTS_NOINDEX,
+  ROBOTS_INDEX, ROBOTS_NOINDEX, pageChrome,
 } from '../constants.js'
+import { VOCAB_INDEX_PATH, isDeckLanguage, vocabLanguageIndexPath } from '../../../packages/shared/lib/vocab-hubs.ts'
 import {
   escapeHtml, buildHreflangTags,
   localizedUrl,
@@ -25,6 +26,8 @@ export async function handleLandingBotRequest(url) {
   const lang = isUiLocale(rawLang) ? rawLang : 'en'
   const robots = isIndexable(lang) ? ROBOTS_INDEX : ROBOTS_NOINDEX
   const copy = LANDING_COPY[lang]
+  const chrome = pageChrome(lang)
+  const vocabularyPath = isDeckLanguage(lang) ? vocabLanguageIndexPath(lang) : VOCAB_INDEX_PATH
   const pageTitle = LANDING_TITLES[lang] || LANDING_TITLES.en
   const pageDesc = LANDING_DESCS[lang] || LANDING_DESCS.en
   const canonicalUrl = localizedUrl('/landing', lang)
@@ -71,7 +74,7 @@ ${jsonLdScripts}`
 <header>
 <h1>${escapeHtml(pageTitle)}</h1>
 <p>${escapeHtml(pageDesc)}</p>
-<a href="${SITE_URL}/auth/login">${lang === 'ko' ? '무료로 시작하기' : 'Start Learning for Free'}</a>
+<a href="${SITE_URL}/auth/login">${chrome.startFree}</a>
 </header>
 
 <section>
@@ -92,18 +95,18 @@ ${faqHtml}
 </section>
 
 <section>
-<h2>${lang === 'ko' ? '학습 인사이트' : 'Learning Insights'}</h2>
-<p>${lang === 'ko' ? '과학적 학습 전략, 간격 반복 팁 등 유용한 글을 확인하세요.' : 'Explore science-backed learning strategies, spaced repetition tips, and more.'}</p>
-<a href="${localizedUrl('/insight', lang)}">${lang === 'ko' ? '인사이트 보기 →' : 'Browse Insights →'}</a>
+<h2>${chrome.insightsHeading}</h2>
+<p>${chrome.insightsBlurb}</p>
+<a href="${localizedUrl('/insight', lang)}">${chrome.browseInsights}</a>
 </section>
 </main>
 
 <footer>
-<p>&copy; ${new Date().getFullYear()} ${BRAND_NAME}. ${lang === 'ko' ? '과학적 학습으로 더 스마트하게.' : 'Learn smarter with science.'}</p>
+<p>&copy; ${new Date().getFullYear()} ${BRAND_NAME}. ${chrome.tagline}</p>
 <nav>
-<a href="${canonicalUrl}">${lang === 'ko' ? '홈' : 'Home'}</a>
-<a href="${localizedUrl('/insight', lang)}">${lang === 'ko' ? '인사이트' : 'Insights'}</a>
-<a href="${SITE_URL}/vocabulary${lang === 'ko' ? '/ko' : ''}">${lang === 'ko' ? '영어 단어장' : 'Vocabulary lists'}</a>
+<a href="${canonicalUrl}">${chrome.home}</a>
+<a href="${localizedUrl('/insight', lang)}">${chrome.insights}</a>
+<a href="${SITE_URL}${vocabularyPath}">${chrome.vocabulary}</a>
 </nav>
 </footer>`
 

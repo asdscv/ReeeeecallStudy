@@ -23,7 +23,7 @@ describe('AEO public content', () => {
     expect(schemas.map((s) => s['@type'])).not.toContain('ProfilePage')
     expect(schemas.some((s) => s.aggregateRating)).toBe(false)
     expect(schemas.find((s) => s['@type'] === 'FAQPage').mainEntity[1].acceptedAnswer.text).toBe(copy.faq.a2)
-    expect(response.headers.get('X-Robots-Tag').startsWith(lang === 'en' || lang === 'ko' ? 'index' : 'noindex')).toBe(true)
+    expect(response.headers.get('X-Robots-Tag').startsWith(['en', 'ko', 'ja', 'vi'].includes(lang) ? 'index' : 'noindex')).toBe(true)
     expect(response.headers.get('Vary')).toContain('User-Agent')
   })
 

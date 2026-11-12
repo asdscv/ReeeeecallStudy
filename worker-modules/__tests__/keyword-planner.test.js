@@ -85,7 +85,7 @@ describe('buildKeywordJevRequest', () => {
     expect(Object.keys(req.questions.deck_0.criteria)).toEqual(['toeic', 'ielts', 'toefl', 'conversation', 'general', 'none'])
     expect(req.state.candidates).toEqual([{ query: 'a' }, { query: 'b' }])
     expect(req.questions.fit_1.instructions).toContain('`candidates[1].query`')
-    expect(Object.keys(req.questions.lang_0.criteria)).toEqual(['en', 'ko', 'other'])
+    expect(Object.keys(req.questions.lang_0.criteria)).toEqual(['en', 'ko', 'ja', 'vi', 'other'])
   })
 })
 
@@ -317,8 +317,8 @@ describe('deck guides use the deck\'s own words', () => {
     expect(user).toContain('the words listed under «Words From The Deck»')
   })
 
-  it('gives the English edition the same English words without the Korean meanings', () => {
-    const { user } = buildPrompt(topic, 'en', { deckWords: words })
+  it('leaves the meaning out when the edition has no deck in its language (the pipeline blanks it)', () => {
+    const { user } = buildPrompt(topic, 'en', { deckWords: words.map((w) => ({ ...w, meaning: '' })) })
     expect(user).toContain('- word0 — Example 0.')
     expect(user).not.toContain('뜻0')
   })

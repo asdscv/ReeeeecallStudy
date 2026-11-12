@@ -15,7 +15,7 @@ export const SEO = {
   // the worker's worker-modules/locale-policy.js (LOCALE_REGISTRY index flag) —
   // keep the two in sync; minor languages stay served but are not indexed.
   SUPPORTED_LOCALES: ['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id', 'es'] as const,
-  INDEXABLE_LOCALES: ['en', 'ko'] as const,
+  INDEXABLE_LOCALES: ['en', 'ko', 'ja', 'vi'] as const,
 } as const
 
 const OG_LOCALE_MAP: Record<string, string> = {

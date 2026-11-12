@@ -1,7 +1,7 @@
 // Content list page bot handler — extracted from worker.js handleContentListBot
 import {
   SITE_URL, BRAND_NAME, DEFAULT_OG_IMAGE,
-  LIST_TITLES, LIST_DESCS, ROBOTS_INDEX, ROBOTS_NOINDEX,
+  LIST_TITLES, LIST_DESCS, ROBOTS_INDEX, ROBOTS_NOINDEX, pageChrome,
 } from '../constants.js'
 import {
   escapeHtml, buildHreflangTags,
@@ -87,7 +87,7 @@ ${articlesHtml}
 </section>
 </main>
 <footer>
-<p><a href="${SITE_URL}/landing">Start Learning with ${BRAND_NAME}</a></p>
+<p><a href="${localizedUrl('/landing', lang)}">${pageChrome(lang).startLearning}</a></p>
 </footer>`
 
   const html = buildHtmlDocument({ lang, head, body, robots })

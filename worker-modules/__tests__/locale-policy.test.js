@@ -6,9 +6,9 @@ import {
 } from '../locale-policy.js'
 
 describe('locale-policy (single source of truth)', () => {
-  it('generates and indexes only en + ko under the current policy', () => {
-    expect(GENERATED_LOCALES).toEqual(['en', 'ko'])
-    expect(INDEXABLE_LOCALES).toEqual(['en', 'ko'])
+  it('generates and indexes en, ko, ja and vi under the current policy', () => {
+    expect(GENERATED_LOCALES).toEqual(['en', 'ko', 'ja', 'vi'])
+    expect(INDEXABLE_LOCALES).toEqual(['en', 'ko', 'ja', 'vi'])
   })
 
   it('still SERVES all 8 locales to users (ui) — reach is preserved', () => {
@@ -18,7 +18,8 @@ describe('locale-policy (single source of truth)', () => {
 
   it('predicates reflect the registry flags independently', () => {
     expect(isGenerated('en')).toBe(true)
-    expect(isGenerated('ja')).toBe(false)
+    expect(isGenerated('ja')).toBe(true)
+    expect(isGenerated('zh')).toBe(false)
     expect(isIndexable('ko')).toBe(true)
     expect(isIndexable('th')).toBe(false)
     // es: served to users but NOT indexed — the whole point of the policy
