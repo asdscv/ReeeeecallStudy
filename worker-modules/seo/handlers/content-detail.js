@@ -17,6 +17,12 @@ import {
 } from '../json-ld.js'
 import { renderBlocksToHtml } from '../content-renderer.js'
 import { withDropOffCtas } from '../../../packages/shared/lib/content-drop-off.ts'
+import { parseDeckFamily, deckListingFilter } from '../../../packages/shared/lib/official-deck-family.ts'
+import { wordListHeading } from '../../../packages/shared/lib/listing-seo.ts'
+import {
+  VOCAB_INDEX_PATH, VOCAB_EN_INDEX, VOCAB_LANGUAGE_INDEX,
+  isDeckLanguage, vocabHubForFamily, vocabHubPath, vocabHubShortTitle, vocabLanguageIndexPath,
+} from '../../../packages/shared/lib/vocab-hubs.ts'
 import { buildHtmlDocument, buildMetaTags, buildSeoResponse, renderJsonLd } from '../html-builder.js'
 import { INDEXABLE_LOCALES, isIndexable, isUiLocale, DEFAULT_LOCALE } from '../../locale-policy.js'
 
@@ -86,7 +92,9 @@ export async function handleContentDetailBot(slug, url, env) {
   const ogImage = article.og_image_url || article.thumbnail_url || DEFAULT_OG_IMAGE
   const tags = article.tags || []
   const articleSection = tags[0] || 'Education'
-  const bodyHtml = renderBlocksToHtml(withDropOffCtas(blocks, slug))
+  const deckLink = await resolveDeckLink(article, restUrl, anonKey)
+  const bodyHtml = renderBlocksToHtml(withDropOffCtas(blocks, slug, article.deck_family), { deckLink })
+    + `\n${wordListsLink(article.locale)}`
 
   const canonicalUrl = contentCanonicalUrl(SITE_URL, slug, article.locale, article.canonical_url)
 
@@ -164,4 +172,34 @@ ${relatedArticles.map((r) => {
     cacheSeconds: 3600,
     robots,
   })
+}
+
+// The deck a deck-guide article leads to, as a crawlable link: the deck page in the article's
+// language, or the English hub for the English edition (there is no English deck).
+async function resolveDeckLink(article, restUrl, anonKey) {
+  const family = parseDeckFamily(article.deck_family)
+  if (!family) return null
+  const filter = isDeckLanguage(article.locale) ? deckListingFilter(family, article.locale) : null
+  if (filter) {
+    try {
+      const tags = encodeURIComponent(`{${filter.tags.join(',')}}`)
+      const res = await fetch(
+        `${restUrl}/marketplace_listings?select=id,title,category,card_count,tags,owner_is_official,native_language`
+          + `&is_active=eq.true&owner_is_official=eq.true&category=eq.${filter.category}&tags=cs.${tags}&limit=1`,
+        { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } },
+      )
+      const [deck] = res.ok ? await res.json() : []
+      if (deck) return { href: `${SITE_URL}/d/${deck.id}`, label: wordListHeading({ ...deck, sample_fields: [] }, article.locale) }
+    } catch { /* fall through to the hub */ }
+  }
+  const hub = vocabHubForFamily(article.deck_family)
+  return hub ? { href: `${SITE_URL}${vocabHubPath(hub)}`, label: vocabHubShortTitle(hub) } : null
+}
+
+// Every article links to the word lists in its language — a crawl path into all deck pages.
+function wordListsLink(locale) {
+  if (isDeckLanguage(locale)) {
+    return `<p><a href="${SITE_URL}${vocabLanguageIndexPath(locale)}">${escapeHtml(VOCAB_LANGUAGE_INDEX[locale].backToIndex)}</a></p>`
+  }
+  return `<p><a href="${SITE_URL}${VOCAB_INDEX_PATH}">${escapeHtml(VOCAB_EN_INDEX.heading)}</a></p>`
 }

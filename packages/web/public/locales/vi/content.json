@@ -37,6 +37,10 @@
       "button": "Học ngay với bộ thẻ này",
       "meta_one": "Bộ thẻ chính thức miễn phí · {{count, number}} thẻ",
       "meta_other": "Bộ thẻ chính thức miễn phí · {{count, number}} thẻ"
+    },
+    "hub": {
+      "meta": "Danh sách từ miễn phí · câu ví dụ · bộ thẻ 7 ngôn ngữ",
+      "button": "Xem danh sách từ"
     }
   }
 }

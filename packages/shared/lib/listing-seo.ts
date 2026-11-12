@@ -5,6 +5,7 @@
 // the deck's own language (its meanings are in that language), not in the visitor's UI language.
 
 import { DECK_NATIVE_LANGUAGES } from './official-deck-family'
+import { vocabHubForDeck, vocabHubPath, vocabLanguageIndexPath, VOCAB_LANGUAGE_INDEX } from './vocab-hubs'
 
 export interface ListingSeoInput {
   id: string
@@ -128,8 +129,12 @@ export function wordListPageLanguage(listing: Pick<ListingSeoInput, 'owner_is_of
   return listing.owner_is_official && isLang(listing.native_language) ? listing.native_language : null
 }
 
+// 'always': Spanish would otherwise print 1500 — every count on the site carries a separator.
+// (The string form is ES2023 Intl; the web build's lib typings still declare useGrouping boolean.)
+const GROUP_ALWAYS = { useGrouping: 'always' } as unknown as Intl.NumberFormatOptions
+
 function fmt(n: number, lang: Lang): string {
-  return new Intl.NumberFormat(lang).format(n)
+  return new Intl.NumberFormat(lang, GROUP_ALWAYS).format(n)
 }
 
 function levelOf(tags: string[]): string | null {
@@ -177,13 +182,25 @@ export function wordListCta(listing: ListingSeoInput, lang: Lang): string {
   return COPY[lang].cta(fmt(Math.max(0, listing.card_count - listing.sample_fields.length), lang))
 }
 
-/** hreflang: this deck plus the same exam level in every other native language. */
+/**
+ * hreflang: this deck plus the same exam level in every other native language, and — for
+ * «English → X» exam decks — the English hub as both `en` and `x-default`.
+ */
 export function wordListHreflang(listing: ListingSeoInput, siteUrl: string): { lang: string; href: string }[] {
   const self = isLang(listing.native_language) ? [{ lang: listing.native_language, href: `${siteUrl}/d/${listing.id}` }] : []
   const others = (listing.siblings ?? [])
     .filter((s) => isLang(s.native_language) && s.native_language !== listing.native_language)
     .map((s) => ({ lang: s.native_language, href: `${siteUrl}/d/${s.id}` }))
-  return [...self, ...others]
+  const hub = vocabHubForDeck(listing.category, listing.tags)
+  const english = hub
+    ? [{ lang: 'en', href: `${siteUrl}${vocabHubPath(hub)}` }, { lang: 'x-default', href: `${siteUrl}${vocabHubPath(hub)}` }]
+    : []
+  return [...self, ...others, ...english]
+}
+
+/** The link from a deck page back to every official word list in its language. */
+export function wordListIndexLink(lang: Lang): { path: string; label: string } {
+  return { path: vocabLanguageIndexPath(lang), label: VOCAB_LANGUAGE_INDEX[lang].backToIndex }
 }
 
 // Some imported decks wrap whole example sentences in quotes ("Air quality tends to…").

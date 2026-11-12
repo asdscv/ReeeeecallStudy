@@ -35,6 +35,7 @@ import { ContentListPage } from './pages/ContentListPage'
 import { ContentDetailPage } from './pages/ContentDetailPage'
 import { LandingPage } from './pages/LandingPage'
 import { PublicListingPage } from './pages/PublicListingPage'
+import { VocabularyPage } from './pages/VocabularyPage'
 import { TossCheckoutPage } from './pages/checkout/TossCheckoutPage'
 import { TossReturnPage } from './pages/checkout/TossReturnPage'
 import { usePageTracking } from './hooks/usePageTracking'
@@ -260,6 +261,8 @@ function App() {
             <Route path="/insight" element={<ContentListPage />} />
             <Route path="/insight/:slug" element={<ContentDetailPage />} />
             <Route path="/d/:listingId" element={<PublicListingPage />} />
+            <Route path="/vocabulary" element={<VocabularyPage />} />
+            <Route path="/vocabulary/:slug" element={<VocabularyPage />} />
             <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
             {/* Guide — public, no auth required (with Layout for nav) */}

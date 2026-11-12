@@ -37,6 +37,10 @@
       "button": "이 덱으로 바로 학습",
       "meta_one": "무료 공식 덱 · {{count, number}}장",
       "meta_other": "무료 공식 덱 · {{count, number}}장"
+    },
+    "hub": {
+      "meta": "무료 단어 목록 · 예문 · 7개 언어 덱",
+      "button": "단어 목록 보기"
     }
   }
 }

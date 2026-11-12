@@ -7,6 +7,7 @@ import { handleContentDetailBot } from './worker-modules/seo/handlers/content-de
 import { handleContentListBot } from './worker-modules/seo/handlers/content-list.js'
 import { handleLandingBotRequest } from './worker-modules/seo/handlers/landing.js'
 import { handleListingBotRequest } from './worker-modules/seo/handlers/listing.js'
+import { handleVocabularyBot } from './worker-modules/seo/handlers/vocabulary.js'
 import { handleBotNotFound } from './worker-modules/seo/handlers/not-found.js'
 import { handleSitemap, handleSitemapStatic, handleSitemapArticles, handleSitemapListings } from './worker-modules/seo/sitemap.js'
 import { handleRobots } from './worker-modules/seo/robots.js'
@@ -23,6 +24,7 @@ const BOT_HANDLERS = {
   'content-list': (_params, url, env) => handleContentListBot(url, env),
   'landing': (_params, url) => handleLandingBotRequest(url),
   'listing': (params, url, env) => handleListingBotRequest(params.listingId, url, env),
+  'vocabulary': (params, url, env) => handleVocabularyBot(params.slug, url, env),
 }
 
 // ─── Main Worker ─────────────────────────────────────────────────────────────

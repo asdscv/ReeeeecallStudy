@@ -1,5 +1,7 @@
 // Dynamic sitemap handler — sitemap index + sub-sitemaps
 import { SITE_URL, INDEXABLE_LOCALES } from './constants.js'
+import { VOCAB_HUBS, VOCAB_INDEX_PATH, vocabHubPath, vocabLanguageIndexPath } from '../../packages/shared/lib/vocab-hubs.ts'
+import { DECK_NATIVE_LANGUAGES } from '../../packages/shared/lib/official-deck-family.ts'
 import { escapeHtml, getSupabaseRestUrl, getSupabaseAnonKey, localizedUrl } from './helpers.js'
 import { isIndexable } from '../locale-policy.js'
 
@@ -41,7 +43,13 @@ export async function handleSitemapStatic() {
 ${INDEXABLE_LOCALES.map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${escapeHtml(localizedUrl(path, l))}"/>`).join('\n')}
     <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}${path}"/>
   </url>`)).join('\n')
-  const xml = `${URLSET_HEADER}\n${entries}\n</urlset>`
+  const vocabularyPaths = [VOCAB_INDEX_PATH, ...DECK_NATIVE_LANGUAGES.map(vocabLanguageIndexPath), ...VOCAB_HUBS.map(vocabHubPath)]
+  const vocabularyEntries = vocabularyPaths.map((path) => `  <url>
+    <loc>${SITE_URL}${path}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>`).join('\n')
+  const xml = `${URLSET_HEADER}\n${entries}\n${vocabularyEntries}\n</urlset>`
   return xmlResponse(xml)
 }
 

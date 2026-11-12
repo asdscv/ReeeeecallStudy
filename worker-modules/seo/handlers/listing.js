@@ -18,7 +18,7 @@ import { renderSampleCardsHtml, buildSampleCardLearningResources } from '../card
 import { isUiLocale } from '../../locale-policy.js'
 import {
   wordListPageLanguage, wordListHeading, wordListDescription, wordListIntro,
-  wordListColumns, wordListCta, wordListHreflang, wordRows,
+  wordListColumns, wordListCta, wordListHreflang, wordRows, wordListIndexLink,
 } from '../../../packages/shared/lib/listing-seo.ts'
 
 export async function handleListingBotRequest(listingId, url, env) {
@@ -132,6 +132,7 @@ function renderWordListPage(listing, listingId, lang) {
   if (sampleResources.length > 0) datasetJsonLd.hasPart = sampleResources
   const breadcrumbJsonLd = buildBreadcrumbJsonLd([
     { name: BRAND_NAME, url: SITE_URL },
+    { name: wordListIndexLink(lang).label, url: `${SITE_URL}${wordListIndexLink(lang).path}` },
     { name: heading, url: canonicalUrl },
   ])
 
@@ -154,7 +155,8 @@ ${renderJsonLd([datasetJsonLd, breadcrumbJsonLd, buildOrganizationJsonLd()])}`
 
   const tableRows = rows.map((r) => `<tr><td lang="en"><strong>${escapeHtml(r.term)}</strong></td><td>${escapeHtml(r.meaning)}</td><td>${r.example ? `<span lang="en">${escapeHtml(r.example)}</span>` : ''}${r.exampleNote ? `<br><small>${escapeHtml(r.exampleNote)}</small>` : ''}</td></tr>`).join('\n')
 
-  const body = `<nav aria-label="breadcrumb"><ol><li><a href="${SITE_URL}">${BRAND_NAME}</a></li><li>${escapeHtml(heading)}</li></ol></nav>
+  const index = wordListIndexLink(lang)
+  const body = `<nav aria-label="breadcrumb"><ol><li><a href="${SITE_URL}">${BRAND_NAME}</a></li><li><a href="${SITE_URL}${index.path}">${escapeHtml(index.label)}</a></li><li>${escapeHtml(heading)}</li></ol></nav>
 <main>
 <h1>${escapeHtml(heading)}</h1>
 <p>${escapeHtml(wordListIntro(listing, lang))}</p>

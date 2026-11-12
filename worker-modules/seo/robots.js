@@ -1,7 +1,7 @@
 // robots.txt handler — refactored from worker.js with data-driven approach
 import { SITE_URL } from './constants.js'
 
-const PUBLIC_PATHS = ['/landing', '/insight', '/insight/*', '/d/', '/d/*', '/$', '/llms.txt$', '/llms-full.txt$', '/sitemap.xml$', '/sitemap-static.xml$', '/sitemap-articles.xml$', '/sitemap-listings.xml$', '/feed.xml$', '/feed.atom$', '/feed.json$', '/rss.xml$', '/atom.xml$']
+const PUBLIC_PATHS = ['/landing', '/insight', '/insight/*', '/d/', '/d/*', '/vocabulary', '/vocabulary/*', '/$', '/llms.txt$', '/llms-full.txt$', '/sitemap.xml$', '/sitemap-static.xml$', '/sitemap-articles.xml$', '/sitemap-listings.xml$', '/feed.xml$', '/feed.atom$', '/feed.json$', '/rss.xml$', '/atom.xml$']
 const PRIVATE_PATHS = ['/docs/', '/auth/', '/decks/', '/settings', '/history', '/quick-study', '/marketplace', '/my-shares', '/templates', '/admin', '/api-docs', '/api/', '/dashboard']
 const AI_BOTS = ['ChatGPT-User', 'GPTBot', 'OAI-SearchBot', 'PerplexityBot', 'Perplexity-User', 'Claude-SearchBot', 'Claude-User', 'ClaudeBot', 'Google-Extended', 'Bytespider', 'Amazonbot', 'Meta-ExternalAgent', 'Cohere-ai', 'YouBot', 'iaskspider', 'anthropic-ai']
 

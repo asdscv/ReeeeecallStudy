@@ -43,7 +43,10 @@ describe('article sitemap completeness', () => {
 
   it('lists English and Korean landing and insight canonicals separately', async () => {
     const xml = await (await handleSitemapStatic()).text()
-    expect(xml.match(/<url>/g)).toHaveLength(4)
+    // 4 landing/insight + /vocabulary + 7 language indexes + 15 exam hubs
+    expect(xml.match(/<url>/g)).toHaveLength(27)
+    expect(xml).toContain('/vocabulary/toeic-800</loc>')
+    expect(xml).toContain('/vocabulary/ko</loc>')
     expect(xml).toContain('/landing?lang=ko</loc>')
     expect(xml).toContain('/insight?lang=ko</loc>')
     expect(xml).not.toContain('lang=ja')

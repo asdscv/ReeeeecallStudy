@@ -15,6 +15,11 @@ export const PAGE_ROUTES = [
     extract: () => ({}),
   },
   {
+    pattern: /^\/vocabulary(?:\/([a-z0-9-]+))?\/?$/,
+    handler: 'vocabulary',
+    extract: (match) => ({ slug: match[1] || null }),
+  },
+  {
     pattern: /^\/d\/([^/]+)\/?$/,
     handler: 'listing',
     extract: (match) => ({ listingId: match[1] }),
