@@ -129,4 +129,11 @@ export const pairs: BrainGameDef<PairsState> = {
     }
   },
   signature: (s) => `pr:${s.cards.join('')}`,
+  solution(s) {
+    if (s.phase !== 'play') return null
+    const partner = (i: number) => s.cards.findIndex((c, j) => j !== i && c === s.cards[i] && !s.matched[j])
+    if (s.open.length === 1) return [partner(s.open[0])]
+    const first = s.matched.findIndex((m) => !m)
+    return first < 0 ? null : [first, partner(first)]
+  },
 }

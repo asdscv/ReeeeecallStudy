@@ -43,6 +43,19 @@ export function BrainSettingsDialog({ open, onOpenChange }: { open: boolean; onO
         </section>
         <section className="space-y-2">
           <label className="flex items-center justify-between gap-3 min-h-12 cursor-pointer">
+            <span className="text-base font-medium text-foreground">{t('settings.sound')}</span>
+            <input
+              type="checkbox"
+              checked={settings.sound}
+              onChange={(e) => setSettings({ sound: e.target.checked })}
+              className="w-6 h-6 accent-[var(--brand)] cursor-pointer"
+              data-testid="brain-sound"
+            />
+          </label>
+          <p className="text-sm text-muted-foreground">{t('settings.soundHelp')}</p>
+        </section>
+        <section className="space-y-2">
+          <label className="flex items-center justify-between gap-3 min-h-12 cursor-pointer">
             <span className="text-base font-medium text-foreground">{t('settings.centerOnly')}</span>
             <input
               type="checkbox"

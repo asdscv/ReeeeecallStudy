@@ -194,6 +194,12 @@ export interface BrainGameDef<S> {
   view(s: S): RoundView
   /** Identity of the generated puzzle, so a session can refuse an immediate repeat. */
   signature(s: S): string
+  /**
+   * The taps that answer what is being asked right now, in order (only the first is certain to
+   * stay right — a pairs board changes after each flip). Null while nothing is being asked. The
+   * how-to-play demo plays from it, and the tests use it to play every game through.
+   */
+  solution(s: S): number[] | null
   /** Quick Eye only: the platform reports how long the stimulus was really on screen. */
   exposed?(s: S, actualMs: number, frameMs: number): S
 }

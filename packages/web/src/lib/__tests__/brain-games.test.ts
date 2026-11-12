@@ -28,6 +28,16 @@ import {
   serializeProgress,
   stepLevel,
   targetAccuracy,
+  buildDemo,
+  emptyHistory,
+  gameHistory,
+  parseHistory,
+  recordHistory,
+  serializeHistory,
+  roundStars,
+  streakTier,
+  todaysPlanSeed,
+  HISTORY_PER_GAME,
   weekProgress,
   weekStart,
   type BrainGameId,
@@ -378,5 +388,94 @@ describe('progress', () => {
     expect(parseProgress('not json')).toEqual(emptyProgress())
     expect(parseProgress('{"v":2}')).toEqual(emptyProgress())
     expect(parseProgress('{"v":1,"games":{},"quickEye":{"variant":99,"recentMs":[1,2],"recentOk":"1"}}').quickEye).toMatchObject({ variant: 16, recentMs: [], recentOk: '' })
+  })
+})
+
+/** Plays a trial with nothing but the game's own `solution()` — what the how-to-play demo does. */
+function playBySolution(def: Any, s: Any): Any {
+  for (let guard = 0; guard < 2000 && !def.outcome(s); guard++) {
+    const view = def.view(s)
+    if (view.kind === 'quickEye' && view.phase === 'stimulus') {
+      s = def.exposed(s, view.exposureMs, 1000 / 60)
+      continue
+    }
+    if (def.pendingMs(s) !== null && !def.acceptsInput(s)) {
+      s = def.advance(s)
+      continue
+    }
+    const taps = def.solution(s)
+    if (!taps || taps.length === 0) throw new Error('no solution while input is expected')
+    s = def.tap(s, taps[0])
+  }
+  return s
+}
+
+describe('solution() — the demo and these tests play every game from the engine alone', () => {
+  for (const { id, def } of BRAIN_GAMES) {
+    it(`${id}: following solution() always wins`, () => {
+      for (const ctx of CONTEXTS) {
+        for (const level of LEVELS) {
+          for (let seed = 1; seed <= 12; seed++) {
+            const c = { ...ctx, variant: 1 + (seed % 16) }
+            const s0 = def.create(id === 'quickEye' ? Math.min(level, 12) : Math.max(1, level), createRng(seed * 104729 + level), c)
+            const won = playBySolution(def, s0)
+            expect(def.outcome(won)?.correct, `${id} L${level} seed ${seed}`).toBe(true)
+            expect(def.solution(won), 'nothing is asked once the trial is over').toBeNull()
+          }
+        }
+      }
+    })
+  }
+
+  it('every game has a demo that asks something, taps, and ends on a right answer', () => {
+    for (const { id, def } of BRAIN_GAMES) {
+      const frames = buildDemo(id)
+      expect(frames.length, id).toBeGreaterThan(2)
+      expect(frames.some((f) => f.tap !== undefined), `${id} demo taps`).toBe(true)
+      const last = frames[frames.length - 1].view
+      if (last.kind === 'choice') expect(last.picked).toBe(last.correctIndex)
+      if (last.kind === 'quickEye') {
+        expect(last.pickedCenter).toBe(last.correctCenter)
+        expect(last.pickedDirection).toBe(last.correctDirection)
+      }
+      if (last.kind === 'grid') expect(last.cells.some((c) => c.tone === 'wrong'), `${id} demo makes no mistake`).toBe(false)
+      expect(frames.every((f) => f.holdMs > 0 && f.holdMs <= 1600)).toBe(true)
+      // Quick Eye's demo shows the flash (variant 2: centre and star).
+      if (id === 'quickEye') expect(frames.some((f) => f.flash)).toBe(true)
+      void def
+    }
+  })
+})
+
+describe('round history, stars and streaks', () => {
+  it('keeps the last rounds per game, round-trips, and stays small for SecureStore', () => {
+    let h = emptyHistory()
+    for (const { id } of BRAIN_GAMES) {
+      for (let i = 0; i < 20; i++) h = recordHistory(h, id, { day: '2026-11-12', level: 12.34 + i, accuracy: 0.876 })
+    }
+    for (const { id } of BRAIN_GAMES) expect(gameHistory(h, id)).toHaveLength(HISTORY_PER_GAME)
+    const raw = serializeHistory(h)
+    expect(raw.length).toBeLessThan(1800)
+    const back = parseHistory(raw)
+    expect(gameHistory(back, 'memoryGrid').at(-1)).toEqual({ day: '2026-11-12', level: 31.3, accuracy: 0.88 })
+    expect(parseHistory('{"rounds":{"memoryGrid":[[1,2],"x",[1,2,3]],"nope":[[1,1,1]]}}').rounds).toEqual({ memoryGrid: [[1, 2, 3]] })
+    expect(parseHistory('garbage')).toEqual(emptyHistory())
+  })
+
+  it('stars by accuracy (none for very short rounds), streak tiers at 3, 6 and 10', () => {
+    expect(roundStars(4, 4)).toBe(0)
+    expect(roundStars(10, 9)).toBe(3)
+    expect(roundStars(10, 8)).toBe(2)
+    expect(roundStars(10, 5)).toBe(1)
+    expect([2, 3, 6, 10].map(streakTier)).toEqual([0, 1, 2, 3])
+  })
+
+  it("today's line-up is the same all day, and changes once a session is done", () => {
+    const p = emptyProgress()
+    const a = planTodaysSession(p, createRng(todaysPlanSeed(p, '2026-11-12'))).map((s) => s.gameId)
+    const b = planTodaysSession(p, createRng(todaysPlanSeed(p, '2026-11-12'))).map((s) => s.gameId)
+    expect(a).toEqual(b)
+    const after = recordSession(p, 22, '2026-11-12', null, a)
+    expect(todaysPlanSeed(after, '2026-11-12')).not.toBe(todaysPlanSeed(p, '2026-11-12'))
   })
 })

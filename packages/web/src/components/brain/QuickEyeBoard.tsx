@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, type CSSProperties } from 'react'
 import { useTranslation } from 'react-i18next'
-import { quickEyeBox, quickEyeGeometry, slotPosition, type QuickEyeView } from '@reeeeecall/shared/lib/brain-games'
+import { focusIfKeyboard } from './brain-ui'
+import { CANVAS_TONES, quickEyeBox, quickEyeGeometry, slotPosition, type GameTheme, type QuickEyeView } from '@reeeeecall/shared/lib/brain-games'
 
 /**
  * Quick Eye on the web.
@@ -13,9 +14,9 @@ import { quickEyeBox, quickEyeGeometry, slotPosition, type QuickEyeView } from '
  */
 const DIR_ARROWS = ['↑', '↗', '→', '↘', '↓', '↙', '←', '↖']
 
-export function Shape({ id, size, className }: { id: string; size: number; className?: string }) {
+export function Shape({ id, size, color = '#FFFFFF' }: { id: string; size: number; color?: string }) {
   const radius = id === 'circle' ? '50%' : `${Number(id.split(':')[1] ?? 0)}%`
-  return <span className={`inline-block bg-foreground ${className ?? ''}`} style={{ width: size, height: size, borderRadius: radius }} aria-hidden="true" />
+  return <span className="inline-block" style={{ width: size, height: size, borderRadius: radius, background: color }} aria-hidden="true" />
 }
 
 /** Median of recent frame intervals, measured continuously so a refresh-rate change is followed. */
@@ -44,11 +45,18 @@ export function QuickEyeBoard({
   onTap,
   onExposure,
   width,
+  theme,
+  demo,
+  maxSize,
 }: {
   view: QuickEyeView
   onTap: (index: number) => void
   onExposure: (actualMs: number, frameMs: number) => void
   width: number
+  theme: GameTheme
+  /** The how-to-play board: the flash is drawn still, nothing is timed, nothing takes input. */
+  demo?: boolean
+  maxSize?: number
 }) {
   const { t } = useTranslation('brain')
   const frameMs = useFrameInterval()
@@ -56,7 +64,7 @@ export function QuickEyeBoard({
   const maskRef = useRef<HTMLCanvasElement>(null)
   // The page around the field (header, chances, prompt, the answer row below) takes ~400px; the
   // field gets what is left, so the answers stay above the fold.
-  const size = Math.max(280, Math.min(width, 520, window.innerHeight - 400))
+  const size = demo ? Math.min(width, maxSize ?? 260) : Math.max(280, Math.min(width, 520, maxSize ?? window.innerHeight - 420))
   const { boxW, boxH, shape } = quickEyeBox(size, view.center.length === 2)
   const half = size / 2
   // Ring radii and one stimulus size for every ring, laid out so nothing overlaps the box or a
@@ -87,7 +95,7 @@ export function QuickEyeBoard({
 
   // The exposure itself.
   useEffect(() => {
-    if (view.phase !== 'stimulus') return
+    if (view.phase !== 'stimulus' || demo) return
     const stim = stimRef.current
     const mask = maskRef.current
     if (!stim || !mask) return
@@ -115,9 +123,9 @@ export function QuickEyeBoard({
   // The frame loop writes these opacities directly; whenever the phase that owns them is over, put
   // them back (a voided trial jumps from the stimulus straight to 'done' and React would not).
   useEffect(() => {
-    if (view.phase !== 'stimulus' && stimRef.current) stimRef.current.style.opacity = '0'
-    if (view.phase !== 'mask' && maskRef.current) maskRef.current.style.opacity = '0'
-  }, [view.phase])
+    if (stimRef.current) stimRef.current.style.opacity = demo && view.phase === 'stimulus' ? '1' : view.phase === 'stimulus' ? stimRef.current.style.opacity : '0'
+    if (maskRef.current) maskRef.current.style.opacity = view.phase === 'mask' ? (demo ? '1' : maskRef.current.style.opacity) : '0'
+  }, [view.phase, demo])
 
   // A voided trial reaches 'done' without an answer: there is nothing to reveal.
   const done = view.phase === 'done' && view.pickedCenter !== undefined
@@ -127,8 +135,9 @@ export function QuickEyeBoard({
   // 1-2 answer the centre, 1-8 the direction (clockwise from up, as drawn).
   const answersRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    if (view.phase === 'answerCenter') answersRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])')?.focus({ preventScroll: true })
-    if (view.phase === 'answerLocation') document.querySelector<HTMLButtonElement>('[data-testid="brain-qe-dir-0"]')?.focus({ preventScroll: true })
+    if (demo) return
+    if (view.phase === 'answerCenter') focusIfKeyboard(answersRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])'))
+    if (view.phase === 'answerLocation') focusIfKeyboard(document.querySelector<HTMLButtonElement>('[data-testid="brain-qe-dir-0"]'))
     if (view.phase !== 'answerCenter' && view.phase !== 'answerLocation') return
     const onKey = (e: KeyboardEvent) => {
       const n = Number(e.key)
@@ -138,15 +147,24 @@ export function QuickEyeBoard({
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [view.phase, onTap])
+  }, [view.phase, onTap, demo])
+
+  const glass = { background: CANVAS_TONES.tile, border: `1.5px solid ${CANVAS_TONES.tileBorder}` }
+  const dirSize = demo ? 34 : 56
 
   return (
-    <div className="mx-auto flex flex-col items-center gap-5 select-none">
-      <div className="relative" style={{ width: size, height: size }} data-testid="brain-qe-field">
+    <div className={`mx-auto flex flex-col items-center select-none ${demo ? 'gap-3' : 'gap-5'}`}>
+      <div className="relative rounded-3xl" style={{ width: size, height: size, background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 70%)' }} data-testid={demo ? undefined : 'brain-qe-field'}>
+        {/* Faint ring guides: where things can appear, without hinting where they will. */}
+        <svg className="absolute inset-0 pointer-events-none" width={size} height={size} aria-hidden="true">
+          {geo.radii.map((r, i) => (
+            <circle key={i} cx={half} cy={half} r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={1} strokeDasharray="2 6" />
+          ))}
+        </svg>
         {/* The centre box, always there: it is what the eyes rest on between trials. */}
         <div
-          className="absolute rounded-xl border-2 border-foreground/80 bg-muted"
-          style={{ width: boxW, height: boxH, left: half - boxW / 2, top: half - boxH / 2 }}
+          className={`absolute rounded-xl ${view.phase === 'fixation' ? 'bfx-glow' : ''}`}
+          style={{ width: boxW, height: boxH, left: half - boxW / 2, top: half - boxH / 2, border: '2px solid rgba(255,255,255,0.75)', background: 'rgba(255,255,255,0.08)', ['--bfx-glow' as string]: theme.glow }}
         />
         {/* Stimulus layer — drawn now, shown only by the frame loop above. */}
         <div ref={stimRef} className="absolute inset-0" style={{ opacity: 0 }} aria-hidden="true">
@@ -159,13 +177,13 @@ export function QuickEyeBoard({
             const p = place(d.ring, d.slot)
             const s = stim
             return (
-              <span key={i} className="absolute text-foreground leading-none" style={{ left: p.x - s / 2, top: p.y - s / 2, fontSize: s, width: s, height: s, textAlign: 'center' }}>▲</span>
+              <span key={i} className="absolute text-white leading-none" style={{ left: p.x - s / 2, top: p.y - s / 2, fontSize: s, width: s, height: s, textAlign: 'center' }}>▲</span>
             )
           })}
           {view.target && (() => {
             const p = place(view.target.ring, view.target.slot)
             const s = stim
-            return <span className="absolute text-foreground leading-none" style={{ left: p.x - s / 2, top: p.y - s / 2, fontSize: s, width: s, height: s, textAlign: 'center' }}>★</span>
+            return <span className="absolute text-white leading-none" style={{ left: p.x - s / 2, top: p.y - s / 2, fontSize: s, width: s, height: s, textAlign: 'center' }}>★</span>
           })()}
         </div>
         <canvas
@@ -180,24 +198,28 @@ export function QuickEyeBoard({
         {view.asksLocation && (view.phase === 'answerLocation' || done) &&
           DIR_ARROWS.map((arrow, d) => {
             const angle = (d / 8) * 2 * Math.PI
-            const r = R - 4
+            const r = R - (demo ? 2 : 4)
             const x = half + r * Math.sin(angle)
             const y = half - r * Math.cos(angle)
-            let tone = 'bg-card border-2 border-brand text-brand-active hover:bg-brand/10'
-            if (done && d === view.correctDirection) tone = 'bg-success border-2 border-success text-success-foreground'
-            else if (done && d === view.pickedDirection) tone = 'bg-destructive border-2 border-destructive text-destructive-foreground'
-            else if (done) tone = 'bg-card border-2 border-border text-muted-foreground'
+            let style: CSSProperties = { ...glass, color: '#fff', borderColor: theme.accent }
+            let anim = 'bfx-rise'
+            if (done && d === view.correctDirection) { style = { background: CANVAS_TONES.correct, border: `2px solid ${CANVAS_TONES.correct}`, color: '#fff' }; anim = 'bfx-pop' }
+            else if (done && d === view.pickedDirection) { style = { background: CANVAS_TONES.wrong, border: `2px solid ${CANVAS_TONES.wrong}`, color: '#fff' }; anim = 'bfx-shake' }
+            else if (done) style = { ...glass, color: 'rgba(255,255,255,0.4)' }
             return (
               <button
                 key={d}
                 type="button"
-                disabled={done}
-                aria-label={t(`quickEye.dir.${d}`)}
-                onPointerDown={(e) => { e.preventDefault(); if (!done) onTap(d) }}
-                onClick={(e) => { if (e.detail === 0 && !done) onTap(d) }}
-                className={`absolute rounded-full flex items-center justify-center text-2xl font-bold cursor-pointer disabled:cursor-default ${tone}`}
-                style={{ width: 56, height: 56, left: x - 28, top: y - 28 }}
-                data-testid={`brain-qe-dir-${d}`}
+                disabled={done || demo}
+                tabIndex={demo ? -1 : undefined}
+                aria-hidden={demo || undefined}
+                aria-label={demo ? undefined : t(`quickEye.dir.${d}`)}
+                onPointerDown={(e) => { e.preventDefault(); if (!done && !demo) onTap(d) }}
+                onClick={(e) => { if (e.detail === 0 && !done && !demo) onTap(d) }}
+                className={`absolute rounded-full flex items-center justify-center font-bold ${demo ? 'text-base' : 'text-2xl'} ${done || demo ? 'cursor-default' : 'cursor-pointer hover:bg-white/20 active:scale-90 transition-transform'} ${anim}`}
+                style={{ ...style, width: dirSize, height: dirSize, left: x - dirSize / 2, top: y - dirSize / 2 }}
+                data-testid={demo ? undefined : `brain-qe-dir-${d}`}
+                data-tap={d}
               >
                 {arrow}
               </button>
@@ -207,25 +229,30 @@ export function QuickEyeBoard({
 
       {/* What was in the centre: two large answers, drawn as the shapes themselves. */}
       {answering && (view.phase === 'answerCenter' || done) && (
-        <div ref={answersRef} className="flex gap-4" role="group">
+        <div ref={answersRef} className={`flex ${demo ? 'gap-2' : 'gap-4'}`} role={demo ? undefined : 'group'}>
           {view.centerOptions.map((opt, i) => {
             const isShape = opt !== 'same' && opt !== 'different'
-            let tone = 'bg-card border-2 border-border hover:border-brand'
-            if (done && i === view.correctCenter) tone = 'bg-success/15 border-2 border-success'
-            else if (done && i === view.pickedCenter) tone = 'bg-destructive/15 border-2 border-destructive'
+            let style: CSSProperties = glass
+            let anim = 'bfx-rise'
+            if (done && i === view.correctCenter) { style = { background: 'rgba(34,197,94,0.25)', border: `2px solid ${CANVAS_TONES.correct}`, boxShadow: '0 0 24px rgba(34,197,94,0.45)' }; anim = 'bfx-pop' }
+            else if (done && i === view.pickedCenter) { style = { background: 'rgba(239,68,68,0.25)', border: `2px solid ${CANVAS_TONES.wrong}` }; anim = 'bfx-shake' }
             const label = isShape ? t(opt === 'circle' ? 'quickEye.circle' : 'quickEye.square') : t(`quickEye.${opt}`)
             return (
               <button
                 key={i}
                 type="button"
-                disabled={view.phase !== 'answerCenter'}
-                aria-label={label}
-                onPointerDown={(e) => { e.preventDefault(); if (view.phase === 'answerCenter') onTap(i) }}
-                onClick={(e) => { if (e.detail === 0 && view.phase === 'answerCenter') onTap(i) }}
-                className={`min-w-24 min-h-24 px-4 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer disabled:cursor-default ${tone}`}
-                data-testid={`brain-qe-center-${i}`}
+                disabled={view.phase !== 'answerCenter' || demo}
+                tabIndex={demo ? -1 : undefined}
+                aria-hidden={demo || undefined}
+                aria-label={demo ? undefined : label}
+                onPointerDown={(e) => { e.preventDefault(); if (view.phase === 'answerCenter' && !demo) onTap(i) }}
+                onClick={(e) => { if (e.detail === 0 && view.phase === 'answerCenter' && !demo) onTap(i) }}
+                className={`${demo ? 'min-w-14 min-h-14 px-2' : 'min-w-24 min-h-24 px-4'} rounded-2xl flex flex-col items-center justify-center gap-2 ${view.phase === 'answerCenter' && !demo ? 'cursor-pointer hover:bg-white/20 active:scale-95 transition-transform' : 'cursor-default'} ${anim}`}
+                style={style}
+                data-testid={demo ? undefined : `brain-qe-center-${i}`}
+                data-tap={i}
               >
-                {isShape ? <Shape id={opt} size={56} /> : <span className="text-xl font-semibold text-foreground">{label}</span>}
+                {isShape ? <Shape id={opt} size={demo ? 30 : 56} /> : <span className={`${demo ? 'text-sm' : 'text-xl'} font-semibold text-white`}>{label}</span>}
               </button>
             )
           })}

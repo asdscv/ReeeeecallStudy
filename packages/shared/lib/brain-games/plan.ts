@@ -64,6 +64,15 @@ export function planTodaysSession(p: BrainProgress, rng: Rng): PlanSlot[] {
   ]
 }
 
+/**
+ * The seed for today's line-up: the same all day until a session is finished, so the line-up the
+ * home screen previews is the one that plays (and a reload does not reshuffle it).
+ */
+export function todaysPlanSeed(p: BrainProgress, today: string): number {
+  const [y, m, d] = today.split('-').map(Number)
+  return ((y * 372 + m * 31 + d) * 101 + p.sessions.total * 7919) >>> 0
+}
+
 export function plannedMinutes(slots: readonly PlanSlot[]): number {
   return slots.reduce((a, s) => a + s.minutes, 0)
 }

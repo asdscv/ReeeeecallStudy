@@ -1,39 +1,47 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Settings, Play, ChevronRight, BookOpen } from 'lucide-react'
+import { Settings, Play, ChevronRight, BookOpen, Trophy, Clock, Sparkles } from 'lucide-react'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
 import {
   BRAIN_GAMES,
+  GAME_THEMES,
+  TRAINING_THEME,
   courseStatus,
   createRng,
   displayLevel,
+  gameHistory,
   gameProgress,
   localDayKey,
   planTodaysSession,
   plannedMinutes,
   researchContent,
+  todaysPlanSeed,
   weekProgress,
 } from '@reeeeecall/shared/lib/brain-games'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
-import { BRAIN_ICONS } from '../../components/brain/brain-ui'
+import { BRAIN_ICONS, cardBackground } from '../../components/brain/brain-ui'
 import { BrainSettingsDialog } from '../../components/brain/BrainSettingsDialog'
+import { Sparkline } from '../../components/brain/RoundSummary'
+import { WeekRing } from '../../components/brain/WeekRing'
 import { useBrainHydrated } from '../../components/brain/useBrainHydrated'
 
 /**
- * `/brain` — Today's Training first (the bounded session the research counts), free practice of
- * any single game below, then the research basis and the disclaimer. Progress is shown as
- * sessions this week and course steps, never as a streak or a "brain score".
+ * `/brain` — Today's Training first (the bounded session the research counts), every game below
+ * as its own card in its own colours, then the research basis and the disclaimer. Progress is
+ * shown as sessions this week and course steps, never as a streak or a "brain score".
  */
 export function BrainHomePage() {
   const { t, i18n } = useTranslation('brain')
   useBrainHydrated()
   const progress = useBrainStore((s) => s.progress)
+  const history = useBrainStore((s) => s.history)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const today = localDayKey()
   const week = weekProgress(progress, today)
   const course = courseStatus(progress, today)
-  const minutes = useMemo(() => plannedMinutes(planTodaysSession(progress, createRng(1))), [progress])
+  const plan = planTodaysSession(progress, createRng(todaysPlanSeed(progress, today)))
+  const minutes = plannedMinutes(plan)
   const research = researchContent(i18n.language)
 
   const courseChip =
@@ -44,87 +52,152 @@ export function BrainHomePage() {
         : course.nextBoosterOn
           ? t('training.boosterNext', { date: course.nextBoosterOn })
           : null
+  const courseFrac = course.phase === 'booster' && course.booster ? course.booster.done / course.booster.total : course.phase === 'core' ? course.coreDone / course.coreTotal : 1
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-8">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-foreground">{t('title')}</h1>
-          <p className="text-sm text-muted-foreground mt-1">{t('subtitle')}</p>
+          <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
+          <p className="text-base text-muted-foreground mt-1">{t('subtitle')}</p>
         </div>
         <button
           type="button"
           onClick={() => setSettingsOpen(true)}
           aria-label={t('home.settings')}
-          className="w-11 h-11 shrink-0 flex items-center justify-center rounded-lg text-muted-foreground hover:bg-accent border-none bg-transparent cursor-pointer"
+          className="w-11 h-11 shrink-0 flex items-center justify-center rounded-xl text-muted-foreground hover:bg-accent border-none bg-transparent cursor-pointer"
           data-testid="brain-settings"
         >
           <Settings className="w-5 h-5" aria-hidden="true" />
         </button>
       </div>
 
-      <section className="p-5 rounded-2xl bg-card border border-border space-y-4" data-testid="brain-training-card">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">{t('training.title')}</h2>
-          <p className="text-sm text-muted-foreground mt-0.5">{t('training.desc', { minutes })}</p>
+      {/* Today's Training — the hero. */}
+      <section
+        className="relative overflow-hidden rounded-3xl p-6 sm:p-7 text-white shadow-[0_20px_50px_-20px_rgba(49,46,129,0.6)]"
+        style={{ background: cardBackground(TRAINING_THEME) }}
+        data-testid="brain-training-card"
+      >
+        <div aria-hidden="true" className="pointer-events-none absolute -top-24 -right-16 w-72 h-72 rounded-full opacity-40 blur-2xl" style={{ background: 'radial-gradient(circle, #A5B4FC 0%, transparent 65%)' }} />
+        <div className="relative flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold uppercase tracking-wider text-white/75">{t('training.kicker')}</p>
+            <h2 className="mt-1 text-3xl font-extrabold tracking-tight">{t('training.title')}</h2>
+            <p className="mt-1 text-base text-white/85">{t('training.desc', { minutes })}</p>
+          </div>
+          <WeekRing done={week.done} goal={week.goal} size={88} label={t('training.week', { done: week.done, goal: week.goal })} />
         </div>
+
+        <ul className="relative mt-5 flex items-center gap-2" aria-label={t('training.lineup')}>
+          {plan.map((slot, i) => {
+            const Icon = BRAIN_ICONS[BRAIN_GAMES.find((g) => g.id === slot.gameId)?.icon ?? '']
+            return (
+              <li key={i} className="flex items-center gap-2 min-w-0">
+                <span className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ring-1 ring-white/30" style={{ background: cardBackground(GAME_THEMES[slot.gameId]) }} title={t(`games.${slot.gameId}.name`)}>
+                  {Icon && <Icon className="w-5 h-5 text-white" aria-hidden="true" />}
+                  <span className="sr-only">{t(`games.${slot.gameId}.name`)}</span>
+                </span>
+                {i < plan.length - 1 && <span className="w-3 h-0.5 rounded-full bg-white/40" aria-hidden="true" />}
+              </li>
+            )
+          })}
+        </ul>
+
         <Link
           to="/brain/training"
-          className="flex items-center justify-center gap-2 min-h-14 rounded-xl bg-brand text-brand-foreground text-lg font-semibold no-underline hover:bg-brand-hover transition-colors"
+          className="relative mt-6 flex items-center justify-center gap-2 min-h-14 rounded-2xl bg-white text-lg font-extrabold no-underline shadow-[0_10px_30px_rgba(0,0,0,0.25)] hover:scale-[1.01] active:scale-[0.99] transition-transform"
+          style={{ color: TRAINING_THEME.cardTo }}
           data-testid="brain-training-start"
         >
-          <Play className="w-5 h-5" aria-hidden="true" />
+          <Play className="w-5 h-5 fill-current" aria-hidden="true" />
           {t('training.start')}
         </Link>
-        <div className="flex flex-wrap gap-2 text-sm">
-          <span className={`px-3 py-1 rounded-full ${week.done >= week.goal ? 'bg-success/10 text-success font-medium' : 'bg-muted text-foreground'}`}>
-            {week.done >= week.goal ? t('training.weekDone') : t('training.week', { done: week.done, goal: week.goal })}
-          </span>
-          {courseChip && <span className="px-3 py-1 rounded-full bg-muted text-foreground">{courseChip}</span>}
-          {progress.sessions.minutes > 0 && (
-            <span className="px-3 py-1 rounded-full bg-muted text-foreground">{t('training.minutes', { value: formatCount(progress.sessions.minutes) })}</span>
+
+        <div className="relative mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+          {courseChip && (
+            <div>
+              <p className="font-semibold text-white/90">{courseChip}</p>
+              <div className="mt-1.5 h-2 rounded-full bg-white/20 overflow-hidden">
+                <div className="h-full rounded-full bg-white" style={{ width: `${Math.max(4, courseFrac * 100)}%` }} />
+              </div>
+            </div>
           )}
+          <p className="flex items-center gap-1.5 text-white/85 sm:justify-end">
+            <Clock className="w-4 h-4" aria-hidden="true" />
+            {progress.sessions.minutes > 0 ? t('training.minutes', { value: formatCount(progress.sessions.minutes) }) : t('training.dose')}
+          </p>
         </div>
-        <p className="text-sm text-muted-foreground">{t('training.dose')}</p>
       </section>
 
-      <section className="space-y-3">
+      {/* Every game, in its own colours. */}
+      <section className="space-y-3" aria-labelledby="brain-free-play">
         <div>
-          <h2 className="text-base font-semibold text-foreground">{t('home.freePlay')}</h2>
-          <p className="text-sm text-muted-foreground mt-0.5">{t('home.freePlayHint')}</p>
+          <h2 id="brain-free-play" className="text-xl font-bold text-foreground">{t('home.freePlay')}</h2>
+          <p className="text-base text-muted-foreground mt-0.5">{t('home.freePlayHint')}</p>
         </div>
-        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {BRAIN_GAMES.map((game) => {
             const Icon = BRAIN_ICONS[game.icon]
+            const theme = GAME_THEMES[game.id]
             const p = gameProgress(progress, game.id)
             const played = p.rounds > 0
-            const level =
-              game.id === 'quickEye'
-                ? t('home.quickEyeLevel', { stage: progress.quickEye.variant, speed: Math.round(p.level) })
-                : played
-                  ? t('home.level', { level: displayLevel(p.level) })
-                  : t('home.new')
+            const qe = game.id === 'quickEye'
             const best = progress.bestRuns[game.id]
+            const trend = gameHistory(history, game.id).map((h) => h.level)
+            const levelLabel = !played
+              ? t('home.new')
+              : qe
+                ? t('home.quickEyeLevel', { stage: progress.quickEye.variant, speed: Math.round(p.level) })
+                : t('home.level', { level: displayLevel(p.level).toFixed(1) })
+            // How far into the current whole level (Quick Eye: along its 12 speed steps).
+            const frac = qe ? p.level / 12 : p.level - Math.floor(p.level)
             return (
               <li key={game.id}>
                 <Link
                   to={`/brain/play/${game.id}`}
-                  className="flex items-start gap-3 p-4 min-h-16 bg-card rounded-xl border border-border no-underline hover:border-brand transition-colors h-full"
+                  className="group relative flex flex-col h-full min-h-44 p-5 rounded-3xl text-white no-underline overflow-hidden shadow-[0_12px_30px_-14px_rgba(0,0,0,0.5)] hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-14px_rgba(0,0,0,0.55)] transition-[transform,box-shadow] duration-200"
+                  style={{ background: cardBackground(theme) }}
                   data-testid={`brain-game-${game.id}`}
                 >
-                  <div className="w-11 h-11 rounded-lg bg-brand/10 text-brand-active flex items-center justify-center shrink-0">
-                    {Icon && <Icon className="w-5 h-5" aria-hidden="true" />}
+                  <div aria-hidden="true" className="pointer-events-none absolute -bottom-10 -right-6 opacity-[0.14] group-hover:opacity-20 transition-opacity">
+                    {Icon && <Icon className="w-40 h-40" strokeWidth={1.25} />}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <p className="text-base font-semibold text-foreground">{t(`games.${game.id}.name`)}</p>
-                      <span className="text-sm text-muted-foreground shrink-0">{game.id === 'quickEye' && !played ? t('home.new') : level}</span>
+                  <div className="relative flex items-start justify-between gap-3">
+                    <span className="w-12 h-12 rounded-2xl bg-white/20 ring-1 ring-white/25 flex items-center justify-center">
+                      {Icon && <Icon className="w-6 h-6" aria-hidden="true" />}
+                    </span>
+                    <span className={`px-2.5 py-1 rounded-full text-sm font-bold ${played ? 'bg-white/20' : 'bg-white text-slate-900'}`}>
+                      {!played && <Sparkles className="inline w-3.5 h-3.5 mr-1 -mt-0.5" aria-hidden="true" />}
+                      {levelLabel}
+                    </span>
+                  </div>
+                  <div className="relative mt-3 flex-1">
+                    <p className="text-xl font-extrabold">{t(`games.${game.id}.name`)}</p>
+                    <p className="mt-0.5 text-sm text-white/85 line-clamp-2">{t(`games.${game.id}.desc`)}</p>
+                  </div>
+                  <div className="relative mt-3 flex items-end justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      {played && (
+                        <div className="h-1.5 rounded-full bg-white/25 overflow-hidden" aria-hidden="true">
+                          <div className="h-full rounded-full bg-white" style={{ width: `${Math.max(4, frac * 100)}%` }} />
+                        </div>
+                      )}
+                      <p className="mt-1.5 text-sm text-white/85 flex items-center gap-1">
+                        {t(`skills.${game.skill}`)}
+                        {best ? (
+                          <>
+                            <span aria-hidden="true">·</span>
+                            <Trophy className="w-3.5 h-3.5" aria-hidden="true" />
+                            {t('home.record', { value: formatCount(best) })}
+                          </>
+                        ) : null}
+                      </p>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-0.5">{t(`games.${game.id}.desc`)}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {t(`skills.${game.skill}`)}
-                      {best ? ` · ${t('home.record', { value: formatCount(best) })}` : ''}
-                    </p>
+                    {trend.length >= 2 && (
+                      <div className="w-24 shrink-0 opacity-90">
+                        <Sparkline values={trend} color="#FFFFFF" height={36} />
+                      </div>
+                    )}
                   </div>
                 </Link>
               </li>
@@ -133,12 +206,12 @@ export function BrainHomePage() {
         </ul>
       </section>
 
-      <p className="text-sm text-muted-foreground leading-relaxed">{t('home.howItWorks')}</p>
+      <p className="text-base text-muted-foreground leading-relaxed">{t('home.howItWorks')}</p>
 
       {research && (
         <Link
           to="/brain/research"
-          className="flex items-center gap-3 p-4 min-h-14 rounded-xl border border-border bg-card no-underline hover:border-brand"
+          className="flex items-center gap-3 p-4 min-h-14 rounded-2xl border border-border bg-card no-underline hover:border-brand"
           data-testid="brain-research-link"
         >
           <BookOpen className="w-5 h-5 text-brand-active" aria-hidden="true" />

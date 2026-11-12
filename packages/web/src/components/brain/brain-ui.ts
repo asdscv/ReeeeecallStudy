@@ -1,5 +1,5 @@
 import { Aperture, LayoutGrid, Repeat, Copy, Hash, Eye, Droplet, PlusCircle, TrendingUp, type LucideIcon } from 'lucide-react'
-import type { BrainColor, CellTone } from '@reeeeecall/shared/lib/brain-games'
+import type { BrainColor } from '@reeeeecall/shared/lib/brain-games'
 import type { BrainStorage } from '@reeeeecall/shared/stores/brain-store'
 import type { PlatformContext } from '@reeeeecall/shared/hooks/useBrainRound'
 
@@ -26,22 +26,6 @@ export const INK: Record<BrainColor, string> = {
   orange: '#ea580c',
 }
 
-/**
- * Cell tones. A lit cell carries a ring as well as a colour (WCAG 1.4.11: state must not be
- * colour alone), and the "missed" answer a dashed ring.
- */
-export const TONE_CLASS: Record<CellTone, string> = {
-  idle: 'bg-muted hover:bg-accent text-foreground',
-  lit: 'bg-brand text-brand-foreground ring-4 ring-inset ring-white/70',
-  correct: 'bg-success text-success-foreground',
-  wrong: 'bg-destructive text-destructive-foreground',
-  missed: 'bg-brand/15 outline-dashed outline-[3px] outline-offset-[-6px] outline-brand-active text-foreground',
-  faceDown: 'bg-brand hover:bg-brand-hover text-white',
-  faceUp: 'bg-brand/10 border-2 border-brand/40 text-foreground',
-  matched: 'bg-success/10 border-2 border-success/50 text-foreground opacity-60',
-  done: 'bg-muted/40 text-muted-foreground',
-}
-
 export function brainStorageFor(userId: string): BrainStorage {
   const key = `reeeeecall-brain:${userId}`
   return {
@@ -60,7 +44,30 @@ export function brainStorageFor(userId: string): BrainStorage {
         // Private mode or full storage: the session still plays, progress just is not kept.
       }
     },
+    loadHistory: () => {
+      try {
+        return localStorage.getItem(`${key}:history`)
+      } catch {
+        return null
+      }
+    },
+    saveHistory: (raw) => {
+      try {
+        localStorage.setItem(`${key}:history`, raw)
+      } catch {
+        // Same as progress.
+      }
+    },
   }
+}
+
+/** The game screen's background: the game's deep gradient. */
+export function canvasBackground(theme: { canvasFrom: string; canvasTo: string }): string {
+  return `radial-gradient(120% 80% at 50% 0%, ${theme.canvasTo} 0%, ${theme.canvasFrom} 70%)`
+}
+
+export function cardBackground(theme: { cardFrom: string; cardTo: string }): string {
+  return `linear-gradient(135deg, ${theme.cardFrom} 0%, ${theme.cardTo} 100%)`
 }
 
 /**
@@ -71,4 +78,18 @@ export function brainStorageFor(userId: string): BrainStorage {
 export function webPlatform(boardWidth: number, maxCols: number): PlatformContext {
   const small = Math.min(window.innerWidth, window.innerHeight) < 600 || boardWidth < 600
   return { maxCols, minExposureMs: 33, ringSlots: small ? [8, 16, 16] : [16, 16, 16] }
+}
+
+/**
+ * Whether the player is driving with the keyboard. Screens move focus to their main button only
+ * then — on a touch screen, focus moved by script draws a ring the player never asked for.
+ */
+let keyboardMode = false
+if (typeof window !== 'undefined') {
+  window.addEventListener('keydown', (e) => { if (e.key === 'Tab' || e.key.startsWith('Arrow') || e.key === 'Enter' || e.key === ' ') keyboardMode = true }, true)
+  window.addEventListener('pointerdown', () => { keyboardMode = false }, true)
+}
+
+export function focusIfKeyboard(el: HTMLElement | null | undefined) {
+  if (keyboardMode) el?.focus({ preventScroll: true })
 }

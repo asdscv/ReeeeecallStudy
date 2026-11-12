@@ -21,7 +21,11 @@
     "doneBody": "Nice work. A day or two of rest before the next one is fine.",
     "quitTitle": "Training stopped",
     "quitBody": "Your records so far are saved. Because it wasn't finished, it doesn't count as a completed session.",
-    "backHome": "Back to Brain Training"
+    "backHome": "Back to Brain Training",
+    "kicker": "3 times a week",
+    "lineup": "Today's line-up",
+    "minutesShort": "{{value}} min",
+    "stopBody": "Everything so far is saved, but an unfinished session doesn't count as a completed one."
   },
   "home": {
     "freePlay": "Free practice",
@@ -46,7 +50,11 @@
     "centerOnly": "Quick Eye: centre only",
     "centerOnlyHelp": "Turn on if the star at the edges is hard to see. You'll only answer the centre picture.",
     "flash": "Quick Eye shows pictures very briefly. If you are sensitive to flashing light, take it easy.",
-    "close": "Close"
+    "close": "Close",
+    "sound": "Sound effects",
+    "soundHelp": "A short sound when you get one right or wrong.",
+    "haptics": "Vibration",
+    "hapticsHelp": "A short vibration when you get one right or wrong. Same as the app-wide vibration setting."
   },
   "skills": {
     "memory": "Memory",
@@ -127,7 +135,19 @@
     "paused": "Paused",
     "resume": "Resume",
     "stop": "Finish",
-    "stopConfirm": "Stop here? Your records so far are saved."
+    "stopConfirm": "Stop here? Your records so far are saved.",
+    "go": "Go!",
+    "back": "Back",
+    "streakCount": "{{value}} in a row",
+    "streakBanner": "{{value}} in a row!",
+    "levelUpBanner": "Level up! Lv. {{level}}",
+    "fasterBanner": "Faster!",
+    "roundOver": "Round over",
+    "roundCleared": "Round cleared!",
+    "stopTitle": "Stop here?",
+    "stopBody": "Everything so far is saved.",
+    "keepPlaying": "Keep playing",
+    "stopNow": "Stop"
   },
   "quickEye": {
     "watch": "Look at the centre",
@@ -148,7 +168,8 @@
       "5": "Down left",
       "6": "Left",
       "7": "Up left"
-    }
+    },
+    "speedStep": "Speed {{step}}/12"
   },
   "summary": {
     "livesOut": "Round over",
@@ -162,7 +183,12 @@
     "improved": "Your record in this game improved",
     "newBest": "Personal best score",
     "again": "Play again",
-    "home": "All games"
+    "home": "All games",
+    "stars": "{{value}} stars",
+    "time": "Time",
+    "trend": "Level, recent rounds",
+    "otherGames": "Other games",
+    "minutes": "Minutes"
   },
   "colors": {
     "red": "RED",
@@ -171,5 +197,16 @@
     "yellow": "YELLOW",
     "purple": "PURPLE",
     "orange": "ORANGE"
+  },
+  "intro": {
+    "howTo": "How to play",
+    "replay": "Replay",
+    "start": "Start",
+    "practiceNote": "The first 4 are practice. They cost no chances and score no points.",
+    "level": "Level",
+    "speed": "Speed",
+    "stage": "Stage",
+    "rounds": "Played",
+    "best": "Best score"
   }
 }

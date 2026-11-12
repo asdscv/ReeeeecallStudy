@@ -79,4 +79,5 @@ export const memoryGrid: BrainGameDef<MemoryGridState> = {
     }
   },
   signature: (s) => `mg:${s.n}:${s.targets.join(',')}`,
+  solution: (s) => (s.phase === 'recall' ? s.targets.filter((t) => !s.picked.includes(t)) : null),
 }

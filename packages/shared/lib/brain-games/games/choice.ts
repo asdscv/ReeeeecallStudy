@@ -42,6 +42,7 @@ export function choiceGame(
       }
     },
     signature: (s) => s.sig,
+    solution: (s) => (done(s) ? null : [s.correctIndex]),
   }
 }
 

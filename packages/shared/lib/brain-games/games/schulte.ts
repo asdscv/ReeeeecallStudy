@@ -107,4 +107,5 @@ export const schulte: BrainGameDef<SchulteState> = {
     }
   },
   signature: (s) => `sc:${s.order}:${s.values.join(',')}`,
+  solution: (s) => (schulte.outcome(s) === null ? [s.values.indexOf(nextValue(s))] : null),
 }

@@ -106,4 +106,9 @@ export const sequence: BrainGameDef<SequenceState> = {
     }
   },
   signature: (s) => `sq:${s.reverse ? 'r' : 'f'}:${s.seq.join(',')}`,
+  solution(s) {
+    if (s.phase !== 'input') return null
+    const order = s.reverse ? [...s.seq].reverse() : s.seq
+    return order.slice(s.inputs.length)
+  },
 }

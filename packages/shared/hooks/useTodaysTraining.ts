@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { type BrainGameId, type PlanSlot, createRng, planTodaysSession, plannedMinutes, randomSeed } from '../lib/brain-games'
+import { type BrainGameId, type PlanSlot, createRng, localDayKey, planTodaysSession, plannedMinutes, todaysPlanSeed } from '../lib/brain-games'
 import { useBrainStore } from '../stores/brain-store'
 import type { RoundStats } from './useBrainRound'
 
@@ -38,7 +38,10 @@ interface TrainingState {
 function init(): TrainingState {
   const now = Date.now()
   return {
-    slots: planTodaysSession(useBrainStore.getState().progress, createRng(randomSeed())),
+    slots: (() => {
+      const progress = useBrainStore.getState().progress
+      return planTodaysSession(progress, createRng(todaysPlanSeed(progress, localDayKey())))
+    })(),
     slotIndex: 0,
     slotStartedAt: now,
     roundsInSlot: 0,

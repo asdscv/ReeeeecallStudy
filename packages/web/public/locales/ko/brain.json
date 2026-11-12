@@ -21,7 +21,11 @@
     "doneBody": "수고했어요. 다음 훈련은 하루 이틀 쉬고 해도 좋아요.",
     "quitTitle": "훈련을 멈췄어요",
     "quitBody": "지금까지의 기록은 저장됐어요. 끝까지 하지 않아 완료한 훈련으로는 세지 않아요.",
-    "backHome": "두뇌 트레이닝으로"
+    "backHome": "두뇌 트레이닝으로",
+    "kicker": "주 3회 루틴",
+    "lineup": "오늘의 구성",
+    "minutesShort": "{{value}}분",
+    "stopBody": "지금까지의 기록은 저장되지만, 끝까지 하지 않으면 완료한 훈련으로 세지 않아요."
   },
   "home": {
     "freePlay": "자유 연습",
@@ -46,7 +50,11 @@
     "centerOnly": "빠른 눈: 가운데만",
     "centerOnlyHelp": "가장자리 별이 잘 보이지 않으면 켜세요. 가운데 그림만 맞혀요.",
     "flash": "빠른 눈은 그림이 아주 짧게 나타났다 사라져요. 빛에 민감하다면 무리하지 마세요.",
-    "close": "닫기"
+    "close": "닫기",
+    "sound": "효과음",
+    "soundHelp": "맞히거나 틀릴 때 짧은 소리가 나요.",
+    "haptics": "진동",
+    "hapticsHelp": "맞히거나 틀릴 때 짧게 진동해요. 앱 전체의 진동 설정과 같아요."
   },
   "skills": {
     "memory": "기억",
@@ -127,7 +135,19 @@
     "paused": "잠시 멈춤",
     "resume": "이어서 하기",
     "stop": "그만하기",
-    "stopConfirm": "여기서 그만할까요? 지금까지의 기록은 저장돼요."
+    "stopConfirm": "여기서 그만할까요? 지금까지의 기록은 저장돼요.",
+    "go": "시작!",
+    "back": "나가기",
+    "streakCount": "{{value}}연속",
+    "streakBanner": "{{value}}연속 정답!",
+    "levelUpBanner": "레벨 업! Lv. {{level}}",
+    "fasterBanner": "더 빨라졌어요!",
+    "roundOver": "라운드 끝",
+    "roundCleared": "라운드 클리어!",
+    "stopTitle": "그만할까요?",
+    "stopBody": "지금까지의 기록은 저장돼요.",
+    "keepPlaying": "계속하기",
+    "stopNow": "그만하기"
   },
   "quickEye": {
     "watch": "가운데를 보세요",
@@ -148,7 +168,8 @@
       "5": "왼쪽 아래",
       "6": "왼쪽",
       "7": "왼쪽 위"
-    }
+    },
+    "speedStep": "속도 {{step}}/12"
   },
   "summary": {
     "livesOut": "라운드 끝",
@@ -162,7 +183,12 @@
     "improved": "이 게임 기록이 좋아졌어요",
     "newBest": "개인 최고 점수",
     "again": "한 판 더",
-    "home": "게임 목록"
+    "home": "게임 목록",
+    "stars": "별 {{value}}개",
+    "time": "시간",
+    "trend": "최근 라운드 레벨",
+    "otherGames": "다른 게임",
+    "minutes": "분"
   },
   "colors": {
     "red": "빨강",
@@ -171,5 +197,16 @@
     "yellow": "노랑",
     "purple": "보라",
     "orange": "주황"
+  },
+  "intro": {
+    "howTo": "이렇게 해요",
+    "replay": "다시 보기",
+    "start": "시작",
+    "practiceNote": "처음 4문제는 연습이에요. 기회와 점수가 줄지 않아요.",
+    "level": "레벨",
+    "speed": "속도",
+    "stage": "단계",
+    "rounds": "플레이",
+    "best": "최고 점수"
   }
 }

@@ -412,7 +412,8 @@ export function useBrainRound(gameId: BrainGameId, platform: PlatformContext) {
     // final trial, the store already holds the eased level and the round's would undo the easing.
     const stored = gameProgress(store.getState().progress, s.gameId).level
     const next = counted ? { id: s.gameId, level: restartLevel(s.group, stored, s.stats.bestLevel) } : undefined
-    const { isNewBest } = store.getState().finishRun(s.gameId, s.stats.points, next)
+    const round = counted ? { level: s.stats.levelEnd, accuracy: s.stats.correct / s.stats.trials } : undefined
+    const { isNewBest } = store.getState().finishRun(s.gameId, s.stats.points, next, round)
     dispatch({ type: 'best', isNewBest })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.over])

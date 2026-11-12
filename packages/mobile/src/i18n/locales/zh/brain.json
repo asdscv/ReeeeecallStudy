@@ -21,7 +21,11 @@
     "doneBody": "辛苦了。休息一两天再进行下一次也没关系。",
     "quitTitle": "训练已停止",
     "quitBody": "目前的记录已保存。因为没有完成，不计入已完成的训练。",
-    "backHome": "返回大脑训练"
+    "backHome": "返回大脑训练",
+    "kicker": "3 times a week",
+    "lineup": "Today's line-up",
+    "minutesShort": "{{value}} min",
+    "stopBody": "Everything so far is saved, but an unfinished session doesn't count as a completed one."
   },
   "home": {
     "freePlay": "自由练习",
@@ -46,7 +50,11 @@
     "centerOnly": "快眼: 只答中间",
     "centerOnlyHelp": "如果边缘的星星不容易看清，可以打开此项。只需回答中间的图案。",
     "flash": "快眼中的图案只会极短暂地出现。如果你对闪光敏感，请不要勉强。",
-    "close": "关闭"
+    "close": "关闭",
+    "sound": "Sound effects",
+    "soundHelp": "A short sound when you get one right or wrong.",
+    "haptics": "Vibration",
+    "hapticsHelp": "A short vibration when you get one right or wrong. Same as the app-wide vibration setting."
   },
   "skills": {
     "memory": "记忆",
@@ -127,7 +135,19 @@
     "paused": "已暂停",
     "resume": "继续",
     "stop": "结束",
-    "stopConfirm": "要在这里结束吗？目前的记录会保存。"
+    "stopConfirm": "要在这里结束吗？目前的记录会保存。",
+    "go": "Go!",
+    "back": "Back",
+    "streakCount": "{{value}} in a row",
+    "streakBanner": "{{value}} in a row!",
+    "levelUpBanner": "Level up! Lv. {{level}}",
+    "fasterBanner": "Faster!",
+    "roundOver": "Round over",
+    "roundCleared": "Round cleared!",
+    "stopTitle": "Stop here?",
+    "stopBody": "Everything so far is saved.",
+    "keepPlaying": "Keep playing",
+    "stopNow": "Stop"
   },
   "quickEye": {
     "watch": "看中间",
@@ -148,7 +168,8 @@
       "5": "左下",
       "6": "左",
       "7": "左上"
-    }
+    },
+    "speedStep": "Speed {{step}}/12"
   },
   "summary": {
     "livesOut": "本轮结束",
@@ -162,7 +183,12 @@
     "improved": "你在这个游戏中的成绩提高了",
     "newBest": "个人最高分",
     "again": "再玩一次",
-    "home": "全部游戏"
+    "home": "全部游戏",
+    "stars": "{{value}} stars",
+    "time": "Time",
+    "trend": "Level, recent rounds",
+    "otherGames": "Other games",
+    "minutes": "Minutes"
   },
   "colors": {
     "red": "红",
@@ -171,5 +197,16 @@
     "yellow": "黄",
     "purple": "紫",
     "orange": "橙"
+  },
+  "intro": {
+    "howTo": "How to play",
+    "replay": "Replay",
+    "start": "Start",
+    "practiceNote": "The first 4 are practice. They cost no chances and score no points.",
+    "level": "Level",
+    "speed": "Speed",
+    "stage": "Stage",
+    "rounds": "Played",
+    "best": "Best score"
   }
 }

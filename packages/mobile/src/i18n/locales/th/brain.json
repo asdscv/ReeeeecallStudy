@@ -21,7 +21,11 @@
     "doneBody": "เยี่ยมมาก พักสักวันสองวันก่อนฝึกครั้งต่อไปก็ได้",
     "quitTitle": "หยุดการฝึกแล้ว",
     "quitBody": "บันทึกที่ผ่านมาถูกเก็บไว้แล้ว แต่เพราะยังไม่จบ จึงไม่นับเป็นการฝึกที่ทำครบ",
-    "backHome": "กลับไปที่ฝึกสมอง"
+    "backHome": "กลับไปที่ฝึกสมอง",
+    "kicker": "3 times a week",
+    "lineup": "Today's line-up",
+    "minutesShort": "{{value}} min",
+    "stopBody": "Everything so far is saved, but an unfinished session doesn't count as a completed one."
   },
   "home": {
     "freePlay": "ฝึกอิสระ",
@@ -46,7 +50,11 @@
     "centerOnly": "ตาไว: เฉพาะตรงกลาง",
     "centerOnlyHelp": "เปิดไว้หากมองดาวที่ขอบได้ยาก คุณจะตอบแค่ภาพตรงกลาง",
     "flash": "ตาไวจะแสดงภาพเพียงชั่วพริบตา หากคุณไวต่อแสงกะพริบ โปรดอย่าฝืนเล่น",
-    "close": "ปิด"
+    "close": "ปิด",
+    "sound": "Sound effects",
+    "soundHelp": "A short sound when you get one right or wrong.",
+    "haptics": "Vibration",
+    "hapticsHelp": "A short vibration when you get one right or wrong. Same as the app-wide vibration setting."
   },
   "skills": {
     "memory": "ความจำ",
@@ -127,7 +135,19 @@
     "paused": "หยุดอยู่",
     "resume": "เล่นต่อ",
     "stop": "จบ",
-    "stopConfirm": "จบตรงนี้ไหม? บันทึกที่ผ่านมาจะถูกเก็บไว้"
+    "stopConfirm": "จบตรงนี้ไหม? บันทึกที่ผ่านมาจะถูกเก็บไว้",
+    "go": "Go!",
+    "back": "Back",
+    "streakCount": "{{value}} in a row",
+    "streakBanner": "{{value}} in a row!",
+    "levelUpBanner": "Level up! Lv. {{level}}",
+    "fasterBanner": "Faster!",
+    "roundOver": "Round over",
+    "roundCleared": "Round cleared!",
+    "stopTitle": "Stop here?",
+    "stopBody": "Everything so far is saved.",
+    "keepPlaying": "Keep playing",
+    "stopNow": "Stop"
   },
   "quickEye": {
     "watch": "มองตรงกลาง",
@@ -148,7 +168,8 @@
       "5": "ซ้ายล่าง",
       "6": "ซ้าย",
       "7": "ซ้ายบน"
-    }
+    },
+    "speedStep": "Speed {{step}}/12"
   },
   "summary": {
     "livesOut": "จบรอบ",
@@ -162,7 +183,12 @@
     "improved": "สถิติของคุณในเกมนี้ดีขึ้น",
     "newBest": "คะแนนสูงสุดส่วนตัว",
     "again": "เล่นอีกครั้ง",
-    "home": "เกมทั้งหมด"
+    "home": "เกมทั้งหมด",
+    "stars": "{{value}} stars",
+    "time": "Time",
+    "trend": "Level, recent rounds",
+    "otherGames": "Other games",
+    "minutes": "Minutes"
   },
   "colors": {
     "red": "แดง",
@@ -171,5 +197,16 @@
     "yellow": "เหลือง",
     "purple": "ม่วง",
     "orange": "ส้ม"
+  },
+  "intro": {
+    "howTo": "How to play",
+    "replay": "Replay",
+    "start": "Start",
+    "practiceNote": "The first 4 are practice. They cost no chances and score no points.",
+    "level": "Level",
+    "speed": "Speed",
+    "stage": "Stage",
+    "rounds": "Played",
+    "best": "Best score"
   }
 }

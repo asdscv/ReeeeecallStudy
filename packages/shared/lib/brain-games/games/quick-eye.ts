@@ -236,6 +236,11 @@ export const quickEye: BrainGameDef<QuickEyeState> = {
           : {}),
     }
   },
+  solution(s) {
+    if (s.phase === 'answerCenter') return s.targetDir === null ? [s.correctCenter] : [s.correctCenter, s.targetDir]
+    if (s.phase === 'answerLocation') return s.targetDir === null ? null : [s.targetDir]
+    return null
+  },
   signature: (s) =>
     `qe:${s.variant}:${s.center.join('+')}:${s.target ? `${s.target.ring}.${s.target.slot}` : '-'}:${s.distractors.map((d) => `${d.ring}.${d.slot}`).join(',')}`,
 }

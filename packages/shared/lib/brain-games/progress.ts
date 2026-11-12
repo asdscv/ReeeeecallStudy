@@ -44,6 +44,8 @@ export interface BrainSettings {
   timing: TimingMode
   /** Quick Eye without the periphery — for players with a visual-field loss. */
   centerOnly: boolean
+  /** Game sounds (web). On by default; mobile uses the app's vibration setting instead. */
+  sound: boolean
 }
 
 export interface BrainProgress {
@@ -87,7 +89,7 @@ export function emptyProgress(): BrainProgress {
     practiced: [],
     quickEye: emptyQuickEye(),
     sessions: emptySessions(),
-    settings: { timing: 1, centerOnly: false },
+    settings: { timing: 1, centerOnly: false, sound: true },
   }
 }
 
@@ -279,7 +281,7 @@ export function parseProgress(raw: string | null | undefined): BrainProgress {
       practiced: Array.isArray(data.practiced) ? data.practiced.filter((x): x is BrainGameId => typeof x === 'string') : [],
       quickEye,
       sessions,
-      settings: { timing, centerOnly: data.settings?.centerOnly === true },
+      settings: { timing, centerOnly: data.settings?.centerOnly === true, sound: data.settings?.sound !== false },
     }
   } catch {
     return emptyProgress()

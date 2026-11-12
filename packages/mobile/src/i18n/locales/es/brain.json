@@ -21,7 +21,11 @@
     "doneBody": "Buen trabajo. Puedes descansar uno o dos días antes del siguiente.",
     "quitTitle": "Entrenamiento detenido",
     "quitBody": "Tus registros hasta ahora se han guardado. Como no lo terminaste, no cuenta como sesión completada.",
-    "backHome": "Volver a Entrenamiento mental"
+    "backHome": "Volver a Entrenamiento mental",
+    "kicker": "3 times a week",
+    "lineup": "Today's line-up",
+    "minutesShort": "{{value}} min",
+    "stopBody": "Everything so far is saved, but an unfinished session doesn't count as a completed one."
   },
   "home": {
     "freePlay": "Práctica libre",
@@ -46,7 +50,11 @@
     "centerOnly": "Ojo rápido: solo el centro",
     "centerOnlyHelp": "Actívalo si te cuesta ver la estrella de los bordes. Solo responderás la imagen del centro.",
     "flash": "Ojo rápido muestra imágenes durante muy poco tiempo. Si eres sensible a las luces intermitentes, tómatelo con calma.",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "sound": "Sound effects",
+    "soundHelp": "A short sound when you get one right or wrong.",
+    "haptics": "Vibration",
+    "hapticsHelp": "A short vibration when you get one right or wrong. Same as the app-wide vibration setting."
   },
   "skills": {
     "memory": "Memoria",
@@ -127,7 +135,19 @@
     "paused": "En pausa",
     "resume": "Reanudar",
     "stop": "Terminar",
-    "stopConfirm": "¿Terminar aquí? Tus registros hasta ahora quedan guardados."
+    "stopConfirm": "¿Terminar aquí? Tus registros hasta ahora quedan guardados.",
+    "go": "Go!",
+    "back": "Back",
+    "streakCount": "{{value}} in a row",
+    "streakBanner": "{{value}} in a row!",
+    "levelUpBanner": "Level up! Lv. {{level}}",
+    "fasterBanner": "Faster!",
+    "roundOver": "Round over",
+    "roundCleared": "Round cleared!",
+    "stopTitle": "Stop here?",
+    "stopBody": "Everything so far is saved.",
+    "keepPlaying": "Keep playing",
+    "stopNow": "Stop"
   },
   "quickEye": {
     "watch": "Mira el centro",
@@ -148,7 +168,8 @@
       "5": "Abajo a la izquierda",
       "6": "Izquierda",
       "7": "Arriba a la izquierda"
-    }
+    },
+    "speedStep": "Speed {{step}}/12"
   },
   "summary": {
     "livesOut": "Ronda terminada",
@@ -162,7 +183,12 @@
     "improved": "Tu récord en este juego ha mejorado",
     "newBest": "Mejor puntuación personal",
     "again": "Jugar otra vez",
-    "home": "Todos los juegos"
+    "home": "Todos los juegos",
+    "stars": "{{value}} stars",
+    "time": "Time",
+    "trend": "Level, recent rounds",
+    "otherGames": "Other games",
+    "minutes": "Minutes"
   },
   "colors": {
     "red": "ROJO",
@@ -171,5 +197,16 @@
     "yellow": "AMARILLO",
     "purple": "MORADO",
     "orange": "NARANJA"
+  },
+  "intro": {
+    "howTo": "How to play",
+    "replay": "Replay",
+    "start": "Start",
+    "practiceNote": "The first 4 are practice. They cost no chances and score no points.",
+    "level": "Level",
+    "speed": "Speed",
+    "stage": "Stage",
+    "rounds": "Played",
+    "best": "Best score"
   }
 }

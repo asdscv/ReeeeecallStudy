@@ -21,3 +21,6 @@ export {
 } from './games/quick-eye'
 export { researchContent, type ResearchContent, type ResearchSection } from './research-content'
 export { quickEyeGeometry, quickEyeBox, slotPosition, QUICK_EYE_BOX_RADIUS } from './games/quick-eye-geometry'
+export * from './theme'
+export * from './history'
+export { buildDemo, type DemoFrame } from './demo'

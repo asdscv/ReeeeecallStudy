@@ -110,4 +110,5 @@ export const oddOneOut: BrainGameDef<OddOneOutState> = {
     }
   },
   signature: (s) => `oo:${s.common}:${s.odd}:${s.oddRotate}:${s.oddIndex}`,
+  solution: (s) => (s.phase === 'find' ? [s.oddIndex] : null),
 }
