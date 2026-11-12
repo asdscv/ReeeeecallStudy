@@ -54,7 +54,9 @@ export function QuickEyeBoard({
   const frameMs = useFrameInterval()
   const stimRef = useRef<HTMLDivElement>(null)
   const maskRef = useRef<HTMLCanvasElement>(null)
-  const size = Math.max(300, Math.min(width, 520, window.innerHeight - 260))
+  // The page around the field (header, chances, prompt, the answer row below) takes ~400px; the
+  // field gets what is left, so the answers stay above the fold.
+  const size = Math.max(280, Math.min(width, 520, window.innerHeight - 400))
   const { boxW, boxH, shape } = quickEyeBox(size, view.center.length === 2)
   const half = size / 2
   // Ring radii and one stimulus size for every ring, laid out so nothing overlaps the box or a
@@ -95,7 +97,9 @@ export function QuickEyeBoard({
       if (!start) {
         start = ts
         stim.style.opacity = '1'
-      } else if (ts - start >= view.exposureMs - frame / 2) {
+      } else if (Math.round((ts - start) / frame) >= Math.max(1, Math.round(view.exposureMs / frame))) {
+        // Frames counted exactly as the engine checks them (round(ms / frame)) — a "half a frame
+        // early" threshold disagreed with that rounding at 90Hz and voided half the 50ms trials.
         stim.style.opacity = '0'
         mask.style.opacity = '1'
         onExposure(ts - start, frame)
@@ -108,8 +112,33 @@ export function QuickEyeBoard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view.phase])
 
-  const answering = view.phase === 'answerCenter' || view.phase === 'answerLocation' || view.phase === 'done'
-  const done = view.phase === 'done'
+  // The frame loop writes these opacities directly; whenever the phase that owns them is over, put
+  // them back (a voided trial jumps from the stimulus straight to 'done' and React would not).
+  useEffect(() => {
+    if (view.phase !== 'stimulus' && stimRef.current) stimRef.current.style.opacity = '0'
+    if (view.phase !== 'mask' && maskRef.current) maskRef.current.style.opacity = '0'
+  }, [view.phase])
+
+  // A voided trial reaches 'done' without an answer: there is nothing to reveal.
+  const done = view.phase === 'done' && view.pickedCenter !== undefined
+  const answering = view.phase === 'answerCenter' || view.phase === 'answerLocation' || done
+
+  // Keyboard: focus follows the question (the buttons it was on unmount between phases), and
+  // 1-2 answer the centre, 1-8 the direction (clockwise from up, as drawn).
+  const answersRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (view.phase === 'answerCenter') answersRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])')?.focus({ preventScroll: true })
+    if (view.phase === 'answerLocation') document.querySelector<HTMLButtonElement>('[data-testid="brain-qe-dir-0"]')?.focus({ preventScroll: true })
+    if (view.phase !== 'answerCenter' && view.phase !== 'answerLocation') return
+    const onKey = (e: KeyboardEvent) => {
+      const n = Number(e.key)
+      if (!Number.isInteger(n) || n < 1) return
+      if (view.phase === 'answerCenter' && n <= 2) onTap(n - 1)
+      if (view.phase === 'answerLocation' && n <= 8) onTap(n - 1)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [view.phase, onTap])
 
   return (
     <div className="mx-auto flex flex-col items-center gap-5 select-none">
@@ -155,8 +184,8 @@ export function QuickEyeBoard({
             const x = half + r * Math.sin(angle)
             const y = half - r * Math.cos(angle)
             let tone = 'bg-card border-2 border-brand text-brand-active hover:bg-brand/10'
-            if (done && d === view.correctDirection) tone = 'bg-success border-2 border-success text-white'
-            else if (done && d === view.pickedDirection) tone = 'bg-destructive border-2 border-destructive text-white'
+            if (done && d === view.correctDirection) tone = 'bg-success border-2 border-success text-success-foreground'
+            else if (done && d === view.pickedDirection) tone = 'bg-destructive border-2 border-destructive text-destructive-foreground'
             else if (done) tone = 'bg-card border-2 border-border text-muted-foreground'
             return (
               <button
@@ -178,7 +207,7 @@ export function QuickEyeBoard({
 
       {/* What was in the centre: two large answers, drawn as the shapes themselves. */}
       {answering && (view.phase === 'answerCenter' || done) && (
-        <div className="flex gap-4" role="group">
+        <div ref={answersRef} className="flex gap-4" role="group">
           {view.centerOptions.map((opt, i) => {
             const isShape = opt !== 'same' && opt !== 'different'
             let tone = 'bg-card border-2 border-border hover:border-brand'

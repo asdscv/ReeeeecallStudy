@@ -332,6 +332,29 @@ describe('per-game life rules', () => {
   })
 })
 
+describe('migration and rotation', () => {
+  it('converts v1 span levels to the new length scale', () => {
+    const v1 = JSON.stringify({ v: 1, games: { memoryGrid: { level: 6, bestLevel: 9, rounds: 4, wins: 3 }, sequence: { level: 6, bestLevel: 6, rounds: 2, wins: 1 }, math: { level: 6, bestLevel: 6, rounds: 2, wins: 1 } }, totalRounds: 8, totalPoints: 0, lastDay: null, dayStreak: 0, todayRounds: 0 })
+    const p = parseProgress(v1)
+    expect(p.games.memoryGrid).toMatchObject({ level: 4, bestLevel: 5 }) // 3 + ⌊5·0.6⌋ = 6 cells → length 6 − 2
+    expect(p.games.sequence).toMatchObject({ level: 3 }) // 3 + ⌊5·0.45⌋ = 5 tiles → 3
+    expect(p.games.math).toMatchObject({ level: 6 }) // other games keep their scale
+    // A v2 record is read as written.
+    const v2 = parseProgress(serializeProgress({ ...emptyProgress(), games: { memoryGrid: { level: 6, bestLevel: 6, rounds: 1, wins: 1 } } }))
+    expect(v2.games.memoryGrid?.level).toBe(6)
+  })
+
+  it('rotates by the games recent sessions used, not by trial counts', () => {
+    let p = emptyProgress()
+    p = recordSession(p, 22, '2026-11-10', null, ['quickEye', 'oddOneOut', 'memoryGrid', 'pairs'])
+    for (let seed = 1; seed < 30; seed++) {
+      const plan = planTodaysSession(p, createRng(seed))
+      expect(plan[1].gameId).toBe('schulte')
+      expect(plan[2].gameId).not.toBe('memoryGrid')
+    }
+  })
+})
+
 describe('progress', () => {
   it('records rounds, keeps the best level, and counts day streaks', () => {
     let p = emptyProgress()

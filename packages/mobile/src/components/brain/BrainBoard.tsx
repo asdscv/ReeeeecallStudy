@@ -68,7 +68,8 @@ export function GridBoard({ view, onTap, width, height }: { view: GridView; onTa
               alignItems: 'center',
               justifyContent: 'center',
             }}
-            {...testProps(`brain-cell-${i}`)}
+            testID={`brain-cell-${i}`}
+            accessibilityLabel={c.label ?? String(i + 1)}
           >
             {c.label ? (
               <Text
@@ -133,7 +134,7 @@ export function ChoiceBoard({ view, onTap, width }: { view: ChoiceView; onTap: (
           minimumFontScale={0.84}
           numberOfLines={2}
           allowFontScaling={false}
-          {...testProps('brain-stimulus')}
+          testID={'brain-stimulus'}
         >
           {stimulus}
         </Text>
@@ -161,7 +162,7 @@ export function ChoiceBoard({ view, onTap, width }: { view: ChoiceView; onTap: (
                 styles.option,
                 { width: optionWidth, backgroundColor: bg, borderColor: pressed && !answered ? theme.colors.primary : border },
               ]}
-              {...testProps(`brain-option-${i}`)}
+              testID={`brain-option-${i}`}
             >
               {isRight || isPicked ? <Feather name={isRight ? 'check' : 'x'} size={20} color={fg} /> : null}
               <Text style={{ fontSize: 22, fontWeight: '700', color: fg, flexShrink: 1 }} numberOfLines={1} adjustsFontSizeToFit>

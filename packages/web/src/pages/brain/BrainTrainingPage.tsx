@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
 import { brainGame, courseStatus, displayLevel, localDayKey, weekProgress, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
@@ -22,6 +22,7 @@ export function BrainTrainingPage() {
 function Training() {
   const { t } = useTranslation('brain')
   const s = useTodaysTraining()
+  const navigate = useNavigate()
   const trackEvent = useTrackEvent()
   const progress = useBrainStore((st) => st.progress)
   const onOver = useCallback((stats: RoundStats) => s.onRoundOver(s.slot.gameId, stats), [s])
@@ -63,10 +64,19 @@ function Training() {
         <button
           type="button"
           onClick={s.continueSession}
-          className="w-full min-h-14 rounded-xl bg-brand text-white text-lg font-semibold hover:bg-brand-hover border-none cursor-pointer"
+          className="w-full min-h-14 rounded-xl bg-brand text-brand-foreground text-lg font-semibold hover:bg-brand-hover border-none cursor-pointer"
           data-testid="brain-training-continue"
         >
           {t('training.continue')}
+        </button>
+        {/* A way out between games, not only mid-round. Rounds so far are saved; the session is not counted. */}
+        <button
+          type="button"
+          onClick={() => { if (window.confirm(t('play.stopConfirm'))) navigate('/brain') }}
+          className="w-full min-h-12 rounded-xl border border-border bg-transparent text-base text-muted-foreground hover:bg-accent cursor-pointer"
+          data-testid="brain-training-stop"
+        >
+          {t('play.stop')}
         </button>
       </Centered>
     )
@@ -118,7 +128,7 @@ function Training() {
       )}
       <Link
         to="/brain"
-        className="w-full flex items-center justify-center min-h-14 rounded-xl bg-brand text-white text-lg font-semibold no-underline hover:bg-brand-hover"
+        className="w-full flex items-center justify-center min-h-14 rounded-xl bg-brand text-brand-foreground text-lg font-semibold no-underline hover:bg-brand-hover"
         data-testid="brain-training-home"
       >
         {t('training.backHome')}

@@ -637,7 +637,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
       <button
         type="submit"
         disabled={!canSubmit || (useImage ? limit.reached : limit.exceeds(numericInputOr(cardCount, 0)))}
-        className="w-full py-3 rounded-xl bg-brand text-white font-semibold hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition"
+        className="w-full py-3 rounded-xl bg-brand text-brand-foreground font-semibold hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition"
       >
         {t('config.startGenerate')}
       </button>

@@ -32,9 +32,9 @@ export const INK: Record<BrainColor, string> = {
  */
 export const TONE_CLASS: Record<CellTone, string> = {
   idle: 'bg-muted hover:bg-accent text-foreground',
-  lit: 'bg-brand text-white ring-4 ring-inset ring-white/70',
-  correct: 'bg-success text-white',
-  wrong: 'bg-destructive text-white',
+  lit: 'bg-brand text-brand-foreground ring-4 ring-inset ring-white/70',
+  correct: 'bg-success text-success-foreground',
+  wrong: 'bg-destructive text-destructive-foreground',
   missed: 'bg-brand/15 outline-dashed outline-[3px] outline-offset-[-6px] outline-brand-active text-foreground',
   faceDown: 'bg-brand hover:bg-brand-hover text-white',
   faceUp: 'bg-brand/10 border-2 border-brand/40 text-foreground',

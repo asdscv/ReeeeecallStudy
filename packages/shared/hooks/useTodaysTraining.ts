@@ -83,8 +83,11 @@ export function useTodaysTraining() {
   useEffect(() => {
     if (state.phase !== 'done' || recorded.current) return
     recorded.current = true
-    useBrainStore.getState().completeSession(((state.finishedAt ?? Date.now()) - state.startedAt) / 60_000)
-  }, [state.phase, state.finishedAt, state.startedAt])
+    useBrainStore.getState().completeSession(
+      ((state.finishedAt ?? Date.now()) - state.startedAt) / 60_000,
+      state.slots.map((slot) => slot.gameId),
+    )
+  }, [state.phase, state.finishedAt, state.startedAt, state.slots])
 
   /** From the "next game" screen into the next slot. */
   const continueSession = useCallback(() => {

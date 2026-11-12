@@ -32,7 +32,7 @@ export function TimePeriodTabs({ value, onChange, range, onRangeChange }: TimePe
             onClick={() => onChange(opt.value)}
             className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium transition cursor-pointer whitespace-nowrap ${
               value === opt.value
-                ? 'bg-brand text-white'
+                ? 'bg-brand text-brand-foreground'
                 : 'bg-card text-muted-foreground hover:bg-muted'
             }`}
           >
@@ -55,7 +55,7 @@ export function TimePeriodTabs({ value, onChange, range, onRangeChange }: TimePe
             }}
             className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium transition cursor-pointer whitespace-nowrap border-l border-border ${
               value === 'custom'
-                ? 'bg-brand text-white'
+                ? 'bg-brand text-brand-foreground'
                 : 'bg-card text-muted-foreground hover:bg-muted'
             }`}
           >

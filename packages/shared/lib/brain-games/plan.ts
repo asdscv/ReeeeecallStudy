@@ -8,7 +8,6 @@ import {
   CORE_COURSE_SESSIONS,
   WEEKLY_GOAL,
   dayDiff,
-  gameProgress,
 } from './progress'
 
 /**
@@ -34,10 +33,16 @@ export const GAME_SLOT_MINUTES = 4
 
 const byRole = (role: string) => BRAIN_GAMES.filter((g) => g.role === role).map((g) => g.id)
 
-/** Least practised first, ties broken by the rng, so the rotation drifts to what has had least time. */
+/**
+ * The candidate used longest ago in Today's Training (never used = longest), ties broken by the rng.
+ * Not by trial count: a fast game piles up trials four times quicker than a slow one, so counting
+ * trials kept steering the session back to the same slow games.
+ */
 function leastPlayed(p: BrainProgress, ids: BrainGameId[], rng: Rng): BrainGameId {
+  const recent = p.sessions.recentGames
+  const lastUse = (id: BrainGameId) => recent.lastIndexOf(id)
   const shuffled = rng.shuffle(ids)
-  return shuffled.reduce((best, id) => (gameProgress(p, id).rounds < gameProgress(p, best).rounds ? id : best), shuffled[0])
+  return shuffled.reduce((best, id) => (lastUse(id) < lastUse(best) ? id : best), shuffled[0])
 }
 
 /**

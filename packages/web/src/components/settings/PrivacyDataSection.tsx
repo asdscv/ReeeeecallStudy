@@ -75,7 +75,7 @@ export function PrivacyDataSection() {
                 type="button"
                 disabled={deleting}
                 onClick={deleteAccount}
-                className="px-4 py-2 rounded-lg bg-destructive text-white text-sm cursor-pointer disabled:opacity-50"
+                className="px-4 py-2 rounded-lg bg-destructive text-destructive-foreground text-sm cursor-pointer disabled:opacity-50"
               >
                 {deleting ? '…' : t('privacy.deleteConfirmBtn')}
               </button>

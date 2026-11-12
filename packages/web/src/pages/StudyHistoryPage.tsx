@@ -347,7 +347,7 @@ export function StudyHistoryPage() {
                 onClick={() => setDeckScope('all')}
                 className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition cursor-pointer whitespace-nowrap ${
                   deckScope === 'all'
-                    ? 'bg-brand text-white'
+                    ? 'bg-brand text-brand-foreground'
                     : 'bg-card text-muted-foreground border border-border hover:bg-muted'
                 }`}
               >
@@ -359,7 +359,7 @@ export function StudyHistoryPage() {
                   onClick={() => setDeckScope(d.id)}
                   className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition cursor-pointer whitespace-nowrap ${
                     deckScope === d.id
-                      ? 'bg-brand text-white'
+                      ? 'bg-brand text-brand-foreground'
                       : 'bg-card text-muted-foreground border border-border hover:bg-muted'
                   }`}
                 >
@@ -479,7 +479,7 @@ export function StudyHistoryPage() {
                         onClick={() => setCurrentPage(page)}
                         className={`w-10 h-10 text-sm rounded cursor-pointer ${
                           currentPage === page
-                            ? 'bg-brand text-white'
+                            ? 'bg-brand text-brand-foreground'
                             : 'hover:bg-accent text-foreground'
                         }`}
                       >

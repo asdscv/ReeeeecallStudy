@@ -25,7 +25,7 @@
   },
   "home": {
     "freePlay": "자유 연습",
-    "freePlayHint": "게임 하나를 골라 연습해요. 기회 3번을 다 쓰면 라운드가 끝나요.",
+    "freePlayHint": "게임 하나를 골라 연습해요. 기회를 다 쓰면 라운드가 끝나요.",
     "level": "Lv. {{level}}",
     "best": "최고 Lv. {{level}}",
     "new": "처음",

@@ -79,7 +79,7 @@ export function SearchFilters({
         >
           {t('filters.label', { defaultValue: 'Filter' })}
           {activeCount > 0 && (
-            <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium bg-brand text-white rounded-full">
+            <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium bg-brand text-brand-foreground rounded-full">
               {activeCount}
             </span>
           )}
@@ -188,7 +188,7 @@ export function SearchFilters({
                     onClick={() => onFilterChange({ dateRange: range === 'all' ? undefined : range })}
                     className={`px-3 py-1.5 text-xs rounded-full border cursor-pointer transition ${
                       isActive
-                        ? 'bg-brand text-white border-brand'
+                        ? 'bg-brand text-brand-foreground border-brand'
                         : 'bg-card text-muted-foreground border-border hover:border-brand/30'
                     }`}
                   >
@@ -211,7 +211,7 @@ export function SearchFilters({
                 onClick={() => onFilterChange({ shareMode: undefined })}
                 className={`px-3 py-1.5 text-xs rounded-full border cursor-pointer transition ${
                   !filters.shareMode
-                    ? 'bg-brand text-white border-brand'
+                    ? 'bg-brand text-brand-foreground border-brand'
                     : 'bg-card text-muted-foreground border-border hover:border-brand/30'
                 }`}
               >
@@ -225,7 +225,7 @@ export function SearchFilters({
                     onClick={() => onFilterChange({ shareMode: isActive ? undefined : mode })}
                     className={`px-3 py-1.5 text-xs rounded-full border cursor-pointer transition ${
                       isActive
-                        ? 'bg-brand text-white border-brand'
+                        ? 'bg-brand text-brand-foreground border-brand'
                         : 'bg-card text-muted-foreground border-border hover:border-brand/30'
                     }`}
                   >

@@ -37,8 +37,8 @@ interface BrainStore {
   finishRun(mode: BrainGameId | 'mix', points: number, nextStartLevel?: { id: BrainGameId; level: number }): { isNewBest: boolean; best: number }
   practiced(id: BrainGameId): void
   setSettings(patch: Partial<BrainSettings>): void
-  /** A completed Today's Training session. */
-  completeSession(minutes: number): void
+  /** A completed Today's Training session, with the games it used (for the rotation). */
+  completeSession(minutes: number, games?: BrainGameId[]): void
 }
 
 let storage: BrainStorage | null = null
@@ -82,10 +82,10 @@ export const useBrainStore = create<BrainStore>((set, get) => {
     setSettings(patch) {
       commit(updateSettings(get().progress, patch))
     },
-    completeSession(minutes) {
+    completeSession(minutes, games = []) {
       const today = localDayKey()
       const p = get().progress
-      commit(recordSession(p, minutes, today, openBooster(p, today)))
+      commit(recordSession(p, minutes, today, openBooster(p, today), games))
     },
   }
 })

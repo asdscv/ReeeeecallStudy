@@ -105,8 +105,11 @@ export function QuickEyeBoard({
         return
       }
       const elapsed = info.timestamp - shownAt.value
-      // Hide on the frame nearest the target: half a frame early beats half a frame late.
-      if (elapsed >= targetMs.value - frameMs / 2) {
+      // Count frames exactly as the engine will when it checks the report (round(ms / frame)):
+      // a "half a frame early" threshold disagreed with that rounding at 90Hz, where 50ms is 4.5
+      // frames, and voided about half of those trials.
+      const wantFrames = Math.max(1, Math.round(targetMs.value / frameMs))
+      if (Math.round(elapsed / frameMs) >= wantFrames) {
         stimOpacity.value = 0
         maskOpacity.value = 1
         armed.value = false

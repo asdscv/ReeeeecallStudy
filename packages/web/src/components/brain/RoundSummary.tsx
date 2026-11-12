@@ -48,7 +48,7 @@ export function RoundSummary({ gameId, stats, onAgain }: { gameId: BrainGameId; 
           <button
             type="button"
             onClick={onAgain}
-            className="flex-1 min-h-12 px-3 text-base font-semibold rounded-xl bg-brand text-white hover:bg-brand-hover border-none cursor-pointer"
+            className="flex-1 min-h-12 px-3 text-base font-semibold rounded-xl bg-brand text-brand-foreground hover:bg-brand-hover border-none cursor-pointer"
             data-testid="brain-again"
           >
             {t('summary.again')}

@@ -400,7 +400,7 @@ export function DeckDetailPage() {
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-4">
           <button
             onClick={() => navigate(`/decks/${deckId}/study/setup`)}
-            className="px-3 sm:px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
+            className="px-3 sm:px-4 py-2 bg-brand text-brand-foreground rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
           >
             {t('decks:detail.startStudy')}
           </button>
@@ -566,7 +566,7 @@ export function DeckDetailPage() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
                 <button
                   onClick={() => { setEditingCard(null); setShowCardForm(true) }}
-                  className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
+                  className="px-4 py-2 bg-brand text-brand-foreground rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
                 >
                   {t('decks:detail.addFirstCard')}
                 </button>
@@ -784,7 +784,7 @@ export function DeckDetailPage() {
                           onClick={() => setCurrentPage(page)}
                           className={`w-10 h-10 text-sm rounded cursor-pointer ${
                             safePage === page
-                              ? 'bg-brand text-white'
+                              ? 'bg-brand text-brand-foreground'
                               : 'hover:bg-accent text-foreground'
                           }`}
                         >

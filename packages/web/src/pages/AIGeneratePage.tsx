@@ -210,9 +210,9 @@ export function AIGeneratePage() {
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
                       isComplete
-                        ? 'bg-success text-white'
+                        ? 'bg-success text-success-foreground'
                         : isActive
-                          ? 'bg-brand text-white ring-4 ring-blue-100'
+                          ? 'bg-brand text-brand-foreground ring-4 ring-blue-100'
                           : 'bg-accent text-muted-foreground'
                     }`}
                   >

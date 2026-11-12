@@ -216,7 +216,7 @@ export function PublicListingPage() {
               <p className="text-muted-foreground mb-4">{t('marketplace:preview.viewInMarket')}</p>
               <Link
                 to={`/marketplace/${listing.id}`}
-                className="inline-block px-6 py-3 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand-hover transition no-underline"
+                className="inline-block px-6 py-3 bg-brand text-brand-foreground text-sm font-semibold rounded-lg hover:bg-brand-hover transition no-underline"
                 data-testid="cta-marketplace"
               >
                 {t('marketplace:detail.getDeck')}
@@ -228,7 +228,7 @@ export function PublicListingPage() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Link
                   to={`/auth/login?redirect=${encodeURIComponent(`/marketplace/${listing.id}`)}`}
-                  className="inline-block px-6 py-3 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand-hover transition no-underline"
+                  className="inline-block px-6 py-3 bg-brand text-brand-foreground text-sm font-semibold rounded-lg hover:bg-brand-hover transition no-underline"
                   data-testid="cta-login"
                 >
                   {t('marketplace:preview.ctaLogin')}

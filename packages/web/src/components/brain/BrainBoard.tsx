@@ -92,8 +92,8 @@ function Choice({ view, onTap }: { view: ChoiceView; onTap: (index: number) => v
       <div className={`grid gap-3 ${view.options.length > 4 ? 'grid-cols-3' : 'grid-cols-2'}`}>
         {view.options.map((o, i) => {
           let tone = 'bg-card border-2 border-border hover:border-brand text-foreground'
-          if (answered && i === view.correctIndex) tone = 'bg-success text-white border-2 border-success'
-          else if (answered && i === view.picked) tone = 'bg-destructive text-white border-2 border-destructive'
+          if (answered && i === view.correctIndex) tone = 'bg-success text-success-foreground border-2 border-success'
+          else if (answered && i === view.picked) tone = 'bg-destructive text-destructive-foreground border-2 border-destructive'
           else if (answered) tone = 'bg-card border-2 border-border text-muted-foreground'
           return (
             <button

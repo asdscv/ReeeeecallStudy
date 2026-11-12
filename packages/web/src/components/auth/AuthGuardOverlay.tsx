@@ -20,10 +20,10 @@ const FIRST_FLIP_DELAY = 750  // Show front briefly, then flip
 const FLIP_INTERVAL = 3000
 const RATING_BUTTONS = ['Again', 'Hard', 'Good', 'Easy']
 const RATING_COLORS = [
-  'bg-destructive text-white shadow-red-500/40',
+  'bg-destructive text-destructive-foreground shadow-red-500/40',
   'bg-orange-500 text-white shadow-orange-500/40',
   'bg-emerald-500 text-white shadow-emerald-500/40',
-  'bg-brand text-white shadow-blue-500/40',
+  'bg-brand text-brand-foreground shadow-blue-500/40',
 ]
 
 function MockBrowserPreview({ prefersReduced }: { prefersReduced: boolean | null }) {

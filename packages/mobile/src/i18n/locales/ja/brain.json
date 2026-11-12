@@ -25,7 +25,7 @@
   },
   "home": {
     "freePlay": "自由練習",
-    "freePlayHint": "ゲームを1つ選んで練習します。チャンスを3回使い切るとラウンド終了です。",
+    "freePlayHint": "ゲームを1つ選んで練習します。チャンスを使い切るとラウンド終了です。",
     "level": "Lv. {{level}}",
     "best": "最高 Lv. {{level}}",
     "new": "NEW",

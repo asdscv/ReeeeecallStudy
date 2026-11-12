@@ -337,7 +337,7 @@ export function TemplateEditPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-brand text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition shrink-0"
+          className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-brand text-brand-foreground rounded-lg text-xs sm:text-sm font-medium hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition shrink-0"
         >
           <Save size={16} />
           <span className="hidden sm:inline">{saving ? `${t('common:saving')}...` : t('common:save')}</span>
@@ -482,7 +482,7 @@ export function TemplateEditPage() {
                 onClick={() => setLayoutMode('default')}
                 className={`flex-1 px-4 py-2.5 text-sm font-medium transition cursor-pointer ${
                   layoutMode === 'default'
-                    ? 'bg-brand text-white'
+                    ? 'bg-brand text-brand-foreground'
                     : 'bg-card text-muted-foreground hover:bg-muted'
                 }`}
               >
@@ -493,7 +493,7 @@ export function TemplateEditPage() {
                 onClick={() => setLayoutMode('custom')}
                 className={`flex-1 px-4 py-2.5 text-sm font-medium transition cursor-pointer ${
                   layoutMode === 'custom'
-                    ? 'bg-brand text-white'
+                    ? 'bg-brand text-brand-foreground'
                     : 'bg-card text-muted-foreground hover:bg-muted'
                 }`}
               >

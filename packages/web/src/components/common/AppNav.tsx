@@ -69,7 +69,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         to="/quick-study"
         onClick={onNavigate}
         className={`flex items-center justify-center gap-2 h-11 mx-3 mb-3 rounded-lg text-sm font-semibold no-underline transition-colors ${
-          isPathActive(pathname, '/quick-study') ? 'bg-brand-active text-white' : 'bg-brand text-white hover:bg-brand-hover'
+          isPathActive(pathname, '/quick-study') ? 'bg-brand-active text-brand-foreground' : 'bg-brand text-brand-foreground hover:bg-brand-hover'
         }`}
         data-testid="nav-quick-study"
       >
@@ -164,16 +164,36 @@ export function MenuSheet({ open, onClose }: { open: boolean; onClose: () => voi
       onClose()
     }
   }, [pathname, onClose])
+  const panelRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!open) return
+    // Where focus goes back to when the sheet closes (the button that opened it).
+    const opener = document.activeElement as HTMLElement | null
     closeRef.current?.focus()
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') return onClose()
+      if (e.key !== 'Tab' || !panelRef.current) return
+      // Keep Tab inside the sheet: it is modal, and the page behind it is covered.
+      const items = [...panelRef.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')]
+      if (items.length === 0) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
+    }
+    // The sheet is `lg:hidden`: rotating a tablet to landscape hides it, so close it too — or the
+    // scroll lock would stay on with nothing on screen to lift it.
+    const wide = window.matchMedia('(min-width: 1024px)')
+    const onWide = () => { if (wide.matches) onClose() }
     const prevOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     window.addEventListener('keydown', onKey)
+    wide.addEventListener('change', onWide)
     return () => {
       window.removeEventListener('keydown', onKey)
+      wide.removeEventListener('change', onWide)
       document.body.style.overflow = prevOverflow
+      opener?.focus?.({ preventScroll: true })
     }
   }, [open, onClose])
 
@@ -181,7 +201,7 @@ export function MenuSheet({ open, onClose }: { open: boolean; onClose: () => voi
   return (
     <div className="lg:hidden fixed inset-0 z-[60]" role="dialog" aria-modal="true" aria-label={t('menu')} data-testid="menu-sheet">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="absolute inset-y-0 left-0 w-[min(20rem,85vw)] bg-card shadow-xl flex flex-col pt-[env(safe-area-inset-top)]">
+      <div ref={panelRef} className="absolute inset-y-0 left-0 w-[min(20rem,85vw)] bg-card shadow-xl flex flex-col pt-[env(safe-area-inset-top)]">
         <div className="flex items-center justify-between h-14 px-4">
           <Link to="/dashboard" onClick={onClose} className="flex items-center gap-2 no-underline">
             <img src="/favicon.png" alt="" className="w-8 h-8 object-contain" />

@@ -25,7 +25,7 @@
   },
   "home": {
     "freePlay": "Latihan bebas",
-    "freePlayHint": "Pilih satu permainan untuk dilatih. Ronde berakhir saat 3 kesempatanmu habis.",
+    "freePlayHint": "Pilih satu permainan untuk dilatih. Ronde berakhir saat kesempatanmu habis.",
     "level": "Lv. {{level}}",
     "best": "Terbaik Lv. {{level}}",
     "new": "Baru",

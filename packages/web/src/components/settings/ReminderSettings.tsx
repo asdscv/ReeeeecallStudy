@@ -153,7 +153,7 @@ export function ReminderSettings() {
                   onClick={() => toggleDay(day)}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer ${
                     days.includes(day)
-                      ? 'bg-brand text-white'
+                      ? 'bg-brand text-brand-foreground'
                       : 'bg-accent text-muted-foreground hover:bg-accent'
                   }`}
                 >

@@ -15,13 +15,17 @@ import { webPlatform } from './brain-ui'
 export function RoundView({ gameId, onOver, caption }: { gameId: BrainGameId; onOver: (stats: RoundStats) => void; caption?: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState<number | null>(null)
+  // The CONTENT width: the measured box has no padding of its own (clientWidth counts padding,
+  // and a padded measure let a 6-column grid overflow a 390px phone by its gutters).
   useLayoutEffect(() => {
     if (ref.current) setWidth(Math.min(ref.current.clientWidth, 560))
   }, [])
   return (
     <main className="min-h-dvh flex flex-col bg-background">
-      <div ref={ref} className="max-w-2xl w-full mx-auto px-4">
-        {width === null ? null : <Round gameId={gameId} onOver={onOver} caption={caption} width={width} />}
+      <div className="max-w-2xl w-full mx-auto px-4">
+        <div ref={ref} className="w-full">
+          {width === null ? null : <Round gameId={gameId} onOver={onOver} caption={caption} width={width} />}
+        </div>
       </div>
     </main>
   )
@@ -47,8 +51,40 @@ function Round({ gameId, onOver, caption, width }: { gameId: BrainGameId; onOver
     }
   }, [r.done, r.stats, onOver])
 
+  // A hidden tab pauses the round: a timed trial must not run out of chances while the player is
+  // away. (A Quick Eye flash in progress cannot pause; the engine voids it instead.)
+  const live = useRef(r)
+  useEffect(() => {
+    live.current = r
+  })
+  // A pause asked for mid-flash (Quick Eye's stimulus cannot pause) is remembered and taken as soon
+  // as the round can pause, rather than dropped.
+  const wantPause = useRef(false)
+  useEffect(() => {
+    const onVisibility = () => {
+      const cur = live.current
+      if (!document.hidden || cur.paused || cur.over) return
+      if (cur.canPause) cur.pause()
+      else wantPause.current = true
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => document.removeEventListener('visibilitychange', onVisibility)
+  }, [])
+  useEffect(() => {
+    if (wantPause.current && r.canPause && !r.paused) {
+      wantPause.current = false
+      r.pause()
+    }
+  }, [r])
+
   const finish = () => {
-    if (r.stats.trials === 0 || window.confirm(t('play.stopConfirm'))) r.stop()
+    if (r.stats.trials === 0) return r.stop()
+    // window.confirm blocks the page, but the trial's deadline keeps counting underneath it — pause
+    // first, or cancelling would land straight on a timeout and cost a chance.
+    const wasPaused = r.paused
+    if (r.canPause && !wasPaused) r.pause()
+    if (window.confirm(t('play.stopConfirm'))) r.stop()
+    else if (!wasPaused) r.resume()
   }
 
   const levelText = gameId === 'quickEye' ? `${t('quickEye.stage', { stage: variant })} · ${Math.round(r.level)}/12` : t('home.level', { level: r.level })
@@ -150,7 +186,7 @@ function Round({ gameId, onOver, caption, width }: { gameId: BrainGameId; onOver
             <button
               type="button"
               onClick={r.resume}
-              className="min-h-12 px-6 rounded-xl bg-brand text-white text-base font-semibold hover:bg-brand-hover border-none cursor-pointer"
+              className="min-h-12 px-6 rounded-xl bg-brand text-brand-foreground text-base font-semibold hover:bg-brand-hover border-none cursor-pointer"
             >
               {t('play.resume')}
             </button>

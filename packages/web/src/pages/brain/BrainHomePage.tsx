@@ -70,7 +70,7 @@ export function BrainHomePage() {
         </div>
         <Link
           to="/brain/training"
-          className="flex items-center justify-center gap-2 min-h-14 rounded-xl bg-brand text-white text-lg font-semibold no-underline hover:bg-brand-hover transition-colors"
+          className="flex items-center justify-center gap-2 min-h-14 rounded-xl bg-brand text-brand-foreground text-lg font-semibold no-underline hover:bg-brand-hover transition-colors"
           data-testid="brain-training-start"
         >
           <Play className="w-5 h-5" aria-hidden="true" />

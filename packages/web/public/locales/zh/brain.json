@@ -25,7 +25,7 @@
   },
   "home": {
     "freePlay": "自由练习",
-    "freePlayHint": "选一个游戏来练习。3次机会用完，本轮结束。",
+    "freePlayHint": "选一个游戏来练习。机会用完，本轮结束。",
     "level": "Lv. {{level}}",
     "best": "最高 Lv. {{level}}",
     "new": "新",

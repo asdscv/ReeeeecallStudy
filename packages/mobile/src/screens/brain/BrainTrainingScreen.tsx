@@ -81,6 +81,20 @@ function Training() {
           </View>
         </View>
         <Button title={t('training.continue')} onPress={s.continueSession} size="lg" testID="brain-training-continue" />
+        {/* A way out between games on every platform — iOS has no back button here and the swipe is
+            off. Rounds so far are saved; the session is not counted. */}
+        <Button
+          title={t('play.stop')}
+          variant="outline"
+          size="lg"
+          onPress={() =>
+            Alert.alert(t('play.stop'), t('play.stopConfirm'), [
+              { text: t('play.resume'), style: 'cancel' },
+              { text: t('play.stop'), style: 'destructive', onPress: () => navigation.goBack() },
+            ])
+          }
+          testID="brain-training-stop"
+        />
       </Centered>
     )
   }

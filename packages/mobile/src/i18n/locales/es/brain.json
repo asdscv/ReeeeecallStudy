@@ -25,7 +25,7 @@
   },
   "home": {
     "freePlay": "Práctica libre",
-    "freePlayHint": "Elige un juego para practicar. La ronda termina cuando usas tus 3 oportunidades.",
+    "freePlayHint": "Elige un juego para practicar. La ronda termina cuando usas todas tus oportunidades.",
     "level": "Nv. {{level}}",
     "best": "Mejor Nv. {{level}}",
     "new": "Nuevo",

@@ -89,7 +89,8 @@ interface State {
   pausedAt: number | null
   recentSigs: string[]
   correctRts: number[]
-  voids: number
+  /** Voids from mismatched frames since the floor last moved (stalls and hidden tabs don't count). */
+  frameVoids: number
   minExposureMs: number
   stats: RoundStats
 }
@@ -134,20 +135,23 @@ function raiseFloor(ms: number): number {
   return ladder.find((x) => x > ms) ?? ms
 }
 
-function judge(state: State, round: State['round'], now: number, timedOut: boolean): State {
+function judge(state: State, round: State['round'], now: number, timedOut: boolean, frameVoid = false): State {
   const def = brainGame(state.gameId).def
   const outcome = def.outcome(round)
   if (!outcome || state.result) return { ...state, round, timedOut }
   const rules = GROUP_RULES[state.group]
 
   if (outcome.void) {
-    const voids = state.voids + 1
-    const tooMany = voids >= 3 && voids / (voids + state.trialInRound) > 0.2
+    // Only a dropped-frame void says the display cannot hold this exposure. A stalled or hidden tab
+    // says nothing about the device, so it neither counts nor raises the floor. After a raise the
+    // count starts again, so the floor moves one step per three bad frames, not on every void.
+    const frameVoids = state.frameVoids + (frameVoid ? 1 : 0)
+    const tooMany = frameVoid && frameVoids >= 3 && frameVoids / (frameVoids + state.trialInRound) > 0.2
     return {
       ...state,
       round,
       timedOut,
-      voids,
+      frameVoids: tooMany ? 0 : frameVoids,
       minExposureMs: tooMany ? raiseFloor(state.minExposureMs) : state.minExposureMs,
       result: { correct: false, timedOut, void: true, practice: state.trialIsPractice, points: 0, livesLost: 0, levelBefore: state.level, levelAfter: state.level },
     }
@@ -172,8 +176,9 @@ function judge(state: State, round: State['round'], now: number, timedOut: boole
   let livesLost = outcome.livesSpent ?? (outcome.correct || forgivenTimeout ? 0 : 1)
   let lives: number
   if (state.group === 'span') {
-    lives = outcome.correct ? rules.lives : Math.max(0, state.lives - 1)
-    livesLost = outcome.correct ? 0 : 1
+    // A relaxed-timing timeout costs no chance here either; the length still does not move up.
+    livesLost = outcome.correct || forgivenTimeout ? 0 : 1
+    lives = outcome.correct ? rules.lives : Math.max(0, state.lives - livesLost)
   } else {
     lives = Math.max(0, state.lives - livesLost)
   }
@@ -208,11 +213,17 @@ function reducer(state: State, action: Action): State {
     case 'tap':
       if (state.result || state.over || state.paused || !def.acceptsInput(state.round)) return state
       return judge(state, def.tap(state.round, action.index), action.now, false)
-    case 'timeout':
-      return state.result || state.over ? state : judge(state, def.timeout(state.round), action.now, true)
+    case 'timeout': {
+      if (state.result || state.over || state.paused) return state
+      // A timer is a request, not a verdict: one armed before a pause (or before a blocking dialog
+      // that a resume followed) can fire late. Only a deadline that has really passed counts.
+      const limit = scaledLimit(def.timeLimitMs(state.round), state.timing)
+      if (limit !== null && state.inputStartedAt !== null && action.now < state.inputStartedAt + limit - 50) return state
+      return judge(state, def.timeout(state.round), action.now, true)
+    }
     case 'exposed':
       if (state.result || state.over || !def.exposed) return state
-      return judge(state, def.exposed(state.round, action.actualMs, action.frameMs), action.now, false)
+      return judge(state, def.exposed(state.round, action.actualMs, action.frameMs), action.now, false, true)
     case 'inputStarted':
       return state.inputStartedAt === null ? { ...state, inputStartedAt: action.now } : state
     case 'next': {
@@ -294,7 +305,7 @@ function init({ gameId, platform }: { gameId: BrainGameId; platform: PlatformCon
     pausedAt: null,
     recentSigs: [sig],
     correctRts: [],
-    voids: 0,
+    frameVoids: 0,
     minExposureMs: platform.minExposureMs,
     stats: {
       trials: 0,
@@ -397,7 +408,10 @@ export function useBrainRound(gameId: BrainGameId, platform: PlatformContext) {
     if (!state.over) return
     const s = stateRef.current
     const counted = s.stats.trials > 0
-    const next = counted ? { id: s.gameId, level: restartLevel(s.group, s.stats.levelEnd, s.stats.bestLevel) } : undefined
+    // From the STORED level, not the round's last one: when Quick Eye's next variant opened on the
+    // final trial, the store already holds the eased level and the round's would undo the easing.
+    const stored = gameProgress(store.getState().progress, s.gameId).level
+    const next = counted ? { id: s.gameId, level: restartLevel(s.group, stored, s.stats.bestLevel) } : undefined
     const { isNewBest } = store.getState().finishRun(s.gameId, s.stats.points, next)
     dispatch({ type: 'best', isNewBest })
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -55,7 +55,7 @@ const KO: ResearchContent = {
       bullets: [
         '「빠른 눈」: 미국의 대규모 노인 인지훈련 연구(ACTIVE)와 후속 연구(IHAMS)에서 쓰인 처리속도 훈련 방식을 참고했습니다. 화면 가운데와 가장자리에 그림이 아주 짧게 나타나면 무엇이 어디에 있었는지 고르는 과제로, 실력에 따라 보이는 시간이 짧아지고 방해물이 늘어납니다. 다만 ACTIVE는 강사가 진행하는 소규모 수업이었고(IHAMS에는 집에서 혼자 한 집단도 있었습니다), 이 앱의 게임은 그 프로그램과 같지 않으며 연구로 검증되지 않았습니다. [1–5]',
         '난이도 자동 조절: 정답률이 일정 수준(빠른 눈 약 80%, 다른 게임 약 85%)에 머물도록 난이도를 조금씩 올리고 내리는 심리학의 «가중 상하법»을 썼습니다. 원래 연구의 목표 정답률은 75%였는데, 기회가 3번(빠른 눈 5번)인 라운드가 너무 빨리 끝나지 않도록 조금 높였습니다. [6]',
-        '순서·공간 기억 게임: 표준 «코르시 블록» 과제처럼 한 길이에 기회 두 번을 주고, 1초에 하나씩 보여 줍니다. [7]',
+        '순서·공간 기억 게임: 표준 «코르시 블록» 과제처럼 한 길이에 기회를 두 번 줍니다. 순서 기억 게임은 이 과제처럼 1초에 하나씩 보여 줍니다. [7]',
         '주 3회, 20~25분: 여러 연구를 모은 분석에서 주 3회 이하로 훈련한 연구들이 그보다 자주 한 연구들보다 결과가 좋았지만, 서로 다른 연구를 비교한 것이라 확실하지 않습니다. 같은 분석에서 30분 미만 세션은 근거가 약했는데, 「오늘의 훈련」은 부담을 줄이려고 20~25분으로 정해 이 기준보다 짧습니다. [8]',
         '기본 과정과 복습 과정: ACTIVE 연구는 10회 수업을 마친 참가자 중 일부에게 약 1년, 3년 시점에 복습 수업을 했습니다. 이 구조를 빌려 10세션 기본 과정과 복습 과정을 만들었습니다. [1, 2]',
       ],
@@ -96,7 +96,7 @@ const EN: ResearchContent = {
       bullets: [
         'Quick Eye is modelled on the speed-of-processing training used in a large US study of older adults (ACTIVE) and a follow-up trial (IHAMS). Pictures flash briefly in the centre and at the edges, and you report what and where they were; the display time shortens and distractors increase as you improve. ACTIVE used small trainer-led classes (IHAMS also had an at-home group); our game is not the same program and has not been tested in a study. [1–5]',
         'Automatic difficulty uses a weighted up-down rule from psychology that keeps your accuracy around a set level (about 80% in Quick Eye, about 85% in the other games). The original studies aimed for 75%; we raised it a little so rounds with 3 chances (5 in Quick Eye) don\'t end too quickly. [6]',
-        'The order and spatial memory games follow the standard Corsi block task: two tries at each length, one item per second. [7]',
+        'The order and spatial memory games follow the standard Corsi block task\'s two tries at each length; the order game also shows one item per second, as that task does. [7]',
         'Three sessions a week, 20–25 minutes: in a pooled analysis, studies that trained three times a week or less did better than those that trained more often, though this compares different studies and is uncertain. Sessions under 30 minutes had weak evidence; Today\'s Training is 20–25 minutes to keep it manageable, which is shorter than that. [8]',
         'Core course and refresher course: ACTIVE offered refresher classes about one and three years later to some participants who completed its ten sessions. We borrowed that structure. [1, 2]',
       ],

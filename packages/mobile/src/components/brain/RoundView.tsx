@@ -132,13 +132,23 @@ function Round({ gameId, onOver, caption, confirmEmpty = false, width }: RoundVi
 
   // A phone call or a notification should not cost a chance: the round pauses when the app leaves
   // the foreground. (A Quick Eye stimulus cannot pause; the engine voids it if it never finished.)
+  const wantPause = useRef(false)
   useEffect(() => {
     const sub = AppState.addEventListener('change', (state) => {
       const now = live.current
-      if (state !== 'active' && !now.over && !now.paused && now.canPause) pause()
+      if (state === 'active' || now.over || now.paused) return
+      // Mid-flash (Quick Eye's stimulus cannot pause) the request is remembered, not dropped.
+      if (now.canPause) pause()
+      else wantPause.current = true
     })
     return () => sub.remove()
   }, [pause])
+  useEffect(() => {
+    if (wantPause.current && r.canPause && !r.paused && !r.over) {
+      wantPause.current = false
+      pause()
+    }
+  }, [r.canPause, r.paused, r.over, pause])
 
   // ── What the header and the result line say ─────────────────────────────────
   const levelText =
@@ -174,7 +184,7 @@ function Round({ gameId, onOver, caption, confirmEmpty = false, width }: RoundVi
           onPress={finish}
           style={({ pressed }) => [styles.finish, pressed && { backgroundColor: theme.colors.surface }]}
           accessibilityRole="button"
-          {...testProps('brain-finish')}
+          testID={'brain-finish'}
         >
           <Feather name="x" size={20} color={theme.colors.textSecondary} />
           <Text style={[styles.finishText, { color: theme.colors.textSecondary }]} numberOfLines={1}>
@@ -190,7 +200,7 @@ function Round({ gameId, onOver, caption, confirmEmpty = false, width }: RoundVi
           <Text style={[styles.gameName, { color: theme.colors.text }]} numberOfLines={1}>
             {t(`games.${gameId}.name`)}
           </Text>
-          <Text style={[styles.level, { color: theme.colors.textSecondary }]} numberOfLines={1} {...testProps('brain-level')}>
+          <Text style={[styles.level, { color: theme.colors.textSecondary }]} numberOfLines={1} testID={'brain-level'}>
             {levelText}
           </Text>
         </View>
@@ -205,7 +215,7 @@ function Round({ gameId, onOver, caption, confirmEmpty = false, width }: RoundVi
         >
           <Feather name={r.paused ? 'play' : 'pause'} size={22} color={theme.colors.text} />
         </Pressable>
-        <Text style={[styles.score, { color: theme.colors.text }]} accessibilityLabel={`${t('play.score')} ${formatCount(r.stats.points)}`} {...testProps('brain-score')}>
+        <Text style={[styles.score, { color: theme.colors.text }]} accessibilityLabel={`${t('play.score')} ${formatCount(r.stats.points)}`} testID={'brain-score'}>
           {formatCount(r.stats.points)}
         </Text>
       </View>
@@ -213,7 +223,7 @@ function Round({ gameId, onOver, caption, confirmEmpty = false, width }: RoundVi
       {/* Chances, calm: no red, no flashing — gamification already makes a task feel harder. */}
       <View style={styles.livesRow}>
         {r.practice ? (
-          <Text style={[styles.practice, { color: theme.colors.primary }]} numberOfLines={2} {...testProps('brain-practice')}>
+          <Text style={[styles.practice, { color: theme.colors.primary }]} numberOfLines={2} testID={'brain-practice'}>
             {t('play.practice', { done: practiceCount, total: r.practiceTotal })} · {t('play.practiceHint')}
           </Text>
         ) : practiceJustEnded ? (
@@ -238,7 +248,7 @@ function Round({ gameId, onOver, caption, confirmEmpty = false, width }: RoundVi
       <TimerBar key={r.trialId} timer={r.timer} theme={theme} />
 
       <View style={styles.body}>
-        <Text style={[styles.prompt, { color: theme.colors.text }]} numberOfLines={2} {...testProps('brain-prompt')}>
+        <Text style={[styles.prompt, { color: theme.colors.text }]} numberOfLines={2} testID={'brain-prompt'}>
           {t(r.view.prompt.key, r.view.prompt.params)}
         </Text>
         <View
@@ -261,7 +271,7 @@ function Round({ gameId, onOver, caption, confirmEmpty = false, width }: RoundVi
         </View>
         <View style={styles.resultRow} accessibilityLiveRegion="polite">
           {result && resultText ? (
-            <Text style={[styles.result, { color: resultColor }]} {...testProps('brain-result')}>
+            <Text style={[styles.result, { color: resultColor }]} testID={'brain-result'}>
               {resultText}
               {result.points > 0 ? (
                 <Text style={{ color: theme.colors.primary }}>  {t('play.points', { value: formatCount(result.points) })}</Text>

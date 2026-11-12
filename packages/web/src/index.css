@@ -40,7 +40,7 @@
   --destructive-active: #7F1D1D;
   --success: #15803D;
   --success-foreground: #FFFFFF;
-  --warning: #B45309;
+  --warning: #92400E;
   --warning-foreground: #FFFFFF;
   --content-tertiary: #5F6672;
   --chart-1: #E97451;
@@ -76,7 +76,7 @@
   --accent: #1F2937;
   --accent-foreground: #F9FAFB;
   --destructive: #F87171;
-  --destructive-foreground: #FFFFFF;
+  --destructive-foreground: #450A0A;
   /* Lighter than --card (#1E293B)/surfaces so borders are visible in dark mode */
   --border: #374151;
   --input: #374151;
@@ -84,7 +84,7 @@
   --brand: #60A5FA;
   --brand-hover: #93C5FD;
   --brand-active: #BFDBFE;
-  --brand-foreground: #1E3A8A;
+  --brand-foreground: #172554;
   --destructive-hover: #EF4444;
   --destructive-active: #DC2626;
   --success: #4ADE80;

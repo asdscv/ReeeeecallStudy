@@ -25,7 +25,7 @@
   },
   "home": {
     "freePlay": "Luyện tự do",
-    "freePlayHint": "Chọn một trò chơi để luyện. Lượt chơi kết thúc khi bạn dùng hết 3 cơ hội.",
+    "freePlayHint": "Chọn một trò chơi để luyện. Lượt chơi kết thúc khi bạn dùng hết cơ hội.",
     "level": "Cấp {{level}}",
     "best": "Cao nhất cấp {{level}}",
     "new": "Mới",

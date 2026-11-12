@@ -36,6 +36,8 @@ export interface SessionLog {
   coreDoneOn: string | null
   /** Refresher courses: index of the one in progress or last done (0 = none yet) and its sessions. */
   booster: { index: number; sessions: number }
+  /** Games played in the most recent sessions, oldest first (last 9) — what the rotation avoids. */
+  recentGames: BrainGameId[]
 }
 
 export interface BrainSettings {
@@ -70,7 +72,7 @@ export const BOOSTER_SESSIONS = 4
 export const BOOSTER_MONTHS = [11, 35] as const
 
 const emptyQuickEye = (): QuickEyeProgress => ({ variant: 1, recentMs: [], recentOk: '', thresholdMs: null })
-const emptySessions = (): SessionLog => ({ recentDays: [], total: 0, minutes: 0, coreDoneOn: null, booster: { index: 0, sessions: 0 } })
+const emptySessions = (): SessionLog => ({ recentDays: [], total: 0, minutes: 0, coreDoneOn: null, booster: { index: 0, sessions: 0 }, recentGames: [] })
 
 export function emptyProgress(): BrainProgress {
   return {
@@ -187,7 +189,7 @@ export function updateSettings(p: BrainProgress, patch: Partial<BrainSettings>):
  * A completed Today's Training session. Counts toward the core course, then toward a refresher
  * when one is open (see `courseStatus` in plan.ts).
  */
-export function recordSession(p: BrainProgress, minutes: number, today: string, boosterOpen: number | null): BrainProgress {
+export function recordSession(p: BrainProgress, minutes: number, today: string, boosterOpen: number | null, games: BrainGameId[] = []): BrainProgress {
   const s = p.sessions
   const total = s.total + 1
   let booster = s.booster
@@ -202,6 +204,7 @@ export function recordSession(p: BrainProgress, minutes: number, today: string, 
       minutes: s.minutes + Math.max(0, Math.round(minutes)),
       coreDoneOn: s.coreDoneOn ?? (total >= CORE_COURSE_SESSIONS ? today : null),
       booster,
+      recentGames: [...s.recentGames, ...games].slice(-9),
     },
   }
 }
@@ -220,12 +223,18 @@ export function parseProgress(raw: string | null | undefined): BrainProgress {
     const data = JSON.parse(raw) as Partial<BrainProgress>
     if (!data || data.v !== 1 || typeof data.games !== 'object' || data.games === null) return emptyProgress()
     const games: BrainProgress['games'] = {}
+    // v1 records (written before Today's Training existed, so without `sessions`) measured the span
+    // games on another scale: Flash Grid had 3 + ⌊(L−1)·0.6⌋ cells and Sequence 3 + ⌊(L−1)·0.45⌋
+    // tiles, where the level is now the length − 2. Convert, or a v1 level 6 would open at 8 tiles.
+    const v1 = data.sessions === undefined
     for (const [id, g] of Object.entries(data.games)) {
       if (!g || typeof g.level !== 'number' || !Number.isFinite(g.level)) continue
       const min = id === 'quickEye' ? 0 : 1
+      const span = v1 && (id === 'memoryGrid' || id === 'sequence')
+      const toLength = (lv: number) => (span ? Math.max(1, 1 + Math.floor((lv - 1) * (id === 'memoryGrid' ? 0.6 : 0.45))) : lv)
       games[id as BrainGameId] = {
-        level: Math.max(min, g.level),
-        bestLevel: Math.max(min, Number(g.bestLevel) || g.level),
+        level: Math.max(min, toLength(g.level)),
+        bestLevel: Math.max(min, toLength(Number(g.bestLevel) || g.level)),
         rounds: num(g.rounds),
         wins: num(g.wins),
       }
@@ -255,6 +264,7 @@ export function parseProgress(raw: string | null | undefined): BrainProgress {
       minutes: num(se.minutes),
       coreDoneOn: isDay(se.coreDoneOn) ? se.coreDoneOn : null,
       booster: { index: Math.round(num(booster.index)), sessions: Math.round(num(booster.sessions)) },
+      recentGames: Array.isArray(se.recentGames) ? se.recentGames.filter((x): x is BrainGameId => typeof x === 'string').slice(-9) : [],
     }
     const timing = data.settings && TIMING_MODES.includes(data.settings.timing) ? data.settings.timing : 1
     return {

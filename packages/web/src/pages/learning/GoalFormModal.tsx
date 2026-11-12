@@ -505,7 +505,7 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
               type="button"
               onClick={submit}
               disabled={submitting}
-              className="px-4 py-1.5 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-60"
+              className="px-4 py-1.5 text-sm font-medium bg-brand text-brand-foreground rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-60"
             >
               {submitting ? t('form.saving') : t('form.save')}
             </button>

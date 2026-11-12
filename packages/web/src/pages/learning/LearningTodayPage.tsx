@@ -1478,7 +1478,7 @@ function PlanWeekStrip({ week }: { week: PlanWeek }) {
   const { t } = useTranslation('learning')
 
   const fill: Record<DayState, string> = {
-    done:      'bg-brand text-white border-brand',
+    done:      'bg-brand text-brand-foreground border-brand',
     partial:   'bg-brand/25 text-foreground border-brand/40',
     extra:     'bg-success/20 text-foreground border-success/40',
     untouched: 'bg-transparent text-content-tertiary border-border',

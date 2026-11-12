@@ -89,7 +89,7 @@ export function BrainHomeScreen() {
             }}
             style={({ pressed }) => [styles.start, { backgroundColor: pressed ? theme.colors.buttonPrimaryPressed : theme.colors.buttonPrimary }]}
             accessibilityRole="button"
-            {...testProps('brain-training-start')}
+            testID={'brain-training-start'}
           >
             <Feather name="play" size={22} color={theme.colors.primaryText} />
             <Text style={[styles.startText, { color: theme.colors.primaryText }]}>{t('training.start')}</Text>
@@ -134,7 +134,7 @@ export function BrainHomeScreen() {
                   { backgroundColor: theme.colors.surfaceElevated, borderColor: pressed ? theme.colors.primary : theme.colors.border },
                 ]}
                 accessibilityRole="button"
-                {...testProps(`brain-game-${game.id}`)}
+                testID={`brain-game-${game.id}`}
               >
                 <View style={[styles.gameIcon, { backgroundColor: theme.colors.primaryLight }]}>
                   <Feather name={game.icon as FeatherName} size={24} color={theme.colors.primary} />
@@ -168,7 +168,7 @@ export function BrainHomeScreen() {
               { backgroundColor: theme.colors.surfaceElevated, borderColor: pressed ? theme.colors.primary : theme.colors.border },
             ]}
             accessibilityRole="button"
-            {...testProps('brain-research-link')}
+            testID={'brain-research-link'}
           >
             <Feather name="book-open" size={22} color={theme.colors.primary} />
             <Text style={[styles.researchText, { color: theme.colors.text }]}>{t('home.research')}</Text>

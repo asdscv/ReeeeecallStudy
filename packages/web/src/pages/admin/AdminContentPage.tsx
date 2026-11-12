@@ -146,7 +146,7 @@ export function AdminContentPage() {
                 onClick={() => setStatusFilter(s)}
                 className={`px-3 py-1 text-xs rounded-full cursor-pointer transition ${
                   statusFilter === s
-                    ? 'bg-brand text-white'
+                    ? 'bg-brand text-brand-foreground'
                     : 'bg-accent text-muted-foreground hover:bg-accent'
                 }`}
               >

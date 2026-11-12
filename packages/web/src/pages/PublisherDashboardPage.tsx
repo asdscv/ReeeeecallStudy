@@ -101,7 +101,7 @@ export function PublisherDashboardPage() {
           </p>
           <button
             onClick={() => navigate('/decks')}
-            className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover cursor-pointer"
+            className="px-4 py-2 bg-brand text-brand-foreground rounded-lg text-sm font-medium hover:bg-brand-hover cursor-pointer"
           >
             {t('publisher.goToDecks')}
           </button>

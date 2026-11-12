@@ -183,7 +183,7 @@ export function QuizRunPage() {
         <button
           type="button"
           onClick={() => navigate('/quiz')}
-          className="px-3 py-1.5 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer"
+          className="px-3 py-1.5 text-sm font-medium bg-brand text-brand-foreground rounded-lg cursor-pointer"
         >
           {t('run.backToQuiz')}
         </button>
@@ -477,7 +477,7 @@ export function QuizRunPage() {
             disabled={item.question_type === 'mcq'
               ? choice === null
               : text.trim() === '' || length.state === 'too_short' || length.state === 'too_long'}
-            className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50"
+            className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-brand-foreground rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50"
           >
             {t('run.submit')}
           </button>
@@ -493,7 +493,7 @@ export function QuizRunPage() {
                 type="button"
                 onClick={() => void requestGrade()}
                 disabled={grading || shownPrice === null}
-                className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50"
+                className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-brand-foreground rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50"
               >
                 {/* The price stays off the BUTTON — a button is a decision, not a price tag —
                     and is said in the line below it instead. It used to be said nowhere at all,
@@ -507,7 +507,7 @@ export function QuizRunPage() {
               className={`px-3 py-2 text-sm font-medium rounded-lg cursor-pointer transition-colors ${
                 item.question_type !== 'mcq' && item.score === null
                   ? 'flex-1 border border-border text-foreground hover:border-brand/40'
-                  : 'flex-1 bg-brand text-white hover:bg-brand-hover'
+                  : 'flex-1 bg-brand text-brand-foreground hover:bg-brand-hover'
               }`}
             >
               {isLast ? t('run.finish') : t('run.next')}

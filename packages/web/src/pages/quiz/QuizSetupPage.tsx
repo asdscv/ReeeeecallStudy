@@ -203,7 +203,7 @@ export function QuizSetupPage() {
                 onClick={() => setType(option)}
                 className={`px-3 py-1.5 text-sm rounded-lg border cursor-pointer transition-colors ${
                   type === option
-                    ? 'bg-brand text-white border-brand'
+                    ? 'bg-brand text-brand-foreground border-brand'
                     : 'bg-background text-foreground border-border hover:border-brand/40'
                 }`}
               >
@@ -225,7 +225,7 @@ export function QuizSetupPage() {
                 disabled={eligible > 0 && option > eligible}
                 className={`px-3 py-1.5 text-sm rounded-lg border cursor-pointer transition-colors disabled:opacity-40 ${
                   count === option
-                    ? 'bg-brand text-white border-brand'
+                    ? 'bg-brand text-brand-foreground border-brand'
                     : 'bg-background text-foreground border-border hover:border-brand/40'
                 }`}
               >
@@ -294,7 +294,7 @@ export function QuizSetupPage() {
                   onClick={() => setDifficulty(band.level)}
                   className={`px-3 py-1.5 text-sm rounded-lg border cursor-pointer transition-colors ${
                     activeBand === band.level
-                      ? 'bg-brand text-white border-brand'
+                      ? 'bg-brand text-brand-foreground border-brand'
                       : 'bg-background text-foreground border-border hover:border-brand/40'
                   }`}
                 >
@@ -359,7 +359,7 @@ export function QuizSetupPage() {
         type="button"
         onClick={() => void submit()}
         disabled={!canSubmit}
-        className="w-full px-3 py-2 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50"
+        className="w-full px-3 py-2 text-sm font-medium bg-brand text-brand-foreground rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50"
       >
         {generating
           // A 50-question quiz is several model calls and can take over a minute. A button

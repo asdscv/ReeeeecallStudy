@@ -51,7 +51,7 @@ export function RoundSummary({
         ) : null}
 
         {stats.isNewBest ? (
-          <View style={[styles.best, { backgroundColor: theme.colors.primaryLight }]} {...testProps('brain-new-best')}>
+          <View style={[styles.best, { backgroundColor: theme.colors.primaryLight }]} testID={'brain-new-best'}>
             <Feather name="award" size={18} color={theme.colors.primary} />
             <Text style={[styles.bestText, { color: theme.colors.primary }]}>{t('summary.newBest')}</Text>
           </View>

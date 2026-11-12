@@ -25,7 +25,7 @@
   },
   "home": {
     "freePlay": "Free practice",
-    "freePlayHint": "Pick one game to practise. A round ends when your 3 chances are used.",
+    "freePlayHint": "Pick one game to practise. A round ends when your chances are used up.",
     "level": "Lv. {{level}}",
     "best": "Best Lv. {{level}}",
     "new": "New",

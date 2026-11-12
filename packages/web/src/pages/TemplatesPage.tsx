@@ -111,7 +111,7 @@ export function TemplatesPage() {
           </button>
           <button
             onClick={handleNew}
-            className="px-3 sm:px-4 py-2 bg-brand text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
+            className="px-3 sm:px-4 py-2 bg-brand text-brand-foreground rounded-lg text-xs sm:text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
           >
             {t('createNew')}
           </button>
@@ -130,7 +130,7 @@ export function TemplatesPage() {
           <p className="text-muted-foreground mb-4 text-sm sm:text-base">{t('empty')}</p>
           <button
             onClick={handleNew}
-            className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
+            className="px-4 py-2 bg-brand text-brand-foreground rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
           >
             {t('createFirst')}
           </button>
