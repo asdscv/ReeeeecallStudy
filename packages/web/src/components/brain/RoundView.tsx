@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { X, Pause, Play, Heart, Flame, Check, Trophy, Flag, HeartCrack } from 'lucide-react'
+import { X, Pause, Play, Heart, Flame, Check, Trophy, Flag, HeartCrack, Volume2, VolumeX } from 'lucide-react'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
 import { GAME_THEMES, comboMultiplier, maxColsFor, quickEyeMsAt, streakTier, type BrainGameId, type GameTheme } from '@reeeeecall/shared/lib/brain-games'
 import { useBrainRound, type RoundStats } from '@reeeeecall/shared/hooks/useBrainRound'
@@ -84,6 +84,8 @@ function Round({ gameId, onOver, caption, width, theme }: { gameId: BrainGameId;
   const [platform] = useState(() => webPlatform(width, maxColsFor(width)))
   const r = useBrainRound(gameId, platform)
   const timing = useBrainStore((s) => s.progress.settings.timing)
+  const sound = useBrainStore((s) => s.progress.settings.sound)
+  const setSettings = useBrainStore((s) => s.setSettings)
   const variant = useBrainStore((s) => s.progress.quickEye.variant)
   const reported = useRef(false)
   const [pops, setPops] = useState<Pop[]>([])
@@ -356,6 +358,17 @@ function Round({ gameId, onOver, caption, width, theme }: { gameId: BrainGameId;
           </button>
           <button type="button" onClick={askStop} className="w-64 min-h-12 rounded-2xl bg-white/10 hover:bg-white/20 text-base font-semibold text-white border-none cursor-pointer">
             {t('play.stop')}
+          </button>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={sound}
+            onClick={() => setSettings({ sound: !sound })}
+            className="flex items-center justify-center gap-2 w-64 min-h-12 rounded-2xl bg-transparent hover:bg-white/10 text-base text-white/85 border border-white/20 cursor-pointer"
+            data-testid="brain-pause-sound"
+          >
+            {sound ? <Volume2 className="w-5 h-5" aria-hidden="true" /> : <VolumeX className="w-5 h-5" aria-hidden="true" />}
+            {t('settings.sound')}
           </button>
         </Overlay>
       )}
