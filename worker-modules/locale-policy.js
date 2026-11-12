@@ -19,11 +19,14 @@
 export const LOCALE_REGISTRY = {
   en: { generate: true, index: true, ui: true },
   ko: { generate: true, index: true, ui: true },
-  // Minor locales: kept SERVING to existing users (ui), but no longer generated
-  // or indexed — their thin auto-translated pages were diluting site-wide quality.
+  // Minor locales (generate:false, index:false): kept SERVING to existing users (ui), but not
+  // generated or indexed — their thin auto-translated pages were diluting site-wide quality.
   zh: { generate: false, index: false, ui: true },
-  ja: { generate: false, index: false, ui: true },
-  vi: { generate: false, index: false, ui: true },
+  // ja/vi back since 2026-11-12: every official deck has a Japanese and a Vietnamese edition, so
+  // these readers get a real deck page, and articles are now ~1,000-word pieces written per
+  // language. The old short auto-translations were unpublished (contents.pruned_reason) first.
+  ja: { generate: true, index: true, ui: true },
+  vi: { generate: true, index: true, ui: true },
   th: { generate: false, index: false, ui: true },
   id: { generate: false, index: false, ui: true },
   es: { generate: false, index: false, ui: true },

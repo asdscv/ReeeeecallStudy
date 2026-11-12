@@ -24,7 +24,7 @@ describe('PIPELINE_DEFAULTS', () => {
 })
 
 describe('LOCALES (generation set — see locale-policy.js)', () => {
-  it('generates only en + ko under the current locale policy', () => {
-    expect(LOCALES).toEqual(['en', 'ko'])
+  it('generates en, ko, ja and vi under the current locale policy', () => {
+    expect(LOCALES).toEqual(['en', 'ko', 'ja', 'vi'])
   })
 })

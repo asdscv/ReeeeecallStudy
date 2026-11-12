@@ -37,6 +37,43 @@ export const OG_LOCALE_MAP = {
   vi: 'vi_VN', th: 'th_TH', id: 'id_ID', es: 'es_ES',
 }
 
+// Crawler page chrome (buttons, footers, section headings) for every indexable locale — an indexed
+// Japanese page must not carry English links. Other locales fall back to English.
+const PAGE_CHROME = {
+  en: {
+    startFree: 'Start Learning for Free', insightsHeading: 'Learning Insights',
+    insightsBlurb: 'Explore science-backed learning strategies, spaced repetition tips, and more.',
+    browseInsights: 'Browse Insights →', tagline: 'Learn smarter with science.', home: 'Home', insights: 'Insights',
+    vocabulary: 'Vocabulary lists', related: 'Related Articles', moreInsights: 'More Learning Insights',
+    startLearning: `Start Learning with ${BRAND_NAME}`,
+  },
+  ko: {
+    startFree: '무료로 시작하기', insightsHeading: '학습 인사이트',
+    insightsBlurb: '과학적 학습 전략, 간격 반복 팁 등 유용한 글을 확인하세요.',
+    browseInsights: '인사이트 보기 →', tagline: '과학적 학습으로 더 스마트하게.', home: '홈', insights: '인사이트',
+    vocabulary: '영어 단어장', related: '관련 글', moreInsights: '더 많은 학습 인사이트',
+    startLearning: `${BRAND_NAME}에서 학습 시작하기`,
+  },
+  ja: {
+    startFree: '無料で始める', insightsHeading: '学習インサイト',
+    insightsBlurb: '科学的な学習戦略や間隔反復のコツなど、役立つ記事をご覧ください。',
+    browseInsights: 'インサイトを見る →', tagline: '科学的な学習で、もっとスマートに。', home: 'ホーム', insights: 'インサイト',
+    vocabulary: '英単語帳', related: '関連記事', moreInsights: 'その他の学習インサイト',
+    startLearning: `${BRAND_NAME}で学習を始める`,
+  },
+  vi: {
+    startFree: 'Bắt đầu học miễn phí', insightsHeading: 'Kiến thức học tập',
+    insightsBlurb: 'Khám phá chiến lược học tập dựa trên khoa học, mẹo lặp lại ngắt quãng và nhiều hơn nữa.',
+    browseInsights: 'Xem bài viết →', tagline: 'Học thông minh hơn với khoa học.', home: 'Trang chủ', insights: 'Bài viết',
+    vocabulary: 'Từ vựng tiếng Anh', related: 'Bài viết liên quan', moreInsights: 'Thêm bài viết học tập',
+    startLearning: `Bắt đầu học với ${BRAND_NAME}`,
+  },
+}
+
+export function pageChrome(lang) {
+  return PAGE_CHROME[lang] || PAGE_CHROME.en
+}
+
 export const LIST_TITLES = {
   en: 'Learning Insights — Science-Backed Study Strategies | ReeeeecallStudy',
   ko: '학습 인사이트 — 과학적 학습 전략 | ReeeeecallStudy',

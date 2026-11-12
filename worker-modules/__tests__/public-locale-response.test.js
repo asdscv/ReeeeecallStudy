@@ -5,7 +5,7 @@ import { handleRSSFeed } from '../seo/feeds.js'
 afterEach(() => vi.unstubAllGlobals())
 
 describe('public response locale consistency', () => {
-  it.each(['/landing?lang=ja', '/insight?lang=zh', '/?lang=es'])('preserves noindex on human HTML for %s', async (path) => {
+  it.each(['/landing?lang=th', '/insight?lang=zh', '/?lang=es'])('preserves noindex on human HTML for %s', async (path) => {
     const assets = { fetch: vi.fn(async () => new Response('<html>app</html>', { headers: { 'Content-Type': 'text/html', Vary: 'Accept-Encoding' } })) }
     const response = await worker.fetch(new Request(`https://reeeeecallstudy.xyz${path}`, { headers: { 'User-Agent': 'Mozilla/5.0 Chrome/140' } }), { ASSETS: assets })
     expect(response.headers.get('X-Robots-Tag')).toBe('noindex, follow')

@@ -86,17 +86,8 @@ export async function runContentPipeline(env, cron) {
       const topic = topics[i]
 
       topicsAttempted++
-      // Deck guides teach the deck's own words (its Korean edition carries the meanings; the
-      // English edition uses the same English words) — never AI-picked words the deck lacks.
-      let deckWords = null
-      if (topic.deckFamily) {
-        try {
-          deckWords = await db.getOfficialDeckWords(topic.deckFamily, 'ko')
-          info('Deck words loaded', { deck: topic.deckFamily, count: deckWords.length })
-        } catch (err) {
-          warn('Deck words unavailable, generating without them', { deck: topic.deckFamily, error: err.message })
-        }
-      }
+      // Deck guides teach the deck's own words — never AI-picked words the deck lacks.
+      const deckWordsFor = topic.deckFamily ? await loadDeckWords(db, topic.deckFamily) : () => null
       const successesBefore = LOCALES.reduce((n, l) => n + successCount[l], 0)
 
       try {
@@ -122,7 +113,7 @@ export async function runContentPipeline(env, cron) {
         let sharedSlug = null
         try {
           const primaryArticle = await generateForLocale(
-            env, db, topic, DEFAULT_LOCALE, recentContent, null, thumbnailUrl, runState, deckWords,
+            env, db, topic, DEFAULT_LOCALE, recentContent, null, thumbnailUrl, runState, deckWordsFor(DEFAULT_LOCALE),
           )
           if (primaryArticle) {
             sharedSlug = primaryArticle.slug
@@ -142,7 +133,7 @@ export async function runContentPipeline(env, cron) {
         const otherLocales = LOCALES.filter(l => l !== DEFAULT_LOCALE)
         const results = await Promise.allSettled(
           otherLocales.map(locale =>
-            generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl, runState, deckWords),
+            generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl, runState, deckWordsFor(locale)),
           ),
         )
 
@@ -199,6 +190,25 @@ export async function runContentPipeline(env, cron) {
   } catch (err) {
     error('Pipeline failed', { error: err.message, stack: err.stack })
   }
+}
+
+// Each edition gets the deck its readers are shown: the words with meanings in its own language.
+// Same-family decks share their English words, so an edition with no deck in its language (English;
+// conversation decks exist only in Korean) gets those words without meanings.
+async function loadDeckWords(db, deckFamily) {
+  const byLocale = {}
+  await Promise.all(LOCALES.map(async (locale) => {
+    try {
+      const words = await db.getOfficialDeckWords(deckFamily, locale)
+      if (words.length > 0) byLocale[locale] = words
+    } catch (err) {
+      warn('Deck words unavailable', { deck: deckFamily, locale, error: err.message })
+    }
+  }))
+  info('Deck words loaded', { deck: deckFamily, locales: Object.keys(byLocale) })
+  const source = byLocale.ko || Object.values(byLocale)[0]
+  const withoutMeanings = source ? source.map((w) => ({ ...w, meaning: '' })) : null
+  return (locale) => byLocale[locale] || withoutMeanings
 }
 
 async function loadAiTopics(env, recentContent, topicCount) {

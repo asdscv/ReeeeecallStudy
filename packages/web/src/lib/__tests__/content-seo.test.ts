@@ -61,7 +61,7 @@ describe('legacy multilingual canonicals', () => {
       { lang: 'ko', href: `${SEO.SITE_URL}/insight/ko-only?lang=ko` },
       { lang: 'x-default', href: `${SEO.SITE_URL}/insight/ko-only?lang=ko` },
     ])
-    expect(buildHreflangAlternates('ja-only', ['ja'])).toEqual([])
+    expect(buildHreflangAlternates('zh-only', ['zh'])).toEqual([])
   })
 })
 
@@ -263,7 +263,7 @@ describe('buildHreflangAlternates', () => {
     for (const locale of SEO.INDEXABLE_LOCALES) {
       expect(langs).toContain(locale)
     }
-    expect(langs).not.toContain('ja') // minor (non-indexable) locales excluded
+    expect(langs).not.toContain('zh') // minor (non-indexable) locales excluded
     expect(langs).toContain('x-default')
   })
 
@@ -500,7 +500,7 @@ describe('buildStaticHreflangAlternates', () => {
     for (const locale of SEO.INDEXABLE_LOCALES) {
       expect(langs).toContain(locale)
     }
-    expect(langs).not.toContain('ja') // minor (non-indexable) locales excluded
+    expect(langs).not.toContain('zh') // minor (non-indexable) locales excluded
     expect(langs).toContain('x-default')
   })
 

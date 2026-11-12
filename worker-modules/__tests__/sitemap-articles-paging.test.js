@@ -27,7 +27,7 @@ describe('article sitemap completeness', () => {
     expect(locs).toContain('https://reeeeecallstudy.xyz/insight/article-840')
     expect(calls).toHaveLength(4)
     expect(calls.every((u) => u.searchParams.get('order').includes('id.asc'))).toBe(true)
-    expect(calls.every((u) => u.searchParams.get('locale') === 'in.(en,ko)')).toBe(true)
+    expect(calls.every((u) => u.searchParams.get('locale') === 'in.(en,ko,ja,vi)')).toBe(true)
   })
 
   it('does not cache an empty or partial sitemap when a later page fails', async () => {
@@ -41,14 +41,16 @@ describe('article sitemap completeness', () => {
     expect(await response.text()).not.toContain('<urlset')
   })
 
-  it('lists English and Korean landing and insight canonicals separately', async () => {
+  it('lists the landing and insight canonical of every indexable language separately', async () => {
     const xml = await (await handleSitemapStatic()).text()
-    // 4 landing/insight + /vocabulary + 7 language indexes + 15 exam hubs
-    expect(xml.match(/<url>/g)).toHaveLength(27)
+    // 8 landing/insight (en, ko, ja, vi) + /vocabulary + 7 language indexes + 15 exam hubs
+    expect(xml.match(/<url>/g)).toHaveLength(31)
+    expect(xml).toContain('/landing?lang=ja</loc>')
+    expect(xml).toContain('/insight?lang=vi</loc>')
     expect(xml).toContain('/vocabulary/toeic-800</loc>')
     expect(xml).toContain('/vocabulary/ko</loc>')
     expect(xml).toContain('/landing?lang=ko</loc>')
     expect(xml).toContain('/insight?lang=ko</loc>')
-    expect(xml).not.toContain('lang=ja')
+    expect(xml).not.toContain('lang=zh')
   })
 })

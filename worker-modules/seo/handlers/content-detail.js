@@ -2,7 +2,7 @@ import { contentCanonicalUrl } from '../../../packages/shared/lib/content-canoni
 // Content detail page bot handler — extracted from worker.js handleContentDetailBot
 import {
   SITE_URL, BRAND_NAME, DEFAULT_OG_IMAGE,
-  LIST_TITLES, ROBOTS_INDEX, ROBOTS_NOINDEX,
+  LIST_TITLES, ROBOTS_INDEX, ROBOTS_NOINDEX, pageChrome,
 } from '../constants.js'
 import {
   escapeHtml, buildHreflangTags,
@@ -152,7 +152,7 @@ ${bodyHtml}
 </section>
 </article>
 ${relatedArticles.length > 0 ? `<aside>
-<h2>${article.locale === 'ko' ? '관련 글' : 'Related Articles'}</h2>
+<h2>${pageChrome(article.locale).related}</h2>
 <ul>
 ${relatedArticles.map((r) => {
   const rDate = r.published_at ? new Date(r.published_at).toISOString().split('T')[0] : ''
@@ -161,8 +161,8 @@ ${relatedArticles.map((r) => {
 </ul>
 </aside>` : ''}
 <footer>
-<p><a href="${localizedUrl('/insight', article.locale)}">← ${article.locale === 'ko' ? '더 많은 학습 인사이트' : 'More Learning Insights'}</a></p>
-<p><a href="${localizedUrl('/landing', article.locale)}">${article.locale === 'ko' ? `${BRAND_NAME}에서 학습 시작하기` : `Start Learning with ${BRAND_NAME}`}</a></p>
+<p><a href="${localizedUrl('/insight', article.locale)}">← ${pageChrome(article.locale).moreInsights}</a></p>
+<p><a href="${localizedUrl('/landing', article.locale)}">${pageChrome(article.locale).startLearning}</a></p>
 </footer>`
 
   const html = buildHtmlDocument({ lang: article.locale, head, body, robots })

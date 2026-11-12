@@ -145,7 +145,7 @@ ${placement}
 - The first paragraph must answer the query directly, in under 40 words.
 - Stay on this query from start to finish. Do not widen it into a general article about studying.
 
-${FORMAT_INSTRUCTIONS[topic.format] || FORMAT_INSTRUCTIONS.guide}${deckWordsSection(deckWords, locale)}${deckSection(topic, locale, deckWords)}`
+${FORMAT_INSTRUCTIONS[topic.format] || FORMAT_INSTRUCTIONS.guide}${deckWordsSection(deckWords)}${deckSection(topic, locale, deckWords)}`
 }
 
 // The page's call to action opens our free official deck for this exam level, so the article
@@ -153,17 +153,16 @@ ${FORMAT_INSTRUCTIONS[topic.format] || FORMAT_INSTRUCTIONS.guide}${deckWordsSect
 // Only where this edition's readers are actually shown a deck: there is no English-native deck,
 // and conversation decks exist only for Korean readers.
 // Real cards from the deck the page leads to — the article's examples must be words the reader
-// will actually find in that deck. Meanings are given only to the edition in the deck's language.
+// will actually find in that deck. An edition gets meanings only from its own language's deck.
 const DECK_WORDS_IN_PROMPT = 15
-const DECK_WORDS_LOCALE = 'ko'
 
-function deckWordsSection(deckWords, locale) {
+function deckWordsSection(deckWords) {
   if (!Array.isArray(deckWords) || deckWords.length === 0) return ''
   const n = Math.min(DECK_WORDS_IN_PROMPT, deckWords.length)
   const picked = Array.from({ length: n }, (_, i) => deckWords[Math.floor((i * deckWords.length) / n)])
   const lines = picked.map((w) => {
     const parts = [w.term]
-    if (locale === DECK_WORDS_LOCALE && w.meaning) parts.push(w.meaning)
+    if (w.meaning) parts.push(w.meaning)
     if (w.example) parts.push(w.example)
     return `- ${parts.join(' — ')}`
   })
@@ -185,6 +184,8 @@ function deckSection(topic, locale, deckWords) {
 
 Below the article, readers get our free official flashcard deck for this level (${topic.deckFamily}). Teach the vocabulary itself: what this level demands, ${hasWords ? 'the words listed under «Words From The Deck»' : '10-15 representative words or expressions'} with meanings and a short example sentence each, and a daily review plan. Mention the free deck once, where a reader would want the full list. Do not state how many cards it has.`
 }
+
+const NATIVE_TERMS = 'Write study terms in the article\'s language — spaced repetition, active recall, flashcard, forgetting curve (e.g. 간격 반복, 間隔反復, lặp lại ngắt quãng). Keep English only for the English words being taught, example sentences, and exam names.'
 
 export function buildPrompt(topic, locale, options = {}) {
   const { previousTitles = [], deckWords = null } = options
@@ -222,8 +223,10 @@ Write a unique, insightful article about ${translated ? 'that need' : `"${topic.
     throw new Error(`prompt-builder: no LOCALE_INSTRUCTIONS for locale "${locale}" — add one before generating it`)
   }
 
+  // Rehearsal: the Korean and Japanese editions kept "spaced repetition" in English mid-sentence.
+  const terms = locale === 'en' ? '' : `\n\n${NATIVE_TERMS}`
   return {
     system: SYSTEM_PROMPT,
-    user: `${topicContext}${searchQuerySection(topic, locale, deckWords)}${titleAvoidance}\n\n## Language\n\n${localeInstruction}`,
+    user: `${topicContext}${searchQuerySection(topic, locale, deckWords)}${titleAvoidance}\n\n## Language\n\n${localeInstruction}${terms}`,
   }
 }

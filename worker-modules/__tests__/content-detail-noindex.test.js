@@ -32,15 +32,15 @@ function stubFetch(rows) {
 afterEach(() => vi.unstubAllGlobals())
 
 describe('content-detail noindex policy (real handler behaviour)', () => {
-  it('a non-indexable (ja) article is served noindex with NO ja hreflang', async () => {
-    stubFetch([article('ja')])
-    const url = new URL('https://reeeeecallstudy.xyz/insight/foo?lang=ja')
+  it('a non-indexable (zh) article is served noindex with NO zh hreflang', async () => {
+    stubFetch([article('zh')])
+    const url = new URL('https://reeeeecallstudy.xyz/insight/foo?lang=zh')
     const res = await handleContentDetailBot('foo', url, env)
     expect(res).toBeTruthy()
     expect(res.headers.get('X-Robots-Tag')).toBe('noindex, follow')
     const html = await res.text()
     expect(html).toContain('<meta name="robots" content="noindex, follow">')
-    expect(html).not.toContain('hreflang="ja"') // ja not indexable → excluded
+    expect(html).not.toContain('hreflang="zh"') // zh not indexable → excluded
   })
 
   it('an indexable (en) article is served index with en hreflang', async () => {
@@ -53,20 +53,34 @@ describe('content-detail noindex policy (real handler behaviour)', () => {
     expect(html).toContain('hreflang="en"')
   })
 
-  it('?lang=ja with only an en row falls back to en and stays indexable', async () => {
+  it('?lang=zh with only an en row falls back to en and stays indexable', async () => {
     stubFetch([article('en', 'baz')])
-    const url = new URL('https://reeeeecallstudy.xyz/insight/baz?lang=ja')
+    const url = new URL('https://reeeeecallstudy.xyz/insight/baz?lang=zh')
     const res = await handleContentDetailBot('baz', url, env)
     expect(res.headers.get('X-Robots-Tag')).toContain('index') // served en
   })
 
-  it('hreflang covers en+ko when both exist, excludes the non-indexable ja', async () => {
-    stubFetch([article('en', 'multi'), article('ko', 'multi'), article('ja', 'multi')])
+  it('hreflang covers the indexable editions that exist (en, ko, ja), excludes the non-indexable zh', async () => {
+    stubFetch([article('en', 'multi'), article('ko', 'multi'), article('ja', 'multi'), article('zh', 'multi')])
     const url = new URL('https://reeeeecallstudy.xyz/insight/multi')
     const res = await handleContentDetailBot('multi', url, env)
     const html = await res.text()
     expect(html).toContain('hreflang="en"')
     expect(html).toContain('hreflang="ko"')
-    expect(html).not.toContain('hreflang="ja"')
+    expect(html).toContain('hreflang="ja"')
+    expect(html).not.toContain('hreflang="vi"') // no vi edition → no phantom variant
+    expect(html).not.toContain('hreflang="zh"')
+  })
+})
+
+describe('an indexed Japanese article speaks Japanese around the article too', () => {
+  it('links and headings are in Japanese, not English', async () => {
+    stubFetch([article('ja', 'jp')])
+    const res = await handleContentDetailBot('jp', new URL('https://reeeeecallstudy.xyz/insight/jp?lang=ja'), env)
+    expect(res.headers.get('X-Robots-Tag')).toContain('index, follow')
+    const html = await res.text()
+    expect(html).toContain('その他の学習インサイト')
+    expect(html).toContain('ReeeeecallStudyで学習を始める')
+    expect(html).not.toContain('More Learning Insights')
   })
 })
