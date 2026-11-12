@@ -303,3 +303,29 @@ describe('same need as a page we already wrote', () => {
     expect(none).toBeNull()
   })
 })
+
+describe('deck guides use the deck\'s own words', () => {
+  const words = Array.from({ length: 50 }, (_, i) => ({ term: `word${i}`, meaning: `뜻${i}`, example: `Example ${i}.`, exampleNote: `예문 ${i}` }))
+  const topic = topicFromKeyword({ query: '토익 800점 단어', locale: 'ko', format: 'guide', deckFamily: 'toeic:800' })
+
+  it('gives the Korean edition 15 spread words with meanings', () => {
+    const { user } = buildPrompt(topic, 'ko', { deckWords: words })
+    expect(user).toContain('## Words From The Deck')
+    expect(user).toContain('- word0 — 뜻0 — Example 0.')
+    expect(user).toContain('- word46 — ')
+    expect((user.match(/^- word\d+/gm) || []).length).toBe(15)
+    expect(user).toContain('the words listed under «Words From The Deck»')
+  })
+
+  it('gives the English edition the same English words without the Korean meanings', () => {
+    const { user } = buildPrompt(topic, 'en', { deckWords: words })
+    expect(user).toContain('- word0 — Example 0.')
+    expect(user).not.toContain('뜻0')
+  })
+
+  it('falls back to the old instruction when the deck words could not be loaded', () => {
+    const { user } = buildPrompt(topic, 'ko')
+    expect(user).not.toContain('## Words From The Deck')
+    expect(user).toContain('10-15 representative words')
+  })
+})

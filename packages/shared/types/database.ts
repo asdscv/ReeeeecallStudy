@@ -666,7 +666,13 @@ export interface PublicListingPreview {
   created_at: string
   owner_name: string | null
   owner_is_official: boolean
+  /** Official decks: 50 cards spread across the deck (mig 287); other decks: the first 10. */
   sample_fields: { field_values: Record<string, string> }[]
+  native_language?: string | null
+  learning_language?: string | null
+  study_level?: string | null
+  /** The same exam level in other native languages (official decks only) — the hreflang cluster. */
+  siblings?: { id: string; native_language: string }[] | null
 }
 
 // ── Admin RPC response types ──

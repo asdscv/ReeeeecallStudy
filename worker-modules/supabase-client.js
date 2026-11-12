@@ -1,6 +1,8 @@
 // Supabase REST API client for content operations
 
 import { getSupabaseConfig } from './config.js'
+import { parseDeckFamily, deckListingFilter } from '../packages/shared/lib/official-deck-family.ts'
+import { wordRows } from '../packages/shared/lib/listing-seo.ts'
 import { info, error } from './logger.js'
 
 export function createSupabaseClient(env) {
@@ -40,6 +42,30 @@ export function createSupabaseClient(env) {
       throw new Error(`Failed to fetch planned articles: ${res.status} - ${await res.text()}`)
     }
     return res.json()
+  }
+
+  // The same 50 cards the deck's public page shows (get_public_listing_preview), as word rows.
+  async function getOfficialDeckWords(deckFamily, readerLanguage) {
+    const family = parseDeckFamily(deckFamily)
+    const filter = family && deckListingFilter(family, readerLanguage)
+    if (!filter) return []
+    const headers = { apikey: config.serviceKey, Authorization: `Bearer ${config.serviceKey}` }
+    const tags = encodeURIComponent(`{${filter.tags.join(',')}}`)
+    const listRes = await fetch(
+      `${restUrl}/marketplace_listings?select=id&is_active=eq.true&owner_is_official=eq.true&category=eq.${filter.category}&tags=cs.${tags}&limit=1`,
+      { headers },
+    )
+    if (!listRes.ok) throw new Error(`Deck lookup failed: ${listRes.status}`)
+    const [listing] = await listRes.json()
+    if (!listing) return []
+    const previewRes = await fetch(`${restUrl}/rpc/get_public_listing_preview`, {
+      method: 'POST',
+      headers: { ...headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_listing_id: listing.id }),
+    })
+    if (!previewRes.ok) throw new Error(`Deck preview failed: ${previewRes.status}`)
+    const preview = await previewRes.json()
+    return preview ? wordRows(preview) : []
   }
 
   async function insertContent(article) {
@@ -90,5 +116,5 @@ export function createSupabaseClient(env) {
     return publicUrl
   }
 
-  return { getRecentContent, getPlannedArticles, insertContent, uploadImage }
+  return { getRecentContent, getPlannedArticles, getOfficialDeckWords, insertContent, uploadImage }
 }

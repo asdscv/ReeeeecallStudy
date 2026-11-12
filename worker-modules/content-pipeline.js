@@ -86,6 +86,17 @@ export async function runContentPipeline(env, cron) {
       const topic = topics[i]
 
       topicsAttempted++
+      // Deck guides teach the deck's own words (its Korean edition carries the meanings; the
+      // English edition uses the same English words) — never AI-picked words the deck lacks.
+      let deckWords = null
+      if (topic.deckFamily) {
+        try {
+          deckWords = await db.getOfficialDeckWords(topic.deckFamily, 'ko')
+          info('Deck words loaded', { deck: topic.deckFamily, count: deckWords.length })
+        } catch (err) {
+          warn('Deck words unavailable, generating without them', { deck: topic.deckFamily, error: err.message })
+        }
+      }
       const successesBefore = LOCALES.reduce((n, l) => n + successCount[l], 0)
 
       try {
@@ -111,7 +122,7 @@ export async function runContentPipeline(env, cron) {
         let sharedSlug = null
         try {
           const primaryArticle = await generateForLocale(
-            env, db, topic, DEFAULT_LOCALE, recentContent, null, thumbnailUrl, runState,
+            env, db, topic, DEFAULT_LOCALE, recentContent, null, thumbnailUrl, runState, deckWords,
           )
           if (primaryArticle) {
             sharedSlug = primaryArticle.slug
@@ -131,7 +142,7 @@ export async function runContentPipeline(env, cron) {
         const otherLocales = LOCALES.filter(l => l !== DEFAULT_LOCALE)
         const results = await Promise.allSettled(
           otherLocales.map(locale =>
-            generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl, runState),
+            generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl, runState, deckWords),
           ),
         )
 
@@ -210,11 +221,12 @@ function buildImagePrompt(topic) {
   return `A modern, clean editorial illustration for a blog article about "${topic.titleHint}" in the context of ${topic.category}. Abstract, minimal style with soft gradients and geometric shapes. No text, no letters, no words. Professional, educational tone. Vibrant but not overwhelming colors.`
 }
 
-async function generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl, runState) {
+async function generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl, runState, deckWords = null) {
   info('Generating content', { locale, topic: topic.id || topic.titleHint })
 
   const prompt = buildPrompt(topic, locale, {
     previousTitles: runState.primaryTitles || [],
+    deckWords,
   })
   let article = null
 
