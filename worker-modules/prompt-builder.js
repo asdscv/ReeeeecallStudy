@@ -185,6 +185,8 @@ function deckSection(topic, locale, deckWords) {
 Below the article, readers get our free official flashcard deck for this level (${topic.deckFamily}). Teach the vocabulary itself: what this level demands, ${hasWords ? 'the words listed under «Words From The Deck»' : '10-15 representative words or expressions'} with meanings and a short example sentence each, and a daily review plan. Mention the free deck once, where a reader would want the full list. Do not state how many cards it has.`
 }
 
+const NATIVE_TERMS = 'Write study terms in the article\'s language — spaced repetition, active recall, flashcard, forgetting curve (e.g. 간격 반복, 間隔反復, lặp lại ngắt quãng). Keep English only for the English words being taught, example sentences, and exam names.'
+
 export function buildPrompt(topic, locale, options = {}) {
   const { previousTitles = [], deckWords = null } = options
 
@@ -221,8 +223,10 @@ Write a unique, insightful article about ${translated ? 'that need' : `"${topic.
     throw new Error(`prompt-builder: no LOCALE_INSTRUCTIONS for locale "${locale}" — add one before generating it`)
   }
 
+  // Rehearsal: the Korean and Japanese editions kept "spaced repetition" in English mid-sentence.
+  const terms = locale === 'en' ? '' : `\n\n${NATIVE_TERMS}`
   return {
     system: SYSTEM_PROMPT,
-    user: `${topicContext}${searchQuerySection(topic, locale, deckWords)}${titleAvoidance}\n\n## Language\n\n${localeInstruction}`,
+    user: `${topicContext}${searchQuerySection(topic, locale, deckWords)}${titleAvoidance}\n\n## Language\n\n${localeInstruction}${terms}`,
   }
 }

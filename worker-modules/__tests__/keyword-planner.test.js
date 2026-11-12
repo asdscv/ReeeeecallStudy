@@ -323,6 +323,11 @@ describe('deck guides use the deck\'s own words', () => {
     expect(user).not.toContain('뜻0')
   })
 
+  it('asks non-English editions for study terms in their own language, not English', () => {
+    expect(buildPrompt(topic, 'ja').user).toContain('間隔反復')
+    expect(buildPrompt(topic, 'en').user).not.toContain('Write study terms in the article')
+  })
+
   it('falls back to the old instruction when the deck words could not be loaded', () => {
     const { user } = buildPrompt(topic, 'ko')
     expect(user).not.toContain('## Words From The Deck')
