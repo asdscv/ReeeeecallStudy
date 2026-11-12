@@ -323,6 +323,7 @@ const styles = StyleSheet.create({
   statsRow: { flexDirection: 'row', gap: 12, marginTop: 2 },
   footer: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', paddingTop: 10, marginTop: 6, borderTopWidth: 1 },
   footerActions: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  iconBtn: { paddingHorizontal: 8, paddingVertical: 8, borderRadius: 6 },
-  studyBtn: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 8 },
+  // 48: Android's touch minimum (44 is Apple's); these sat at ~31-41 on every row.
+  iconBtn: { paddingHorizontal: 8, paddingVertical: 8, borderRadius: 6, minWidth: 48, minHeight: 48, alignItems: 'center', justifyContent: 'center' },
+  studyBtn: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 8, minHeight: 44, justifyContent: 'center' },
 })
