@@ -1,0 +1,105 @@
+{
+  "title": "脳トレ",
+  "subtitle": "記憶力・集中力・瞬発力・推理力 — 毎回新しく作られる問題が、あなたのレベルに合わせて出題されます。",
+  "note": "日常の脳の運動を楽しむためのゲームで、医療サービスではありません。",
+  "mix": {
+    "title": "ミックストレーニング",
+    "desc": "ゲームが自動で切り替わり、苦手な分野を多めに出題します。好きなだけ続けられます。",
+    "start": "スタート"
+  },
+  "home": {
+    "games": "ゲーム",
+    "level": "Lv. {{level}}",
+    "best": "最高 Lv. {{level}}",
+    "new": "NEW",
+    "streak_one": "{{count}}日連続",
+    "streak_other": "{{count}}日連続",
+    "today": "今日 {{value}}回",
+    "totalPoints": "累計スコア {{value}}",
+    "howItWorks": "問題は毎回新しく作られます。正解すると次は少し難しく、間違えると易しくなるので、いつも「ちょっと難しい」くらいに保たれます。"
+  },
+  "skills": {
+    "memory": "記憶力",
+    "attention": "集中力",
+    "speed": "瞬発力",
+    "reasoning": "推理力"
+  },
+  "games": {
+    "memoryGrid": {
+      "name": "瞬間記憶",
+      "desc": "一瞬光ったマスを覚えて、タップしましょう。"
+    },
+    "sequence": {
+      "name": "順番記憶",
+      "desc": "光る順番を見て、同じ順にタップしましょう。"
+    },
+    "pairs": {
+      "name": "神経衰弱",
+      "desc": "カードを2枚ずつめくって同じ絵のペアを見つけましょう。"
+    },
+    "schulte": {
+      "name": "数字さがし",
+      "desc": "散らばった数字を順番に素早くタップしましょう。"
+    },
+    "oddOneOut": {
+      "name": "仲間はずれ",
+      "desc": "全部同じなのに一つだけ違います。見つけましょう。"
+    },
+    "stroop": {
+      "name": "色と文字",
+      "desc": "文字の意味ではなく、文字の色を選びましょう。"
+    },
+    "math": {
+      "name": "スピード計算",
+      "desc": "時間内に計算して答えを選びましょう。"
+    },
+    "series": {
+      "name": "規則さがし",
+      "desc": "数字の規則を見つけて次の数を選びましょう。"
+    }
+  },
+  "play": {
+    "memorize": "光ったマスを覚えて",
+    "tapLit": "光っていたマスをタップ · 残り{{left}}",
+    "watch": "順番をよく見て",
+    "watchReverse": "よく見て — 逆の順番でタップします",
+    "repeat": "同じ順番でタップ · {{done}}/{{total}}",
+    "repeatReverse": "逆の順番でタップ · {{done}}/{{total}}",
+    "memorizePairs": "絵の位置を覚えて",
+    "findPairs": "ペアを探そう · 残りミス {{lives}}",
+    "tapAscending": "1から{{max}}まで順番に · 次: {{next}}",
+    "tapDescending": "{{max}}から1まで逆順に · 次: {{next}}",
+    "findOdd": "違うものをタップ",
+    "pickInk": "文字の「色」を選んで",
+    "pickWord": "文字の「意味」を選んで",
+    "solve": "答えを選んで",
+    "nextNumber": "次に来る数は？",
+    "correct": "正解！",
+    "wrong": "おしい",
+    "timeUp": "時間切れ",
+    "levelUp": "レベルアップ！ Lv. {{level}}",
+    "points": "+{{value}}",
+    "score": "スコア",
+    "streak": "連続",
+    "stop": "終了",
+    "mixBadge": "ミックス"
+  },
+  "summary": {
+    "title": "おつかれさま",
+    "rounds": "解いた問題",
+    "accuracy": "正答率",
+    "points": "スコア",
+    "bestStreak": "最高連続",
+    "levels": "レベルの変化",
+    "again": "続ける",
+    "home": "ゲーム一覧"
+  },
+  "colors": {
+    "red": "あか",
+    "blue": "あお",
+    "green": "みどり",
+    "yellow": "きいろ",
+    "purple": "むらさき",
+    "orange": "オレンジ"
+  }
+}

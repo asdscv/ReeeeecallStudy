@@ -1,0 +1,105 @@
+{
+  "title": "Brain Training",
+  "subtitle": "Memory, focus, speed and reasoning — a fresh puzzle every round, set to your level.",
+  "note": "Everyday brain exercise for fun. Not a medical service.",
+  "mix": {
+    "title": "Mixed training",
+    "desc": "Games switch on their own and lean toward your weakest skill. Keep going as long as you like.",
+    "start": "Start"
+  },
+  "home": {
+    "games": "Games",
+    "level": "Lv. {{level}}",
+    "best": "Best Lv. {{level}}",
+    "new": "New",
+    "streak_one": "{{count}}-day streak",
+    "streak_other": "{{count}}-day streak",
+    "today": "Rounds today: {{value}}",
+    "totalPoints": "Total points: {{value}}",
+    "howItWorks": "Every round is generated fresh. Get it right and the next one is a little harder; miss and it eases off — so it always stays just challenging enough."
+  },
+  "skills": {
+    "memory": "Memory",
+    "attention": "Attention",
+    "speed": "Speed",
+    "reasoning": "Reasoning"
+  },
+  "games": {
+    "memoryGrid": {
+      "name": "Flash Grid",
+      "desc": "Remember which cells lit up, then tap them."
+    },
+    "sequence": {
+      "name": "Sequence",
+      "desc": "Watch the tiles flash and repeat the order."
+    },
+    "pairs": {
+      "name": "Match Pairs",
+      "desc": "Flip two cards at a time to find matching pictures."
+    },
+    "schulte": {
+      "name": "Number Hunt",
+      "desc": "Tap the numbers in order as fast as you can."
+    },
+    "oddOneOut": {
+      "name": "Odd One Out",
+      "desc": "Spot the one that is different."
+    },
+    "stroop": {
+      "name": "Color Word",
+      "desc": "Pick the ink color, not the word you read."
+    },
+    "math": {
+      "name": "Quick Math",
+      "desc": "Solve it before time runs out."
+    },
+    "series": {
+      "name": "Number Pattern",
+      "desc": "Find the rule and pick the next number."
+    }
+  },
+  "play": {
+    "memorize": "Memorize the lit cells",
+    "tapLit": "Tap the cells that were lit · {{left}} left",
+    "watch": "Watch the order",
+    "watchReverse": "Watch — you will repeat it backwards",
+    "repeat": "Tap in the same order · {{done}}/{{total}}",
+    "repeatReverse": "Tap in REVERSE order · {{done}}/{{total}}",
+    "memorizePairs": "Memorize the pictures",
+    "findPairs": "Find the pairs · misses left: {{lives}}",
+    "tapAscending": "Tap 1 → {{max}} in order · next: {{next}}",
+    "tapDescending": "Tap {{max}} → 1 in order · next: {{next}}",
+    "findOdd": "Tap the one that is different",
+    "pickInk": "Pick the INK color",
+    "pickWord": "Pick what the word SAYS",
+    "solve": "Pick the answer",
+    "nextNumber": "What comes next?",
+    "correct": "Correct!",
+    "wrong": "Not quite",
+    "timeUp": "Time's up",
+    "levelUp": "Level up! Lv. {{level}}",
+    "points": "+{{value}}",
+    "score": "Score",
+    "streak": "Streak",
+    "stop": "Finish",
+    "mixBadge": "Mixed"
+  },
+  "summary": {
+    "title": "Nice work",
+    "rounds": "Rounds",
+    "accuracy": "Accuracy",
+    "points": "Points",
+    "bestStreak": "Best streak",
+    "levels": "Levels",
+    "again": "Keep going",
+    "home": "All games"
+  },
+  "colors": {
+    "red": "RED",
+    "blue": "BLUE",
+    "green": "GREEN",
+    "yellow": "YELLOW",
+    "purple": "PURPLE",
+    "orange": "ORANGE"
+  }
+}

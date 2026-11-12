@@ -1,0 +1,105 @@
+{
+  "title": "大脑训练",
+  "subtitle": "记忆力·专注力·反应力·推理力 — 每一轮都是新生成的题目，按你的水平出题。",
+  "note": "用于日常大脑锻炼的游戏，并非医疗服务。",
+  "mix": {
+    "title": "混合训练",
+    "desc": "游戏会自动切换，并更多地练习你较弱的能力。想玩多久都可以。",
+    "start": "开始"
+  },
+  "home": {
+    "games": "游戏",
+    "level": "Lv. {{level}}",
+    "best": "最高 Lv. {{level}}",
+    "new": "新",
+    "streak_one": "连续{{count}}天",
+    "streak_other": "连续{{count}}天",
+    "today": "今天 {{value}} 轮",
+    "totalPoints": "累计得分 {{value}}",
+    "howItWorks": "每一轮题目都是新生成的。答对了下一轮会稍难一点，答错了就变简单，所以难度始终保持在“稍有挑战”。"
+  },
+  "skills": {
+    "memory": "记忆力",
+    "attention": "专注力",
+    "speed": "反应力",
+    "reasoning": "推理力"
+  },
+  "games": {
+    "memoryGrid": {
+      "name": "瞬间记忆",
+      "desc": "记住亮过的格子，然后点出来。"
+    },
+    "sequence": {
+      "name": "顺序记忆",
+      "desc": "看方块闪烁的顺序，然后按相同顺序点击。"
+    },
+    "pairs": {
+      "name": "翻牌配对",
+      "desc": "每次翻两张牌，找出相同的图案。"
+    },
+    "schulte": {
+      "name": "数字寻找",
+      "desc": "按顺序尽快点击散落的数字。"
+    },
+    "oddOneOut": {
+      "name": "找不同",
+      "desc": "全都一样，只有一个不同。找出来吧。"
+    },
+    "stroop": {
+      "name": "颜色文字",
+      "desc": "选择文字的颜色，而不是文字的意思。"
+    },
+    "math": {
+      "name": "快速计算",
+      "desc": "在时间内算出答案。"
+    },
+    "series": {
+      "name": "数字规律",
+      "desc": "找出规律，选出下一个数。"
+    }
+  },
+  "play": {
+    "memorize": "记住亮起的格子",
+    "tapLit": "点击刚才亮过的格子 · 还剩{{left}}个",
+    "watch": "注意看顺序",
+    "watchReverse": "注意看 — 要倒着点",
+    "repeat": "按相同顺序点击 · {{done}}/{{total}}",
+    "repeatReverse": "按相反顺序点击 · {{done}}/{{total}}",
+    "memorizePairs": "记住图案位置",
+    "findPairs": "找出配对 · 剩余失误 {{lives}}",
+    "tapAscending": "从1到{{max}}按顺序点 · 下一个: {{next}}",
+    "tapDescending": "从{{max}}到1倒着点 · 下一个: {{next}}",
+    "findOdd": "点出不同的那个",
+    "pickInk": "选择文字的「颜色」",
+    "pickWord": "选择文字的「意思」",
+    "solve": "选出答案",
+    "nextNumber": "下一个数是？",
+    "correct": "正确！",
+    "wrong": "差一点",
+    "timeUp": "时间到",
+    "levelUp": "升级！Lv. {{level}}",
+    "points": "+{{value}}",
+    "score": "得分",
+    "streak": "连对",
+    "stop": "结束",
+    "mixBadge": "混合"
+  },
+  "summary": {
+    "title": "辛苦了",
+    "rounds": "完成轮数",
+    "accuracy": "正确率",
+    "points": "得分",
+    "bestStreak": "最高连对",
+    "levels": "等级变化",
+    "again": "继续",
+    "home": "全部游戏"
+  },
+  "colors": {
+    "red": "红",
+    "blue": "蓝",
+    "green": "绿",
+    "yellow": "黄",
+    "purple": "紫",
+    "orange": "橙"
+  }
+}

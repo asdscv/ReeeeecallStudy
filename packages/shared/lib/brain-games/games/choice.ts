@@ -1,0 +1,65 @@
+import type { BrainGameDef, ChoiceView, PromptView } from '../types'
+import type { Rng } from '../rng'
+
+/** The part every pick-one-answer game shares: options, the right one, the pick. */
+export interface ChoiceState {
+  prompt: PromptView
+  stimulus: ChoiceView['stimulus']
+  options: ChoiceView['options']
+  correctIndex: number
+  limitMs: number
+  picked: number | null
+  timedOut: boolean
+  sig: string
+}
+
+export function choiceGame(
+  id: BrainGameDef<ChoiceState>['id'],
+  create: (level: number, rng: Rng) => ChoiceState,
+): BrainGameDef<ChoiceState> {
+  const done = (s: ChoiceState) => s.picked !== null || s.timedOut
+  return {
+    id,
+    create,
+    pendingMs: () => null,
+    advance: (s) => s,
+    acceptsInput: (s) => !done(s),
+    tap: (s, i) => (done(s) || i < 0 || i >= s.options.length ? s : { ...s, picked: i }),
+    timeout: (s) => (done(s) ? s : { ...s, timedOut: true }),
+    outcome(s) {
+      if (!done(s)) return null
+      const correct = s.picked === s.correctIndex
+      return { correct, accuracy: correct ? 1 : 0 }
+    },
+    timeLimitMs: (s) => s.limitMs,
+    view(s) {
+      return {
+        kind: 'choice',
+        prompt: s.prompt,
+        stimulus: s.stimulus,
+        options: s.options,
+        ...(done(s) ? { picked: s.picked ?? undefined, correctIndex: s.correctIndex } : {}),
+      }
+    },
+    signature: (s) => s.sig,
+  }
+}
+
+/**
+ * Plausible wrong answers around `answer`: off by one, off by the step, a digit slip. Distinct
+ * and non-negative, so the right answer is never the only sensible-looking option.
+ */
+export function numericOptions(answer: number, rng: Rng, hints: number[] = []): { options: number[]; correctIndex: number } {
+  const candidates = new Set<number>()
+  const add = (v: number) => {
+    if (Number.isFinite(v) && v >= 0 && v !== answer && Number.isInteger(v)) candidates.add(v)
+  }
+  hints.forEach(add)
+  ;[1, -1, 2, -2, 10, -10].forEach((d) => add(answer + d))
+  const digits = String(answer)
+  if (digits.length >= 2) add(Number(digits.slice(0, -2) + digits.slice(-1) + digits.slice(-2, -1)))
+  for (let spread = 3; candidates.size < 3; spread += 2) add(answer + rng.int(-spread, spread))
+  const wrong = rng.sample([...candidates], 3)
+  const options = rng.shuffle([answer, ...wrong])
+  return { options, correctIndex: options.indexOf(answer) }
+}

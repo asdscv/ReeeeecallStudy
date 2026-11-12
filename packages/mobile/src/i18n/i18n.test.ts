@@ -20,6 +20,7 @@ const NAMESPACES = [
   'guide', 'errors', 'paywall', 'update',
   'learning',
   'quiz',
+  'brain',
 ] as const
 
 let passed = 0

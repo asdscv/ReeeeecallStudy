@@ -1,0 +1,105 @@
+{
+  "title": "두뇌 트레이닝",
+  "subtitle": "기억력·집중력·순발력·추리력 — 매 판 새로 만들어지는 문제가 내 수준에 맞춰 나옵니다.",
+  "note": "일상 두뇌 운동을 위한 게임이며 의료 서비스가 아닙니다.",
+  "mix": {
+    "title": "섞어서 계속하기",
+    "desc": "게임이 알아서 바뀌고, 약한 영역을 더 자주 냅니다. 원하는 만큼 계속하세요.",
+    "start": "시작"
+  },
+  "home": {
+    "games": "게임",
+    "level": "Lv. {{level}}",
+    "best": "최고 Lv. {{level}}",
+    "new": "새로움",
+    "streak_one": "{{count}}일 연속",
+    "streak_other": "{{count}}일 연속",
+    "today": "오늘 {{value}}판",
+    "totalPoints": "누적 점수 {{value}}",
+    "howItWorks": "문제는 매 판 새로 만들어집니다. 맞히면 다음 판이 조금 어려워지고, 틀리면 쉬워져서 언제나 «살짝 어려운» 수준이 유지됩니다."
+  },
+  "skills": {
+    "memory": "기억력",
+    "attention": "집중력",
+    "speed": "순발력",
+    "reasoning": "추리력"
+  },
+  "games": {
+    "memoryGrid": {
+      "name": "순간 기억",
+      "desc": "잠깐 켜진 칸을 기억했다가 눌러 보세요."
+    },
+    "sequence": {
+      "name": "순서 기억",
+      "desc": "깜빡이는 순서를 보고 그대로 따라 누르세요."
+    },
+    "pairs": {
+      "name": "같은 그림 찾기",
+      "desc": "카드를 두 장씩 뒤집어 같은 그림 짝을 찾으세요."
+    },
+    "schulte": {
+      "name": "숫자 순서",
+      "desc": "흩어진 숫자를 순서대로 빠르게 누르세요."
+    },
+    "oddOneOut": {
+      "name": "다른 하나 찾기",
+      "desc": "모두 같은데 하나만 다릅니다. 찾아보세요."
+    },
+    "stroop": {
+      "name": "색깔 단어",
+      "desc": "글자 뜻이 아니라 글자 색깔을 고르세요."
+    },
+    "math": {
+      "name": "빠른 계산",
+      "desc": "시간 안에 계산해서 답을 고르세요."
+    },
+    "series": {
+      "name": "규칙 찾기",
+      "desc": "숫자의 규칙을 찾아 다음 수를 고르세요."
+    }
+  },
+  "play": {
+    "memorize": "켜진 칸을 기억하세요",
+    "tapLit": "켜졌던 칸을 누르세요 · {{left}}개 남음",
+    "watch": "순서를 잘 보세요",
+    "watchReverse": "잘 보세요 — 거꾸로 누를 거예요",
+    "repeat": "같은 순서로 누르세요 · {{done}}/{{total}}",
+    "repeatReverse": "거꾸로 누르세요 · {{done}}/{{total}}",
+    "memorizePairs": "그림 위치를 기억하세요",
+    "findPairs": "짝을 찾으세요 · 남은 기회 {{lives}}",
+    "tapAscending": "1부터 {{max}}까지 순서대로 · 다음: {{next}}",
+    "tapDescending": "{{max}}부터 1까지 거꾸로 · 다음: {{next}}",
+    "findOdd": "다른 하나를 누르세요",
+    "pickInk": "글자 «색깔»을 고르세요",
+    "pickWord": "글자 «뜻»을 고르세요",
+    "solve": "답을 고르세요",
+    "nextNumber": "다음에 올 수는?",
+    "correct": "정답!",
+    "wrong": "아쉬워요",
+    "timeUp": "시간 초과",
+    "levelUp": "레벨 업! Lv. {{level}}",
+    "points": "+{{value}}",
+    "score": "점수",
+    "streak": "연속",
+    "stop": "그만하기",
+    "mixBadge": "섞어서"
+  },
+  "summary": {
+    "title": "수고했어요",
+    "rounds": "푼 문제",
+    "accuracy": "정답률",
+    "points": "점수",
+    "bestStreak": "최고 연속",
+    "levels": "레벨 변화",
+    "again": "계속하기",
+    "home": "게임 목록"
+  },
+  "colors": {
+    "red": "빨강",
+    "blue": "파랑",
+    "green": "초록",
+    "yellow": "노랑",
+    "purple": "보라",
+    "orange": "주황"
+  }
+}
