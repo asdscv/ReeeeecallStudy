@@ -25,6 +25,7 @@ const KEYS = {
   haptics: 'app-haptics-enabled',
   // Suffixed with the user id — SecureStore keys allow [A-Za-z0-9._-], which a UUID fits.
   brainProgress: 'brain-progress',
+  brainHistory: 'brain-history',
 } as const
 
 function read(key: string): string | null {
@@ -79,5 +80,16 @@ export const localPrefs = {
   },
   setBrainProgress(userId: string, raw: string): void {
     write(`${KEYS.brainProgress}.${userId}`, raw)
+  },
+
+  /**
+   * Recent brain rounds per game (the trend lines), per user — kept apart from progress so each
+   * stays under the ~2KB value limit (eight entries of three integers per game, see history.ts).
+   */
+  getBrainHistory(userId: string): string | null {
+    return read(`${KEYS.brainHistory}.${userId}`)
+  },
+  setBrainHistory(userId: string, raw: string): void {
+    write(`${KEYS.brainHistory}.${userId}`, raw)
   },
 }

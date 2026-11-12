@@ -1,74 +1,105 @@
+import { AppState } from 'react-native'
 import type { Feather } from '@expo/vector-icons'
-import { maxColsFor, type BrainColor, type CellTone } from '@reeeeecall/shared/lib/brain-games'
+import { brainGame, maxColsFor, type BrainColor, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
 import type { PlatformContext } from '@reeeeecall/shared/hooks/useBrainRound'
 import type { BrainStorage } from '@reeeeecall/shared/stores/brain-store'
-import { palette, type Theme } from '../../theme'
 import { localPrefs } from '../../utils/local-prefs'
 
 export type FeatherName = React.ComponentProps<typeof Feather>['name']
 
-/** Same ink colours as web, so the colour-word game reads the same on every platform. */
-export const INK: Record<BrainColor, string> = {
-  red: '#ef4444',
-  blue: '#3b82f6',
-  green: '#16a34a',
-  yellow: '#d4a106',
-  purple: '#a855f7',
-  orange: '#f97316',
+/** The catalog names its icons in Feather's vocabulary (web maps the same names to lucide). */
+export function gameIcon(id: BrainGameId): FeatherName {
+  return brainGame(id).icon as FeatherName
 }
 
 /**
- * A second cue besides colour, for players who cannot tell the tones apart. A colour-blind player
- * otherwise sees "a blue cell" and "a grey cell" at the same brightness — the memorise phase of
- * Flash Grid would be unplayable.
+ * Ink colours for the colour-word game — the same as web. The stimulus sits on a white card on
+ * every canvas, so these are the darker shades that keep their contrast against white.
  */
-export type ToneMark = 'dot' | 'check' | 'cross'
-
-export interface ToneStyle {
-  bg: string
-  fg: string
-  border?: string
-  borderWidth?: number
-  borderStyle?: 'solid' | 'dashed'
-  opacity?: number
-  mark?: ToneMark
+export const INK: Record<BrainColor, string> = {
+  red: '#dc2626',
+  blue: '#2563eb',
+  green: '#15803d',
+  yellow: '#b45309',
+  purple: '#9333ea',
+  orange: '#ea580c',
 }
 
-export function toneStyle(tone: CellTone, theme: Theme): ToneStyle {
-  const c = theme.colors
-  // `textInverse` is white on the light theme and near-black on the dark one, where primary,
-  // success and error are the lighter 400 shades — white on those fails contrast.
-  switch (tone) {
-    case 'lit':
-      // Primary against the idle surface: blue-600 on gray-100 ≈ 4.7:1, blue-400 on gray-800 ≈ 5.7:1.
-      return { bg: c.primary, fg: c.textInverse, mark: 'dot' }
-    case 'correct':
-      return { bg: c.success, fg: c.textInverse, mark: 'check' }
-    case 'wrong':
-      return { bg: c.error, fg: c.textInverse, mark: 'cross' }
-    case 'missed':
-      // The cell that should have been tapped: outlined, dashed — readable without its colour.
-      return { bg: c.primaryLight, fg: c.text, border: c.primary, borderWidth: 3, borderStyle: 'dashed' }
-    case 'faceDown':
-      return { bg: theme.isDark ? palette.blue[500] : palette.blue[400], fg: '#fff' }
-    case 'faceUp':
-      return { bg: c.primaryLight, fg: c.text, border: theme.isDark ? palette.blue[700] : palette.blue[200], borderWidth: 2 }
-    case 'matched':
-      return { bg: c.successLight, fg: c.text, border: c.success, borderWidth: 2, opacity: 0.6 }
-    case 'done':
-      return { bg: c.surface, fg: c.textTertiary, opacity: 0.45 }
-    case 'idle':
-    default:
-      return { bg: c.surface, fg: c.text, border: c.border, borderWidth: 1 }
+/** Text on the white cards and lit tiles of the canvas. */
+export const CANVAS_INK = '#0F172A'
+/** The colours the canvas uses beyond each game's theme (verdicts, hearts, gold). */
+export const FX = {
+  heart: '#FB7185',
+  gold: '#FDE68A',
+  goodText: '#86EFAC',
+  badText: '#FCA5A5',
+  amber: '#FBBF24',
+  red: '#F87171',
+  overlay: 'rgba(2,6,23,0.82)',
+  glass: 'rgba(255,255,255,0.07)',
+  glassBorder: 'rgba(255,255,255,0.10)',
+} as const
+
+/**
+ * SecureStore writes are synchronous (Keystore encryption and a commit on Android), and a round
+ * saves after every judged trial — in the middle of the reveal and its haptic. So writes are
+ * coalesced: the store updates in memory at once, the value reaches disk ~400ms after the last
+ * change, and anything pending is written straight away when the app leaves the foreground or a
+ * brain screen closes (flushBrainStorage).
+ */
+const SAVE_DELAY_MS = 400
+const flushers = new Set<() => void>()
+let appStateHooked = false
+
+function deferredWriter(write: (raw: string) => void) {
+  let pending: string | null = null
+  let timer: ReturnType<typeof setTimeout> | null = null
+  const flush = () => {
+    if (timer) clearTimeout(timer)
+    timer = null
+    if (pending === null) return
+    const raw = pending
+    pending = null
+    write(raw)
+  }
+  flushers.add(flush)
+  if (!appStateHooked) {
+    appStateHooked = true
+    AppState.addEventListener('change', (state) => {
+      if (state !== 'active') flushBrainStorage()
+    })
+  }
+  return {
+    save(raw: string) {
+      pending = raw
+      if (!timer) timer = setTimeout(flush, SAVE_DELAY_MS)
+    },
+    /** What a load would see — the pending value if one has not reached disk yet. */
+    pending: () => pending,
   }
 }
+
+/** Write every pending brain save now (a brain screen closing, the app going to the background). */
+export function flushBrainStorage() {
+  flushers.forEach((flush) => flush())
+}
+
+const storages = new Map<string, BrainStorage>()
 
 export function brainStorageFor(userId: string): BrainStorage {
-  return {
+  const cached = storages.get(userId)
+  if (cached) return cached
+  const progress = deferredWriter((raw) => localPrefs.setBrainProgress(userId, raw))
+  const history = deferredWriter((raw) => localPrefs.setBrainHistory(userId, raw))
+  const storage: BrainStorage = {
     key: `brain-progress.${userId}`,
-    load: () => localPrefs.getBrainProgress(userId),
-    save: (raw) => localPrefs.setBrainProgress(userId, raw),
+    load: () => progress.pending() ?? localPrefs.getBrainProgress(userId),
+    save: progress.save,
+    loadHistory: () => history.pending() ?? localPrefs.getBrainHistory(userId),
+    saveHistory: history.save,
   }
+  storages.set(userId, storage)
+  return storage
 }
 
 /**
@@ -88,3 +119,8 @@ export function mobilePlatform(boardWidth: number, screenShortSide: number): Pla
 
 /** Widest a board gets on a tablet — past this, cells only grow and the eyes travel further. */
 export const MAX_BOARD_WIDTH = 560
+
+/** "1:05" — the round's time on the results screen. */
+export function clock(seconds: number): string {
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`
+}

@@ -168,7 +168,8 @@ export function Sparkline({ values, color, height = 56 }: { values: number[]; co
   const min = Math.min(...values)
   const max = Math.max(...values)
   const span = max - min || 1
-  const pts = values.map((v, i) => [(i / Math.max(1, values.length - 1)) * (w - 12) + 6, height - 6 - ((v - min) / span) * (height - 12)])
+  // A flat run sits mid-height, not on the floor.
+  const pts = values.map((v, i) => [(i / Math.max(1, values.length - 1)) * (w - 12) + 6, max === min ? height / 2 : height - 6 - ((v - min) / span) * (height - 12)])
   const d = pts.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`).join(' ')
   const last = pts[pts.length - 1]
   return (

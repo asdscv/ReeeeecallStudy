@@ -1,187 +1,325 @@
-import { useCallback, useEffect } from 'react'
-import { View, Text, ScrollView, StyleSheet, Alert, BackHandler } from 'react-native'
+import { useCallback, useEffect, useState } from 'react'
+import { View, Text, ScrollView, StyleSheet, BackHandler } from 'react-native'
+import Animated from 'react-native-reanimated'
 import { Feather } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
-import { brainGame, courseStatus, displayLevel, localDayKey, weekProgress, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
-import { useTodaysTraining } from '@reeeeecall/shared/hooks/useTodaysTraining'
+import {
+  GAME_THEMES,
+  TRAINING_THEME,
+  courseStatus,
+  displayLevel,
+  localDayKey,
+  quickEyeMsAt,
+  weekProgress,
+  type BrainGameId,
+  type PlanSlot,
+} from '@reeeeecall/shared/lib/brain-games'
+import { useTodaysTraining, type TrainingTotals } from '@reeeeecall/shared/hooks/useTodaysTraining'
 import type { RoundStats } from '@reeeeecall/shared/hooks/useBrainRound'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
-import { Button, Screen } from '../../components/ui'
 import { RoundView } from '../../components/brain/RoundView'
-import { Stat } from '../../components/brain/RoundSummary'
+import { GameIntro } from '../../components/brain/GameIntro'
+import { CanvasButton, CanvasSheet, Confetti, GameCanvas, GradientFill, StatTile } from '../../components/brain/GameCanvas'
+import { WeekRing } from '../../components/brain/WeekRing'
 import { useBrainHydrated } from '../../components/brain/useBrainHydrated'
-import type { FeatherName } from '../../components/brain/brain-ui'
-import { useTheme } from '../../theme'
-import { testProps } from '../../utils/testProps'
+import { celebrateHaptic } from '../../components/brain/fx-haptics'
+import { useMotion } from '../../components/brain/motion'
+import { FX, flushBrainStorage, gameIcon } from '../../components/brain/brain-ui'
+
+/** Quick Eye's levels are flash times on the 33ms floor the phone uses (mobilePlatform). */
+const QE_FLOOR_MS = 33
 
 /**
- * Today's Training: four games in a row, one bounded session. The session plans its line-up from
- * the player's progress, so it waits until that is loaded.
+ * Today's Training: the line-up, then each game's intro (with the session's steps), its rounds,
+ * the next game's intro, and the session's end. The session plans its line-up from the player's
+ * progress, so it waits until that is loaded.
  */
 export function BrainTrainingScreen() {
+  useTranslation('brain')
   const ready = useBrainHydrated()
-  return <Screen padding={false}>{ready ? <Training /> : null}</Screen>
+  useEffect(() => () => flushBrainStorage(), [])
+  return ready ? <Training /> : <GameCanvas theme={TRAINING_THEME}>{null}</GameCanvas>
 }
 
 function Training() {
-  const theme = useTheme()
   const { t } = useTranslation('brain')
   const navigation = useNavigation()
   const s = useTodaysTraining()
-  const progress = useBrainStore((st) => st.progress)
-  const { onRoundOver } = s
+  const [stage, setStage] = useState<'lineup' | 'intro' | 'play'>('lineup')
+  const [askingStop, setAskingStop] = useState(false)
+  const { onRoundOver, continueSession } = s
   const gameId = s.slot.gameId
   // No summary between rounds: the session moves on by itself, and the end screen sums it up.
   const onOver = useCallback((stats: RoundStats) => onRoundOver(gameId, stats), [onRoundOver, gameId])
+  const games = s.slots.map((slot) => slot.gameId)
+  const stepsLabel = t('training.title')
+  const leave = useCallback(() => navigation.goBack(), [navigation])
 
-  // Between games, Android's back button would leave mid-session without a word; ask first, as
-  // "Finish" does during a round (RoundView handles the button while a round is up).
-  const between = s.phase === 'between'
+  // On an intro mid-session, Android's back button asks first (a second press keeps playing) — a
+  // stop there leaves the session uncounted. The line-up and the end screen just leave; a round
+  // handles the button itself.
+  const guarded = (s.phase === 'playing' && stage === 'intro') || s.phase === 'between'
   useEffect(() => {
-    if (!between) return
+    if (!guarded) return
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
-      Alert.alert(t('play.stop'), t('play.stopConfirm'), [
-        { text: t('play.resume'), style: 'cancel' },
-        { text: t('play.stop'), style: 'destructive', onPress: () => navigation.goBack() },
-      ])
+      setAskingStop((asking) => !asking)
       return true
     })
     return () => sub.remove()
-  }, [between, navigation, t])
+  }, [guarded])
 
+  const stopSheet = askingStop ? (
+    <CanvasSheet
+      theme={GAME_THEMES[s.next?.gameId ?? gameId]}
+      testID="brain-training-stop-sheet"
+      title={t('play.stopTitle')}
+      body={t('training.stopBody')}
+      keepLabel={t('play.keepPlaying')}
+      onKeep={() => setAskingStop(false)}
+      stopLabel={t('play.stopNow')}
+      onStop={leave}
+      stopTestID="brain-training-stop"
+    />
+  ) : null
+
+  if (s.phase === 'playing' && stage === 'lineup') {
+    return <Lineup slots={s.slots} minutes={s.plannedMinutes} onStart={() => setStage('intro')} onClose={leave} />
+  }
+  if (s.phase === 'playing' && stage === 'intro') {
+    return (
+      <GameIntro
+        gameId={gameId}
+        onStart={() => setStage('play')}
+        onClose={() => setAskingStop(true)}
+        closeLabel={t('play.stop')}
+        steps={{ games, index: s.slotIndex, label: stepsLabel }}
+        overlay={stopSheet}
+      />
+    )
+  }
   if (s.phase === 'playing') {
     return (
       <RoundView
         key={s.roundKey}
         gameId={gameId}
-        caption={t('training.slot', { index: s.slotIndex + 1, total: s.slots.length })}
+        caption={`${t('training.title')} · ${t('training.slot', { index: s.slotIndex + 1, total: s.slots.length })}`}
         onOver={onOver}
         confirmEmpty
+        stopBody={t('training.stopBody')}
       />
     )
   }
-
   if (s.phase === 'between' && s.next) {
-    const entry = brainGame(s.next.gameId)
     return (
-      <Centered>
-        <Text style={[styles.slot, { color: theme.colors.textSecondary }]}>
-          {t('training.slot', { index: s.slotIndex + 2, total: s.slots.length })}
-        </Text>
-        <Text style={[styles.heading, { color: theme.colors.text }]}>{t('training.next')}</Text>
-        <View style={[styles.nextGame, { backgroundColor: theme.colors.surface }]}>
-          <View style={[styles.nextIcon, { backgroundColor: theme.colors.primaryLight }]}>
-            <Feather name={entry.icon as FeatherName} size={28} color={theme.colors.primary} />
-          </View>
-          <View style={styles.nextText}>
-            <Text style={[styles.nextName, { color: theme.colors.text }]}>{t(`games.${s.next.gameId}.name`)}</Text>
-            <Text style={[styles.body, { color: theme.colors.textSecondary }]}>{t(`games.${s.next.gameId}.desc`)}</Text>
-          </View>
-        </View>
-        <Button title={t('training.continue')} onPress={s.continueSession} size="lg" testID="brain-training-continue" />
-        {/* A way out between games on every platform — iOS has no back button here and the swipe is
-            off. Rounds so far are saved; the session is not counted. */}
-        <Button
-          title={t('play.stop')}
-          variant="outline"
-          size="lg"
-          onPress={() =>
-            Alert.alert(t('play.stop'), t('play.stopConfirm'), [
-              { text: t('play.resume'), style: 'cancel' },
-              { text: t('play.stop'), style: 'destructive', onPress: () => navigation.goBack() },
-            ])
-          }
-          testID="brain-training-stop"
-        />
-      </Centered>
+      <GameIntro
+        gameId={s.next.gameId}
+        onStart={() => {
+          continueSession()
+          setStage('play')
+        }}
+        onClose={() => setAskingStop(true)}
+        closeLabel={t('play.stop')}
+        steps={{ games, index: s.slotIndex + 1, label: stepsLabel }}
+        overlay={stopSheet}
+      />
     )
   }
+  return <SessionEnd done={s.phase === 'done'} totals={s.totals} activeMinutes={s.activeMinutes} onHome={leave} />
+}
 
-  // Done or stopped. The week and the course are read after the session was recorded.
-  const today = localDayKey()
-  const week = weekProgress(progress, today)
-  const course = courseStatus(progress, today)
-  const done = s.phase === 'done'
-  const accuracy = s.totals.trials > 0 ? Math.round((s.totals.correct / s.totals.trials) * 100) : 0
-  const levels = Object.entries(s.totals.levels) as [BrainGameId, { start: number; end: number }][]
-  const courseLine =
-    course.phase === 'booster' && course.booster
-      ? t('training.booster', { done: course.booster.done, total: course.booster.total })
-      : course.phase === 'maintenance' && course.nextBoosterOn
-        ? t('training.boosterNext', { date: course.nextBoosterOn })
-        : t('training.course', { done: course.coreDone, total: course.coreTotal })
-
+/** The session's line-up before it starts: four games, about how long, one start. */
+function Lineup({ slots, minutes, onStart, onClose }: { slots: PlanSlot[]; minutes: number; onStart: () => void; onClose: () => void }) {
+  const { t } = useTranslation('brain')
+  const progress = useBrainStore((st) => st.progress)
+  const week = weekProgress(progress, localDayKey())
+  const rise = useMotion('rise', 'lineup')
   return (
-    <Centered>
-      <Feather name={done ? 'check-circle' : 'pause-circle'} size={40} color={done ? theme.colors.success : theme.colors.textSecondary} />
-      <Text style={[styles.heading, { color: theme.colors.text }]}>{done ? t('training.doneTitle') : t('training.quitTitle')}</Text>
-      <Text style={[styles.body, styles.centerText, { color: theme.colors.textSecondary }]}>{done ? t('training.doneBody') : t('training.quitBody')}</Text>
-      {done ? (
-        <View style={styles.chips}>
-          <Text style={[styles.chip, { backgroundColor: theme.colors.surface, color: theme.colors.text }]}>
-            {week.done >= week.goal ? t('training.weekDone') : t('training.week', { done: week.done, goal: week.goal })}
+    <GameCanvas theme={TRAINING_THEME} testID="brain-training-lineup">
+      <View style={styles.root}>
+        <View style={styles.header}>
+          <CanvasButton variant="chip" icon="x" label={t('play.back')} onPress={onClose} theme={TRAINING_THEME} testID="brain-training-back" />
+        </View>
+        <ScrollView contentContainerStyle={styles.lineupContent} showsVerticalScrollIndicator={false}>
+          <Animated.View style={[styles.lineupHero, rise]}>
+            <View style={styles.flex}>
+              <Text style={styles.h1} accessibilityRole="header" maxFontSizeMultiplier={1.4}>
+                {t('training.title')}
+              </Text>
+              <Text style={styles.lead} maxFontSizeMultiplier={1.5}>
+                {t('training.desc', { minutes })}
+              </Text>
+            </View>
+            <WeekRing done={week.done} goal={week.goal} label={t('training.week', { done: week.done, goal: week.goal })} color={TRAINING_THEME.accent} />
+          </Animated.View>
+          <View style={styles.list} accessibilityLabel={t('training.lineup')}>
+            {slots.map((slot, i) => (
+              <LineupRow key={i} index={i} slot={slot} />
+            ))}
+          </View>
+          <Text style={styles.dose} maxFontSizeMultiplier={1.5}>
+            {t('training.dose')}
           </Text>
-          <Text style={[styles.chip, { backgroundColor: theme.colors.surface, color: theme.colors.text }]}>{courseLine}</Text>
+        </ScrollView>
+        <View style={styles.bottomBar}>
+          <CanvasButton icon="play" label={t('training.start')} onPress={onStart} theme={TRAINING_THEME} testID="brain-training-begin" />
         </View>
-      ) : null}
-      <View style={styles.tiles}>
-        <Stat label={t('summary.trials')} value={formatCount(s.totals.trials)} theme={theme} />
-        <Stat label={t('summary.accuracy')} value={`${accuracy}%`} theme={theme} />
       </View>
-      {levels.length > 0 ? (
-        <View style={styles.levels}>
-          {levels.map(([id, l]) => {
-            const from = displayLevel(l.start)
-            const to = displayLevel(l.end)
-            const up = to > from
-            return (
-              <View key={id} style={styles.levelRow}>
-                <Text style={[styles.body, styles.levelName, { color: theme.colors.text }]} numberOfLines={1}>
-                  {t(`games.${id}.name`)}
-                </Text>
-                {up ? <Feather name="trending-up" size={16} color={theme.colors.success} /> : null}
-                <Text style={[styles.body, styles.levelValue, { color: up ? theme.colors.success : theme.colors.textSecondary }]}>
-                  {t('summary.levelChange', { from, to })}
-                </Text>
-              </View>
-            )
-          })}
-        </View>
-      ) : null}
-      <Button title={t('training.backHome')} onPress={() => navigation.goBack()} size="lg" testID="brain-training-home" />
-    </Centered>
+    </GameCanvas>
   )
 }
 
-function Centered({ children }: { children: React.ReactNode }) {
-  const theme = useTheme()
+function LineupRow({ index, slot }: { index: number; slot: PlanSlot }) {
+  const { t } = useTranslation('brain')
+  const rise = useMotion('rise', slot.gameId, index * 70)
+  const theme = GAME_THEMES[slot.gameId]
   return (
-    <ScrollView contentContainerStyle={styles.centered} showsVerticalScrollIndicator={false}>
-      <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]} {...testProps('brain-training-card', true)}>
-        {children}
+    <Animated.View style={[styles.row, rise]} accessible accessibilityLabel={`${index + 1}. ${t(`games.${slot.gameId}.name`)}, ${t('training.minutesShort', { value: slot.minutes })}`}>
+      <Text style={styles.rowIndex} maxFontSizeMultiplier={1.3}>
+        {index + 1}
+      </Text>
+      <View style={styles.rowIcon}>
+        <GradientFill from={theme.cardFrom} to={theme.cardTo} width={56} height={56} light={0.06} />
+        <Feather name={gameIcon(slot.gameId)} size={26} color="#FFFFFF" />
       </View>
-    </ScrollView>
+      <View style={styles.flex}>
+        <Text style={styles.rowName} numberOfLines={1} maxFontSizeMultiplier={1.4}>
+          {t(`games.${slot.gameId}.name`)}
+        </Text>
+        <Text style={styles.rowDesc} numberOfLines={1} maxFontSizeMultiplier={1.4}>
+          {t(`games.${slot.gameId}.desc`)}
+        </Text>
+      </View>
+      <View style={styles.rowTime}>
+        <Feather name="clock" size={15} color="rgba(255,255,255,0.75)" />
+        <Text style={styles.rowTimeText} maxFontSizeMultiplier={1.3}>
+          {t('training.minutesShort', { value: slot.minutes })}
+        </Text>
+      </View>
+    </Animated.View>
+  )
+}
+
+/** Session complete (or stopped): the week ring fills, the course moves, each game's change. */
+function SessionEnd({ done, totals, activeMinutes, onHome }: { done: boolean; totals: TrainingTotals; activeMinutes: number; onHome: () => void }) {
+  const { t } = useTranslation('brain')
+  // Read after the session was recorded, so the week and the course already include it.
+  const progress = useBrainStore((st) => st.progress)
+  const today = localDayKey()
+  const week = weekProgress(progress, today)
+  const course = courseStatus(progress, today)
+  const accuracy = totals.trials > 0 ? Math.round((totals.correct / totals.trials) * 100) : 0
+  const minutes = Math.max(1, Math.round(activeMinutes))
+  const levels = Object.entries(totals.levels) as [BrainGameId, { start: number; end: number }][]
+  const titleIn = useMotion('rise', done)
+  useEffect(() => {
+    if (done) celebrateHaptic()
+  }, [done])
+  const courseLabel =
+    course.phase === 'booster' && course.booster
+      ? t('training.booster', { done: course.booster.done, total: course.booster.total })
+      : t('training.course', { done: course.coreDone, total: course.coreTotal })
+  const courseFrac = course.phase === 'booster' && course.booster ? course.booster.done / course.booster.total : course.coreDone / course.coreTotal
+
+  return (
+    <GameCanvas theme={TRAINING_THEME} testID="brain-training-card">
+      <ScrollView contentContainerStyle={styles.endContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.endHead}>
+          {done ? <WeekRing done={week.done} goal={week.goal} size={132} label={t('training.week', { done: week.done, goal: week.goal })} color={FX.gold} /> : null}
+          <Animated.Text style={[styles.h1, styles.centerText, titleIn]} accessibilityRole="header" maxFontSizeMultiplier={1.4}>
+            {done ? t('training.doneTitle') : t('training.quitTitle')}
+          </Animated.Text>
+          <Text style={[styles.lead, styles.centerText]} maxFontSizeMultiplier={1.5}>
+            {done ? (week.done >= week.goal ? t('training.weekDone') : t('training.doneBody')) : t('training.quitBody')}
+          </Text>
+        </View>
+
+        {done ? (
+          <View style={styles.card} accessible accessibilityLabel={courseLabel}>
+            <Text style={styles.courseLabel} maxFontSizeMultiplier={1.4}>
+              {courseLabel}
+            </Text>
+            <View style={styles.track}>
+              <View style={[styles.trackFill, { width: `${Math.max(4, Math.min(1, courseFrac) * 100)}%` }]} />
+            </View>
+          </View>
+        ) : null}
+
+        <View style={styles.stats}>
+          <StatTile icon="clock" label={t('summary.minutes')} value={formatCount(minutes)} center />
+          <StatTile icon="list" label={t('summary.trials')} value={formatCount(totals.trials)} center />
+          <StatTile icon="target" label={t('summary.accuracy')} value={`${formatCount(accuracy)}%`} center />
+        </View>
+
+        {levels.length > 0 ? (
+          <View style={styles.list}>
+            {levels.map(([id, l]) => {
+              // Quick Eye's level is its flash time: shorter is better.
+              const qe = id === 'quickEye'
+              const from = qe ? quickEyeMsAt(l.start, QE_FLOOR_MS) : displayLevel(l.start)
+              const to = qe ? quickEyeMsAt(l.end, QE_FLOOR_MS) : displayLevel(l.end)
+              const better = qe ? to < from : to > from
+              const fmt = (v: number) => (qe ? `${formatCount(v)}ms` : v.toFixed(1))
+              const theme = GAME_THEMES[id]
+              return (
+                <View key={id} style={styles.row} accessible accessibilityLabel={`${t(`games.${id}.name`)} ${fmt(from)} → ${fmt(to)}`}>
+                  <View style={[styles.rowIcon, styles.rowIconSmall]}>
+                    <GradientFill from={theme.cardFrom} to={theme.cardTo} width={44} height={44} light={0.06} />
+                    <Feather name={gameIcon(id)} size={20} color="#FFFFFF" />
+                  </View>
+                  <Text style={[styles.rowName, styles.flex]} numberOfLines={1} maxFontSizeMultiplier={1.4}>
+                    {t(`games.${id}.name`)}
+                  </Text>
+                  <View style={styles.change}>
+                    <Text style={[styles.changeText, { color: better ? FX.goodText : 'rgba(255,255,255,0.8)' }]} maxFontSizeMultiplier={1.3}>
+                      {fmt(from)}
+                    </Text>
+                    <Feather name="arrow-right" size={15} color={better ? FX.goodText : 'rgba(255,255,255,0.8)'} />
+                    <Text style={[styles.changeText, { color: better ? FX.goodText : 'rgba(255,255,255,0.8)' }]} maxFontSizeMultiplier={1.3}>
+                      {fmt(to)}
+                    </Text>
+                  </View>
+                </View>
+              )
+            })}
+          </View>
+        ) : null}
+
+        <CanvasButton icon="home" label={t('training.backHome')} onPress={onHome} theme={TRAINING_THEME} testID="brain-training-home" />
+      </ScrollView>
+      {done ? <Confetti colors={[FX.gold, '#A5B4FC', '#FFFFFF', '#F0ABFC', FX.goodText]} /> : null}
+    </GameCanvas>
   )
 }
 
 const styles = StyleSheet.create({
-  centered: { flexGrow: 1, justifyContent: 'center', padding: 16 },
-  card: { borderRadius: 20, borderWidth: 1, padding: 22, gap: 16, alignItems: 'center', width: '100%', maxWidth: 440, alignSelf: 'center' },
-  slot: { fontSize: 15, fontVariant: ['tabular-nums'] },
-  heading: { fontSize: 24, fontWeight: '700', textAlign: 'center' },
-  body: { fontSize: 15, lineHeight: 22 },
+  root: { flex: 1 },
+  flex: { flex: 1, minWidth: 0 },
   centerText: { textAlign: 'center' },
-  nextGame: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, borderRadius: 16, alignSelf: 'stretch' },
-  nextIcon: { width: 56, height: 56, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  nextText: { flex: 1, gap: 4 },
-  nextName: { fontSize: 19, fontWeight: '700' },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8 },
-  chip: { fontSize: 15, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, overflow: 'hidden' },
-  tiles: { flexDirection: 'row', justifyContent: 'space-between', alignSelf: 'stretch' },
-  levels: { alignSelf: 'stretch', gap: 8 },
-  levelRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  levelName: { flex: 1 },
-  levelValue: { fontVariant: ['tabular-nums'] },
+  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 8, minHeight: 56 },
+  lineupContent: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 24, gap: 24 },
+  lineupHero: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+  h1: { color: '#FFFFFF', fontSize: 34, fontWeight: '800', letterSpacing: -0.5 },
+  lead: { color: 'rgba(255,255,255,0.82)', fontSize: 17, lineHeight: 25, marginTop: 6 },
+  list: { gap: 10 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 18, backgroundColor: FX.glass, borderWidth: 1, borderColor: FX.glassBorder },
+  rowIndex: { width: 22, textAlign: 'center', color: 'rgba(255,255,255,0.6)', fontSize: 18, fontWeight: '900', fontVariant: ['tabular-nums'] },
+  rowIcon: { width: 56, height: 56, borderRadius: 16, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
+  rowIconSmall: { width: 44, height: 44, borderRadius: 12 },
+  rowName: { color: '#FFFFFF', fontSize: 17, fontWeight: '700' },
+  rowDesc: { color: 'rgba(255,255,255,0.75)', fontSize: 14, marginTop: 2 },
+  rowTime: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  rowTimeText: { color: 'rgba(255,255,255,0.75)', fontSize: 14 },
+  dose: { color: 'rgba(255,255,255,0.75)', fontSize: 16, lineHeight: 23 },
+  bottomBar: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 12 },
+  endContent: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 16, paddingVertical: 24, gap: 18, width: '100%', maxWidth: 480, alignSelf: 'center' },
+  endHead: { alignItems: 'center', gap: 12 },
+  card: { borderRadius: 18, backgroundColor: FX.glass, borderWidth: 1, borderColor: FX.glassBorder, padding: 16, gap: 12 },
+  courseLabel: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
+  track: { height: 10, borderRadius: 5, backgroundColor: 'rgba(255,255,255,0.10)', overflow: 'hidden' },
+  trackFill: { height: 10, borderRadius: 5, backgroundColor: TRAINING_THEME.accent },
+  stats: { flexDirection: 'row', gap: 8 },
+  change: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  changeText: { fontSize: 16, fontVariant: ['tabular-nums'] },
 })

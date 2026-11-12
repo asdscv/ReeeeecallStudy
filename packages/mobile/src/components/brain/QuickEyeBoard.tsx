@@ -1,12 +1,19 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
-import { View, Text, Pressable, StyleSheet } from 'react-native'
+import { View, Text, Pressable, StyleSheet, type View as RNView } from 'react-native'
 import Animated, { runOnJS, useAnimatedStyle, useFrameCallback, useSharedValue, type FrameInfo } from 'react-native-reanimated'
 import { Feather } from '@expo/vector-icons'
 import { useTranslation } from 'react-i18next'
-import { FIELD_RINGS, QUICK_EYE_BOX_RADIUS, quickEyeBox, quickEyeGeometry, type QuickEyeView } from '@reeeeecall/shared/lib/brain-games'
-import { useTheme } from '../../theme'
-import { haptics } from '../../utils/haptics'
+import {
+  CANVAS_TONES,
+  FIELD_RINGS,
+  QUICK_EYE_BOX_RADIUS,
+  quickEyeBox,
+  quickEyeGeometry,
+  type GameTheme,
+  type QuickEyeView,
+} from '@reeeeecall/shared/lib/brain-games'
 import { testProps } from '../../utils/testProps'
+import { useMotion, type Motion } from './motion'
 
 /**
  * Quick Eye on the phone.
@@ -20,6 +27,10 @@ import { testProps } from '../../utils/testProps'
  *
  * RoundView remounts this board for every trial, so each trial starts with fresh shared values,
  * a fresh mask and a fresh frame window.
+ *
+ * Drawn on the game's dark canvas: white shapes, faint ring guides, glass answer buttons. In `demo`
+ * mode (the how-to-play player) the flash is drawn still for the frame that holds it, no frame is
+ * counted and no exposure is ever reported.
  */
 const DIR_ARROWS = ['↑', '↗', '→', '↘', '↓', '↙', '←', '↖']
 const DIR_BUTTON = 56
@@ -46,25 +57,35 @@ export function QuickEyeBoard({
   onExposure,
   width,
   height,
+  theme,
+  demo,
+  paused,
+  registerTarget,
 }: {
   view: QuickEyeView
   onTap: (index: number) => void
   onExposure: (actualMs: number, frameMs: number) => void
   width: number
   height: number
+  theme: GameTheme
+  /** The how-to-play board: the flash is drawn still, nothing is timed, nothing takes input. */
+  demo?: boolean
+  /** The round is paused: the frame callback stops until play resumes. */
+  paused?: boolean
+  /** Demo only: each answer button's view, by the index a tap on it sends. */
+  registerTarget?: (index: number, node: RNView | null) => void
 }) {
-  const theme = useTheme()
   const { t } = useTranslation('brain')
-  const field = Math.floor(Math.min(width, 520, Math.max(280, height)))
+  const field = demo ? Math.floor(Math.min(width, height)) : Math.floor(Math.min(width, 520, Math.max(280, height)))
   const half = field / 2
   // 112pt square; 160pt wide for the two side-by-side shapes of same/different, but no taller —
   // a 160pt square's corners would push the inner ring out until a phone's stars shrank to ~13pt.
   // Only a field narrower than a phone shrinks the box.
   const { boxW, boxH, shape } = quickEyeBox(field, view.center.length === 2)
   const geo = useMemo(() => quickEyeGeometry(field, boxW, boxH, view.ringSlots), [field, boxW, boxH, view.ringSlots])
-  const ink = theme.colors.text
-  // Mid grey with the shapes in the theme's text colour: ≥4.5:1 in both themes.
-  const boxBg = theme.isDark ? '#6B7280' : '#9CA3AF'
+  // White shapes on the dark canvas, in a faintly lit box: far above 4.5:1 on every game's canvas.
+  const ink = '#FFFFFF'
+  const boxBg = 'rgba(255,255,255,0.08)'
 
   // ── The exposure ────────────────────────────────────────────────────────────
   const stimOpacity = useSharedValue(0)
@@ -120,11 +141,17 @@ export function QuickEyeBoard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   )
-  // Running from mount: the 500ms fixation fills the frame window before onset.
-  const frame = useFrameCallback(onFrame, true)
+  // Running from mount: the 500ms fixation fills the frame window before onset. (Never in a demo.)
+  const frame = useFrameCallback(onFrame, !demo)
   frameRef.current = frame
 
   useEffect(() => {
+    if (demo) {
+      // The demo shows each phase as a still: the flash on its frame, then the mask.
+      stimOpacity.value = view.phase === 'stimulus' ? 1 : 0
+      maskOpacity.value = view.phase === 'mask' ? 1 : 0
+      return
+    }
     switch (view.phase) {
       case 'stimulus':
         shownAt.value = -1
@@ -145,6 +172,18 @@ export function QuickEyeBoard({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view.phase])
+
+  // While paused nothing is timed, so no frame needs counting. The engine never pauses mid-flash;
+  // a pause in fixation resumes into fixation, whose frames refill the window before onset.
+  const wasPaused = useRef(false)
+  useEffect(() => {
+    if (demo) return
+    if (paused) frame.setActive(false)
+    else if (wasPaused.current && (view.phase === 'fixation' || view.phase === 'stimulus')) frame.setActive(true)
+    wasPaused.current = !!paused
+    // Only a change of `paused` toggles it; phase changes are the effect above's.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paused])
 
   const stimStyle = useAnimatedStyle(() => ({ opacity: stimOpacity.value }))
   const maskStyle = useAnimatedStyle(() => ({ opacity: maskOpacity.value }))
@@ -171,16 +210,23 @@ export function QuickEyeBoard({
   const showCenterOptions = view.phase === 'answerCenter' || answered
   const showDirections = view.asksLocation && (view.phase === 'answerLocation' || answered)
   // Big enough to hit (≥72pt), small enough to sit inside the ring of direction buttons.
-  const option = Math.round(Math.min(Math.max(72, field * 0.27), 112, geo.R - 42))
+  const option = Math.round(Math.min(Math.max(demo ? 44 : 72, field * 0.27), 112, geo.R - (demo ? 26 : 42)))
+  const dirSize = demo ? 34 : DIR_BUTTON
 
   return (
-    <View style={[styles.field, { width: field, height: field }]} {...testProps('brain-qe-field', true)}>
+    <View style={[styles.field, { width: field, height: field }]} {...(demo ? {} : testProps('brain-qe-field', true))}>
+      {/* Faint ring guides: where things can appear, without hinting where they will. */}
+      {geo.radii.map((r, i) => (
+        <View key={`ring${i}`} pointerEvents="none" style={[styles.ring, { width: r * 2, height: r * 2, borderRadius: r, left: half - r, top: half - r }]} />
+      ))}
+
       {/* The centre box, there whenever the answers are not: it is where the eyes rest. */}
       {!showCenterOptions ? (
         <View
           style={[
             styles.box,
-            { width: boxW, height: boxH, left: half - boxW / 2, top: half - boxH / 2, backgroundColor: boxBg, borderColor: ink },
+            { width: boxW, height: boxH, left: half - boxW / 2, top: half - boxH / 2, backgroundColor: boxBg },
+            view.phase === 'fixation' && !demo ? { boxShadow: `0 0 22px ${theme.glow}` } : null,
           ]}
         />
       ) : null}
@@ -211,44 +257,36 @@ export function QuickEyeBoard({
 
       {/* What was in the centre: two large answers, drawn as the shapes themselves. */}
       {showCenterOptions ? (
-        <View style={[styles.centerOptions, { top: half - option / 2, width: field }]}>
+        <View style={[styles.centerOptions, { top: half - option / 2, width: field, gap: demo ? 8 : 12 }]}>
           {view.centerOptions.map((opt, i) => {
             const isShape = opt !== 'same' && opt !== 'different'
             const label = isShape ? t(opt === 'circle' ? 'quickEye.circle' : 'quickEye.square') : t(`quickEye.${opt}`)
             const right = answered && i === view.correctCenter
             const wrong = answered && i === view.pickedCenter && !right
             return (
-              <Pressable
+              <AnswerButton
                 key={i}
-                disabled={view.phase !== 'answerCenter'}
-                onPress={() => {
-                  haptics.selection()
-                  onTap(i)
-                }}
-                accessibilityRole="button"
-                accessibilityLabel={label}
-                style={({ pressed }) => [
-                  styles.option,
-                  {
-                    width: option,
-                    height: option,
-                    backgroundColor: right ? theme.colors.successLight : wrong ? theme.colors.errorLight : theme.colors.surfaceElevated,
-                    borderColor: right ? theme.colors.success : wrong ? theme.colors.error : pressed ? theme.colors.primary : theme.colors.border,
-                    borderWidth: right || wrong ? 3 : 2,
-                  },
-                ]}
+                index={i}
+                size={option}
+                round={false}
+                state={right ? 'right' : wrong ? 'wrong' : answered ? 'dim' : 'open'}
+                accent={theme.accent}
+                disabled={view.phase !== 'answerCenter' || !!demo}
+                demo={demo}
+                label={label}
+                onTap={onTap}
+                registerTarget={registerTarget}
                 // A plain testID: on Android `testProps` would replace the spoken label with the id.
-                testID={`brain-qe-center-${i}`}
+                testID={demo ? undefined : `brain-qe-center-${i}`}
               >
                 {isShape ? (
                   <Shape id={opt} size={Math.round(option * 0.55)} color={ink} />
                 ) : (
-                  <Text style={[styles.optionText, { color: ink }]} numberOfLines={1} adjustsFontSizeToFit>
+                  <Text style={[styles.optionText, demo && { fontSize: 13 }]} numberOfLines={1} adjustsFontSizeToFit maxFontSizeMultiplier={1.3}>
                     {label}
                   </Text>
                 )}
-                {right || wrong ? <Badge right={right} theme={theme} /> : null}
-              </Pressable>
+              </AnswerButton>
             )
           })}
         </View>
@@ -258,43 +296,115 @@ export function QuickEyeBoard({
       {showDirections
         ? DIR_ARROWS.map((arrow, d) => {
             const angle = (d / 8) * 2 * Math.PI
-            const r = geo.R - 4
+            const r = geo.R - (demo ? 2 : 4)
             const x = half + r * Math.sin(angle)
             const y = half - r * Math.cos(angle)
             const right = answered && d === view.correctDirection
             const wrong = answered && d === view.pickedDirection && !right
-            const bg = right ? theme.colors.success : wrong ? theme.colors.error : theme.colors.surfaceElevated
-            const fg = right || wrong ? theme.colors.textInverse : answered ? theme.colors.textSecondary : theme.colors.primary
             return (
-              <Pressable
+              <AnswerButton
                 key={d}
-                disabled={view.phase !== 'answerLocation'}
-                onPress={() => {
-                  haptics.selection()
-                  onTap(d)
-                }}
-                accessibilityRole="button"
-                accessibilityLabel={t(`quickEye.dir.${d}`)}
-                style={({ pressed }) => [
-                  styles.dir,
-                  {
-                    left: x - DIR_BUTTON / 2,
-                    top: y - DIR_BUTTON / 2,
-                    backgroundColor: pressed && !answered ? theme.colors.primaryLight : bg,
-                    borderColor: right ? theme.colors.success : wrong ? theme.colors.error : answered ? theme.colors.border : theme.colors.primary,
-                  },
-                ]}
-                testID={`brain-qe-dir-${d}`}
+                index={d}
+                size={dirSize}
+                round
+                position={{ left: x - dirSize / 2, top: y - dirSize / 2 }}
+                state={right ? 'right' : wrong ? 'wrong' : answered ? 'dim' : 'open'}
+                accent={theme.accent}
+                disabled={view.phase !== 'answerLocation' || !!demo}
+                demo={demo}
+                label={t(`quickEye.dir.${d}`)}
+                onTap={onTap}
+                registerTarget={registerTarget}
+                testID={demo ? undefined : `brain-qe-dir-${d}`}
               >
-                <Text style={[styles.arrow, { color: fg }]} allowFontScaling={false}>
+                <Text style={[styles.arrow, demo && styles.arrowDemo]} allowFontScaling={false}>
                   {arrow}
                 </Text>
-                {right || wrong ? <Badge right={right} theme={theme} /> : null}
-              </Pressable>
+              </AnswerButton>
             )
           })
         : null}
     </View>
+  )
+}
+
+/**
+ * One answer on the field — a centre answer (rounded square) or a direction (circle). Glass while
+ * open; afterwards the right one turns green with a tick and pops, a wrong pick red with a cross
+ * and shakes, the rest dim — the marks, not only the colours, tell them apart.
+ */
+function AnswerButton({
+  index,
+  size,
+  round,
+  position,
+  state,
+  accent,
+  disabled,
+  demo,
+  label,
+  onTap,
+  registerTarget,
+  testID,
+  children,
+}: {
+  index: number
+  size: number
+  round: boolean
+  position?: { left: number; top: number }
+  state: 'open' | 'right' | 'wrong' | 'dim'
+  accent: string
+  disabled: boolean
+  demo?: boolean
+  label: string
+  onTap: (index: number) => void
+  registerTarget?: (index: number, node: RNView | null) => void
+  testID?: string
+  children: React.ReactNode
+}) {
+  const motion: Motion = state === 'right' ? 'pop' : state === 'wrong' ? 'shake' : state === 'open' ? 'rise' : null
+  const anim = useMotion(motion, state)
+  const right = state === 'right'
+  const wrong = state === 'wrong'
+  const look = round
+    ? right
+      ? { backgroundColor: CANVAS_TONES.correct, borderColor: CANVAS_TONES.correct }
+      : wrong
+        ? { backgroundColor: CANVAS_TONES.wrong, borderColor: CANVAS_TONES.wrong }
+        : state === 'dim'
+          ? { backgroundColor: CANVAS_TONES.tile, borderColor: CANVAS_TONES.tileBorder, opacity: 0.45 }
+          : { backgroundColor: CANVAS_TONES.tile, borderColor: accent }
+    : right
+      ? { backgroundColor: 'rgba(34,197,94,0.25)', borderColor: CANVAS_TONES.correct, boxShadow: '0 0 24px rgba(34,197,94,0.45)' }
+      : wrong
+        ? { backgroundColor: 'rgba(239,68,68,0.25)', borderColor: CANVAS_TONES.wrong }
+        : { backgroundColor: CANVAS_TONES.tile, borderColor: CANVAS_TONES.tileBorder }
+  return (
+    <Pressable
+      ref={registerTarget ? (node) => registerTarget(index, node) : undefined}
+      disabled={disabled}
+      onPress={() => onTap(index)}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled, checked: right ? true : undefined }}
+      style={({ pressed }) => [
+        round ? { position: 'absolute', width: size, height: size, ...position } : { width: size, height: size },
+        pressed && !disabled && { transform: [{ scale: 0.92 }] },
+      ]}
+      testID={testID}
+    >
+      <Animated.View
+        style={[
+          round ? styles.dir : styles.option,
+          { width: size, height: size, borderRadius: round ? size / 2 : demo ? 12 : 18, borderWidth: right || wrong ? (round ? 2 : 3) : 2 },
+          look,
+          anim,
+        ]}
+      >
+        {children}
+        {right || wrong ? <Badge right={right} small={demo} /> : null}
+      </Animated.View>
+    </Pressable>
   )
 }
 
@@ -322,41 +432,26 @@ function Glyph({ glyph, x, y, size, color }: { glyph: string; x: number; y: numb
 }
 
 /** ✓ on the right answer, ✕ on a wrong pick — the mark does not depend on seeing green and red. */
-function Badge({ right, theme }: { right: boolean; theme: ReturnType<typeof useTheme> }) {
+function Badge({ right, small }: { right: boolean; small?: boolean }) {
+  const s = small ? 16 : 24
   return (
-    <View style={[styles.badge, { backgroundColor: right ? theme.colors.success : theme.colors.error, borderColor: theme.colors.surfaceElevated }]}>
-      <Feather name={right ? 'check' : 'x'} size={14} color={theme.colors.textInverse} />
+    <View style={[styles.badge, { width: s, height: s, borderRadius: s / 2, top: -s / 4, right: -s / 4, backgroundColor: right ? CANVAS_TONES.correct : CANVAS_TONES.wrong }]}>
+      <Feather name={right ? 'check' : 'x'} size={small ? 10 : 14} color="#FFFFFF" />
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  field: { alignSelf: 'center' },
-  box: { position: 'absolute', borderRadius: QUICK_EYE_BOX_RADIUS, borderWidth: 2 },
+  field: { alignSelf: 'center', borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.04)' },
+  ring: { position: 'absolute', borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  box: { position: 'absolute', borderRadius: QUICK_EYE_BOX_RADIUS, borderWidth: 2, borderColor: 'rgba(255,255,255,0.75)' },
   center: { position: 'absolute', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12 },
   mask: { borderRadius: 16, overflow: 'hidden' },
-  centerOptions: { position: 'absolute', left: 0, flexDirection: 'row', justifyContent: 'center', gap: 12 },
-  option: { borderRadius: 18, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
-  optionText: { fontSize: 20, fontWeight: '700' },
-  dir: {
-    position: 'absolute',
-    width: DIR_BUTTON,
-    height: DIR_BUTTON,
-    borderRadius: DIR_BUTTON / 2,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  arrow: { fontSize: 26, fontWeight: '700', lineHeight: 30 },
-  badge: {
-    position: 'absolute',
-    top: -6,
-    right: -6,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  centerOptions: { position: 'absolute', left: 0, flexDirection: 'row', justifyContent: 'center' },
+  option: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
+  optionText: { color: '#FFFFFF', fontSize: 20, fontWeight: '700' },
+  dir: { alignItems: 'center', justifyContent: 'center' },
+  arrow: { color: '#FFFFFF', fontSize: 26, fontWeight: '700', lineHeight: 30 },
+  arrowDemo: { fontSize: 16, lineHeight: 19 },
+  badge: { position: 'absolute', borderWidth: 2, borderColor: 'rgba(15,23,42,0.9)', alignItems: 'center', justifyContent: 'center' },
 })

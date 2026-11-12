@@ -1,10 +1,12 @@
+import { useState } from 'react'
 import { View, Text, Pressable, Switch, Modal, ScrollView, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { TIMING_MODES, type BrainSettings, type TimingMode } from '@reeeeecall/shared/lib/brain-games'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
 import { Button } from '../ui'
-import { useTheme } from '../../theme'
-import { haptics } from '../../utils/haptics'
+import { useTheme, type Theme } from '../../theme'
+import { areHapticsEnabled, haptics, setHapticsEnabled } from '../../utils/haptics'
+import { localPrefs } from '../../utils/local-prefs'
 
 const TIMING_LABEL: Record<TimingMode, string> = {
   1: 'settings.timing_1',
@@ -14,8 +16,10 @@ const TIMING_LABEL: Record<TimingMode, string> = {
 }
 
 /**
- * Relaxed timing and Quick Eye's centre-only mode. Both exist for the same reason: an older
- * player's slower reactions or a narrower visual field should not read as failing the game.
+ * Relaxed timing and Quick Eye's centre-only mode — both exist for the same reason: an older
+ * player's slower reactions or a narrower visual field should not read as failing the game — and
+ * vibration. The web has a game-sound switch here; the phone's games speak through haptics, so its
+ * switch is the app-wide vibration setting itself (the same one Settings shows).
  */
 export function BrainSettingsModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const theme = useTheme()
@@ -25,9 +29,17 @@ export function BrainSettingsModal({ visible, onClose }: { visible: boolean; onC
     haptics.selection()
     useBrainStore.getState().setSettings(patch)
   }
+  const [hapticsOn, setHapticsOn] = useState(areHapticsEnabled)
+  const setVibration = (on: boolean) => {
+    setHapticsOn(on)
+    setHapticsEnabled(on)
+    localPrefs.setHapticsEnabled(on)
+    if (on) haptics.success() // felt at once, so the player knows it is on
+  }
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    // Re-read on open: the same setting can change in the app's Settings while this stays mounted.
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} onShow={() => setHapticsOn(areHapticsEnabled())}>
       {/* The backdrop closes the sheet but is not itself an accessibility element — it would
           swallow every control inside it (see SettingsScreen's language modal). */}
       <Pressable style={[styles.overlay, { backgroundColor: theme.colors.overlay }]} accessible={false} onPress={onClose}>
@@ -72,19 +84,23 @@ export function BrainSettingsModal({ visible, onClose }: { visible: boolean; onC
               <Text style={[styles.help, { color: theme.colors.textSecondary }]}>{t('settings.timingHelp')}</Text>
             </View>
 
-            <View style={styles.section}>
-              <View style={styles.switchRow}>
-                <Text style={[styles.label, styles.switchLabel, { color: theme.colors.text }]}>{t('settings.centerOnly')}</Text>
-                <Switch
-                  value={settings.centerOnly}
-                  onValueChange={(v) => set({ centerOnly: v })}
-                  trackColor={{ true: theme.colors.primary }}
-                  accessibilityLabel={t('settings.centerOnly')}
-                  testID="brain-center-only"
-                />
-              </View>
-              <Text style={[styles.help, { color: theme.colors.textSecondary }]}>{t('settings.centerOnlyHelp')}</Text>
-            </View>
+            <SwitchRow
+              label={t('settings.haptics')}
+              help={t('settings.hapticsHelp')}
+              value={hapticsOn}
+              onChange={setVibration}
+              theme={theme}
+              testID="brain-haptics"
+            />
+
+            <SwitchRow
+              label={t('settings.centerOnly')}
+              help={t('settings.centerOnlyHelp')}
+              value={settings.centerOnly}
+              onChange={(v) => set({ centerOnly: v })}
+              theme={theme}
+              testID="brain-center-only"
+            />
 
             <Text style={[styles.help, styles.flash, { color: theme.colors.textSecondary, borderTopColor: theme.colors.border }]}>
               {t('settings.flash')}
@@ -95,6 +111,36 @@ export function BrainSettingsModal({ visible, onClose }: { visible: boolean; onC
         </View>
       </Pressable>
     </Modal>
+  )
+}
+
+/**
+ * A whole-row switch: the row is the control (role switch, one big target, one announcement), the
+ * Switch inside is its picture.
+ */
+function SwitchRow({ label, help, value, onChange, theme, testID }: { label: string; help: string; value: boolean; onChange: (v: boolean) => void; theme: Theme; testID: string }) {
+  return (
+    <View style={styles.section}>
+      <Pressable
+        onPress={() => onChange(!value)}
+        style={styles.switchRow}
+        accessibilityRole="switch"
+        accessibilityLabel={label}
+        accessibilityHint={help}
+        accessibilityState={{ checked: value }}
+        testID={testID}
+      >
+        <Text style={[styles.label, styles.switchLabel, { color: theme.colors.text }]}>{label}</Text>
+        <Switch
+          value={value}
+          onValueChange={onChange}
+          trackColor={{ true: theme.colors.primary }}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        />
+      </Pressable>
+      <Text style={[styles.help, { color: theme.colors.textSecondary }]}>{help}</Text>
+    </View>
   )
 }
 
