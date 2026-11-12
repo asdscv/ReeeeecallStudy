@@ -17,12 +17,13 @@ const GLIDE = Easing.bezier(0.3, 0.7, 0.2, 1)
  * a fingertip makes each tap. It loops until the player starts; under reduce motion it holds each
  * frame longer and the fingertip jumps instead of gliding.
  */
-export function DemoPlayer({ gameId, width }: { gameId: BrainGameId; width: number }) {
+export function DemoPlayer({ gameId, width, centerOnly = false }: { gameId: BrainGameId; width: number; centerOnly?: boolean }) {
   const { t } = useTranslation('brain')
   const reduced = useReducedMotion()
   const theme = GAME_THEMES[gameId]
   const boardWidth = Math.max(200, Math.min(width - 32, 300))
-  const frames = useMemo(() => buildDemo(gameId, { maxCols: Math.min(4, maxColsFor(boardWidth)) }), [gameId, boardWidth])
+  // A player on Quick Eye's "centre only" setting sees the centre-only task demonstrated.
+  const frames = useMemo(() => buildDemo(gameId, { maxCols: Math.min(4, maxColsFor(boardWidth)), centerOnly }), [gameId, boardWidth, centerOnly])
   const [i, setI] = useState(0)
   const [run, setRun] = useState(0)
   // The frames differ in height (Quick Eye's answers replace its box, a choice's options appear):

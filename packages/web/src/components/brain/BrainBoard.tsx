@@ -28,7 +28,8 @@ export function BrainBoard(props: BoardProps) {
   return <QuickEyeBoard view={view} onTap={props.onTap} onExposure={props.onExposure} width={props.width} theme={props.theme} demo={props.demo} maxSize={props.maxHeight} />
 }
 
-const GAP = 10
+// The same gap maxColsFor() assumes, or the widest grid would overflow its board.
+const GAP = 8
 
 /** Each tone as a face: what it looks like, and the motion it enters with. */
 function face(tone: CellTone, theme: GameTheme): { style: CSSProperties; anim: string; icon?: 'check' | 'x' } {

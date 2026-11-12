@@ -8,8 +8,9 @@ import { areHapticsEnabled } from '../../utils/haptics'
  * of heard. Every buzz checks the app-wide vibration setting first (Settings, or the brain
  * settings sheet), exactly as the app's haptics wrapper does.
  *
- * - Android uses its own haptic constants (Confirm, Reject, Clock_Tick …) — crisp, and no VIBRATE
- *   permission — instead of the Vibrator-based impact calls, which feel buzzy there.
+ * - Android plays the light ticks (taps, flips, countdown) with its own haptic constants — crisp,
+ *   where the vibrator feels buzzy — and the verdicts through the vibrator, which still buzzes when
+ *   the system's touch feedback is off (the app has no sound, so a verdict must always be felt).
  * - Events of one moment are felt as one buzz, the strongest: a wrong answer that also costs a life
  *   is one Reject, not two. The tap that finishes a trial plays only the verdict, never its hit.
  * - Nothing buzzes for Quick Eye's flash or a Sequence playback: a buzz would blur the stimulus or
@@ -40,16 +41,10 @@ const IOS: Record<Kind, () => Promise<void>> = {
   success: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success),
 }
 
-const ANDROID: Record<Kind, Haptics.AndroidHaptics> = {
+const ANDROID: Partial<Record<Kind, Haptics.AndroidHaptics>> = {
   hit: Haptics.AndroidHaptics.Virtual_Key,
   flip: Haptics.AndroidHaptics.Segment_Tick,
   tick: Haptics.AndroidHaptics.Clock_Tick,
-  go: Haptics.AndroidHaptics.Context_Click,
-  correct: Haptics.AndroidHaptics.Confirm,
-  miss: Haptics.AndroidHaptics.Reject,
-  wrong: Haptics.AndroidHaptics.Reject,
-  lifeLost: Haptics.AndroidHaptics.Reject,
-  success: Haptics.AndroidHaptics.Confirm,
 }
 
 let pending: Kind | null = null
@@ -66,10 +61,14 @@ function play(kind: Kind) {
   lastAt = now
   if (NOTIFICATION.has(kind)) lastNotificationAt = now
   const ios = IOS[kind]
-  if (Platform.OS === 'android') {
+  const constant = Platform.OS === 'android' ? ANDROID[kind] : undefined
+  if (constant !== undefined) {
     // A binary whose expo-haptics predates the Android constants falls back to the iOS-style call.
-    Haptics.performAndroidHapticsAsync(ANDROID[kind]).catch(() => ios().catch(() => {}))
+    Haptics.performAndroidHapticsAsync(constant).catch(() => ios().catch(() => {}))
   } else {
+    // Verdicts go through the vibrator on Android too: the haptic constants fall silent when the
+    // system's touch feedback is off, and with no sound in the app the verdict must still be felt —
+    // and feel like the settings switch's test buzz, which uses the same path.
     ios().catch(() => {})
   }
 }

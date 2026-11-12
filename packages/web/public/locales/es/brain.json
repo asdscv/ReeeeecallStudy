@@ -188,7 +188,8 @@
     "time": "Tiempo",
     "trend": "Nivel en las últimas rondas",
     "otherGames": "Otros juegos",
-    "minutes": "Minutos"
+    "minutes": "Minutos",
+    "voided": "La pantalla se trababa una y otra vez, así que la ronda se detuvo"
   },
   "colors": {
     "red": "ROJO",

@@ -188,7 +188,8 @@
     "time": "시간",
     "trend": "최근 라운드 레벨",
     "otherGames": "다른 게임",
-    "minutes": "분"
+    "minutes": "분",
+    "voided": "화면이 자꾸 끊겨서 라운드를 멈췄어요"
   },
   "colors": {
     "red": "빨강",

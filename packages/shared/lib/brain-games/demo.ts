@@ -37,7 +37,10 @@ const RESULT_HOLD_MS = 1400
 export function buildDemo(gameId: BrainGameId, ctx: Partial<CreateContext> = {}): DemoFrame[] {
   const def = brainGame(gameId).def
   const setup = DEMO_SETUP[gameId]
-  const context: CreateContext = { ...DEFAULT_CONTEXT, maxCols: 4, ringSlots: [8, 16, 16], ...ctx, variant: setup.variant ?? 1, centerOnly: false }
+  // A player on Quick Eye's "centre only" setting sees the centre-only task demonstrated.
+  const centerOnly = ctx.centerOnly === true
+  const variant = centerOnly ? 1 : (setup.variant ?? 1)
+  const context: CreateContext = { ...DEFAULT_CONTEXT, maxCols: 4, ringSlots: [8, 16, 16], ...ctx, variant, centerOnly }
   let s = def.create(setup.level, createRng(setup.seed), context)
   const frames: DemoFrame[] = []
   for (let guard = 0; guard < 200; guard++) {

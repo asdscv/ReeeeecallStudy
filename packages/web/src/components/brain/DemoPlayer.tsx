@@ -12,12 +12,13 @@ const noop = () => {}
  * a pointer makes each tap. It loops until the player starts; under reduced motion it holds each
  * frame longer and the pointer jumps instead of gliding.
  */
-export function DemoPlayer({ gameId, width }: { gameId: BrainGameId; width: number }) {
+export function DemoPlayer({ gameId, width, centerOnly = false }: { gameId: BrainGameId; width: number; centerOnly?: boolean }) {
   const { t } = useTranslation('brain')
   const reduced = useReducedMotion()
   const theme = GAME_THEMES[gameId]
-  const boardWidth = Math.min(width - 32, 300)
-  const frames = useMemo(() => buildDemo(gameId, { maxCols: Math.min(4, maxColsFor(boardWidth)) }), [gameId, boardWidth])
+  // Inside the demo card's padding (16px each side) and border.
+  const boardWidth = Math.min(width - 34, 300)
+  const frames = useMemo(() => buildDemo(gameId, { maxCols: Math.min(4, maxColsFor(boardWidth)), centerOnly }), [gameId, boardWidth, centerOnly])
   const [i, setI] = useState(0)
   const [run, setRun] = useState(0)
   const box = useRef<HTMLDivElement>(null)

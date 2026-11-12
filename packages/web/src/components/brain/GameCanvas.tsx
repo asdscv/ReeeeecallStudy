@@ -13,8 +13,11 @@ export function GameCanvas({ theme, children, testId }: { theme: GameTheme; chil
     <main
       className="relative min-h-dvh overflow-clip text-white"
       style={{ background: canvasBackground(theme) }}
-      // Audio may only start after a gesture; the first touch anywhere unlocks it.
+      // Audio may only start after a gesture; the first touch anywhere unlocks it. iOS Safari counts
+      // only touchend/click as that gesture, not pointerdown — so all of them.
       onPointerDownCapture={() => sfx.unlock()}
+      onTouchEndCapture={() => sfx.unlock()}
+      onClickCapture={() => sfx.unlock()}
       onKeyDownCapture={() => sfx.unlock()}
       data-testid={testId}
     >
@@ -31,15 +34,27 @@ export function GameCanvas({ theme, children, testId }: { theme: GameTheme; chil
 export function Countdown({ onDone, goLabel }: { onDone: () => void; goLabel: string }) {
   const reduced = useReducedMotion()
   const [n, setN] = useState(3)
+  const [hidden, setHidden] = useState(() => document.hidden)
   const done = useRef(onDone)
   useEffect(() => {
     done.current = onDone
   })
+  // A hidden tab holds the countdown, and it starts over from 3 when the player is back — a round
+  // must not begin while nobody is looking.
   useEffect(() => {
+    const onVisibility = () => {
+      setHidden(document.hidden)
+      if (document.hidden) setN(3)
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => document.removeEventListener('visibilitychange', onVisibility)
+  }, [])
+  useEffect(() => {
+    if (hidden) return
     sfx.countdown(n)
     const t = setTimeout(() => (n > 0 ? setN(n - 1) : done.current()), n > 0 ? (reduced ? 450 : 650) : 450)
     return () => clearTimeout(t)
-  }, [n, reduced])
+  }, [n, reduced, hidden])
   return (
     <div className="flex items-center justify-center min-h-[50vh]" role="status" aria-live="assertive" data-testid="brain-countdown">
       <span key={n} className="bfx-pop text-8xl font-black tabular-nums drop-shadow-[0_8px_30px_rgba(0,0,0,0.45)]">

@@ -188,7 +188,8 @@
     "time": "用时",
     "trend": "最近几轮的等级",
     "otherGames": "其他游戏",
-    "minutes": "分钟"
+    "minutes": "分钟",
+    "voided": "画面多次卡顿，本轮已停止"
   },
   "colors": {
     "red": "红",

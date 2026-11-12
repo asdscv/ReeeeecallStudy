@@ -188,7 +188,8 @@
     "time": "Waktu",
     "trend": "Level beberapa ronde terakhir",
     "otherGames": "Game lain",
-    "minutes": "Menit"
+    "minutes": "Menit",
+    "voided": "Layar terus tersendat, jadi ronde dihentikan"
   },
   "colors": {
     "red": "MERAH",

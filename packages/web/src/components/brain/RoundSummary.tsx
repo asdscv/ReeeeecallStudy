@@ -25,7 +25,8 @@ export function RoundSummary({ gameId, stats, onAgain }: { gameId: BrainGameId; 
   const accuracy = stats.trials > 0 ? Math.round((stats.correct / stats.trials) * 100) : 0
   const stars = roundStars(stats.trials, stats.correct)
   const score = useCountUp(stats.points)
-  const title = stats.endedBy === 'cap' ? t('summary.cleared') : stats.endedBy === 'stop' ? t('summary.stopped') : t('summary.livesOut')
+  const title =
+    stats.endedBy === 'cap' ? t('summary.cleared') : stats.endedBy === 'stop' ? t('summary.stopped') : stats.endedBy === 'void' ? t('summary.voided') : t('summary.livesOut')
   // Quick Eye's level is its flash time: shorter is better.
   const qe = gameId === 'quickEye'
   const from = qe ? quickEyeMsAt(stats.levelStart) : displayLevel(stats.levelStart)

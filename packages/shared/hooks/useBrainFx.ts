@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import type { CellTone } from '../lib/brain-games'
+import { exposureMsFor, type CellTone } from '../lib/brain-games'
 import type { BrainRound } from './useBrainRound'
 
 /**
@@ -29,7 +29,7 @@ export type BrainFx =
   | { kind: 'lifeLost'; left: number }
   | { kind: 'levelUp'; level: number }
   | { kind: 'void' }
-  | { kind: 'roundEnd'; reason: 'lives' | 'cap' | 'stop' | null }
+  | { kind: 'roundEnd'; reason: 'lives' | 'cap' | 'stop' | 'void' | null }
   | { kind: 'newBest' }
 
 const HIT_TONES: readonly CellTone[] = ['correct', 'done', 'matched']
@@ -39,13 +39,14 @@ export function useBrainFx(r: BrainRound, onFx: (fx: BrainFx) => void) {
   useEffect(() => {
     emit.current = onFx
   })
-  const prev = useRef<{ trialId: number; tones: CellTone[]; phase: string | null; hits: number; flashes: number; lives: number | null }>({
+  const prev = useRef<{ trialId: number; tones: CellTone[]; phase: string | null; hits: number; flashes: number; lives: number | null; slips: number | null }>({
     trialId: -1,
     tones: [],
     phase: null,
     hits: 0,
     flashes: 0,
     lives: null,
+    slips: null,
   })
 
   // Inside a trial: what the board did since the last render.
@@ -54,7 +55,7 @@ export function useBrainFx(r: BrainRound, onFx: (fx: BrainFx) => void) {
     const p = prev.current
     const fresh = p.trialId !== r.trialId
     if (fresh) {
-      prev.current = { trialId: r.trialId, tones: [], phase: null, hits: 0, flashes: 0, lives: null }
+      prev.current = { trialId: r.trialId, tones: [], phase: null, hits: 0, flashes: 0, lives: null, slips: null }
     }
     const cur = prev.current
     if (view.kind === 'grid') {
@@ -66,6 +67,10 @@ export function useBrainFx(r: BrainRound, onFx: (fx: BrainFx) => void) {
         else if (lit === 1) emit.current({ kind: 'flash', cell: tones.indexOf('lit'), index: cur.flashes++ })
       }
       let missed = false
+      // Match Pairs: a mismatch costs a slip only when it went against what had been seen; turning
+      // over unseen cards is exploring, and must not sound like a mistake.
+      const slips = r.gameId === 'pairs' && typeof view.prompt.params?.lives === 'number' ? Number(view.prompt.params.lives) : null
+      const pairSlip = slips !== null && cur.slips !== null && slips < cur.slips
       if (!fresh && cur.tones.length === tones.length) {
         tones.forEach((t, i) => {
           const was = cur.tones[i]
@@ -76,15 +81,17 @@ export function useBrainFx(r: BrainRound, onFx: (fx: BrainFx) => void) {
             if (!(t === 'matched' && tones.some((u, j) => j < i && u === 'matched' && cur.tones[j] !== 'matched'))) {
               emit.current({ kind: 'hit', cell: i, step: ++cur.hits })
             }
-          } else if (t === 'wrong' && !r.result && !missed) {
+          } else if (t === 'wrong' && !r.result && !missed && (r.gameId !== 'pairs' || pairSlip)) {
             // A pairs mismatch turns two cards red at once: one miss.
             missed = true
             emit.current({ kind: 'miss', cell: i })
           }
-          else if (t === 'faceUp' && was === 'faceDown') emit.current({ kind: 'flip', cell: i })
+          // Only a card the player turned: a board ending by time shows every face at once.
+          else if (t === 'faceUp' && was === 'faceDown' && !r.result) emit.current({ kind: 'flip', cell: i })
         })
       }
       cur.tones = tones
+      cur.slips = slips
       // Number Hunt spends a life on each wrong tap, inside the grid.
       const lives = typeof view.prompt.params?.lives === 'number' && r.gameId === 'schulte' ? Number(view.prompt.params.lives) : null
       if (lives !== null && cur.lives !== null && lives < cur.lives) {
@@ -114,9 +121,12 @@ export function useBrainFx(r: BrainRound, onFx: (fx: BrainFx) => void) {
     else emit.current({ kind: 'wrong', timedOut: res.timedOut, practice: res.practice })
     if (res.livesLost > 0 && r.gameId !== 'schulte') emit.current({ kind: 'lifeLost', left: r.lives })
     // Whole steps only: the staircase moves in tenths, and a fanfare every tenth would be noise.
-    if (!res.practice && Math.floor(res.levelAfter + 1e-9) > Math.floor(res.levelBefore + 1e-9)) {
-      emit.current({ kind: 'levelUp', level: Math.floor(res.levelAfter + 1e-9) })
-    }
+    // Quick Eye: exactly when the flash gets shorter (its ladder steps on rounding, not on whole levels).
+    const up =
+      r.gameId === 'quickEye'
+        ? exposureMsFor(res.levelAfter) < exposureMsFor(res.levelBefore)
+        : Math.floor(res.levelAfter + 1e-9) > Math.floor(res.levelBefore + 1e-9)
+    if (!res.practice && up) emit.current({ kind: 'levelUp', level: Math.floor(res.levelAfter + 1e-9) })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [r.result])
 

@@ -92,7 +92,7 @@ export function GameIntro({
               <Text style={styles.kicker} accessibilityRole="header" maxFontSizeMultiplier={1.4}>
                 {t('intro.howTo')}
               </Text>
-              {width !== null ? <DemoPlayer gameId={gameId} width={width} /> : null}
+              {width !== null ? <DemoPlayer gameId={gameId} width={width} centerOnly={progress.settings.centerOnly} /> : null}
             </View>
 
             <View style={styles.stats}>

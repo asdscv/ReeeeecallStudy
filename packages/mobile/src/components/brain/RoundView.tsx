@@ -144,14 +144,17 @@ function Round({
   const [banner, setBanner] = useState<{ id: number; text: string } | null>(null)
   const [burst, setBurst] = useState<{ id: number; ok: boolean } | null>(null)
   const [heartHit, setHeartHit] = useState(0)
-  const [confirming, setConfirming] = useState(false)
+  // The stop sheet is asked for, then shown once the round has paused under it (mid-flash it waits
+  // for the flash to finish, so a flash is never hidden and then answered unseen).
+  const [sheetWanted, setSheetWanted] = useState(false)
+  const confirming = sheetWanted && r.paused
   const [ending, setEnding] = useState(false)
   const seq = useRef(0)
 
   // The latest round for handlers that outlive a render (back button, app state, fx).
-  const live = useRef({ r, confirming })
+  const live = useRef({ r, confirming: sheetWanted })
   useEffect(() => {
-    live.current = { r, confirming }
+    live.current = { r, confirming: sheetWanted }
   })
 
   // ── Effects: haptics, the verdict burst, "+N", banners, hearts ─────────────
@@ -212,17 +215,20 @@ function Round({
     if (cur.over) return
     // Nothing counted yet (or only practice): nothing to lose, nothing to confirm.
     if (cur.stats.trials === 0 && !confirmEmpty) return cur.stop()
-    pausedForSheet.current = cur.canPause && !cur.paused
-    if (pausedForSheet.current) cur.pause()
-    setConfirming(true)
+    pausedForSheet.current = !cur.paused
+    setSheetWanted(true)
+    if (cur.canPause && !cur.paused) cur.pause()
   }, [confirmEmpty])
+  useEffect(() => {
+    if (sheetWanted && !r.paused && r.canPause && !r.over) r.pause()
+  }, [sheetWanted, r])
   const cancelStop = useCallback(() => {
-    setConfirming(false)
+    setSheetWanted(false)
     if (pausedForSheet.current) live.current.r.resume()
     pausedForSheet.current = false
   }, [])
   const confirmStop = useCallback(() => {
-    setConfirming(false)
+    setSheetWanted(false)
     pausedForSheet.current = false
     live.current.r.stop()
   }, [])
@@ -253,6 +259,9 @@ function Round({
     const subs = [AppState.addEventListener('change', (state) => state !== 'active' && away())]
     // Android stays 'active' under the notification shade or a system dialog; it sends 'blur'.
     if (Platform.OS === 'android') subs.push(AppState.addEventListener('blur', away))
+    // A round can start while the app is already in the background (the countdown ran out under a
+    // phone call): it starts paused.
+    if (AppState.currentState !== 'active') away()
     return () => subs.forEach((s) => s.remove())
   }, [])
   const { canPause, paused, over, pause } = r
@@ -343,7 +352,7 @@ function Round({
           </View>
 
           {tier > 0 && !r.practice ? (
-            <Streak tier={tier} streak={r.stats.streak} label={t('play.streakCount', { value: r.stats.streak })} />
+            <Streak tier={tier} streak={r.stats.streak} label={t('play.streakCount', { value: r.stats.streak })} narrow={screen.width < 400 || r.maxLives > 3} />
           ) : (
             <View />
           )}
@@ -362,7 +371,11 @@ function Round({
         {/* The round's progress (capped rounds), then this trial's clock. */}
         <View style={[styles.bars, compact && styles.barsCompact]}>
           {/* Its room is kept during practice too, so the board does not resize when practice ends. */}
-          {capProgress !== null ? <CapBar progress={capProgress} /> : r.roundCap !== null ? <View style={styles.capSpacer} /> : null}
+          {capProgress !== null ? (
+            <CapBar progress={capProgress} now={r.trialInRound} max={r.roundCap ?? 0} label={t('play.trial', { done: r.trialInRound, total: r.roundCap ?? 0 })} />
+          ) : r.roundCap !== null ? (
+            <View style={styles.capSpacer} />
+          ) : null}
           <TimerBar key={r.trialId} timer={r.timer} accent={theme.accent} />
         </View>
 
@@ -432,7 +445,7 @@ function Round({
         />
       ) : null}
 
-      {ending ? <RoundOver endedBy={r.stats.endedBy} cleared={t('play.roundCleared')} over={t('play.roundOver')} theme={theme} /> : null}
+      {ending ? <RoundOver endedBy={r.stats.endedBy} cleared={t('play.roundCleared')} over={r.stats.endedBy === 'void' ? t('summary.voided') : t('play.roundOver')} theme={theme} /> : null}
     </View>
   )
 }
@@ -475,8 +488,12 @@ function Prompt({ text, compact }: { text: string; compact: boolean }) {
   // Once per mount — the prompt is keyed by trial and prompt key, so a live counter in it ("next:
   // 7") updates in place instead of sliding in again on every tap.
   const rise = useMotion('rise', 0)
+  // Room for two lines at the text size actually used (system scaling up to HUD_SCALE), so a
+  // two-line prompt never pushes the board down mid-round.
+  const { fontScale } = useWindowDimensions()
+  const scale = Math.min(HUD_SCALE, Math.max(1, fontScale))
   return (
-    <View style={[styles.promptBox, compact && styles.promptBoxCompact]} pointerEvents="none">
+    <View style={[styles.promptBox, compact && styles.promptBoxCompact, { minHeight: Math.round((compact ? 44 : 50) * scale) }]} pointerEvents="none">
       <Animated.Text
         style={[styles.prompt, compact && styles.promptCompact, rise]}
         // Two lines reserved; a long prompt shrinks rather than cutting off its live counter.
@@ -541,18 +558,26 @@ function ScorePop({ text, color, onDone }: { text: string; color: string; onDone
   )
 }
 
-function Streak({ tier, streak, label }: { tier: number; streak: number; label: string }) {
+function Streak({ tier, streak, label, narrow }: { tier: number; streak: number; label: string; narrow: boolean }) {
   const pop = useMotion('pop', tier)
   const bg = tier >= 3 ? '#F97316' : tier === 2 ? 'rgba(251,146,60,0.9)' : 'rgba(255,255,255,0.14)'
   return (
-    <Animated.View style={[styles.streak, { backgroundColor: bg }, tier >= 3 && styles.streakHot, pop]} testID="brain-streak">
+    <Animated.View
+      style={[styles.streak, { backgroundColor: bg }, tier >= 3 && styles.streakHot, pop]}
+      accessible
+      accessibilityLabel={label}
+      testID="brain-streak"
+    >
       <Feather name="zap" size={18} color="#FFFFFF" />
+      {/* A narrow phone (or five hearts beside it) gets the flame and the number only. */}
       <Text style={styles.streakText} numberOfLines={1} maxFontSizeMultiplier={1.2}>
-        {label}
+        {narrow ? streak : label}
       </Text>
-      <Text style={styles.streakMult} maxFontSizeMultiplier={1.2}>
-        ×{comboMultiplier(streak)}
-      </Text>
+      {narrow ? null : (
+        <Text style={styles.streakMult} maxFontSizeMultiplier={1.2}>
+          ×{comboMultiplier(streak)}
+        </Text>
+      )}
     </Animated.View>
   )
 }
@@ -645,7 +670,7 @@ function RoundOver({ endedBy, cleared, over, theme }: { endedBy: RoundStats['end
   )
 }
 
-function CapBar({ progress }: { progress: number }) {
+function CapBar({ progress, now, max, label }: { progress: number; now: number; max: number; label: string }) {
   const k = useSharedValue(progress)
   useEffect(() => {
     k.value = withTiming(progress, { duration: 300 })
@@ -654,7 +679,7 @@ function CapBar({ progress }: { progress: number }) {
   }, [progress])
   const fill = useAnimatedStyle(() => ({ transform: [{ scaleX: Math.max(0.0001, k.value) }] }))
   return (
-    <View style={styles.capTrack}>
+    <View style={styles.capTrack} accessible accessibilityRole="progressbar" accessibilityLabel={label} accessibilityValue={{ min: 0, max, now }}>
       <Animated.View style={[styles.capFill, fill]} />
     </View>
   )

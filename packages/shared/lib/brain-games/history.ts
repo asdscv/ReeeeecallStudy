@@ -44,8 +44,15 @@ export function serializeHistory(h: BrainHistory): string {
   return JSON.stringify(h)
 }
 
+// Days from 2024 to about 2133, levels to 500, accuracy 0-100: anything else is corrupt (and a
+// day far out of range would make the date conversion throw on every screen that draws a trend).
 const isEntry = (e: unknown): e is HistoryEntry =>
-  Array.isArray(e) && e.length === 3 && e.every((x) => typeof x === 'number' && Number.isFinite(x))
+  Array.isArray(e) &&
+  e.length === 3 &&
+  e.every((x) => typeof x === 'number' && Number.isInteger(x)) &&
+  e[0] >= 0 && e[0] <= 40_000 &&
+  e[1] >= 0 && e[1] <= 5_000 &&
+  e[2] >= 0 && e[2] <= 100
 
 export function parseHistory(raw: string | null | undefined): BrainHistory {
   if (!raw) return emptyHistory()

@@ -188,7 +188,8 @@
     "time": "Time",
     "trend": "Level, recent rounds",
     "otherGames": "Other games",
-    "minutes": "Minutes"
+    "minutes": "Minutes",
+    "voided": "The screen kept stuttering, so the round stopped"
   },
   "colors": {
     "red": "RED",

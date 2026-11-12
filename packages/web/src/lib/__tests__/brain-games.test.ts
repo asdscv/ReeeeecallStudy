@@ -445,8 +445,13 @@ describe('solution() — the demo and these tests play every game from the engin
       }
       if (last.kind === 'grid') expect(last.cells.some((c) => c.tone === 'wrong'), `${id} demo makes no mistake`).toBe(false)
       expect(frames.every((f) => f.holdMs > 0 && f.holdMs <= 1600)).toBe(true)
-      // Quick Eye's demo shows the flash (variant 2: centre and star).
-      if (id === 'quickEye') expect(frames.some((f) => f.flash)).toBe(true)
+      // Quick Eye's demo shows the flash (variant 2: centre and star) — or the centre alone for a
+      // player on the centre-only setting.
+      if (id === 'quickEye') {
+        expect(frames.some((f) => f.flash)).toBe(true)
+        const centre = buildDemo('quickEye', { centerOnly: true })
+        expect(centre.every((f) => f.view.kind !== 'quickEye' || f.view.target === null)).toBe(true)
+      }
       void def
     }
   })
@@ -465,6 +470,8 @@ describe('round history, stars and streaks', () => {
     expect(gameHistory(back, 'memoryGrid').at(-1)).toEqual({ day: '2026-11-12', level: 31.3, accuracy: 0.88 })
     expect(parseHistory('{"rounds":{"memoryGrid":[[1,2],"x",[1,2,3]],"nope":[[1,1,1]]}}').rounds).toEqual({ memoryGrid: [[1, 2, 3]] })
     expect(parseHistory('garbage')).toEqual(emptyHistory())
+    // A day far out of range would throw in the date conversion on every trend: it is dropped.
+    expect(parseHistory('{"rounds":{"math":[[9e15,10,50],[1000,10,50]]}}').rounds).toEqual({ math: [[1000, 10, 50]] })
   })
 
   it('stars by accuracy (none for very short rounds), streak tiers at 3, 6 and 10', () => {

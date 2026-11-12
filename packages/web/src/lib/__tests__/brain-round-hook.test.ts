@@ -48,6 +48,19 @@ describe('memorise phases and pause', () => {
 })
 
 describe('rounds always end', () => {
+  it('relaxed timing: a partial span answer is forgiven once per length, then costs a chance', () => {
+    seed((p) => ({ ...p, settings: { ...p.settings, timing: 2 } }))
+    const { result } = renderHook(() => useBrainRound('sequence', PLATFORM))
+    for (let guard = 0; guard < 2000 && !result.current.over; guard++) {
+      const taps = result.current.solution
+      // Enter the first tile of each sequence, then wait it out.
+      if (taps && taps.length && result.current.view.kind === 'grid' && result.current.view.prompt.params?.done === 0) act(() => result.current.tap(taps[0]))
+      else advance(200)
+    }
+    expect(result.current.stats.endedBy).toBe('lives')
+    expect(result.current.stats.trials).toBe(3)
+  })
+
   it('relaxed timing: a span trial left blank costs a chance, so waiting cannot loop forever', () => {
     seed((p) => ({ ...p, settings: { ...p.settings, timing: 2 } }))
     const { result } = renderHook(() => useBrainRound('memoryGrid', PLATFORM))
@@ -96,6 +109,59 @@ describe('Quick Eye void trials', () => {
     for (let i = 0; i < 200 && !result.current.over; i++) advance(500)
     expect(result.current.over).toBe(true)
     expect(result.current.stats.trials).toBe(0)
+    // Not "cleared": the round stopped itself.
+    expect(result.current.stats.endedBy).toBe('void')
+  })
+
+  it('once lenient, stays lenient: a device a frame or two off keeps playing, not voiding five in six', () => {
+    seed()
+    const { result } = renderHook(() => useBrainRound('quickEye', PLATFORM))
+    let voids = 0
+    let counted = 0
+    for (let guard = 0; guard < 2000 && counted < 6; guard++) {
+      const v = result.current.view
+      if (v.kind === 'quickEye' && v.phase === 'stimulus' && !result.current.result) {
+        act(() => result.current.reportExposure(v.exposureMs + 2 * (1000 / 60), 1000 / 60))
+        const judged = (result.current as { result: { void: boolean } | null }).result
+        if (judged?.void) voids++
+      }
+      const taps = result.current.solution
+      if (taps && taps.length && !result.current.result) {
+        act(() => result.current.tap(taps[0]))
+        if ((result.current as { result: unknown }).result) counted++
+      }
+      advance(50)
+    }
+    expect(counted).toBe(6)
+    expect(voids).toBe(5)
+  })
+
+  it('a device whose floor gets raised never loses level for answering right', () => {
+    seed((p) => ({ ...p, games: { ...p.games, quickEye: { level: 11, bestLevel: 11, rounds: 3, wins: 3 } } }))
+    const { result } = renderHook(() => useBrainRound('quickEye', PLATFORM))
+    let lowest = result.current.level
+    for (let guard = 0; guard < 3000 && !result.current.over; guard++) {
+      const v = result.current.view
+      // One frame long every time: voids, then the floor rises, then lenient play.
+      if (v.kind === 'quickEye' && v.phase === 'stimulus' && !result.current.result) act(() => result.current.reportExposure(v.exposureMs + 1000 / 60, 1000 / 60))
+      const taps = result.current.solution
+      if (taps && taps.length && !result.current.result) act(() => result.current.tap(taps[0]))
+      lowest = Math.min(lowest, result.current.level)
+      advance(50)
+    }
+    expect(lowest).toBeGreaterThanOrEqual(10.9)
+  })
+
+  it('a pause during fixation restarts the fixation: the flash never comes right after resume', () => {
+    seed()
+    const { result } = renderHook(() => useBrainRound('quickEye', PLATFORM))
+    advance(450)
+    act(() => result.current.pause())
+    advance(5000)
+    act(() => result.current.resume())
+    advance(100)
+    const v = result.current.view
+    expect(v.kind === 'quickEye' && v.phase).toBe('fixation')
   })
 })
 

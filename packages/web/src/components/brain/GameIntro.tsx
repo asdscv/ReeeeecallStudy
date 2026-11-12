@@ -39,8 +39,9 @@ export function GameIntro({
 
   const measure = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(360)
+  // The content width: clientWidth counts the container's own 16px gutters.
   useLayoutEffect(() => {
-    if (measure.current) setWidth(measure.current.clientWidth)
+    if (measure.current) setWidth(measure.current.clientWidth - 32)
   }, [])
 
   const start = useRef<HTMLButtonElement>(null)
@@ -96,7 +97,7 @@ export function GameIntro({
 
         <section className="mt-5 space-y-2" aria-labelledby="brain-howto">
           <h2 id="brain-howto" className="text-sm font-semibold uppercase tracking-wider text-white/70">{t('intro.howTo')}</h2>
-          <DemoPlayer gameId={gameId} width={width} />
+          <DemoPlayer gameId={gameId} width={width} centerOnly={progress.settings.centerOnly} />
         </section>
 
         <div className="mt-4 grid grid-cols-3 gap-2">

@@ -188,7 +188,8 @@
     "time": "Thời gian",
     "trend": "Cấp độ các vòng gần đây",
     "otherGames": "Trò khác",
-    "minutes": "Phút"
+    "minutes": "Phút",
+    "voided": "Màn hình liên tục bị giật nên vòng chơi đã dừng"
   },
   "colors": {
     "red": "ĐỎ",

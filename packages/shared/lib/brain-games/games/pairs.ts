@@ -57,7 +57,9 @@ export const pairs: BrainGameDef<PairsState> = {
     const cards = rng.shuffle([...faces, ...faces])
     // The preview tapers away over levels 18-24 instead of vanishing at once.
     const fade = Math.max(0, Math.min(1, (24 - level) / 6))
-    const previewMs = Math.round(Math.max(0, 1500 + board.pairs * 250 - level * 90) * (level < 18 ? 1 : fade))
+    const tapered = Math.round(Math.max(0, 1500 + board.pairs * 250 - level * 90) * (level < 18 ? 1 : fade))
+    // Under half a second a preview is a flicker, not a look: none at all is fairer.
+    const previewMs = tapered < 500 ? 0 : tapered
     return {
       level,
       cols: board.cols,
