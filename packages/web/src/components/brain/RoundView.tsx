@@ -220,7 +220,8 @@ function Round({ gameId, onOver, caption, width, theme }: { gameId: BrainGameId;
         <button
           type="button"
           onClick={askStop}
-          className="flex items-center gap-1.5 min-h-11 px-3 rounded-xl bg-white/10 hover:bg-white/20 border-none text-white text-base cursor-pointer"
+          aria-label={t('play.stop')}
+          className="flex items-center gap-1.5 min-h-11 min-w-11 px-3 rounded-xl bg-white/10 hover:bg-white/20 border-none text-white text-base cursor-pointer"
           data-testid="brain-finish"
         >
           <X className="w-5 h-5" aria-hidden="true" />
