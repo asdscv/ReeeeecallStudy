@@ -16,10 +16,12 @@ export interface ChoiceState {
 export function choiceGame(
   id: BrainGameDef<ChoiceState>['id'],
   create: (level: number, rng: Rng, ctx: CreateContext) => ChoiceState,
+  opts: { maxLevel?: number } = {},
 ): BrainGameDef<ChoiceState> {
   const done = (s: ChoiceState) => s.picked !== null || s.timedOut
   return {
     id,
+    ...(opts.maxLevel !== undefined ? { maxLevel: () => opts.maxLevel as number } : {}),
     create,
     pendingMs: () => null,
     advance: (s) => s,
@@ -59,7 +61,9 @@ export function numericOptions(answer: number, rng: Rng, hints: number[] = []): 
   ;[1, -1, 2, -2, 10, -10].forEach((d) => add(answer + d))
   const digits = String(answer)
   if (digits.length >= 2) add(Number(digits.slice(0, -2) + digits.slice(-1) + digits.slice(-2, -1)))
-  for (let spread = 3; candidates.size < 3; spread += 2) add(answer + rng.int(-spread, spread))
+  // Bounded: a non-finite answer (corrupt input) must not spin forever looking for neighbours.
+  for (let spread = 3, tries = 0; candidates.size < 3 && tries < 200; spread += 2, tries++) add(answer + rng.int(-spread, spread))
+  for (let k = 1; candidates.size < 3; k++) candidates.add(k * 1000 + candidates.size)
   const wrong = rng.sample([...candidates], 3)
   const options = rng.shuffle([answer, ...wrong])
   return { options, correctIndex: options.indexOf(answer) }

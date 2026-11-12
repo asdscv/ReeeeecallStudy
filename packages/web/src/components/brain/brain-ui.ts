@@ -1,5 +1,5 @@
 import { Aperture, LayoutGrid, Repeat, Copy, Hash, Eye, Droplet, PlusCircle, TrendingUp, type LucideIcon } from 'lucide-react'
-import type { BrainColor } from '@reeeeecall/shared/lib/brain-games'
+import { INK_COLORS } from '@reeeeecall/shared/lib/brain-games'
 import type { BrainStorage } from '@reeeeecall/shared/stores/brain-store'
 import type { PlatformContext } from '@reeeeecall/shared/hooks/useBrainRound'
 
@@ -16,15 +16,8 @@ export const BRAIN_ICONS: Record<string, LucideIcon> = {
   'trending-up': TrendingUp,
 }
 
-/** Ink colours for the colour-word game — saturated enough to read on light and dark. */
-export const INK: Record<BrainColor, string> = {
-  red: '#dc2626',
-  blue: '#2563eb',
-  green: '#15803d',
-  yellow: '#b45309',
-  purple: '#9333ea',
-  orange: '#ea580c',
-}
+/** Ink colours for the colour-word game (shared with the app). */
+export const INK = INK_COLORS
 
 export function brainStorageFor(userId: string): BrainStorage {
   const key = `reeeeecall-brain:${userId}`
@@ -75,8 +68,10 @@ export function cardBackground(theme: { cardFrom: string; cardTo: string }): str
  * timing is not trustworthy enough at one frame without hardware checks — and keeps the inner ring
  * to the 8 radial positions on small screens, where 16 stimuli would overlap the centre box.
  */
-export function webPlatform(boardWidth: number, maxCols: number): PlatformContext {
-  const small = Math.min(window.innerWidth, window.innerHeight) < 600 || boardWidth < 600
+export function webPlatform(_boardWidth: number, maxCols: number): PlatformContext {
+  // Decided by the screen, as the app does (its screenShortSide) — not by the board, which is
+  // capped at 560px and would always read as "small".
+  const small = Math.min(window.innerWidth, window.innerHeight) < 600
   return { maxCols, minExposureMs: 33, ringSlots: small ? [8, 16, 16] : [16, 16, 16] }
 }
 

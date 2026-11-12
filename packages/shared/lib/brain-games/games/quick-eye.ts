@@ -19,6 +19,20 @@ import type { BrainGameDef, FieldSlot, QuickEyeView } from '../types'
 /** Exposure ladder in ms, from easiest (level 0) to hardest (level 12): 30 frames down to 1 at 60Hz. */
 export const QUICK_EYE_LADDER_MS = [500, 400, 333, 267, 217, 167, 133, 100, 83, 67, 50, 33, 17] as const
 
+/** The highest ladder step a floor of `minMs` still shows differently from the one before. */
+export function quickEyeMaxLevel(minMs: number): number {
+  let top = 0
+  QUICK_EYE_LADDER_MS.forEach((ms, i) => {
+    if (ms >= minMs) top = i
+  })
+  return top
+}
+
+/** The exposure a level actually shows on a platform with this floor. */
+export function quickEyeMsAt(level: number, minMs = 33): number {
+  return Math.max(exposureMsFor(level), minMs)
+}
+
 export function exposureMsFor(level: number): number {
   const i = Math.max(0, Math.min(QUICK_EYE_LADDER_MS.length - 1, Math.round(level)))
   return QUICK_EYE_LADDER_MS[i]
@@ -171,8 +185,9 @@ export const quickEye: BrainGameDef<QuickEyeState> = {
     if (s.phase === 'mask') return { ...s, phase: 'answerCenter' }
     return s
   },
-  exposed(s, actualMs, frameMs) {
+  exposed(s, actualMs, frameMs, lenient) {
     if (s.phase !== 'stimulus') return s
+    if (lenient && actualMs > 0) return { ...s, shownMs: actualMs, phase: 'mask' }
     // A trial whose exposure was not what it claims does not count. At a few frames even one frame
     // off is a large relative error, so up to 6 target frames the count must match exactly;
     // beyond that one frame either way is allowed.
@@ -183,6 +198,8 @@ export const quickEye: BrainGameDef<QuickEyeState> = {
     return { ...s, shownMs: actualMs, phase: 'mask' }
   },
   acceptsInput: (s) => s.phase === 'answerCenter' || s.phase === 'answerLocation',
+  // The ladder step at the platform's shortest exposure: below it every level shows the same flash.
+  maxLevel: (ctx) => quickEyeMaxLevel(ctx.minExposureMs),
   tap(s, index) {
     if (s.phase === 'answerCenter') {
       if (index < 0 || index > 1) return s

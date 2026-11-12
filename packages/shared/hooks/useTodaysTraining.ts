@@ -26,7 +26,9 @@ export interface TrainingTotals {
 interface TrainingState {
   slots: PlanSlot[]
   slotIndex: number
-  slotStartedAt: number
+  /** Time actually played in this slot and in the session (paused and between-games time excluded). */
+  slotActiveMs: number
+  activeMs: number
   roundsInSlot: number
   roundKey: number
   phase: TrainingPhase
@@ -43,7 +45,8 @@ function init(): TrainingState {
       return planTodaysSession(progress, createRng(todaysPlanSeed(progress, localDayKey())))
     })(),
     slotIndex: 0,
-    slotStartedAt: now,
+    slotActiveMs: 0,
+    activeMs: 0,
     roundsInSlot: 0,
     roundKey: 1,
     phase: 'playing',
@@ -67,16 +70,18 @@ export function useTodaysTraining() {
         points: s.totals.points + stats.points,
         levels: { ...s.totals.levels, [gameId]: { start: prior?.start ?? stats.levelStart, end: stats.levelEnd } },
       }
-      if (stats.endedBy === 'stop') return { ...s, totals, phase: 'quit' }
+      const activeMs = s.activeMs + stats.activeMs
+      const slotActiveMs = s.slotActiveMs + stats.activeMs
+      if (stats.endedBy === 'stop') return { ...s, totals, activeMs, slotActiveMs, phase: 'quit' }
       const now = Date.now()
       const slot = s.slots[s.slotIndex]
       const rounds = s.roundsInSlot + 1
-      const left = slot.minutes * 60_000 - (now - s.slotStartedAt)
+      const left = slot.minutes * 60_000 - slotActiveMs
       if (rounds < slot.maxRounds && left > 60_000) {
-        return { ...s, totals, roundsInSlot: rounds, roundKey: s.roundKey + 1 }
+        return { ...s, totals, activeMs, slotActiveMs, roundsInSlot: rounds, roundKey: s.roundKey + 1 }
       }
-      if (s.slotIndex + 1 < s.slots.length) return { ...s, totals, phase: 'between' }
-      return { ...s, totals, phase: 'done', finishedAt: now }
+      if (s.slotIndex + 1 < s.slots.length) return { ...s, totals, activeMs, slotActiveMs, phase: 'between' }
+      return { ...s, totals, activeMs, slotActiveMs, phase: 'done', finishedAt: now }
     })
   }, [])
 
@@ -86,18 +91,18 @@ export function useTodaysTraining() {
   useEffect(() => {
     if (state.phase !== 'done' || recorded.current) return
     recorded.current = true
-    useBrainStore.getState().completeSession(
-      ((state.finishedAt ?? Date.now()) - state.startedAt) / 60_000,
-      state.slots.map((slot) => slot.gameId),
-    )
-  }, [state.phase, state.finishedAt, state.startedAt, state.slots])
+    // Minutes actually played — a session left paused through a phone call, or sitting on the
+    // "next game" screen overnight, must not record hours. Capped at half again the plan.
+    const minutes = Math.min(state.activeMs / 60_000, plannedMinutes(state.slots) * 1.5)
+    useBrainStore.getState().completeSession(minutes, state.slots.map((slot) => slot.gameId))
+  }, [state.phase, state.activeMs, state.slots])
 
   /** From the "next game" screen into the next slot. */
   const continueSession = useCallback(() => {
     setState((s) =>
       s.phase !== 'between'
         ? s
-        : { ...s, phase: 'playing', slotIndex: s.slotIndex + 1, roundsInSlot: 0, slotStartedAt: Date.now(), roundKey: s.roundKey + 1 },
+        : { ...s, phase: 'playing', slotIndex: s.slotIndex + 1, roundsInSlot: 0, slotActiveMs: 0, roundKey: s.roundKey + 1 },
     )
   }, [])
 
@@ -114,6 +119,8 @@ export function useTodaysTraining() {
     totals: state.totals,
     plannedMinutes: plannedMinutes(state.slots),
     startedAt: state.startedAt,
+    /** Minutes actually played so far. */
+    activeMinutes: state.activeMs / 60_000,
     onRoundOver,
     continueSession,
   }

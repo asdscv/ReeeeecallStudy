@@ -10,6 +10,7 @@ import type { BrainGameDef, CellView } from '../types'
  */
 export interface SchulteState {
   n: number
+  level: number
   /** cell index → number shown */
   values: number[]
   order: 'asc' | 'desc'
@@ -24,6 +25,18 @@ export interface SchulteState {
   seed: number
 }
 
+
+/**
+ * Time for a grid. Past level 12 the grid stops growing, so the clock tightens instead — 3% a level,
+ * down to about 0.65s a number, which a practised adult can hold; the level stops there (40).
+ */
+export const SCHULTE_MAX_LEVEL = 40
+function schulteLimit(n: number, shuffleEach: boolean, level: number): number {
+  const cells = n * n
+  const base = 2000 + cells * (shuffleEach ? 2200 : 1500)
+  const floor = 1500 + cells * (shuffleEach ? 1000 : 650)
+  return Math.round(Math.max(floor, base * Math.pow(0.97, Math.max(0, level - 12))))
+}
 
 function nextValue(s: SchulteState): number {
   return s.order === 'asc' ? s.found + 1 : s.n * s.n - s.found
@@ -53,6 +66,7 @@ export const schulte: BrainGameDef<SchulteState> = {
     if (shuffleEach) n = Math.max(3, n - 1)
     return {
       n,
+      level,
       values: rng.shuffle(range(n * n).map((i) => i + 1)),
       order: level >= 5 && rng.chance(0.35) ? 'desc' : 'asc',
       shuffleEach,
@@ -83,7 +97,8 @@ export const schulte: BrainGameDef<SchulteState> = {
     if (s.mistakes >= s.maxMistakes || s.timedOut) return { correct: false, accuracy: s.found / total, livesSpent: s.mistakes }
     return null
   },
-  timeLimitMs: (s) => 2000 + s.n * s.n * (s.shuffleEach ? 2200 : 1500),
+  timeLimitMs: (s) => schulteLimit(s.n, s.shuffleEach, s.level),
+  maxLevel: () => SCHULTE_MAX_LEVEL,
   view(s) {
     const cells: CellView[] = s.values.map((value, i) => ({
       label: String(value),

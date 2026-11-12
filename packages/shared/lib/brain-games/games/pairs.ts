@@ -12,6 +12,7 @@ import type { BrainGameDef, CellView } from '../types'
  * finishing it within the budget is right, running out is one life.
  */
 export interface PairsState {
+  level: number
   cols: number
   rows: number
   cards: string[]
@@ -54,8 +55,11 @@ export const pairs: BrainGameDef<PairsState> = {
       level >= 10 ? rng.pick(FAMILIES) : rng.shuffle(FAMILIES.flat())
     const faces = rng.sample(pool, board.pairs)
     const cards = rng.shuffle([...faces, ...faces])
-    const previewMs = level < 18 ? Math.max(0, 1500 + board.pairs * 250 - level * 90) : 0
+    // The preview tapers away over levels 18-24 instead of vanishing at once.
+    const fade = Math.max(0, Math.min(1, (24 - level) / 6))
+    const previewMs = Math.round(Math.max(0, 1500 + board.pairs * 250 - level * 90) * (level < 18 ? 1 : fade))
     return {
+      level,
       cols: board.cols,
       rows: board.rows,
       cards,
@@ -107,7 +111,11 @@ export const pairs: BrainGameDef<PairsState> = {
     const found = s.matched.filter(Boolean).length
     return { correct: found === s.cards.length && !s.timedOut, accuracy: found / s.cards.length }
   },
-  timeLimitMs: (s) => 6000 + (s.cards.length / 2) * 6000,
+  timeLimitMs: (s) => {
+    const pairsCount = s.cards.length / 2
+    return Math.round(Math.max(4000 + pairsCount * 2500, (6000 + pairsCount * 6000) * Math.pow(0.97, Math.max(0, s.level - 24))))
+  },
+  maxLevel: () => 50,
   view(s) {
     const cells: CellView[] = s.cards.map((face, i) => {
       if (s.matched[i]) return { label: face, tone: 'matched' }

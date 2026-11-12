@@ -59,6 +59,8 @@ export interface RoundStats {
   /** Span games: the longest length passed. Others: the highest level reached. */
   bestLevel: number
   startedAt: number
+  /** Time actually played, ms — wall clock minus paused time. Set when the round ends. */
+  activeMs: number
   endedBy: 'lives' | 'cap' | 'stop' | null
   isNewBest: boolean
 }
@@ -87,6 +89,10 @@ interface State {
   /** Paused by the player: every clock stops; the input clock resumes where it was. */
   paused: boolean
   pausedAt: number | null
+  /** Total paused time so far, for the round's active time. */
+  pausedMs: number
+  /** Voided trials in a row. After a few, Quick Eye accepts the real exposure; after more, the round ends. */
+  voidRun: number
   recentSigs: string[]
   correctRts: number[]
   /** Voids from mismatched frames since the floor last moved (stalls and hidden tabs don't count). */
@@ -102,12 +108,15 @@ type Action =
   | { type: 'inputStarted'; now: number }
   | { type: 'exposed'; actualMs: number; frameMs: number; now: number }
   | { type: 'next'; level: number; variant: number; seed: number; endPractice: boolean }
-  | { type: 'end'; reason: 'lives' | 'cap' | 'stop' }
+  | { type: 'end'; reason: 'lives' | 'cap' | 'stop'; now: number }
   | { type: 'pause'; now: number }
   | { type: 'resume'; now: number }
   | { type: 'best'; isNewBest: boolean }
 
 const RECENT_SIGS = 12
+/** Voids in a row after which Quick Eye takes the measured exposure as it is, and then ends the round. */
+const LENIENT_AFTER_VOIDS = 5
+const END_AFTER_VOIDS = 8
 const REVEAL = { right: 700, wrong: 1500, quickEyeRight: 900, quickEyeWrong: 1400, void: 250 }
 
 function buildCtx(s: Pick<State, 'platform' | 'centerOnly' | 'lives' | 'minExposureMs'>, variant: number): CreateContext {
@@ -119,6 +128,12 @@ function buildCtx(s: Pick<State, 'platform' | 'centerOnly' | 'lives' | 'minExpos
     livesLeft: s.lives,
     variant,
   }
+}
+
+/** The level past which this game's puzzle stops changing on this screen (see BrainGameDef.maxLevel). */
+function levelCap(gameId: BrainGameId, s: Pick<State, 'platform' | 'centerOnly' | 'lives' | 'minExposureMs'>): number {
+  const def = brainGame(gameId).def
+  return def.maxLevel ? def.maxLevel(buildCtx(s, 1)) : Infinity
 }
 
 function newTrial(gameId: BrainGameId, level: number, seed: number, ctx: CreateContext, recentSigs: string[]) {
@@ -151,6 +166,7 @@ function judge(state: State, round: State['round'], now: number, timedOut: boole
       ...state,
       round,
       timedOut,
+      voidRun: state.voidRun + 1,
       frameVoids: tooMany ? 0 : frameVoids,
       minExposureMs: tooMany ? raiseFloor(state.minExposureMs) : state.minExposureMs,
       result: { correct: false, timedOut, void: true, practice: state.trialIsPractice, points: 0, livesLost: 0, levelBefore: state.level, levelAfter: state.level },
@@ -163,6 +179,7 @@ function judge(state: State, round: State['round'], now: number, timedOut: boole
       ...state,
       round,
       timedOut,
+      voidRun: 0,
       practiceLeft: Math.max(0, state.practiceLeft - 1),
       result: { correct: outcome.correct, timedOut, void: false, practice: true, points: 0, livesLost: 0, levelBefore: state.level, levelAfter: state.level },
     }
@@ -170,9 +187,11 @@ function judge(state: State, round: State['round'], now: number, timedOut: boole
 
   const median = recentMedian(state.correctRts)
   const fast = outcome.correct && rt !== null && median !== null && rt < median
-  const levelAfter = stepLevel(state.group, state.level, outcome.correct, outcome.accuracy, state.trialInRound)
-  // In a relaxed-timing mode a timeout still moves the level down but costs no life.
-  const forgivenTimeout = timedOut && state.timing !== 1
+  const levelAfter = Math.min(levelCap(state.gameId, state), stepLevel(state.group, state.level, outcome.correct, outcome.accuracy, state.trialInRound))
+  // In a relaxed-timing mode a timeout still moves the level down but costs no life — except a span
+  // trial with nothing entered: waiting out a length the player cannot recall would otherwise loop
+  // at that length forever, since a miss never moves a span level.
+  const forgivenTimeout = timedOut && state.timing !== 1 && (state.group !== 'span' || outcome.accuracy > 0)
   let livesLost = outcome.livesSpent ?? (outcome.correct || forgivenTimeout ? 0 : 1)
   let lives: number
   if (state.group === 'span') {
@@ -189,6 +208,7 @@ function judge(state: State, round: State['round'], now: number, timedOut: boole
     round,
     timedOut,
     lives,
+    voidRun: 0,
     trialInRound: state.trialInRound + 1,
     correctRts: outcome.correct && rt !== null ? [...state.correctRts, rt].slice(-20) : state.correctRts,
     result: { correct: outcome.correct, timedOut, void: false, practice: false, points, livesLost, levelBefore: state.level, levelAfter },
@@ -223,7 +243,7 @@ function reducer(state: State, action: Action): State {
     }
     case 'exposed':
       if (state.result || state.over || !def.exposed) return state
-      return judge(state, def.exposed(state.round, action.actualMs, action.frameMs), action.now, false, true)
+      return judge(state, def.exposed(state.round, action.actualMs, action.frameMs, state.voidRun >= LENIENT_AFTER_VOIDS), action.now, false, true)
     case 'inputStarted':
       return state.inputStartedAt === null ? { ...state, inputStartedAt: action.now } : state
     case 'next': {
@@ -231,12 +251,13 @@ function reducer(state: State, action: Action): State {
       const lives = action.endPractice ? rules.lives : state.lives
       const practice = !action.endPractice && state.practiceLeft > 0
       const ctx = buildCtx({ ...state, lives }, action.variant)
-      const { round, sig } = newTrial(state.gameId, action.level, action.seed, ctx, state.recentSigs)
+      const level = Math.min(levelCap(state.gameId, state), action.level)
+      const { round, sig } = newTrial(state.gameId, level, action.seed, ctx, state.recentSigs)
       return {
         ...state,
         round,
         trialId: state.trialId + 1,
-        level: action.level,
+        level,
         lives,
         practiceLeft: action.endPractice ? 0 : state.practiceLeft,
         trialIsPractice: practice,
@@ -244,11 +265,15 @@ function reducer(state: State, action: Action): State {
         timedOut: false,
         result: null,
         recentSigs: [...state.recentSigs, sig].slice(-RECENT_SIGS),
-        stats: action.endPractice ? { ...state.stats, levelStart: action.level, levelEnd: action.level, bestLevel: action.level } : state.stats,
+        stats: action.endPractice ? { ...state.stats, levelStart: level, levelEnd: level, bestLevel: level } : state.stats,
       }
     }
-    case 'end':
-      return state.over ? state : { ...state, over: true, paused: false, stats: { ...state.stats, endedBy: action.reason } }
+    case 'end': {
+      if (state.over) return state
+      const held = state.paused && state.pausedAt !== null ? action.now - state.pausedAt : 0
+      const activeMs = Math.max(0, action.now - state.stats.startedAt - state.pausedMs - held)
+      return { ...state, over: true, paused: false, stats: { ...state.stats, endedBy: action.reason, activeMs } }
+    }
     case 'pause': {
       // Not mid-exposure: a Quick Eye stimulus is a few frames long and pausing it would void it.
       const view = def.view(state.round)
@@ -262,6 +287,7 @@ function reducer(state: State, action: Action): State {
         ...state,
         paused: false,
         pausedAt: null,
+        pausedMs: state.pausedMs + held,
         inputStartedAt: state.inputStartedAt === null ? null : state.inputStartedAt + held,
       }
     }
@@ -274,7 +300,7 @@ function init({ gameId, platform }: { gameId: BrainGameId; platform: PlatformCon
   const progress = useBrainStore.getState().progress
   const entry = brainGame(gameId)
   const rules = GROUP_RULES[entry.group]
-  const level = gameProgress(progress, gameId).level
+  const stored = gameProgress(progress, gameId).level
   const practiceLeft = progress.practiced.includes(gameId) ? 0 : PRACTICE_TRIALS
   const base = {
     platform,
@@ -282,6 +308,8 @@ function init({ gameId, platform }: { gameId: BrainGameId; platform: PlatformCon
     lives: rules.lives,
     minExposureMs: platform.minExposureMs,
   }
+  // A level earned on a wider screen (or before a cap existed) starts at this screen's ceiling.
+  const level = Math.min(levelCap(gameId, base), stored)
   const { round, sig } = newTrial(gameId, level, randomSeed(), buildCtx(base, progress.quickEye.variant), [])
   return {
     gameId,
@@ -303,6 +331,8 @@ function init({ gameId, platform }: { gameId: BrainGameId; platform: PlatformCon
     finalized: false,
     paused: false,
     pausedAt: null,
+    pausedMs: 0,
+    voidRun: 0,
     recentSigs: [sig],
     correctRts: [],
     frameVoids: 0,
@@ -317,6 +347,7 @@ function init({ gameId, platform }: { gameId: BrainGameId; platform: PlatformCon
       levelEnd: level,
       bestLevel: level,
       startedAt: Date.now(),
+      activeMs: 0,
       endedBy: null,
       isNewBest: false,
     },
@@ -337,10 +368,20 @@ export function useBrainRound(gameId: BrainGameId, platform: PlatformContext) {
   const view: RoundView = def.view(state.round)
 
   // Time passing inside a trial: memorise phases, sequence flashes, Quick Eye's fixation and mask.
+  // A pause keeps what was left of the phase: resuming must not replay a whole memorise phase, or
+  // pausing (or a phone call) would buy unlimited study time.
+  const phase = useRef<{ round: unknown; armedAt: number; wait: number; left: number | null } | null>(null)
   useEffect(() => {
     if (pending === null) return
-    const t = setTimeout(() => dispatch({ type: 'advance', now: Date.now() }), pending)
-    return () => clearTimeout(t)
+    const prior = phase.current
+    const wait = prior && prior.round === state.round && prior.left !== null ? prior.left : pending
+    const armed = { round: state.round as unknown, armedAt: Date.now(), wait, left: null as number | null }
+    phase.current = armed
+    const t = setTimeout(() => dispatch({ type: 'advance', now: Date.now() }), wait)
+    return () => {
+      clearTimeout(t)
+      armed.left = Math.max(0, armed.wait - (Date.now() - armed.armedAt))
+    }
   }, [pending, state.round])
 
   // A Quick Eye stimulus the platform never reported (a hidden tab, a stalled renderer) is voided.
@@ -386,9 +427,12 @@ export function useBrainRound(gameId: BrainGameId, platform: PlatformContext) {
     const delay = result.void ? REVEAL.void : result.correct ? (isQuickEye ? REVEAL.quickEyeRight : REVEAL.right) : isQuickEye ? REVEAL.quickEyeWrong : REVEAL.wrong
     const t = setTimeout(() => {
       const cur = stateRef.current
+      // A device whose flashes never come out right (or a stimulus that never reports) must not
+      // keep the round going forever on trials that do not count.
+      if (result.void && cur.voidRun >= END_AFTER_VOIDS) return dispatch({ type: 'end', reason: 'cap', now: Date.now() })
       if (!result.practice && !result.void) {
-        if (cur.lives <= 0) return dispatch({ type: 'end', reason: 'lives' })
-        if (rules.roundCap !== null && cur.trialInRound >= rules.roundCap) return dispatch({ type: 'end', reason: 'cap' })
+        if (cur.lives <= 0) return dispatch({ type: 'end', reason: 'lives', now: Date.now() })
+        if (rules.roundCap !== null && cur.trialInRound >= rules.roundCap) return dispatch({ type: 'end', reason: 'cap', now: Date.now() })
       }
       const endPractice = result.practice && cur.practiceLeft === 0
       if (endPractice) store.getState().practiced(cur.gameId)
@@ -423,7 +467,7 @@ export function useBrainRound(gameId: BrainGameId, platform: PlatformContext) {
     (actualMs: number, frameMs: number) => dispatch({ type: 'exposed', actualMs, frameMs, now: Date.now() }),
     [],
   )
-  const stop = useCallback(() => dispatch({ type: 'end', reason: 'stop' }), [])
+  const stop = useCallback(() => dispatch({ type: 'end', reason: 'stop', now: Date.now() }), [])
   const pause = useCallback(() => dispatch({ type: 'pause', now: Date.now() }), [])
   const resume = useCallback(() => dispatch({ type: 'resume', now: Date.now() }), [])
 
@@ -453,6 +497,8 @@ export function useBrainRound(gameId: BrainGameId, platform: PlatformContext) {
     stats: state.stats,
     trialInRound: state.trialInRound,
     roundCap: rules.roundCap,
+    /** The taps that answer this trial — for tests and automated play-throughs; never drawn. */
+    solution: busy ? null : def.solution(state.round),
     /** Present while the input clock runs; platforms animate a bar from it. */
     timer:
       state.inputStartedAt !== null && !busy && limit !== null && !state.paused

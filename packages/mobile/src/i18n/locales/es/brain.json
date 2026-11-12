@@ -22,10 +22,10 @@
     "quitTitle": "Entrenamiento detenido",
     "quitBody": "Tus registros hasta ahora se han guardado. Como no lo terminaste, no cuenta como sesión completada.",
     "backHome": "Volver a Entrenamiento mental",
-    "kicker": "3 times a week",
-    "lineup": "Today's line-up",
+    "kicker": "3 veces por semana",
+    "lineup": "Juegos de hoy",
     "minutesShort": "{{value}} min",
-    "stopBody": "Everything so far is saved, but an unfinished session doesn't count as a completed one."
+    "stopBody": "Lo hecho queda guardado, pero una sesión sin terminar no cuenta como completada."
   },
   "home": {
     "freePlay": "Práctica libre",
@@ -33,7 +33,7 @@
     "level": "Nv. {{level}}",
     "best": "Mejor Nv. {{level}}",
     "new": "Nuevo",
-    "quickEyeLevel": "Etapa {{stage}} · velocidad {{speed}}/12",
+    "quickEyeLevel": "Etapa {{stage}} · {{ms}} ms",
     "record": "Mejor: {{value}} pts",
     "settings": "Ajustes",
     "research": "Estudios de referencia",
@@ -51,10 +51,10 @@
     "centerOnlyHelp": "Actívalo si te cuesta ver la estrella de los bordes. Solo responderás la imagen del centro.",
     "flash": "Ojo rápido muestra imágenes durante muy poco tiempo. Si eres sensible a las luces intermitentes, tómatelo con calma.",
     "close": "Cerrar",
-    "sound": "Sound effects",
-    "soundHelp": "A short sound when you get one right or wrong.",
-    "haptics": "Vibration",
-    "hapticsHelp": "A short vibration when you get one right or wrong. Same as the app-wide vibration setting."
+    "sound": "Efectos de sonido",
+    "soundHelp": "Un sonido breve al acertar o fallar.",
+    "haptics": "Vibración",
+    "hapticsHelp": "Una vibración breve al acertar o fallar. Es el mismo ajuste de vibración de toda la app."
   },
   "skills": {
     "memory": "Memoria",
@@ -136,18 +136,18 @@
     "resume": "Reanudar",
     "stop": "Terminar",
     "stopConfirm": "¿Terminar aquí? Tus registros hasta ahora quedan guardados.",
-    "go": "Go!",
-    "back": "Back",
-    "streakCount": "{{value}} in a row",
-    "streakBanner": "{{value}} in a row!",
-    "levelUpBanner": "Level up! Lv. {{level}}",
-    "fasterBanner": "Faster!",
-    "roundOver": "Round over",
-    "roundCleared": "Round cleared!",
-    "stopTitle": "Stop here?",
-    "stopBody": "Everything so far is saved.",
-    "keepPlaying": "Keep playing",
-    "stopNow": "Stop"
+    "go": "¡Ya!",
+    "back": "Volver",
+    "streakCount": "{{value}} seguidas",
+    "streakBanner": "¡{{value}} seguidas!",
+    "levelUpBanner": "¡Subes de nivel! Nv. {{level}}",
+    "fasterBanner": "¡Más rápido!",
+    "roundOver": "Fin de la ronda",
+    "roundCleared": "¡Ronda superada!",
+    "stopTitle": "¿Parar aquí?",
+    "stopBody": "Todo lo hecho hasta ahora queda guardado.",
+    "keepPlaying": "Seguir jugando",
+    "stopNow": "Parar"
   },
   "quickEye": {
     "watch": "Mira el centro",
@@ -169,7 +169,7 @@
       "6": "Izquierda",
       "7": "Arriba a la izquierda"
     },
-    "speedStep": "Speed {{step}}/12"
+    "flashMs": "Destello {{ms}} ms"
   },
   "summary": {
     "livesOut": "Ronda terminada",
@@ -184,11 +184,11 @@
     "newBest": "Mejor puntuación personal",
     "again": "Jugar otra vez",
     "home": "Todos los juegos",
-    "stars": "{{value}} stars",
-    "time": "Time",
-    "trend": "Level, recent rounds",
-    "otherGames": "Other games",
-    "minutes": "Minutes"
+    "stars": "{{value}} estrellas",
+    "time": "Tiempo",
+    "trend": "Nivel en las últimas rondas",
+    "otherGames": "Otros juegos",
+    "minutes": "Minutos"
   },
   "colors": {
     "red": "ROJO",
@@ -199,14 +199,14 @@
     "orange": "NARANJA"
   },
   "intro": {
-    "howTo": "How to play",
-    "replay": "Replay",
-    "start": "Start",
-    "practiceNote": "The first 4 are practice. They cost no chances and score no points.",
-    "level": "Level",
-    "speed": "Speed",
-    "stage": "Stage",
-    "rounds": "Played",
-    "best": "Best score"
+    "howTo": "Cómo se juega",
+    "replay": "Ver de nuevo",
+    "start": "Empezar",
+    "practiceNote": "Las 4 primeras son de práctica: no gastan oportunidades ni suman puntos.",
+    "level": "Nivel",
+    "speed": "Velocidad",
+    "stage": "Etapa",
+    "rounds": "Partidas",
+    "best": "Mejor puntuación"
   }
 }

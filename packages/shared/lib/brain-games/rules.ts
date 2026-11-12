@@ -27,7 +27,10 @@ export interface GroupRules {
   /** Level change on a right answer, and on a wrong one (span: wrong does not move the level). */
   up: number
   down: number
-  /** Trials after which the round ends as cleared; null = no cap. */
+  /**
+   * Trials after which the round ends as cleared. Span rounds are capped too (14): the Corsi rule
+   * alone never ends a round for a player who keeps passing.
+   */
   roundCap: number | null
   min: number
   max: number
@@ -38,7 +41,7 @@ export interface GroupRules {
 export const GROUP_RULES: Record<GameGroup, GroupRules> = {
   speed: { lives: 3, up: 0.15, down: 0.85, roundCap: 20, min: 1, max: Infinity, restartDrop: 0.5 },
   quickEye: { lives: 5, up: 0.25, down: 1.0, roundCap: 30, min: 0, max: 12, restartDrop: 1.0 },
-  span: { lives: 2, up: 1, down: 0, roundCap: null, min: 1, max: Infinity, restartDrop: 2 },
+  span: { lives: 2, up: 1, down: 0, roundCap: 14, min: 1, max: Infinity, restartDrop: 2 },
 }
 
 /** Trials at the start of a round that take double steps. */

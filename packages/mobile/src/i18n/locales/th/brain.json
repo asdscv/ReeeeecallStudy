@@ -22,10 +22,10 @@
     "quitTitle": "หยุดการฝึกแล้ว",
     "quitBody": "บันทึกที่ผ่านมาถูกเก็บไว้แล้ว แต่เพราะยังไม่จบ จึงไม่นับเป็นการฝึกที่ทำครบ",
     "backHome": "กลับไปที่ฝึกสมอง",
-    "kicker": "3 times a week",
-    "lineup": "Today's line-up",
-    "minutesShort": "{{value}} min",
-    "stopBody": "Everything so far is saved, but an unfinished session doesn't count as a completed one."
+    "kicker": "สัปดาห์ละ 3 ครั้ง",
+    "lineup": "รายการวันนี้",
+    "minutesShort": "{{value}} นาที",
+    "stopBody": "ทุกอย่างที่เล่นมาถูกบันทึกไว้ แต่ถ้าไม่เล่นจนจบจะไม่นับเป็นการฝึกที่ทำครบ"
   },
   "home": {
     "freePlay": "ฝึกอิสระ",
@@ -33,7 +33,7 @@
     "level": "Lv. {{level}}",
     "best": "สูงสุด Lv. {{level}}",
     "new": "ใหม่",
-    "quickEyeLevel": "ด่าน {{stage}} · ความเร็ว {{speed}}/12",
+    "quickEyeLevel": "ด่าน {{stage}} · {{ms}} มิลลิวินาที",
     "record": "สูงสุด {{value}} คะแนน",
     "settings": "ตั้งค่า",
     "research": "งานวิจัยอ้างอิง",
@@ -51,10 +51,10 @@
     "centerOnlyHelp": "เปิดไว้หากมองดาวที่ขอบได้ยาก คุณจะตอบแค่ภาพตรงกลาง",
     "flash": "ตาไวจะแสดงภาพเพียงชั่วพริบตา หากคุณไวต่อแสงกะพริบ โปรดอย่าฝืนเล่น",
     "close": "ปิด",
-    "sound": "Sound effects",
-    "soundHelp": "A short sound when you get one right or wrong.",
-    "haptics": "Vibration",
-    "hapticsHelp": "A short vibration when you get one right or wrong. Same as the app-wide vibration setting."
+    "sound": "เสียงเอฟเฟกต์",
+    "soundHelp": "มีเสียงสั้นๆ เมื่อตอบถูกหรือผิด",
+    "haptics": "การสั่น",
+    "hapticsHelp": "สั่นสั้นๆ เมื่อตอบถูกหรือผิด ใช้การตั้งค่าเดียวกับการสั่นของทั้งแอป"
   },
   "skills": {
     "memory": "ความจำ",
@@ -136,18 +136,18 @@
     "resume": "เล่นต่อ",
     "stop": "จบ",
     "stopConfirm": "จบตรงนี้ไหม? บันทึกที่ผ่านมาจะถูกเก็บไว้",
-    "go": "Go!",
-    "back": "Back",
-    "streakCount": "{{value}} in a row",
-    "streakBanner": "{{value}} in a row!",
-    "levelUpBanner": "Level up! Lv. {{level}}",
-    "fasterBanner": "Faster!",
-    "roundOver": "Round over",
-    "roundCleared": "Round cleared!",
-    "stopTitle": "Stop here?",
-    "stopBody": "Everything so far is saved.",
-    "keepPlaying": "Keep playing",
-    "stopNow": "Stop"
+    "go": "เริ่ม!",
+    "back": "กลับ",
+    "streakCount": "ถูกติดกัน {{value}}",
+    "streakBanner": "ถูกติดกัน {{value}} ข้อ!",
+    "levelUpBanner": "เลเวลอัป! Lv. {{level}}",
+    "fasterBanner": "เร็วขึ้นแล้ว!",
+    "roundOver": "จบรอบ",
+    "roundCleared": "ผ่านรอบแล้ว!",
+    "stopTitle": "หยุดตรงนี้ไหม?",
+    "stopBody": "ทุกอย่างที่เล่นมาถูกบันทึกไว้แล้ว",
+    "keepPlaying": "เล่นต่อ",
+    "stopNow": "หยุด"
   },
   "quickEye": {
     "watch": "มองตรงกลาง",
@@ -169,7 +169,7 @@
       "6": "ซ้าย",
       "7": "ซ้ายบน"
     },
-    "speedStep": "Speed {{step}}/12"
+    "flashMs": "แสดง {{ms}} มิลลิวินาที"
   },
   "summary": {
     "livesOut": "จบรอบ",
@@ -184,11 +184,11 @@
     "newBest": "คะแนนสูงสุดส่วนตัว",
     "again": "เล่นอีกครั้ง",
     "home": "เกมทั้งหมด",
-    "stars": "{{value}} stars",
-    "time": "Time",
-    "trend": "Level, recent rounds",
-    "otherGames": "Other games",
-    "minutes": "Minutes"
+    "stars": "{{value}} ดาว",
+    "time": "เวลา",
+    "trend": "เลเวลในรอบล่าสุด",
+    "otherGames": "เกมอื่น",
+    "minutes": "นาที"
   },
   "colors": {
     "red": "แดง",
@@ -199,14 +199,14 @@
     "orange": "ส้ม"
   },
   "intro": {
-    "howTo": "How to play",
-    "replay": "Replay",
-    "start": "Start",
-    "practiceNote": "The first 4 are practice. They cost no chances and score no points.",
-    "level": "Level",
-    "speed": "Speed",
-    "stage": "Stage",
-    "rounds": "Played",
-    "best": "Best score"
+    "howTo": "วิธีเล่น",
+    "replay": "ดูอีกครั้ง",
+    "start": "เริ่ม",
+    "practiceNote": "4 ข้อแรกเป็นการฝึก ไม่เสียโอกาสและไม่นับคะแนน",
+    "level": "เลเวล",
+    "speed": "ความเร็ว",
+    "stage": "ด่าน",
+    "rounds": "เล่นแล้ว",
+    "best": "คะแนนสูงสุด"
   }
 }

@@ -22,10 +22,10 @@
     "quitTitle": "トレーニングを中断しました",
     "quitBody": "ここまでの記録は保存されました。最後まで終えていないため、完了したトレーニングには数えません。",
     "backHome": "脳トレに戻る",
-    "kicker": "3 times a week",
-    "lineup": "Today's line-up",
-    "minutesShort": "{{value}} min",
-    "stopBody": "Everything so far is saved, but an unfinished session doesn't count as a completed one."
+    "kicker": "週3回のルーティン",
+    "lineup": "今日のメニュー",
+    "minutesShort": "{{value}}分",
+    "stopBody": "ここまでの記録は保存されますが、最後まで終えないと完了したトレーニングには数えません。"
   },
   "home": {
     "freePlay": "自由練習",
@@ -33,7 +33,7 @@
     "level": "Lv. {{level}}",
     "best": "最高 Lv. {{level}}",
     "new": "NEW",
-    "quickEyeLevel": "ステージ{{stage}} · スピード {{speed}}/12",
+    "quickEyeLevel": "ステージ{{stage}} · {{ms}}ms",
     "record": "最高 {{value}}点",
     "settings": "設定",
     "research": "研究の根拠",
@@ -51,10 +51,10 @@
     "centerOnlyHelp": "端に出る星が見えにくい場合はオンにしてください。中央の絵だけに答えます。",
     "flash": "クイックアイでは絵がごく短い時間だけ表示されます。光の点滅に敏感な方は無理をしないでください。",
     "close": "閉じる",
-    "sound": "Sound effects",
-    "soundHelp": "A short sound when you get one right or wrong.",
-    "haptics": "Vibration",
-    "hapticsHelp": "A short vibration when you get one right or wrong. Same as the app-wide vibration setting."
+    "sound": "効果音",
+    "soundHelp": "正解・不正解のときに短い音が鳴ります。",
+    "haptics": "バイブレーション",
+    "hapticsHelp": "正解・不正解のときに短く振動します。アプリ全体の振動設定と同じです。"
   },
   "skills": {
     "memory": "記憶",
@@ -136,18 +136,18 @@
     "resume": "再開",
     "stop": "終了",
     "stopConfirm": "ここで終了しますか？ここまでの記録は保存されます。",
-    "go": "Go!",
-    "back": "Back",
-    "streakCount": "{{value}} in a row",
-    "streakBanner": "{{value}} in a row!",
-    "levelUpBanner": "Level up! Lv. {{level}}",
-    "fasterBanner": "Faster!",
-    "roundOver": "Round over",
-    "roundCleared": "Round cleared!",
-    "stopTitle": "Stop here?",
-    "stopBody": "Everything so far is saved.",
-    "keepPlaying": "Keep playing",
-    "stopNow": "Stop"
+    "go": "スタート！",
+    "back": "戻る",
+    "streakCount": "{{value}}連続",
+    "streakBanner": "{{value}}問連続正解！",
+    "levelUpBanner": "レベルアップ！ Lv. {{level}}",
+    "fasterBanner": "もっと速く！",
+    "roundOver": "ラウンド終了",
+    "roundCleared": "ラウンドクリア！",
+    "stopTitle": "ここでやめますか？",
+    "stopBody": "ここまでの記録は保存されます。",
+    "keepPlaying": "続ける",
+    "stopNow": "やめる"
   },
   "quickEye": {
     "watch": "中央を見て",
@@ -169,7 +169,7 @@
       "6": "左",
       "7": "左上"
     },
-    "speedStep": "Speed {{step}}/12"
+    "flashMs": "表示 {{ms}}ms"
   },
   "summary": {
     "livesOut": "ラウンド終了",
@@ -184,11 +184,11 @@
     "newBest": "自己ベストスコア",
     "again": "もう一度",
     "home": "ゲーム一覧",
-    "stars": "{{value}} stars",
-    "time": "Time",
-    "trend": "Level, recent rounds",
-    "otherGames": "Other games",
-    "minutes": "Minutes"
+    "stars": "星{{value}}つ",
+    "time": "時間",
+    "trend": "最近のラウンドのレベル",
+    "otherGames": "ほかのゲーム",
+    "minutes": "分"
   },
   "colors": {
     "red": "あか",
@@ -199,14 +199,14 @@
     "orange": "オレンジ"
   },
   "intro": {
-    "howTo": "How to play",
-    "replay": "Replay",
-    "start": "Start",
-    "practiceNote": "The first 4 are practice. They cost no chances and score no points.",
-    "level": "Level",
-    "speed": "Speed",
-    "stage": "Stage",
-    "rounds": "Played",
-    "best": "Best score"
+    "howTo": "遊び方",
+    "replay": "もう一度見る",
+    "start": "スタート",
+    "practiceNote": "最初の4問は練習です。チャンスは減らず、点数も入りません。",
+    "level": "レベル",
+    "speed": "速さ",
+    "stage": "ステージ",
+    "rounds": "プレイ回数",
+    "best": "最高スコア"
   }
 }

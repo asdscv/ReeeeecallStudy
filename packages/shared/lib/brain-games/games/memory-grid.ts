@@ -18,15 +18,30 @@ export interface MemoryGridState {
   timedOut: boolean
 }
 
+const MIN_SHOW_MS = 500
+
+/** Cells the largest grid on this screen holds. */
+function capacity(maxCols: number): { n: number; k: number } {
+  const n = Math.max(3, Math.min(7, maxCols))
+  return { n, k: Math.floor(n * n * 0.45) }
+}
+
 export const memoryGrid: BrainGameDef<MemoryGridState> = {
   id: 'memoryGrid',
+  // Past the largest grid only the show time shrinks; once it reaches its floor the puzzle no
+  // longer changes, so the length stops there (it depends on how big a grid this screen fits).
+  maxLevel(ctx) {
+    const { k } = capacity(ctx.maxCols)
+    const overflow = Math.ceil((1200 + k * 250 - MIN_SHOW_MS) / 120)
+    return k + overflow - 2
+  },
   create(level, rng, ctx) {
     const wanted = 2 + Math.max(1, Math.round(level))
     const n = clamp(Math.ceil(Math.sqrt(wanted * 2.6)), 3, Math.max(3, Math.min(7, ctx.maxCols)))
     const k = Math.min(wanted, Math.floor(n * n * 0.45))
     // Past the largest grid the only lever left is time, so it keeps shrinking with the level.
     const overflow = Math.max(0, wanted - k)
-    const showMs = Math.max(1000, 1200 + k * 250 - overflow * 120)
+    const showMs = Math.max(MIN_SHOW_MS, 1200 + k * 250 - overflow * 120)
     return {
       n,
       targets: rng.sample(range(n * n), k).sort((a, b) => a - b),

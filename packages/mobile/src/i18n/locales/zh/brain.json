@@ -22,10 +22,10 @@
     "quitTitle": "训练已停止",
     "quitBody": "目前的记录已保存。因为没有完成，不计入已完成的训练。",
     "backHome": "返回大脑训练",
-    "kicker": "3 times a week",
-    "lineup": "Today's line-up",
-    "minutesShort": "{{value}} min",
-    "stopBody": "Everything so far is saved, but an unfinished session doesn't count as a completed one."
+    "kicker": "每周 3 次",
+    "lineup": "今日安排",
+    "minutesShort": "{{value}} 分钟",
+    "stopBody": "到目前为止的记录已保存，但没有完成的训练不算作完成一次。"
   },
   "home": {
     "freePlay": "自由练习",
@@ -33,7 +33,7 @@
     "level": "Lv. {{level}}",
     "best": "最高 Lv. {{level}}",
     "new": "新",
-    "quickEyeLevel": "第{{stage}}阶段 · 速度 {{speed}}/12",
+    "quickEyeLevel": "第{{stage}}阶段 · {{ms}} 毫秒",
     "record": "最高 {{value}} 分",
     "settings": "设置",
     "research": "研究依据",
@@ -51,10 +51,10 @@
     "centerOnlyHelp": "如果边缘的星星不容易看清，可以打开此项。只需回答中间的图案。",
     "flash": "快眼中的图案只会极短暂地出现。如果你对闪光敏感，请不要勉强。",
     "close": "关闭",
-    "sound": "Sound effects",
-    "soundHelp": "A short sound when you get one right or wrong.",
-    "haptics": "Vibration",
-    "hapticsHelp": "A short vibration when you get one right or wrong. Same as the app-wide vibration setting."
+    "sound": "音效",
+    "soundHelp": "答对或答错时会有短促的提示音。",
+    "haptics": "振动",
+    "hapticsHelp": "答对或答错时短暂振动。与整个应用的振动设置相同。"
   },
   "skills": {
     "memory": "记忆",
@@ -136,18 +136,18 @@
     "resume": "继续",
     "stop": "结束",
     "stopConfirm": "要在这里结束吗？目前的记录会保存。",
-    "go": "Go!",
-    "back": "Back",
-    "streakCount": "{{value}} in a row",
-    "streakBanner": "{{value}} in a row!",
-    "levelUpBanner": "Level up! Lv. {{level}}",
-    "fasterBanner": "Faster!",
-    "roundOver": "Round over",
-    "roundCleared": "Round cleared!",
-    "stopTitle": "Stop here?",
-    "stopBody": "Everything so far is saved.",
-    "keepPlaying": "Keep playing",
-    "stopNow": "Stop"
+    "go": "开始！",
+    "back": "返回",
+    "streakCount": "连对{{value}}题",
+    "streakBanner": "连续答对{{value}}题！",
+    "levelUpBanner": "升级！Lv. {{level}}",
+    "fasterBanner": "更快了！",
+    "roundOver": "本轮结束",
+    "roundCleared": "本轮通关！",
+    "stopTitle": "要在这里停下吗？",
+    "stopBody": "到目前为止的记录都已保存。",
+    "keepPlaying": "继续玩",
+    "stopNow": "停止"
   },
   "quickEye": {
     "watch": "看中间",
@@ -169,7 +169,7 @@
       "6": "左",
       "7": "左上"
     },
-    "speedStep": "Speed {{step}}/12"
+    "flashMs": "显示 {{ms}} 毫秒"
   },
   "summary": {
     "livesOut": "本轮结束",
@@ -184,11 +184,11 @@
     "newBest": "个人最高分",
     "again": "再玩一次",
     "home": "全部游戏",
-    "stars": "{{value}} stars",
-    "time": "Time",
-    "trend": "Level, recent rounds",
-    "otherGames": "Other games",
-    "minutes": "Minutes"
+    "stars": "{{value}} 颗星",
+    "time": "用时",
+    "trend": "最近几轮的等级",
+    "otherGames": "其他游戏",
+    "minutes": "分钟"
   },
   "colors": {
     "red": "红",
@@ -199,14 +199,14 @@
     "orange": "橙"
   },
   "intro": {
-    "howTo": "How to play",
-    "replay": "Replay",
-    "start": "Start",
-    "practiceNote": "The first 4 are practice. They cost no chances and score no points.",
-    "level": "Level",
-    "speed": "Speed",
-    "stage": "Stage",
-    "rounds": "Played",
-    "best": "Best score"
+    "howTo": "玩法",
+    "replay": "再看一遍",
+    "start": "开始",
+    "practiceNote": "前 4 题是练习，不扣机会，也不计分。",
+    "level": "等级",
+    "speed": "速度",
+    "stage": "阶段",
+    "rounds": "已玩",
+    "best": "最高分"
   }
 }

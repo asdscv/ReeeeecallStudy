@@ -9,6 +9,7 @@ import type { BrainGameDef, CellView } from '../types'
  * last tier instead of topping out.
  */
 export interface OddOneOutState {
+  level: number
   cols: number
   rows: number
   common: string
@@ -38,7 +39,7 @@ const LOOKALIKES: readonly (readonly [string, string])[][] = [
   [
     ['O', 'Q'], ['b', 'd'], ['p', 'q'], ['6', '9'], ['E', 'F'], ['M', 'N'],
     ['8', 'B'], ['人', '入'], ['土', '士'], ['未', '末'], ['大', '太'], ['日', '曰'],
-    ['C', 'G'], ['l', 'I'], ['5', 'S'], ['u', 'v'],
+    ['C', 'G'], ['5', 'S'], ['u', 'v'],
   ],
 ]
 
@@ -66,6 +67,7 @@ export const oddOneOut: BrainGameDef<OddOneOutState> = {
       ;[common, odd] = rng.chance(0.5) ? [pair[0], pair[1]] : [pair[1], pair[0]]
     }
     return {
+      level,
       cols: n,
       rows: n,
       common,
@@ -88,7 +90,12 @@ export const oddOneOut: BrainGameDef<OddOneOutState> = {
     const correct = s.picked === s.oddIndex && !s.timedOut
     return { correct, accuracy: correct ? 1 : 0 }
   },
-  timeLimitMs: (s) => 3500 + s.cols * s.rows * 260,
+  // The grid tops out at 7×7 (level 18); from there the clock tightens 3% a level to a floor.
+  timeLimitMs: (s) => {
+    const cells = s.cols * s.rows
+    return Math.round(Math.max(1800 + cells * 90, (3500 + cells * 260) * Math.pow(0.97, Math.max(0, s.level - 18))))
+  },
+  maxLevel: () => 50,
   view(s) {
     const cells: CellView[] = range(s.cols * s.rows).map((i) => {
       const isOdd = i === s.oddIndex

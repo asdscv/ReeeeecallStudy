@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { X, Play, Clock, Target, ListChecks, ArrowRight, Home } from 'lucide-react'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
-import { GAME_THEMES, TRAINING_THEME, brainGame, courseStatus, displayLevel, localDayKey, weekProgress, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
+import { GAME_THEMES, TRAINING_THEME, brainGame, courseStatus, displayLevel, localDayKey, quickEyeMsAt, weekProgress, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
 import { useTodaysTraining } from '@reeeeecall/shared/hooks/useTodaysTraining'
 import type { RoundStats } from '@reeeeecall/shared/hooks/useBrainRound'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
@@ -80,7 +80,7 @@ function Training() {
       </>
     )
   }
-  return <SessionEnd done={s.phase === 'done'} totals={s.totals} startedAt={s.startedAt} />
+  return <SessionEnd done={s.phase === 'done'} totals={s.totals} activeMinutes={s.activeMinutes} />
 }
 
 /** The session's line-up before it starts: four games, about how long, one start. */
@@ -145,14 +145,14 @@ function Lineup({ games, minutes, onStart, onClose }: { games: BrainGameId[]; mi
 }
 
 /** Session complete (or stopped): the week ring fills, the course moves, each game's change. */
-function SessionEnd({ done, totals, startedAt }: { done: boolean; totals: ReturnType<typeof useTodaysTraining>['totals']; startedAt: number }) {
+function SessionEnd({ done, totals, activeMinutes }: { done: boolean; totals: ReturnType<typeof useTodaysTraining>['totals']; activeMinutes: number }) {
   const { t } = useTranslation('brain')
   const progress = useBrainStore((st) => st.progress)
   const today = localDayKey()
   const week = weekProgress(progress, today)
   const course = courseStatus(progress, today)
   const accuracy = totals.trials > 0 ? Math.round((totals.correct / totals.trials) * 100) : 0
-  const [minutes] = useState(() => Math.max(1, Math.round((Date.now() - startedAt) / 60_000)))
+  const minutes = Math.max(1, Math.round(activeMinutes))
   const levels = Object.entries(totals.levels) as [BrainGameId, { start: number; end: number }][]
   useEffect(() => {
     if (done) sfx.play({ kind: 'newBest' })
@@ -192,10 +192,11 @@ function SessionEnd({ done, totals, startedAt }: { done: boolean; totals: Return
         {levels.length > 0 && (
           <ul className="space-y-2">
             {levels.map(([id, l]) => {
-              // Quick Eye's level is a 0-12 speed step, shown whole like on its card.
+              // Quick Eye's level is its flash time: shorter is better.
               const qe = id === 'quickEye'
-              const from = qe ? Math.round(l.start) : displayLevel(l.start)
-              const to = qe ? Math.round(l.end) : displayLevel(l.end)
+              const from = qe ? quickEyeMsAt(l.start) : displayLevel(l.start)
+              const to = qe ? quickEyeMsAt(l.end) : displayLevel(l.end)
+              const better = qe ? to < from : to > from
               const Icon = BRAIN_ICONS[brainGame(id).icon]
               return (
                 <li key={id} className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.07] border border-white/10">
@@ -203,10 +204,10 @@ function SessionEnd({ done, totals, startedAt }: { done: boolean; totals: Return
                     {Icon && <Icon className="w-5 h-5 text-white" aria-hidden="true" />}
                   </span>
                   <span className="flex-1 text-base font-semibold">{t(`games.${id}.name`)}</span>
-                  <span className="flex items-center gap-1.5 text-base tabular-nums" style={{ color: to > from ? '#86EFAC' : 'rgba(255,255,255,0.8)' }}>
-                    {qe ? `${from}/12` : from.toFixed(1)}
+                  <span className="flex items-center gap-1.5 text-base tabular-nums" style={{ color: better ? '#86EFAC' : 'rgba(255,255,255,0.8)' }}>
+                    {qe ? `${from}ms` : from.toFixed(1)}
                     <ArrowRight className="w-4 h-4" aria-hidden="true" />
-                    {qe ? `${to}/12` : to.toFixed(1)}
+                    {qe ? `${to}ms` : to.toFixed(1)}
                   </span>
                 </li>
               )

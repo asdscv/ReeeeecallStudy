@@ -232,11 +232,15 @@ export function parseProgress(raw: string | null | undefined): BrainProgress {
     for (const [id, g] of Object.entries(data.games)) {
       if (!g || typeof g.level !== 'number' || !Number.isFinite(g.level)) continue
       const min = id === 'quickEye' ? 0 : 1
+      // A sane ceiling as well as a floor: a corrupted or edited level (1e308) would otherwise make
+      // the games build absurd puzzles. No game's level means anything past these.
+      const max = id === 'quickEye' ? GROUP_RULES.quickEye.max : 500
       const span = v1 && (id === 'memoryGrid' || id === 'sequence')
       const toLength = (lv: number) => (span ? Math.max(1, 1 + Math.floor((lv - 1) * (id === 'memoryGrid' ? 0.6 : 0.45))) : lv)
+      const clampLv = (lv: number) => Math.min(max, Math.max(min, Number.isFinite(lv) ? lv : min))
       games[id as BrainGameId] = {
-        level: Math.max(min, toLength(g.level)),
-        bestLevel: Math.max(min, toLength(Number(g.bestLevel) || g.level)),
+        level: clampLv(toLength(g.level)),
+        bestLevel: clampLv(toLength(Number(g.bestLevel) || g.level)),
         rounds: num(g.rounds),
         wins: num(g.wins),
       }

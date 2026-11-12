@@ -333,7 +333,7 @@ describe('per-game life rules', () => {
 
   it('Match Pairs does not count turning over unseen cards as mistakes', () => {
     const def = brainGame('pairs').def as Any
-    let s = def.create(20, createRng(11), DEFAULT_CONTEXT) // no preview at this level
+    let s = def.create(24, createRng(11), DEFAULT_CONTEXT) // the preview has tapered away by here
     s = settle(def, s)
     const a = 0
     const b = s.cards.findIndex((c: string, i: number) => i !== a && c !== s.cards[a])
@@ -378,7 +378,7 @@ describe('progress', () => {
 
   it('round-trips, tolerates garbage, and stays small enough for SecureStore', () => {
     let p = emptyProgress()
-    for (const g of BRAIN_GAMES) p = recordRound(p, g.id, { level: 123.45, correct: true, points: 99999, shownMs: 133 }, '2026-11-12')
+    for (const g of BRAIN_GAMES) p = recordRound(p, g.id, { level: g.id === 'quickEye' ? 9 : 123.45, correct: true, points: 99999, shownMs: 133 }, '2026-11-12')
     for (let i = 0; i < 30; i++) p = recordRound(p, 'quickEye', { level: 6.25, correct: i % 3 !== 0, points: 10, shownMs: i % 3 ? 267 : 333 }, '2026-11-12')
     for (let i = 0; i < 20; i++) p = recordSession(p, 23, `2026-11-${String(10 + (i % 18)).padStart(2, '0')}`, null)
     p = { ...p, bestRuns: Object.fromEntries(BRAIN_GAMES.map((g) => [g.id, 123456])), practiced: BRAIN_GAMES.map((g) => g.id) }
@@ -388,6 +388,11 @@ describe('progress', () => {
     expect(parseProgress('not json')).toEqual(emptyProgress())
     expect(parseProgress('{"v":2}')).toEqual(emptyProgress())
     expect(parseProgress('{"v":1,"games":{},"quickEye":{"variant":99,"recentMs":[1,2],"recentOk":"1"}}').quickEye).toMatchObject({ variant: 16, recentMs: [], recentOk: '' })
+    // A corrupted level is clamped, never handed to a game as 1e308 (which hung Quick Math).
+    const huge = parseProgress('{"v":1,"games":{"math":{"level":1e308},"quickEye":{"level":99}},"sessions":{}}')
+    expect(huge.games.math?.level).toBe(500)
+    expect(huge.games.quickEye?.level).toBe(12)
+    expect(brainGame('math').def.create(1e308, createRng(1), DEFAULT_CONTEXT)).toBeTruthy()
   })
 })
 

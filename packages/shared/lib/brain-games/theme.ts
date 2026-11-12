@@ -1,4 +1,4 @@
-import type { BrainGameId } from './types'
+import type { BrainColor, BrainGameId } from './types'
 
 /**
  * Each game's colour identity, shared by web and mobile so a game looks like itself everywhere.
@@ -55,6 +55,20 @@ export const CANVAS_TONES = {
   wrong: '#EF4444',
   done: 'rgba(255,255,255,0.05)',
 } as const
+
+/**
+ * Colour Word inks, on the white stimulus card both platforms draw: each at least 4.5:1 against
+ * white (orange 3.6:1 — still above the 3:1 large-text bar the 40px+ word needs), and each hue far
+ * enough from the others to name at a glance.
+ */
+export const INK_COLORS: Record<BrainColor, string> = {
+  red: '#DC2626',
+  blue: '#2563EB',
+  green: '#15803D',
+  yellow: '#A16207',
+  purple: '#9333EA',
+  orange: '#EA580C',
+}
 
 /** Streak tiers for the combo badge: 3, 6 and 10 in a row. */
 export function streakTier(streak: number): 0 | 1 | 2 | 3 {

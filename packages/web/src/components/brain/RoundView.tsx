@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNo
 import { useTranslation } from 'react-i18next'
 import { X, Pause, Play, Heart, Flame, Check, Trophy, Flag, HeartCrack } from 'lucide-react'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
-import { GAME_THEMES, comboMultiplier, maxColsFor, streakTier, type BrainGameId, type GameTheme } from '@reeeeecall/shared/lib/brain-games'
+import { GAME_THEMES, comboMultiplier, maxColsFor, quickEyeMsAt, streakTier, type BrainGameId, type GameTheme } from '@reeeeecall/shared/lib/brain-games'
 import { useBrainRound, type RoundStats } from '@reeeeecall/shared/hooks/useBrainRound'
 import { useBrainFx, type BrainFx } from '@reeeeecall/shared/hooks/useBrainFx'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
@@ -197,7 +197,7 @@ function Round({ gameId, onOver, caption, width, theme }: { gameId: BrainGameId;
     return () => window.removeEventListener('keydown', onKey)
   })
 
-  const levelText = gameId === 'quickEye' ? `${t('quickEye.stage', { stage: variant })} · ${t('quickEye.speedStep', { step: Math.round(r.level) })}` : t('home.level', { level: r.level.toFixed(1) })
+  const levelText = gameId === 'quickEye' ? `${t('quickEye.stage', { stage: variant })} · ${t('quickEye.flashMs', { ms: quickEyeMsAt(r.level) })}` : t('home.level', { level: r.level.toFixed(1) })
   const resultText = !r.result
     ? null
     : r.result.void

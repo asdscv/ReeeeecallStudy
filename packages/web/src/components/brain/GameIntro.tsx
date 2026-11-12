@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 're
 import { useTranslation } from 'react-i18next'
 import { X, Play, Trophy, Gauge, Sparkles } from 'lucide-react'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
-import { GAME_THEMES, brainGame, displayLevel, gameProgress, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
+import { GAME_THEMES, brainGame, displayLevel, gameProgress, quickEyeMsAt, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
 import { BRAIN_ICONS, cardBackground, focusIfKeyboard } from './brain-ui'
 import { DemoPlayer } from './DemoPlayer'
@@ -100,7 +100,7 @@ export function GameIntro({
         </section>
 
         <div className="mt-4 grid grid-cols-3 gap-2">
-          <IntroStat icon={<Gauge className="w-5 h-5" aria-hidden="true" />} label={qe ? t('intro.speed') : t('intro.level')} value={qe ? (p.rounds > 0 ? `${Math.round(p.level)}/12` : '—') : p.rounds > 0 ? displayLevel(p.level).toFixed(1) : '—'} accent={theme.accent} />
+          <IntroStat icon={<Gauge className="w-5 h-5" aria-hidden="true" />} label={qe ? t('intro.speed') : t('intro.level')} value={qe ? (p.rounds > 0 ? `${quickEyeMsAt(p.level)}ms` : '—') : p.rounds > 0 ? displayLevel(p.level).toFixed(1) : '—'} accent={theme.accent} />
           <IntroStat icon={<Sparkles className="w-5 h-5" aria-hidden="true" />} label={qe ? t('intro.stage') : t('intro.rounds')} value={qe ? String(progress.quickEye.variant) : formatCount(p.rounds)} accent={theme.accent} />
           <IntroStat icon={<Trophy className="w-5 h-5" aria-hidden="true" />} label={t('intro.best')} value={best ? formatCount(best) : '—'} accent={theme.accent} />
         </div>

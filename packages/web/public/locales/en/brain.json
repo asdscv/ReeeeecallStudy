@@ -33,7 +33,7 @@
     "level": "Lv. {{level}}",
     "best": "Best Lv. {{level}}",
     "new": "New",
-    "quickEyeLevel": "Stage {{stage}} · speed {{speed}}/12",
+    "quickEyeLevel": "Stage {{stage}} · {{ms}} ms",
     "record": "Best {{value}} pts",
     "settings": "Settings",
     "research": "Research basis",
@@ -169,7 +169,7 @@
       "6": "Left",
       "7": "Up left"
     },
-    "speedStep": "Speed {{step}}/12"
+    "flashMs": "Flash {{ms}} ms"
   },
   "summary": {
     "livesOut": "Round over",

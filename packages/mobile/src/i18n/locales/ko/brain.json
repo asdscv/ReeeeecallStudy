@@ -33,7 +33,7 @@
     "level": "Lv. {{level}}",
     "best": "최고 Lv. {{level}}",
     "new": "처음",
-    "quickEyeLevel": "{{stage}}단계 · 속도 {{speed}}/12",
+    "quickEyeLevel": "{{stage}}단계 · {{ms}}ms",
     "record": "최고 {{value}}점",
     "settings": "설정",
     "research": "연구 근거",
@@ -169,7 +169,7 @@
       "6": "왼쪽",
       "7": "왼쪽 위"
     },
-    "speedStep": "속도 {{step}}/12"
+    "flashMs": "노출 {{ms}}ms"
   },
   "summary": {
     "livesOut": "라운드 끝",

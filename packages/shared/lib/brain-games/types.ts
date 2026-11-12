@@ -141,8 +141,8 @@ export interface CreateContext {
   /** Quick Eye's current variant (1-based). Other games ignore it. */
   variant: number
   /**
-   * The shortest exposure this platform can show reliably. Web counts display frames and goes
-   * down to one 60Hz frame (17ms); React Native's JS clock is jittery, so it starts at 33ms.
+   * The shortest exposure this platform can show reliably. Both platforms start at two 60Hz frames
+   * (33ms); the round raises it when this device keeps dropping frames.
    */
   minExposureMs: number
   /**
@@ -200,6 +200,14 @@ export interface BrainGameDef<S> {
    * how-to-play demo plays from it, and the tests use it to play every game through.
    */
   solution(s: S): number[] | null
-  /** Quick Eye only: the platform reports how long the stimulus was really on screen. */
-  exposed?(s: S, actualMs: number, frameMs: number): S
+  /**
+   * Quick Eye only: the platform reports how long the stimulus was really on screen. `lenient`
+   * accepts any real exposure (after repeated voids on a device whose frames never match exactly).
+   */
+  exposed?(s: S, actualMs: number, frameMs: number, lenient?: boolean): S
+  /**
+   * The level past which this game's puzzle stops changing on this screen. The staircase stops
+   * there, so the level means the same task everywhere and never climbs on an unchanged puzzle.
+   */
+  maxLevel?(ctx: CreateContext): number
 }

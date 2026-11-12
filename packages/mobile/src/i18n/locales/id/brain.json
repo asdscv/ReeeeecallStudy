@@ -22,10 +22,10 @@
     "quitTitle": "Latihan dihentikan",
     "quitBody": "Catatanmu sejauh ini sudah tersimpan. Karena belum selesai, sesi ini tidak dihitung sebagai sesi yang tuntas.",
     "backHome": "Kembali ke Latihan Otak",
-    "kicker": "3 times a week",
-    "lineup": "Today's line-up",
-    "minutesShort": "{{value}} min",
-    "stopBody": "Everything so far is saved, but an unfinished session doesn't count as a completed one."
+    "kicker": "3 kali seminggu",
+    "lineup": "Susunan hari ini",
+    "minutesShort": "{{value}} mnt",
+    "stopBody": "Semua yang sudah dimainkan tersimpan, tetapi sesi yang tidak selesai tidak dihitung sebagai sesi lengkap."
   },
   "home": {
     "freePlay": "Latihan bebas",
@@ -33,7 +33,7 @@
     "level": "Lv. {{level}}",
     "best": "Terbaik Lv. {{level}}",
     "new": "Baru",
-    "quickEyeLevel": "Tahap {{stage}} · kecepatan {{speed}}/12",
+    "quickEyeLevel": "Tahap {{stage}} · {{ms}} md",
     "record": "Terbaik {{value}} poin",
     "settings": "Pengaturan",
     "research": "Dasar penelitian",
@@ -51,10 +51,10 @@
     "centerOnlyHelp": "Aktifkan jika bintang di tepi sulit terlihat. Kamu hanya menjawab gambar di tengah.",
     "flash": "Mata Cepat menampilkan gambar dengan sangat singkat. Jika kamu sensitif terhadap cahaya berkedip, mainlah dengan santai.",
     "close": "Tutup",
-    "sound": "Sound effects",
-    "soundHelp": "A short sound when you get one right or wrong.",
-    "haptics": "Vibration",
-    "hapticsHelp": "A short vibration when you get one right or wrong. Same as the app-wide vibration setting."
+    "sound": "Efek suara",
+    "soundHelp": "Suara singkat saat jawaban benar atau salah.",
+    "haptics": "Getar",
+    "hapticsHelp": "Getaran singkat saat jawaban benar atau salah. Sama dengan pengaturan getar aplikasi."
   },
   "skills": {
     "memory": "Memori",
@@ -136,18 +136,18 @@
     "resume": "Lanjutkan",
     "stop": "Selesai",
     "stopConfirm": "Berhenti di sini? Catatanmu sejauh ini tetap tersimpan.",
-    "go": "Go!",
-    "back": "Back",
-    "streakCount": "{{value}} in a row",
-    "streakBanner": "{{value}} in a row!",
-    "levelUpBanner": "Level up! Lv. {{level}}",
-    "fasterBanner": "Faster!",
-    "roundOver": "Round over",
-    "roundCleared": "Round cleared!",
-    "stopTitle": "Stop here?",
-    "stopBody": "Everything so far is saved.",
-    "keepPlaying": "Keep playing",
-    "stopNow": "Stop"
+    "go": "Mulai!",
+    "back": "Kembali",
+    "streakCount": "{{value}} beruntun",
+    "streakBanner": "{{value}} benar beruntun!",
+    "levelUpBanner": "Naik level! Lv. {{level}}",
+    "fasterBanner": "Makin cepat!",
+    "roundOver": "Ronde selesai",
+    "roundCleared": "Ronde tuntas!",
+    "stopTitle": "Berhenti di sini?",
+    "stopBody": "Semua yang sudah dimainkan tersimpan.",
+    "keepPlaying": "Lanjut main",
+    "stopNow": "Berhenti"
   },
   "quickEye": {
     "watch": "Lihat ke tengah",
@@ -169,7 +169,7 @@
       "6": "Kiri",
       "7": "Kiri atas"
     },
-    "speedStep": "Speed {{step}}/12"
+    "flashMs": "Kilatan {{ms}} md"
   },
   "summary": {
     "livesOut": "Ronde selesai",
@@ -184,11 +184,11 @@
     "newBest": "Skor terbaik pribadi",
     "again": "Main lagi",
     "home": "Semua permainan",
-    "stars": "{{value}} stars",
-    "time": "Time",
-    "trend": "Level, recent rounds",
-    "otherGames": "Other games",
-    "minutes": "Minutes"
+    "stars": "{{value}} bintang",
+    "time": "Waktu",
+    "trend": "Level beberapa ronde terakhir",
+    "otherGames": "Game lain",
+    "minutes": "Menit"
   },
   "colors": {
     "red": "MERAH",
@@ -199,14 +199,14 @@
     "orange": "JINGGA"
   },
   "intro": {
-    "howTo": "How to play",
-    "replay": "Replay",
-    "start": "Start",
-    "practiceNote": "The first 4 are practice. They cost no chances and score no points.",
+    "howTo": "Cara bermain",
+    "replay": "Putar ulang",
+    "start": "Mulai",
+    "practiceNote": "4 soal pertama adalah latihan — tidak mengurangi kesempatan dan tidak menambah skor.",
     "level": "Level",
-    "speed": "Speed",
-    "stage": "Stage",
-    "rounds": "Played",
-    "best": "Best score"
+    "speed": "Kecepatan",
+    "stage": "Tahap",
+    "rounds": "Dimainkan",
+    "best": "Skor terbaik"
   }
 }

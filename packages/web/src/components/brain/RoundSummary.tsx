@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { Star, Crown, RotateCcw, LayoutGrid, Target, Flame, ListChecks, TrendingUp, Timer } from 'lucide-react'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
-import { GAME_THEMES, brainGame, displayLevel, gameHistory, roundStars, type BrainGameId, type GameTheme } from '@reeeeecall/shared/lib/brain-games'
+import { GAME_THEMES, brainGame, displayLevel, gameHistory, quickEyeMaxLevel, quickEyeMsAt, roundStars, type BrainGameId, type GameTheme } from '@reeeeecall/shared/lib/brain-games'
 import type { RoundStats } from '@reeeeecall/shared/hooks/useBrainRound'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
 import { Confetti, GameCanvas } from './GameCanvas'
@@ -25,11 +25,11 @@ export function RoundSummary({ gameId, stats, onAgain }: { gameId: BrainGameId; 
   const stars = roundStars(stats.trials, stats.correct)
   const score = useCountUp(stats.points)
   const title = stats.endedBy === 'cap' ? t('summary.cleared') : stats.endedBy === 'stop' ? t('summary.stopped') : t('summary.livesOut')
-  // Quick Eye's level is a 0-12 speed step, shown whole like on its card.
+  // Quick Eye's level is its flash time: shorter is better.
   const qe = gameId === 'quickEye'
-  const from = qe ? Math.round(stats.levelStart) : displayLevel(stats.levelStart)
-  const to = qe ? Math.round(stats.levelEnd) : displayLevel(stats.levelEnd)
-  const [seconds] = useState(() => Math.max(0, Math.round((Date.now() - stats.startedAt) / 1000)))
+  const from = qe ? quickEyeMsAt(stats.levelStart) : displayLevel(stats.levelStart)
+  const to = qe ? quickEyeMsAt(stats.levelEnd) : displayLevel(stats.levelEnd)
+  const seconds = Math.round(stats.activeMs / 1000)
 
   const again = useRef<HTMLButtonElement>(null)
   useEffect(() => {
@@ -77,7 +77,7 @@ export function RoundSummary({ gameId, stats, onAgain }: { gameId: BrainGameId; 
           </p>
         )}
 
-        {stats.trials > 0 && <LevelCard from={from} to={to} qe={qe} span={brainGame(gameId).group === 'span'} theme={theme} />}
+        {stats.trials > 0 && <LevelCard from={from} to={to} qe={qe} qeLevel={stats.levelEnd} span={brainGame(gameId).group === 'span'} theme={theme} />}
 
         <div className="grid grid-cols-2 gap-2">
           <Stat icon={<ListChecks className="w-5 h-5" aria-hidden="true" />} label={t('summary.trials')} value={formatCount(stats.trials)} />
@@ -122,12 +122,13 @@ export function RoundSummary({ gameId, stats, onAgain }: { gameId: BrainGameId; 
   )
 }
 
-function LevelCard({ from, to, qe, span, theme }: { from: number; to: number; qe: boolean; span: boolean; theme: GameTheme }) {
+function LevelCard({ from, to, qe, qeLevel, span, theme }: { from: number; to: number; qe: boolean; qeLevel: number; span: boolean; theme: GameTheme }) {
   const { t } = useTranslation('brain')
-  const up = to > from
-  const fmt = (v: number) => (qe ? `${v}/12` : v.toFixed(1))
-  // The bar shows where in the current whole level the player now stands.
-  const frac = qe ? to / 12 : to - Math.floor(to)
+  const up = qe ? to < from : to > from
+  const fmt = (v: number) => (qe ? `${v}ms` : v.toFixed(1))
+  // The bar shows where in the current whole level the player now stands (Quick Eye: how far down
+  // its ladder of flash times).
+  const frac = qe ? qeLevel / quickEyeMaxLevel(33) : to - Math.floor(to)
   return (
     <div className="rounded-2xl bg-white/[0.07] border border-white/10 p-4" data-testid="brain-summary-level">
       <div className="flex items-baseline justify-between">

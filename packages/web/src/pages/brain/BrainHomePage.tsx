@@ -15,6 +15,8 @@ import {
   localDayKey,
   planTodaysSession,
   plannedMinutes,
+  quickEyeMaxLevel,
+  quickEyeMsAt,
   researchContent,
   todaysPlanSeed,
   weekProgress,
@@ -147,10 +149,10 @@ export function BrainHomePage() {
             const levelLabel = !played
               ? t('home.new')
               : qe
-                ? t('home.quickEyeLevel', { stage: progress.quickEye.variant, speed: Math.round(p.level) })
+                ? t('home.quickEyeLevel', { stage: progress.quickEye.variant, ms: quickEyeMsAt(p.level) })
                 : t('home.level', { level: displayLevel(p.level).toFixed(1) })
             // How far into the current whole level (Quick Eye: along its 12 speed steps).
-            const frac = qe ? p.level / 12 : p.level - Math.floor(p.level)
+            const frac = qe ? p.level / quickEyeMaxLevel(33) : p.level - Math.floor(p.level)
             return (
               <li key={game.id}>
                 <Link
