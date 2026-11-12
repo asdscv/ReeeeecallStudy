@@ -127,3 +127,31 @@ describe('one topic a day, even when an edition fails', () => {
     expect(slugs.size).toBe(1)
   })
 })
+
+describe('deck guide prompt carries the deck words', () => {
+  it('loads the Korean deck once per topic and passes its words to both editions', async () => {
+    vi.clearAllMocks()
+    planKeywordTopic.mockResolvedValue(null)
+    planDeckTopic.mockResolvedValue({
+      id: 'toeic-800', category: 'c', titleHint: '토익 800점 단어', keywords: ['토익 800점 단어'], tags: [], audience: 'a',
+      targetQuery: '토익 800점 단어', queryLocale: 'ko', format: 'guide', deckFamily: 'toeic:800',
+    })
+    generateImage.mockRejectedValue(new Error('no image in test'))
+    callAI.mockImplementation(async () => article('toeic-800-vocabulary'))
+    const getOfficialDeckWords = vi.fn().mockResolvedValue([{ term: 'adjudicate', meaning: '판결하다', example: 'The committee will adjudicate.', exampleNote: '' }])
+    createSupabaseClient.mockReturnValue({
+      getRecentContent: vi.fn().mockResolvedValue([]),
+      getPlannedArticles: vi.fn().mockResolvedValue([]),
+      getOfficialDeckWords,
+      uploadImage: vi.fn(),
+      insertContent: vi.fn(async (record) => ({ ...record, id: record.locale })),
+    })
+    await runContentPipeline({}, '0 6 * * *')
+    expect(getOfficialDeckWords).toHaveBeenCalledTimes(1)
+    expect(getOfficialDeckWords).toHaveBeenCalledWith('toeic:800', 'ko')
+    const prompts = callAI.mock.calls.map((c) => c[2])
+    expect(prompts).toHaveLength(2)
+    expect(prompts.every((p) => p.includes('- adjudicate'))).toBe(true)
+    expect(prompts.some((p) => p.includes('판결하다'))).toBe(true)
+  })
+})

@@ -124,7 +124,8 @@ export function MarketplaceDetailPage() {
         { p_listing_id: listingId },
       )
       const previewTyped = previewRpc as unknown as PublicListingPreview | null
-      const previewFields = previewTyped?.sample_fields ?? []
+      // The public word-list page shows up to 50 official cards; this panel keeps its 10.
+      const previewFields = (previewTyped?.sample_fields ?? []).slice(0, 10)
       setPreviewSampleFields(previewFields)
 
       if (previewFields.length === 0) {

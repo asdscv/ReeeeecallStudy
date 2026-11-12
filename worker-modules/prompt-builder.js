@@ -131,7 +131,7 @@ const FORMAT_INSTRUCTIONS = {
 
 // The page exists to answer one query Google already shows us for, so the query must be
 // unmistakable on the page — and the page must not drift into a generic study article.
-function searchQuerySection(topic, locale) {
+function searchQuerySection(topic, locale, deckWords) {
   if (!topic.targetQuery) return ''
   const q = topic.targetQuery
   const placement = topic.queryLocale === locale
@@ -145,25 +145,49 @@ ${placement}
 - The first paragraph must answer the query directly, in under 40 words.
 - Stay on this query from start to finish. Do not widen it into a general article about studying.
 
-${FORMAT_INSTRUCTIONS[topic.format] || FORMAT_INSTRUCTIONS.guide}${deckSection(topic, locale)}`
+${FORMAT_INSTRUCTIONS[topic.format] || FORMAT_INSTRUCTIONS.guide}${deckWordsSection(deckWords, locale)}${deckSection(topic, locale, deckWords)}`
 }
 
 // The page's call to action opens our free official deck for this exam level, so the article
 // should teach the vocabulary itself and make the deck the obvious next step.
 // Only where this edition's readers are actually shown a deck: there is no English-native deck,
 // and conversation decks exist only for Korean readers.
-function deckSection(topic, locale) {
+// Real cards from the deck the page leads to — the article's examples must be words the reader
+// will actually find in that deck. Meanings are given only to the edition in the deck's language.
+const DECK_WORDS_IN_PROMPT = 15
+const DECK_WORDS_LOCALE = 'ko'
+
+function deckWordsSection(deckWords, locale) {
+  if (!Array.isArray(deckWords) || deckWords.length === 0) return ''
+  const n = Math.min(DECK_WORDS_IN_PROMPT, deckWords.length)
+  const picked = Array.from({ length: n }, (_, i) => deckWords[Math.floor((i * deckWords.length) / n)])
+  const lines = picked.map((w) => {
+    const parts = [w.term]
+    if (locale === DECK_WORDS_LOCALE && w.meaning) parts.push(w.meaning)
+    if (w.example) parts.push(w.example)
+    return `- ${parts.join(' — ')}`
+  })
+  return `
+
+## Words From The Deck
+
+These are real cards from the deck this page leads to. Use exactly these words as the article's example words — do not add or substitute others. Explain each in the article's language; you may shorten the example sentences.
+${lines.join('\n')}`
+}
+
+function deckSection(topic, locale, deckWords) {
   const family = parseDeckFamily(topic.deckFamily)
   if (!family || !deckListingFilter(family, locale)) return ''
+  const hasWords = Array.isArray(deckWords) && deckWords.length > 0
   return `
 
 ## The Deck This Page Leads To
 
-Below the article, readers get our free official flashcard deck for this level (${topic.deckFamily}). Teach the vocabulary itself: what this level demands, 10-15 representative words or expressions with meanings and a short example sentence each (label them as examples, not an official list), and a daily review plan. Mention the free deck once, where a reader would want the full list. Do not state how many cards it has.`
+Below the article, readers get our free official flashcard deck for this level (${topic.deckFamily}). Teach the vocabulary itself: what this level demands, ${hasWords ? 'the words listed under «Words From The Deck»' : '10-15 representative words or expressions'} with meanings and a short example sentence each, and a daily review plan. Mention the free deck once, where a reader would want the full list. Do not state how many cards it has.`
 }
 
 export function buildPrompt(topic, locale, options = {}) {
-  const { previousTitles = [] } = options
+  const { previousTitles = [], deckWords = null } = options
 
   // Another language's edition of a search-query topic must not carry the original query's
   // words — that is how "JLPT N2 문법 Mastery" ended up as an English title.
@@ -200,6 +224,6 @@ Write a unique, insightful article about ${translated ? 'that need' : `"${topic.
 
   return {
     system: SYSTEM_PROMPT,
-    user: `${topicContext}${searchQuerySection(topic, locale)}${titleAvoidance}\n\n## Language\n\n${localeInstruction}`,
+    user: `${topicContext}${searchQuerySection(topic, locale, deckWords)}${titleAvoidance}\n\n## Language\n\n${localeInstruction}`,
   }
 }
