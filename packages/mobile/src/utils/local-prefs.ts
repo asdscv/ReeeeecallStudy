@@ -23,6 +23,8 @@ const KEYS = {
   // don't lose their saved theme.
   theme: 'reeeeecall-user-theme',
   haptics: 'app-haptics-enabled',
+  // Suffixed with the user id — SecureStore keys allow [A-Za-z0-9._-], which a UUID fits.
+  brainProgress: 'brain-progress',
 } as const
 
 function read(key: string): string | null {
@@ -66,5 +68,16 @@ export const localPrefs = {
   },
   setHapticsEnabled(enabled: boolean): void {
     write(KEYS.haptics, enabled ? 'true' : 'false')
+  },
+
+  /**
+   * Brain-training progress (levels, streak), per user. A few hundred bytes of JSON — well
+   * under SecureStore's ~2KB value limit (see `parseProgress` in shared/lib/brain-games).
+   */
+  getBrainProgress(userId: string): string | null {
+    return read(`${KEYS.brainProgress}.${userId}`)
+  },
+  setBrainProgress(userId: string, raw: string): void {
+    write(`${KEYS.brainProgress}.${userId}`, raw)
   },
 }

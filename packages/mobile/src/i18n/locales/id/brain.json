@@ -1,0 +1,105 @@
+{
+  "title": "Latihan Otak",
+  "subtitle": "Memori, fokus, kecepatan, dan penalaran — teka-teki baru setiap ronde, sesuai levelmu.",
+  "note": "Latihan otak sehari-hari untuk hiburan. Bukan layanan medis.",
+  "mix": {
+    "title": "Latihan campuran",
+    "desc": "Permainan berganti sendiri dan lebih sering melatih kemampuan terlemahmu. Main selama yang kamu mau.",
+    "start": "Mulai"
+  },
+  "home": {
+    "games": "Permainan",
+    "level": "Lv. {{level}}",
+    "best": "Terbaik Lv. {{level}}",
+    "new": "Baru",
+    "streak_one": "{{count}} hari beruntun",
+    "streak_other": "{{count}} hari beruntun",
+    "today": "Ronde hari ini: {{value}}",
+    "totalPoints": "Total poin: {{value}}",
+    "howItWorks": "Setiap ronde dibuat baru. Benar, ronde berikutnya sedikit lebih sulit; salah, jadi lebih mudah — jadi selalu cukup menantang."
+  },
+  "skills": {
+    "memory": "Memori",
+    "attention": "Fokus",
+    "speed": "Kecepatan",
+    "reasoning": "Penalaran"
+  },
+  "games": {
+    "memoryGrid": {
+      "name": "Kotak Kilat",
+      "desc": "Ingat kotak yang menyala, lalu ketuk."
+    },
+    "sequence": {
+      "name": "Urutan",
+      "desc": "Lihat urutan kotak berkedip dan ulangi."
+    },
+    "pairs": {
+      "name": "Cari Pasangan",
+      "desc": "Buka dua kartu sekaligus untuk mencari gambar yang sama."
+    },
+    "schulte": {
+      "name": "Buru Angka",
+      "desc": "Ketuk angka secara berurutan secepat mungkin."
+    },
+    "oddOneOut": {
+      "name": "Yang Berbeda",
+      "desc": "Semua sama kecuali satu. Temukan."
+    },
+    "stroop": {
+      "name": "Warna Kata",
+      "desc": "Pilih warna tulisannya, bukan arti katanya."
+    },
+    "math": {
+      "name": "Hitung Cepat",
+      "desc": "Selesaikan sebelum waktu habis."
+    },
+    "series": {
+      "name": "Pola Angka",
+      "desc": "Temukan polanya dan pilih angka berikutnya."
+    }
+  },
+  "play": {
+    "memorize": "Ingat kotak yang menyala",
+    "tapLit": "Ketuk kotak yang tadi menyala · sisa {{left}}",
+    "watch": "Perhatikan urutannya",
+    "watchReverse": "Perhatikan — kamu akan mengulang terbalik",
+    "repeat": "Ketuk dengan urutan sama · {{done}}/{{total}}",
+    "repeatReverse": "Ketuk dengan urutan TERBALIK · {{done}}/{{total}}",
+    "memorizePairs": "Ingat gambarnya",
+    "findPairs": "Cari pasangannya · sisa salah: {{lives}}",
+    "tapAscending": "Ketuk 1 → {{max}} berurutan · berikutnya: {{next}}",
+    "tapDescending": "Ketuk {{max}} → 1 berurutan · berikutnya: {{next}}",
+    "findOdd": "Ketuk yang berbeda",
+    "pickInk": "Pilih WARNA tulisan",
+    "pickWord": "Pilih ARTI kata",
+    "solve": "Pilih jawabannya",
+    "nextNumber": "Angka berikutnya?",
+    "correct": "Benar!",
+    "wrong": "Hampir",
+    "timeUp": "Waktu habis",
+    "levelUp": "Naik level! Lv. {{level}}",
+    "points": "+{{value}}",
+    "score": "Skor",
+    "streak": "Beruntun",
+    "stop": "Selesai",
+    "mixBadge": "Campuran"
+  },
+  "summary": {
+    "title": "Kerja bagus",
+    "rounds": "Ronde",
+    "accuracy": "Akurasi",
+    "points": "Poin",
+    "bestStreak": "Beruntun terbaik",
+    "levels": "Perubahan level",
+    "again": "Lanjut",
+    "home": "Semua permainan"
+  },
+  "colors": {
+    "red": "MERAH",
+    "blue": "BIRU",
+    "green": "HIJAU",
+    "yellow": "KUNING",
+    "purple": "UNGU",
+    "orange": "JINGGA"
+  }
+}

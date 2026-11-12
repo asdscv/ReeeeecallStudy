@@ -24,6 +24,7 @@ import { DecksStack } from './DecksStack'
 import { StudyStack } from './StudyStack'
 import { AIStack } from './AIStack'
 import { QuizStack } from './QuizStack'
+import { BrainStack } from './BrainStack'
 import { MarketplaceStack } from './MarketplaceStack'
 import { SettingsStack } from './SettingsStack'
 import type { MainTabParamList } from './types'
@@ -36,6 +37,7 @@ const Drawer = createDrawerNavigator<MainTabParamList>()
  * Menu structure:
  * 1. Quick Study
  * 2. Dashboard
+ * 2b. Brain training
  * 3. Study (group)
  *    └ AI 학습 (sub-group, always expanded — see the comment at its call site)
  * 4. Settings
@@ -129,6 +131,15 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
           theme={theme}
           onPress={() => go('HomeTab', 'Dashboard')}
           testID="drawer-dashboard"
+        />
+
+        {/* Brain training — its own row, not a 학습 section: it studies no deck. */}
+        <MenuItem
+          icon="grid" label={t('nav.brainTraining')}
+          active={isActive('BrainHome')}
+          theme={theme}
+          onPress={() => go('BrainTab', 'BrainHome')}
+          testID="drawer-brain"
         />
 
         {/* Study (group) */}
@@ -413,6 +424,7 @@ export function MainDrawer() {
       <Drawer.Screen name="StudyTab" component={StudyStack} />
       <Drawer.Screen name="AITab" component={AIStack} />
       <Drawer.Screen name="QuizTab" component={QuizStack} />
+      <Drawer.Screen name="BrainTab" component={BrainStack} />
       <Drawer.Screen name="MarketplaceTab" component={MarketplaceStack} />
       <Drawer.Screen name="SettingsTab" component={SettingsStack} />
     </Drawer.Navigator>

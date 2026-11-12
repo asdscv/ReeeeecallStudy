@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, type ReactElement } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Menu, X, ChevronDown, BookOpen, Zap, BarChart2, Cpu, Layers, FileText, Compass, Store, TrendingUp, Link2, Archive, Clock, Award, Settings as SettingsIcon, Shield, HelpCircle, Target, Hand, type LucideIcon } from 'lucide-react'
+import { Menu, X, ChevronDown, BookOpen, Zap, BarChart2, Cpu, Layers, FileText, Compass, Store, TrendingUp, Link2, Archive, Clock, Award, Settings as SettingsIcon, Shield, HelpCircle, Target, Hand, LayoutGrid, type LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { aiHubEntries } from '@reeeeecall/shared/lib/ai/hub/catalog'
 import { useAuthStore } from '../../stores/auth-store'
@@ -35,6 +35,7 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   target: Target,
   menu: Menu,
   hand: Hand,
+  grid: LayoutGrid,
 }
 
 function NavIcon({ name, className }: { name: string; className?: string }) {
@@ -84,6 +85,7 @@ export function Layout() {
   const navItems: NavItem[] = [
     { kind: 'link', path: '/quick-study', label: t('nav.quickStudy'), icon: 'zap' },
     { kind: 'link', path: '/dashboard', label: t('nav.dashboard'), icon: 'bar-chart-2' },
+    { kind: 'link', path: '/brain', label: t('nav.brainTraining'), icon: 'grid' },
     { kind: 'group', label: t('nav.study'), icon: 'book-open', children: [
       // Derived, not listed: registering a fourth AI feature must add a menu item without
       // an edit here. The section header itself opens the hub.

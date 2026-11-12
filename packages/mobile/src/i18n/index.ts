@@ -28,6 +28,7 @@ const resources = {
     learning: require('./locales/en/learning.json'),
     quiz: require('./locales/en/quiz.json'),
     wallet: require('./locales/en/wallet.json'),
+    brain: require('./locales/en/brain.json'),
   },
   ko: {
     common: require('./locales/ko/common.json'),
@@ -48,6 +49,7 @@ const resources = {
     learning: require('./locales/ko/learning.json'),
     quiz: require('./locales/ko/quiz.json'),
     wallet: require('./locales/ko/wallet.json'),
+    brain: require('./locales/ko/brain.json'),
   },
   ja: {
     common: require('./locales/ja/common.json'),
@@ -68,6 +70,7 @@ const resources = {
     learning: require('./locales/ja/learning.json'),
     quiz: require('./locales/ja/quiz.json'),
     wallet: require('./locales/ja/wallet.json'),
+    brain: require('./locales/ja/brain.json'),
   },
   zh: {
     common: require('./locales/zh/common.json'),
@@ -88,6 +91,7 @@ const resources = {
     learning: require('./locales/zh/learning.json'),
     quiz: require('./locales/zh/quiz.json'),
     wallet: require('./locales/zh/wallet.json'),
+    brain: require('./locales/zh/brain.json'),
   },
   vi: {
     common: require('./locales/vi/common.json'),
@@ -108,6 +112,7 @@ const resources = {
     learning: require('./locales/vi/learning.json'),
     quiz: require('./locales/vi/quiz.json'),
     wallet: require('./locales/vi/wallet.json'),
+    brain: require('./locales/vi/brain.json'),
   },
   th: {
     common: require('./locales/th/common.json'),
@@ -128,6 +133,7 @@ const resources = {
     learning: require('./locales/th/learning.json'),
     quiz: require('./locales/th/quiz.json'),
     wallet: require('./locales/th/wallet.json'),
+    brain: require('./locales/th/brain.json'),
   },
   id: {
     common: require('./locales/id/common.json'),
@@ -148,6 +154,7 @@ const resources = {
     learning: require('./locales/id/learning.json'),
     quiz: require('./locales/id/quiz.json'),
     wallet: require('./locales/id/wallet.json'),
+    brain: require('./locales/id/brain.json'),
   },
   es: {
     common: require('./locales/es/common.json'),
@@ -168,6 +175,7 @@ const resources = {
     learning: require('./locales/es/learning.json'),
     quiz: require('./locales/es/quiz.json'),
     wallet: require('./locales/es/wallet.json'),
+    brain: require('./locales/es/brain.json'),
   },
 }
 
@@ -217,7 +225,7 @@ i18n
     fallbackLng: 'en',
     supportedLngs,
 
-    ns: ['common', 'auth', 'dashboard', 'decks', 'study', 'marketplace', 'settings', 'history', 'import-export', 'guide', 'errors', 'paywall', 'update', 'sharing', 'ai-generate', 'learning', 'quiz'],
+    ns: ['common', 'auth', 'dashboard', 'decks', 'study', 'marketplace', 'settings', 'history', 'import-export', 'guide', 'errors', 'paywall', 'update', 'sharing', 'ai-generate', 'learning', 'quiz', 'brain'],
     defaultNS: 'common',
 
     interpolation: { escapeValue: false },

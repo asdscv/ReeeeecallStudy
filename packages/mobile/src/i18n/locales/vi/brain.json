@@ -1,0 +1,105 @@
+{
+  "title": "Luyện trí não",
+  "subtitle": "Trí nhớ, tập trung, phản xạ và suy luận — mỗi lượt là một câu đố mới, theo đúng trình độ của bạn.",
+  "note": "Trò chơi rèn luyện trí não hằng ngày để giải trí, không phải dịch vụ y tế.",
+  "mix": {
+    "title": "Luyện tập tổng hợp",
+    "desc": "Trò chơi tự đổi và ưu tiên kỹ năng yếu nhất của bạn. Chơi bao lâu tùy thích.",
+    "start": "Bắt đầu"
+  },
+  "home": {
+    "games": "Trò chơi",
+    "level": "Cấp {{level}}",
+    "best": "Cao nhất cấp {{level}}",
+    "new": "Mới",
+    "streak_one": "Chuỗi {{count}} ngày",
+    "streak_other": "Chuỗi {{count}} ngày",
+    "today": "Hôm nay {{value}} lượt",
+    "totalPoints": "Tổng điểm {{value}}",
+    "howItWorks": "Mỗi lượt đều được tạo mới. Đúng thì lượt sau khó hơn một chút, sai thì dễ hơn — nên luôn ở mức «hơi thử thách»."
+  },
+  "skills": {
+    "memory": "Trí nhớ",
+    "attention": "Tập trung",
+    "speed": "Phản xạ",
+    "reasoning": "Suy luận"
+  },
+  "games": {
+    "memoryGrid": {
+      "name": "Ô sáng",
+      "desc": "Nhớ các ô vừa sáng lên rồi chạm vào chúng."
+    },
+    "sequence": {
+      "name": "Nhớ thứ tự",
+      "desc": "Xem các ô nhấp nháy rồi chạm lại đúng thứ tự."
+    },
+    "pairs": {
+      "name": "Lật hình",
+      "desc": "Lật hai thẻ mỗi lần để tìm cặp hình giống nhau."
+    },
+    "schulte": {
+      "name": "Tìm số",
+      "desc": "Chạm các số theo thứ tự nhanh nhất có thể."
+    },
+    "oddOneOut": {
+      "name": "Tìm điểm khác",
+      "desc": "Tất cả giống nhau trừ một. Hãy tìm nó."
+    },
+    "stroop": {
+      "name": "Màu và chữ",
+      "desc": "Chọn màu của chữ, không phải nghĩa của chữ."
+    },
+    "math": {
+      "name": "Tính nhanh",
+      "desc": "Tính xong trước khi hết giờ."
+    },
+    "series": {
+      "name": "Quy luật số",
+      "desc": "Tìm quy luật và chọn số tiếp theo."
+    }
+  },
+  "play": {
+    "memorize": "Ghi nhớ các ô sáng",
+    "tapLit": "Chạm các ô vừa sáng · còn {{left}}",
+    "watch": "Xem thứ tự",
+    "watchReverse": "Xem kỹ — bạn sẽ chạm ngược lại",
+    "repeat": "Chạm đúng thứ tự · {{done}}/{{total}}",
+    "repeatReverse": "Chạm theo thứ tự NGƯỢC · {{done}}/{{total}}",
+    "memorizePairs": "Ghi nhớ các hình",
+    "findPairs": "Tìm các cặp · lượt sai còn lại: {{lives}}",
+    "tapAscending": "Chạm từ 1 đến {{max}} · tiếp theo: {{next}}",
+    "tapDescending": "Chạm từ {{max}} về 1 · tiếp theo: {{next}}",
+    "findOdd": "Chạm vào cái khác biệt",
+    "pickInk": "Chọn MÀU của chữ",
+    "pickWord": "Chọn NGHĨA của chữ",
+    "solve": "Chọn đáp án",
+    "nextNumber": "Số tiếp theo là gì?",
+    "correct": "Chính xác!",
+    "wrong": "Tiếc quá",
+    "timeUp": "Hết giờ",
+    "levelUp": "Lên cấp! Cấp {{level}}",
+    "points": "+{{value}}",
+    "score": "Điểm",
+    "streak": "Chuỗi",
+    "stop": "Kết thúc",
+    "mixBadge": "Tổng hợp"
+  },
+  "summary": {
+    "title": "Làm tốt lắm",
+    "rounds": "Số lượt",
+    "accuracy": "Tỉ lệ đúng",
+    "points": "Điểm",
+    "bestStreak": "Chuỗi dài nhất",
+    "levels": "Thay đổi cấp",
+    "again": "Chơi tiếp",
+    "home": "Tất cả trò chơi"
+  },
+  "colors": {
+    "red": "ĐỎ",
+    "blue": "XANH DƯƠNG",
+    "green": "XANH LÁ",
+    "yellow": "VÀNG",
+    "purple": "TÍM",
+    "orange": "CAM"
+  }
+}

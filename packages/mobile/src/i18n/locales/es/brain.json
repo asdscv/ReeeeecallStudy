@@ -1,0 +1,105 @@
+{
+  "title": "Entrenamiento mental",
+  "subtitle": "Memoria, atención, rapidez y razonamiento: un reto nuevo en cada ronda, ajustado a tu nivel.",
+  "note": "Ejercicio mental cotidiano para divertirse. No es un servicio médico.",
+  "mix": {
+    "title": "Entrenamiento mixto",
+    "desc": "Los juegos cambian solos y se centran en tu punto más débil. Sigue todo el tiempo que quieras.",
+    "start": "Empezar"
+  },
+  "home": {
+    "games": "Juegos",
+    "level": "Nv. {{level}}",
+    "best": "Mejor Nv. {{level}}",
+    "new": "Nuevo",
+    "streak_one": "Racha de {{count}} día",
+    "streak_other": "Racha de {{count}} días",
+    "today": "Rondas hoy: {{value}}",
+    "totalPoints": "Puntos totales: {{value}}",
+    "howItWorks": "Cada ronda se genera desde cero. Si aciertas, la siguiente es un poco más difícil; si fallas, se suaviza. Así siempre es un reto justo."
+  },
+  "skills": {
+    "memory": "Memoria",
+    "attention": "Atención",
+    "speed": "Rapidez",
+    "reasoning": "Razonamiento"
+  },
+  "games": {
+    "memoryGrid": {
+      "name": "Cuadrícula flash",
+      "desc": "Recuerda qué casillas se iluminaron y tócalas."
+    },
+    "sequence": {
+      "name": "Secuencia",
+      "desc": "Mira el orden en que parpadean y repítelo."
+    },
+    "pairs": {
+      "name": "Parejas",
+      "desc": "Voltea dos cartas a la vez para encontrar las parejas."
+    },
+    "schulte": {
+      "name": "Caza de números",
+      "desc": "Toca los números en orden lo más rápido posible."
+    },
+    "oddOneOut": {
+      "name": "El diferente",
+      "desc": "Todos son iguales menos uno. Encuéntralo."
+    },
+    "stroop": {
+      "name": "Color y palabra",
+      "desc": "Elige el color de la tinta, no la palabra que lees."
+    },
+    "math": {
+      "name": "Cálculo rápido",
+      "desc": "Resuélvelo antes de que se acabe el tiempo."
+    },
+    "series": {
+      "name": "Patrón numérico",
+      "desc": "Descubre la regla y elige el siguiente número."
+    }
+  },
+  "play": {
+    "memorize": "Memoriza las casillas iluminadas",
+    "tapLit": "Toca las casillas que se iluminaron · quedan {{left}}",
+    "watch": "Mira el orden",
+    "watchReverse": "Mira: lo repetirás al revés",
+    "repeat": "Toca en el mismo orden · {{done}}/{{total}}",
+    "repeatReverse": "Toca en orden INVERSO · {{done}}/{{total}}",
+    "memorizePairs": "Memoriza las imágenes",
+    "findPairs": "Encuentra las parejas · fallos restantes: {{lives}}",
+    "tapAscending": "Toca del 1 al {{max}} en orden · siguiente: {{next}}",
+    "tapDescending": "Toca del {{max}} al 1 en orden · siguiente: {{next}}",
+    "findOdd": "Toca el que es diferente",
+    "pickInk": "Elige el COLOR de la tinta",
+    "pickWord": "Elige lo que DICE la palabra",
+    "solve": "Elige la respuesta",
+    "nextNumber": "¿Qué número sigue?",
+    "correct": "¡Correcto!",
+    "wrong": "Casi",
+    "timeUp": "Se acabó el tiempo",
+    "levelUp": "¡Subes de nivel! Nv. {{level}}",
+    "points": "+{{value}}",
+    "score": "Puntos",
+    "streak": "Racha",
+    "stop": "Terminar",
+    "mixBadge": "Mixto"
+  },
+  "summary": {
+    "title": "¡Buen trabajo!",
+    "rounds": "Rondas",
+    "accuracy": "Aciertos",
+    "points": "Puntos",
+    "bestStreak": "Mejor racha",
+    "levels": "Niveles",
+    "again": "Seguir",
+    "home": "Todos los juegos"
+  },
+  "colors": {
+    "red": "ROJO",
+    "blue": "AZUL",
+    "green": "VERDE",
+    "yellow": "AMARILLO",
+    "purple": "MORADO",
+    "orange": "NARANJA"
+  }
+}
