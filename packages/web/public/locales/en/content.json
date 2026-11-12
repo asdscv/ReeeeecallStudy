@@ -37,6 +37,10 @@
       "button": "Study this deck now",
       "meta_one": "Free official deck · {{count, number}} card",
       "meta_other": "Free official deck · {{count, number}} cards"
+    },
+    "hub": {
+      "meta": "Free word list · example sentences · decks in 7 languages",
+      "button": "See the word list"
     }
   }
 }

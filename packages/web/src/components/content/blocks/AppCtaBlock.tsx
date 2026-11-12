@@ -6,6 +6,7 @@ import { playStoreUrlWithReferrer } from '@reeeeecall/shared/lib/app-store-links
 import { StoreBadges } from '../../common/AppDownload'
 import { useTrackEvent } from '../../../hooks/useTrackEvent'
 import { useOfficialDeck } from '../../../hooks/useOfficialDeck'
+import { isDeckLanguage, vocabHubForFamily, vocabHubPath, vocabHubShortTitle } from '@reeeeecall/shared/lib/vocab-hubs'
 
 const MEDIUM = 'app_cta'
 
@@ -14,8 +15,10 @@ export function AppCtaBlock({ props }: { props: AppCtaBlockType['props'] }) {
   const trackEvent = useTrackEvent()
   const { position, campaign, deckFamily } = props
   const deck = useOfficialDeck(deckFamily, i18n.language)
+  // No deck carries English meanings — English readers get the English word list for the exam level.
+  const hub = isDeckLanguage(i18n.language.slice(0, 2)) ? null : vocabHubForFamily(deckFamily)
 
-  const track = (target: 'ios' | 'android' | 'web' | 'deck') =>
+  const track = (target: 'ios' | 'android' | 'web' | 'deck' | 'hub') =>
     trackEvent({ category: 'content', action: 'app_cta_click', label: `${position}:${target}` })
 
   const utm = (content: string) => new URLSearchParams({
@@ -45,6 +48,26 @@ export function AppCtaBlock({ props }: { props: AppCtaBlockType['props'] }) {
           </span>
           <span className="hidden sm:inline-flex items-center gap-1 text-sm font-semibold text-brand whitespace-nowrap">
             {t('appCta.deck.button')}
+            <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+          </span>
+        </Link>
+      )}
+      {!deck && hub && (
+        <Link
+          to={`${vocabHubPath(hub)}?${utm(`hub_${position}`)}`}
+          onClick={() => track('hub')}
+          className="group mb-5 flex items-center gap-4 rounded-xl border border-brand/30 bg-card p-4 no-underline transition hover:border-brand"
+          data-app-cta-hub={hub.slug}
+        >
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand">
+            <Layers className="h-5 w-5" aria-hidden="true" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate font-semibold text-foreground">{vocabHubShortTitle(hub)}</span>
+            <span className="block text-sm text-muted-foreground">{t('appCta.hub.meta')}</span>
+          </span>
+          <span className="hidden sm:inline-flex items-center gap-1 text-sm font-semibold text-brand whitespace-nowrap">
+            {t('appCta.hub.button')}
             <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
           </span>
         </Link>

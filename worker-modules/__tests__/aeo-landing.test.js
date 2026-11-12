@@ -34,6 +34,7 @@ describe('AEO public content', () => {
       expect(block).toContain('Allow: /$')
       expect(block).toContain('Allow: /llms.txt$')
       expect(block).toContain('Allow: /sitemap.xml$')
+      expect(block).toContain('Allow: /vocabulary/*')
       expect(block).toContain('Disallow: /')
       expect(block).not.toContain('Allow: /auth')
     }

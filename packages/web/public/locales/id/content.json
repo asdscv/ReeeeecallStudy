@@ -37,6 +37,10 @@
       "button": "Belajar dengan dek ini sekarang",
       "meta_one": "Dek resmi gratis · {{count, number}} kartu",
       "meta_other": "Dek resmi gratis · {{count, number}} kartu"
+    },
+    "hub": {
+      "meta": "Daftar kata gratis · contoh kalimat · dek dalam 7 bahasa",
+      "button": "Lihat daftar kata"
     }
   }
 }

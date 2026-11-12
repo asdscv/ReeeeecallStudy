@@ -37,6 +37,10 @@
       "button": "このデッキですぐ学習",
       "meta_one": "無料の公式デッキ · {{count, number}}枚",
       "meta_other": "無料の公式デッキ · {{count, number}}枚"
+    },
+    "hub": {
+      "meta": "無料の単語リスト · 例文 · 7言語のデッキ",
+      "button": "単語リストを見る"
     }
   }
 }

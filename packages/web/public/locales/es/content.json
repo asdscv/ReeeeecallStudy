@@ -37,6 +37,10 @@
       "button": "Estudia este mazo ahora",
       "meta_one": "Mazo oficial gratis · {{count, number}} tarjeta",
       "meta_other": "Mazo oficial gratis · {{count, number}} tarjetas"
+    },
+    "hub": {
+      "meta": "Lista de palabras gratis · frases de ejemplo · mazos en 7 idiomas",
+      "button": "Ver la lista"
     }
   }
 }

@@ -103,6 +103,7 @@ ${faqHtml}
 <nav>
 <a href="${canonicalUrl}">${lang === 'ko' ? '홈' : 'Home'}</a>
 <a href="${localizedUrl('/insight', lang)}">${lang === 'ko' ? '인사이트' : 'Insights'}</a>
+<a href="${SITE_URL}/vocabulary${lang === 'ko' ? '/ko' : ''}">${lang === 'ko' ? '영어 단어장' : 'Vocabulary lists'}</a>
 </nav>
 </footer>`
 

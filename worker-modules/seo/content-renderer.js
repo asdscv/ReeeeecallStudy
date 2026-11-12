@@ -1,7 +1,7 @@
 import { escapeHtml } from './helpers.js'
 import { APP_STORE_URL, playStoreUrlWithReferrer } from '../../packages/shared/lib/app-store-links.ts'
 
-export function renderBlocksToHtml(blocks, { articleTitle } = {}) {
+export function renderBlocksToHtml(blocks, { articleTitle, deckLink } = {}) {
   const parts = []
   for (const block of blocks) {
     if (!block.props) continue
@@ -41,7 +41,8 @@ export function renderBlocksToHtml(blocks, { articleTitle } = {}) {
       }
       case 'app_cta': {
         const play = playStoreUrlWithReferrer({ source: 'blog', medium: 'app_cta', campaign: p.campaign || '', content: p.position })
-        parts.push(`<aside><a href="${escapeHtml(APP_STORE_URL)}">App Store</a> · <a href="${escapeHtml(play)}">Google Play</a></aside>`)
+        const deck = deckLink ? `<a href="${escapeHtml(deckLink.href)}">${escapeHtml(deckLink.label)}</a> · ` : ''
+        parts.push(`<aside>${deck}<a href="${escapeHtml(APP_STORE_URL)}">App Store</a> · <a href="${escapeHtml(play)}">Google Play</a></aside>`)
         break
       }
       case 'cta':

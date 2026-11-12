@@ -35,7 +35,7 @@ describe('heading = the phrase people search for', () => {
     ['ja', 'TOEIC 800点 英単語1,500語 — 意味・例文 (영어 → 한국어)'],
     ['zh', '托业800分词汇1,500个 — 释义与例句 (영어 → 한국어)'],
     ['vi', 'Từ vựng TOEIC 800 — 1.500 từ kèm nghĩa và ví dụ (영어 → 한국어)'],
-    ['es', 'Vocabulario TOEIC 800 — 1500 palabras con significado y ejemplos (영어 → 한국어)'],
+    ['es', 'Vocabulario TOEIC 800 — 1.500 palabras con significado y ejemplos (영어 → 한국어)'],
   ] as const)('%s', (lang, expected) => {
     expect(wordListHeading(deck(), lang)).toBe(expected)
   })
@@ -81,7 +81,16 @@ describe('hreflang cluster', () => {
       { lang: 'ko', href: 'https://x/d/d1' },
       { lang: 'ja', href: 'https://x/d/d-ja' },
       { lang: 'vi', href: 'https://x/d/d-vi' },
+      { lang: 'en', href: 'https://x/vocabulary/toeic-800' },
+      { lang: 'x-default', href: 'https://x/vocabulary/toeic-800' },
     ])
+  })
+
+  it('gives reverse and general decks no English page', () => {
+    const reverse = deck({ tags: ['source:ko', 'target:en', 'level:800'] })
+    expect(wordListHreflang(reverse, 'https://x').map((h) => h.lang)).not.toContain('en')
+    const general = deck({ category: 'beginner', tags: ['source:en', 'level:batch-3'] })
+    expect(wordListHreflang(general, 'https://x').map((h) => h.lang)).not.toContain('x-default')
   })
 })
 

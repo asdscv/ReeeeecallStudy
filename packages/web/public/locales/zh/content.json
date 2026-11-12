@@ -37,6 +37,10 @@
       "button": "立即用这个牌组学习",
       "meta_one": "免费官方牌组 · {{count, number}} 张",
       "meta_other": "免费官方牌组 · {{count, number}} 张"
+    },
+    "hub": {
+      "meta": "免费单词表 · 例句 · 7种语言的牌组",
+      "button": "查看单词表"
     }
   }
 }

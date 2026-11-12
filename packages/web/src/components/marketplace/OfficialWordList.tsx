@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import type { PublicListingPreview } from '../../types/database'
 import {
-  wordListHeading, wordListIntro, wordListColumns, wordListCta, wordRows,
+  wordListHeading, wordListIntro, wordListColumns, wordListCta, wordRows, wordListIndexLink,
 } from '@reeeeecall/shared/lib/listing-seo'
 import { OfficialBadge } from '../common/OfficialBadge'
 import { useTrackEvent } from '../../hooks/useTrackEvent'
@@ -22,9 +22,13 @@ export function OfficialWordList({ listing, lang, signedIn }: OfficialWordListPr
   const [termCol, meaningCol, exampleCol] = wordListColumns(lang, listing.category)
   const target = `/marketplace/${listing.id}`
   const studyHref = signedIn ? target : `/auth/login?redirect=${encodeURIComponent(target)}`
+  const index = wordListIndexLink(lang)
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-10 sm:py-16" lang={lang}>
+      <nav className="text-sm mb-4">
+        <Link to={index.path} className="text-brand hover:underline" data-testid="word-list-index-link">{index.label}</Link>
+      </nav>
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-3" data-testid="listing-title">
           {wordListHeading(listing, lang)}
