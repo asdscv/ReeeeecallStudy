@@ -11,6 +11,7 @@ interface Problem {
   text: string
   answer: number
   hints: number[]
+  tag?: string
 }
 
 function simple(level: number, rng: Rng): Problem {
@@ -25,17 +26,17 @@ function simple(level: number, rng: Rng): Problem {
   if (op === '−') {
     const a = rng.int(2, max)
     const b = rng.int(1, a)
-    return { text: `${a} − ${b}`, answer: a - b, hints: [a + b] }
+    return { text: `${a} − ${b}`, answer: a - b, hints: [a + b], tag: 'math.sub' }
   }
   const factorMax = Math.min(9 + Math.floor(level / 4), 25)
   if (op === '×') {
     const a = rng.int(2, factorMax)
     const b = rng.int(2, 9)
-    return { text: `${a} × ${b}`, answer: a * b, hints: [a * (b + 1), a * (b - 1), a + b] }
+    return { text: `${a} × ${b}`, answer: a * b, hints: [a * (b + 1), a * (b - 1), a + b], tag: 'math.mul' }
   }
   const b = rng.int(2, 9)
   const q = rng.int(2, factorMax)
-  return { text: `${b * q} ÷ ${b}`, answer: q, hints: [q + 1, q - 1, b] }
+  return { text: `${b * q} ÷ ${b}`, answer: q, hints: [q + 1, q - 1, b], tag: 'math.div' }
 }
 
 function advanced(level: number, rng: Rng): Problem {
@@ -78,5 +79,6 @@ export const math = choiceGame('math', (level, rng) => {
     picked: null,
     timedOut: false,
     sig: `ma:${problem.text}`,
+    tags: twoStep ? ['math.twoStep'] : problem.tag ? [problem.tag] : [],
   }
 })

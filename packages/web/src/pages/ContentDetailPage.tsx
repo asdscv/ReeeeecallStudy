@@ -123,7 +123,7 @@ export function ContentDetailPage() {
                 <div className="flex items-center gap-2 mt-2 text-xs text-content-tertiary">
                   {item.reading_time_minutes && <span>{item.reading_time_minutes} min</span>}
                   {item.tags?.slice(0, 2).map((tag) => (
-                    <span key={tag} className="bg-accent text-muted-foreground px-1.5 py-0.5 rounded text-[10px]">
+                    <span key={tag} className="bg-accent text-muted-foreground px-1.5 py-0.5 rounded text-xs">
                       {tag}
                     </span>
                   ))}

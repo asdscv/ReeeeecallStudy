@@ -1,127 +1,449 @@
-import { useEffect } from 'react'
-import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native'
+import { useState } from 'react'
+import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
-import { BRAIN_GAMES, currentDays, displayLevel, gameProgress, localDayKey } from '@reeeeecall/shared/lib/brain-games'
+import {
+  ACHIEVEMENTS,
+  BRAIN_GAMES,
+  GAME_THEMES,
+  TRAINING_THEME,
+  courseStatus,
+  createRng,
+  displayLevel,
+  gameHistory,
+  gameProgress,
+  hasAchievement,
+  localDayKey,
+  planTodaysSession,
+  plannedMinutes,
+  researchContent,
+  todaysPlanSeed,
+  weekProgress,
+  type AchievementId,
+  type BrainGameEntry,
+} from '@reeeeecall/shared/lib/brain-games'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
 import { Screen, ScreenHeader } from '../../components/ui'
-import { useAuthState } from '../../hooks'
 import { useTheme } from '../../theme'
 import { testProps } from '../../utils/testProps'
-import { brainStorageFor } from '../../components/brain/brain-ui'
+import { haptics } from '../../utils/haptics'
+import { BrainSettingsModal } from '../../components/brain/BrainSettingsModal'
+import { GradientFill } from '../../components/brain/GameCanvas'
+import { WeekRing } from '../../components/brain/WeekRing'
+import { Sparkline } from '../../components/brain/Sparkline'
+import { useBrainHydrated } from '../../components/brain/useBrainHydrated'
+import { FX, gameIcon } from '../../components/brain/brain-ui'
+import { ACHIEVEMENT_ICONS, TierBar, TierMedal, qeSpeedLevel, tierA11y, tierName, tierStanding } from '../../components/brain/tier-ui'
 import type { BrainStackParamList } from '../../navigation/types'
 
 type Nav = NativeStackNavigationProp<BrainStackParamList, 'BrainHome'>
-type FeatherName = React.ComponentProps<typeof Feather>['name']
 
-/** The mixed run up top, every game below with the level it is at. */
+/**
+ * Today's Training first — the bounded session the research counts — then every game as its own
+ * card in its own colours, how it works, the research basis and the disclaimer. Progress is shown
+ * as sessions this week and course steps, never as a streak or a "brain score".
+ */
 export function BrainHomeScreen() {
   const theme = useTheme()
-  const { t } = useTranslation('brain')
+  const { t, i18n } = useTranslation('brain')
   const navigation = useNavigation<Nav>()
-  const { user } = useAuthState()
-  const hydrate = useBrainStore((s) => s.hydrate)
+  const { width } = useWindowDimensions()
+  useBrainHydrated()
   const progress = useBrainStore((s) => s.progress)
+  const history = useBrainStore((s) => s.history)
+  const meta = useBrainStore((s) => s.meta)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
-  useEffect(() => {
-    if (user) hydrate(brainStorageFor(user.id))
-  }, [user, hydrate])
+  const today = localDayKey()
+  const week = weekProgress(progress, today)
+  const course = courseStatus(progress, today)
+  // The line-up that will actually play: the same seed all day, until a session is finished.
+  const plan = planTodaysSession(progress, createRng(todaysPlanSeed(progress, today)))
+  const minutes = plannedMinutes(plan)
+  const research = researchContent(i18n.language)
+  // Two cards a row on a tablet.
+  const twoUp = width >= 600
 
-  const days = currentDays(progress, localDayKey())
-  const chip = { backgroundColor: theme.colors.surface }
+  const courseChip =
+    course.phase === 'booster' && course.booster
+      ? t('training.booster', { done: course.booster.done, total: course.booster.total })
+      : course.phase === 'core'
+        ? t('training.course', { done: course.coreDone, total: course.coreTotal })
+        : course.nextBoosterOn
+          ? t('training.boosterNext', { date: course.nextBoosterOn })
+          : null
+  const courseFrac = course.phase === 'booster' && course.booster ? course.booster.done / course.booster.total : course.phase === 'core' ? course.coreDone / course.coreTotal : 1
+
+  const settingsButton = (
+    <Pressable
+      onPress={() => setSettingsOpen(true)}
+      style={({ pressed }) => [styles.gear, pressed && { backgroundColor: theme.colors.surface }]}
+      accessibilityRole="button"
+      accessibilityLabel={t('home.settings')}
+      testID="brain-settings"
+    >
+      <Feather name="settings" size={22} color={theme.colors.text} />
+    </Pressable>
+  )
 
   return (
     <Screen padding={false}>
-      <ScreenHeader title={t('title')} mode="drawer" />
+      <ScreenHeader title={t('title')} mode="drawer" rightContent={settingsButton} />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={{ color: theme.colors.textSecondary, fontSize: 13 }}>{t('subtitle')}</Text>
+        <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>{t('subtitle')}</Text>
 
-        {progress.totalRounds > 0 ? (
-          <View style={styles.chips}>
-            <Text style={[styles.chip, { backgroundColor: theme.isDark ? 'rgba(234,179,8,0.15)' : '#fef9c3', color: theme.isDark ? '#facc15' : '#a16207' }]}>
-              🔥 {t('home.streak', { count: days.dayStreak })}
-            </Text>
-            <Text style={[styles.chip, chip, { color: theme.colors.textSecondary }]}>
-              {t('home.today', { value: formatCount(days.todayRounds) })}
-            </Text>
-            <Text style={[styles.chip, chip, { color: theme.colors.textSecondary }]}>
-              {t('home.totalPoints', { value: formatCount(progress.totalPoints) })}
-            </Text>
+        {/* Today's Training — the hero. */}
+        <View style={styles.hero} {...testProps('brain-training-card', true)}>
+          <GradientFill from={TRAINING_THEME.cardFrom} to={TRAINING_THEME.cardTo} />
+          <View pointerEvents="none" style={styles.heroGlow} />
+          <View style={styles.heroTop}>
+            <View style={styles.flex}>
+              <Text style={styles.kicker} maxFontSizeMultiplier={1.4}>
+                {t('training.kicker')}
+              </Text>
+              <Text style={styles.heroTitle} accessibilityRole="header" maxFontSizeMultiplier={1.4}>
+                {t('training.title')}
+              </Text>
+              <Text style={styles.heroDesc} maxFontSizeMultiplier={1.5}>
+                {t('training.desc', { minutes })}
+              </Text>
+            </View>
+            <WeekRing done={week.done} goal={week.goal} size={84} label={t('training.week', { done: week.done, goal: week.goal })} />
           </View>
-        ) : null}
 
-        <Pressable
-          onPress={() => navigation.navigate('BrainPlay', { mode: 'mix' })}
-          style={({ pressed }) => [styles.mix, { backgroundColor: pressed ? theme.colors.buttonPrimaryPressed : theme.colors.primary }]}
-          {...testProps('brain-mix')}
-        >
-          <View style={styles.mixIcon}>
-            <Feather name="shuffle" size={20} color="#fff" />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>{t('mix.title')}</Text>
-            <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12, marginTop: 2 }}>{t('mix.desc')}</Text>
-          </View>
-          <View style={styles.mixStart}>
-            <Text style={{ color: theme.colors.primary, fontWeight: '700', fontSize: 13 }}>▶ {t('mix.start')}</Text>
-          </View>
-        </Pressable>
-
-        <Text style={{ color: theme.colors.textTertiary, fontSize: 12, fontWeight: '600' }}>{t('home.games')}</Text>
-        <View style={{ gap: 8 }}>
-          {BRAIN_GAMES.map((game) => {
-            const p = gameProgress(progress, game.id)
-            return (
-              <Pressable
-                key={game.id}
-                onPress={() => navigation.navigate('BrainPlay', { mode: game.id })}
-                style={({ pressed }) => [
-                  styles.game,
-                  { backgroundColor: theme.colors.surfaceElevated, borderColor: pressed ? theme.colors.primary : theme.colors.border },
-                ]}
-                {...testProps(`brain-game-${game.id}`)}
-              >
-                <View style={[styles.gameIcon, { backgroundColor: theme.colors.primaryLight }]}>
-                  <Feather name={game.icon as FeatherName} size={20} color={theme.colors.primary} />
+          <View style={styles.lineup} accessible accessibilityLabel={`${t('training.lineup')}: ${plan.map((slot) => t(`games.${slot.gameId}.name`)).join(', ')}`}>
+            {plan.map((slot, i) => (
+              <View key={i} style={styles.lineupItem}>
+                <View style={styles.lineupIcon}>
+                  <GradientFill from={GAME_THEMES[slot.gameId].cardFrom} to={GAME_THEMES[slot.gameId].cardTo} width={44} height={44} light={0.06} />
+                  <Feather name={gameIcon(slot.gameId)} size={20} color="#FFFFFF" />
                 </View>
-                <View style={{ flex: 1, gap: 2 }}>
-                  <View style={styles.gameTop}>
-                    <Text style={{ color: theme.colors.text, fontSize: 15, fontWeight: '600', flexShrink: 1 }} numberOfLines={1}>
-                      {t(`games.${game.id}.name`)}
-                    </Text>
-                    <Text style={{ color: theme.colors.textTertiary, fontSize: 12 }}>
-                      {p.rounds > 0 ? t('home.level', { level: displayLevel(p.level) }) : t('home.new')}
-                    </Text>
-                  </View>
-                  <Text style={{ color: theme.colors.textSecondary, fontSize: 13 }}>{t(`games.${game.id}.desc`)}</Text>
-                  <Text style={{ color: theme.colors.textTertiary, fontSize: 11 }}>
-                    {t(`skills.${game.skill}`)}
-                    {p.rounds > 0 ? ` · ${t('home.best', { level: displayLevel(p.bestLevel) })}` : ''}
-                  </Text>
+                {i < plan.length - 1 ? <View style={styles.lineupDash} /> : null}
+              </View>
+            ))}
+          </View>
+
+          <Pressable
+            onPress={() => {
+              haptics.tap()
+              navigation.navigate('BrainTraining')
+            }}
+            style={({ pressed }) => [styles.start, pressed && styles.pressed]}
+            accessibilityRole="button"
+            testID="brain-training-start"
+          >
+            <Feather name="play" size={22} color={TRAINING_THEME.cardTo} />
+            <Text style={[styles.startText, { color: TRAINING_THEME.cardTo }]} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+              {t('training.start')}
+            </Text>
+          </Pressable>
+
+          <View style={styles.heroFoot}>
+            {courseChip ? (
+              <View style={styles.course}>
+                <Text style={styles.courseText} maxFontSizeMultiplier={1.4}>
+                  {courseChip}
+                </Text>
+                <View style={styles.courseTrack}>
+                  <View style={[styles.courseFill, { width: `${Math.max(4, Math.min(1, courseFrac) * 100)}%` }]} />
                 </View>
-              </Pressable>
-            )
-          })}
+              </View>
+            ) : null}
+            <View style={styles.minutes}>
+              <Feather name="clock" size={15} color="rgba(255,255,255,0.85)" />
+              <Text style={styles.minutesText} maxFontSizeMultiplier={1.4}>
+                {progress.sessions.minutes > 0 ? t('training.minutes', { value: formatCount(progress.sessions.minutes) }) : t('training.dose')}
+              </Text>
+            </View>
+          </View>
         </View>
 
-        <Text style={{ color: theme.colors.textSecondary, fontSize: 12, lineHeight: 18 }}>{t('home.howItWorks')}</Text>
-        <Text style={{ color: theme.colors.textTertiary, fontSize: 11 }}>{t('note')}</Text>
+        {/* Every game, in its own colours. */}
+        <View style={styles.sectionHead}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]} accessibilityRole="header">
+            {t('home.freePlay')}
+          </Text>
+          <Text style={[styles.body, { color: theme.colors.textSecondary }]}>{t('home.freePlayHint')}</Text>
+        </View>
+
+        <View style={styles.cards}>
+          {BRAIN_GAMES.map((game) => (
+            <GameCard
+              key={game.id}
+              game={game}
+              twoUp={twoUp}
+              levelLabel={levelLabel(game)}
+              onPress={() => navigation.navigate('BrainPlay', { mode: game.id })}
+              trend={gameHistory(history, game.id).map((h) => h.level)}
+            />
+          ))}
+        </View>
+
+        {/* Achievements: every one listed, earned ones in colour — never a count or a total. */}
+        <View style={styles.sectionHead}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]} accessibilityRole="header">
+            {t('achievements.title')}
+          </Text>
+        </View>
+        <View style={styles.achGrid} testID="brain-achievements">
+          {ACHIEVEMENTS.map((id) => (
+            <AchievementTile key={id} id={id} earned={hasAchievement(meta, id)} columns={width >= 600 ? 3 : 2} />
+          ))}
+        </View>
+
+        <Text style={[styles.body, { color: theme.colors.textSecondary }]}>{t('home.howItWorks')}</Text>
+
+        {research ? (
+          <Pressable
+            onPress={() => navigation.navigate('BrainResearch')}
+            style={({ pressed }) => [
+              styles.research,
+              { backgroundColor: theme.colors.surfaceElevated, borderColor: pressed ? theme.colors.primary : theme.colors.border },
+            ]}
+            accessibilityRole="button"
+            testID="brain-research-link"
+          >
+            <Feather name="book-open" size={22} color={theme.colors.primary} />
+            <Text style={[styles.researchText, { color: theme.colors.text }]}>{t('home.research')}</Text>
+            <Feather name="chevron-right" size={22} color={theme.colors.textTertiary} />
+          </Pressable>
+        ) : null}
+
+        <View style={styles.footer}>
+          <Text style={[styles.fine, { color: theme.colors.textSecondary }]}>{t('disclaimer')}</Text>
+          <Text style={[styles.fine, { color: theme.colors.textSecondary }]}>{t('worry')}</Text>
+        </View>
       </ScrollView>
+
+      <BrainSettingsModal visible={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </Screen>
+  )
+
+  /** The level, small: "Lv. 7.3" — Quick Eye "Stage 3 · speed 7" (a speed level, never a flash time). */
+  function levelLabel(game: BrainGameEntry): string {
+    const p = gameProgress(progress, game.id)
+    // A placement left part-way (n = 0) has no level yet — never its interim probe level.
+    if (p.rounds === 0 || meta.sk[game.id]?.n === 0) return t('home.new')
+    if (game.id === 'quickEye') return t('home.quickEyeLevel', { stage: progress.quickEye.variant, speed: qeSpeedLevel(p.level) })
+    return t('home.level', { level: displayLevel(p.level).toFixed(1) })
+  }
+}
+
+/**
+ * One achievement on the hub. Earned: in colour with its title and line. Not yet: dimmed, with
+ * "not yet" — the line still says what it takes, so nothing is a mystery box.
+ */
+function AchievementTile({ id, earned, columns }: { id: AchievementId; earned: boolean; columns: number }) {
+  const theme = useTheme()
+  const { t } = useTranslation('brain')
+  const title = t(`achievements.${id}.title`)
+  const body = t(`achievements.${id}.body`)
+  const width = columns === 3 ? '31.8%' : '48.4%'
+  return (
+    <View
+      style={[styles.ach, { width }, earned ? styles.achEarned : { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+      accessible
+      accessibilityLabel={`${title}, ${earned ? t('achievements.earned') : t('achievements.locked')}. ${body}`}
+      testID={`brain-achievement-${id}`}
+    >
+      {earned ? <GradientFill from={TRAINING_THEME.cardFrom} to={TRAINING_THEME.cardTo} light={0.05} /> : null}
+      <View style={styles.achTop}>
+        <View style={[styles.achIcon, earned ? styles.achIconEarned : { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
+          <Feather name={earned ? ACHIEVEMENT_ICONS[id] : 'lock'} size={18} color={earned ? '#0F172A' : theme.colors.textTertiary} />
+        </View>
+        {earned ? null : (
+          <Text style={[styles.achLocked, { color: theme.colors.textSecondary }]} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+            {t('achievements.locked')}
+          </Text>
+        )}
+      </View>
+      <Text style={[styles.achTitle, { color: earned ? '#FFFFFF' : theme.colors.textSecondary }]} maxFontSizeMultiplier={1.4}>
+        {title}
+      </Text>
+      {/* Dimmed by colour and the lock, not by fading the text: the line stays readable. */}
+      <Text style={[styles.achBody, { color: earned ? 'rgba(255,255,255,0.88)' : theme.colors.textSecondary }]} maxFontSizeMultiplier={1.4}>
+        {body}
+      </Text>
+    </View>
+  )
+}
+
+function GameCard({ game, twoUp, levelLabel, onPress, trend }: { game: BrainGameEntry; twoUp: boolean; levelLabel: string; onPress: () => void; trend: number[] }) {
+  const { t } = useTranslation('brain')
+  const progress = useBrainStore((s) => s.progress)
+  const meta = useBrainStore((s) => s.meta)
+  const theme = GAME_THEMES[game.id]
+  const p = gameProgress(progress, game.id)
+  const played = p.rounds > 0
+  const best = progress.bestRuns[game.id]
+  const icon = gameIcon(game.id)
+  // This game's tier and the way to the next — per game only, never added up across games.
+  const standing = tierStanding(game.id, meta, progress)
+  // A placement left part-way (n = 0) has no level yet: shown like a game never played — "new",
+  // no level and no tier bar — never its interim probe level. A tier earned stays.
+  const placing = meta.sk[game.id]?.n === 0
+  const fresh = !played || (placing && standing.tier === 0)
+  const showLevel = played && !placing
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.card, twoUp && styles.cardHalf, pressed && styles.pressed]}
+      accessibilityRole="button"
+      accessibilityLabel={[
+        t(`games.${game.id}.name`),
+        fresh ? t('home.new') : `${t('tiers.label')} ${tierA11y(t, standing)}`,
+        showLevel ? levelLabel : null,
+        t(`games.${game.id}.desc`),
+        best ? t('home.record', { value: formatCount(best) }) : null,
+      ]
+        .filter(Boolean)
+        .join(', ')}
+      testID={`brain-game-${game.id}`}
+    >
+      <GradientFill from={theme.cardFrom} to={theme.cardTo} />
+      <View pointerEvents="none" style={styles.watermark}>
+        <Feather name={icon} size={150} color="#FFFFFF" />
+      </View>
+      <View style={styles.cardTop}>
+        <View style={styles.cardIcon}>
+          <Feather name={icon} size={24} color="#FFFFFF" />
+        </View>
+        {!fresh ? (
+          <View style={[styles.chip, styles.chipPlayed]} testID={`brain-game-${game.id}-tier`}>
+            <TierMedal tier={standing.tier} size={20} />
+            <Text style={[styles.chipText, { color: '#FFFFFF' }]} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+              {tierName(t, standing.tier)}
+            </Text>
+          </View>
+        ) : (
+          <View style={[styles.chip, styles.chipNew]}>
+            <Feather name="star" size={13} color="#0F172A" />
+            <Text style={[styles.chipText, { color: '#0F172A' }]} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+              {t('home.new')}
+            </Text>
+          </View>
+        )}
+      </View>
+      <View style={styles.cardMid}>
+        <Text style={styles.cardName} numberOfLines={1} maxFontSizeMultiplier={1.4}>
+          {t(`games.${game.id}.name`)}
+        </Text>
+        <Text style={styles.cardDesc} numberOfLines={2} maxFontSizeMultiplier={1.4}>
+          {t(`games.${game.id}.desc`)}
+        </Text>
+      </View>
+      <View style={styles.cardFoot}>
+        <View style={styles.flex}>
+          {!fresh ? (
+            <View style={styles.levelTrack}>
+              <TierBar frac={standing.frac} color={standing.next === null ? FX.gold : '#FFFFFF'} track="rgba(255,255,255,0.25)" height={6} />
+            </View>
+          ) : null}
+          <View style={styles.meta}>
+            {showLevel ? (
+              <>
+                <Text style={[styles.metaText, styles.metaLevel]} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+                  {levelLabel}
+                </Text>
+                <Text style={styles.metaText}>·</Text>
+              </>
+            ) : null}
+            <Text style={[styles.metaText, styles.flexShrink]} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+              {t(`skills.${game.skill}`)}
+            </Text>
+            {best ? (
+              <>
+                <Text style={styles.metaText}>·</Text>
+                <Feather name="award" size={13} color="rgba(255,255,255,0.85)" />
+                <Text style={[styles.metaText, styles.flexShrink]} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+                  {t('home.record', { value: formatCount(best) })}
+                </Text>
+              </>
+            ) : null}
+          </View>
+        </View>
+        {trend.length >= 2 ? (
+          <View style={styles.spark}>
+            <Sparkline values={trend} color="#FFFFFF" height={36} width={96} />
+          </View>
+        ) : null}
+      </View>
+    </Pressable>
   )
 }
 
 const styles = StyleSheet.create({
-  content: { paddingHorizontal: 16, paddingBottom: 32, gap: 14 },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { fontSize: 12, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, overflow: 'hidden' },
-  mix: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: 14 },
-  mixIcon: { width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center' },
-  mixStart: { backgroundColor: '#fff', paddingHorizontal: 12, paddingVertical: 7, borderRadius: 8 },
-  game: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, padding: 12, borderRadius: 12, borderWidth: 1 },
-  gameIcon: { width: 40, height: 40, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  gameTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
+  content: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 40, gap: 18 },
+  flex: { flex: 1, minWidth: 0 },
+  flexShrink: { flexShrink: 1 },
+  gear: { width: 48, height: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  subtitle: { fontSize: 15, lineHeight: 22 },
+  pressed: { transform: [{ scale: 0.98 }] },
+  hero: { borderRadius: 26, overflow: 'hidden', padding: 20, gap: 18, boxShadow: '0 20px 40px -18px rgba(49,46,129,0.6)' },
+  heroGlow: { position: 'absolute', top: -96, right: -64, width: 260, height: 260, borderRadius: 130, backgroundColor: '#A5B4FC', opacity: 0.18 },
+  heroTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
+  kicker: { color: 'rgba(255,255,255,0.78)', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
+  heroTitle: { color: '#FFFFFF', fontSize: 28, fontWeight: '800', letterSpacing: -0.5, marginTop: 2 },
+  heroDesc: { color: 'rgba(255,255,255,0.88)', fontSize: 15, lineHeight: 21, marginTop: 4 },
+  lineup: { flexDirection: 'row', alignItems: 'center' },
+  lineupItem: { flexDirection: 'row', alignItems: 'center' },
+  lineupIcon: { width: 44, height: 44, borderRadius: 13, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
+  lineupDash: { width: 12, height: 2, borderRadius: 1, backgroundColor: 'rgba(255,255,255,0.4)', marginHorizontal: 6 },
+  start: {
+    minHeight: 58,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    paddingHorizontal: 16,
+    boxShadow: '0 10px 30px rgba(0,0,0,0.25)',
+  },
+  startText: { fontSize: 18, fontWeight: '800', flexShrink: 1 },
+  heroFoot: { gap: 12 },
+  course: { gap: 6 },
+  courseText: { color: 'rgba(255,255,255,0.92)', fontSize: 14, fontWeight: '600' },
+  courseTrack: { height: 8, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.2)', overflow: 'hidden' },
+  courseFill: { height: 8, borderRadius: 4, backgroundColor: '#FFFFFF' },
+  minutes: { flexDirection: 'row', alignItems: 'flex-start', gap: 6 },
+  minutesText: { flex: 1, color: 'rgba(255,255,255,0.88)', fontSize: 14, lineHeight: 20 },
+  sectionHead: { gap: 4 },
+  sectionTitle: { fontSize: 20, fontWeight: '700' },
+  body: { fontSize: 15, lineHeight: 22 },
+  cards: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  card: { width: '100%', minHeight: 176, borderRadius: 24, overflow: 'hidden', padding: 18, boxShadow: '0 12px 24px -14px rgba(0,0,0,0.5)' },
+  cardHalf: { width: '48.5%' },
+  watermark: { position: 'absolute', right: -24, bottom: -40, opacity: 0.14 },
+  cardTop: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 },
+  cardIcon: { width: 48, height: 48, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.2)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)', alignItems: 'center', justifyContent: 'center' },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999, flexShrink: 1 },
+  chipPlayed: { backgroundColor: 'rgba(255,255,255,0.2)' },
+  chipNew: { backgroundColor: '#FFFFFF' },
+  chipText: { fontSize: 14, fontWeight: '700', flexShrink: 1 },
+  cardMid: { flex: 1, marginTop: 12, gap: 2 },
+  cardName: { color: '#FFFFFF', fontSize: 20, fontWeight: '800' },
+  cardDesc: { color: 'rgba(255,255,255,0.88)', fontSize: 14, lineHeight: 20 },
+  cardFoot: { flexDirection: 'row', alignItems: 'flex-end', gap: 12, marginTop: 12 },
+  levelTrack: { marginBottom: 6 },
+  meta: { flexDirection: 'row', alignItems: 'center', gap: 4, flexWrap: 'wrap' },
+  metaText: { color: 'rgba(255,255,255,0.88)', fontSize: 14 },
+  metaLevel: { fontSize: 13, fontWeight: '700', fontVariant: ['tabular-nums'] },
+  achGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  ach: { borderRadius: 18, borderWidth: 1, overflow: 'hidden', padding: 14, gap: 6 },
+  achEarned: { borderColor: 'transparent', boxShadow: '0 10px 20px -12px rgba(49,46,129,0.6)' },
+  achTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 6, marginBottom: 2 },
+  achIcon: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
+  achIconEarned: { backgroundColor: FX.gold, borderColor: 'rgba(255,255,255,0.6)' },
+  achLocked: { fontSize: 12, fontWeight: '700', flexShrink: 1 },
+  achTitle: { fontSize: 15, fontWeight: '800' },
+  achBody: { fontSize: 13, lineHeight: 18 },
+  spark: { width: 96, opacity: 0.9 },
+  research: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 60, paddingHorizontal: 16, borderRadius: 14, borderWidth: 1 },
+  researchText: { flex: 1, fontSize: 17, fontWeight: '600' },
+  footer: { gap: 8, paddingTop: 4 },
+  fine: { fontSize: 13, lineHeight: 19 },
 })

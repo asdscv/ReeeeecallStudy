@@ -1,44 +1,53 @@
-import { useEffect, useState } from 'react'
-import { Navigate, useParams } from 'react-router-dom'
+import { useState } from 'react'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { isBrainGameId } from '@reeeeecall/shared/lib/brain-games'
-import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
-import type { BrainMode, SessionStats } from '@reeeeecall/shared/hooks/useBrainSession'
-import { useAuthStore } from '../../stores/auth-store'
+import { isBrainGameId, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
+import type { RoundStats } from '@reeeeecall/shared/hooks/useBrainRound'
 import { useTrackEvent } from '../../hooks/useTrackEvent'
-import { BrainSession } from '../../components/brain/BrainSession'
-import { BrainSummary } from '../../components/brain/BrainSummary'
-import { brainStorageFor } from '../../components/brain/brain-ui'
+import { RoundView } from '../../components/brain/RoundView'
+import { RoundSummary } from '../../components/brain/RoundSummary'
+import { GameIntro } from '../../components/brain/GameIntro'
+import { useBrainHydrated } from '../../components/brain/useBrainHydrated'
 
-/** `/brain/play/:mode` — one game by id, or `mix`. Full screen, like a study session. */
+/**
+ * `/brain/play/:mode` — free practice of one game, full screen: the game's intro (with its demo),
+ * a countdown, the round, the results. "Again" goes straight to the countdown.
+ */
 export function BrainPlayPage() {
   const { mode } = useParams()
-  // Load the namespace before the first round draws, so prompts never flash as raw keys.
-  useTranslation('brain')
-  const userId = useAuthStore((s) => s.user?.id)
-  const hydrate = useBrainStore((s) => s.hydrate)
-  const storageKey = useBrainStore((s) => s.storageKey)
+  // Load the namespace before the first trial draws, so prompts never flash as raw keys.
+  const { t } = useTranslation('brain')
+  const ready = useBrainHydrated()
+  const navigate = useNavigate()
   const trackEvent = useTrackEvent()
-  const [finished, setFinished] = useState<SessionStats | null>(null)
+  const [stage, setStage] = useState<'intro' | 'play' | 'summary'>('intro')
+  const [finished, setFinished] = useState<RoundStats | null>(null)
   const [run, setRun] = useState(0)
 
-  useEffect(() => {
-    if (userId) hydrate(brainStorageFor(userId))
-  }, [userId, hydrate])
+  // The old endless mix became Today's Training.
+  if (mode === 'mix') return <Navigate to="/brain/training" replace />
+  if (!isBrainGameId(mode)) return <Navigate to="/brain" replace />
+  // A round reads the player's levels when it starts, so it waits for them.
+  if (!ready) return null
+  const gameId: BrainGameId = mode
 
-  if (mode !== 'mix' && !isBrainGameId(mode)) return <Navigate to="/brain" replace />
-  // The session reads the player's levels when it starts, so it waits for them.
-  if (!userId || storageKey !== brainStorageFor(userId).key) return null
-
-  const finish = (stats: SessionStats) => {
-    setFinished(stats)
-    if (stats.rounds > 0) {
-      trackEvent({ category: 'brain', action: 'session_end', label: mode, value: stats.rounds })
-    }
+  if (stage === 'intro') {
+    return <GameIntro gameId={gameId} onStart={() => setStage('play')} onClose={() => navigate('/brain')} closeLabel={t('play.back')} />
   }
-
-  if (finished) {
-    return <BrainSummary stats={finished} onAgain={() => { setFinished(null); setRun((r) => r + 1) }} />
+  if (stage === 'summary' && finished) {
+    return <RoundSummary gameId={gameId} stats={finished} onAgain={() => { setFinished(null); setRun((r) => r + 1); setStage('play') }} />
   }
-  return <BrainSession key={run} mode={mode as BrainMode} onFinish={finish} />
+  return (
+    <RoundView
+      key={run}
+      gameId={gameId}
+      onOver={(stats) => {
+        if (stats.trials > 0) trackEvent({ category: 'brain', action: 'round_end', label: `${gameId}:${stats.endedBy}`, value: stats.trials })
+        // Stopping before the first counted trial is backing out, not a round to sum up.
+        if (stats.trials === 0 && stats.endedBy === 'stop') return navigate('/brain')
+        setFinished(stats)
+        setStage('summary')
+      }}
+    />
+  )
 }

@@ -1,22 +1,60 @@
 {
   "title": "Entrenamiento mental",
-  "subtitle": "Memoria, atención, rapidez y razonamiento: un reto nuevo en cada ronda, ajustado a tu nivel.",
-  "note": "Ejercicio mental cotidiano para divertirse. No es un servicio médico.",
-  "mix": {
-    "title": "Entrenamiento mixto",
-    "desc": "Los juegos cambian solos y se centran en tu punto más débil. Sigue todo el tiempo que quieras.",
-    "start": "Empezar"
+  "subtitle": "Juegos de concentración y memoria para un hábito regular de actividad mental",
+  "disclaimer": "Esta función no es un dispositivo médico y no está destinada a diagnosticar, tratar, curar ni prevenir ninguna afección médica.",
+  "worry": "Si te preocupa tu memoria, en lugar de jugar más, habla con un médico o con un servicio de salud de tu zona.",
+  "training": {
+    "title": "Entrenamiento de hoy",
+    "desc": "Ojo rápido y 3 juegos · unos {{minutes}} min",
+    "start": "Empezar el entrenamiento de hoy",
+    "week": "Esta semana {{done}}/{{goal}}",
+    "weekDone": "Objetivo semanal cumplido",
+    "course": "Curso básico {{done}}/{{total}}",
+    "booster": "Repaso {{done}}/{{total}}",
+    "boosterNext": "Próximo repaso: {{date}}",
+    "minutes": "{{value}} min en total",
+    "dose": "El plan son unas tres sesiones de 20 minutos por semana. Puedes jugar más, pero no suma nada extra.",
+    "slot": "Juego {{index}}/{{total}}",
+    "next": "Siguiente juego",
+    "continue": "Continuar",
+    "doneTitle": "Entrenamiento de hoy completado",
+    "doneBody": "Buen trabajo. Puedes descansar uno o dos días antes del siguiente.",
+    "quitTitle": "Entrenamiento detenido",
+    "quitBody": "Tus registros hasta ahora se han guardado. Como no lo terminaste, no cuenta como sesión completada.",
+    "backHome": "Volver a Entrenamiento mental",
+    "kicker": "3 veces por semana",
+    "lineup": "Juegos de hoy",
+    "minutesShort": "{{value}} min",
+    "stopBody": "Lo hecho queda guardado, pero una sesión sin terminar no cuenta como completada."
   },
   "home": {
-    "games": "Juegos",
+    "freePlay": "Práctica libre",
+    "freePlayHint": "Elige un juego para practicar. La ronda termina cuando usas todas tus oportunidades.",
     "level": "Nv. {{level}}",
     "best": "Mejor Nv. {{level}}",
     "new": "Nuevo",
-    "streak_one": "Racha de {{count}} día",
-    "streak_other": "Racha de {{count}} días",
-    "today": "Rondas hoy: {{value}}",
-    "totalPoints": "Puntos totales: {{value}}",
-    "howItWorks": "Cada ronda se genera desde cero. Si aciertas, la siguiente es un poco más difícil; si fallas, se suaviza. Así siempre es un reto justo."
+    "quickEyeLevel": "Etapa {{stage}} · velocidad {{speed}}",
+    "record": "Mejor: {{value}} pts",
+    "settings": "Ajustes",
+    "research": "Estudios de referencia",
+    "howItWorks": "Cada reto se crea desde cero. Si aciertas, el siguiente es un poco más difícil; si fallas, se suaviza. El nivel solo muestra tu habilidad en ese juego: no mide la memoria ni la salud cerebral."
+  },
+  "settings": {
+    "title": "Ajustes de Entrenamiento mental",
+    "timing": "Tiempo relajado",
+    "timingHelp": "Da más tiempo a los juegos con límite, o quítalo del todo. En los modos más largos, quedarte sin tiempo no te cuesta una oportunidad.",
+    "timing_1": "Estándar",
+    "timing_1_5": "1,5×",
+    "timing_2": "2×",
+    "timing_0": "Sin límite",
+    "centerOnly": "Ojo rápido: solo el centro",
+    "centerOnlyHelp": "Actívalo si te cuesta ver la estrella de los bordes. Solo responderás la imagen del centro.",
+    "flash": "Ojo rápido muestra imágenes durante muy poco tiempo. Si eres sensible a las luces intermitentes, tómatelo con calma.",
+    "close": "Cerrar",
+    "sound": "Efectos de sonido",
+    "soundHelp": "Un sonido breve al acertar o fallar.",
+    "haptics": "Vibración",
+    "hapticsHelp": "Una vibración breve al acertar o fallar. Es el mismo ajuste de vibración de toda la app."
   },
   "skills": {
     "memory": "Memoria",
@@ -25,25 +63,29 @@
     "reasoning": "Razonamiento"
   },
   "games": {
+    "quickEye": {
+      "name": "Ojo rápido",
+      "desc": "Ve durante un instante una imagen en el centro y una estrella en el borde, y di qué era y dónde estaba."
+    },
     "memoryGrid": {
       "name": "Cuadrícula flash",
-      "desc": "Recuerda qué casillas se iluminaron y tócalas."
+      "desc": "Práctica de memoria espacial: recuerda las casillas que se iluminaron y tócalas."
     },
     "sequence": {
       "name": "Secuencia",
-      "desc": "Mira el orden en que parpadean y repítelo."
+      "desc": "Práctica de memoria de orden: toca las fichas en el orden en que parpadearon."
     },
     "pairs": {
       "name": "Parejas",
-      "desc": "Voltea dos cartas a la vez para encontrar las parejas."
+      "desc": "Voltea dos cartas a la vez para encontrar imágenes iguales."
     },
     "schulte": {
       "name": "Caza de números",
-      "desc": "Toca los números en orden lo más rápido posible."
+      "desc": "Encuentra y toca en orden los números dispersos."
     },
     "oddOneOut": {
       "name": "El diferente",
-      "desc": "Todos son iguales menos uno. Encuéntralo."
+      "desc": "Todos iguales menos uno. Encuéntralo."
     },
     "stroop": {
       "name": "Color y palabra",
@@ -51,7 +93,7 @@
     },
     "math": {
       "name": "Cálculo rápido",
-      "desc": "Resuélvelo antes de que se acabe el tiempo."
+      "desc": "Resuélvelo y elige la respuesta."
     },
     "series": {
       "name": "Patrón numérico",
@@ -74,25 +116,80 @@
     "pickWord": "Elige lo que DICE la palabra",
     "solve": "Elige la respuesta",
     "nextNumber": "¿Qué número sigue?",
-    "correct": "¡Correcto!",
+    "correct": "Correcto",
     "wrong": "Casi",
     "timeUp": "Se acabó el tiempo",
-    "levelUp": "¡Subes de nivel! Nv. {{level}}",
+    "timeUpForgiven": "Se acabó el tiempo · no pierdes oportunidad",
+    "void": "La pantalla se trabó; te lo mostramos otra vez",
     "points": "+{{value}}",
+    "levelUp": "Subes de nivel · Nv. {{level}}",
+    "lives": "Oportunidades: {{value}}",
+    "livesSpan": "Oportunidades en esta longitud: {{value}}",
+    "practice": "Práctica {{done}}/{{total}}",
+    "practiceHint": "Práctica: no te juegas oportunidades ni puntos.",
+    "practiceDone": "Práctica terminada. ¡Vamos allá!",
+    "trial": "{{done}}/{{total}}",
     "score": "Puntos",
     "streak": "Racha",
+    "pause": "Pausa",
+    "paused": "En pausa",
+    "resume": "Reanudar",
     "stop": "Terminar",
-    "mixBadge": "Mixto"
+    "stopConfirm": "¿Terminar aquí? Tus registros hasta ahora quedan guardados.",
+    "go": "¡Ya!",
+    "back": "Volver",
+    "streakCount": "{{value}} seguidas",
+    "streakBanner": "¡{{value}} seguidas!",
+    "levelUpBanner": "¡Subes de nivel! Nv. {{level}}",
+    "fasterBanner": "¡Más rápido!",
+    "roundOver": "Fin de la ronda",
+    "roundCleared": "¡Ronda superada!",
+    "stopTitle": "¿Parar aquí?",
+    "stopBody": "Todo lo hecho hasta ahora queda guardado.",
+    "keepPlaying": "Seguir jugando",
+    "stopNow": "Parar"
+  },
+  "quickEye": {
+    "watch": "Mira el centro",
+    "what": "¿Qué había en el centro?",
+    "where": "¿En qué dirección estaba la estrella?",
+    "sameOrDifferent": "¿Eran iguales las dos imágenes del centro?",
+    "same": "Iguales",
+    "different": "Diferentes",
+    "circle": "Círculo",
+    "square": "Cuadrado",
+    "stage": "Etapa {{stage}}",
+    "dir": {
+      "0": "Arriba",
+      "1": "Arriba a la derecha",
+      "2": "Derecha",
+      "3": "Abajo a la derecha",
+      "4": "Abajo",
+      "5": "Abajo a la izquierda",
+      "6": "Izquierda",
+      "7": "Arriba a la izquierda"
+    },
+    "speedLevel": "Nivel de velocidad {{level}}"
   },
   "summary": {
-    "title": "¡Buen trabajo!",
-    "rounds": "Rondas",
+    "livesOut": "Ronda terminada",
+    "cleared": "Ronda superada",
+    "stopped": "Buen momento para parar",
+    "trials": "Retos",
     "accuracy": "Aciertos",
     "points": "Puntos",
     "bestStreak": "Mejor racha",
-    "levels": "Niveles",
-    "again": "Seguir",
-    "home": "Todos los juegos"
+    "levelChange": "Nv. {{from}} → {{to}}",
+    "improved": "Tu récord en este juego ha mejorado",
+    "newBest": "Mejor puntuación personal",
+    "again": "Jugar otra vez",
+    "home": "Todos los juegos",
+    "stars": "{{value}} estrellas",
+    "time": "Tiempo",
+    "trend": "Nivel en las últimas rondas",
+    "otherGames": "Otros juegos",
+    "minutes": "Minutos",
+    "voided": "La pantalla se trababa una y otra vez, así que la ronda se detuvo"
   },
   "colors": {
     "red": "ROJO",
@@ -101,5 +198,267 @@
     "yellow": "AMARILLO",
     "purple": "MORADO",
     "orange": "NARANJA"
+  },
+  "intro": {
+    "howTo": "Cómo se juega",
+    "replay": "Ver de nuevo",
+    "start": "Empezar",
+    "practiceNote": "Las 4 primeras son de práctica: no gastan oportunidades ni suman puntos.",
+    "level": "Nivel",
+    "speed": "Velocidad",
+    "stage": "Etapa",
+    "rounds": "Partidas",
+    "best": "Mejor puntuación",
+    "welcomeBack": "Bienvenido de nuevo. Las primeras preguntas volverán a encontrar tu nivel.",
+    "firstPlacement": "Las primeras preguntas buscan el nivel inicial adecuado."
+  },
+  "mechanics": {
+    "quickEye": {
+      "periphery": {
+        "title": "Busca la estrella",
+        "body": "Una estrella aparece también fuera. Elige la figura del centro y luego el lado donde estaba la estrella."
+      },
+      "distractors": {
+        "title": "Estrella entre triángulos",
+        "body": "También aparecen triángulos. Elige el lado donde estaba la única estrella."
+      },
+      "similar": {
+        "title": "Formas parecidas",
+        "body": "Las esquinas del cuadrado se redondean y se parece más a un círculo."
+      },
+      "sameDiff": {
+        "title": "¿Iguales o distintas?",
+        "body": "Aparecen dos figuras en el centro. Di si son iguales o distintas."
+      }
+    },
+    "oddOneOut": {
+      "rotation": {
+        "title": "La que está girada",
+        "body": "Todas son el mismo dibujo. Toca la que está girada en otra dirección. A veces todo el tablero está inclinado."
+      },
+      "lookalike": {
+        "title": "Parecidas",
+        "body": "La diferente se parece cada vez más a las demás."
+      },
+      "nearTwin": {
+        "title": "Casi gemelas",
+        "body": "Solo cambia un detalle pequeño, como una sonrisa o una manecilla."
+      },
+      "glyphs": {
+        "title": "Letras engañosas",
+        "body": "Letras que se parecen, como b y d o 6 y 9."
+      }
+    },
+    "board": {
+      "biggerGrid": {
+        "title": "Tablero más grande",
+        "body": "Ahora hay más casillas."
+      },
+      "moreNumbers": {
+        "title": "Más números",
+        "body": "Ahora hay más números, y también más tiempo."
+      },
+      "moreCards": {
+        "title": "Más cartas",
+        "body": "Ahora hay más parejas, con más tiempo y margen de error."
+      },
+      "moreChoices": {
+        "title": "Más opciones",
+        "body": "Hay un color más para elegir."
+      }
+    },
+    "schulte": {
+      "descending": {
+        "title": "Cuenta atrás",
+        "body": "Toca desde el número más grande hasta el 1."
+      },
+      "reshuffle": {
+        "title": "Modo mezcla",
+        "body": "Los números cambian de sitio con cada toque. A cambio, el tablero es un tamaño menor."
+      }
+    },
+    "memoryGrid": {
+      "fastShow": {
+        "title": "Se ve menos tiempo",
+        "body": "El tablero ya tiene su tamaño máximo. Ahora las casillas se iluminan menos tiempo."
+      }
+    },
+    "sequence": {
+      "reverse": {
+        "title": "Al revés",
+        "body": "Toca las casillas en orden inverso, empezando por la última que se iluminó."
+      }
+    },
+    "series": {
+      "descending": {
+        "title": "Números que bajan",
+        "body": "Los números también pueden bajar lo mismo en cada paso."
+      },
+      "geometric": {
+        "title": "Multiplicar",
+        "body": "Aparece una regla en la que cada número es el anterior por el mismo número."
+      },
+      "alternating": {
+        "title": "Sube y baja",
+        "body": "Aparece una regla que suma y resta por turnos."
+      },
+      "growing": {
+        "title": "Saltos que crecen",
+        "body": "Aparece una regla en la que lo que se suma crece cada vez."
+      },
+      "fibonacci": {
+        "title": "Los dos anteriores",
+        "body": "Aparece una regla en la que cada número es la suma de los dos anteriores."
+      },
+      "squares": {
+        "title": "Cuadrados",
+        "body": "Aparece una regla basada en números multiplicados por sí mismos."
+      },
+      "interleaved": {
+        "title": "Dos en una",
+        "body": "Dos reglas se turnan. Lee un número sí y otro no."
+      },
+      "doublePlus": {
+        "title": "Doble y suma",
+        "body": "Aparece una regla que duplica el número anterior y suma lo mismo."
+      }
+    },
+    "pairs": {
+      "oneFamily": {
+        "title": "Un solo tema",
+        "body": "Ahora todos los dibujos son de un mismo tema, como animales o frutas."
+      },
+      "noPreview": {
+        "title": "Sin vistazo",
+        "body": "Ya no se muestran las cartas al principio. Recuérdalas mientras las giras."
+      }
+    },
+    "stroop": {
+      "word": {
+        "title": "Cambio de regla",
+        "body": "Cuando te pidan lo que DICE, elige el color que nombra la palabra, no el de la tinta."
+      }
+    },
+    "math": {
+      "sub": {
+        "title": "Llega la resta",
+        "body": "Ahora también hay restas."
+      },
+      "mul": {
+        "title": "Llega la multiplicación",
+        "body": "Ahora también hay multiplicaciones."
+      },
+      "div": {
+        "title": "Llega la división",
+        "body": "También hay divisiones. El resultado siempre es exacto."
+      },
+      "twoStep": {
+        "title": "Dos pasos",
+        "body": "Ahora hay problemas de dos pasos. Con + y × juntos, haz primero la ×; si hay un ?, elige el número que falta."
+      }
+    }
+  },
+  "rule": {
+    "label": "Regla nueva",
+    "gotIt": "Entendido",
+    "unscored": "Esta no cuenta para los puntos ni las oportunidades.",
+    "change": "Novedad"
+  },
+  "placement": {
+    "label": "Buscando tu nivel inicial",
+    "hint": "Unas pocas preguntas para encontrar el nivel adecuado. No se gastan oportunidades."
+  },
+  "tiers": {
+    "none": "Sin rango",
+    "t1": "Bronce",
+    "t2": "Plata",
+    "t3": "Oro",
+    "t4": "Platino",
+    "t5": "Diamante",
+    "t6": "Maestro",
+    "label": "Rango",
+    "next": "Hasta el siguiente rango",
+    "up": "¡{{tier}} conseguido!",
+    "upBody": "Has llegado a {{tier}} en {{game}}.",
+    "max": "Rango máximo"
+  },
+  "achievements": {
+    "title": "Logros",
+    "earned": "Logro",
+    "locked": "Todavía no",
+    "firstClear": {
+      "title": "Primera ronda completa",
+      "body": "Jugaste una ronda hasta el final."
+    },
+    "cleanRound": {
+      "title": "Ronda limpia",
+      "body": "Terminaste una ronda sin perder ninguna oportunidad."
+    },
+    "streak10": {
+      "title": "10 seguidas",
+      "body": "Acertaste 10 seguidas."
+    },
+    "streak20": {
+      "title": "20 seguidas",
+      "body": "Acertaste 20 seguidas."
+    },
+    "flawlessHunt": {
+      "title": "Sin toques erróneos",
+      "body": "Terminaste una Caza de números de 5×5 o más sin fallar ningún toque."
+    },
+    "span7": {
+      "title": "Siete de memoria",
+      "body": "Recordaste 7 en Secuencia o Cuadrícula flash."
+    },
+    "quickEyeStage5": {
+      "title": "Ojo rápido: etapa 5",
+      "body": "Llegaste a la etapa 5 de Ojo rápido."
+    },
+    "quickEyeStage10": {
+      "title": "Ojo rápido: etapa 10",
+      "body": "Llegaste a la etapa 10 de Ojo rápido."
+    },
+    "allGames": {
+      "title": "Todos los juegos",
+      "body": "Probaste los 9 juegos."
+    },
+    "firstSession": {
+      "title": "Primera sesión",
+      "body": "Terminaste el Entrenamiento de hoy por primera vez."
+    },
+    "weekGoal": {
+      "title": "3 esta semana",
+      "body": "Hiciste el Entrenamiento de hoy 3 veces en una semana."
+    },
+    "coreCourse": {
+      "title": "Curso básico completo",
+      "body": "Terminaste el curso básico de 10 sesiones."
+    },
+    "comeback": {
+      "title": "De vuelta",
+      "body": "Volviste tras más de 2 semanas y terminaste una sesión."
+    },
+    "goldTier": {
+      "title": "Primer Oro",
+      "body": "Llegaste a Oro en un juego."
+    },
+    "masterTier": {
+      "title": "Primer Maestro",
+      "body": "Llegaste a Maestro en un juego."
+    }
+  },
+  "breakdown": {
+    "title": "Desglose de puntos",
+    "base": "Base",
+    "speed": "Rapidez",
+    "combo": "Racha",
+    "clear": "Bonus por completar",
+    "clean": "Bonus sin fallos",
+    "total": "Total"
+  },
+  "relax": {
+    "suggest": "Tus últimas rondas terminaron pronto. ¿Activamos más tiempo?",
+    "turnOn": "Activar tiempo ×1,5",
+    "on": "Más tiempo activado"
   }
 }

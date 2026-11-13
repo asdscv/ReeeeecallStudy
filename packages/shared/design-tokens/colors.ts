@@ -87,8 +87,9 @@ export const lightTheme = {
 
   // Text
   text: palette.gray[900],
-  textSecondary: palette.gray[500],
-  textTertiary: palette.gray[400],
+  // AA (4.5:1) on white: gray-400 tertiary was 2.5:1. Raised with the web tokens in one pass.
+  textSecondary: palette.gray[600],
+  textTertiary: palette.gray[500],
   textInverse: palette.white,
 
   // Border
@@ -97,11 +98,11 @@ export const lightTheme = {
   borderFocus: palette.blue[500],
 
   // Semantic
-  error: palette.red[500],
+  error: palette.red[700],
   errorLight: palette.red[50],
-  success: palette.green[500],
+  success: palette.green[700],
   successLight: palette.green[50],
-  warning: palette.yellow[500],
+  warning: palette.yellow[700],
   warningLight: palette.yellow[50],
 
   // Input
@@ -140,8 +141,8 @@ export const darkTheme = {
 
   // Text
   text: palette.gray[50],
-  textSecondary: palette.gray[400],
-  textTertiary: palette.gray[500],
+  textSecondary: palette.gray[300],
+  textTertiary: palette.gray[400],
   textInverse: palette.gray[900],
 
   // Border — must be LIGHTER than surface (gray800) to be visible on cards.

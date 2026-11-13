@@ -211,13 +211,13 @@ export function PlanSelector() {
                 <div className="flex items-center gap-2">
                   <p className="text-[15px] font-semibold text-foreground">{p.title}</p>
                   {isCurrent && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-brand/15 px-2 py-0.5 text-[11px] font-medium text-brand">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-brand/15 px-2 py-0.5 text-xs font-medium text-brand">
                       <Check className="h-3 w-3" />
                       {t('plans.current')}
                     </span>
                   )}
                   {popular && (
-                    <span className="inline-flex items-center rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                    <span className="inline-flex items-center rounded-full bg-brand px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-white">
                       {t('plans.popular', 'Popular')}
                     </span>
                   )}

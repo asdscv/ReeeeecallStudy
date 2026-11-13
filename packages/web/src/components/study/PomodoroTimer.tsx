@@ -84,7 +84,7 @@ export function PomodoroTimer({ onBreakStart, onBreakEnd, compact = false }: Pom
             transform={`rotate(-90 ${center} ${center})`}
           />
           <text x={center} y={center} textAnchor="middle" dominantBaseline="central"
-            className="text-[10px] font-mono fill-gray-700 dark:fill-gray-300">
+            className="text-xs font-mono fill-gray-700 dark:fill-gray-300">
             {formatTime(timeLeft)}
           </text>
         </svg>
@@ -132,7 +132,7 @@ export function PomodoroTimer({ onBreakStart, onBreakEnd, compact = false }: Pom
         {!isRunning ? (
           <button
             onClick={start}
-            className="px-3 py-1 text-sm bg-brand text-white rounded-lg hover:bg-brand-hover transition-colors"
+            className="px-3 py-1 text-sm bg-brand text-brand-foreground rounded-lg hover:bg-brand-hover transition-colors"
           >
             {t('pomodoro.start')}
           </button>

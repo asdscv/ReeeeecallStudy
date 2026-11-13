@@ -43,7 +43,7 @@ function GroupSection({ group, showLabel, compact }: { group: GroupedRatingDistr
       {showLabel && (
         <div className="flex items-center gap-2 mb-1.5">
           <span className="text-xs font-semibold text-muted-foreground">{t(group.i18nKey)}</span>
-          <span className="text-[10px] text-content-tertiary">{group.total}</span>
+          <span className="text-xs text-content-tertiary">{group.total}</span>
         </div>
       )}
       <div className="flex items-center gap-4">

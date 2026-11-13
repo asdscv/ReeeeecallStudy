@@ -24,7 +24,16 @@
     "analytics": "Analytics",
     "publisher": "Estadísticas del editor",
     "wallet": "Cartera",
-    "quiz": "Cuestionario"
+    "quiz": "Cuestionario",
+    "aiHubHome": "Inicio de IA",
+    "tabsLabel": "Pestañas principales",
+    "short": {
+      "home": "Inicio",
+      "study": "Estudiar",
+      "decks": "Mazos",
+      "brain": "Mente",
+      "more": "Menú"
+    }
   },
   "actions": {
     "save": "Guardar",

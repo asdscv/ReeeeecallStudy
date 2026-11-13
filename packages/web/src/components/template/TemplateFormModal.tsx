@@ -348,7 +348,7 @@ function LayoutEditor({
                     onClick={() => onStyleChange(field.key, style.value)}
                     className={`px-2.5 py-1 text-xs rounded-full cursor-pointer transition ${
                       layoutItem?.style === style.value
-                        ? 'bg-brand text-white'
+                        ? 'bg-brand text-brand-foreground'
                         : 'bg-card border border-border text-muted-foreground hover:border-brand'
                     }`}
                     title={t(style.descKey)}

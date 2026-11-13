@@ -246,7 +246,7 @@ function SystemControls() {
             type="button"
             disabled={busy === 'msg'}
             onClick={saveMsg}
-            className="px-4 py-2 rounded-lg bg-brand text-white text-sm cursor-pointer disabled:opacity-50"
+            className="px-4 py-2 rounded-lg bg-brand text-brand-foreground text-sm cursor-pointer disabled:opacity-50"
           >
             {msgSaved ? t('system.controls.saved') : t('system.controls.save')}
           </button>
@@ -356,7 +356,7 @@ function GrowthLeversPanel() {
       type="button"
       disabled={busy === key}
       onClick={onClick}
-      className="px-4 py-2 rounded-lg bg-brand text-white text-sm cursor-pointer disabled:opacity-50 min-w-[72px]"
+      className="px-4 py-2 rounded-lg bg-brand text-brand-foreground text-sm cursor-pointer disabled:opacity-50 min-w-[72px]"
     >
       {busy === key ? '…' : saved === key ? t('system.controls.saved') : t('system.controls.save')}
     </button>
@@ -452,7 +452,7 @@ function GrowthLeversPanel() {
         </LeverRow>
       </div>
 
-      <p className="text-[11px] text-content-tertiary mt-3">
+      <p className="text-xs text-content-tertiary mt-3">
         {t('system.levers.updated', {
           ai: updatedAt(levers.ai_settings_updated_at),
           cards: updatedAt(levers.card_limit_updated_at),

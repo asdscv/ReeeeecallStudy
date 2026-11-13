@@ -392,7 +392,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
           ))}
         </div>
         {/* Explain what the selected input mode does. */}
-        <p className="text-[11px] text-muted-foreground -mt-1">
+        <p className="text-xs text-muted-foreground -mt-1">
           {t(useImage ? 'config.inputModeImageHint' : 'config.inputModeTopicHint')}
         </p>
 
@@ -448,7 +448,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
                       type="button"
                       onClick={() => removeImage(i)}
                       aria-label={t('config.imageRemove')}
-                      className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-foreground/80 text-[11px] text-background hover:bg-foreground"
+                      className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-foreground/80 text-xs text-background hover:bg-foreground"
                     >
                       ×
                     </button>
@@ -456,7 +456,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
                 ))}
               </div>
             )}
-            <p className="text-[11px] text-content-tertiary mt-1.5">{t('config.imageUploadHint')}</p>
+            <p className="text-xs text-content-tertiary mt-1.5">{t('config.imageUploadHint')}</p>
           </div>
         )}
 
@@ -522,7 +522,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
                 }`}
               >
                 <span className="font-medium">{t('config.fieldAuto')}</span>
-                <span className="block text-[10px] text-content-tertiary mt-0.5">{t('config.fieldAutoDesc')}</span>
+                <span className="block text-xs text-content-tertiary mt-0.5">{t('config.fieldAutoDesc')}</span>
               </button>
               <button
                 type="button"
@@ -534,7 +534,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
                 }`}
               >
                 <span className="font-medium">{t('config.fieldManual')}</span>
-                <span className="block text-[10px] text-content-tertiary mt-0.5">{t('config.fieldManualDesc')}</span>
+                <span className="block text-xs text-content-tertiary mt-0.5">{t('config.fieldManualDesc')}</span>
               </button>
             </div>
           </div>
@@ -596,7 +596,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
                 }`}
               >
                 <span className="font-medium">{t('config.layoutDefault')}</span>
-                <span className="block text-[10px] text-content-tertiary mt-0.5">{t('config.layoutDefaultDesc')}</span>
+                <span className="block text-xs text-content-tertiary mt-0.5">{t('config.layoutDefaultDesc')}</span>
               </button>
               <button
                 type="button"
@@ -608,7 +608,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
                 }`}
               >
                 <span className="font-medium">{t('config.layoutCustom')}</span>
-                <span className="block text-[10px] text-content-tertiary mt-0.5">{t('config.layoutCustomDesc')}</span>
+                <span className="block text-xs text-content-tertiary mt-0.5">{t('config.layoutCustomDesc')}</span>
               </button>
             </div>
           </div>
@@ -637,7 +637,7 @@ export function ConfigStep({ mode, initialTopic, existingDeckId, onStart, showMo
       <button
         type="submit"
         disabled={!canSubmit || (useImage ? limit.reached : limit.exceeds(numericInputOr(cardCount, 0)))}
-        className="w-full py-3 rounded-xl bg-brand text-white font-semibold hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition"
+        className="w-full py-3 rounded-xl bg-brand text-brand-foreground font-semibold hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition"
       >
         {t('config.startGenerate')}
       </button>

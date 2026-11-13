@@ -1,22 +1,60 @@
 {
   "title": "Brain Training",
-  "subtitle": "Memory, focus, speed and reasoning — a fresh puzzle every round, set to your level.",
-  "note": "Everyday brain exercise for fun. Not a medical service.",
-  "mix": {
-    "title": "Mixed training",
-    "desc": "Games switch on their own and lean toward your weakest skill. Keep going as long as you like.",
-    "start": "Start"
+  "subtitle": "Focus and memory games for a regular brain-activity habit",
+  "disclaimer": "This feature is not a medical device and is not intended to diagnose, treat, cure, or prevent any medical condition.",
+  "worry": "If you are worried about your memory, please talk to a doctor or a local health service rather than playing more games.",
+  "training": {
+    "title": "Today's Training",
+    "desc": "Quick Eye and 3 games · about {{minutes}} min",
+    "start": "Start today's training",
+    "week": "This week {{done}}/{{goal}}",
+    "weekDone": "Weekly goal reached",
+    "course": "Core course {{done}}/{{total}}",
+    "booster": "Refresher {{done}}/{{total}}",
+    "boosterNext": "Next refresher: {{date}}",
+    "minutes": "{{value}} min in total",
+    "dose": "About three 20-minute sessions a week is the plan. Playing more is fine, but it earns nothing extra.",
+    "slot": "Game {{index}}/{{total}}",
+    "next": "Next game",
+    "continue": "Continue",
+    "doneTitle": "Today's training done",
+    "doneBody": "Nice work. A day or two of rest before the next one is fine.",
+    "quitTitle": "Training stopped",
+    "quitBody": "Your records so far are saved. Because it wasn't finished, it doesn't count as a completed session.",
+    "backHome": "Back to Brain Training",
+    "kicker": "3 times a week",
+    "lineup": "Today's line-up",
+    "minutesShort": "{{value}} min",
+    "stopBody": "Everything so far is saved, but an unfinished session doesn't count as a completed one."
   },
   "home": {
-    "games": "Games",
+    "freePlay": "Free practice",
+    "freePlayHint": "Pick one game to practise. A round ends when your chances are used up.",
     "level": "Lv. {{level}}",
     "best": "Best Lv. {{level}}",
     "new": "New",
-    "streak_one": "{{count}}-day streak",
-    "streak_other": "{{count}}-day streak",
-    "today": "Rounds today: {{value}}",
-    "totalPoints": "Total points: {{value}}",
-    "howItWorks": "Every round is generated fresh. Get it right and the next one is a little harder; miss and it eases off — so it always stays just challenging enough."
+    "quickEyeLevel": "Stage {{stage}} · speed {{speed}}",
+    "record": "Best {{value}} pts",
+    "settings": "Settings",
+    "research": "Research basis",
+    "howItWorks": "Each puzzle is made fresh. Get it right and the next is a little harder; miss and it eases off. Levels show your skill at that game only — they are not a measure of memory or brain health."
+  },
+  "settings": {
+    "title": "Brain Training settings",
+    "timing": "Relaxed timing",
+    "timingHelp": "Give timed games more time, or none at all. In the longer modes, running out of time doesn't cost a chance.",
+    "timing_1": "Standard",
+    "timing_1_5": "1.5×",
+    "timing_2": "2×",
+    "timing_0": "No limit",
+    "centerOnly": "Quick Eye: centre only",
+    "centerOnlyHelp": "Turn on if the star at the edges is hard to see. You'll only answer the centre picture.",
+    "flash": "Quick Eye shows pictures very briefly. If you are sensitive to flashing light, take it easy.",
+    "close": "Close",
+    "sound": "Sound effects",
+    "soundHelp": "A short sound when you get one right or wrong.",
+    "haptics": "Vibration",
+    "hapticsHelp": "A short vibration when you get one right or wrong. Same as the app-wide vibration setting."
   },
   "skills": {
     "memory": "Memory",
@@ -25,13 +63,17 @@
     "reasoning": "Reasoning"
   },
   "games": {
+    "quickEye": {
+      "name": "Quick Eye",
+      "desc": "See a centre picture and a star at the edge for a split second, then say what and where."
+    },
     "memoryGrid": {
       "name": "Flash Grid",
-      "desc": "Remember which cells lit up, then tap them."
+      "desc": "Spatial memory practice: remember the cells that lit up, then tap them."
     },
     "sequence": {
       "name": "Sequence",
-      "desc": "Watch the tiles flash and repeat the order."
+      "desc": "Order memory practice: tap the tiles in the order they flashed."
     },
     "pairs": {
       "name": "Match Pairs",
@@ -39,19 +81,19 @@
     },
     "schulte": {
       "name": "Number Hunt",
-      "desc": "Tap the numbers in order as fast as you can."
+      "desc": "Find and tap the scattered numbers in order."
     },
     "oddOneOut": {
       "name": "Odd One Out",
-      "desc": "Spot the one that is different."
+      "desc": "All the same but one. Spot it."
     },
     "stroop": {
       "name": "Color Word",
-      "desc": "Pick the ink color, not the word you read."
+      "desc": "Pick the colour of the ink, not the word you read."
     },
     "math": {
       "name": "Quick Math",
-      "desc": "Solve it before time runs out."
+      "desc": "Work it out and pick the answer."
     },
     "series": {
       "name": "Number Pattern",
@@ -66,33 +108,88 @@
     "repeat": "Tap in the same order · {{done}}/{{total}}",
     "repeatReverse": "Tap in REVERSE order · {{done}}/{{total}}",
     "memorizePairs": "Memorize the pictures",
-    "findPairs": "Find the pairs · misses left: {{lives}}",
+    "findPairs": "Find the pairs · slips left {{lives}}",
     "tapAscending": "Tap 1 → {{max}} in order · next: {{next}}",
     "tapDescending": "Tap {{max}} → 1 in order · next: {{next}}",
     "findOdd": "Tap the one that is different",
-    "pickInk": "Pick the INK color",
+    "pickInk": "Pick the INK colour",
     "pickWord": "Pick what the word SAYS",
     "solve": "Pick the answer",
     "nextNumber": "What comes next?",
-    "correct": "Correct!",
+    "correct": "Correct",
     "wrong": "Not quite",
     "timeUp": "Time's up",
-    "levelUp": "Level up! Lv. {{level}}",
+    "timeUpForgiven": "Time's up · no chance lost",
+    "void": "The screen stuttered — let's show that again",
     "points": "+{{value}}",
+    "levelUp": "Level up · Lv. {{level}}",
+    "lives": "Chances left {{value}}",
+    "livesSpan": "Chances at this length {{value}}",
+    "practice": "Practice {{done}}/{{total}}",
+    "practiceHint": "Practice — no chances or points at stake.",
+    "practiceDone": "Practice done — here we go",
+    "trial": "{{done}}/{{total}}",
     "score": "Score",
     "streak": "Streak",
+    "pause": "Pause",
+    "paused": "Paused",
+    "resume": "Resume",
     "stop": "Finish",
-    "mixBadge": "Mixed"
+    "stopConfirm": "Stop here? Your records so far are saved.",
+    "go": "Go!",
+    "back": "Back",
+    "streakCount": "{{value}} in a row",
+    "streakBanner": "{{value}} in a row!",
+    "levelUpBanner": "Level up! Lv. {{level}}",
+    "fasterBanner": "Faster!",
+    "roundOver": "Round over",
+    "roundCleared": "Round cleared!",
+    "stopTitle": "Stop here?",
+    "stopBody": "Everything so far is saved.",
+    "keepPlaying": "Keep playing",
+    "stopNow": "Stop"
+  },
+  "quickEye": {
+    "watch": "Look at the centre",
+    "what": "What was in the centre?",
+    "where": "Which way was the star?",
+    "sameOrDifferent": "Were the two centre pictures the same?",
+    "same": "Same",
+    "different": "Different",
+    "circle": "Circle",
+    "square": "Square",
+    "stage": "Stage {{stage}}",
+    "dir": {
+      "0": "Up",
+      "1": "Up right",
+      "2": "Right",
+      "3": "Down right",
+      "4": "Down",
+      "5": "Down left",
+      "6": "Left",
+      "7": "Up left"
+    },
+    "speedLevel": "Speed level {{level}}"
   },
   "summary": {
-    "title": "Nice work",
-    "rounds": "Rounds",
+    "livesOut": "Round over",
+    "cleared": "Round cleared",
+    "stopped": "Good stopping point",
+    "trials": "Puzzles",
     "accuracy": "Accuracy",
     "points": "Points",
     "bestStreak": "Best streak",
-    "levels": "Levels",
-    "again": "Keep going",
-    "home": "All games"
+    "levelChange": "Lv. {{from}} → {{to}}",
+    "improved": "Your record in this game improved",
+    "newBest": "Personal best score",
+    "again": "Play again",
+    "home": "All games",
+    "stars": "{{value}} stars",
+    "time": "Time",
+    "trend": "Level, recent rounds",
+    "otherGames": "Other games",
+    "minutes": "Minutes",
+    "voided": "The screen kept stuttering, so the round stopped"
   },
   "colors": {
     "red": "RED",
@@ -101,5 +198,267 @@
     "yellow": "YELLOW",
     "purple": "PURPLE",
     "orange": "ORANGE"
+  },
+  "intro": {
+    "howTo": "How to play",
+    "replay": "Replay",
+    "start": "Start",
+    "practiceNote": "The first 4 are practice. They cost no chances and score no points.",
+    "level": "Level",
+    "speed": "Speed",
+    "stage": "Stage",
+    "rounds": "Played",
+    "best": "Best score",
+    "welcomeBack": "Welcome back. The first few questions will find your level again.",
+    "firstPlacement": "The first few questions find the right starting level."
+  },
+  "mechanics": {
+    "quickEye": {
+      "periphery": {
+        "title": "Find the star",
+        "body": "A star flashes outside too. Pick the centre picture, then the side the star was on."
+      },
+      "distractors": {
+        "title": "Star among triangles",
+        "body": "Triangles flash as well. Pick the side the one star was on."
+      },
+      "similar": {
+        "title": "Close shapes",
+        "body": "The square's corners get rounder, closer to a circle."
+      },
+      "sameDiff": {
+        "title": "Same or different?",
+        "body": "Two shapes flash in the centre. Say whether they match."
+      }
+    },
+    "oddOneOut": {
+      "rotation": {
+        "title": "The turned one",
+        "body": "All the same picture. Tap the one turned a different way. Sometimes the whole grid is tilted."
+      },
+      "lookalike": {
+        "title": "Look-alikes",
+        "body": "The odd one now looks more like the rest."
+      },
+      "nearTwin": {
+        "title": "Near twins",
+        "body": "Only a tiny detail differs, like a smile or a clock hand."
+      },
+      "glyphs": {
+        "title": "Tricky letters",
+        "body": "Letters that look alike, like b and d or 6 and 9."
+      }
+    },
+    "board": {
+      "biggerGrid": {
+        "title": "Bigger grid",
+        "body": "More cells now."
+      },
+      "moreNumbers": {
+        "title": "More numbers",
+        "body": "More numbers now, with more time to match."
+      },
+      "moreCards": {
+        "title": "More cards",
+        "body": "More pairs now, with more time and slips to match."
+      },
+      "moreChoices": {
+        "title": "More choices",
+        "body": "One more colour to choose from."
+      }
+    },
+    "schulte": {
+      "descending": {
+        "title": "Count down",
+        "body": "Tap from the biggest number down to 1."
+      },
+      "reshuffle": {
+        "title": "Shuffle mode",
+        "body": "Numbers move after every tap. The grid is one size smaller."
+      }
+    },
+    "memoryGrid": {
+      "fastShow": {
+        "title": "Shorter look",
+        "body": "The board is full size. Now the cells stay lit for less time."
+      }
+    },
+    "sequence": {
+      "reverse": {
+        "title": "Backwards",
+        "body": "Tap the tiles in reverse, starting from the last one lit."
+      }
+    },
+    "series": {
+      "descending": {
+        "title": "Going down",
+        "body": "Numbers can also shrink by the same amount each step."
+      },
+      "geometric": {
+        "title": "Multiply",
+        "body": "A rule where each number is the last one times the same number."
+      },
+      "alternating": {
+        "title": "Up and down",
+        "body": "A rule that adds, then subtracts, in turn."
+      },
+      "growing": {
+        "title": "Growing steps",
+        "body": "A rule where the amount added grows each time."
+      },
+      "fibonacci": {
+        "title": "The two before",
+        "body": "A rule where each number is the sum of the two before it."
+      },
+      "squares": {
+        "title": "Squares",
+        "body": "A rule built on numbers times themselves."
+      },
+      "interleaved": {
+        "title": "Two in one",
+        "body": "Two patterns take turns. Read every other number."
+      },
+      "doublePlus": {
+        "title": "Double and add",
+        "body": "A rule that doubles the last number, then adds the same amount."
+      }
+    },
+    "pairs": {
+      "oneFamily": {
+        "title": "One theme",
+        "body": "All pictures now come from one theme, like animals or fruit."
+      },
+      "noPreview": {
+        "title": "No peek",
+        "body": "No first look at the cards now. Learn them as you flip."
+      }
+    },
+    "stroop": {
+      "word": {
+        "title": "Rule switch",
+        "body": "When asked what it SAYS, pick the colour the word names, not its ink."
+      }
+    },
+    "math": {
+      "sub": {
+        "title": "Subtraction",
+        "body": "Take-away problems join the mix."
+      },
+      "mul": {
+        "title": "Multiplication",
+        "body": "Times problems join the mix."
+      },
+      "div": {
+        "title": "Division",
+        "body": "Sharing problems join. Answers always come out whole."
+      },
+      "twoStep": {
+        "title": "Two steps",
+        "body": "Problems with two steps now. With + and × together, do × first; with a ?, pick what fills it."
+      }
+    }
+  },
+  "rule": {
+    "label": "New rule",
+    "gotIt": "Got it",
+    "unscored": "This one doesn't count toward points or chances.",
+    "change": "What's new"
+  },
+  "placement": {
+    "label": "Finding your start",
+    "hint": "A few questions to find the right level. No chances are used."
+  },
+  "tiers": {
+    "none": "No tier yet",
+    "t1": "Bronze",
+    "t2": "Silver",
+    "t3": "Gold",
+    "t4": "Platinum",
+    "t5": "Diamond",
+    "t6": "Master",
+    "label": "Tier",
+    "next": "To the next tier",
+    "up": "{{tier}} reached!",
+    "upBody": "You reached {{tier}} in {{game}}.",
+    "max": "Top tier"
+  },
+  "achievements": {
+    "title": "Achievements",
+    "earned": "Achievement",
+    "locked": "Not yet",
+    "firstClear": {
+      "title": "First clear",
+      "body": "Played a round to the end."
+    },
+    "cleanRound": {
+      "title": "Clean clear",
+      "body": "Finished a round without losing a chance."
+    },
+    "streak10": {
+      "title": "10 in a row",
+      "body": "Got 10 right in a row."
+    },
+    "streak20": {
+      "title": "20 in a row",
+      "body": "Got 20 right in a row."
+    },
+    "flawlessHunt": {
+      "title": "No wrong taps",
+      "body": "Finished a 5×5 or bigger Number Hunt without a wrong tap."
+    },
+    "span7": {
+      "title": "Seven to remember",
+      "body": "Remembered 7 in Sequence or Flash Grid."
+    },
+    "quickEyeStage5": {
+      "title": "Quick Eye stage 5",
+      "body": "Reached stage 5 of Quick Eye."
+    },
+    "quickEyeStage10": {
+      "title": "Quick Eye stage 10",
+      "body": "Reached stage 10 of Quick Eye."
+    },
+    "allGames": {
+      "title": "Every game",
+      "body": "Tried all 9 games."
+    },
+    "firstSession": {
+      "title": "First session",
+      "body": "Finished Today's Training for the first time."
+    },
+    "weekGoal": {
+      "title": "3 this week",
+      "body": "Did Today's Training 3 times in one week."
+    },
+    "coreCourse": {
+      "title": "Core course done",
+      "body": "Finished the 10-session core course."
+    },
+    "comeback": {
+      "title": "Back again",
+      "body": "Came back after more than 2 weeks and finished a session."
+    },
+    "goldTier": {
+      "title": "First Gold",
+      "body": "Reached Gold in a game."
+    },
+    "masterTier": {
+      "title": "First Master",
+      "body": "Reached Master in a game."
+    }
+  },
+  "breakdown": {
+    "title": "Score breakdown",
+    "base": "Base",
+    "speed": "Speed",
+    "combo": "Run",
+    "clear": "Clear bonus",
+    "clean": "Clean bonus",
+    "total": "Total"
+  },
+  "relax": {
+    "suggest": "Your last rounds ended early. Want to turn on extra time?",
+    "turnOn": "Turn on 1.5× time",
+    "on": "Extra time is on"
   }
 }

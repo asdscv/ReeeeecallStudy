@@ -78,7 +78,7 @@ export function QuizHomePage() {
         </div>
         <Link
           to="/quiz/new"
-          className="px-3 py-1.5 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover shrink-0"
+          className="px-3 py-1.5 text-sm font-medium bg-brand text-brand-foreground rounded-lg cursor-pointer transition-colors hover:bg-brand-hover shrink-0"
         >
           {t('home.create')}
         </Link>

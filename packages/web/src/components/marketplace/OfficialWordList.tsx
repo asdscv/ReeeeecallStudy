@@ -73,7 +73,7 @@ export function OfficialWordList({ listing, lang, signedIn }: OfficialWordListPr
         <Link
           to={studyHref}
           onClick={() => trackEvent({ category: 'marketplace', action: 'word_list_study_click', label: listing.id })}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-brand text-white font-semibold rounded-xl hover:bg-brand-hover transition no-underline"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-brand text-brand-foreground font-semibold rounded-xl hover:bg-brand-hover transition no-underline"
           data-testid="cta-login"
         >
           {wordListCta(listing, lang)}

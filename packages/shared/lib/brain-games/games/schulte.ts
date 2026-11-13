@@ -1,9 +1,16 @@
 import { range } from '../rng'
 import type { BrainGameDef, CellView } from '../types'
 
-/** Numbers scattered on a grid; tap them in order. Visual search and sustained attention. */
+/**
+ * Numbers scattered on a grid; tap them in order. Visual search and sustained attention.
+ *
+ * One grid is one trial, but lives are spent per wrong TAP inside it (a tap on a number that is
+ * not the next one), not per grid: a slow, clean grid costs nothing, and the grid stops as soon as
+ * the round's remaining lives are gone.
+ */
 export interface SchulteState {
   n: number
+  level: number
   /** cell index → number shown */
   values: number[]
   order: 'asc' | 'desc'
@@ -11,12 +18,25 @@ export interface SchulteState {
   shuffleEach: boolean
   found: number
   mistakes: number
+  /** Wrong taps this grid can absorb — the round's lives left when it was made. */
+  maxMistakes: number
   flashWrong: number | null
   timedOut: boolean
   seed: number
 }
 
-const MAX_MISTAKES = 3
+
+/**
+ * Time for a grid. Past level 12 the grid stops growing, so the clock tightens instead — 3% a level,
+ * down to about 0.65s a number, which a practised adult can hold; the level stops there (40).
+ */
+export const SCHULTE_MAX_LEVEL = 40
+function schulteLimit(n: number, shuffleEach: boolean, level: number): number {
+  const cells = n * n
+  const base = 2000 + cells * (shuffleEach ? 2200 : 1500)
+  const floor = 1500 + cells * (shuffleEach ? 1000 : 650)
+  return Math.round(Math.max(floor, base * Math.pow(0.97, Math.max(0, level - 12))))
+}
 
 function nextValue(s: SchulteState): number {
   return s.order === 'asc' ? s.found + 1 : s.n * s.n - s.found
@@ -40,17 +60,19 @@ function reshuffle(values: number[], seed: number): number[] {
 
 export const schulte: BrainGameDef<SchulteState> = {
   id: 'schulte',
-  create(level, rng) {
-    let n = level < 4 ? 3 : level < 9 ? 4 : level < 16 ? 5 : 6
+  create(level, rng, ctx) {
+    let n = Math.min(level < 4 ? 3 : level < 9 ? 4 : level < 16 ? 5 : 6, Math.max(3, ctx.maxCols))
     const shuffleEach = level >= 12 && rng.chance(0.25)
     if (shuffleEach) n = Math.max(3, n - 1)
     return {
       n,
+      level,
       values: rng.shuffle(range(n * n).map((i) => i + 1)),
       order: level >= 5 && rng.chance(0.35) ? 'desc' : 'asc',
       shuffleEach,
       found: 0,
       mistakes: 0,
+      maxMistakes: Math.max(1, ctx.livesLeft),
       flashWrong: null,
       timedOut: false,
       seed: rng.int(1, 0x7ffffff),
@@ -71,11 +93,12 @@ export const schulte: BrainGameDef<SchulteState> = {
   timeout: (s) => ({ ...s, timedOut: true }),
   outcome(s) {
     const total = s.n * s.n
-    if (s.found === total) return { correct: true, accuracy: 1 }
-    if (s.mistakes >= MAX_MISTAKES || s.timedOut) return { correct: false, accuracy: s.found / total }
+    if (s.found === total) return { correct: true, accuracy: 1, livesSpent: s.mistakes }
+    if (s.mistakes >= s.maxMistakes || s.timedOut) return { correct: false, accuracy: s.found / total, livesSpent: s.mistakes }
     return null
   },
-  timeLimitMs: (s) => 2000 + s.n * s.n * (s.shuffleEach ? 2200 : 1500),
+  timeLimitMs: (s) => schulteLimit(s.n, s.shuffleEach, s.level),
+  maxLevel: () => SCHULTE_MAX_LEVEL,
   view(s) {
     const cells: CellView[] = s.values.map((value, i) => ({
       label: String(value),
@@ -93,10 +116,19 @@ export const schulte: BrainGameDef<SchulteState> = {
         params: {
           next: s.found < total ? nextValue(s) : total,
           max: total,
-          lives: MAX_MISTAKES - s.mistakes,
+          lives: s.maxMistakes - s.mistakes,
         },
       },
     }
   },
   signature: (s) => `sc:${s.order}:${s.values.join(',')}`,
+  solution: (s) => (schulte.outcome(s) === null ? [s.values.indexOf(nextValue(s))] : null),
+  mechanics(s) {
+    const tags: string[] = []
+    // A reshuffle grid is one size smaller on purpose; its size change is not "bigger grid" news.
+    for (let n = 4; n <= 6; n++) if (s.n >= n) tags.push(`schulte.grid${n}`)
+    if (s.order === 'desc') tags.push('schulte.descending')
+    if (s.shuffleEach) tags.push('schulte.reshuffle')
+    return tags
+  },
 }

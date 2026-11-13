@@ -1,37 +1,79 @@
 {
   "title": "Latihan Otak",
-  "subtitle": "Memori, fokus, kecepatan, dan penalaran — teka-teki baru setiap ronde, sesuai levelmu.",
-  "note": "Latihan otak sehari-hari untuk hiburan. Bukan layanan medis.",
-  "mix": {
-    "title": "Latihan campuran",
-    "desc": "Permainan berganti sendiri dan lebih sering melatih kemampuan terlemahmu. Main selama yang kamu mau.",
-    "start": "Mulai"
+  "subtitle": "Permainan fokus dan memori untuk kebiasaan aktivitas otak yang rutin",
+  "disclaimer": "Fitur ini bukan perangkat medis dan tidak dimaksudkan untuk mendiagnosis, mengobati, menyembuhkan, atau mencegah kondisi medis apa pun.",
+  "worry": "Jika kamu khawatir tentang daya ingatmu, bicarakan dengan dokter atau layanan kesehatan setempat, alih-alih bermain lebih banyak.",
+  "training": {
+    "title": "Latihan hari ini",
+    "desc": "Mata Cepat dan 3 permainan · sekitar {{minutes}} menit",
+    "start": "Mulai latihan hari ini",
+    "week": "Minggu ini {{done}}/{{goal}}",
+    "weekDone": "Target mingguan tercapai",
+    "course": "Kursus inti {{done}}/{{total}}",
+    "booster": "Penyegaran {{done}}/{{total}}",
+    "boosterNext": "Penyegaran berikutnya: {{date}}",
+    "minutes": "Total {{value}} menit",
+    "dose": "Rencananya sekitar tiga sesi 20 menit per minggu. Boleh main lebih banyak, tapi tidak ada tambahan apa pun.",
+    "slot": "Permainan {{index}}/{{total}}",
+    "next": "Permainan berikutnya",
+    "continue": "Lanjutkan",
+    "doneTitle": "Latihan hari ini selesai",
+    "doneBody": "Kerja bagus. Istirahat sehari atau dua hari sebelum sesi berikutnya juga tidak apa-apa.",
+    "quitTitle": "Latihan dihentikan",
+    "quitBody": "Catatanmu sejauh ini sudah tersimpan. Karena belum selesai, sesi ini tidak dihitung sebagai sesi yang tuntas.",
+    "backHome": "Kembali ke Latihan Otak",
+    "kicker": "3 kali seminggu",
+    "lineup": "Susunan hari ini",
+    "minutesShort": "{{value}} mnt",
+    "stopBody": "Semua yang sudah dimainkan tersimpan, tetapi sesi yang tidak selesai tidak dihitung sebagai sesi lengkap."
   },
   "home": {
-    "games": "Permainan",
+    "freePlay": "Latihan bebas",
+    "freePlayHint": "Pilih satu permainan untuk dilatih. Ronde berakhir saat kesempatanmu habis.",
     "level": "Lv. {{level}}",
     "best": "Terbaik Lv. {{level}}",
     "new": "Baru",
-    "streak_one": "{{count}} hari beruntun",
-    "streak_other": "{{count}} hari beruntun",
-    "today": "Ronde hari ini: {{value}}",
-    "totalPoints": "Total poin: {{value}}",
-    "howItWorks": "Setiap ronde dibuat baru. Benar, ronde berikutnya sedikit lebih sulit; salah, jadi lebih mudah — jadi selalu cukup menantang."
+    "quickEyeLevel": "Tahap {{stage}} · kecepatan {{speed}}",
+    "record": "Terbaik {{value}} poin",
+    "settings": "Pengaturan",
+    "research": "Dasar penelitian",
+    "howItWorks": "Setiap teka-teki dibuat baru. Jawab benar, berikutnya sedikit lebih sulit; salah, jadi lebih mudah. Level hanya menunjukkan kemampuanmu di permainan itu — bukan ukuran daya ingat atau kesehatan otak."
+  },
+  "settings": {
+    "title": "Pengaturan Latihan Otak",
+    "timing": "Waktu santai",
+    "timingHelp": "Beri lebih banyak waktu pada permainan berwaktu, atau hapus batas waktunya. Di mode yang lebih lama, kehabisan waktu tidak mengurangi kesempatan.",
+    "timing_1": "Standar",
+    "timing_1_5": "1,5×",
+    "timing_2": "2×",
+    "timing_0": "Tanpa batas",
+    "centerOnly": "Mata Cepat: tengah saja",
+    "centerOnlyHelp": "Aktifkan jika bintang di tepi sulit terlihat. Kamu hanya menjawab gambar di tengah.",
+    "flash": "Mata Cepat menampilkan gambar dengan sangat singkat. Jika kamu sensitif terhadap cahaya berkedip, mainlah dengan santai.",
+    "close": "Tutup",
+    "sound": "Efek suara",
+    "soundHelp": "Suara singkat saat jawaban benar atau salah.",
+    "haptics": "Getar",
+    "hapticsHelp": "Getaran singkat saat jawaban benar atau salah. Sama dengan pengaturan getar aplikasi."
   },
   "skills": {
     "memory": "Memori",
-    "attention": "Fokus",
+    "attention": "Perhatian",
     "speed": "Kecepatan",
     "reasoning": "Penalaran"
   },
   "games": {
+    "quickEye": {
+      "name": "Mata Cepat",
+      "desc": "Lihat sekilas gambar di tengah dan bintang di tepi, lalu jawab apa dan di mana."
+    },
     "memoryGrid": {
       "name": "Kotak Kilat",
-      "desc": "Ingat kotak yang menyala, lalu ketuk."
+      "desc": "Latihan mengingat posisi: ingat kotak yang menyala, lalu ketuk."
     },
     "sequence": {
       "name": "Urutan",
-      "desc": "Lihat urutan kotak berkedip dan ulangi."
+      "desc": "Latihan mengingat urutan: ketuk kotak sesuai urutan kedipnya."
     },
     "pairs": {
       "name": "Cari Pasangan",
@@ -39,7 +81,7 @@
     },
     "schulte": {
       "name": "Buru Angka",
-      "desc": "Ketuk angka secara berurutan secepat mungkin."
+      "desc": "Temukan dan ketuk angka yang tersebar secara berurutan."
     },
     "oddOneOut": {
       "name": "Yang Berbeda",
@@ -47,11 +89,11 @@
     },
     "stroop": {
       "name": "Warna Kata",
-      "desc": "Pilih warna tulisannya, bukan arti katanya."
+      "desc": "Pilih warna tulisannya, bukan kata yang kamu baca."
     },
     "math": {
       "name": "Hitung Cepat",
-      "desc": "Selesaikan sebelum waktu habis."
+      "desc": "Hitung lalu pilih jawabannya."
     },
     "series": {
       "name": "Pola Angka",
@@ -74,25 +116,80 @@
     "pickWord": "Pilih ARTI kata",
     "solve": "Pilih jawabannya",
     "nextNumber": "Angka berikutnya?",
-    "correct": "Benar!",
-    "wrong": "Hampir",
+    "correct": "Benar",
+    "wrong": "Belum tepat",
     "timeUp": "Waktu habis",
-    "levelUp": "Naik level! Lv. {{level}}",
+    "timeUpForgiven": "Waktu habis · kesempatan tidak berkurang",
+    "void": "Layar tersendat — kita tampilkan lagi",
     "points": "+{{value}}",
+    "levelUp": "Naik level · Lv. {{level}}",
+    "lives": "Sisa kesempatan {{value}}",
+    "livesSpan": "Sisa kesempatan di panjang ini {{value}}",
+    "practice": "Pemanasan {{done}}/{{total}}",
+    "practiceHint": "Pemanasan — tidak ada kesempatan atau poin yang dipertaruhkan.",
+    "practiceDone": "Pemanasan selesai — ayo mulai",
+    "trial": "{{done}}/{{total}}",
     "score": "Skor",
     "streak": "Beruntun",
+    "pause": "Jeda",
+    "paused": "Dijeda",
+    "resume": "Lanjutkan",
     "stop": "Selesai",
-    "mixBadge": "Campuran"
+    "stopConfirm": "Berhenti di sini? Catatanmu sejauh ini tetap tersimpan.",
+    "go": "Mulai!",
+    "back": "Kembali",
+    "streakCount": "{{value}} beruntun",
+    "streakBanner": "{{value}} benar beruntun!",
+    "levelUpBanner": "Naik level! Lv. {{level}}",
+    "fasterBanner": "Makin cepat!",
+    "roundOver": "Ronde selesai",
+    "roundCleared": "Ronde tuntas!",
+    "stopTitle": "Berhenti di sini?",
+    "stopBody": "Semua yang sudah dimainkan tersimpan.",
+    "keepPlaying": "Lanjut main",
+    "stopNow": "Berhenti"
+  },
+  "quickEye": {
+    "watch": "Lihat ke tengah",
+    "what": "Apa yang ada di tengah?",
+    "where": "Ke arah mana bintangnya?",
+    "sameOrDifferent": "Apakah dua gambar di tengah sama?",
+    "same": "Sama",
+    "different": "Beda",
+    "circle": "Lingkaran",
+    "square": "Persegi",
+    "stage": "Tahap {{stage}}",
+    "dir": {
+      "0": "Atas",
+      "1": "Kanan atas",
+      "2": "Kanan",
+      "3": "Kanan bawah",
+      "4": "Bawah",
+      "5": "Kiri bawah",
+      "6": "Kiri",
+      "7": "Kiri atas"
+    },
+    "speedLevel": "Level kecepatan {{level}}"
   },
   "summary": {
-    "title": "Kerja bagus",
-    "rounds": "Ronde",
+    "livesOut": "Ronde selesai",
+    "cleared": "Ronde berhasil",
+    "stopped": "Waktu yang pas untuk berhenti",
+    "trials": "Teka-teki",
     "accuracy": "Akurasi",
     "points": "Poin",
     "bestStreak": "Beruntun terbaik",
-    "levels": "Perubahan level",
-    "again": "Lanjut",
-    "home": "Semua permainan"
+    "levelChange": "Lv. {{from}} → {{to}}",
+    "improved": "Rekormu di permainan ini meningkat",
+    "newBest": "Skor terbaik pribadi",
+    "again": "Main lagi",
+    "home": "Semua permainan",
+    "stars": "{{value}} bintang",
+    "time": "Waktu",
+    "trend": "Level beberapa ronde terakhir",
+    "otherGames": "Game lain",
+    "minutes": "Menit",
+    "voided": "Layar terus tersendat, jadi ronde dihentikan"
   },
   "colors": {
     "red": "MERAH",
@@ -101,5 +198,267 @@
     "yellow": "KUNING",
     "purple": "UNGU",
     "orange": "JINGGA"
+  },
+  "intro": {
+    "howTo": "Cara bermain",
+    "replay": "Putar ulang",
+    "start": "Mulai",
+    "practiceNote": "4 soal pertama adalah latihan — tidak mengurangi kesempatan dan tidak menambah skor.",
+    "level": "Level",
+    "speed": "Kecepatan",
+    "stage": "Tahap",
+    "rounds": "Dimainkan",
+    "best": "Skor terbaik",
+    "welcomeBack": "Selamat datang kembali. Beberapa soal pertama akan menemukan levelmu lagi.",
+    "firstPlacement": "Beberapa soal pertama mencari level awal yang pas."
+  },
+  "mechanics": {
+    "quickEye": {
+      "periphery": {
+        "title": "Cari bintangnya",
+        "body": "Sebuah bintang juga muncul di luar. Pilih gambar tengah, lalu sisi tempat bintang itu muncul."
+      },
+      "distractors": {
+        "title": "Bintang di antara segitiga",
+        "body": "Segitiga juga muncul. Pilih sisi tempat satu bintang itu muncul."
+      },
+      "similar": {
+        "title": "Bentuk mirip",
+        "body": "Sudut persegi makin membulat sehingga makin mirip lingkaran."
+      },
+      "sameDiff": {
+        "title": "Sama atau beda?",
+        "body": "Dua bentuk muncul di tengah. Pilih apakah keduanya sama."
+      }
+    },
+    "oddOneOut": {
+      "rotation": {
+        "title": "Yang terputar",
+        "body": "Semua gambarnya sama. Ketuk yang menghadap arah lain. Kadang seluruh papan miring."
+      },
+      "lookalike": {
+        "title": "Mirip",
+        "body": "Yang berbeda makin mirip dengan yang lain."
+      },
+      "nearTwin": {
+        "title": "Hampir kembar",
+        "body": "Hanya detail kecil yang berbeda, seperti senyum atau jarum jam."
+      },
+      "glyphs": {
+        "title": "Huruf yang mengecoh",
+        "body": "Huruf yang mirip, seperti b dan d atau 6 dan 9."
+      }
+    },
+    "board": {
+      "biggerGrid": {
+        "title": "Papan lebih besar",
+        "body": "Sekarang kotaknya lebih banyak."
+      },
+      "moreNumbers": {
+        "title": "Angka bertambah",
+        "body": "Angkanya lebih banyak, waktunya juga bertambah."
+      },
+      "moreCards": {
+        "title": "Kartu bertambah",
+        "body": "Pasangannya lebih banyak, dengan waktu dan kesempatan salah yang ikut bertambah."
+      },
+      "moreChoices": {
+        "title": "Pilihan bertambah",
+        "body": "Ada satu warna lagi untuk dipilih."
+      }
+    },
+    "schulte": {
+      "descending": {
+        "title": "Hitung mundur",
+        "body": "Ketuk dari angka terbesar sampai 1."
+      },
+      "reshuffle": {
+        "title": "Mode acak",
+        "body": "Posisi angka berubah setiap kali diketuk. Sebagai gantinya, papannya satu ukuran lebih kecil."
+      }
+    },
+    "memoryGrid": {
+      "fastShow": {
+        "title": "Tampil lebih singkat",
+        "body": "Papan sudah paling besar. Sekarang kotak menyala lebih singkat."
+      }
+    },
+    "sequence": {
+      "reverse": {
+        "title": "Terbalik",
+        "body": "Ketuk kotak dengan urutan terbalik, mulai dari yang terakhir menyala."
+      }
+    },
+    "series": {
+      "descending": {
+        "title": "Angka menurun",
+        "body": "Angka juga bisa berkurang dengan jumlah yang sama tiap langkah."
+      },
+      "geometric": {
+        "title": "Kali",
+        "body": "Muncul aturan: tiap angka adalah angka sebelumnya dikali angka yang sama."
+      },
+      "alternating": {
+        "title": "Naik turun",
+        "body": "Muncul aturan yang menambah lalu mengurangi secara bergantian."
+      },
+      "growing": {
+        "title": "Selisih bertambah",
+        "body": "Muncul aturan: angka yang ditambahkan makin besar tiap kali."
+      },
+      "fibonacci": {
+        "title": "Dua angka sebelumnya",
+        "body": "Muncul aturan: tiap angka adalah jumlah dua angka sebelumnya."
+      },
+      "squares": {
+        "title": "Kuadrat",
+        "body": "Muncul aturan yang memakai angka dikali dirinya sendiri."
+      },
+      "interleaved": {
+        "title": "Dua jadi satu",
+        "body": "Dua aturan bergantian. Baca selang satu angka."
+      },
+      "doublePlus": {
+        "title": "Dua kali lalu tambah",
+        "body": "Muncul aturan: angka sebelumnya dikali dua lalu ditambah jumlah yang sama."
+      }
+    },
+    "pairs": {
+      "oneFamily": {
+        "title": "Satu tema",
+        "body": "Sekarang semua gambar dari satu tema, seperti hewan atau buah."
+      },
+      "noPreview": {
+        "title": "Tanpa intip",
+        "body": "Kartu tidak diperlihatkan di awal. Ingat sambil membaliknya."
+      }
+    },
+    "stroop": {
+      "word": {
+        "title": "Aturan berganti",
+        "body": "Saat diminta ARTI kata, pilih warna yang disebut kata itu, bukan warna tintanya."
+      }
+    },
+    "math": {
+      "sub": {
+        "title": "Ada pengurangan",
+        "body": "Sekarang ada soal pengurangan juga."
+      },
+      "mul": {
+        "title": "Ada perkalian",
+        "body": "Sekarang ada soal perkalian juga."
+      },
+      "div": {
+        "title": "Ada pembagian",
+        "body": "Ada soal pembagian juga. Hasilnya selalu bulat."
+      },
+      "twoStep": {
+        "title": "Dua langkah",
+        "body": "Sekarang ada soal dua langkah. Jika ada + dan ×, kerjakan × dulu; jika ada ?, pilih angka yang mengisinya."
+      }
+    }
+  },
+  "rule": {
+    "label": "Aturan baru",
+    "gotIt": "Mengerti",
+    "unscored": "Soal ini tidak dihitung untuk skor maupun kesempatan.",
+    "change": "Yang baru"
+  },
+  "placement": {
+    "label": "Mencari level awalmu",
+    "hint": "Beberapa soal untuk menemukan level yang pas. Kesempatan tidak berkurang."
+  },
+  "tiers": {
+    "none": "Belum ada peringkat",
+    "t1": "Perunggu",
+    "t2": "Perak",
+    "t3": "Emas",
+    "t4": "Platinum",
+    "t5": "Berlian",
+    "t6": "Master",
+    "label": "Peringkat",
+    "next": "Menuju peringkat berikutnya",
+    "up": "{{tier}} tercapai!",
+    "upBody": "Kamu mencapai {{tier}} di {{game}}.",
+    "max": "Peringkat tertinggi"
+  },
+  "achievements": {
+    "title": "Pencapaian",
+    "earned": "Pencapaian",
+    "locked": "Belum",
+    "firstClear": {
+      "title": "Ronde pertama tuntas",
+      "body": "Memainkan satu ronde sampai selesai."
+    },
+    "cleanRound": {
+      "title": "Tuntas tanpa salah",
+      "body": "Menyelesaikan ronde tanpa kehilangan kesempatan."
+    },
+    "streak10": {
+      "title": "10 beruntun",
+      "body": "Menjawab benar 10 kali berturut-turut."
+    },
+    "streak20": {
+      "title": "20 beruntun",
+      "body": "Menjawab benar 20 kali berturut-turut."
+    },
+    "flawlessHunt": {
+      "title": "Tanpa salah ketuk",
+      "body": "Menyelesaikan Buru Angka 5×5 atau lebih tanpa salah ketuk."
+    },
+    "span7": {
+      "title": "Tujuh dalam ingatan",
+      "body": "Mengingat 7 di Urutan atau Kotak Kilat."
+    },
+    "quickEyeStage5": {
+      "title": "Mata Cepat tahap 5",
+      "body": "Mencapai tahap 5 Mata Cepat."
+    },
+    "quickEyeStage10": {
+      "title": "Mata Cepat tahap 10",
+      "body": "Mencapai tahap 10 Mata Cepat."
+    },
+    "allGames": {
+      "title": "Semua game",
+      "body": "Mencoba ke-9 game."
+    },
+    "firstSession": {
+      "title": "Sesi pertama",
+      "body": "Menyelesaikan Latihan hari ini untuk pertama kalinya."
+    },
+    "weekGoal": {
+      "title": "3 kali minggu ini",
+      "body": "Melakukan Latihan hari ini 3 kali dalam seminggu."
+    },
+    "coreCourse": {
+      "title": "Kursus dasar selesai",
+      "body": "Menyelesaikan kursus dasar 10 sesi."
+    },
+    "comeback": {
+      "title": "Kembali lagi",
+      "body": "Kembali setelah lebih dari 2 minggu dan menyelesaikan satu sesi."
+    },
+    "goldTier": {
+      "title": "Emas pertama",
+      "body": "Mencapai Emas di satu game."
+    },
+    "masterTier": {
+      "title": "Master pertama",
+      "body": "Mencapai Master di satu game."
+    }
+  },
+  "breakdown": {
+    "title": "Rincian skor",
+    "base": "Dasar",
+    "speed": "Kecepatan",
+    "combo": "Beruntun",
+    "clear": "Bonus tuntas",
+    "clean": "Bonus tanpa salah",
+    "total": "Total"
+  },
+  "relax": {
+    "suggest": "Beberapa ronde terakhirmu cepat berakhir. Mau tambah waktu?",
+    "turnOn": "Aktifkan waktu 1,5×",
+    "on": "Waktu tambahan aktif"
   }
 }

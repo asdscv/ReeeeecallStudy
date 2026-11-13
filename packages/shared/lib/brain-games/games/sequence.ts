@@ -1,7 +1,11 @@
 import { range } from '../rng'
 import type { BrainGameDef, CellView } from '../types'
 
-/** Tiles flash one after another; repeat the order (or reverse it). Sequential memory span. */
+/**
+ * Tiles flash one after another; repeat the order (or reverse it). Sequential memory span —
+ * the Corsi block task: the level IS the length (level 1 = 3 tiles), presented at one tile per
+ * second as the standard administration does (Kessels 2000), never faster.
+ */
 export interface SequenceState {
   n: number
   seq: number[]
@@ -23,9 +27,9 @@ function expected(s: SequenceState): number {
 
 export const sequence: BrainGameDef<SequenceState> = {
   id: 'sequence',
-  create(level, rng) {
-    const length = 3 + Math.floor((level - 1) * 0.45)
-    const n = length >= 7 ? 4 : 3
+  create(level, rng, ctx) {
+    const length = 2 + Math.max(1, Math.round(level))
+    const n = Math.min(length >= 7 ? 4 : 3, Math.max(3, ctx.maxCols))
     const seq: number[] = []
     for (let i = 0; i < length; i++) {
       let cell = rng.int(0, n * n - 1)
@@ -36,9 +40,9 @@ export const sequence: BrainGameDef<SequenceState> = {
     return {
       n,
       seq,
-      reverse: level >= 6 && rng.chance(Math.min(0.5, 0.2 + (level - 6) * 0.03)),
-      flashMs: Math.max(360, 750 - level * 14),
-      gapMs: Math.max(140, 300 - level * 5),
+      reverse: length >= 6 && rng.chance(Math.min(0.5, 0.2 + (length - 6) * 0.05)),
+      flashMs: 700,
+      gapMs: 300,
       phase: 'watch',
       step: -1,
       flashOn: false,
@@ -102,4 +106,10 @@ export const sequence: BrainGameDef<SequenceState> = {
     }
   },
   signature: (s) => `sq:${s.reverse ? 'r' : 'f'}:${s.seq.join(',')}`,
+  mechanics: (s) => [...(s.n >= 4 ? ['sequence.grid4'] : []), ...(s.reverse ? ['sequence.reverse'] : [])],
+  solution(s) {
+    if (s.phase !== 'input') return null
+    const order = s.reverse ? [...s.seq].reverse() : s.seq
+    return order.slice(s.inputs.length)
+  },
 }

@@ -24,7 +24,16 @@
     "analytics": "Analytics",
     "publisher": "パブリッシャー統計",
     "wallet": "ウォレット",
-    "quiz": "クイズ"
+    "quiz": "クイズ",
+    "aiHubHome": "AI学習ホーム",
+    "tabsLabel": "メインタブ",
+    "short": {
+      "home": "ホーム",
+      "study": "学習",
+      "decks": "デッキ",
+      "brain": "脳トレ",
+      "more": "メニュー"
+    }
   },
   "actions": {
     "save": "保存",

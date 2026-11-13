@@ -1,61 +1,103 @@
 {
   "title": "두뇌 트레이닝",
-  "subtitle": "기억력·집중력·순발력·추리력 — 매 판 새로 만들어지는 문제가 내 수준에 맞춰 나옵니다.",
-  "note": "일상 두뇌 운동을 위한 게임이며 의료 서비스가 아닙니다.",
-  "mix": {
-    "title": "섞어서 계속하기",
-    "desc": "게임이 알아서 바뀌고, 약한 영역을 더 자주 냅니다. 원하는 만큼 계속하세요.",
-    "start": "시작"
+  "subtitle": "집중력·기억 게임으로 만드는 꾸준한 두뇌 활동 습관",
+  "disclaimer": "이 기능은 의료기기가 아니며 질병의 진단·치료·예방을 목적으로 하지 않습니다.",
+  "worry": "기억력이 걱정되면 게임보다 가까운 치매안심센터나 의사와 상담하세요. 만 60세 이상은 보건소(치매안심센터)에서 무료로 인지 선별검사를 받을 수 있습니다.",
+  "training": {
+    "title": "오늘의 훈련",
+    "desc": "빠른 눈과 게임 3가지 · 약 {{minutes}}분",
+    "start": "오늘의 훈련 시작",
+    "week": "이번 주 {{done}}/{{goal}}회",
+    "weekDone": "이번 주 목표 달성",
+    "course": "기본 과정 {{done}}/{{total}}",
+    "booster": "복습 과정 {{done}}/{{total}}",
+    "boosterNext": "다음 복습 과정: {{date}}",
+    "minutes": "누적 {{value}}분",
+    "dose": "주 3회, 한 번에 20분쯤이 기본이에요. 더 해도 되지만 추가 보상은 없어요.",
+    "slot": "게임 {{index}}/{{total}}",
+    "next": "다음 게임",
+    "continue": "계속하기",
+    "doneTitle": "오늘의 훈련 완료",
+    "doneBody": "수고했어요. 다음 훈련은 하루 이틀 쉬고 해도 좋아요.",
+    "quitTitle": "훈련을 멈췄어요",
+    "quitBody": "지금까지의 기록은 저장됐어요. 끝까지 하지 않아 완료한 훈련으로는 세지 않아요.",
+    "backHome": "두뇌 트레이닝으로",
+    "kicker": "주 3회 루틴",
+    "lineup": "오늘의 구성",
+    "minutesShort": "{{value}}분",
+    "stopBody": "지금까지의 기록은 저장되지만, 끝까지 하지 않으면 완료한 훈련으로 세지 않아요."
   },
   "home": {
-    "games": "게임",
+    "freePlay": "자유 연습",
+    "freePlayHint": "게임 하나를 골라 연습해요. 기회를 다 쓰면 라운드가 끝나요.",
     "level": "Lv. {{level}}",
     "best": "최고 Lv. {{level}}",
-    "new": "새로움",
-    "streak_one": "{{count}}일 연속",
-    "streak_other": "{{count}}일 연속",
-    "today": "오늘 {{value}}판",
-    "totalPoints": "누적 점수 {{value}}",
-    "howItWorks": "문제는 매 판 새로 만들어집니다. 맞히면 다음 판이 조금 어려워지고, 틀리면 쉬워져서 언제나 «살짝 어려운» 수준이 유지됩니다."
+    "new": "처음",
+    "quickEyeLevel": "{{stage}}단계 · 속도 {{speed}}",
+    "record": "최고 {{value}}점",
+    "settings": "설정",
+    "research": "연구 근거",
+    "howItWorks": "문제는 매번 새로 만들어지고, 맞히면 조금 어려워지고 틀리면 쉬워져요. 레벨은 그 게임의 실력일 뿐 기억력이나 두뇌 건강을 재는 점수가 아니에요."
+  },
+  "settings": {
+    "title": "두뇌 트레이닝 설정",
+    "timing": "시간 여유",
+    "timingHelp": "제한 시간이 있는 게임의 시간을 늘리거나 없앨 수 있어요. 늘린 모드에서는 시간이 지나도 기회가 줄지 않아요.",
+    "timing_1": "기본",
+    "timing_1_5": "1.5배",
+    "timing_2": "2배",
+    "timing_0": "제한 없음",
+    "centerOnly": "빠른 눈: 가운데만",
+    "centerOnlyHelp": "가장자리 별이 잘 보이지 않으면 켜세요. 가운데 그림만 맞혀요.",
+    "flash": "빠른 눈은 그림이 아주 짧게 나타났다 사라져요. 빛에 민감하다면 무리하지 마세요.",
+    "close": "닫기",
+    "sound": "효과음",
+    "soundHelp": "맞히거나 틀릴 때 짧은 소리가 나요.",
+    "haptics": "진동",
+    "hapticsHelp": "맞히거나 틀릴 때 짧게 진동해요. 앱 전체의 진동 설정과 같아요."
   },
   "skills": {
-    "memory": "기억력",
-    "attention": "집중력",
-    "speed": "순발력",
-    "reasoning": "추리력"
+    "memory": "기억",
+    "attention": "주의",
+    "speed": "속도",
+    "reasoning": "추리"
   },
   "games": {
+    "quickEye": {
+      "name": "빠른 눈",
+      "desc": "가운데 그림과 가장자리 별을 아주 잠깐 보고, 무엇이 어디 있었는지 맞혀요."
+    },
     "memoryGrid": {
       "name": "순간 기억",
-      "desc": "잠깐 켜진 칸을 기억했다가 눌러 보세요."
+      "desc": "공간 기억 연습: 잠깐 켜진 칸을 기억했다가 눌러요."
     },
     "sequence": {
       "name": "순서 기억",
-      "desc": "깜빡이는 순서를 보고 그대로 따라 누르세요."
+      "desc": "순서 기억 연습: 깜빡인 순서대로 눌러요."
     },
     "pairs": {
       "name": "같은 그림 찾기",
-      "desc": "카드를 두 장씩 뒤집어 같은 그림 짝을 찾으세요."
+      "desc": "카드를 두 장씩 뒤집어 같은 그림 짝을 찾아요."
     },
     "schulte": {
       "name": "숫자 순서",
-      "desc": "흩어진 숫자를 순서대로 빠르게 누르세요."
+      "desc": "흩어진 숫자를 순서대로 찾아 눌러요."
     },
     "oddOneOut": {
       "name": "다른 하나 찾기",
-      "desc": "모두 같은데 하나만 다릅니다. 찾아보세요."
+      "desc": "모두 같은데 하나만 달라요. 찾아 보세요."
     },
     "stroop": {
       "name": "색깔 단어",
-      "desc": "글자 뜻이 아니라 글자 색깔을 고르세요."
+      "desc": "글자 뜻이 아니라 글자 색깔을 골라요."
     },
     "math": {
       "name": "빠른 계산",
-      "desc": "시간 안에 계산해서 답을 고르세요."
+      "desc": "계산해서 답을 골라요."
     },
     "series": {
       "name": "규칙 찾기",
-      "desc": "숫자의 규칙을 찾아 다음 수를 고르세요."
+      "desc": "숫자의 규칙을 찾아 다음 수를 골라요."
     }
   },
   "play": {
@@ -66,7 +108,7 @@
     "repeat": "같은 순서로 누르세요 · {{done}}/{{total}}",
     "repeatReverse": "거꾸로 누르세요 · {{done}}/{{total}}",
     "memorizePairs": "그림 위치를 기억하세요",
-    "findPairs": "짝을 찾으세요 · 남은 기회 {{lives}}",
+    "findPairs": "짝을 찾으세요 · 실수 여유 {{lives}}",
     "tapAscending": "1부터 {{max}}까지 순서대로 · 다음: {{next}}",
     "tapDescending": "{{max}}부터 1까지 거꾸로 · 다음: {{next}}",
     "findOdd": "다른 하나를 누르세요",
@@ -74,25 +116,80 @@
     "pickWord": "글자 «뜻»을 고르세요",
     "solve": "답을 고르세요",
     "nextNumber": "다음에 올 수는?",
-    "correct": "정답!",
+    "correct": "정답",
     "wrong": "아쉬워요",
-    "timeUp": "시간 초과",
-    "levelUp": "레벨 업! Lv. {{level}}",
+    "timeUp": "시간이 지났어요",
+    "timeUpForgiven": "시간이 지났어요 · 기회는 그대로",
+    "void": "화면이 끊겨서 다시 보여 드릴게요",
     "points": "+{{value}}",
+    "levelUp": "레벨 업 · Lv. {{level}}",
+    "lives": "남은 기회 {{value}}",
+    "livesSpan": "이 길이에서 남은 기회 {{value}}",
+    "practice": "연습 {{done}}/{{total}}",
+    "practiceHint": "연습이에요. 기회와 점수가 줄지 않아요.",
+    "practiceDone": "연습 끝, 이제 시작해요",
+    "trial": "{{done}}/{{total}}",
     "score": "점수",
     "streak": "연속",
+    "pause": "일시정지",
+    "paused": "잠시 멈춤",
+    "resume": "이어서 하기",
     "stop": "그만하기",
-    "mixBadge": "섞어서"
+    "stopConfirm": "여기서 그만할까요? 지금까지의 기록은 저장돼요.",
+    "go": "시작!",
+    "back": "나가기",
+    "streakCount": "{{value}}연속",
+    "streakBanner": "{{value}}연속 정답!",
+    "levelUpBanner": "레벨 업! Lv. {{level}}",
+    "fasterBanner": "더 빨라졌어요!",
+    "roundOver": "라운드 끝",
+    "roundCleared": "라운드 클리어!",
+    "stopTitle": "그만할까요?",
+    "stopBody": "지금까지의 기록은 저장돼요.",
+    "keepPlaying": "계속하기",
+    "stopNow": "그만하기"
+  },
+  "quickEye": {
+    "watch": "가운데를 보세요",
+    "what": "가운데에 무엇이 있었나요?",
+    "where": "별은 어느 쪽에 있었나요?",
+    "sameOrDifferent": "가운데 두 그림이 같았나요?",
+    "same": "같아요",
+    "different": "달라요",
+    "circle": "동그라미",
+    "square": "네모",
+    "stage": "{{stage}}단계",
+    "dir": {
+      "0": "위",
+      "1": "오른쪽 위",
+      "2": "오른쪽",
+      "3": "오른쪽 아래",
+      "4": "아래",
+      "5": "왼쪽 아래",
+      "6": "왼쪽",
+      "7": "왼쪽 위"
+    },
+    "speedLevel": "속도 레벨 {{level}}"
   },
   "summary": {
-    "title": "수고했어요",
-    "rounds": "푼 문제",
+    "livesOut": "라운드 끝",
+    "cleared": "라운드 클리어",
+    "stopped": "여기까지 했어요",
+    "trials": "푼 문제",
     "accuracy": "정답률",
     "points": "점수",
     "bestStreak": "최고 연속",
-    "levels": "레벨 변화",
-    "again": "계속하기",
-    "home": "게임 목록"
+    "levelChange": "Lv. {{from}} → {{to}}",
+    "improved": "이 게임 기록이 좋아졌어요",
+    "newBest": "개인 최고 점수",
+    "again": "한 판 더",
+    "home": "게임 목록",
+    "stars": "별 {{value}}개",
+    "time": "시간",
+    "trend": "최근 라운드 레벨",
+    "otherGames": "다른 게임",
+    "minutes": "분",
+    "voided": "화면이 자꾸 끊겨서 라운드를 멈췄어요"
   },
   "colors": {
     "red": "빨강",
@@ -101,5 +198,267 @@
     "yellow": "노랑",
     "purple": "보라",
     "orange": "주황"
+  },
+  "intro": {
+    "howTo": "이렇게 해요",
+    "replay": "다시 보기",
+    "start": "시작",
+    "practiceNote": "처음 4문제는 연습이에요. 기회와 점수가 줄지 않아요.",
+    "level": "레벨",
+    "speed": "속도",
+    "stage": "단계",
+    "rounds": "플레이",
+    "best": "최고 점수",
+    "welcomeBack": "다시 오셨네요. 처음 몇 문제로 알맞은 레벨을 다시 맞출게요.",
+    "firstPlacement": "처음 몇 문제는 알맞은 시작 레벨을 찾는 문제예요."
+  },
+  "mechanics": {
+    "quickEye": {
+      "periphery": {
+        "title": "별도 찾아요",
+        "body": "가운데 그림과 함께 바깥에 별이 잠깐 떠요. 가운데 그림을 고른 다음, 별이 있던 쪽도 고르세요."
+      },
+      "distractors": {
+        "title": "세모 속의 별",
+        "body": "세모들이 함께 떠요. 그 사이의 별 하나가 있던 쪽을 고르세요."
+      },
+      "similar": {
+        "title": "닮은 모양",
+        "body": "네모의 모서리가 둥글어져 동그라미와 비슷해져요."
+      },
+      "sameDiff": {
+        "title": "같아요? 달라요?",
+        "body": "가운데에 그림이 두 개 떠요. 두 그림이 같은지 다른지 고르세요."
+      }
+    },
+    "oddOneOut": {
+      "rotation": {
+        "title": "돌아간 하나",
+        "body": "모두 같은 그림이에요. 혼자 다른 방향으로 돌아간 것을 누르세요. 판 전체가 기울어 있을 때도 있어요."
+      },
+      "lookalike": {
+        "title": "닮은 그림",
+        "body": "다른 하나가 나머지와 더 비슷해져요."
+      },
+      "nearTwin": {
+        "title": "거의 쌍둥이",
+        "body": "표정이나 시계 바늘처럼 아주 작은 곳만 달라요."
+      },
+      "glyphs": {
+        "title": "헷갈리는 글자",
+        "body": "b와 d, 6과 9처럼 닮은 글자가 나와요."
+      }
+    },
+    "board": {
+      "biggerGrid": {
+        "title": "판이 커져요",
+        "body": "칸이 더 많아졌어요."
+      },
+      "moreNumbers": {
+        "title": "숫자가 늘어요",
+        "body": "숫자가 더 많아졌어요. 시간도 그만큼 늘어요."
+      },
+      "moreCards": {
+        "title": "카드가 늘어요",
+        "body": "짝이 더 많아졌어요. 시간과 실수 여유도 함께 늘어요."
+      },
+      "moreChoices": {
+        "title": "보기가 늘어요",
+        "body": "고를 수 있는 색이 하나 더 늘었어요."
+      }
+    },
+    "schulte": {
+      "descending": {
+        "title": "거꾸로 세기",
+        "body": "가장 큰 수부터 1까지 거꾸로 누르세요."
+      },
+      "reshuffle": {
+        "title": "숫자가 섞여요",
+        "body": "누를 때마다 숫자 자리가 바뀌어요. 대신 판이 한 칸 작아요."
+      }
+    },
+    "memoryGrid": {
+      "fastShow": {
+        "title": "더 짧게 보여요",
+        "body": "판이 가장 커졌어요. 이제 칸이 켜져 있는 시간이 줄어요."
+      }
+    },
+    "sequence": {
+      "reverse": {
+        "title": "거꾸로 누르기",
+        "body": "본 순서와 반대로, 마지막에 켜진 칸부터 누르세요."
+      }
+    },
+    "series": {
+      "descending": {
+        "title": "줄어드는 수",
+        "body": "수가 같은 만큼씩 줄어들 수도 있어요."
+      },
+      "geometric": {
+        "title": "몇 배씩",
+        "body": "앞의 수에 같은 수를 곱해서 커지는 규칙이 나와요."
+      },
+      "alternating": {
+        "title": "올라갔다 내려갔다",
+        "body": "더하기와 빼기가 번갈아 나오는 규칙이 나와요."
+      },
+      "growing": {
+        "title": "늘어나는 간격",
+        "body": "더하는 수가 매번 커지는 규칙이 나와요."
+      },
+      "fibonacci": {
+        "title": "앞의 두 수",
+        "body": "앞의 두 수를 더해 다음 수를 만드는 규칙이 나와요."
+      },
+      "squares": {
+        "title": "같은 수끼리 곱하기",
+        "body": "수를 자기 자신과 곱한 값으로 이어지는 규칙이 나와요."
+      },
+      "interleaved": {
+        "title": "두 줄이 섞여요",
+        "body": "두 규칙이 한 칸씩 번갈아 나와요. 하나 걸러 읽어 보세요."
+      },
+      "doublePlus": {
+        "title": "두 배 더하기",
+        "body": "앞의 수를 두 배 하고 같은 수를 더하는 규칙이 나와요."
+      }
+    },
+    "pairs": {
+      "oneFamily": {
+        "title": "비슷한 그림끼리",
+        "body": "이제 한 종류(동물, 과일 등)에서만 그림이 나와요."
+      },
+      "noPreview": {
+        "title": "미리보기 없음",
+        "body": "처음에 그림을 보여 주지 않아요. 뒤집으면서 기억하세요."
+      }
+    },
+    "stroop": {
+      "word": {
+        "title": "규칙이 바뀌어요",
+        "body": "«뜻»을 고르라고 하면 글자 색이 아니라 글자가 말하는 색을 고르세요."
+      }
+    },
+    "math": {
+      "sub": {
+        "title": "빼기 등장",
+        "body": "이제 빼기 문제도 나와요."
+      },
+      "mul": {
+        "title": "곱하기 등장",
+        "body": "이제 곱하기 문제도 나와요."
+      },
+      "div": {
+        "title": "나누기 등장",
+        "body": "나누기 문제도 나와요. 답은 늘 딱 떨어져요."
+      },
+      "twoStep": {
+        "title": "두 번 계산하기",
+        "body": "두 번 계산하는 문제가 나와요. +와 ×가 함께 있으면 ×를 먼저, ?가 있으면 들어갈 수를 고르세요."
+      }
+    }
+  },
+  "rule": {
+    "label": "새 규칙",
+    "gotIt": "알겠어요",
+    "unscored": "이번 문제는 점수와 기회에 들어가지 않아요.",
+    "change": "달라진 점"
+  },
+  "placement": {
+    "label": "시작 레벨 찾는 중",
+    "hint": "몇 문제로 알맞은 레벨을 찾고 있어요. 기회는 줄지 않아요."
+  },
+  "tiers": {
+    "none": "등급 전",
+    "t1": "브론즈",
+    "t2": "실버",
+    "t3": "골드",
+    "t4": "플래티넘",
+    "t5": "다이아",
+    "t6": "마스터",
+    "label": "등급",
+    "next": "다음 등급까지",
+    "up": "{{tier}} 달성!",
+    "upBody": "{{game}}에서 {{tier}} 등급이 됐어요.",
+    "max": "최고 등급"
+  },
+  "achievements": {
+    "title": "업적",
+    "earned": "업적 달성",
+    "locked": "아직",
+    "firstClear": {
+      "title": "첫 완주",
+      "body": "라운드를 끝까지 마쳤어요."
+    },
+    "cleanRound": {
+      "title": "무실수 완주",
+      "body": "기회를 하나도 잃지 않고 라운드를 마쳤어요."
+    },
+    "streak10": {
+      "title": "10연속",
+      "body": "10문제를 연달아 맞혔어요."
+    },
+    "streak20": {
+      "title": "20연속",
+      "body": "20문제를 연달아 맞혔어요."
+    },
+    "flawlessHunt": {
+      "title": "한 번에 다 찾기",
+      "body": "5×5 이상 숫자 순서를 한 번도 틀리지 않고 끝냈어요."
+    },
+    "span7": {
+      "title": "일곱 칸 기억",
+      "body": "순서·순간 기억에서 7칸을 기억해 냈어요."
+    },
+    "quickEyeStage5": {
+      "title": "빠른 눈 5단계",
+      "body": "빠른 눈 5단계에 올랐어요."
+    },
+    "quickEyeStage10": {
+      "title": "빠른 눈 10단계",
+      "body": "빠른 눈 10단계에 올랐어요."
+    },
+    "allGames": {
+      "title": "모든 게임",
+      "body": "9가지 게임을 모두 해 봤어요."
+    },
+    "firstSession": {
+      "title": "첫 훈련",
+      "body": "오늘의 훈련을 처음 끝까지 했어요."
+    },
+    "weekGoal": {
+      "title": "이번 주 3회",
+      "body": "한 주에 오늘의 훈련 3회를 채웠어요."
+    },
+    "coreCourse": {
+      "title": "기본 과정 완료",
+      "body": "기본 과정 10회를 마쳤어요."
+    },
+    "comeback": {
+      "title": "다시 시작",
+      "body": "2주 넘게 쉬었다가 다시 훈련을 마쳤어요."
+    },
+    "goldTier": {
+      "title": "첫 골드",
+      "body": "한 게임에서 골드 등급에 올랐어요."
+    },
+    "masterTier": {
+      "title": "첫 마스터",
+      "body": "한 게임에서 마스터 등급에 올랐어요."
+    }
+  },
+  "breakdown": {
+    "title": "점수 내역",
+    "base": "기본 점수",
+    "speed": "빠른 정답",
+    "combo": "연속 정답",
+    "clear": "완주 보너스",
+    "clean": "무실수 보너스",
+    "total": "합계"
+  },
+  "relax": {
+    "suggest": "라운드가 연달아 일찍 끝났어요. 시간 여유를 켜 볼까요?",
+    "turnOn": "시간 여유 1.5배 켜기",
+    "on": "시간 여유를 켰어요"
   }
 }

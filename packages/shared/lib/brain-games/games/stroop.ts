@@ -22,9 +22,12 @@ export const stroop = choiceGame('stroop', (level, rng) => {
     stimulus: { textKey: `colors.${word}`, color: ink },
     options: colors.map((c) => ({ textKey: `colors.${c}` })),
     correctIndex: colors.indexOf(answer),
-    limitMs: Math.max(1600, 5200 - level * 130),
+    // Six colours and the rule switch are in by level 15; the clock reaches its 1.4s floor at 30,
+    // where the game stops getting harder (maxLevel).
+    limitMs: Math.max(1400, 5200 - level * 130),
     picked: null,
     timedOut: false,
     sig: `st:${rule}:${word}:${ink}:${colors.join(',')}`,
+    tags: [...(optionCount >= 3 ? [`stroop.options${optionCount}`] : []), ...(rule === 'word' ? ['stroop.word'] : [])],
   }
-})
+}, { maxLevel: 30 })

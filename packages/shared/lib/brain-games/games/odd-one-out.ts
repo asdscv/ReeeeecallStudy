@@ -9,6 +9,7 @@ import type { BrainGameDef, CellView } from '../types'
  * last tier instead of topping out.
  */
 export interface OddOneOutState {
+  level: number
   cols: number
   rows: number
   common: string
@@ -19,6 +20,8 @@ export interface OddOneOutState {
   phase: 'find' | 'done'
   picked: number | null
   timedOut: boolean
+  /** Look-alike tier of a symbol round (0-3); null on a rotation round. */
+  tier: number | null
 }
 
 /** Pairs that look more alike the higher the tier. Letters and CJK render the same everywhere. */
@@ -38,7 +41,7 @@ const LOOKALIKES: readonly (readonly [string, string])[][] = [
   [
     ['O', 'Q'], ['b', 'd'], ['p', 'q'], ['6', '9'], ['E', 'F'], ['M', 'N'],
     ['8', 'B'], ['人', '入'], ['土', '士'], ['未', '末'], ['大', '太'], ['日', '曰'],
-    ['C', 'G'], ['l', 'I'], ['5', 'S'], ['u', 'v'],
+    ['C', 'G'], ['5', 'S'], ['u', 'v'],
   ],
 ]
 
@@ -47,13 +50,14 @@ const ROTATABLE = ['F', 'R', 'G', 'J', 'L', 'P', '4', '7', '➜', '☂', '♞', 
 
 export const oddOneOut: BrainGameDef<OddOneOutState> = {
   id: 'oddOneOut',
-  create(level, rng) {
-    const n = level < 3 ? 3 : level < 7 ? 4 : level < 12 ? 5 : level < 18 ? 6 : 7
+  create(level, rng, ctx) {
+    const n = Math.min(level < 3 ? 3 : level < 7 ? 4 : level < 12 ? 5 : level < 18 ? 6 : 7, Math.max(3, ctx.maxCols))
     const rotateRound = level >= 4 && rng.chance(0.35)
     let common: string
     let odd: string
     let baseRotate = 0
     let oddRotate = 0
+    let tier: number | null = null
     if (rotateRound) {
       common = odd = rng.pick(ROTATABLE)
       baseRotate = rng.pick([0, 0, 90, 180, 270])
@@ -61,11 +65,12 @@ export const oddOneOut: BrainGameDef<OddOneOutState> = {
       oddRotate = baseRotate + angle * (rng.chance(0.5) ? 1 : -1)
     } else {
       const top = Math.min(LOOKALIKES.length - 1, Math.floor(level / 5))
-      const tier = rng.int(Math.max(0, top - 1), top)
+      tier = rng.int(Math.max(0, top - 1), top)
       const pair = rng.pick(LOOKALIKES[tier])
       ;[common, odd] = rng.chance(0.5) ? [pair[0], pair[1]] : [pair[1], pair[0]]
     }
     return {
+      level,
       cols: n,
       rows: n,
       common,
@@ -76,6 +81,7 @@ export const oddOneOut: BrainGameDef<OddOneOutState> = {
       phase: 'find',
       picked: null,
       timedOut: false,
+      tier,
     }
   },
   pendingMs: () => null,
@@ -88,7 +94,12 @@ export const oddOneOut: BrainGameDef<OddOneOutState> = {
     const correct = s.picked === s.oddIndex && !s.timedOut
     return { correct, accuracy: correct ? 1 : 0 }
   },
-  timeLimitMs: (s) => 3500 + s.cols * s.rows * 260,
+  // The grid tops out at 7×7 (level 18); from there the clock tightens 3% a level to a floor.
+  timeLimitMs: (s) => {
+    const cells = s.cols * s.rows
+    return Math.round(Math.max(1800 + cells * 90, (3500 + cells * 260) * Math.pow(0.97, Math.max(0, s.level - 18))))
+  },
+  maxLevel: () => 50,
   view(s) {
     const cells: CellView[] = range(s.cols * s.rows).map((i) => {
       const isOdd = i === s.oddIndex
@@ -110,4 +121,12 @@ export const oddOneOut: BrainGameDef<OddOneOutState> = {
     }
   },
   signature: (s) => `oo:${s.common}:${s.odd}:${s.oddRotate}:${s.oddIndex}`,
+  solution: (s) => (s.phase === 'find' ? [s.oddIndex] : null),
+  mechanics(s) {
+    const tags: string[] = []
+    for (let n = 4; n <= 7; n++) if (s.cols >= n) tags.push(`oddOneOut.grid${n}`)
+    if (s.tier === null) tags.push('oddOneOut.rotation')
+    else if (s.tier >= 1) tags.push(['', 'oddOneOut.lookalike', 'oddOneOut.nearTwin', 'oddOneOut.glyphs'][s.tier])
+    return tags
+  },
 }

@@ -161,7 +161,7 @@ export function AdminContentsPage() {
               onClick={() => setViewDays(p)}
               className={`px-3 py-1 text-xs rounded-full border transition cursor-pointer ${
                 viewDays === p
-                  ? 'bg-brand text-white border-brand'
+                  ? 'bg-brand text-brand-foreground border-brand'
                   : 'bg-card text-muted-foreground border-border hover:border-border'
               }`}
             >

@@ -250,7 +250,7 @@ function Hub({ hub }: { hub: VocabHub }) {
                   to={`/d/${d.id}`}
                   hrefLang={d.native_language ?? undefined}
                   lang={d.native_language ?? undefined}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand text-white text-sm font-medium hover:bg-brand-hover no-underline"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand text-brand-foreground text-sm font-medium hover:bg-brand-hover no-underline"
                 >
                   {isDeckLanguage(d.native_language) ? LANGUAGE_NATIVE_NAME[d.native_language] : d.native_language}
                   <ArrowRight className="w-3.5 h-3.5" />

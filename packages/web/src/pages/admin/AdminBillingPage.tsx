@@ -284,7 +284,7 @@ export function AdminBillingPage() {
         <div className="px-4 py-3 border-b border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
             <h3 className="text-sm font-medium text-foreground">{t('billing.subscriptions.title')}</h3>
-            <p className="text-[11px] text-content-tertiary mt-0.5">{t('billing.subscriptions.refundNote')}</p>
+            <p className="text-xs text-content-tertiary mt-0.5">{t('billing.subscriptions.refundNote')}</p>
           </div>
           <select
             value={statusFilter}
@@ -382,7 +382,7 @@ export function AdminBillingPage() {
         <div className="px-4 py-3 border-b border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
             <h3 className="text-sm font-medium text-foreground">{t('billing.payments.title')}</h3>
-            <p className="text-[11px] text-content-tertiary mt-0.5">{t('billing.channel.paymentsHint')}</p>
+            <p className="text-xs text-content-tertiary mt-0.5">{t('billing.channel.paymentsHint')}</p>
           </div>
           <div className="flex items-center gap-2">
             {/* Channel filter. Mobile store purchases are NOT payment_intents rows —
@@ -404,7 +404,7 @@ export function AdminBillingPage() {
               ))}
             </div>
             {billingPayments.length > 0 && (
-              <span className="text-[11px] text-content-tertiary tabular-nums">
+              <span className="text-xs text-content-tertiary tabular-nums">
                 {t('billing.payments.loadedCount', { total: billingPayments.length })}
               </span>
             )}
@@ -719,7 +719,7 @@ function UserBillingPanel() {
                     <option key={p.id} value={p.id}>{p.title} · ${((p.priceUsdCents ?? 0) / 100).toFixed(2)}</option>
                   ))}
                 </select>
-                <label className="block text-[11px] text-muted-foreground">{t('billing.user.grantPeriodEnd')}</label>
+                <label className="block text-xs text-muted-foreground">{t('billing.user.grantPeriodEnd')}</label>
                 <input
                   type="date"
                   value={grantPeriodEnd}
@@ -739,7 +739,7 @@ function UserBillingPanel() {
               {/* Adjust wallet */}
               <div className="border border-border rounded-lg p-3 space-y-2">
                 <p className="text-xs font-semibold text-foreground">{t('billing.user.adjustWallet')}</p>
-                <label className="block text-[11px] text-muted-foreground">{t('billing.user.adjustAmount')}</label>
+                <label className="block text-xs text-muted-foreground">{t('billing.user.adjustAmount')}</label>
                 <input
                   type="number"
                   value={adjustWon}
@@ -747,7 +747,7 @@ function UserBillingPanel() {
                   placeholder="0"
                   className="w-full px-2 py-1.5 text-xs border border-border rounded-lg bg-muted tabular-nums"
                 />
-                <label className="block text-[11px] text-muted-foreground">{t('billing.user.adjustReason')}</label>
+                <label className="block text-xs text-muted-foreground">{t('billing.user.adjustReason')}</label>
                 <input
                   type="text"
                   value={adjustReason}

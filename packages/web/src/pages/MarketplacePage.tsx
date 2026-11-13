@@ -159,7 +159,7 @@ export function MarketplacePage() {
                       onClick={() => setCurrentPage(page)}
                       className={`w-10 h-10 text-sm rounded cursor-pointer ${
                         safePage === page
-                          ? 'bg-brand text-white'
+                          ? 'bg-brand text-brand-foreground'
                           : 'hover:bg-accent text-foreground'
                       }`}
                     >

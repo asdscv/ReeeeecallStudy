@@ -39,10 +39,15 @@ export type AIStackParamList = {
   LearningToday: { goalId: string }
 }
 
-// 두뇌 트레이닝 — endless brain games. `mode` is a game id or 'mix'. See BrainStack.tsx.
+// 두뇌 트레이닝. See BrainStack.tsx.
 export type BrainStackParamList = {
   BrainHome: undefined
+  /** Today's Training — the bounded four-game session. */
+  BrainTraining: undefined
+  /** Free practice of one game. `mode` is a game id (BrainGameId); anything else goes back. */
   BrainPlay: { mode: string }
+  /** The research basis (ko/en only). */
+  BrainResearch: undefined
 }
 
 // Main tabs (로그인 후)

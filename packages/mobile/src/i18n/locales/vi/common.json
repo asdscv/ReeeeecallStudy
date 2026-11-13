@@ -22,7 +22,16 @@
     "achievements": "Thành tích",
     "publisherStats": "Thống kê nhà xuất bản",
     "wallet": "Ví",
-    "quiz": "Kiểm tra"
+    "quiz": "Kiểm tra",
+    "aiHubHome": "Trang AI",
+    "tabsLabel": "Thẻ chính",
+    "short": {
+      "home": "Trang chủ",
+      "study": "Học",
+      "decks": "Bộ thẻ",
+      "brain": "Trí não",
+      "more": "Menu"
+    }
   },
   "actions": {
     "save": "Lưu",

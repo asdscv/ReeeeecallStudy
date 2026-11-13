@@ -160,7 +160,7 @@ export function ReviewTemplateStep({ template, onChange, onRegenerate, onNext }:
         <button
           type="button"
           onClick={onNext}
-          className="flex-1 px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover cursor-pointer"
+          className="flex-1 px-4 py-2 bg-brand text-brand-foreground rounded-lg text-sm font-medium hover:bg-brand-hover cursor-pointer"
         >
           {t('review.next')}
         </button>

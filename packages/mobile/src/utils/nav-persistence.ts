@@ -16,7 +16,10 @@ import {
   serializeNavState,
 } from './nav-persistence-core'
 
-const NAV_STATE_FILE = `${FileSystem.documentDirectory}nav-state-v1.json`
+// v2: the brain-training stack and the tab bar changed the route tree. A state saved by the older
+// tree would be restored into the new one (screens that no longer exist, a tab bar that did not
+// know where it was), so the file name moves and old saves are simply not read.
+const NAV_STATE_FILE = `${FileSystem.documentDirectory}nav-state-v2.json`
 
 /**
  * Load the persisted navigation state if present and fresh.

@@ -320,7 +320,7 @@ export function MarketplaceDetailPage() {
           <button
             onClick={handleAcquire}
             disabled={acquiring || hasAcquired || wouldExceed}
-            className="px-6 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="px-6 py-2.5 bg-brand text-brand-foreground rounded-lg text-sm font-medium hover:bg-brand-hover transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {hasAcquired
               ? t('marketplace:detail.alreadyAcquired', { defaultValue: 'Already in your collection' })

@@ -272,7 +272,7 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
 
           <div className="block">
             <span className="text-xs font-medium text-foreground">{t('form.decks')}</span>
-            <p className="text-[11px] text-content-tertiary mt-0.5">{t('form.decksHint')}</p>
+            <p className="text-xs text-content-tertiary mt-0.5">{t('form.decksHint')}</p>
             <div className="mt-1.5 max-h-40 overflow-y-auto border border-border rounded-lg p-2 space-y-0.5">
               {decks.length === 0 && <p className="text-xs text-content-tertiary">{t('form.noDecks')}</p>}
               {decks.map((deck) => (
@@ -294,7 +294,7 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
                 job; the split between seen and unseen is what every number below is computed
                 from, so it is stated where the choice is made. */}
             {selection.total > 0 && (
-              <p className="mt-1.5 text-[11px] text-content-tertiary">
+              <p className="mt-1.5 text-xs text-content-tertiary">
                 {t('form.decksSummary', { total: selection.total, unseen: selection.unseen })}
               </p>
             )}
@@ -303,7 +303,7 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
           {/* ── Which side of the question the learner is pinning ──────────────── */}
           <div>
             <span className="text-xs font-medium text-foreground">{t('form.basisLabel')}</span>
-            <p className="text-[11px] text-content-tertiary mt-0.5">{t('form.basisHint')}</p>
+            <p className="text-xs text-content-tertiary mt-0.5">{t('form.basisHint')}</p>
             <div
               role="radiogroup"
               aria-label={t('form.basisLabel')}
@@ -396,7 +396,7 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
               </select>
               {/* The missing sentence. Picking a smaller number makes every minute figure on the
                   screen go UP, which without this reads as the app punishing the learner. */}
-              <p className="mt-1 text-[11px] text-content-tertiary">{t('form.studyDaysHint')}</p>
+              <p className="mt-1 text-xs text-content-tertiary">{t('form.studyDaysHint')}</p>
             </label>
 
             <label className="block">
@@ -421,12 +421,12 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
               </div>
               {/* What raising or lowering it actually costs — distinct from the reviews-first
                   rule below, which holds at every value including this one. */}
-              <p className="mt-1 text-[11px] text-content-tertiary">{t('form.newCardsPerDayHint')}</p>
+              <p className="mt-1 text-xs text-content-tertiary">{t('form.newCardsPerDayHint')}</p>
               {/* 0 is a real answer, not a broken one, and nothing said so. */}
               {newCardsPerDay === 0 && (
-                <p className="mt-1 text-[11px] text-content-tertiary">{t('form.newCardsPerDayZero')}</p>
+                <p className="mt-1 text-xs text-content-tertiary">{t('form.newCardsPerDayZero')}</p>
               )}
-              <p className="mt-1 text-[11px] text-content-tertiary">{t('form.newCardsHint')}</p>
+              <p className="mt-1 text-xs text-content-tertiary">{t('form.newCardsHint')}</p>
             </label>
           </div>
 
@@ -438,7 +438,7 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
             <h3 className="text-xs font-semibold text-foreground">{t('form.plan.title')}</h3>
 
             {selection.total === 0 || (basis === 'date' ? daysAvailable === null : !budgetMinutes) ? (
-              <p className="text-[11px] text-content-tertiary">
+              <p className="text-xs text-content-tertiary">
                 {t(basis === 'date' ? 'form.plan.needDecksAndDate' : 'form.plan.needDecksAndBudget')}
               </p>
             ) : basis === 'date' ? (
@@ -447,7 +447,7 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
                   <p className="text-sm text-foreground">{minutes(projection.averageMinutesPerDay)}</p>
                   {/* Stated separately and never averaged away: this is the day the learner has
                       to actually survive. */}
-                  <p className="text-[11px] text-content-tertiary">
+                  <p className="text-xs text-content-tertiary">
                     {t('form.plan.peak', {
                       minutes: Math.round(projection.peakMinutesPerDay),
                       day: projection.peakDay + 1,
@@ -457,12 +457,12 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
                       the ceiling set above — they are the same unit and used to disagree in
                       silence. */}
                   {neededNewPerDay !== null && (
-                    <p className="text-[11px] text-content-tertiary">
+                    <p className="text-xs text-content-tertiary">
                       {t('form.plan.newPerDayNeeded', { count: neededNewPerDay })}
                     </p>
                   )}
                   {capBlocksTarget && (
-                    <p className="text-[11px] text-warning">
+                    <p className="text-xs text-warning">
                       {t('form.plan.capBelowNeeded', { count: newCardsPerDay })}
                     </p>
                   )}
@@ -476,7 +476,7 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
                     : t('form.plan.tooSlow')}
                 </p>
                 {budgetFinishDate && (
-                  <p className="text-[11px] text-content-tertiary">{t('form.plan.peakBasis')}</p>
+                  <p className="text-xs text-content-tertiary">{t('form.plan.peakBasis')}</p>
                 )}
               </>
             )}
@@ -484,8 +484,8 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
             {/* Only SRS-mode study feeds the plan — cramming and the sequential modes call
                 apply_study_rating with no SRS payload, so they move nothing here. Said out loud
                 rather than left for the learner to discover from a plan that never changes. */}
-            <p className="text-[11px] text-content-tertiary pt-1">{t('form.plan.srsOnly')}</p>
-            <p className="text-[11px] text-content-tertiary">{t('form.plan.estimate')}</p>
+            <p className="text-xs text-content-tertiary pt-1">{t('form.plan.srsOnly')}</p>
+            <p className="text-xs text-content-tertiary">{t('form.plan.estimate')}</p>
           </section>
 
           {localError && <p role="alert" className="text-xs text-destructive">{localError}</p>}
@@ -505,7 +505,7 @@ export function GoalFormModal({ goal, onCancel, onSubmit, submitting }: {
               type="button"
               onClick={submit}
               disabled={submitting}
-              className="px-4 py-1.5 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-60"
+              className="px-4 py-1.5 text-sm font-medium bg-brand text-brand-foreground rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-60"
             >
               {submitting ? t('form.saving') : t('form.save')}
             </button>

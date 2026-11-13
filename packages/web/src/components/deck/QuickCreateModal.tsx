@@ -285,7 +285,7 @@ export function QuickCreateModal({ open, onClose, onCreated }: QuickCreateModalP
                     <div className="flex items-center gap-1.5">
                       <span className="text-sm font-medium text-foreground">{presetSummary(p)}</span>
                       {p.id === QUICK_PRESETS[0].id && (
-                        <span className="text-[10px] font-medium text-brand bg-brand/10 px-1.5 py-0.5 rounded">
+                        <span className="text-xs font-medium text-brand bg-brand/10 px-1.5 py-0.5 rounded">
                           {t('decks:quickCreate.basicLabel')}
                         </span>
                       )}

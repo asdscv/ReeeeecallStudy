@@ -1,9 +1,11 @@
-import { LayoutGrid, Repeat, Copy, Hash, Eye, Droplet, PlusCircle, TrendingUp, type LucideIcon } from 'lucide-react'
-import type { BrainColor, CellTone } from '@reeeeecall/shared/lib/brain-games'
+import { Aperture, LayoutGrid, Repeat, Copy, Hash, Eye, Droplet, PlusCircle, TrendingUp, type LucideIcon } from 'lucide-react'
+import { INK_COLORS } from '@reeeeecall/shared/lib/brain-games'
 import type { BrainStorage } from '@reeeeecall/shared/stores/brain-store'
+import type { PlatformContext } from '@reeeeecall/shared/hooks/useBrainRound'
 
 /** The catalog names icons; web draws them with lucide (mobile uses the same names in Feather). */
 export const BRAIN_ICONS: Record<string, LucideIcon> = {
+  aperture: Aperture,
   grid: LayoutGrid,
   repeat: Repeat,
   copy: Copy,
@@ -14,32 +16,14 @@ export const BRAIN_ICONS: Record<string, LucideIcon> = {
   'trending-up': TrendingUp,
 }
 
-/** Ink colours for the colour-word game — saturated enough to read on light and dark. */
-export const INK: Record<BrainColor, string> = {
-  red: '#ef4444',
-  blue: '#3b82f6',
-  green: '#16a34a',
-  yellow: '#d4a106',
-  purple: '#a855f7',
-  orange: '#f97316',
-}
-
-export const TONE_CLASS: Record<CellTone, string> = {
-  idle: 'bg-muted hover:bg-accent text-foreground',
-  lit: 'bg-brand text-white scale-[1.03]',
-  correct: 'bg-success text-white',
-  wrong: 'bg-destructive text-white',
-  missed: 'bg-brand/25 ring-2 ring-brand text-foreground',
-  faceDown: 'bg-brand/85 hover:bg-brand text-white',
-  faceUp: 'bg-brand/10 border-2 border-brand/30 text-foreground',
-  matched: 'bg-success/15 border-2 border-success/40 text-foreground opacity-60',
-  done: 'bg-muted/40 text-content-tertiary',
-}
+/** Ink colours for the colour-word game (shared with the app). */
+export const INK = INK_COLORS
 
 export function brainStorageFor(userId: string): BrainStorage {
   const key = `reeeeecall-brain:${userId}`
   return {
     key,
+    userId,
     load: () => {
       try {
         return localStorage.getItem(key)
@@ -54,5 +38,80 @@ export function brainStorageFor(userId: string): BrainStorage {
         // Private mode or full storage: the session still plays, progress just is not kept.
       }
     },
+    loadHistory: () => {
+      try {
+        return localStorage.getItem(`${key}:history`)
+      } catch {
+        return null
+      }
+    },
+    saveHistory: (raw) => {
+      try {
+        localStorage.setItem(`${key}:history`, raw)
+      } catch {
+        // Same as progress.
+      }
+    },
+    loadMeta: () => {
+      try {
+        return localStorage.getItem(`${key}:meta`)
+      } catch {
+        return null
+      }
+    },
+    saveMeta: (raw) => {
+      try {
+        localStorage.setItem(`${key}:meta`, raw)
+      } catch {
+        // Same as progress.
+      }
+    },
   }
+}
+
+/** The account was deleted: its brain record leaves this browser too (the server row goes with the account). */
+export function forgetBrainOnDevice(userId: string) {
+  const key = `reeeeecall-brain:${userId}`
+  for (const k of [key, `${key}:history`, `${key}:meta`]) {
+    try {
+      localStorage.removeItem(k)
+    } catch {
+      // Blocked storage: nothing was kept there either.
+    }
+  }
+}
+
+/** The game screen's background: the game's deep gradient. */
+export function canvasBackground(theme: { canvasFrom: string; canvasTo: string }): string {
+  return `radial-gradient(120% 80% at 50% 0%, ${theme.canvasTo} 0%, ${theme.canvasFrom} 70%)`
+}
+
+export function cardBackground(theme: { cardFrom: string; cardTo: string }): string {
+  return `linear-gradient(135deg, ${theme.cardFrom} 0%, ${theme.cardTo} 100%)`
+}
+
+/**
+ * The web's platform context. Quick Eye starts at 33ms (two 60Hz frames) — a browser's frame
+ * timing is not trustworthy enough at one frame without hardware checks — and keeps the inner ring
+ * to the 8 radial positions on small screens, where 16 stimuli would overlap the centre box.
+ */
+export function webPlatform(_boardWidth: number, maxCols: number): PlatformContext {
+  // Decided by the screen, as the app does (its screenShortSide) — not by the board, which is
+  // capped at 560px and would always read as "small".
+  const small = Math.min(window.innerWidth, window.innerHeight) < 600
+  return { maxCols, minExposureMs: 33, ringSlots: small ? [8, 16, 16] : [16, 16, 16] }
+}
+
+/**
+ * Whether the player is driving with the keyboard. Screens move focus to their main button only
+ * then — on a touch screen, focus moved by script draws a ring the player never asked for.
+ */
+let keyboardMode = false
+if (typeof window !== 'undefined') {
+  window.addEventListener('keydown', (e) => { if (e.key === 'Tab' || e.key.startsWith('Arrow') || e.key === 'Enter' || e.key === ' ') keyboardMode = true }, true)
+  window.addEventListener('pointerdown', () => { keyboardMode = false }, true)
+}
+
+export function focusIfKeyboard(el: HTMLElement | null | undefined) {
+  if (keyboardMode) el?.focus({ preventScroll: true })
 }

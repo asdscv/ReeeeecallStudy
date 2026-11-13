@@ -81,8 +81,8 @@ export function NextGoalsWidget() {
                 />
               </div>
               <div className="flex items-center justify-between mt-0.5">
-                <span className="text-[10px] text-content-tertiary">{goal.progress}%</span>
-                <span className="text-[10px] text-brand font-medium">+{goal.xp} XP</span>
+                <span className="text-xs text-content-tertiary">{goal.progress}%</span>
+                <span className="text-xs text-brand font-medium">+{goal.xp} XP</span>
               </div>
             </div>
           </div>
