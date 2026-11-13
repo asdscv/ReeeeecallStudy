@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Aperture,
   CalendarCheck,
   Crown,
-  Eye,
   Flag,
   Flame,
   GraduationCap,
@@ -34,8 +32,6 @@ const ICONS: Record<AchievementId, LucideIcon> = {
   streak20: Zap,
   flawlessHunt: Hash,
   span7: LayoutGrid,
-  quickEyeStage5: Aperture,
-  quickEyeStage10: Eye,
   allGames: Shapes,
   firstSession: Sparkles,
   weekGoal: CalendarCheck,

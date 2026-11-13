@@ -6,7 +6,6 @@ import {
   type CreateContext,
   type GameGroup,
   type PlacementState,
-  type QuickEyeKnob,
   type RecentTrial,
   type RoundOutcome,
   type RoundView,
@@ -15,7 +14,6 @@ import {
   GROUP_RULES,
   MECHANICS,
   PRACTICE_TRIALS,
-  QUICK_EYE_LADDER_MS,
   SKILL,
   achievementBit,
   blockedRules,
@@ -35,15 +33,6 @@ import {
   placementDone,
   placementHandover,
   placementLevel,
-  quickEyeBase,
-  quickEyeHold,
-  quickEyeIndex,
-  quickEyeKnob,
-  quickEyeSpeedGauge,
-  quickEyeStage,
-  quickEyeTierStage,
-  QUICK_EYE_HOLD_NEED,
-  exposureMsFor,
   randomSeed,
   recentMedian,
   restartLevel,
@@ -64,8 +53,8 @@ import { useBrainStore } from '../stores/brain-store'
 
 /**
  * One round of one game — trials until the chances run out, the round's cap is reached, or the
- * player stops. Web and mobile only draw `view` and call `tap` / `reportExposure`; every timer and
- * every rule lives here, so the two platforms cannot drift.
+ * player stops. Web and mobile only draw `view` and call `tap`; every timer and every rule lives
+ * here, so the two platforms cannot drift.
  *
  * The game logic of a round, in order:
  *   practice (first time only; ends after 2 right in a row) → placement (a game never played:
@@ -74,14 +63,6 @@ import { useBrainStore } from '../stores/brain-store'
  *   tier, achievements, score bonuses).
  * A rule the player has not met yet stops its first trial with a card, and that trial is unscored;
  * a bigger board gets a short notice. See lib/brain-games/{rules,skill,placement,mechanics,tiers}.ts.
- *
- * Quick Eye on top of that: practice is the centre alone (variant 1) at 500 → 400 → 333 → 267ms;
- * every record then plays from variant 2, and a new rule's four unscored trials step the exposure
- * down from three levels easier to the player's own; placement (6-10 trials, opening at 267ms)
- * sends a player who could not yet place the star to variant 1, without saying so. No lives: a leg
- * of 20 counted trials. A stage reached shows a short interstitial between trials (`stageUp`, the
- * round paused); the answer's reveal can be skipped after 500ms. Nothing is shown, sounded or
- * counted up while the display is being measured (`quiet`: fixation, stimulus, mask).
  *
  * The board games since the hard-content change (GAMES_DIFFICULTY_PLAN §2.3-2.9): one placement
  * path for a game never played, a pre-estimate record or a re-opened estimate (ZEST; Number Hunt's
@@ -94,10 +75,6 @@ export interface PlatformContext {
   maxCols: number
   /** Tallest grid with cells ≥ 56dp on this screen (see maxRowsFor). Unset: 7. */
   maxRows?: number
-  /** Shortest Quick Eye exposure this platform shows reliably. */
-  minExposureMs: number
-  /** Quick Eye slots per ring. */
-  ringSlots: number[]
 }
 
 /** practice: first-time tutorial · intro: right after a new-rule card · placement: finding the start · counted: the real thing. */
@@ -105,10 +82,10 @@ export type TrialKind = 'practice' | 'intro' | 'placement' | 'counted'
 
 export interface TrialResult {
   correct: boolean
-  /** 0..1 — Quick Eye: 0.5 when only one of its two answers was right (the run is kept, not grown). */
+  /** 0..1, how much of the trial was right. */
   accuracy: number
   timedOut: boolean
-  /** The trial did not count (dropped frames) and is being replaced. */
+  /** The trial did not count (its outcome said `void`) and is being replaced. */
   void: boolean
   /** Unscored: a practice trial or the trial right after a new-rule card. */
   practice: boolean
@@ -148,12 +125,11 @@ export interface RoundStats {
   /**
    * Of `activeMs`, the time spent setting up rather than playing: practice, placement (Match
    * Pairs' probe boards) and rule-card trials, at most 2 minutes a round. Today's Training keeps it
-   * out of the slot, so a first day's setup does not eat the game's minutes. Always 0 for Quick Eye.
+   * out of the slot, so a first day's setup does not eat the game's minutes.
    */
   setupMs: number
   /**
-   * 'void': the round stopped itself after many trials in a row that could not count (a stalled
-   * screen). 'time': its time budget (a Today's Training slot) ran out — it ends after the trial in
+   * 'void': the round stopped itself after many trials in a row that could not count. 'time': its time budget (a Today's Training slot) ran out — it ends after the trial in
    * play, as a normal ending, not a quit.
    */
   endedBy: 'lives' | 'cap' | 'stop' | 'void' | 'time' | null
@@ -172,32 +148,6 @@ export interface RoundStats {
   achievements: AchievementId[]
   /** Rounds in a row ended early on chances: offer relaxed timing (a suggestion, never automatic). */
   suggestRelax: boolean
-  /** Quick Eye: counted trials in order — both answers right, one of two, neither (the leg bar). Empty for other games. */
-  legMarks: LegMark[]
-  /** Quick Eye: counted trials after which the shown speed level rose (the flash got shorter). */
-  rungUps: number
-  /**
-   * Quick Eye: the stage (as shown) the round ended on, when higher than the one it started on — set
-   * with the end, so a stage passed on the last trial (no interstitial came) still reaches the summary.
-   */
-  stageReached: number | null
-}
-
-export type LegMark = 'ok' | 'half' | 'miss'
-
-/** Quick Eye moved to a higher stage between trials: a short interstitial, the round paused. */
-export interface StageUp {
-  /** Stages as shown ("Stage N"): the variant, or the centre task's stage on the centre-only setting. */
-  from: number
-  to: number
-  /** The variant now played — for a preview board (buildDemo('quickEye', { variant })). */
-  variant: number
-  /** The one new thing (`quickEye.knob.<knob>`), or null. */
-  knob: QuickEyeKnob | null
-  /** A new rule's card comes right after (show no preview — the card explains it). */
-  ruleFollows: boolean
-  /** Changes with every stage-up (a key for the overlay and its fx). */
-  id: number
 }
 
 interface State {
@@ -205,7 +155,6 @@ interface State {
   group: GameGroup
   platform: PlatformContext
   timing: TimingMode
-  centerOnly: boolean
   // Each game's state is private to that game.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   round: any
@@ -213,8 +162,6 @@ interface State {
   level: number
   /** Where this round started (restored when a round is too short to say anything). */
   startLevel: number
-  variant: number
-  startVariant: number
   trialKind: TrialKind
   trialInRound: number
   /** Counted trials (the staircase's): drives the round cap, the estimate and the start rule. */
@@ -227,7 +174,7 @@ interface State {
   practiceLeft: number
   practiceDone: number
   practiceStreak: number
-  /** Unscored trials still to come after a new-rule card (Quick Eye: 4 per new stage, its protocol). */
+  /** Unscored trials still to come after a new-rule card. */
   introLeft: number
   /** The rule card holding this trial, until the player has read it. */
   intro: { tag: string } | null
@@ -259,18 +206,11 @@ interface State {
   pausedAt: number | null
   pausedMs: number
   voidRun: number
-  lenient: boolean
   recentSigs: string[]
   correctRts: number[]
-  frameVoids: number
-  minExposureMs: number
   stats: RoundStats
-  /** Quick Eye: the level a never-played placement opens at (267ms, where a rule card's ramp ends); null = the placement's own pick. */
+  /** The level a placement's first trial is played at when nothing is known yet; null = the placement's own pick. */
   placeStart: number | null
-  /** Quick Eye placement: trials that asked where the star was, and how many were placed right. */
-  placeLoc: { ok: number; n: number }
-  /** Quick Eye: a stage reached, shown between trials (the round is paused under it). */
-  stageUp: StageUp | null
   /** When the trial's result came in (the reveal can be skipped REVEAL_SKIP_AFTER_MS later). */
   resultAt: number | null
   revealSkipped: boolean
@@ -297,37 +237,24 @@ type Action =
   | { type: 'tap'; index: number; now: number }
   | { type: 'timeout'; now: number }
   | { type: 'inputStarted'; now: number }
-  | { type: 'exposed'; actualMs: number; frameMs: number; now: number }
-  | { type: 'next'; level: number; variant: number; seed: number; now: number }
+  | { type: 'next'; level: number; seed: number; now: number }
   | { type: 'end'; reason: 'lives' | 'cap' | 'stop' | 'void' | 'time'; now: number }
   | { type: 'pause'; now: number }
   | { type: 'resume'; now: number }
   | { type: 'ackIntro'; now: number }
-  | { type: 'ackStageUp'; now: number }
   | { type: 'skipReveal'; now: number }
-  | { type: 'best'; isNewBest: boolean; tierUp: number | null; achievements: AchievementId[]; suggestRelax: boolean; stageReached: number | null }
+  | { type: 'best'; isNewBest: boolean; tierUp: number | null; achievements: AchievementId[]; suggestRelax: boolean }
 
 const RECENT_SIGS = 24
-const LENIENT_AFTER_VOIDS = 5
 const END_AFTER_VOIDS = 8
 /**
- * How long a trial's answer stays up. Quick Eye's reveal shows the scene that flashed, so it stays
- * longer — longest after a miss, which has the most to show — and can be skipped after
- * REVEAL_SKIP_AFTER_MS. Flash onsets stay ≥ 1.5s apart even then (mask + skip + fixation). A voided
- * trial (only Quick Eye voids) has no mask and no answer, so its pause is what keeps the next flash
- * ≥ 1s after it (EVIDENCE §2.3: flash + 500 + the 500ms fixation; at 250 a 33ms flash came back
- * ~780ms later).
+ * How long a trial's answer stays up: longer when it shows something to read (a miss's worked line,
+ * a pattern's rule), and then skippable after REVEAL_SKIP_AFTER_MS. A void trial has no answer.
  */
-const REVEAL = { right: 700, rightWithRule: 1300, wrong: 1500, wrongWithReveal: 2400, quickEyeRight: 1000, quickEyeHalf: 1400, quickEyeWrong: 1600, void: 500 }
+const REVEAL = { right: 700, rightWithRule: 1300, wrong: 1500, wrongWithReveal: 2400, void: 500 }
 const REVEAL_SKIP_AFTER_MS = 500
-/** The stage-up interstitial clears itself after this (or on a tap: ackStageUp). */
-const STAGE_UP_MS = 2000
-/** Quick Eye's practice exposures (ladder levels): 500, 400, 333, 267ms — two right in a row end it. */
-const QE_PRACTICE_LEVELS = [0, 1, 2, 3] as const
-/** Quick Eye's placement opens at 267ms (ladder level 3). */
-const QE_PLACE_START = 3
 /** Rounds this short (counted trials) say too little to move the next start. */
-const SHORT_ROUND = { speed: 5, quickEye: 5, span: 2 }
+const SHORT_ROUND = { speed: 5, span: 2 }
 /** Setup time kept out of a Today's Training slot, at most (per round). */
 const SETUP_CAP_MS = 120_000
 /** A span game away this long re-enters fast (§2.6). */
@@ -335,19 +262,15 @@ const FAST_ENTRY_AFTER_DAYS = 14
 /** Match Pairs' probe ladder: the first board's level, the step after a clean clear, the most boards, the sd it hands over with, the start when no board passed. */
 const PROBE = { start: 3, clean: 3, boards: 4, sd: 2, none: 2 } as const
 
-type CtxSource = Pick<State, 'platform' | 'centerOnly' | 'lives' | 'minExposureMs'> & Partial<Pick<State, 'roundSeed' | 'recent'>>
+type CtxSource = Pick<State, 'platform' | 'lives'> & Partial<Pick<State, 'roundSeed' | 'recent'>>
 
 /** What a trial is built with. `trial` is what the round knows about this one: its kind and the rules it must not use. */
-function buildCtx(s: CtxSource, variant: number, trial: { kind: TrialKind; blockRules: readonly string[] } = { kind: 'counted', blockRules: [] }): CreateContext {
+function buildCtx(s: CtxSource, trial: { kind: TrialKind; blockRules: readonly string[] } = { kind: 'counted', blockRules: [] }): CreateContext {
   return {
     ...DEFAULT_CONTEXT,
     maxCols: s.platform.maxCols,
     maxRows: s.platform.maxRows ?? DEFAULT_CONTEXT.maxRows,
-    ringSlots: s.platform.ringSlots,
-    minExposureMs: s.minExposureMs,
-    centerOnly: s.centerOnly,
     livesLeft: s.lives,
-    variant,
     trialKind: trial.kind,
     blockRules: trial.blockRules,
     recent: s.recent ?? [],
@@ -355,10 +278,10 @@ function buildCtx(s: CtxSource, variant: number, trial: { kind: TrialKind; block
   }
 }
 
-/** The level past which this game's puzzle stops changing on this screen — from the platform's floor. */
-function levelCap(gameId: BrainGameId, s: Pick<State, 'platform' | 'centerOnly' | 'lives'>): number {
+/** The level past which this game's puzzle stops changing on this screen. */
+function levelCap(gameId: BrainGameId, s: Pick<State, 'platform' | 'lives'>): number {
   const def = brainGame(gameId).def
-  return def.maxLevel ? def.maxLevel(buildCtx({ ...s, minExposureMs: s.platform.minExposureMs }, 1)) : Infinity
+  return def.maxLevel ? def.maxLevel(buildCtx(s)) : Infinity
 }
 
 function createTrial(gameId: BrainGameId, level: number, seed: number, ctx: CreateContext, recentSigs: string[]) {
@@ -378,19 +301,17 @@ function seenTag(s: Pick<State, 'seenMask' | 'seenAdded'>, tag: string): boolean
 }
 
 /**
- * The rules a new trial must not use (§2.4). Quick Eye's rules come with its stages: never gated
- * here. Match Pairs' probe boards gate like counted trials, so the first one can open with the
- * no-preview card (it still counts as probe board 1).
+ * The rules a new trial must not use (§2.4). Match Pairs' probe boards gate like counted trials, so
+ * the first one can open with the no-preview card (it still counts as probe board 1).
  */
 function gateRules(s: Pick<State, 'gameId' | 'seenMask' | 'seenAdded' | 'cardsShown' | 'cardAt' | 'counted' | 'probe'>, kind: TrialKind): readonly string[] {
-  if (s.gameId === 'quickEye') return []
   const asKind: TrialKind = s.probe && kind === 'placement' ? 'counted' : kind
   return blockedRules(s.gameId, (tag) => seenTag(s, tag), asKind, { shown: s.cardsShown, countedSinceLast: s.cardAt === null ? null : s.counted - s.cardAt })
 }
 
 /** Setup (practice, placement, a rule card's trial) as opposed to play — kept out of a Today's Training slot. */
-function isSetupTrial(s: Pick<State, 'gameId' | 'trialKind'>): boolean {
-  return s.gameId !== 'quickEye' && s.trialKind !== 'counted'
+function isSetupTrial(s: Pick<State, 'trialKind'>): boolean {
+  return s.trialKind !== 'counted'
 }
 
 /** `stats.setupMs` with the trial in play closed at `now` (paused time excluded). */
@@ -409,39 +330,11 @@ function fastJump(gameId: BrainGameId, level: number): number {
   return Math.min(level + 2, nextRule)
 }
 
-/** Quick Eye's practice trial: the centre alone, a step shorter each try. */
-function qePracticeLevel(practiceDone: number): number {
-  return QE_PRACTICE_LEVELS[Math.max(0, Math.min(QE_PRACTICE_LEVELS.length - 1, practiceDone))]
-}
-
-/**
- * Quick Eye's unscored trials after a rule card: from three levels easier than the player's level
- * down to it — L−3, L−2, L−1, L (never below 0). `introLeft` counts this trial.
- */
-function qeIntroLevel(level: number, introLeft: number): number {
-  return Math.max(0, level - 3 + Math.max(0, 4 - introLeft))
-}
-
 /** The level a placement trial is played at (Match Pairs' probe: its board's level). */
 function placeLevel(s: Pick<State, 'place' | 'placeStart'> & Partial<Pick<State, 'probe'>>): number {
   if (s.probe) return s.probe.level
   if (!s.place) return 0
   return s.placeStart !== null && s.place.n === 0 ? s.placeStart : placementLevel(s.place)
-}
-
-/**
- * A Quick Eye trial that just opened with a rule card is played again, the same trial (same seed,
- * same context), at the first of the easier exposures. The flash's length is the only difference.
- */
-function easeIntroTrial(s: State, seed: number, ctx: CreateContext, sigsBefore: string[], recentBefore: RecentTrial[]): State {
-  if (s.gameId !== 'quickEye' || !s.intro) return s
-  const { round, sig, recent } = createTrial(s.gameId, qeIntroLevel(s.level, 4), seed, ctx, sigsBefore)
-  return { ...s, round, recentSigs: [...sigsBefore, sig].slice(-RECENT_SIGS), recent: [...recentBefore, recent].slice(-2) }
-}
-
-/** The stage a Quick Eye trial shows ("Stage N"). */
-function shownStage(s: Pick<State, 'centerOnly'>, variant: number): number {
-  return quickEyeStage(variant, s.centerOnly)
 }
 
 /**
@@ -470,28 +363,21 @@ function introduce(s: State, now: number): State {
     next = {
       ...next,
       intro: { tag: rule },
-      introLeft: s.gameId === 'quickEye' ? 4 : 1,
+      introLeft: 1,
       trialKind: 'intro',
       paused: true,
       pausedAt: now,
-      // The round's card budget (§2.4): Quick Eye's cards come with its stages, not counted here.
-      cardsShown: s.gameId === 'quickEye' ? s.cardsShown : s.cardsShown + 1,
-      cardAt: s.gameId === 'quickEye' ? s.cardAt : s.counted,
+      // The round's card budget (§2.4).
+      cardsShown: s.cardsShown + 1,
+      cardAt: s.counted,
     }
   }
   return next
 }
 
-/** The next exposure floor when too many trials on this device are being voided. */
-function raiseFloor(ms: number): number {
-  const ladder = [...QUICK_EYE_LADDER_MS].reverse()
-  return ladder.find((x) => x > ms) ?? ms
-}
-
 /** Chance of a right answer by guessing, for placement's model. */
 function guessRate(view: RoundView): number {
   if (view.kind === 'choice') return 1 / Math.max(2, view.options.length)
-  if (view.kind === 'quickEye') return 1 / (view.centerOptions.length * (view.asksLocation ? 8 : 1))
   return 0.02
 }
 
@@ -501,9 +387,9 @@ function trialLimit(s: Pick<State, 'gameId' | 'round' | 'timing' | 'trialKind'>)
   return base === null ? null : s.trialKind === 'intro' ? base * 2 : base
 }
 
-/** Where the staircase takes over from a placement: Quick Eye at half the posterior's spread below its mean, the board games at a quarter. */
+/** Where the staircase takes over from a placement: a quarter of the posterior's spread below its mean (the game's plan). */
 function handoverK(gameId: BrainGameId): number {
-  return gameId === 'quickEye' ? 0.5 : zestPlan(gameId).handoverK
+  return zestPlan(gameId).handoverK
 }
 
 /**
@@ -512,7 +398,7 @@ function handoverK(gameId: BrainGameId): number {
  * The input clock already leaves paused time out (resume moves its start).
  */
 function placementWeight(state: State, round: State['round'], outcome: RoundOutcome, rt: number | null, timedOut: boolean): number {
-  if (state.gameId === 'quickEye' || !zestPlan(state.gameId).graded) return 1
+  if (!zestPlan(state.gameId).graded) return 1
   if (outcome.correct) {
     const limit = trialLimit({ ...state, round })
     return limit !== null && rt !== null && rt / limit <= 0.5 ? 2 : 1
@@ -563,33 +449,26 @@ function judgeProbe(state: State, round: State['round'], outcome: RoundOutcome, 
   }
 }
 
-function judge(state: State, round: State['round'], now: number, timedOut: boolean, frameVoid = false): State {
-  const next = judgeTrial(state, round, now, timedOut, frameVoid)
+function judge(state: State, round: State['round'], now: number, timedOut: boolean): State {
+  const next = judgeTrial(state, round, now, timedOut)
   return next.result && !state.result ? { ...next, resultAt: now, revealSkipped: false } : next
 }
 
-function judgeTrial(state: State, round: State['round'], now: number, timedOut: boolean, frameVoid: boolean): State {
+function judgeTrial(state: State, round: State['round'], now: number, timedOut: boolean): State {
   const def = brainGame(state.gameId).def
   const outcome = def.outcome(round)
   if (!outcome || state.result) return { ...state, round, timedOut }
   const rules = GROUP_RULES[state.group]
   const kind = state.trialKind
-  const qe = state.gameId === 'quickEye'
   const base = { correct: outcome.correct, accuracy: outcome.correct ? 1 : outcome.void ? 0 : outcome.accuracy, timedOut, void: false, kind, livesLost: 0, levelBefore: state.level }
 
   if (outcome.void) {
-    // Only a dropped-frame void says the display cannot hold this exposure; a stalled or hidden tab
-    // says nothing about the device, so it neither counts nor raises the floor.
-    const frameVoids = state.frameVoids + (frameVoid ? 1 : 0)
-    const tooMany = frameVoid && frameVoids >= 3 && frameVoids / (frameVoids + state.trialInRound) > 0.2
+    // A trial that could not count: no life, no level change, replaced by a fresh one.
     return {
       ...state,
       round,
       timedOut,
       voidRun: state.voidRun + 1,
-      lenient: state.lenient || state.voidRun + 1 >= LENIENT_AFTER_VOIDS,
-      frameVoids: tooMany ? 0 : frameVoids,
-      minExposureMs: tooMany ? raiseFloor(state.minExposureMs) : state.minExposureMs,
       result: { ...base, correct: false, void: true, practice: kind === 'practice' || kind === 'intro', points: 0, levelAfter: state.level },
     }
   }
@@ -621,20 +500,17 @@ function judgeTrial(state: State, round: State['round'], now: number, timedOut: 
   }
 
   const median = recentMedian(state.correctRts)
-  const fast = outcome.correct && rt !== null && median !== null && rt < median && state.gameId !== 'quickEye'
+  const fast = outcome.correct && rt !== null && median !== null && rt < median
   const cap = levelCap(state.gameId, state)
 
   // Points: base by difficulty, a speed bonus against the player's own median, the run.
   // Whole points per trial, split so the parts add up to exactly what the trial scored.
-  // Quick Eye: by stage and speed level (quickEyeBase), never by speed of answer.
-  const rawBase = outcome.correct ? (qe ? quickEyeBase(state.variant, state.level) : 10 * Math.max(1, state.level)) : 0
-  const points = outcome.correct ? (qe ? Math.round(rawBase * (1 + Math.min(state.stats.streak, 10) * 0.1)) : roundPoints(state.level, true, fast, state.stats.streak)) : 0
+  const rawBase = outcome.correct ? 10 * Math.max(1, state.level) : 0
+  const points = outcome.correct ? roundPoints(state.level, true, fast, state.stats.streak) : 0
   const basePts = Math.round(rawBase)
   const speedPts = fast ? Math.round(rawBase * 1.25) - basePts : 0
   const comboPts = points - basePts - speedPts
-  // Quick Eye: one of its two answers right keeps the run (neither grows it nor breaks it).
-  const half = qe && !outcome.correct && outcome.accuracy === 0.5
-  const streak = outcome.correct ? state.stats.streak + 1 : half ? state.stats.streak : 0
+  const streak = outcome.correct ? state.stats.streak + 1 : 0
   const score = {
     ...state.stats.score,
     base: state.stats.score.base + basePts,
@@ -658,14 +534,12 @@ function judgeTrial(state: State, round: State['round'], now: number, timedOut: 
     const finished = placementDone(place)
     const handover = finished ? placementHandover(place, handoverK(state.gameId)) : null
     const levelAfter = Math.min(cap, handover ? handover.level : placementLevel(place))
-    const asked = view.kind === 'quickEye' && view.asksLocation
     return {
       ...state,
       round,
       timedOut,
       voidRun: 0,
       correctRts,
-      placeLoc: asked && view.kind === 'quickEye' ? { ok: state.placeLoc.ok + (view.pickedDirection === view.correctDirection ? 1 : 0), n: state.placeLoc.n + 1 } : state.placeLoc,
       place: finished ? null : place,
       placed: state.placed || finished,
       placementTrials: state.placementTrials + 1,
@@ -694,7 +568,6 @@ function judgeTrial(state: State, round: State['round'], now: number, timedOut: 
   const reversal = state.group !== 'span' && state.lastDir !== 0 && dir !== state.lastDir
   const upRun = outcome.correct ? state.upRun + 1 : 0
   // In a relaxed-timing mode a timeout still moves the level down but costs no chance (EVIDENCE §4.3).
-  // A game without lives (Quick Eye) never spends one.
   const forgivenTimeout = timedOut && state.timing !== 1
   let livesLost = rules.lives > 0 ? outcome.livesSpent ?? (outcome.correct || forgivenTimeout ? 0 : 1) : 0
   let lives: number
@@ -730,8 +603,6 @@ function judgeTrial(state: State, round: State['round'], now: number, timedOut: 
       ...statsCommon,
       levelEnd: levelAfter,
       bestLevel: Math.max(state.stats.bestLevel, state.group === 'span' ? (outcome.correct ? state.level : state.stats.bestLevel) : levelAfter),
-      legMarks: qe ? [...state.stats.legMarks, outcome.correct ? 'ok' : half ? 'half' : 'miss'] : state.stats.legMarks,
-      rungUps: state.stats.rungUps + (qe && exposureMsFor(levelAfter) < exposureMsFor(state.level) ? 1 : 0),
     },
   }
 }
@@ -751,42 +622,27 @@ function reducer(state: State, action: Action): State {
       if (limit !== null && state.inputStartedAt !== null && action.now < state.inputStartedAt + limit - 50) return state
       return judge(state, def.timeout(state.round), action.now, true)
     }
-    case 'exposed':
-      if (state.result || state.over || !def.exposed) return state
-      return judge(state, def.exposed(state.round, action.actualMs, action.frameMs, state.lenient), action.now, false, !state.lenient)
     case 'inputStarted':
       return state.inputStartedAt === null ? { ...state, inputStartedAt: action.now } : state
     case 'next': {
       const rules = GROUP_RULES[state.group]
-      const qe = state.gameId === 'quickEye'
       const endPractice = state.trialKind === 'practice' && state.practiceLeft === 0
       const lives = endPractice ? rules.lives : state.lives
       const kind: TrialKind = state.practiceLeft > 0 ? 'practice' : state.introLeft > 0 ? 'intro' : state.place || state.probe ? 'placement' : 'counted'
       const cap = levelCap(state.gameId, state)
       // Practice and rule-intro trials hold the level; placement (and Match Pairs' probe) picks its
-      // own; counted trials take the stored level (which Quick Eye's stage ladder may just have eased back).
+      // own; counted trials take the stored level.
       const counted = kind === 'counted' ? (endPractice && state.seedLevel !== null ? state.seedLevel : action.level) : state.level
       const level = Math.min(cap, kind === 'placement' ? placeLevel(state) : counted)
-      // A new Quick Eye stage re-opens the estimate so the new stage is found fast, and its
-      // reversals start afresh: the old stage's never stand for the new one.
-      const newStage = action.variant > state.variant
-      const sd = newStage ? Math.max(state.sd, 1.5) : state.sd
-      // Quick Eye's practice is the centre alone at its own exposures; its intro trials ease in.
-      const trialVariant = qe && kind === 'practice' ? 1 : action.variant
-      const trialLevel = !qe ? level : kind === 'practice' ? qePracticeLevel(state.practiceDone) : kind === 'intro' ? qeIntroLevel(level, state.introLeft) : level
       // The trial that just ended, closed for the setup clock; then the unseen rules this one must not use.
       const setupMs = setupThrough(state, action.now, state.pausedMs)
-      const ctx = buildCtx({ ...state, lives }, trialVariant, { kind, blockRules: gateRules(state, kind) })
-      const { round, sig, recent } = createTrial(state.gameId, trialLevel, action.seed, ctx, state.recentSigs)
+      const ctx = buildCtx({ ...state, lives }, { kind, blockRules: gateRules(state, kind) })
+      const { round, sig, recent } = createTrial(state.gameId, level, action.seed, ctx, state.recentSigs)
       const fresh: State = {
         ...state,
         round,
         trialId: state.trialId + 1,
         level,
-        variant: action.variant,
-        sd,
-        reversals: newStage ? [] : state.reversals,
-        lastDir: newStage ? 0 : state.lastDir,
         lives,
         trialKind: kind,
         intro: null,
@@ -802,25 +658,7 @@ function reducer(state: State, action: Action): State {
         trialPausedMs: state.pausedMs,
         stats: endPractice ? { ...state.stats, setupMs, levelStart: level, levelEnd: level, bestLevel: level } : { ...state.stats, setupMs },
       }
-      const introduced = easeIntroTrial(introduce(fresh, action.now), action.seed, ctx, state.recentSigs, state.recent)
-      // A Quick Eye stage reached (never during placement, which feeds no stage window): a short
-      // interstitial between trials, the round paused under it. Only a stage that shows as one —
-      // on the centre-only setting stages 1-9 look the same.
-      const stageTo = qe ? shownStage(state, action.variant) : 0
-      if (!qe || !newStage || kind === 'placement' || kind === 'practice' || stageTo <= shownStage(state, state.variant)) return introduced
-      return {
-        ...introduced,
-        stageUp: {
-          from: shownStage(state, state.variant),
-          to: stageTo,
-          variant: action.variant,
-          knob: quickEyeKnob(action.variant, state.centerOnly),
-          ruleFollows: introduced.intro !== null,
-          id: introduced.trialId,
-        },
-        paused: true,
-        pausedAt: introduced.pausedAt ?? action.now,
-      }
+      return introduce(fresh, action.now)
     }
     case 'end': {
       if (state.over) return state
@@ -837,7 +675,6 @@ function reducer(state: State, action: Action): State {
         over: true,
         paused: false,
         intro: null,
-        stageUp: null,
         stats: {
           ...state.stats,
           endedBy: action.reason,
@@ -851,13 +688,11 @@ function reducer(state: State, action: Action): State {
       }
     }
     case 'pause': {
-      // Not mid-exposure: a Quick Eye stimulus is a few frames long and pausing it would void it.
-      const view = def.view(state.round)
-      if (state.over || state.paused || (view.kind === 'quickEye' && view.phase === 'stimulus')) return state
+      if (state.over || state.paused) return state
       return { ...state, paused: true, pausedAt: action.now }
     }
     case 'resume': {
-      if (!state.paused || state.intro || state.stageUp) return state
+      if (!state.paused || state.intro) return state
       const held = state.pausedAt === null ? 0 : action.now - state.pausedAt
       return {
         ...state,
@@ -870,8 +705,6 @@ function reducer(state: State, action: Action): State {
     case 'ackIntro': {
       if (!state.intro) return state
       const seenAdded = state.seenAdded.includes(state.intro.tag) ? state.seenAdded : [...state.seenAdded, state.intro.tag]
-      // Still under a stage-up interstitial: the round stays paused until that clears too.
-      if (state.stageUp) return { ...state, intro: null, seenAdded }
       const held = state.pausedAt === null ? 0 : action.now - state.pausedAt
       return {
         ...state,
@@ -882,25 +715,18 @@ function reducer(state: State, action: Action): State {
         pausedMs: state.pausedMs + held,
       }
     }
-    case 'ackStageUp': {
-      if (!state.stageUp) return state
-      // A new rule's card follows: the round stays paused under it (its time still not played time).
-      if (state.intro) return { ...state, stageUp: null }
-      const held = state.pausedAt === null ? 0 : action.now - state.pausedAt
-      return { ...state, stageUp: null, paused: false, pausedAt: null, pausedMs: state.pausedMs + held }
-    }
     case 'skipReveal':
-      // Quick Eye's reveal, a miss's worked answer (a choice view's `stimulus.reveal`) or a right
-      // pattern's rule, once it has been up long enough to be seen: on to the next trial now.
+      // A miss's worked answer (a choice view's `stimulus.reveal`) or a right pattern's rule, once it
+      // has been up long enough to be seen: on to the next trial now.
       if (!state.result || state.over || state.paused || state.revealSkipped) return state
-      if (state.gameId !== 'quickEye' && !missReveal(state) && !ruleReveal(state)) return state
+      if (!missReveal(state) && !ruleReveal(state)) return state
       if (state.resultAt === null || action.now - state.resultAt < REVEAL_SKIP_AFTER_MS) return state
       return { ...state, revealSkipped: true }
     case 'best':
       return {
         ...state,
         finalized: true,
-        stats: { ...state.stats, isNewBest: action.isNewBest, tierUp: action.tierUp, achievements: action.achievements, suggestRelax: action.suggestRelax, stageReached: action.stageReached },
+        stats: { ...state.stats, isNewBest: action.isNewBest, tierUp: action.tierUp, achievements: action.achievements, suggestRelax: action.suggestRelax },
       }
   }
 }
@@ -942,9 +768,7 @@ function init({ gameId, platform }: { gameId: BrainGameId; platform: PlatformCon
   const roundSeed = randomSeed()
   const base = {
     platform,
-    centerOnly: progress.settings.centerOnly,
     lives: rules.lives,
-    minExposureMs: platform.minExposureMs,
     roundSeed,
     recent: [] as RecentTrial[],
   }
@@ -975,23 +799,13 @@ function init({ gameId, platform }: { gameId: BrainGameId; platform: PlatformCon
       const oe = meta.sk[other]
       const passed = oe && oe.n > 0 ? oe.mu : og && og.rounds > 0 ? og.bestLevel - 1 : null
       const floor = gameId === 'sequence' ? 2 : rules.min
-      const otherLength = passed === null ? null : brainGame(other).def.spanLength?.(Math.round(passed), buildCtx(base, 1)) ?? Math.round(passed) + 2
+      const otherLength = passed === null ? null : brainGame(other).def.spanLength?.(Math.round(passed), buildCtx(base)) ?? Math.round(passed) + 2
       seedLevel = otherLength === null ? floor : Math.max(floor, otherLength - 2 - 2)
     } else if (gameId === 'pairs') {
       // A board takes too long for a placement series: a ladder of up to four probe boards (§2.7).
       probe = { board: 0, level: Math.min(cap, PROBE.start), passed: false }
       sd = PROBE.sd
       level = practiceLeft > 0 ? rules.min : probe.level
-    } else if (gameId === 'quickEye') {
-      // Quick Eye's own placement (unchanged until its plan adopts the board games' fixes): it starts
-      // near 267ms rather than 500ms, opening exactly there for a never-played player — where the
-      // periphery card's ramp (500 → 400 → 333 → 267ms) ends. Practice and a rule card's four
-      // trials come first, so six to ten trials.
-      const seed = legacy ? gp.level : est && est.n === 0 ? est.mu : null
-      place = startPlacement({ lo: rules.min, hi: Math.min(11, cap), mu0: seed ?? 3, sigma0: 3, target: 0.8, slope: 1, maxMove: 2, minTrials: 6, maxTrials: 10 })
-      if (seed === null) placeStart = QE_PLACE_START
-      sd = SKILL[group].sd0
-      level = practiceLeft > 0 ? rules.min : placeLevel({ place, placeStart })
     } else {
       // One path (§2.3): a re-opened estimate's level, else the pre-estimate record's, else a
       // cross-game guess. Unseen rules are blocked in placement (ctx.blockRules), so no rule ceiling.
@@ -1021,14 +835,6 @@ function init({ gameId, platform }: { gameId: BrainGameId; platform: PlatformCon
     // days away add to it — the start falls with the grown uncertainty, the bigger steps re-find it.
     level = Math.min(gp.level, est.mu) - Math.max(0, 0.5 * (sd - est.sd))
   }
-  // Quick Eye's redesigned field makes the same flash harder (no afterimage on a mid-grey field):
-  // a returning player starts two steps easier, once, with the estimate re-opened so the bigger
-  // steps re-find the level. The stage stays. Marked done by the field's notice (mechanics).
-  const clearView = mechanicInfo('quickEye.clearView')
-  if (gameId === 'quickEye' && !place && gp.rounds > 0 && clearView && !hasBit(meta.seen, clearView.bit)) {
-    level -= 2
-    sd = SKILL[group].sd0
-  }
   if (seedLevel !== null) {
     // Practice is level-one basics; the seeded start comes after it.
     level = practiceLeft > 0 ? rules.min : seedLevel
@@ -1036,24 +842,20 @@ function init({ gameId, platform }: { gameId: BrainGameId; platform: PlatformCon
   }
   level = Math.min(cap, Math.max(rules.min, level))
   const trialKind: TrialKind = practiceLeft > 0 ? 'practice' : place || probe ? 'placement' : 'counted'
-  const qePractice = gameId === 'quickEye' && trialKind === 'practice'
   const trialSeed = randomSeed()
   const blockRules = gateRules({ gameId, seenMask: meta.seen, seenAdded: [], cardsShown: 0, cardAt: null, counted: 0, probe }, trialKind)
-  const ctx = buildCtx(base, qePractice ? 1 : progress.quickEye.variant, { kind: trialKind, blockRules })
-  const { round, sig, recent } = createTrial(gameId, qePractice ? qePracticeLevel(practiceDone) : level, trialSeed, ctx, [])
+  const ctx = buildCtx(base, { kind: trialKind, blockRules })
+  const { round, sig, recent } = createTrial(gameId, level, trialSeed, ctx, [])
   const now = Date.now()
   const state: State = {
     gameId,
     group,
     platform,
     timing: progress.settings.timing,
-    centerOnly: base.centerOnly,
     round,
     trialId: 1,
     level,
     startLevel: level,
-    variant: progress.quickEye.variant,
-    startVariant: progress.quickEye.variant,
     trialKind,
     trialInRound: 0,
     counted: 0,
@@ -1088,12 +890,9 @@ function init({ gameId, platform }: { gameId: BrainGameId; platform: PlatformCon
     pausedAt: null,
     pausedMs: 0,
     voidRun: 0,
-    lenient: false,
     recentSigs: [sig],
     // The speed bonus compares with the player's own median, carried between rounds.
     correctRts: meta.rt[gameId] ? Array.from({ length: 5 }, () => meta.rt[gameId] as number) : [],
-    frameVoids: 0,
-    minExposureMs: platform.minExposureMs,
     stats: {
       trials: 0,
       correct: 0,
@@ -1114,13 +913,8 @@ function init({ gameId, platform }: { gameId: BrainGameId; platform: PlatformCon
       tierUp: null,
       achievements: [],
       suggestRelax: false,
-      legMarks: [],
-      rungUps: 0,
-      stageReached: null,
     },
     placeStart,
-    placeLoc: { ok: 0, n: 0 },
-    stageUp: null,
     resultAt: null,
     revealSkipped: false,
     roundSeed,
@@ -1133,7 +927,7 @@ function init({ gameId, platform }: { gameId: BrainGameId; platform: PlatformCon
     trialAt: now,
     trialPausedMs: 0,
   }
-  return easeIntroTrial(introduce(state, now), trialSeed, ctx, [], [])
+  return introduce(state, now)
 }
 
 /** Everything a finished round writes: the estimate, the next start, tier, achievements. */
@@ -1167,7 +961,6 @@ function finishRound(s: State) {
   const stored = gameProgress(progress, id).level
   let nextStart: number | undefined
   if ((s.counted === 0 && s.placementTrials === 0) || ((s.place || s.probe) && s.counted === 0)) nextStart = undefined
-  else if (id === 'quickEye' && progress.quickEye.variant !== s.startVariant) nextStart = stored // the new stage's eased level stands
   else if (short) nextStart = s.startLevel
   else if (group === 'span') nextStart = restartLevel(group, stored, s.spanPassed || s.startLevel)
   else nextStart = startFromEstimate(group, mu, s.sd, { momentum: s.stats.cleared && countedAccuracy >= 0.9, mercy: wipes >= 2 })
@@ -1183,7 +976,7 @@ function finishRound(s: State) {
     tierValue = span2
   } else if (s.counted > 0) {
     const settled = theta ?? (s.stats.cleared && s.misses <= 1 ? levelEnd - 1 : null)
-    if (settled !== null) tierValue = id === 'quickEye' ? quickEyeIndex(quickEyeTierStage(progress.quickEye.variant, progress.settings.centerOnly), settled) : settled
+    if (settled !== null) tierValue = settled
   }
   const reached = tierValue === null ? 0 : tierFor(id, tierValue)
   const newTier = Math.max(oldTier, reached)
@@ -1237,10 +1030,10 @@ function finishRound(s: State) {
       cleared: s.stats.cleared,
       trials: s.counted,
       correct: s.countedCorrect,
-      // Without lives (Quick Eye) "without losing a chance" means without a miss.
+      // A game without lives would count its misses for "without losing a chance".
       livesLost: GROUP_RULES[group].lives > 0 ? s.livesLostTotal : s.misses,
       bestStreak: s.stats.bestStreak,
-      spanLength: group === 'span' && s.spanPassed > 0 ? brainGame(id).def.spanLength?.(s.spanPassed, buildCtx(s, 1)) ?? s.spanPassed + 2 : 0,
+      spanLength: group === 'span' && s.spanPassed > 0 ? brainGame(id).def.spanLength?.(s.spanPassed, buildCtx(s)) ?? s.spanPassed + 2 : 0,
       flawlessHunt: s.flawlessHunt,
     },
     useBrainStore.getState().progress,
@@ -1248,10 +1041,7 @@ function finishRound(s: State) {
   )
   if (achievements.length) updateMeta?.((m) => ({ ...m, ach: achievements.reduce((mask, a) => setBit(mask, achievementBit(a)), m.ach) }))
 
-  const timed = id !== 'quickEye'
-  const variantNow = useBrainStore.getState().progress.quickEye.variant
-  const stageReached = id === 'quickEye' && shownStage(s, variantNow) > shownStage(s, s.startVariant) ? shownStage(s, variantNow) : null
-  return { isNewBest, tierUp, achievements, suggestRelax: wipes >= 2 && timed && s.timing === 1, stageReached }
+  return { isNewBest, tierUp, achievements, suggestRelax: wipes >= 2 && s.timing === 1 }
 }
 
 export interface RoundOptions {
@@ -1268,6 +1058,8 @@ export function useBrainRound(gameId: BrainGameId, platform: PlatformContext, op
   const store = useBrainStore
   const def = brainGame(state.gameId).def
   const rules = GROUP_RULES[state.group]
+  // A game whose trial is a whole puzzle may end its rounds sooner (catalog `roundCap`: Code Break's five codes).
+  const roundCap = brainGame(state.gameId).roundCap ?? rules.roundCap
   const busy = state.result !== null || state.over
   const pending = busy || state.paused ? null : def.pendingMs(state.round)
   const accepts = !busy && !state.paused && def.acceptsInput(state.round)
@@ -1276,15 +1068,13 @@ export function useBrainRound(gameId: BrainGameId, platform: PlatformContext, op
   stateRef.current = state
   const view: RoundView = def.view(state.round)
 
-  // Time passing inside a trial: memorise phases, sequence flashes, Quick Eye's fixation and mask.
-  // A pause keeps what was left of the phase (no free study time); Quick Eye's fixation restarts in
-  // full, so the flash never comes a moment after the pause screen closes.
+  // Time passing inside a trial: memorise phases, sequence flashes, flipping a pair back.
+  // A pause keeps what was left of the phase (no free study time).
   const phase = useRef<{ round: unknown; armedAt: number; wait: number; left: number | null } | null>(null)
   useEffect(() => {
     if (pending === null) return
     const prior = phase.current
-    const keepsLeft = state.gameId !== 'quickEye'
-    const wait = keepsLeft && prior && prior.round === state.round && prior.left !== null ? prior.left : pending
+    const wait = prior && prior.round === state.round && prior.left !== null ? prior.left : pending
     const armed = { round: state.round as unknown, armedAt: Date.now(), wait, left: null as number | null }
     phase.current = armed
     const t = setTimeout(() => dispatch({ type: 'advance', now: Date.now() }), wait)
@@ -1292,16 +1082,7 @@ export function useBrainRound(gameId: BrainGameId, platform: PlatformContext, op
       clearTimeout(t)
       armed.left = Math.max(0, armed.wait - (Date.now() - armed.armedAt))
     }
-  }, [pending, state.round, state.gameId])
-
-  // A Quick Eye stimulus the platform never reported (a hidden tab, a stalled renderer) is voided.
-  const stalled = !busy && !state.paused && view.kind === 'quickEye' && view.phase === 'stimulus'
-  useEffect(() => {
-    if (!stalled || view.kind !== 'quickEye') return
-    const t = setTimeout(() => dispatch({ type: 'timeout', now: Date.now() }), view.exposureMs + 2500)
-    return () => clearTimeout(t)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stalled, state.trialId])
+  }, [pending, state.round])
 
   // The input clock starts the first time the trial takes input (never while a rule card is up).
   useEffect(() => {
@@ -1344,25 +1125,7 @@ export function useBrainRound(gameId: BrainGameId, platform: PlatformContext, op
     const result = state.result
     if (!result || result.void || result.practice) return
     const s = stateRef.current
-    const outcome = def.outcome(s.round)
-    // Placement flashes stay out of Quick Eye's stage window: the protocol judges stages on the staircase.
-    const shownMs = result.kind === 'counted' ? outcome?.shownMs : undefined
-    store.getState().record(s.gameId, { level: result.levelAfter, correct: result.correct, points: result.points, shownMs })
-    // Quick Eye's placement just handed over (its last trial clears `place`): a player it put at the
-    // easiest flash who placed fewer than half the stars starts on the centre alone — variant 1,
-    // with its own bar — rather than at a stage they cannot yet play. Never announced.
-    if (
-      s.gameId === 'quickEye' &&
-      result.kind === 'placement' &&
-      s.place === null &&
-      !s.centerOnly &&
-      s.variant === 2 &&
-      result.levelAfter <= 0.5 &&
-      s.placeLoc.n > 0 &&
-      s.placeLoc.ok / s.placeLoc.n < 0.5
-    ) {
-      store.getState().setQuickEyeVariant?.(1)
-    }
+    store.getState().record(s.gameId, { level: result.levelAfter, correct: result.correct, points: result.points })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.result])
 
@@ -1383,52 +1146,37 @@ export function useBrainRound(gameId: BrainGameId, platform: PlatformContext, op
     const result = state.result
     if (!result || state.over || state.paused) return
     const s = stateRef.current
-    const isQuickEye = s.gameId === 'quickEye'
     const delay = state.revealSkipped
       ? 0
       : result.void
         ? REVEAL.void
-        : isQuickEye
-          ? result.correct
-            ? REVEAL.quickEyeRight
-            : result.accuracy === 0.5
-              ? REVEAL.quickEyeHalf
-              : REVEAL.quickEyeWrong
-          : result.correct
-            ? ruleReveal(s)
-              ? REVEAL.rightWithRule
-              : REVEAL.right
-            : missReveal(s)
-              ? REVEAL.wrongWithReveal
-              : REVEAL.wrong
+        : result.correct
+          ? ruleReveal(s)
+            ? REVEAL.rightWithRule
+            : REVEAL.right
+          : missReveal(s)
+            ? REVEAL.wrongWithReveal
+            : REVEAL.wrong
     const t = setTimeout(() => {
       const cur = stateRef.current
       if (result.void && cur.voidRun >= END_AFTER_VOIDS) return dispatch({ type: 'end', reason: 'void', now: Date.now() })
       if (result.kind === 'counted' && !result.void) {
-        // A game without lives (Quick Eye) ends only at its cap, its time budget or the player's stop.
         if (rules.lives > 0 && cur.lives <= 0) return dispatch({ type: 'end', reason: 'lives', now: Date.now() })
-        if (rules.roundCap !== null && cur.counted >= rules.roundCap) return dispatch({ type: 'end', reason: 'cap', now: Date.now() })
+        if (roundCap !== null && cur.counted >= roundCap) return dispatch({ type: 'end', reason: 'cap', now: Date.now() })
       }
       // The slot's time is up: this trial was the last (never mid-trial, never during practice
       // left unfinished — practice is short and is what makes the game playable). Setup time is not
       // play time, and a board game's placement (or probe) always runs to its handover.
       const now = Date.now()
       const played = now - cur.stats.startedAt - cur.pausedMs - setupThrough(cur, now, cur.pausedMs)
-      const placing = cur.gameId !== 'quickEye' && (cur.place !== null || cur.probe !== null)
+      const placing = cur.place !== null || cur.probe !== null
       if (budget.current !== undefined && played >= budget.current && cur.practiceLeft === 0 && !placing) return dispatch({ type: 'end', reason: 'time', now })
       const progress = store.getState().progress
-      dispatch({ type: 'next', level: gameProgress(progress, cur.gameId).level, variant: progress.quickEye.variant, seed: randomSeed(), now: Date.now() })
+      dispatch({ type: 'next', level: gameProgress(progress, cur.gameId).level, seed: randomSeed(), now: Date.now() })
     }, delay)
     return () => clearTimeout(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.result, state.paused, state.revealSkipped])
-
-  // A stage-up interstitial clears itself (a tap clears it sooner: ackStageUp).
-  useEffect(() => {
-    if (!state.stageUp) return
-    const t = setTimeout(() => dispatch({ type: 'ackStageUp', now: Date.now() }), STAGE_UP_MS)
-    return () => clearTimeout(t)
-  }, [state.stageUp])
 
   // The round is over: write its end once.
   useEffect(() => {
@@ -1438,24 +1186,11 @@ export function useBrainRound(gameId: BrainGameId, platform: PlatformContext, op
   }, [state.over])
 
   const tap = useCallback((index: number) => dispatch({ type: 'tap', index, now: Date.now() }), [])
-  const reportExposure = useCallback(
-    (actualMs: number, frameMs: number) => dispatch({ type: 'exposed', actualMs, frameMs, now: Date.now() }),
-    [],
-  )
   const stop = useCallback(() => dispatch({ type: 'end', reason: 'stop', now: Date.now() }), [])
   const pause = useCallback(() => dispatch({ type: 'pause', now: Date.now() }), [])
   const resume = useCallback(() => dispatch({ type: 'resume', now: Date.now() }), [])
   const ackIntro = useCallback(() => dispatch({ type: 'ackIntro', now: Date.now() }), [])
-  const ackStageUp = useCallback(() => dispatch({ type: 'ackStageUp', now: Date.now() }), [])
   const skipReveal = useCallback(() => dispatch({ type: 'skipReveal', now: Date.now() }), [])
-
-  // Quick Eye's window, read reactively: "hold top speed n/14" moves the moment a trial is saved.
-  const qeProgress = useBrainStore((st) => st.progress.quickEye)
-  const isQuickEye = state.gameId === 'quickEye'
-  const shownLevel = state.result ? state.result.levelAfter : state.level
-  const qeCap = isQuickEye ? levelCap(state.gameId, state) : Infinity
-  const speed = isQuickEye && state.trialKind === 'counted' ? quickEyeSpeedGauge(shownLevel, stepMultiplier(state.group, state.sd), qeCap) : null
-  const held = speed?.atTop && qeProgress.variant === state.variant ? quickEyeHold(qeProgress.recentMs, qeProgress.recentOk, state.variant) : null
 
   const meta = (store.getState() as { meta?: BrainMeta }).meta
   return {
@@ -1465,14 +1200,13 @@ export function useBrainRound(gameId: BrainGameId, platform: PlatformContext, op
     level: displayLevel(state.result ? state.result.levelAfter : state.level),
     view,
     tap,
-    reportExposure,
     stop,
     pause,
     resume,
-    /** Paused by the player (a rule card or a stage-up is not a pause: see `intro`, `stageUp`). */
-    paused: state.paused && !state.intro && !state.stageUp,
-    /** Pausing is not offered mid-exposure, or under a rule card or a stage-up. */
-    canPause: !state.over && !state.intro && !state.stageUp && !(view.kind === 'quickEye' && view.phase === 'stimulus'),
+    /** Paused by the player (a rule card is not a pause: see `intro`). */
+    paused: state.paused && !state.intro,
+    /** Pausing is not offered under a rule card. */
+    canPause: !state.over && !state.intro,
     /** A rule met for the first time: the platform shows its card (mechanics.<copy>) and calls ackIntro. */
     intro: state.intro ? { tag: state.intro.tag, copy: mechanicInfo(state.intro.tag)?.copy ?? state.intro.tag } : null,
     ackIntro,
@@ -1495,7 +1229,7 @@ export function useBrainRound(gameId: BrainGameId, platform: PlatformContext, op
     done: state.over && state.finalized,
     stats: state.stats,
     trialInRound: state.counted,
-    roundCap: rules.roundCap,
+    roundCap,
     /** The game's best tier before this round (0-6). */
     tier: meta?.tier[state.gameId] ?? 0,
     /** The taps that answer this trial — for tests and automated play-throughs; never drawn. */
@@ -1506,29 +1240,8 @@ export function useBrainRound(gameId: BrainGameId, platform: PlatformContext, op
         ? { startedAt: state.inputStartedAt, limitMs: limit }
         : null,
     /**
-     * Quick Eye's display is being measured — fixation, stimulus, mask, the round running. Hold every
-     * chip, count-up, toast, scenery animation, sound and vibration until it is false (the one
-     * exception: the `fixation` fx's ready cue at its start).
-     */
-    quiet: isQuickEye && !busy && !state.paused && (view.kind === 'quickEye' && (view.phase === 'fixation' || view.phase === 'stimulus' || view.phase === 'mask')),
-    /** Quick Eye: the stage as shown, "Stage N" (the trial's own — practice is stage 1). Null for other games. */
-    stage: isQuickEye && view.kind === 'quickEye' ? shownStage(state, view.variant) : null,
-    /**
-     * Quick Eye's speed gauge, on counted trials only (null in practice, rule-card trials and
-     * placement): `shown` speed level 0-11, `pips` 0-3 of 4 filled, `toNext` right answers until it
-     * rises (`quickEye.gauge` {{count}}), `atTop` at the platform's shortest flash.
-     */
-    speed,
-    /** At top speed: "hold top speed n/need" (`quickEye.hold`) — the evidence criterion's progress. Null otherwise. */
-    hold: held ? { filled: Math.min(QUICK_EYE_HOLD_NEED, held.filled), need: QUICK_EYE_HOLD_NEED } : null,
-    /** Quick Eye: the leg so far, one mark per counted trial (`roundCap` cells; no red for a miss). */
-    legMarks: state.stats.legMarks,
-    /** Quick Eye: a stage reached — show the interstitial while set; it clears itself after 2s, or call ackStageUp on a tap. */
-    stageUp: state.stageUp,
-    ackStageUp,
-    /**
-     * On with the next trial now — taken from 500ms after the result: Quick Eye's reveal, and a missed
-     * choice trial's worked answer (`stimulus.reveal`, up 2.4s). A tap on the board, Space / Enter.
+     * On with the next trial now — taken from 500ms after the result: a missed choice trial's worked
+     * answer (`stimulus.reveal`, up 2.4s) or a right pattern's rule. A tap on the board, Space / Enter.
      */
     skipReveal,
   }

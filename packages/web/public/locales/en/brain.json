@@ -2,7 +2,7 @@
   "title": "Brain Training",
   "subtitle": "Focus and memory games for a regular brain-activity habit",
   "disclaimer": "This feature is not a medical device and is not intended to diagnose, treat, cure, or prevent any medical condition.",
-  "worry": "If you are worried about your memory, please talk to a doctor or a local health service rather than playing more games.",
+  "worry": "If you are worried about your memory, speak with a doctor or a local memory clinic.",
   "training": {
     "title": "Today's Training",
     "desc": "{{count}} games · about {{minutes}} min",
@@ -43,10 +43,8 @@
     "level": "Lv. {{level}}",
     "best": "Best Lv. {{level}}",
     "new": "New",
-    "quickEyeLevel": "Stage {{stage}} · speed {{speed}}",
     "record": "Best {{value}} pts",
     "settings": "Settings",
-    "research": "Research basis",
     "howItWorks": "Each puzzle is made fresh. Get it right and the next is a little harder; miss and it eases off. Levels show your skill at that game only — they are not a measure of memory or brain health."
   },
   "settings": {
@@ -57,9 +55,6 @@
     "timing_1_5": "1.5×",
     "timing_2": "2×",
     "timing_0": "No limit",
-    "centerOnly": "Quick Eye: centre only",
-    "centerOnlyHelp": "Turn on if the star at the edges is hard to see. You'll only answer the centre picture.",
-    "flash": "Quick Eye shows pictures very briefly. If you are sensitive to flashing light, take it easy.",
     "close": "Close",
     "sound": "Sound effects",
     "soundHelp": "A short sound when you get one right or wrong.",
@@ -73,10 +68,6 @@
     "reasoning": "Reasoning"
   },
   "games": {
-    "quickEye": {
-      "name": "Quick Eye",
-      "desc": "Watch the centre shape and catch, at a glance, which way the star flashed."
-    },
     "memoryGrid": {
       "name": "Flash Grid",
       "desc": "Spatial memory practice: remember the cells that lit up, then tap them."
@@ -108,6 +99,22 @@
     "series": {
       "name": "Number Pattern",
       "desc": "Find the rule and pick the next number."
+    },
+    "setMatch": {
+      "name": "Set Match",
+      "desc": "Find three cards whose features are each all the same or all different."
+    },
+    "codeBreak": {
+      "name": "Code Break",
+      "desc": "Use strikes (right digit and place) and balls (right digit, wrong place) to find the code."
+    },
+    "makeNumber": {
+      "name": "Make the Number",
+      "desc": "Use every number exactly once to make the target."
+    },
+    "mazeRun": {
+      "name": "Maze Run",
+      "desc": "Trace a path to the flag. Backtrack when you reach a dead end."
     }
   },
   "play": {
@@ -183,59 +190,75 @@
     "newBestReverse": "{{count}} in reverse!",
     "newBestReverse_one": "{{count}} in reverse!",
     "newBestReverse_other": "{{count}} in reverse!",
-    "lookalikeBadge": "Look-alikes"
-  },
-  "quickEye": {
-    "watch": "Look at the centre",
-    "what": "What was in the centre?",
-    "where": "Which way was the star?",
-    "sameOrDifferent": "Were the two centre pictures the same?",
-    "same": "Same",
-    "different": "Different",
-    "circle": "Circle",
-    "square": "Square",
-    "stage": "Stage {{stage}}",
-    "dir": {
-      "0": "Up",
-      "1": "Up right",
-      "2": "Right",
-      "3": "Down right",
-      "4": "Down",
-      "5": "Down left",
-      "6": "Left",
-      "7": "Up left"
+    "lookalikeBadge": "Look-alikes",
+    "setMatchFind": "Pick three cards: each feature all the same or all different",
+    "setMatchNone": "No set",
+    "setPicked_one": "{{count}} picked",
+    "setPicked_other": "{{count}} picked",
+    "setCard_one": "{{count}} shapes",
+    "setCard_other": "{{count}} shapes",
+    "setBroken": "Check {{attributes}}. Two alike and one different is not a set.",
+    "setAttribute": {
+      "shape": "Shape",
+      "count": "Count",
+      "color": "Colour",
+      "fill": "Fill"
     },
-    "speedLevel": "Speed level {{level}}",
-    "knob": {
-      "wider": "Now look wider",
-      "ring2": "Out to the middle ring",
-      "ring3": "Out to the outer ring",
-      "crowd": "Find the star among triangles",
-      "moreCrowd": "More triangles",
-      "similar": "The centre shapes look more alike",
-      "sameDiff": "Same or different?"
+    "setShape": {
+      "circle": "Circle",
+      "triangle": "Triangle",
+      "square": "Square",
+      "diamond": "Diamond"
     },
-    "stageUp": {
-      "title": "New stage",
-      "stage": "Stage {{stage}}",
-      "ease": "A new stage starts a little slower",
-      "continue": "Continue"
+    "setColor": {
+      "blue": "Blue",
+      "vermillion": "Vermillion",
+      "black": "Black"
     },
-    "gauge": "{{count}} more right and it gets faster",
-    "speedUp": "One step faster",
-    "topSpeed": "Top speed",
-    "hold": "Hold top speed {{n}}/14",
-    "wasHere": "It was here",
-    "nearMiss": "So close, right next to it",
-    "missFast": "That one was quick",
-    "slowerStart": "A little faster now",
-    "legEnd": "End of leg",
-    "nextGoal": "Next: stay near speed level {{level}}",
-    "landscapeHint": "Turn your phone sideways or use a tablet for a wider view",
-    "revealA11y": "Answer: {{center}}, star {{dir}}",
-    "warmup": "Getting ready",
-    "gauge_one": "{{count}} more right and it gets faster",
-    "gauge_other": "{{count}} more right and it gets faster"
+    "setFill": {
+      "solid": "Solid",
+      "striped": "Striped",
+      "outline": "Outline"
+    },
+    "codeBreakGuess_one": "Find the {{length}}-digit code · {{count}} guesses left",
+    "codeBreakGuess_other": "Find the {{length}}-digit code · {{count}} guesses left",
+    "codeGuesses": "Guesses {{used}}/{{total}}",
+    "codeRepeats": "Digits may repeat",
+    "codeDistinct": "No repeated digits",
+    "codeHistory": "Guesses and clues",
+    "codeFirstGuess": "Enter your first guess",
+    "codeFeedback": "{{strikes}} S · {{balls}} B",
+    "codeEntry": "Current guess",
+    "codeNotes": "Mark ruled-out digits",
+    "codeNote": "Toggle note for {{digit}}",
+    "codeAnswer": "Code: {{code}}",
+    "erase": "Erase",
+    "submit": "Submit",
+    "undo": "Undo",
+    "clear": "Clear",
+    "makeNumberSigns": "Choose the signs to make {{target}}",
+    "makeNumberTarget": "Use every number to make {{target}}",
+    "makeTarget": "Target {{target}}",
+    "makeFixed": "Keep this order · choose the signs",
+    "makeAny": "Each number once · any order",
+    "makeTries_one": "{{count}} tries left",
+    "makeTries_other": "{{count}} tries left",
+    "makeExpression": "Your expression",
+    "makeValue": "This makes {{value}}. Try editing it.",
+    "mazeRunGo": "Trace a path to the flag",
+    "mazeRunKeys_one": "Collect {{count}} keys in number order, then reach the flag",
+    "mazeRunKeys_other": "Collect {{count}} keys in number order, then reach the flag",
+    "mazeRunMemorize": "Remember the walls and paths",
+    "mazeMemorise": "Walls will hide soon",
+    "mazeDrag": "Drag or tap a neighbouring cell · backtrack to erase",
+    "mazeBumps_one": "{{count}} bumps left",
+    "mazeBumps_other": "{{count}} bumps left",
+    "mazeStart": "Start",
+    "mazeGoal": "Flag · goal",
+    "mazeKey_one": "Key {{count}}",
+    "mazeKey_other": "Key {{count}}",
+    "memorizeNumbers": "Remember the positions · 1 to {{max}}",
+    "memoryBadge": "Face-down memory"
   },
   "summary": {
     "livesOut": "Round over",
@@ -258,49 +281,25 @@
     "voided": "The screen kept stuttering, so the round stopped"
   },
   "colors": {
-    "red": "RED",
     "blue": "BLUE",
-    "green": "GREEN",
-    "yellow": "YELLOW",
+    "orange": "ORANGE",
     "purple": "PURPLE",
-    "orange": "ORANGE"
+    "black": "BLACK",
+    "brown": "BROWN",
+    "gray": "GRAY"
   },
   "intro": {
     "howTo": "How to play",
     "replay": "Replay",
     "start": "Start",
-    "practiceNote": "The first 4 are practice. They cost no chances and score no points.",
+    "practiceNote": "The first few puzzles are practice. No chances or points are lost.",
     "level": "Level",
-    "speed": "Speed",
-    "stage": "Stage",
     "rounds": "Played",
     "best": "Best score",
     "welcomeBack": "Welcome back. The first few questions will find your level again.",
     "firstPlacement": "The first few questions find the right starting level."
   },
   "mechanics": {
-    "quickEye": {
-      "periphery": {
-        "title": "Find the star",
-        "body": "A star flashes outside too. Pick the centre picture, then the side the star was on."
-      },
-      "distractors": {
-        "title": "Star among triangles",
-        "body": "Triangles flash as well. Pick the side the one star was on."
-      },
-      "similar": {
-        "title": "Close shapes",
-        "body": "The square's corners get rounder, closer to a circle."
-      },
-      "sameDiff": {
-        "title": "Same or different?",
-        "body": "Two shapes flash in the centre. Say whether they match."
-      },
-      "clearView": {
-        "title": "A clearer screen",
-        "body": "The cover changed, so the first few start a little slower."
-      }
-    },
     "oddOneOut": {
       "rotation": {
         "title": "The turned one",
@@ -316,7 +315,7 @@
       },
       "glyphs": {
         "title": "Tricky letters",
-        "body": "Letters that look alike, like b and d or 6 and 9."
+        "body": "Letters that look alike, like b and d or O and Q."
       },
       "colorNoise": {
         "title": "Ignore the colours",
@@ -381,6 +380,10 @@
       "unmarked": {
         "title": "No marks",
         "body": "Found numbers stay as they are. Keep track yourself."
+      },
+      "memory": {
+        "title": "Face-down memory",
+        "body": "Remember the positions. After the cards turn over, tap from 1 in order. A wrong card is briefly revealed."
       }
     },
     "memoryGrid": {
@@ -397,6 +400,10 @@
       "reverse": {
         "title": "Backwards",
         "body": "Tap the tiles in reverse, starting from the last one lit. From now on it is always reversed."
+      },
+      "faster": {
+        "title": "Faster flashes",
+        "body": "The tiles now light up one after another more quickly. Keep up with the order."
       }
     },
     "series": {
@@ -479,6 +486,22 @@
       "missingTerm": {
         "title": "Find the gap",
         "body": "The ? can now sit inside the row. Pick the number that fills it."
+      },
+      "primes": {
+        "title": "Primes in order",
+        "body": "A rule of prime numbers — divisible only by 1 and themselves — one after another."
+      },
+      "product": {
+        "title": "Multiply the two before",
+        "body": "A rule where each number is the two before it multiplied together."
+      },
+      "digitSum": {
+        "title": "Add its digits",
+        "body": "A rule where each number is the last one plus each of its digits."
+      },
+      "diffPrimes": {
+        "title": "Prime gaps",
+        "body": "A rule where the gaps are prime numbers, one after another."
       }
     },
     "pairs": {
@@ -554,6 +577,94 @@
         "title": "Two digits × two digits",
         "body": "Two-digit numbers are multiplied together."
       }
+    },
+    "setMatch": {
+      "color": {
+        "title": "Colour joins in",
+        "body": "Colour joins shape and count. The three colours must also be all the same or all different."
+      },
+      "fill": {
+        "title": "Fill joins in",
+        "body": "Look at solid, striped and outline too. Every feature must be all the same or all different."
+      },
+      "none": {
+        "title": "There may be no set",
+        "body": "If no three cards form a set, choose No set."
+      },
+      "oneSet": {
+        "title": "Exactly one set",
+        "body": "Find the one set among similar cards."
+      }
+    },
+    "codeBreak": {
+      "three": {
+        "title": "Three-digit codes",
+        "body": "Now find three digits. A strike is a right digit in place; a ball is a right digit elsewhere."
+      },
+      "four": {
+        "title": "Four-digit codes",
+        "body": "Find four digits using the clues from earlier guesses."
+      },
+      "five": {
+        "title": "Five-digit codes",
+        "body": "Now five digits. Deduce their positions as well as their values."
+      },
+      "zero": {
+        "title": "Zero joins in",
+        "body": "The code may contain 0, even in the first position."
+      },
+      "repeats": {
+        "title": "Digits may repeat",
+        "body": "A digit can now appear more than once. Use the clues to work out how many times."
+      }
+    },
+    "makeNumber": {
+      "multiply": {
+        "title": "Multiplication joins in",
+        "body": "You can use ×. Multiplication comes before addition and subtraction."
+      },
+      "divide": {
+        "title": "Division joins in",
+        "body": "Try ÷ too. Do × and ÷ first, from left to right."
+      },
+      "anyOrder": {
+        "title": "Choose the order",
+        "body": "Tap the numbers in any order. Use every tile exactly once."
+      },
+      "brackets": {
+        "title": "Use brackets",
+        "body": "Work out brackets first. This target needs brackets."
+      },
+      "target24": {
+        "title": "Make 24",
+        "body": "Use four numbers once each to make 24. Try a different order and brackets."
+      },
+      "fraction": {
+        "title": "Fractions on the way",
+        "body": "Intermediate results can be fractions. Only the final answer must match the target."
+      }
+    },
+    "mazeRun": {
+      "winding": {
+        "title": "More forks",
+        "body": "Paths wind more. Retrace your path when you hit a dead end."
+      },
+      "keys": {
+        "title": "Collect the keys first",
+        "body": "Collect numbered keys in order, then reach the flag. Backtracking keeps collected keys."
+      },
+      "moreKeys": {
+        "title": "More keys",
+        "body": "Collect all the keys in number order."
+      },
+      "hidden": {
+        "title": "Remember the walls",
+        "body": "Walls hide after a preview. Move from memory. Your remaining wall bumps are shown separately."
+      },
+      "hiddenKeys": {
+        "title": "Keys from memory",
+        "body": "In a hidden maze, collect keys in number order before reaching the flag."
+      }
     }
   },
   "rule": {
@@ -608,17 +719,9 @@
       "title": "Seven to remember",
       "body": "Remembered 7 in Sequence or Flash Grid."
     },
-    "quickEyeStage5": {
-      "title": "Quick Eye stage 5",
-      "body": "Reached stage 5 of Quick Eye."
-    },
-    "quickEyeStage10": {
-      "title": "Quick Eye stage 10",
-      "body": "Reached stage 10 of Quick Eye."
-    },
     "allGames": {
       "title": "Every game",
-      "body": "Tried all 9 games."
+      "body": "Tried every game."
     },
     "firstSession": {
       "title": "First session",

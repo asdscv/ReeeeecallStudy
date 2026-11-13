@@ -37,6 +37,11 @@ import type { BrainCloud, CloudFetch, CloudPush } from '@reeeeecall/shared/store
 import type { BrainStorage } from '@reeeeecall/shared/stores/brain-store'
 
 const D = (n: number) => `2026-11-${String(n).padStart(2, '0')}`
+/**
+ * Quick Eye, removed by the owner (2026-11-13): no longer a BrainGameId, but an old save (or an app
+ * version that still has the game) can carry its record, which must keep merging exactly as before.
+ */
+const QE = 'quickEye' as unknown as BrainGameId
 
 function play(p: BrainProgress, id: BrainGameId, trials: number, from: number, day = D(3)): BrainProgress {
   for (let i = 0; i < trials; i++) p = recordRound(p, id, { level: from + i * 0.1, correct: true, points: 10 }, day)
@@ -48,12 +53,12 @@ function play(p: BrainProgress, id: BrainGameId, trials: number, from: number, d
 describe('mergeProgress', () => {
   it('two devices: each game keeps the side with more trials, never a sum', () => {
     let shared = play(emptyProgress(), 'schulte', 10, 3, D(2))
-    shared = recordSession(shared, 22, D(2), null, ['quickEye', 'schulte', 'sequence', 'pairs'])
+    shared = recordSession(shared, 22, D(2), null, [QE, 'schulte', 'sequence', 'pairs'])
     let a = play(shared, 'schulte', 5, 4)
-    a = recordSession(a, 22, D(3), null, ['quickEye', 'schulte', 'memoryGrid', 'pairs'])
+    a = recordSession(a, 22, D(3), null, [QE, 'schulte', 'memoryGrid', 'pairs'])
     let b = play(shared, 'sequence', 4, 2)
-    b = recordSession(b, 22, D(3), null, ['quickEye', 'oddOneOut', 'sequence', 'stroop'])
-    b = recordSession(b, 22, D(3), null, ['quickEye', 'schulte', 'series', 'math'])
+    b = recordSession(b, 22, D(3), null, [QE, 'oddOneOut', 'sequence', 'stroop'])
+    b = recordSession(b, 22, D(3), null, [QE, 'schulte', 'series', 'math'])
 
     const m = mergeProgress(a, b)
     expect(gameProgress(m, 'schulte').rounds).toBe(15)
@@ -79,34 +84,34 @@ describe('mergeProgress', () => {
     expect(gameProgress(mergeProgress(lo, hi), 'pairs').bestLevel).toBe(12)
   })
 
-  it('Quick Eye: a newer variant wins even with fewer trials, and its level travels with it', () => {
-    const older = { ...play(emptyProgress(), 'quickEye', 40, 6), quickEye: { variant: 5, recentMs: [50], recentOk: '1', thresholdMs: 60 } }
-    const newer = { ...play(emptyProgress(), 'quickEye', 12, 2), quickEye: { variant: 6, recentMs: [], recentOk: '', thresholdMs: 45 } }
+  it("an old save's Quick Eye: a newer variant wins even with fewer trials, and its level travels with it", () => {
+    const older = { ...play(emptyProgress(), QE, 40, 6), quickEye: { variant: 5, recentMs: [50], recentOk: '1', thresholdMs: 60 } }
+    const newer = { ...play(emptyProgress(), QE, 12, 2), quickEye: { variant: 6, recentMs: [], recentOk: '', thresholdMs: 45 } }
     for (const m of [mergeProgress(older, newer), mergeProgress(newer, older)]) {
       expect(m.quickEye.variant).toBe(6)
-      expect(gameProgress(m, 'quickEye').rounds).toBe(12)
-      expect(gameProgress(m, 'quickEye').level).toBeCloseTo(newer.games.quickEye!.level)
+      expect(gameProgress(m, QE).rounds).toBe(12)
+      expect(gameProgress(m, QE).level).toBeCloseTo(newer.games[QE]!.level)
       expect(m.quickEye.thresholdMs).toBe(45)
     }
     // Same variant: more trials.
     const more = { ...older, quickEye: { ...older.quickEye, variant: 6 } }
     expect(mergeProgress(newer, more).quickEye.recentMs).toEqual([50])
-    expect(gameProgress(mergeProgress(newer, more), 'quickEye').rounds).toBe(40)
+    expect(gameProgress(mergeProgress(newer, more), QE).rounds).toBe(40)
   })
 
-  it('Quick Eye: variants 1 and 2 rank together — a slow start placed at 1 is not undone by an untouched or behind variant 2', () => {
-    const placed = { ...play(emptyProgress(), 'quickEye', 9, 0), quickEye: { variant: 1, recentMs: [100], recentOk: '1', thresholdMs: null } }
+  it("an old save's Quick Eye: variants 1 and 2 rank together — a slow start placed at 1 is not undone by an untouched or behind variant 2", () => {
+    const placed = { ...play(emptyProgress(), QE, 9, 0), quickEye: { variant: 1, recentMs: [100], recentOk: '1', thresholdMs: null } }
     // A fresh device (every record starts at variant 2) and the copy pushed mid-placement (fewer trials).
     const fresh = emptyProgress()
-    const midPlacement = play(emptyProgress(), 'quickEye', 6, 0)
+    const midPlacement = play(emptyProgress(), QE, 6, 0)
     for (const other of [fresh, midPlacement]) {
       expect(mergeProgress(placed, other).quickEye.variant).toBe(1)
       expect(mergeProgress(other, placed).quickEye.variant).toBe(1)
     }
     // Played on past it at variant 2 elsewhere (more trials): that side wins; and 3 still beats 1.
-    const passed = { ...play(emptyProgress(), 'quickEye', 30, 2), quickEye: { variant: 2, recentMs: [], recentOk: '', thresholdMs: null } }
+    const passed = { ...play(emptyProgress(), QE, 30, 2), quickEye: { variant: 2, recentMs: [], recentOk: '', thresholdMs: null } }
     expect(mergeProgress(placed, passed).quickEye.variant).toBe(2)
-    const v3 = { ...play(emptyProgress(), 'quickEye', 2, 2), quickEye: { variant: 3, recentMs: [], recentOk: '', thresholdMs: null } }
+    const v3 = { ...play(emptyProgress(), QE, 2, 2), quickEye: { variant: 3, recentMs: [], recentOk: '', thresholdMs: null } }
     expect(mergeProgress(placed, v3).quickEye.variant).toBe(3)
     // Neither played: the same answer from both sides.
     const centreOnly = { ...emptyProgress(), quickEye: { ...emptyProgress().quickEye, variant: 1 } }
@@ -252,18 +257,20 @@ describe('reconcile and formats', () => {
     expect(r.push).toBe(false)
     expect(r.encoded.progress.placement).toEqual({ schulte: 4 })
     expect(r.encoded.meta.streakShield).toBe(2)
-    expect(isNewerFormat({ progress: { v: 3 }, history: { v: 2 }, meta: { v: 2 } })).toBe(true)
-    expect(isNewerFormat({ progress: { v: 2 }, history: { v: 2 }, meta: { v: 3 } })).toBe(true)
-    expect(isNewerFormat({ progress: { v: 2 }, history: null, meta: undefined })).toBe(false)
-    // This app writes v2: a v1 copy (an app from before the hard-content change) is older, not newer.
+    expect(isNewerFormat({ progress: { v: 4 }, history: { v: 3 }, meta: { v: 3 } })).toBe(true)
+    expect(isNewerFormat({ progress: { v: 3 }, history: { v: 3 }, meta: { v: 4 } })).toBe(true)
+    expect(isNewerFormat({ progress: { v: 3 }, history: null, meta: undefined })).toBe(false)
+    // This app writes v3: a v1 copy (before the hard-content change) or a v2 one (before the thinking
+    // games) is older, not newer.
     expect(isNewerFormat({ progress: { v: 1 }, history: { v: 1 }, meta: { v: 1 } })).toBe(false)
+    expect(isNewerFormat({ progress: { v: 2 }, history: { v: 2 }, meta: { v: 2 } })).toBe(false)
   })
 
   it('measures size the way Postgres prints jsonb, and a worst-case record is far under 16KB', () => {
     expect(jsonbTextBytes({ a: 1, b: [1, 2] })).toBe('{"a": 1, "b": [1, 2]}'.length)
     expect(jsonbTextBytes({ s: '가' })).toBe(new TextEncoder().encode('{"s": "가"}').length)
     let p = emptyProgress()
-    const ids: BrainGameId[] = ['quickEye', 'schulte', 'stroop', 'oddOneOut', 'pairs', 'math', 'series', 'memoryGrid', 'sequence']
+    const ids: BrainGameId[] = [QE, 'schulte', 'stroop', 'oddOneOut', 'pairs', 'math', 'series', 'memoryGrid', 'sequence']
     for (const id of ids) p = play(p, id, 60, 5)
     for (let i = 0; i < 12; i++) p = recordSession(p, 22, D(1 + i), null, ids.slice(0, 4))
     expect(jsonbTextBytes(p)).toBeLessThan(4_000)
@@ -581,7 +588,7 @@ describe('brain store cloud sync', () => {
 
   it('a newer-format cloud copy (an updated app on another device) is never merged or overwritten', async () => {
     const server = fakeServer()
-    const newer = { progress: { v: 3, games: {}, something: 'new' }, history: { v: 2, rounds: {} }, meta: { v: 2 }, rev: 7 }
+    const newer = { progress: { v: 4, games: {}, something: 'new' }, history: { v: 3, rounds: {} }, meta: { v: 3 }, rev: 7 }
     server.db.set('u1', clone(newer))
     const A = await device(server)
     A.store.getState().hydrate(A.storageFor('u1'))
@@ -599,8 +606,8 @@ describe('brain store cloud sync', () => {
     const A = await device(server)
     A.store.getState().hydrate(A.storageFor('u1'))
     await idle()
-    // Between this device's read and its write, a newer app writes meta v3: the conflict shows it.
-    server.db.set('u1', { progress: { v: 2 }, history: { v: 2, rounds: {} }, meta: { v: 3 }, rev: 1 })
+    // Between this device's read and its write, a newer app writes meta v4: the conflict shows it.
+    server.db.set('u1', { progress: { v: 3 }, history: { v: 3, rounds: {} }, meta: { v: 4 }, rev: 1 })
     A.store.getState().record('stroop', { level: 3, correct: true, points: 1 })
     await A.flush()
     expect(A.store.getState().cloudStatus).toBe('outdated')
@@ -608,7 +615,7 @@ describe('brain store cloud sync', () => {
     A.store.getState().record('stroop', { level: 3.1, correct: true, points: 1 })
     await vi.advanceTimersByTimeAsync(10_000)
     expect(server.state.pushes).toBe(pushes)
-    expect((server.db.get('u1')!.meta as { v: number }).v).toBe(3)
+    expect((server.db.get('u1')!.meta as { v: number }).v).toBe(4)
 
     // The server's own refusal (client_outdated) stops it the same way.
     const other = fakeServer()
@@ -625,7 +632,7 @@ describe('brain store cloud sync', () => {
     expect(other.state.pushes).toBe(sent)
   })
 
-  it('a v1 save (an app from before the hard-content change) is converted once and goes up as v2; an older write is then refused', async () => {
+  it('a v1 save (an app from before the hard-content change) is converted once and goes up as v3; an older write is then refused', async () => {
     const server = fakeServer()
     // The same old-app record on this device and in the cloud: Quick Math on the v1 scale.
     const v1Progress = { ...JSON.parse(serializeProgress(play(emptyProgress(), 'math', 20, 9))), v: 1 }
@@ -643,7 +650,7 @@ describe('brain store cloud sync', () => {
     expect(A.store.getState().meta.sk.math).toEqual({ mu: migrateLevelV1('math', 10.5), sd: 9, n: 0, day: 1000 })
     expect(A.store.getState().cloudStatus).toBe('synced')
     const row = server.db.get('u1')!
-    expect([ver(row.progress), ver(row.history), ver(row.meta)]).toEqual([2, 2, 2])
+    expect([ver(row.progress), ver(row.history), ver(row.meta)]).toEqual([3, 3, 3])
     // Converted exactly once: the cloud holds the same v2 levels as the device.
     expect(level(row.progress as BrainProgress, 'math')).toBeCloseTo(once)
     expect((row.meta as BrainMeta).sk.math?.mu).toBeCloseTo(migrateLevelV1('math', 10.5))
@@ -658,6 +665,11 @@ describe('brain store cloud sync', () => {
     const old = await server.connect({ uid: 'u1' }).cloud.push({ userId: 'u1', baseRev: row.rev, progress: clone(v1Progress), history: clone(v1History), meta: clone(v1Meta) })
     expect(old).toMatchObject({ ok: true, status: 'client_outdated' })
     expect(server.db.get('u1')!.rev).toBe(row.rev)
+    // So is the production app's v2 copy — its parseMeta and parseHistory drop the thinking games.
+    const v2 = (doc: object) => ({ ...clone(doc), v: 2 })
+    const older = await server.connect({ uid: 'u1' }).cloud.push({ userId: 'u1', baseRev: row.rev, progress: v2(row.progress as object), history: v2(row.history as object), meta: v2(row.meta as object) })
+    expect(older).toMatchObject({ ok: true, status: 'client_outdated' })
+    expect(server.db.get('u1')!.rev).toBe(row.rev)
   })
 
   it('not deployed yet, or nobody signed in: quiet, device-only, the game plays on', async () => {
@@ -668,9 +680,9 @@ describe('brain store cloud sync', () => {
     await idle()
     expect(A.store.getState().cloudStatus).toBe('unavailable')
     expect(A.store.getState().cloudReady).toBe(true)
-    A.round('quickEye', 3, 2)
+    A.round('math', 3, 2)
     await vi.advanceTimersByTimeAsync(10_000)
-    expect(gameProgress(A.store.getState().progress, 'quickEye').rounds).toBe(3)
+    expect(gameProgress(A.store.getState().progress, 'math').rounds).toBe(3)
     expect(server.state.pushes).toBe(0) // backed off, not hammering
     expect(server.state.fetches).toBe(1)
 

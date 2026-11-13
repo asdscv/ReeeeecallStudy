@@ -1,19 +1,17 @@
 /**
  * The round hook's clocks and endings, driven with fake timers: a pause keeps what was left of a
  * memorise phase (it used to replay the whole phase, buying unlimited study time), a span round
- * always ends, a waited-out span trial costs a chance even in relaxed timing, Quick Eye stops a
- * round of nothing but void trials, levels stop at each game's ceiling, and the round reports the
- * time actually played.
+ * always ends, a waited-out span trial costs a chance even in relaxed timing, levels stop at each
+ * game's ceiling, and the round reports the time actually played.
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
-import { dayNumber, emptyHistory, emptyMeta, emptyProgress, hasBit, mechanicInfo, parseMeta, parseProgress, quickEyeMaxLevel, brainGame, DEFAULT_CONTEXT, MECHANICS, setBit, type BrainMeta, type BrainProgress, type CreateContext, type RoundView } from '@reeeeecall/shared/lib/brain-games'
+import { dayNumber, emptyHistory, emptyMeta, emptyProgress, hasBit, mechanicInfo, parseMeta, parseProgress, brainGame, DEFAULT_CONTEXT, MECHANICS, type BrainMeta, type BrainProgress, type CreateContext, type RoundView } from '@reeeeecall/shared/lib/brain-games'
 import { useBrainRound, type PlatformContext, type RoundStats } from '@reeeeecall/shared/hooks/useBrainRound'
 import { useTodaysTraining } from '@reeeeecall/shared/hooks/useTodaysTraining'
-import { useBrainFx, type BrainFx } from '@reeeeecall/shared/hooks/useBrainFx'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
 
-const PLATFORM: PlatformContext = { maxCols: 5, minExposureMs: 33, ringSlots: [8, 16, 16] }
+const PLATFORM: PlatformContext = { maxCols: 5 }
 
 const TODAY = Math.floor(new Date('2026-11-12T10:00:00').getTime() / 86_400_000)
 
@@ -24,18 +22,10 @@ const TODAY = Math.floor(new Date('2026-11-12T10:00:00').getTime() / 86_400_000)
  */
 function seed(patch: (p: BrainProgress) => BrainProgress = (p) => p, meta?: BrainMeta) {
   const p = emptyProgress()
-  const progress = patch({ ...p, practiced: ['memoryGrid', 'sequence', 'quickEye', 'oddOneOut', 'stroop', 'schulte', 'pairs', 'math', 'series'] })
+  const progress = patch({ ...p, practiced: ['memoryGrid', 'sequence', 'oddOneOut', 'stroop', 'schulte', 'pairs', 'math', 'series'] })
   const sk: BrainMeta['sk'] = {}
   for (const [id, g] of Object.entries(progress.games)) if (g && g.rounds > 0) sk[id as keyof BrainMeta['sk']] = { mu: g.level, sd: 1, n: g.rounds, day: TODAY }
   useBrainStore.setState({ progress, meta: meta ?? { ...emptyMeta(), sk }, history: emptyHistory(), storageKey: 'test' })
-}
-
-/** Every rule and board change already met — Quick Eye tests about clocks start without cards or the field's recalibration. */
-const ALL_SEEN = MECHANICS.reduce((mask, _m, bit) => setBit(mask, bit), '')
-
-function seedQe(patch: (p: BrainProgress) => BrainProgress = (p) => p) {
-  seed(patch)
-  useBrainStore.setState((st) => ({ meta: { ...st.meta, seen: ALL_SEEN } }))
 }
 
 beforeEach(() => {
@@ -98,101 +88,9 @@ describe('rounds always end', () => {
   })
 })
 
-describe('Quick Eye void trials', () => {
-  it('after five voids in a row the measured flash is accepted as it was', () => {
-    seedQe()
-    const { result } = renderHook(() => useBrainRound('quickEye', PLATFORM))
-    let voids = 0
-    for (let guard = 0; guard < 400 && voids < 6; guard++) {
-      const v = result.current.view
-      if (v.kind === 'quickEye' && v.phase === 'stimulus' && !result.current.result) {
-        // A device that always shows two frames too many: never an exact match.
-        act(() => result.current.reportExposure(v.exposureMs + 2 * (1000 / 60), 1000 / 60))
-        // Read afresh: the guard above narrowed `result` to null for TypeScript.
-        const judged = (result.current as { result: { void: boolean } | null }).result
-        if (judged?.void) voids++
-        else break
-      }
-      advance(50)
-    }
-    expect(voids).toBe(5)
-    expect(result.current.view.kind === 'quickEye' && result.current.view.phase).toBe('mask')
-  })
-
-  it('a stimulus that never reports (a stalled screen) ends the round after eight voids', () => {
-    seedQe()
-    const { result } = renderHook(() => useBrainRound('quickEye', PLATFORM))
-    for (let i = 0; i < 200 && !result.current.over; i++) advance(500)
-    expect(result.current.over).toBe(true)
-    expect(result.current.stats.trials).toBe(0)
-    // Not "cleared": the round stopped itself.
-    expect(result.current.stats.endedBy).toBe('void')
-  })
-
-  it('once lenient, stays lenient: a device a frame or two off keeps playing, not voiding five in six', () => {
-    seedQe()
-    const { result } = renderHook(() => useBrainRound('quickEye', PLATFORM))
-    let voids = 0
-    let counted = 0
-    for (let guard = 0; guard < 2000 && counted < 6; guard++) {
-      const v = result.current.view
-      if (v.kind === 'quickEye' && v.phase === 'stimulus' && !result.current.result) {
-        act(() => result.current.reportExposure(v.exposureMs + 2 * (1000 / 60), 1000 / 60))
-        const judged = (result.current as { result: { void: boolean } | null }).result
-        if (judged?.void) voids++
-      }
-      const taps = result.current.solution
-      if (taps && taps.length && !result.current.result) {
-        act(() => result.current.tap(taps[0]))
-        if ((result.current as { result: unknown }).result) counted++
-      }
-      advance(50)
-    }
-    expect(counted).toBe(6)
-    expect(voids).toBe(5)
-  })
-
-  it('a device whose floor gets raised never loses level for answering right', () => {
-    // At the top stage: a stage passed would ease the level back three steps on purpose.
-    seedQe((p) => ({ ...p, games: { ...p.games, quickEye: { level: 11, bestLevel: 11, rounds: 3, wins: 3 } }, quickEye: { ...p.quickEye, variant: 16 } }))
-    const { result } = renderHook(() => useBrainRound('quickEye', PLATFORM))
-    let lowest = result.current.level
-    for (let guard = 0; guard < 3000 && !result.current.over; guard++) {
-      const v = result.current.view
-      // One frame long every time: voids, then the floor rises, then lenient play.
-      if (v.kind === 'quickEye' && v.phase === 'stimulus' && !result.current.result) act(() => result.current.reportExposure(v.exposureMs + 1000 / 60, 1000 / 60))
-      const taps = result.current.solution
-      if (taps && taps.length && !result.current.result) act(() => result.current.tap(taps[0]))
-      lowest = Math.min(lowest, result.current.level)
-      advance(50)
-    }
-    expect(lowest).toBeGreaterThanOrEqual(10.9)
-  })
-
-  it('a pause during fixation restarts the fixation: the flash never comes right after resume', () => {
-    seedQe()
-    const { result } = renderHook(() => useBrainRound('quickEye', PLATFORM))
-    advance(450)
-    act(() => result.current.pause())
-    advance(5000)
-    act(() => result.current.resume())
-    advance(100)
-    const v = result.current.view
-    expect(v.kind === 'quickEye' && v.phase).toBe('fixation')
-  })
-})
-
 describe('level ceilings', () => {
-  it("Quick Eye stops at the platform's shortest flash: 33ms is ladder step 11, not 12", () => {
-    expect(quickEyeMaxLevel(33)).toBe(11)
-    expect(quickEyeMaxLevel(17)).toBe(12)
-    seedQe((p) => ({ ...p, games: { ...p.games, quickEye: { level: 12, bestLevel: 12, rounds: 3, wins: 3 } } }))
-    const { result } = renderHook(() => useBrainRound('quickEye', PLATFORM))
-    expect(result.current.level).toBe(11)
-  })
-
   it('games whose puzzle stops changing have a ceiling; the ones that keep growing do not', () => {
-    for (const id of ['schulte', 'oddOneOut', 'pairs', 'stroop', 'memoryGrid', 'quickEye'] as const) {
+    for (const id of ['schulte', 'oddOneOut', 'pairs', 'stroop', 'memoryGrid'] as const) {
       expect(brainGame(id).def.maxLevel?.(DEFAULT_CONTEXT), id).toBeGreaterThan(0)
     }
     expect(brainGame('memoryGrid').def.maxLevel?.({ ...DEFAULT_CONTEXT, maxCols: 3 })).toBeLessThan(brainGame('memoryGrid').def.maxLevel?.({ ...DEFAULT_CONTEXT, maxCols: 7 }) ?? 0)
@@ -221,7 +119,7 @@ describe('placement and rule cards in a round', () => {
   it("a game never played starts by finding the level: no chances spent, then the staircase takes over higher than 1", () => {
     seed()
     const { result } = renderHook(() => useBrainRound('oddOneOut', PLATFORM))
-    // The first placement trial may land on a turned-shape round (level 4+, 35%): its rule card comes first.
+    // Placement blocks every unseen rule, so no card should come; acknowledge one if it does.
     if (result.current.intro) act(() => result.current.ackIntro())
     // Either way the level stays hidden: it is "finding your start" until the staircase takes over.
     expect(result.current.placing).toBe(true)
@@ -458,6 +356,36 @@ describe('the board games\' new round logic (GAMES_DIFFICULTY_PLAN §2.3-2.9)', 
     restore()
   })
 
+  it('Odd One Out: a new player placed mid-way up the mirror tier meets the mirror on 4 cards first, then on the level’s own board', () => {
+    seed()
+    const { result } = renderHook(() => useBrainRound('oddOneOut', PLATFORM))
+    // Right on every board without colour noise, wrong on every one with it (tier 5 on): placement
+    // hands over inside the mirror tier, past its 2×2 level, the mirror blocked all through placement.
+    const play = () => {
+      const r = result.current
+      const taps = r.solution
+      if (!taps || !taps.length || r.result) return advance(100)
+      const v = r.view
+      const inked = v.kind === 'grid' && v.cells.some((c) => c.ink)
+      act(() => r.tap(inked && v.kind === 'grid' ? (taps[0] + 1) % v.cells.length : taps[0]))
+    }
+    let card: { view: RoundView; level: number } | null = null
+    for (let guard = 0; guard < 3000 && !card && !result.current.over; guard++) {
+      const r = result.current
+      if (r.intro) {
+        if (r.intro.tag === 'oddOneOut.mirror') card = { view: r.view, level: r.level }
+        else act(() => r.ackIntro())
+      } else play()
+    }
+    expect(card?.level).toBeGreaterThanOrEqual(17)
+    expect(card?.level).toBeLessThan(21)
+    expect(card?.view.kind === 'grid' && [card.view.cols, card.view.rows]).toEqual([2, 2])
+    act(() => result.current.ackIntro())
+    for (let guard = 0; guard < 200 && result.current.trialKind !== 'counted'; guard++) play()
+    const next = result.current.view
+    expect(next.kind === 'grid' && next.cols).toBeGreaterThan(2)
+  })
+
   it('Number Hunt places in three graded boards: a fast perfect player hands over well up', () => {
     seed()
     const { result } = renderHook(() => useBrainRound('schulte', PLATFORM))
@@ -671,7 +599,8 @@ describe('the board games\' new round logic (GAMES_DIFFICULTY_PLAN §2.3-2.9)', 
   it("a v1 save shaped like the owner's (Quick Math L3, no estimate) opens on placement, from its converted level", () => {
     const v1 = JSON.stringify({ v: 1, games: { math: { level: 3, bestLevel: 3.4, rounds: 120, wins: 100 } }, practiced: ['math'], sessions: {}, quickEyeField: 2 })
     const progress = parseProgress(v1)
-    expect(progress.v).toBe(2)
+    // Written as the current format (v3 since the thinking games), levels on the v2 scale.
+    expect(progress.v).toBe(3)
     expect(progress.games.math?.level).toBeCloseTo(2.35)
     useBrainStore.setState({ progress, meta: parseMeta(JSON.stringify({ v: 1, seen: '' })), history: emptyHistory(), storageKey: 'test' })
     const { calls, restore } = spyCreates('math')
@@ -845,369 +774,5 @@ describe('game logic across rounds', () => {
     const again = renderHook(() => useBrainRound('stroop', PLATFORM))
     playRound(again.result)
     expect(again.result.current.stats.achievements).not.toContain('firstClear')
-  })
-})
-
-// ── Quick Eye (the redesign: practice V1 → V2, eased rule trials, placement, no lives, stage-ups) ──
-
-type Round = { current: ReturnType<typeof useBrainRound> }
-const FRAME = 1000 / 60
-
-/**
- * One step of a Quick Eye round: acknowledge a card, report the flash exactly as asked, answer
- * (with `answer`, given the right taps — by default right), or let 50ms pass.
- */
-function qeStep(result: Round, answer: (taps: number[], r: ReturnType<typeof useBrainRound>) => number = (taps) => taps[0]) {
-  const r = result.current
-  if (r.intro) return void act(() => r.ackIntro())
-  const v = r.view
-  if (v.kind === 'quickEye' && v.phase === 'stimulus' && !r.result && !r.paused) return void act(() => r.reportExposure(v.exposureMs, FRAME))
-  const taps = r.solution
-  if (taps && taps.length && !r.result) return void act(() => r.tap(answer(taps, r)))
-  advance(50)
-}
-
-/** The centre right, the star's direction wrong: one of two answers. */
-const halfRight = (taps: number[], r: ReturnType<typeof useBrainRound>) => (r.view.kind === 'quickEye' && r.view.phase === 'answerLocation' ? (taps[0] + 4) % 8 : taps[0])
-/** Both answers wrong. */
-const allWrong = (taps: number[], r: ReturnType<typeof useBrainRound>) => (r.view.kind === 'quickEye' && r.view.phase === 'answerLocation' ? (taps[0] + 4) % 8 : 1 - taps[0])
-
-function seenExcept(...tags: string[]) {
-  return MECHANICS.reduce((mask, m, bit) => (tags.includes(m.tag) ? mask : setBit(mask, bit)), '')
-}
-
-describe('Quick Eye rounds', () => {
-  it('a first round: centre-alone practice, shorter each time → the periphery card on the first variant-2 trial → four eased trials 500 → 267ms → placement, none in the stage window', () => {
-    seed((p) => ({ ...p, practiced: p.practiced.filter((g) => g !== 'quickEye') }))
-    const { result } = renderHook(() => useBrainRound('quickEye', PLATFORM))
-    const trials: { kind: string; ms: number; variant: number }[] = []
-    let card: string | null = null
-    let seenTrial = -1
-    for (let guard = 0; guard < 4000 && result.current.trialKind !== 'placement'; guard++) {
-      const r = result.current
-      if (r.trialId !== seenTrial && r.view.kind === 'quickEye') {
-        seenTrial = r.trialId
-        trials.push({ kind: r.trialKind, ms: r.view.exposureMs, variant: r.view.variant })
-      }
-      if (r.intro) {
-        card = r.intro.tag
-        // Still "finding your start": no level shown.
-        expect(r.placing).toBe(true)
-      }
-      qeStep(result)
-    }
-    expect(trials.filter((t) => t.kind === 'practice')).toEqual([
-      { kind: 'practice', ms: 500, variant: 1 },
-      { kind: 'practice', ms: 400, variant: 1 },
-    ])
-    expect(card).toBe('quickEye.periphery')
-    const intro = trials.filter((t) => t.kind === 'intro')
-    expect(intro.map((t) => t.ms)).toEqual([500, 400, 333, 267])
-    expect(intro.every((t) => t.variant === 2)).toBe(true)
-    // Placement opens where the ramp ended, on variant 2; nothing so far fed the stage window.
-    const v = result.current.view
-    expect(v.kind === 'quickEye' && [v.exposureMs, v.variant]).toEqual([267, 2])
-    expect(result.current.stage).toBe(2)
-    expect(result.current.speed).toBeNull()
-    expect(useBrainStore.getState().progress.quickEye.recentMs).toEqual([])
-    // Practice met the redesigned field silently: no notice, and no recalibration ever.
-    expect(hasBit(useBrainStore.getState().meta.seen, mechanicInfo('quickEye.clearView')!.bit)).toBe(true)
-    expect(result.current.toast).toBeNull()
-    // Through placement to the counted leg: still nothing in the window until a counted trial.
-    for (let guard = 0; guard < 4000 && result.current.trialKind !== 'counted'; guard++) qeStep(result)
-    expect(useBrainStore.getState().progress.quickEye.recentMs).toEqual([])
-    expect(useBrainStore.getState().progress.quickEye.variant).toBe(2)
-    expect(result.current.speed).not.toBeNull()
-    expect(result.current.maxLives).toBe(0)
-    expect(result.current.roundCap).toBe(20)
-    for (let guard = 0; guard < 400 && !result.current.result; guard++) qeStep(result)
-    expect(useBrainStore.getState().progress.quickEye.recentMs).toHaveLength(1)
-  })
-
-  it('a placement that could not yet place the star sends a slow start to variant 1, silently', () => {
-    seed((p) => ({ ...p, practiced: p.practiced.filter((g) => g !== 'quickEye') }), { ...emptyMeta(), seen: seenExcept() })
-    const { result } = renderHook(() => useBrainRound('quickEye', PLATFORM))
-    let placementTrials = 0
-    let seenTrial = -1
-    for (let guard = 0; guard < 6000 && result.current.trialKind !== 'counted'; guard++) {
-      const r = result.current
-      if (r.trialId !== seenTrial) {
-        seenTrial = r.trialId
-        if (r.trialKind === 'placement') placementTrials++
-      }
-      qeStep(result, r.trialKind === 'placement' ? halfRight : undefined)
-    }
-    expect(placementTrials).toBeGreaterThanOrEqual(6)
-    expect(placementTrials).toBeLessThanOrEqual(10)
-    expect(useBrainStore.getState().progress.quickEye.variant).toBe(1)
-    const v = result.current.view
-    expect(v.kind === 'quickEye' && [v.variant, v.asksLocation]).toEqual([1, false])
-    // Going down a stage is not a stage-up.
-    expect(result.current.stageUp).toBeNull()
-  })
-
-  it('a stage reached opens the interstitial between trials, paused; it clears on a tap or by itself, and a rule card after it keeps the round paused', () => {
-    // Variant 2 at 100ms, fifteen right in a row: one more right passes on the evidence criterion.
-    const window = (p: BrainProgress, variant: number): BrainProgress => ({
-      ...p,
-      games: { ...p.games, quickEye: { level: 7, bestLevel: 7, rounds: 50, wins: 45 } },
-      quickEye: { variant, recentMs: Array.from({ length: 15 }, () => 100), recentOk: '1'.repeat(15), thresholdMs: null },
-    })
-    seedQe((p) => window(p, 2))
-    const a = renderHook(() => useBrainRound('quickEye', PLATFORM))
-    for (let guard = 0; guard < 400 && !a.result.current.stageUp; guard++) qeStep(a.result)
-    expect(useBrainStore.getState().progress.quickEye.variant).toBe(3)
-    expect(a.result.current.stageUp).toMatchObject({ from: 2, to: 3, variant: 3, knob: 'ring2', ruleFollows: false })
-    // Paused, but not a pause the player made; nothing runs under it.
-    expect(a.result.current.paused).toBe(false)
-    expect(a.result.current.canPause).toBe(false)
-    expect(a.result.current.quiet).toBe(false)
-    advance(1500)
-    expect(a.result.current.view.kind === 'quickEye' && a.result.current.view.phase).toBe('fixation')
-    act(() => a.result.current.ackStageUp())
-    expect(a.result.current.stageUp).toBeNull()
-    expect(a.result.current.quiet).toBe(true)
-    advance(600)
-    expect(a.result.current.view.kind === 'quickEye' && a.result.current.view.phase).not.toBe('fixation')
-    a.unmount()
-
-    // It clears by itself after two seconds; the new stage starts three levels easier.
-    seedQe((p) => window(p, 2))
-    const b = renderHook(() => useBrainRound('quickEye', PLATFORM))
-    for (let guard = 0; guard < 400 && !b.result.current.stageUp; guard++) qeStep(b.result)
-    expect(b.result.current.level).toBeLessThan(5)
-    advance(2000)
-    expect(b.result.current.stageUp).toBeNull()
-    b.unmount()
-
-    // Variant 4 → 5 brings distractors, a new rule: its card follows, the round stays paused.
-    seed((p) => window(p, 4))
-    useBrainStore.setState((st) => ({ meta: { ...st.meta, seen: seenExcept('quickEye.distractors') } }))
-    const c = renderHook(() => useBrainRound('quickEye', PLATFORM))
-    for (let guard = 0; guard < 400 && !c.result.current.stageUp; guard++) qeStep(c.result)
-    expect(c.result.current.stageUp).toMatchObject({ from: 4, to: 5, knob: 'crowd', ruleFollows: true })
-    expect(c.result.current.intro?.tag).toBe('quickEye.distractors')
-    act(() => c.result.current.ackStageUp())
-    expect(c.result.current.intro).not.toBeNull()
-    advance(3000)
-    expect(c.result.current.view.kind === 'quickEye' && c.result.current.view.phase).toBe('fixation')
-    act(() => c.result.current.ackIntro())
-    expect(c.result.current.quiet).toBe(true)
-  })
-
-  it('the reveal can be skipped from 500ms after the answer, not before', () => {
-    seedQe((p) => ({ ...p, games: { ...p.games, quickEye: { level: 5, bestLevel: 5, rounds: 30, wins: 24 } }, quickEye: { ...p.quickEye, variant: 3 } }))
-    const { result } = renderHook(() => useBrainRound('quickEye', PLATFORM))
-    for (let guard = 0; guard < 400 && !result.current.result; guard++) qeStep(result)
-    const trial = result.current.trialId
-    advance(300)
-    act(() => result.current.skipReveal())
-    advance(1)
-    expect(result.current.trialId).toBe(trial)
-    expect(result.current.result).not.toBeNull()
-    advance(200)
-    act(() => result.current.skipReveal())
-    advance(1)
-    expect(result.current.trialId).toBe(trial + 1)
-    expect(result.current.result).toBeNull()
-  })
-
-  it('flashes start at least 1.5s apart even answering at once and skipping every reveal (the flicker gate asks ≥ 1s)', () => {
-    seedQe((p) => ({ ...p, games: { ...p.games, quickEye: { level: 6, bestLevel: 6, rounds: 30, wins: 24 } }, quickEye: { ...p.quickEye, variant: 3 } }))
-    const { result } = renderHook(() => useBrainRound('quickEye', PLATFORM))
-    const onsets: number[] = []
-    let phase: string | null = null
-    for (let guard = 0; guard < 4000 && onsets.length < 8; guard++) {
-      const r = result.current
-      const v = r.view
-      if (v.kind === 'quickEye' && v.phase !== phase) {
-        phase = v.phase
-        if (v.phase === 'stimulus') onsets.push(Date.now())
-      }
-      if (r.result) {
-        act(() => r.skipReveal())
-        advance(10)
-        continue
-      }
-      if (v.kind === 'quickEye' && v.phase === 'stimulus') {
-        act(() => r.reportExposure(v.exposureMs, FRAME))
-        continue
-      }
-      const taps = r.solution
-      if (taps && taps.length) act(() => r.tap(taps[0]))
-      else advance(10)
-    }
-    const gaps = onsets.slice(1).map((t, i) => t - onsets[i])
-    expect(gaps.length).toBe(7)
-    expect(Math.min(...gaps)).toBeGreaterThanOrEqual(1500)
-  })
-
-  it('a voided flash (no mask, no answer) is still followed by the next one at least 1s later', () => {
-    seedQe((p) => ({ ...p, games: { ...p.games, quickEye: { level: 11, bestLevel: 11, rounds: 30, wins: 24 } }, quickEye: { ...p.quickEye, variant: 3 } }))
-    const { result } = renderHook(() => useBrainRound('quickEye', PLATFORM))
-    const onsets: number[] = []
-    let phase: string | null = null
-    let flashes = 0
-    for (let guard = 0; guard < 4000 && onsets.length < 6; guard++) {
-      const r = result.current
-      const v = r.view
-      if (v.kind === 'quickEye' && v.phase !== phase) {
-        phase = v.phase
-        if (v.phase === 'stimulus') onsets.push(Date.now())
-      }
-      if (r.result) {
-        advance(10)
-        continue
-      }
-      if (v.kind === 'quickEye' && v.phase === 'stimulus') {
-        // Every other flash two frames long (a dropped frame at 33ms): voided.
-        flashes++
-        act(() => r.reportExposure(flashes % 2 ? v.exposureMs + 2 * FRAME : v.exposureMs, FRAME))
-        continue
-      }
-      const taps = r.solution
-      if (taps && taps.length) act(() => r.tap(taps[0]))
-      else advance(10)
-    }
-    const gaps = onsets.slice(1).map((t, i) => t - onsets[i])
-    expect(gaps.length).toBe(5)
-    // The fake clock does not run during the flash itself, so the real gap is this plus the flash.
-    expect(Math.min(...gaps)).toBeGreaterThanOrEqual(1000)
-  })
-
-  it('one of two answers right keeps the run (no growth, no break); the leg bar marks each counted trial', () => {
-    seedQe((p) => ({ ...p, games: { ...p.games, quickEye: { level: 4, bestLevel: 4, rounds: 30, wins: 24 } }, quickEye: { ...p.quickEye, variant: 3 } }))
-    const { result } = renderHook(() => useBrainRound('quickEye', PLATFORM))
-    // One trial to its result, then past the longest reveal (1600ms) to the next.
-    const play = (answer?: Parameters<typeof qeStep>[1]) => {
-      for (let guard = 0; guard < 400 && !result.current.result; guard++) qeStep(result, answer)
-      const res = result.current.result!
-      advance(1700)
-      return res
-    }
-    play()
-    play()
-    expect(result.current.stats.streak).toBe(2)
-    const half = play(halfRight)
-    expect(half).toMatchObject({ correct: false, accuracy: 0.5, points: 0 })
-    expect(result.current.stats.streak).toBe(2)
-    play()
-    expect(result.current.stats.streak).toBe(3)
-    play(allWrong)
-    expect(result.current.stats.streak).toBe(0)
-    expect(result.current.legMarks).toEqual(['ok', 'ok', 'half', 'ok', 'miss'])
-    // Points by stage and speed level: a right answer at variant 3 scores at least 10 + 40·2.
-    expect(result.current.stats.score.base).toBeGreaterThanOrEqual(3 * 90)
-  })
-
-  it('no lives: twenty misses never end the leg early — it ends at its cap of 20, with no "without a chance lost" bonus', () => {
-    seedQe((p) => ({ ...p, games: { ...p.games, quickEye: { level: 3, bestLevel: 3, rounds: 30, wins: 24 } }, quickEye: { ...p.quickEye, variant: 3 } }))
-    const missing = renderHook(() => useBrainRound('quickEye', PLATFORM))
-    for (let guard = 0; guard < 20_000 && !missing.result.current.done; guard++) qeStep(missing.result, allWrong)
-    expect(missing.result.current.stats).toMatchObject({ endedBy: 'cap', trials: 20, cleared: false })
-    expect(missing.result.current.lives).toBe(0)
-    expect(missing.result.current.maxLives).toBe(0)
-    missing.unmount()
-
-    seedQe((p) => ({ ...p, games: { ...p.games, quickEye: { level: 3, bestLevel: 3, rounds: 30, wins: 24 } }, quickEye: { ...p.quickEye, variant: 3 } }))
-    const clean = renderHook(() => useBrainRound('quickEye', PLATFORM))
-    for (let guard = 0; guard < 20_000 && !clean.result.current.done; guard++) qeStep(clean.result)
-    const s = clean.result.current.stats
-    expect(s).toMatchObject({ endedBy: 'cap', trials: 20, cleared: true })
-    expect(s.score.clear).toBeGreaterThan(0)
-    expect(s.score.clean).toBe(0)
-    expect(s.rungUps).toBeGreaterThan(0)
-  })
-
-  it('a returning player meets the redesigned field once: a notice, two levels easier, the stage kept', () => {
-    const record = (p: BrainProgress): BrainProgress => ({ ...p, games: { ...p.games, quickEye: { level: 8, bestLevel: 9, rounds: 60, wins: 48 } }, quickEye: { ...p.quickEye, variant: 7 } })
-    seed(record)
-    useBrainStore.setState((st) => ({ meta: { ...st.meta, seen: seenExcept('quickEye.clearView') } }))
-    const first = renderHook(() => useBrainRound('quickEye', PLATFORM))
-    expect(first.result.current.stats.levelStart).toBe(6)
-    expect(first.result.current.stage).toBe(7)
-    expect(first.result.current.toast?.copy).toBe('quickEye.clearView')
-    expect(hasBit(useBrainStore.getState().meta.seen, mechanicInfo('quickEye.clearView')!.bit)).toBe(true)
-    first.unmount()
-    const again = renderHook(() => useBrainRound('quickEye', PLATFORM))
-    expect(again.result.current.stats.levelStart).toBe(8)
-    expect(again.result.current.toast).toBeNull()
-  })
-
-  it('fx: while the stimulus and the mask are up only the silent "stimulus" event; the ready cue once as each fixation starts', () => {
-    seedQe((p) => ({ ...p, games: { ...p.games, quickEye: { level: 5, bestLevel: 5, rounds: 30, wins: 24 } }, quickEye: { ...p.quickEye, variant: 6 } }))
-    const log: { fx: BrainFx; phase: string }[] = []
-    const { result } = renderHook(() => {
-      const r = useBrainRound('quickEye', PLATFORM)
-      useBrainFx(r, (fx) => log.push({ fx, phase: r.view.kind === 'quickEye' ? r.view.phase : '' }))
-      return r
-    })
-    let trials = 0
-    for (let guard = 0; guard < 4000 && trials < 5; guard++) {
-      const before = result.current.trialId
-      qeStep(result, (taps, r) => (r.trialId % 2 ? taps[0] : halfRight(taps, r)))
-      if (result.current.trialId !== before) trials++
-    }
-    const measured = log.filter((e) => e.phase === 'stimulus' || e.phase === 'mask')
-    expect(measured.length).toBeGreaterThan(0)
-    expect(measured.every((e) => e.fx.kind === 'stimulus')).toBe(true)
-    expect(log.filter((e) => e.fx.kind === 'fixation')).toHaveLength(trials + 1)
-    expect(log.filter((e) => e.fx.kind === 'fixation').every((e) => e.phase === 'fixation')).toBe(true)
-  })
-})
-
-describe('web sounds during Quick Eye', () => {
-  afterEach(() => vi.unstubAllGlobals())
-
-  it("the flash is never sounded, and while the display is measured only the ready cue plays", async () => {
-    // A Web Audio stand-in that counts voices (every sound starts at least one oscillator).
-    let voices = 0
-    let stops = 0
-    const param = () => ({ value: 0, setValueAtTime: () => {}, exponentialRampToValueAtTime: () => {} })
-    const node = () => ({ connect: <T,>(next: T) => next })
-    class FakeAudioContext {
-      state = 'running'
-      currentTime = 0
-      sampleRate = 44_100
-      destination = {}
-      resume = () => Promise.resolve()
-      createDynamicsCompressor = () => ({ ...node(), threshold: param(), ratio: param() })
-      createGain = () => ({ ...node(), gain: param() })
-      createOscillator = () => {
-        voices++
-        return { ...node(), type: 'sine', frequency: param(), start: () => {}, stop: () => void stops++ }
-      }
-    }
-    vi.stubGlobal('AudioContext', FakeAudioContext)
-    const { sfx } = await import('../../components/brain/sfx')
-    sfx.enabled = true
-    sfx.unlock()
-
-    sfx.play({ kind: 'stimulus' })
-    expect(voices).toBe(0)
-
-    sfx.quiet = true
-    sfx.play({ kind: 'correct', streak: 3, points: 40, practice: false })
-    sfx.play({ kind: 'nearMiss', practice: false })
-    sfx.play({ kind: 'levelUp', level: 5 })
-    sfx.rungUp()
-    sfx.nearMiss()
-    sfx.stageUp(true)
-    expect(voices).toBe(0)
-    sfx.play({ kind: 'fixation' })
-    expect(voices).toBe(1)
-
-    sfx.quiet = false
-    sfx.play({ kind: 'nearMiss', practice: false })
-    sfx.stageUp(true)
-    expect(voices).toBeGreaterThan(1)
-
-    // A stage-up tapped away at once: its chord is still ringing (and its top note still to come)
-    // when the next fixation turns the round quiet — every voice is cut then, before the flash.
-    // (This stand-in never ends a voice, so every one started so far is still ringing.)
-    const stopsBefore = stops
-    sfx.quiet = true
-    expect(stops - stopsBefore).toBe(voices)
-    sfx.quiet = false
   })
 })

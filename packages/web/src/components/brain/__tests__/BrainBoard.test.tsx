@@ -27,7 +27,7 @@ function choice(over: Partial<ChoiceView> = {}, stimulus: Partial<ChoiceView['st
 }
 
 function draw(view: GridView | ChoiceView, onTap: (i: number) => void = noop, extra: { demo?: boolean; onSkip?: () => void } = {}) {
-  return render(<BrainBoard view={view} onTap={onTap} onExposure={noop} width={390} theme={GAME_THEMES.oddOneOut} {...extra} />)
+  return render(<BrainBoard view={view} onTap={onTap} width={390} theme={GAME_THEMES.oddOneOut} {...extra} />)
 }
 
 describe('BrainBoard — grid fields', () => {
@@ -226,24 +226,24 @@ describe('BrainBoard — choice fields', () => {
 
   it('Color Word: the cue strip, the hidden word during the lead, the frame ring', () => {
     const onTap = vi.fn()
-    const { unmount } = draw(choice({ options: [{ textKey: 'colors.red' }, { textKey: 'colors.blue' }] }, { text: undefined, textKey: 'colors.red', color: 'blue', cue: 'word', hidden: true }), onTap)
+    const { unmount } = draw(choice({ options: [{ textKey: 'colors.black' }, { textKey: 'colors.blue' }] }, { text: undefined, textKey: 'colors.black', color: 'blue', cue: 'word', hidden: true }), onTap)
     expect(screen.getByTestId('brain-cue').getAttribute('data-cue')).toBe('word')
     expect(screen.getByTestId('brain-cue').textContent).toContain('play.cueWord')
-    expect(screen.getByTestId('brain-stimulus').textContent).not.toContain('colors.red')
+    expect(screen.getByTestId('brain-stimulus').textContent).not.toContain('colors.black')
     expect(screen.getByTestId('brain-option-0')).toBeDisabled()
     fireEvent.keyDown(window, { key: '1' })
     expect(onTap).not.toHaveBeenCalled()
     unmount()
-    draw(choice({ options: [{ textKey: 'colors.red' }, { textKey: 'colors.blue' }] }, { text: undefined, textKey: 'colors.red', color: 'blue', cue: 'ink', frame: 'green' }), onTap)
-    expect(screen.getByTestId('brain-stimulus').textContent).toContain('colors.red')
-    expect(screen.getByTestId('brain-stimulus').getAttribute('data-frame')).toBe('green')
+    draw(choice({ options: [{ textKey: 'colors.black' }, { textKey: 'colors.blue' }] }, { text: undefined, textKey: 'colors.black', color: 'blue', cue: 'ink', frame: 'brown' }), onTap)
+    expect(screen.getByTestId('brain-stimulus').textContent).toContain('colors.black')
+    expect(screen.getByTestId('brain-stimulus').getAttribute('data-frame')).toBe('brown')
     expect(screen.getByTestId('brain-stimulus').style.boxShadow).toContain('inset 0 0 0 12px')
     fireEvent.keyDown(window, { key: '2' })
     expect(onTap).toHaveBeenCalledWith(1)
   })
 
   it('coloured labels are ink on a white tile', () => {
-    draw(choice({ options: [{ textKey: 'colors.red', color: 'purple' }, { textKey: 'colors.blue', color: 'orange' }] }, { text: undefined, textKey: 'colors.red', color: 'blue' }))
+    draw(choice({ options: [{ textKey: 'colors.black', color: 'purple' }, { textKey: 'colors.blue', color: 'orange' }] }, { text: undefined, textKey: 'colors.black', color: 'blue' }))
     const option = screen.getByTestId('brain-option-0')
     expect(option.style.background).toBe('rgb(255, 255, 255)')
     expect(option.getAttribute('data-color')).toBe('purple')
@@ -252,7 +252,7 @@ describe('BrainBoard — choice fields', () => {
   it('after a wrong pick the reveal prompt shows, and the reveal can be skipped', () => {
     const onSkip = vi.fn()
     draw(
-      choice({ options: [{ textKey: 'colors.red' }, { textKey: 'colors.purple' }], picked: 0, correctIndex: 1 }, { text: undefined, textKey: 'colors.red', color: 'purple', reveal: { prompt: { key: 'play.inkWas', params: { color: 'colors.purple' } } } }),
+      choice({ options: [{ textKey: 'colors.black' }, { textKey: 'colors.purple' }], picked: 0, correctIndex: 1 }, { text: undefined, textKey: 'colors.black', color: 'purple', reveal: { prompt: { key: 'play.inkWas', params: { color: 'colors.purple' } } } }),
       noop,
       { onSkip },
     )

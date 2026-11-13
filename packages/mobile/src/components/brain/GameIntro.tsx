@@ -4,13 +4,13 @@ import Animated from 'react-native-reanimated'
 import { Feather } from '@expo/vector-icons'
 import { useTranslation } from 'react-i18next'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
-import { GAME_THEMES, displayLevel, gameProgress, quickEyeStage, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
+import { GAME_THEMES, displayLevel, gameProgress, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
 import { CanvasButton, GameCanvas, GradientFill, StatTile } from './GameCanvas'
 import { DemoPlayer } from './DemoPlayer'
 import { useMotion } from './motion'
 import { gameIcon, type FeatherName } from './brain-ui'
-import { TierBar, TierMedal, backAfterBreak, opensWithPlacement, qeSpeedLevel, tierA11y, tierName, tierStanding } from './tier-ui'
+import { TierBar, TierMedal, backAfterBreak, opensWithPlacement, tierA11y, tierName, tierStanding } from './tier-ui'
 
 const PADDING = 16
 
@@ -47,7 +47,6 @@ export function GameIntro({
   const welcomeBack = !placementNote && backAfterBreak(gameId, meta)
   const best = progress.bestRuns[gameId]
   const firstTime = !progress.practiced.includes(gameId)
-  const qe = gameId === 'quickEye'
   const [width, setWidth] = useState<number | null>(null)
   const rise = useMotion('rise', gameId)
 
@@ -114,32 +113,30 @@ export function GameIntro({
                 {t('intro.howTo')}
               </Text>
               {width !== null ? (
-                <DemoPlayer gameId={gameId} width={width} centerOnly={progress.settings.centerOnly} variant={qe ? progress.quickEye.variant : undefined} />
+                <DemoPlayer gameId={gameId} width={width} />
               ) : null}
             </View>
 
             <View style={styles.stats}>
               <StatTile
                 icon="activity"
-                label={qe ? t('intro.speed') : t('intro.level')}
-                // Quick Eye: its speed level 0-11 — never a flash time. No level yet for a game never
-                // played or a placement left part-way (n = 0) — not its interim probe level.
-                value={p.rounds > 0 && meta.sk[gameId]?.n !== 0 ? (qe ? formatCount(qeSpeedLevel(p.level)) : displayLevel(p.level).toFixed(1)) : '—'}
+                label={t('intro.level')}
+                // No level yet for a game never played or a placement left part-way (n = 0) — not
+                // its interim probe level.
+                value={p.rounds > 0 && meta.sk[gameId]?.n !== 0 ? displayLevel(p.level).toFixed(1) : '—'}
                 accent={theme.accent}
                 center
               />
-              {/* Quick Eye's stage as the round's header shows it (on the centre-only setting, the centre task's). */}
               <StatTile
                 icon="layers"
-                label={qe ? t('intro.stage') : t('intro.rounds')}
-                value={qe ? formatCount(quickEyeStage(progress.quickEye.variant, progress.settings.centerOnly)) : formatCount(p.rounds)}
+                label={t('intro.rounds')}
+                value={formatCount(p.rounds)}
                 accent={theme.accent}
                 center
               />
               <StatTile icon="award" label={t('intro.best')} value={best ? formatCount(best) : '—'} accent={theme.accent} center />
             </View>
 
-            {/* No "turn your phone sideways" line for Quick Eye, unlike the web: the app is portrait-only. */}
             {firstTime || placementNote || welcomeBack ? (
               <View style={styles.notes}>
                 {firstTime ? <Note icon="edit-3" text={t('intro.practiceNote')} /> : null}

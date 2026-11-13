@@ -15,7 +15,7 @@ const DEMO_MAX_ROWS = 4
  * a pointer makes each tap. It loops until the player starts; under reduced motion it holds each
  * frame longer and the pointer jumps instead of gliding.
  */
-export function DemoPlayer({ gameId, width, centerOnly = false, variant }: { gameId: BrainGameId; width: number; centerOnly?: boolean; /** Quick Eye: the player's stage, so the demo shows the task they will play. */ variant?: number }) {
+export function DemoPlayer({ gameId, width }: { gameId: BrainGameId; width: number }) {
   const { t } = useTranslation('brain')
   const reduced = useReducedMotion()
   const theme = GAME_THEMES[gameId]
@@ -23,16 +23,16 @@ export function DemoPlayer({ gameId, width, centerOnly = false, variant }: { gam
   const boardWidth = Math.min(width - 34, 300)
   const frames = useMemo(
     // At most 4×4 (the demo box is 300×260): an easy board, the same on every screen.
-    () => buildDemo(gameId, { maxCols: Math.min(4, maxColsFor(boardWidth)), maxRows: DEMO_MAX_ROWS, centerOnly, ...(variant !== undefined ? { variant } : {}) }),
-    [gameId, boardWidth, centerOnly, variant],
+    () => buildDemo(gameId, { maxCols: Math.min(4, maxColsFor(boardWidth)), maxRows: DEMO_MAX_ROWS }),
+    [gameId, boardWidth],
   )
   const [i, setI] = useState(0)
   const [run, setRun] = useState(0)
   const box = useRef<HTMLDivElement>(null)
   const [pointer, setPointer] = useState<{ x: number; y: number; press: boolean } | null>(null)
-  // The demo's frames differ in height (Quick Eye's answers appear below its field): hold the
-  // tallest seen so far, so the page under the demo never jumps.
-  const minH = useRef(gameId === 'quickEye' ? 340 : 220)
+  // The demo's frames can differ in height (a strip or a reveal appears): hold the tallest seen so
+  // far, so the page under the demo never jumps.
+  const minH = useRef(220)
   const frame = frames[Math.min(i, frames.length - 1)]
 
   useEffect(() => {
@@ -66,7 +66,7 @@ export function DemoPlayer({ gameId, width, centerOnly = false, variant }: { gam
   return (
     <div className="relative rounded-3xl p-4 bg-white/[0.06] border border-white/10">
       <div ref={box} className="relative flex items-center justify-center" style={{ pointerEvents: 'none' }} aria-hidden="true">
-        <BrainBoard view={frame.view} onTap={noop} onExposure={noop} width={boardWidth} theme={theme} demo maxHeight={260} />
+        <BrainBoard view={frame.view} onTap={noop} width={boardWidth} theme={theme} demo maxHeight={260} />
         {pointer && frame.tap !== undefined && (
           <span
             className="absolute z-10 text-white drop-shadow-[0_4px_10px_rgba(0,0,0,0.6)]"

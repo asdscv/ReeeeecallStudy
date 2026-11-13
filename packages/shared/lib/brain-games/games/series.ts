@@ -7,19 +7,21 @@ import { GAP_ANYWHERE, SERIES_FAMILIES, buildSeriesRow, isSeriesFamily, seriesRe
  * A number pattern with one term missing. Inductive reasoning.
  *
  * The level picks a band of the content ladder (series-rules.ts): each band brings a rule family
- * — falling rows, ×2, alternating steps, growing steps, interleaved lines, the two before added …
- * — then the gap moves inside the row (21), then two families are interleaved (22–28). Every row
- * is checked against every rule a player might read in it and kept only when they all agree, and
- * the wrong options are what plausible wrong rules give.
+ * — falling rows, ×2, alternating steps, growing steps and triangular numbers, interleaved lines,
+ * the two before added, primes, products, digit sums, prime gaps … — then the gap moves inside the
+ * row (21), then two families are interleaved (22–29), and at the top (30–31) one of the newest
+ * families sits under a second hard line. Every row is checked against every rule a player might
+ * read in it and kept only when they all agree, and the wrong options are what plausible wrong
+ * rules give.
  *
  * Most trials come from the player's own band, the three below mixed in for review; no band below
  * the current one comes twice in a row, and the current one never three times. Each band has its
  * own clock; the level's fraction tightens it.
  */
 
-export const SERIES_MAX_LEVEL = 28
-/** Band start levels: one per level to 21, then one every two levels. */
-export const SERIES_BANDS: readonly number[] = [...Array.from({ length: 21 }, (_, i) => i + 1), 22, 24, 26, 28]
+export const SERIES_MAX_LEVEL = 31
+/** Band start levels: one per level to 21, then one every two levels (the top band 30–31). */
+export const SERIES_BANDS: readonly number[] = [...Array.from({ length: 21 }, (_, i) => i + 1), 22, 24, 26, 28, 30]
 
 /** Shares over the current band and one, two and three below (renormalised where fewer exist). */
 const WEIGHTS = [55, 25, 12, 8] as const

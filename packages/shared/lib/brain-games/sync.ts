@@ -1,4 +1,4 @@
-import type { BrainGameId } from './types'
+import type { BrainGameId, RetiredGameId } from './types'
 import { type BrainProgress, type GameProgress, type SessionLog, emptyProgress, parseProgress } from './progress'
 import { type BrainHistory, type HistoryEntry, HISTORY_PER_GAME, parseHistory } from './history'
 import { type BrainMeta, type SkillEstimate, emptyMeta, orMask, parseMeta } from './meta'
@@ -22,10 +22,16 @@ import { BRAIN_GAMES } from './catalog'
  * 2: the hard-content change moved the board games' levels to a new scale (scale.ts). A v1 copy is
  * converted once on reading; an app that only knows v1 stops syncing ('outdated') rather than push
  * old-scale levels over it, and migration 288 refuses any write with a lower `v` than stored.
+ * 3 (2026-11-13): the four thinking games (setMatch, codeBreak, makeNumber, mazeRun). A v2 app's
+ * parseMeta and parseHistory drop game ids it does not know, and its sync pushes the merged copy —
+ * so it would wipe the new games' estimates, tiers, practice and trends from the account (a fresh
+ * phone then re-places them, and a sticky tier is gone). At v3 that app stops syncing instead; its
+ * parseProgress kept unknown game ids, but all three move together so no client is half-locked.
+ * The content of a v2 document is valid v3 — reading it only changes the number.
  */
-export const BRAIN_PROGRESS_FORMAT = 2
-export const BRAIN_HISTORY_FORMAT = 2
-export const BRAIN_META_FORMAT = 2
+export const BRAIN_PROGRESS_FORMAT = 3
+export const BRAIN_HISTORY_FORMAT = 3
+export const BRAIN_META_FORMAT = 3
 /** Mirrors the CHECKs in migration 288 (octet_length of the jsonb text). */
 export const BRAIN_SAVE_MAX_BYTES = 16_384
 
@@ -170,7 +176,11 @@ export function fitsCloud(save: EncodedSave): boolean {
 // ── progress ────────────────────────────────────────────────────────────────
 
 type Side = 'local' | 'remote'
-export type GameSides = Partial<Record<BrainGameId, Side>>
+/** Per game id a save holds — a removed game's too (RETIRED_GAME_IDS), so its old record keeps merging. */
+export type GameSides = Partial<Record<BrainGameId | RetiredGameId, Side>>
+
+/** A save's game records by any id it holds, a removed game's included. */
+const savedGames = (p: BrainProgress) => p.games as Partial<Record<string, GameProgress>>
 
 /**
  * A true tie, broken the same way on both devices (the side whose value prints smaller), so two
@@ -191,7 +201,9 @@ function gameWinner(a: GameProgress | undefined, b: GameProgress | undefined): S
 }
 
 /**
- * Quick Eye's variant ladder and its game record travel together (opening a variant eases the level
+ * Quick Eye was removed by the owner (2026-11-13), but an app version that still has it may share
+ * the account, so an old save's record of it keeps merging as it always did — nothing here shows it.
+ * Its variant ladder and its game record travel together (opening a variant eases the level
  * back, so the pair must not be split). Higher variant first — picking by trials alone could drop a
  * player from variant 6 back to 5 — then more trials. Variants 1 and 2 rank together: 2 is where
  * every record starts (an empty one too) and 1 only where a slow first placement sends a player,
@@ -201,8 +213,8 @@ function quickEyeSide(local: BrainProgress, remote: BrainProgress): Side {
   const rank = (v: number) => Math.max(2, v)
   const [lv, rv] = [rank(local.quickEye.variant), rank(remote.quickEye.variant)]
   if (lv !== rv) return lv > rv ? 'local' : 'remote'
-  const a = local.games.quickEye
-  const b = remote.games.quickEye
+  const a = savedGames(local).quickEye
+  const b = savedGames(remote).quickEye
   // Neither has played: the same answer on both devices, never "keep mine" on each.
   if (!a && !b && local.quickEye.variant !== remote.quickEye.variant) return local.quickEye.variant > remote.quickEye.variant ? 'local' : 'remote'
   if (a && b && a.rounds === b.rounds && a.level === b.level) return tieSide({ a, q: local.quickEye }, { a: b, q: remote.quickEye })
@@ -212,8 +224,8 @@ function quickEyeSide(local: BrainProgress, remote: BrainProgress): Side {
 /** Per game, the side whose record survives — its skill estimate and per-game counters go with it. */
 export function gameSides(local: BrainProgress, remote: BrainProgress): GameSides {
   const sides: GameSides = {}
-  for (const id of new Set([...Object.keys(local.games), ...Object.keys(remote.games)]) as Set<BrainGameId>) {
-    sides[id] = id === 'quickEye' ? quickEyeSide(local, remote) : gameWinner(local.games[id], remote.games[id])
+  for (const id of new Set([...Object.keys(local.games), ...Object.keys(remote.games)]) as Set<BrainGameId | RetiredGameId>) {
+    sides[id] = id === 'quickEye' ? quickEyeSide(local, remote) : gameWinner(savedGames(local)[id], savedGames(remote)[id])
   }
   return sides
 }
@@ -263,7 +275,7 @@ function mergeSessions(a: SessionLog, b: SessionLog): SessionLog {
 /**
  * Local vs cloud, field by field:
  * - games: per game the side with more rounds (trials), tie → higher level; bestLevel is the max.
- * - Quick Eye (games.quickEye + quickEye): higher variant first, then more rounds.
+ * - Quick Eye, removed (an old save's games.quickEye + quickEye): higher variant first, then more rounds.
  * - totals: max · last day / streak / today: from the later day (same day: max) · bestRuns: max per mode
  * - practiced: union · sessions: see mergeSessions · settings: this device's (they are per device).
  * Fields this client does not merge yet keep the local value.
@@ -292,7 +304,7 @@ export function mergeProgress(local: BrainProgress, remote: BrainProgress, sides
 
   return {
     ...local,
-    v: 2,
+    v: 3,
     games,
     totalRounds: Math.max(local.totalRounds, remote.totalRounds),
     totalPoints: Math.max(local.totalPoints, remote.totalPoints),
@@ -337,7 +349,7 @@ export function mergeHistory(local: BrainHistory, remote: BrainHistory): BrainHi
     merged.sort((x, y) => x[0] - y[0] || (key(x) < key(y) ? -1 : key(x) > key(y) ? 1 : 0))
     rounds[id] = merged.slice(-HISTORY_PER_GAME)
   }
-  return { v: 2, rounds }
+  return { v: 3, rounds }
 }
 
 // ── meta ────────────────────────────────────────────────────────────────────
@@ -392,7 +404,7 @@ export function mergeMeta(local: BrainMeta, remote: BrainMeta, sides: GameSides 
   }
   return {
     ...local,
-    v: 2,
+    v: 3,
     sk,
     tier: maxPerGame(local.tier, remote.tier),
     seen: orMask(local.seen, remote.seen),
@@ -431,7 +443,6 @@ function setOrDrop<T>(map: Partial<Record<BrainGameId, T>>, id: BrainGameId, val
  */
 export function pinGame(merged: BrainSaveDocs, local: BrainSaveDocs, id: BrainGameId): BrainSaveDocs {
   const progress: BrainProgress = { ...merged.progress, games: setOrDrop(merged.progress.games, id, local.progress.games[id]) }
-  if (id === 'quickEye') progress.quickEye = local.progress.quickEye
   const meta: BrainMeta = {
     ...merged.meta,
     sk: setOrDrop(merged.meta.sk, id, local.meta.sk[id]),

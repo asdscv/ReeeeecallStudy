@@ -6,7 +6,9 @@ import type { BrainGameDef, CellView, CreateContext, GridView } from '../types'
  * The level is a fixed table, looked up with floor(level): the board size, the family the pictures
  * come from (mixed, one distinct family, or one look-alike family), whether a preview is shown and
  * how many mistakes the board allows. From L14 matches are sets of three. Every integer level
- * changes one of these, so a level means the same puzzle on every screen that can hold it.
+ * changes one of these, so a level means the same puzzle on every screen that can hold it. Past
+ * L18 the boards grow (owner 2026-11-13 «카드 갯수 더 늘리기»): 30 cards on five columns (L19–21),
+ * 36 on a 6×6 screen (L22–24) and 42 on a 7×6 one (L25–26).
  *
  * Turning over a card nobody has seen yet is exploring the board, not a mistake (EVIDENCE #39): a
  * mismatch only counts against the budget when it goes against what had been seen — this card was
@@ -52,7 +54,10 @@ export interface PairsRung {
   budget: number
 }
 
-/** The level table, L1 first. The plan's own rows; nothing past L18 (5 columns) or L16 (fewer). */
+/**
+ * The level table, L1 first. The plan's own rows to L18; L19–21 need five columns, L22–24 a 6×6
+ * screen and L25–26 a 7×6 one (either way round) — four columns stop at L16.
+ */
 export const PAIRS_LADDER: readonly PairsRung[] = [
   { size: 2, sets: 3, cols: 3, rows: 2, family: 'mixed', preview: true, budget: 2 },
   { size: 2, sets: 4, cols: 4, rows: 2, family: 'mixed', preview: true, budget: 2 },
@@ -72,7 +77,18 @@ export const PAIRS_LADDER: readonly PairsRung[] = [
   { size: 3, sets: 8, cols: 4, rows: 6, family: 'lookalike', preview: false, budget: 4 },
   { size: 3, sets: 10, cols: 5, rows: 6, family: 'distinct', preview: false, budget: 4 },
   { size: 3, sets: 10, cols: 5, rows: 6, family: 'lookalike', preview: false, budget: 4 },
+  { size: 2, sets: 15, cols: 5, rows: 6, family: 'distinct', preview: false, budget: 5 },
+  { size: 2, sets: 15, cols: 5, rows: 6, family: 'lookalike', preview: false, budget: 5 },
+  { size: 3, sets: 10, cols: 5, rows: 6, family: 'lookalike', preview: false, budget: 3 },
+  { size: 2, sets: 18, cols: 6, rows: 6, family: 'distinct', preview: false, budget: 5 },
+  { size: 2, sets: 18, cols: 6, rows: 6, family: 'lookalike', preview: false, budget: 5 },
+  { size: 3, sets: 12, cols: 6, rows: 6, family: 'lookalike', preview: false, budget: 4 },
+  { size: 2, sets: 21, cols: 7, rows: 6, family: 'lookalike', preview: false, budget: 5 },
+  { size: 3, sets: 14, cols: 7, rows: 6, family: 'lookalike', preview: false, budget: 4 },
 ]
+
+/** From this level a board must fit the screen as it is (no taller board): the 6×6 and 7×6 rows. */
+const FIT_FROM = 22
 
 /** The L1-2 preview: a 2-second look, a hint only. */
 export const PAIRS_PREVIEW_MS = 2000
@@ -80,15 +96,18 @@ export const PAIRS_PREVIEW_MS = 2000
 export const PAIRS_MISMATCH_MS = 650
 
 /**
- * Picture families: single code points, Unicode 11 or earlier (no 🫐 or 🛻, which older phones draw as
- * boxes), no faces. Distinct families are told apart at a glance; look-alike ones are not.
+ * Picture families: single code points drawn as emoji by default, Unicode 11 or earlier (no 🫐 or
+ * 🛻, which older phones draw as boxes), no faces. Distinct families are told apart at a glance —
+ * no near twins inside one (no wolf beside the dog, boar beside the pig, tomato beside the apple,
+ * brown lumps beside the coconut, two hockey sticks or two oval balls); look-alike ones are not. Each holds at least 21 — the
+ * 42-card boards' pairs.
  */
 export const PAIRS_FAMILIES = {
-  animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔'],
-  fruit: ['🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍈', '🥑'],
-  sports: ['⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🎱', '🏓', '🏸', '🥊', '⛳', '🎯', '🎳', '🛹', '🥌', '🏆'],
-  vehicles: ['🚗', '🚕', '🚙', '🚌', '🚎', '🚓', '🚑', '🚒', '🚐', '🚚', '🚛', '🚜', '🚘', '🚖', '🚔', '🚍'],
-  plants: ['🌸', '🌼', '🌻', '🌺', '🌷', '🌹', '🥀', '💐', '🌿', '🍀', '🍁', '🍂', '🌵', '🌴', '🌲', '🌳'],
+  animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐌', '🦋', '🐴', '🐢', '🐙', '🐧', '🐦', '🐝'],
+  fruit: ['🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍈', '🥑', '🍆', '🌽', '🥕', '🥒', '🥦', '🧀', '🥚', '🍩'],
+  sports: ['⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🎱', '🏓', '🏸', '🥊', '⛳', '🎯', '🎳', '🛹', '🥌', '🏆', '🏒', '🛷', '🏏', '🥅', '🎿', '🏹', '🎣', '🥋'],
+  vehicles: ['🚗', '🚕', '🚙', '🚌', '🚎', '🚓', '🚑', '🚒', '🚐', '🚚', '🚛', '🚜', '🚘', '🚖', '🚔', '🚍', '🚃', '🚋', '🚞', '🚝', '🚄', '🚅', '🚆', '🚈'],
+  plants: ['🌸', '🌼', '🌻', '🌺', '🌷', '🌹', '🥀', '💐', '🌿', '🍀', '🍁', '🍂', '🌵', '🌴', '🌲', '🌳', '🌱', '🌾', '🍃', '🍄', '🎋', '🎍', '💮'],
 } as const satisfies Record<string, readonly string[]>
 
 export type PairsFamilyName = keyof typeof PAIRS_FAMILIES
@@ -108,9 +127,25 @@ function columns(ctx: CreateContext): number {
   return Math.max(3, Math.min(7, Math.floor(ctx.maxCols)))
 }
 
-/** The last level whose board this screen holds: L18 (10 triples, 5 wide) needs five columns. */
+function screenRows(ctx: CreateContext): number {
+  return Math.max(3, Math.min(7, Math.floor(ctx.maxRows)))
+}
+
+/**
+ * The last level whose board this screen holds: L17–21 (30 cards, 5 wide) need five columns; from
+ * L22 a board must fit as it is or turned (6×6, then 7×6).
+ */
 export function pairsMaxLevel(ctx: CreateContext): number {
-  return columns(ctx) >= 5 ? 18 : 16
+  const cols = columns(ctx)
+  const rows = screenRows(ctx)
+  if (cols < 5) return 16
+  let cap = FIT_FROM - 1
+  while (cap < PAIRS_LADDER.length) {
+    const r = PAIRS_LADDER[cap]
+    if (!((r.cols <= cols && r.rows <= rows) || (r.rows <= cols && r.cols <= rows))) break
+    cap++
+  }
+  return cap
 }
 
 /**
@@ -121,7 +156,7 @@ export function pairsMaxLevel(ctx: CreateContext): number {
  */
 function layout(cols: number, rows: number, size: 2 | 3, ctx: CreateContext): { cols: number; rows: number } {
   const maxC = columns(ctx)
-  const maxR = Math.max(3, Math.min(7, Math.floor(ctx.maxRows)))
+  const maxR = screenRows(ctx)
   const shapes = [
     [cols, rows],
     [rows, cols],
@@ -291,7 +326,7 @@ export const pairs: BrainGameDef<PairsState> = {
   },
   signature: (s) => `pr${s.size}:${s.cards.join('')}`,
   mechanics(s) {
-    const tags = [4, 6, 8, 10, 12].filter((n) => s.cards.length >= 2 * n).map((n) => `pairs.board${n}`)
+    const tags = [4, 6, 8, 10, 12, 15, 18, 21].filter((n) => s.cards.length >= 2 * n).map((n) => `pairs.board${n}`)
     if (s.family !== 'mixed') tags.push('pairs.oneFamily')
     if (s.family === 'lookalike') tags.push('pairs.lookalike')
     if (s.previewMs === 0) tags.push('pairs.noPreview')

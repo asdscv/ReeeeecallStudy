@@ -10,10 +10,10 @@ import { useBrainFx, type BrainFx } from '@reeeeecall/shared/hooks/useBrainFx'
  * hand-made round states, since no game emits these views yet.
  */
 
-type Fake = Pick<BrainRound, 'view' | 'trialId' | 'quiet' | 'result' | 'gameId' | 'lives' | 'practice' | 'placing' | 'stageUp' | 'over' | 'done'> & { stats: Partial<BrainRound['stats']> }
+type Fake = Pick<BrainRound, 'view' | 'trialId' | 'result' | 'gameId' | 'lives' | 'practice' | 'placing' | 'over' | 'done'> & { stats: Partial<BrainRound['stats']> }
 
 function fake(view: RoundView, over: Partial<Fake> = {}): Fake {
-  return { view, trialId: 1, quiet: false, result: null, gameId: 'memoryGrid', lives: 3, practice: false, placing: false, stageUp: null, over: false, done: false, stats: { streak: 1, endedBy: null, isNewBest: false }, ...over }
+  return { view, trialId: 1, result: null, gameId: 'memoryGrid', lives: 3, practice: false, placing: false, over: false, done: false, stats: { streak: 1, endedBy: null, isNewBest: false }, ...over }
 }
 
 function cells(tones: CellTone[], extra: Partial<CellView> = {}): CellView[] {

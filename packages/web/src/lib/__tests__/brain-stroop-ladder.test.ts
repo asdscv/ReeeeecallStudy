@@ -51,6 +51,8 @@ const SIMULATIONS: Record<string, Mat> = {
   // Viénot, Brettel & Mollon 1999 (dichromats), in linear sRGB.
   protanVienot: [[0.11238, 0.88762, 0], [0.11238, 0.88762, 0], [0.00401, -0.00401, 1]],
   deutanVienot: [[0.29275, 0.70725, 0], [0.29275, 0.70725, 0], [-0.02234, 0.02234, 1]],
+  // Machado 2009, severity 1.0 (tritanopia, about 1 in 10,000 — covered too since the 2026-11-13 palette).
+  tritanMachado: [[1.255528, -0.076749, -0.178779], [-0.078411, 0.930809, 0.147602], [0.004733, 0.691367, 0.3039]],
 }
 const toLinear = (c: number) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)
 const linearRgb = (hex: string) => [1, 3, 5].map((i) => toLinear(parseInt(hex.slice(i, i + 2), 16) / 255)) as [number, number, number]
@@ -89,6 +91,11 @@ function deltaE2000([l1, a1, b1]: [number, number, number], [l2, a2, b2]: [numbe
 /** The smallest distance between two inks over every simulation. */
 const worstDistance = (a: BrainColor, b: BrainColor) =>
   Math.min(...Object.values(SIMULATIONS).map((m) => deltaE2000(lab(simulate(m, linearRgb(INK_COLORS[a]))), lab(simulate(m, linearRgb(INK_COLORS[b]))))))
+/** WCAG contrast of an ink against the white card. */
+const contrastOnWhite = (hex: string) => {
+  const [r, g, b] = linearRgb(hex)
+  return 1.05 / (0.2126 * r + 0.7152 * g + 0.0722 * b + 0.05)
+}
 
 describe('Color Word: the confusable-ink table', () => {
   it('CIEDE2000 matches the published test pairs', () => {
@@ -98,20 +105,27 @@ describe('Color Word: the confusable-ink table', () => {
     expect(deltaE2000([60.2574, -34.0099, 36.2677], [60.4626, -34.1751, 39.4387])).toBeCloseTo(1.2644, 3)
   })
 
-  it('INK_CONFUSABLE is what protan/deutan simulation of INK_COLORS gives (ΔE2000 < 20), symmetric', () => {
+  it('INK_CONFUSABLE is what protan/deutan/tritan simulation of INK_COLORS gives (ΔE2000 < 20), symmetric', () => {
     const computed = Object.fromEntries(BRAIN_COLORS.map((a) => [a, BRAIN_COLORS.filter((b) => b !== a && worstDistance(a, b) < 20)]))
     expect(INK_CONFUSABLE).toEqual(computed)
     for (const a of BRAIN_COLORS) for (const b of INK_CONFUSABLE[a]) expect(INK_CONFUSABLE[b], `${a}-${b}`).toContain(a)
   })
 
-  it('and does not hinge on the threshold: listed pairs are under 11, every other pair over 49', () => {
+  it('the palette is colour-vision safe for everyone: no pair under 21 in any simulation or in normal vision, so the table is empty', () => {
     for (const a of BRAIN_COLORS) {
       for (const b of BRAIN_COLORS.filter((x) => x !== a)) {
-        const d = worstDistance(a, b)
-        if (INK_CONFUSABLE[a].includes(b)) expect(d, `${a}-${b}`).toBeLessThan(11)
-        else expect(d, `${a}-${b}`).toBeGreaterThan(49)
+        expect(worstDistance(a, b), `${a}-${b}`).toBeGreaterThan(21)
+        expect(deltaE2000(lab(linearRgb(INK_COLORS[a])), lab(linearRgb(INK_COLORS[b]))), `${a}-${b} normal vision`).toBeGreaterThan(21)
       }
+      expect(INK_CONFUSABLE[a], a).toEqual([])
     }
+    // No red, green or yellow (owner 2026-11-13: «적록색맹인데 색 자체가 너무 구분이 안됨»).
+    expect(BRAIN_COLORS.slice().sort()).toEqual(['black', 'blue', 'brown', 'gray', 'orange', 'purple'])
+    expect(Object.keys(INK_COLORS).sort()).toEqual(BRAIN_COLORS.slice().sort())
+  })
+
+  it('every ink reads on the white card: at least 3.5:1 (the word is 40px+, coloured labels ≥ 24px bold)', () => {
+    for (const c of BRAIN_COLORS) expect(contrastOnWhite(INK_COLORS[c]), c).toBeGreaterThanOrEqual(3.5)
   })
 })
 
@@ -152,8 +166,8 @@ describe('Color Word: the round colours and the buttons', () => {
       expect(INK_CONFUSABLE[a], `round ${seed}`).not.toContain(b)
       pairs.add([a, b].sort().join('|'))
     }
-    // One of red/green/yellow/orange with one of blue/purple: 8 pairs.
-    expect(pairs.size).toBe(8)
+    // No pair is confusable, so all 15 pairs of the six colours open rounds.
+    expect(pairs.size).toBe(15)
   })
 
   it('below L5 the buttons keep the round order (colours added at the end); from L5 they move, never to the home order', () => {

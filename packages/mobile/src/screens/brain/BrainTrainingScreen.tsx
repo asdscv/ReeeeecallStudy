@@ -28,7 +28,7 @@ import { useBrainHydrated } from '../../components/brain/useBrainHydrated'
 import { celebrateHaptic } from '../../components/brain/fx-haptics'
 import { useMotion } from '../../components/brain/motion'
 import { FX, flushBrainStorage, gameIcon } from '../../components/brain/brain-ui'
-import { AchievementCard, TIER_COLORS, TierMedal, qeSpeedLevel, tierName } from '../../components/brain/tier-ui'
+import { AchievementCard, TIER_COLORS, TierMedal, tierName } from '../../components/brain/tier-ui'
 
 /**
  * Today's Training: the line-up, then each game's intro (with the session's steps), its rounds,
@@ -322,15 +322,13 @@ function SessionEnd({
               // no change is shown. A finished one counts from where the climb started.
               const start = placed[id]
               const showLevel = start !== null
-              // Quick Eye: its speed level 0-11 (higher is better) — never a flash time.
-              const qe = id === 'quickEye'
               const startLevel = start ?? l.start
-              const from = qe ? qeSpeedLevel(startLevel) : displayLevel(startLevel)
-              const to = qe ? qeSpeedLevel(l.end) : displayLevel(l.end)
+              const from = displayLevel(startLevel)
+              const to = displayLevel(l.end)
               const better = to > from
-              const fmt = (v: number) => (qe ? formatCount(v) : v.toFixed(1))
+              const fmt = (v: number) => v.toFixed(1)
               const theme = GAME_THEMES[id]
-              const change = qe ? `${t('quickEye.speedLevel', { level: from })} → ${formatCount(to)}` : `${fmt(from)} → ${fmt(to)}`
+              const change = `${fmt(from)} → ${fmt(to)}`
               const tierUp = tierUps[id]
               const tierUpText = tierUp ? t('tiers.up', { tier: tierName(t, tierUp) }) : null
               const changeColor = better ? FX.goodText : 'rgba(255,255,255,0.8)'
@@ -361,12 +359,6 @@ function SessionEnd({
                   </View>
                   {showLevel ? (
                     <View style={styles.change}>
-                      {/* Quick Eye's numbers are its speed level, so say so once. */}
-                      {qe ? (
-                        <Text style={styles.changeUnit} numberOfLines={1} maxFontSizeMultiplier={1.3}>
-                          {t('intro.speed')}
-                        </Text>
-                      ) : null}
                       <Text style={[styles.changeText, { color: changeColor }]} maxFontSizeMultiplier={1.3}>
                         {fmt(from)}
                       </Text>
@@ -418,7 +410,6 @@ const styles = StyleSheet.create({
   stats: { flexDirection: 'row', gap: 8 },
   change: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   changeText: { fontSize: 16, fontVariant: ['tabular-nums'] },
-  changeUnit: { color: 'rgba(255,255,255,0.65)', fontSize: 14, flexShrink: 1 },
   tierUp: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
   tierUpText: { fontSize: 14, fontWeight: '800', flexShrink: 1 },
 })

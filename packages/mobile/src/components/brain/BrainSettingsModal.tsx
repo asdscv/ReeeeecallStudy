@@ -16,8 +16,7 @@ const TIMING_LABEL: Record<TimingMode, string> = {
 }
 
 /**
- * Relaxed timing and Quick Eye's centre-only mode — both exist for the same reason: an older
- * player's slower reactions or a narrower visual field should not read as failing the game — and
+ * Relaxed timing — an older player's slower reactions should not read as failing the game — and
  * vibration. The web has a game-sound switch here; the phone's games speak through haptics, so its
  * switch is the app-wide vibration setting itself (the same one Settings shows).
  */
@@ -93,19 +92,6 @@ export function BrainSettingsModal({ visible, onClose }: { visible: boolean; onC
               testID="brain-haptics"
             />
 
-            <SwitchRow
-              label={t('settings.centerOnly')}
-              help={t('settings.centerOnlyHelp')}
-              value={settings.centerOnly}
-              onChange={(v) => set({ centerOnly: v })}
-              theme={theme}
-              testID="brain-center-only"
-            />
-
-            <Text style={[styles.help, styles.flash, { color: theme.colors.textSecondary, borderTopColor: theme.colors.border }]}>
-              {t('settings.flash')}
-            </Text>
-
             <Button title={t('settings.close')} onPress={onClose} size="lg" testID="brain-settings-close" />
           </ScrollView>
         </View>
@@ -166,5 +152,4 @@ const styles = StyleSheet.create({
   help: { fontSize: 15, lineHeight: 22 },
   switchRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, minHeight: 48 },
   switchLabel: { flex: 1 },
-  flash: { borderTopWidth: 1, paddingTop: 16 },
 })

@@ -2,7 +2,7 @@
   "title": "大脑训练",
   "subtitle": "用专注与记忆小游戏，养成规律的动脑习惯",
   "disclaimer": "本功能不是医疗器械，不用于诊断、治疗、治愈或预防任何疾病。",
-  "worry": "如果担心自己的记忆力，与其多玩游戏，不如咨询医生或当地的医疗卫生服务机构。",
+  "worry": "如果担心记忆力，请咨询医生或当地记忆门诊。",
   "training": {
     "title": "今日训练",
     "desc": "{{count}}个游戏 · 约{{minutes}}分钟",
@@ -43,10 +43,8 @@
     "level": "Lv. {{level}}",
     "best": "最高 Lv. {{level}}",
     "new": "新",
-    "quickEyeLevel": "第{{stage}}阶段 · 速度 {{speed}}",
     "record": "最高 {{value}} 分",
     "settings": "设置",
-    "research": "研究依据",
     "howItWorks": "每道题都是新生成的。答对了下一题会稍难一点，答错了就会变简单。等级只代表你在这个游戏中的水平，并不衡量记忆力或大脑健康。"
   },
   "settings": {
@@ -57,9 +55,6 @@
     "timing_1_5": "1.5倍",
     "timing_2": "2倍",
     "timing_0": "不限时",
-    "centerOnly": "快眼: 只答中间",
-    "centerOnlyHelp": "如果边缘的星星不容易看清，可以打开此项。只需回答中间的图案。",
-    "flash": "快眼中的图案只会极短暂地出现。如果你对闪光敏感，请不要勉强。",
     "close": "关闭",
     "sound": "音效",
     "soundHelp": "答对或答错时会有短促的提示音。",
@@ -73,10 +68,6 @@
     "reasoning": "推理"
   },
   "games": {
-    "quickEye": {
-      "name": "快眼",
-      "desc": "盯住中间的形状，一眼看出周围闪现的星星在哪个方向。"
-    },
     "memoryGrid": {
       "name": "瞬间记忆",
       "desc": "空间记忆练习：记住亮过的格子，然后点出来。"
@@ -108,6 +99,22 @@
     "series": {
       "name": "数字规律",
       "desc": "找出规律，选出下一个数。"
+    },
+    "setMatch": {
+      "name": "找组合",
+      "desc": "找出三张卡，每种特征都要全部相同或全部不同。"
+    },
+    "codeBreak": {
+      "name": "数字推理",
+      "desc": "数字和位置都对为S，仅数字对为B。根据提示找出密码。"
+    },
+    "makeNumber": {
+      "name": "凑数字",
+      "desc": "将所有数字各用一次，算出目标数。"
+    },
+    "mazeRun": {
+      "name": "走迷宫",
+      "desc": "沿通道画线走到旗帜，遇到死路可以退回。"
     }
   },
   "play": {
@@ -183,59 +190,75 @@
     "newBestReverse": "倒序{{count}}个！",
     "newBestReverse_one": "倒序{{count}}个！",
     "newBestReverse_other": "倒序{{count}}个！",
-    "lookalikeBadge": "相似的图"
-  },
-  "quickEye": {
-    "watch": "看中间",
-    "what": "中间是什么？",
-    "where": "星星在哪个方向？",
-    "sameOrDifferent": "中间的两个图案一样吗？",
-    "same": "一样",
-    "different": "不一样",
-    "circle": "圆形",
-    "square": "方形",
-    "stage": "第{{stage}}阶段",
-    "dir": {
-      "0": "上",
-      "1": "右上",
-      "2": "右",
-      "3": "右下",
-      "4": "下",
-      "5": "左下",
-      "6": "左",
-      "7": "左上"
+    "lookalikeBadge": "相似的图",
+    "setMatchFind": "选三张卡：每种特征全同或全不同",
+    "setMatchNone": "没有组合",
+    "setPicked_one": "已选{{count}}张",
+    "setPicked_other": "已选{{count}}张",
+    "setCard_one": "{{count}}个图形",
+    "setCard_other": "{{count}}个图形",
+    "setBroken": "请检查{{attributes}}，两同一异不成组合。",
+    "setAttribute": {
+      "shape": "形状",
+      "count": "数量",
+      "color": "颜色",
+      "fill": "填充"
     },
-    "speedLevel": "速度等级 {{level}}",
-    "knob": {
-      "wider": "这次看得更宽一些",
-      "ring2": "扩大到中间一圈",
-      "ring3": "扩大到最外圈",
-      "crowd": "在三角形中找星星",
-      "moreCrowd": "三角形变多了",
-      "similar": "中间的形状更像了",
-      "sameDiff": "一样还是不一样？"
+    "setShape": {
+      "circle": "圆形",
+      "triangle": "三角形",
+      "square": "正方形",
+      "diamond": "菱形"
     },
-    "stageUp": {
-      "title": "新阶段",
-      "stage": "第{{stage}}阶段",
-      "ease": "新阶段开始时会稍微慢一点",
-      "continue": "继续"
+    "setColor": {
+      "blue": "蓝色",
+      "vermillion": "朱红色",
+      "black": "黑色"
     },
-    "gauge": "再答对{{count}}题就快一档",
-    "speedUp": "快了一档",
-    "topSpeed": "最高速度",
-    "hold": "保持最高速度 {{n}}/14",
-    "wasHere": "就在这里",
-    "nearMiss": "好可惜，就在旁边",
-    "missFast": "这次太快了",
-    "slowerStart": "稍微快一点了",
-    "legEnd": "本段结束",
-    "nextGoal": "下一个目标：稳定在速度等级{{level}}左右",
-    "landscapeHint": "把手机横过来，或用平板，看得更宽",
-    "revealA11y": "答案：{{center}}，星星在{{dir}}",
-    "warmup": "准备出发",
-    "gauge_other": "再答对{{count}}题就快一档",
-    "gauge_one": "再答对{{count}}题就快一档"
+    "setFill": {
+      "solid": "实心",
+      "striped": "条纹",
+      "outline": "空心"
+    },
+    "codeBreakGuess_one": "猜出{{length}}位数密码 · 剩{{count}}次",
+    "codeBreakGuess_other": "猜出{{length}}位数密码 · 剩{{count}}次",
+    "codeGuesses": "已猜 {{used}}/{{total}}",
+    "codeRepeats": "数字可重复",
+    "codeDistinct": "数字不重复",
+    "codeHistory": "猜测记录与提示",
+    "codeFirstGuess": "输入第一组猜测",
+    "codeFeedback": "{{strikes}} S · {{balls}} B",
+    "codeEntry": "当前猜测",
+    "codeNotes": "标记排除的数字",
+    "codeNote": "切换{{digit}}的排除标记",
+    "codeAnswer": "密码：{{code}}",
+    "erase": "删除",
+    "submit": "确认",
+    "undo": "撤销",
+    "clear": "清空",
+    "makeNumberSigns": "选择运算符凑出{{target}}",
+    "makeNumberTarget": "用全部数字凑出{{target}}",
+    "makeTarget": "目标 {{target}}",
+    "makeFixed": "数字顺序固定 · 选择运算符",
+    "makeAny": "每个数字用一次 · 顺序不限",
+    "makeTries_one": "剩{{count}}次",
+    "makeTries_other": "剩{{count}}次",
+    "makeExpression": "当前算式",
+    "makeValue": "这个算式等于{{value}}，请修改。",
+    "mazeRunGo": "沿通道画线走到旗帜",
+    "mazeRunKeys_one": "按编号顺序收集{{count}}把钥匙，再到旗帜处",
+    "mazeRunKeys_other": "按编号顺序收集{{count}}把钥匙，再到旗帜处",
+    "mazeRunMemorize": "记住墙壁和通道",
+    "mazeMemorise": "墙壁即将隐藏",
+    "mazeDrag": "拖动或点击相邻格 · 退回即可擦除",
+    "mazeBumps_one": "还可碰墙{{count}}次",
+    "mazeBumps_other": "还可碰墙{{count}}次",
+    "mazeStart": "起点",
+    "mazeGoal": "旗帜 · 终点",
+    "mazeKey_one": "第{{count}}把钥匙",
+    "mazeKey_other": "第{{count}}把钥匙",
+    "memorizeNumbers": "记住数字位置 · 1到{{max}}",
+    "memoryBadge": "翻牌记忆"
   },
   "summary": {
     "livesOut": "本轮结束",
@@ -258,49 +281,25 @@
     "voided": "画面多次卡顿，本轮已停止"
   },
   "colors": {
-    "red": "红",
     "blue": "蓝",
-    "green": "绿",
-    "yellow": "黄",
+    "orange": "橙",
     "purple": "紫",
-    "orange": "橙"
+    "black": "黑",
+    "brown": "棕",
+    "gray": "灰"
   },
   "intro": {
     "howTo": "玩法",
     "replay": "再看一遍",
     "start": "开始",
-    "practiceNote": "前 4 题是练习，不扣机会，也不计分。",
+    "practiceNote": "前几题是练习，不扣机会或分数。",
     "level": "等级",
-    "speed": "速度",
-    "stage": "阶段",
     "rounds": "已玩",
     "best": "最高分",
     "welcomeBack": "欢迎回来。前几道题会重新找到合适的等级。",
     "firstPlacement": "前几道题会找到合适的起始等级。"
   },
   "mechanics": {
-    "quickEye": {
-      "periphery": {
-        "title": "还要找星星",
-        "body": "中央图形出现的同时，外围也会闪现一颗星星。先选中央的图形，再选星星所在的方向。"
-      },
-      "distractors": {
-        "title": "三角形中的星星",
-        "body": "三角形也会一起出现。选出那颗星星所在的方向。"
-      },
-      "similar": {
-        "title": "相似的形状",
-        "body": "方形的角会越来越圆，越来越像圆形。"
-      },
-      "sameDiff": {
-        "title": "相同还是不同？",
-        "body": "中央会出现两个图形。选出它们是否相同。"
-      },
-      "clearView": {
-        "title": "画面更清晰了",
-        "body": "遮挡图案换了，所以前几题会稍慢一点开始。"
-      }
-    },
     "oddOneOut": {
       "rotation": {
         "title": "转向的那一个",
@@ -316,7 +315,7 @@
       },
       "glyphs": {
         "title": "容易混淆的字",
-        "body": "会出现相似的字，比如 b 和 d、6 和 9。"
+        "body": "会出现相似的字，比如 b 和 d、O 和 Q。"
       },
       "colorNoise": {
         "title": "不用管颜色",
@@ -381,6 +380,10 @@
       "unmarked": {
         "title": "没有标记",
         "body": "找到的数字不会变淡。记住你点到哪里了。"
+      },
+      "memory": {
+        "title": "翻牌记忆",
+        "body": "记住位置，翻牌后从1开始依次点击，点错的牌会短暂显示。"
       }
     },
     "memoryGrid": {
@@ -397,6 +400,10 @@
       "reverse": {
         "title": "倒着点",
         "body": "按看到的相反顺序，从最后亮起的格子开始点。从现在起一直都是倒着点。"
+      },
+      "faster": {
+        "title": "闪得更快了",
+        "body": "方块会更快地依次亮起。别跟丢顺序。"
       }
     },
     "series": {
@@ -479,6 +486,22 @@
       "missingTerm": {
         "title": "找出空格",
         "body": "现在 ? 也会出现在一行的中间。选出空格应填的数。"
+      },
+      "primes": {
+        "title": "依次排列的质数",
+        "body": "会出现质数（只能被1和它本身整除的数）依次排列的规律。"
+      },
+      "product": {
+        "title": "前两个数相乘",
+        "body": "会出现前两个数相乘得到下一个数的规律。"
+      },
+      "digitSum": {
+        "title": "加上各位数字",
+        "body": "会出现一个数加上它的各位数字得到下一个数的规律。"
+      },
+      "diffPrimes": {
+        "title": "间隔是质数",
+        "body": "会出现间隔依次为质数的规律。"
       }
     },
     "pairs": {
@@ -554,6 +577,94 @@
         "title": "两位数 × 两位数",
         "body": "会出现两位数相乘的题。"
       }
+    },
+    "setMatch": {
+      "color": {
+        "title": "加入颜色",
+        "body": "除形状和数量外，三张卡的颜色也须全同或全不同。"
+      },
+      "fill": {
+        "title": "加入填充",
+        "body": "还要看实心、条纹和空心。每种特征都须全同或全不同。"
+      },
+      "none": {
+        "title": "可能没有组合",
+        "body": "若任意三张都不成组合，请选“没有组合”。"
+      },
+      "oneSet": {
+        "title": "只有一组",
+        "body": "在相似的卡片中找出唯一的组合。"
+      }
+    },
+    "codeBreak": {
+      "three": {
+        "title": "三位数密码",
+        "body": "现在猜三位数。数字和位置都对为S，仅数字对为B。"
+      },
+      "four": {
+        "title": "四位数密码",
+        "body": "根据先前的提示猜出四位数。"
+      },
+      "five": {
+        "title": "五位数密码",
+        "body": "增加到五位数，也要推理每个数字的位置。"
+      },
+      "zero": {
+        "title": "加入0",
+        "body": "密码可以含0，首位也可能是0。"
+      },
+      "repeats": {
+        "title": "数字可以重复",
+        "body": "同一数字可出现多次，请结合提示推理出现次数。"
+      }
+    },
+    "makeNumber": {
+      "multiply": {
+        "title": "加入乘法",
+        "body": "可以用×，先乘后加减。"
+      },
+      "divide": {
+        "title": "加入除法",
+        "body": "也可以用÷，乘除从左向右先算。"
+      },
+      "anyOrder": {
+        "title": "数字顺序不限",
+        "body": "按任意顺序点击数字，所有数字各用一次。"
+      },
+      "brackets": {
+        "title": "使用括号",
+        "body": "先算括号内，这个目标必须用括号才能得到。"
+      },
+      "target24": {
+        "title": "凑24",
+        "body": "四个数字各用一次凑出24，试着改变顺序和括号。"
+      },
+      "fraction": {
+        "title": "中途可以有分数",
+        "body": "中间结果可以是分数，最后等于目标数即可。"
+      }
+    },
+    "mazeRun": {
+      "winding": {
+        "title": "岔路增多",
+        "body": "道路更加曲折，遇到死路可原路退回。"
+      },
+      "keys": {
+        "title": "先收集钥匙",
+        "body": "按编号收集钥匙后再到旗帜，退回不会丢失已收集的钥匙。"
+      },
+      "moreKeys": {
+        "title": "钥匙增多",
+        "body": "按编号顺序收集所有钥匙。"
+      },
+      "hidden": {
+        "title": "记住墙壁",
+        "body": "预览后墙壁隐藏。凭记忆移动，剩余碰墙次数会单独显示。"
+      },
+      "hiddenKeys": {
+        "title": "凭记忆收集钥匙",
+        "body": "在隐藏墙壁的迷宫中，也要按编号收集钥匙再到旗帜。"
+      }
     }
   },
   "rule": {
@@ -608,17 +719,9 @@
       "title": "记住七个",
       "body": "在顺序记忆或瞬间记忆中记住了 7 个。"
     },
-    "quickEyeStage5": {
-      "title": "快眼第 5 阶段",
-      "body": "升到了快眼第 5 阶段。"
-    },
-    "quickEyeStage10": {
-      "title": "快眼第 10 阶段",
-      "body": "升到了快眼第 10 阶段。"
-    },
     "allGames": {
       "title": "全部游戏",
-      "body": "9 个游戏都玩过了。"
+      "body": "所有游戏都玩过了。"
     },
     "firstSession": {
       "title": "第一次训练",

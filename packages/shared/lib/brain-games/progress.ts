@@ -1,6 +1,5 @@
 import type { BrainGameId } from './types'
 import { GROUP_RULES, TIMING_MODES, type TimingMode } from './rules'
-import { quickEyeAdvance, QUICK_EYE_MAX_VARIANT, QUICK_EYE_WINDOW } from './games/quick-eye'
 import { V2_RESCALED, migrateLevelV1 } from './scale'
 
 /**
@@ -15,10 +14,9 @@ export interface GameProgress {
 }
 
 /**
- * Quick Eye's progression state: its variant and the last 24 valid trials. The threshold in ms is
- * kept for the advancement rule only — it is never shown (a ms threshold reads as an assessment).
- * Every record starts at variant 2 (centre plus periphery); variant 1 is practice, the centre-only
- * setting, and a slow first placement's path (useBrainRound).
+ * Quick Eye's progression state (its stage and last 24 trials). The game was removed by the owner
+ * (2026-11-13): this is still read, clamped and merged, so an app version that still has the game
+ * loses nothing in a sync, but nothing in this version writes it or shows it.
  */
 export interface QuickEyeProgress {
   variant: number
@@ -54,7 +52,7 @@ export const SESSION_MINUTES: readonly SessionMinutes[] = [5, 20]
 
 export interface BrainSettings {
   timing: TimingMode
-  /** Quick Eye without the periphery — for players with a visual-field loss. */
+  /** Quick Eye's centre-only setting — the game is removed; kept so the setting round-trips, never shown. */
   centerOnly: boolean
   /** Game sounds (web). On by default; mobile uses the app's vibration setting instead. */
   sound: boolean
@@ -63,8 +61,12 @@ export interface BrainSettings {
 }
 
 export interface BrainProgress {
-  /** 2 since the hard-content change (levels on the v2 scale); a v1 record is converted once on reading. */
-  v: 2
+  /**
+   * 3 since the thinking games (2026-11-13; sync.ts BRAIN_PROGRESS_FORMAT says why); 2 since the
+   * hard-content change (levels on the v2 scale). A v1 record is converted once on reading; a v2
+   * record is read as it is — v2 → v3 changes nothing in the content.
+   */
+  v: 3
   games: Partial<Record<BrainGameId, GameProgress>>
   totalRounds: number
   totalPoints: number
@@ -77,6 +79,7 @@ export interface BrainProgress {
   bestRuns: Partial<Record<BrainGameId | 'mix', number>>
   /** Games whose practice round has been played. */
   practiced: BrainGameId[]
+  /** Quick Eye's state from an old save (the game is removed) — kept for older app versions only. */
   quickEye: QuickEyeProgress
   /**
    * Which Quick Eye field the record was played on: 2 = the mid-grey field with a matched mask.
@@ -100,7 +103,7 @@ const emptySessions = (): SessionLog => ({ recentDays: [], total: 0, course: 0, 
 
 export function emptyProgress(): BrainProgress {
   return {
-    v: 2,
+    v: 3,
     games: {},
     totalRounds: 0,
     totalPoints: 0,
@@ -116,9 +119,9 @@ export function emptyProgress(): BrainProgress {
   }
 }
 
-/** A game's progress, defaulting to its group's floor (Quick Eye starts at 500ms, level 0). */
+/** A game's progress, defaulting to level 1. */
 export function gameProgress(p: BrainProgress, id: BrainGameId): GameProgress {
-  const min = id === 'quickEye' ? GROUP_RULES.quickEye.min : GROUP_RULES.speed.min
+  const min = GROUP_RULES.speed.min
   return p.games[id] ?? { level: min, bestLevel: min, rounds: 0, wins: 0 }
 }
 
@@ -143,44 +146,27 @@ export function currentDays(p: BrainProgress, today: string): { dayStreak: numbe
   return { dayStreak: 0, todayRounds: 0 }
 }
 
-/**
- * One judged trial. `level` is the level AFTER the trial. Quick Eye's valid trials also feed its
- * variant ladder: on reaching the criterion the next variant opens and the level eases back.
- */
+/** One judged trial. `level` is the level AFTER the trial. */
 export function recordRound(
   p: BrainProgress,
   id: BrainGameId,
-  round: { level: number; correct: boolean; points: number; shownMs?: number },
+  round: { level: number; correct: boolean; points: number },
   today: string,
 ): BrainProgress {
   const g = gameProgress(p, id)
   const gap = p.lastDay ? dayDiff(p.lastDay, today) : null
   const dayStreak = gap === 0 ? p.dayStreak : gap === 1 ? p.dayStreak + 1 : 1
-  let level = round.level
-  let quickEye = p.quickEye
-  if (id === 'quickEye' && typeof round.shownMs === 'number') {
-    const recentMs = [...p.quickEye.recentMs, Math.round(round.shownMs)].slice(-QUICK_EYE_WINDOW)
-    const recentOk = (p.quickEye.recentOk + (round.correct ? '1' : '0')).slice(-QUICK_EYE_WINDOW)
-    const { advance, thresholdMs } = quickEyeAdvance(p.quickEye.variant, recentMs, recentOk.split('').map((c) => c === '1'))
-    if (advance) {
-      quickEye = { variant: Math.min(QUICK_EYE_MAX_VARIANT, p.quickEye.variant + 1), recentMs: [], recentOk: '', thresholdMs }
-      level = Math.max(GROUP_RULES.quickEye.min, round.level - 3)
-    } else {
-      quickEye = { ...p.quickEye, recentMs, recentOk, thresholdMs: thresholdMs ?? p.quickEye.thresholdMs }
-    }
-  }
   return {
     ...p,
     games: {
       ...p.games,
       [id]: {
-        level,
+        level: round.level,
         bestLevel: Math.max(g.bestLevel, round.level),
         rounds: g.rounds + 1,
         wins: g.wins + (round.correct ? 1 : 0),
       },
     },
-    quickEye,
     totalRounds: p.totalRounds + 1,
     totalPoints: p.totalPoints + round.points,
     lastDay: today,
@@ -252,21 +238,27 @@ export function serializeProgress(p: BrainProgress): string {
 }
 
 const num = (v: unknown, min = 0): number => (typeof v === 'number' && Number.isFinite(v) ? Math.max(min, v) : min)
+
+/**
+ * The removed Quick Eye's bounds, for reading an old save's record of it unchanged: its 16 stages,
+ * its 24-trial window, its level 0-12 (games/quick-eye.ts until 2026-11-13).
+ */
+const LEGACY_QUICK_EYE = { maxVariant: 16, window: 24, minLevel: 0, maxLevel: 12 } as const
 const isDay = (v: unknown): v is string => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)
 
 /**
  * Tolerant: anything unreadable becomes an empty record rather than a crash on launch.
  *
- * Reads v1 or v2 and always returns v2. A v1 record's board-game levels are converted to the v2
+ * Reads v1, v2 or v3 and always returns v3. A v1 record's board-game levels are converted to the v2
  * scale (scale.ts) and their best scores cleared — earned on easier content, the precedent Quick
  * Eye's field change set. Converting happens only on a v1 document, so reading the result again
- * changes nothing.
+ * changes nothing. A v2 record is the same content under the old number (sync.ts BRAIN_PROGRESS_FORMAT).
  */
 export function parseProgress(raw: string | null | undefined): BrainProgress {
   if (!raw) return emptyProgress()
   try {
     const data = JSON.parse(raw) as Partial<Omit<BrainProgress, 'v'>> & { v?: unknown }
-    if (!data || (data.v !== 1 && data.v !== 2) || typeof data.games !== 'object' || data.games === null) return emptyProgress()
+    if (!data || (data.v !== 1 && data.v !== 2 && data.v !== 3) || typeof data.games !== 'object' || data.games === null) return emptyProgress()
     const oldScale = data.v === 1
     const games: BrainProgress['games'] = {}
     // Older still: v1 records written before Today's Training existed (so without `sessions`)
@@ -276,10 +268,11 @@ export function parseProgress(raw: string | null | undefined): BrainProgress {
     const preSessions = oldScale && data.sessions === undefined
     for (const [id, g] of Object.entries(data.games)) {
       if (!g || typeof g.level !== 'number' || !Number.isFinite(g.level)) continue
-      const min = id === 'quickEye' ? 0 : 1
+      // A removed game's record (Quick Eye) is kept on its own scale for older app versions.
+      const min = id === 'quickEye' ? LEGACY_QUICK_EYE.minLevel : 1
       // A sane ceiling as well as a floor: a corrupted or edited level (1e308) would otherwise make
       // the games build absurd puzzles. No game's level means anything past these.
-      const max = id === 'quickEye' ? GROUP_RULES.quickEye.max : 500
+      const max = id === 'quickEye' ? LEGACY_QUICK_EYE.maxLevel : 500
       const span = preSessions && (id === 'memoryGrid' || id === 'sequence')
       const toLength = (lv: number) => (span ? Math.max(1, 1 + Math.floor((lv - 1) * (id === 'memoryGrid' ? 0.6 : 0.45))) : lv)
       const rescale = (lv: number) => (oldScale ? migrateLevelV1(id as BrainGameId, toLength(lv)) : lv)
@@ -300,9 +293,9 @@ export function parseProgress(raw: string | null | undefined): BrainProgress {
     if (oldScale) for (const id of V2_RESCALED) delete bestRuns[id]
     const qe = (data.quickEye ?? {}) as Partial<QuickEyeProgress>
     const quickEye: QuickEyeProgress = {
-      variant: Math.min(QUICK_EYE_MAX_VARIANT, Math.max(1, Math.round(num(qe.variant, 1)))),
-      recentMs: Array.isArray(qe.recentMs) ? qe.recentMs.filter((x) => typeof x === 'number' && Number.isFinite(x)).slice(-QUICK_EYE_WINDOW) : [],
-      recentOk: typeof qe.recentOk === 'string' ? qe.recentOk.replace(/[^01]/g, '').slice(-QUICK_EYE_WINDOW) : '',
+      variant: Math.min(LEGACY_QUICK_EYE.maxVariant, Math.max(1, Math.round(num(qe.variant, 1)))),
+      recentMs: Array.isArray(qe.recentMs) ? qe.recentMs.filter((x) => typeof x === 'number' && Number.isFinite(x)).slice(-LEGACY_QUICK_EYE.window) : [],
+      recentOk: typeof qe.recentOk === 'string' ? qe.recentOk.replace(/[^01]/g, '').slice(-LEGACY_QUICK_EYE.window) : '',
       thresholdMs: typeof qe.thresholdMs === 'number' && Number.isFinite(qe.thresholdMs) ? qe.thresholdMs : null,
     }
     if (quickEye.recentMs.length !== quickEye.recentOk.length) {
@@ -319,7 +312,7 @@ export function parseProgress(raw: string | null | undefined): BrainProgress {
       quickEye.recentOk = ''
       quickEye.thresholdMs = null
       if (quickEye.variant === 1 && !centerOnly) quickEye.variant = 2
-      delete bestRuns.quickEye
+      delete (bestRuns as Record<string, number>).quickEye
     }
     const se = (data.sessions ?? {}) as Partial<SessionLog>
     const booster = se.booster && typeof se.booster === 'object' ? se.booster : { index: 0, sessions: 0 }
@@ -335,7 +328,7 @@ export function parseProgress(raw: string | null | undefined): BrainProgress {
     }
     const timing = data.settings && TIMING_MODES.includes(data.settings.timing) ? data.settings.timing : 1
     return {
-      v: 2,
+      v: 3,
       games,
       totalRounds: num(data.totalRounds),
       totalPoints: num(data.totalPoints),

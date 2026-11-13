@@ -3,12 +3,11 @@ import { useTranslation } from 'react-i18next'
 import { useReducedMotion } from 'motion/react'
 import { BookOpen, Check, Copy, Droplet, Undo2, X, type LucideIcon } from 'lucide-react'
 import { CANVAS_TONES, type CellTone, type CellView, type ChoiceView, type GameTheme, type GridView, type RoundView } from '@reeeeecall/shared/lib/brain-games'
+import { SetMatchBoard, CodeBreakBoard, MakeNumberBoard, MazeBoard } from './ThinkingBoards'
 import { BOARD_STRIP_H, CELL_INK, INK, boardHeight } from './brain-ui'
-import { QuickEyeBoard } from './QuickEyeBoard'
 
 /**
- * Draws whatever the engine hands over — a grid, a pick-one choice, or Quick Eye's field — on the
- * game's dark canvas. `demo` draws the same board for the how-to-play player: smaller, never
+ * Draws whatever the engine hands over — a grid or a pick-one choice — on the game's dark canvas. `demo` draws the same board for the how-to-play player: smaller, never
  * focusable, never taking input.
  *
  * Around a grid: a strip above it (header badge, chip, Flash Grid's waves, Match Pairs' miss
@@ -19,15 +18,12 @@ import { QuickEyeBoard } from './QuickEyeBoard'
 export interface BoardProps {
   view: RoundView
   onTap: (index: number) => void
-  onExposure: (actualMs: number, frameMs: number) => void
   width: number
   theme: GameTheme
   demo?: boolean
   /** The tallest the board may be (defaults to what is left of the window). */
   maxHeight?: number
-  /** Quick Eye: the fixation is running (the ready ring closes in). */
-  ready?: boolean
-  /** Move on from the answer's reveal (a tap on the board, Space / Enter): Quick Eye, a choice's worked line. */
+  /** Move on from the answer's reveal (a tap on the board, Space / Enter): a choice's worked line. */
   onSkip?: () => void
   /** The round is paused, or a card is over it: a memorise bar holds where it is. */
   paused?: boolean
@@ -37,7 +33,10 @@ export function BrainBoard(props: BoardProps) {
   const { view } = props
   if (view.kind === 'grid') return <Grid {...props} view={view} />
   if (view.kind === 'choice') return <Choice {...props} view={view} />
-  return <QuickEyeBoard view={view} onTap={props.onTap} onExposure={props.onExposure} width={props.width} demo={props.demo} maxSize={props.maxHeight} ready={props.ready} onSkip={props.onSkip} />
+  if (view.kind === 'setMatch') return <SetMatchBoard {...props} view={view} />
+  if (view.kind === 'codeBreak') return <CodeBreakBoard {...props} view={view} />
+  if (view.kind === 'makeNumber') return <MakeNumberBoard {...props} view={view} />
+  return <MazeBoard {...props} view={view} />
 }
 
 // The same gap maxColsFor() assumes, or the widest grid would overflow its board.

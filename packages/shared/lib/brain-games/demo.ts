@@ -1,6 +1,5 @@
 import { createRng } from './rng'
 import { brainGame } from './catalog'
-import { QUICK_EYE_MAX_VARIANT } from './games/quick-eye'
 import { DEFAULT_CONTEXT, type BrainGameId, type CreateContext, type RoundView } from './types'
 
 /**
@@ -12,15 +11,12 @@ export interface DemoFrame {
   view: RoundView
   /** How long the frame stays up. */
   holdMs: number
-  /** A tap the pointer makes on this frame (cell / option / direction index). */
+  /** A tap the pointer makes on this frame (cell / option index). */
   tap?: number
-  /** Quick Eye: this frame is the flash. */
-  flash?: boolean
 }
 
 /** The level and seed each demo uses — chosen so the demo round is short and readable. */
-const DEMO_SETUP: Record<BrainGameId, { level: number; seed: number; variant?: number }> = {
-  quickEye: { level: 0, seed: 7, variant: 2 },
+const DEMO_SETUP: Record<BrainGameId, { level: number; seed: number }> = {
   oddOneOut: { level: 1, seed: 3 },
   schulte: { level: 1, seed: 5 },
   memoryGrid: { level: 1, seed: 11 },
@@ -29,6 +25,12 @@ const DEMO_SETUP: Record<BrainGameId, { level: number; seed: number; variant?: n
   pairs: { level: 1, seed: 9 },
   stroop: { level: 1, seed: 7 },
   math: { level: 1, seed: 8 },
+  setMatch: { level: 1, seed: 3 },
+  // 41 → 1 strike, 21 → 1 ball, 42: both answers shown before the code (games/code-break.ts).
+  codeBreak: { level: 1, seed: 6 },
+  makeNumber: { level: 1, seed: 2 },
+  // A 4×4 maze from the bottom-left corner with one fork and four turns (games/maze-run.ts).
+  mazeRun: { level: 1, seed: 6 },
 }
 
 const TAP_HOLD_MS = 650
@@ -38,12 +40,7 @@ const RESULT_HOLD_MS = 1400
 export function buildDemo(gameId: BrainGameId, ctx: Partial<CreateContext> = {}): DemoFrame[] {
   const def = brainGame(gameId).def
   const setup = DEMO_SETUP[gameId]
-  // Quick Eye demonstrates the player's own stage (from V2 — V1 is only ever practice), or the
-  // centre-only task for a player on that setting.
-  const centerOnly = ctx.centerOnly === true
-  const variant =
-    gameId === 'quickEye' ? (centerOnly ? 1 : Math.max(2, Math.min(QUICK_EYE_MAX_VARIANT, Math.round(ctx.variant ?? setup.variant ?? 2)))) : (setup.variant ?? 1)
-  const context: CreateContext = { ...DEFAULT_CONTEXT, maxCols: 4, ringSlots: [8, 16, 16], ...ctx, variant, centerOnly }
+  const context: CreateContext = { ...DEFAULT_CONTEXT, maxCols: 4, ...ctx }
   let s = def.create(setup.level, createRng(setup.seed), context)
   const frames: DemoFrame[] = []
   for (let guard = 0; guard < 200; guard++) {
@@ -52,12 +49,6 @@ export function buildDemo(gameId: BrainGameId, ctx: Partial<CreateContext> = {})
       break
     }
     const view = def.view(s)
-    if (view.kind === 'quickEye' && view.phase === 'stimulus' && def.exposed) {
-      // The demo shows the flash long enough to see what the game is about.
-      frames.push({ view, holdMs: 900, flash: true })
-      s = def.exposed(s, view.exposureMs, 1000 / 60)
-      continue
-    }
     const pending = def.pendingMs(s)
     if (pending !== null) {
       frames.push({ view, holdMs: Math.min(pending, 1600) })

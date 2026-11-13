@@ -46,8 +46,6 @@ export type BrainStackParamList = {
   BrainTraining: undefined
   /** Free practice of one game. `mode` is a game id (BrainGameId); anything else goes back. */
   BrainPlay: { mode: string }
-  /** The research basis (ko/en only). */
-  BrainResearch: undefined
 }
 
 // Main tabs (로그인 후)

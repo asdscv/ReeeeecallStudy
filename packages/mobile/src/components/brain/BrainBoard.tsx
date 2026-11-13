@@ -17,14 +17,14 @@ import {
 } from '@reeeeecall/shared/lib/brain-games'
 import { formatCount, formatDecimal } from '@reeeeecall/shared/lib/format-number'
 import { testProps } from '../../utils/testProps'
+import { SetMatchBoard, CodeBreakBoard, MakeNumberBoard, MazeBoard } from './ThinkingBoards'
 import { BOARD_STRIP_H, CANVAS_INK, CELL_INK, FX, type FeatherName } from './brain-ui'
 import { GradientFill } from './GameCanvas'
 import { useDrain, useMotion, type Motion } from './motion'
-import { QuickEyeBoard } from './QuickEyeBoard'
 
 /**
- * Draws whatever trial the engine hands over — a grid, a pick-one choice, or Quick Eye's field —
- * on the game's dark canvas. Three shapes cover all nine games.
+ * Draws whatever trial the engine hands over — a grid or a pick-one choice — on the game's dark
+ * canvas.
  *
  * Around a grid: a strip above it (header badge, chip, Flash Grid's waves, Match Pairs' miss
  * budget), a memorise bar under it, Odd One Out's «없음» button below and its miss chip / «없었어요»
@@ -37,15 +37,14 @@ import { QuickEyeBoard } from './QuickEyeBoard'
 export interface BoardProps {
   view: RoundView
   onTap: (index: number) => void
-  onExposure: (actualMs: number, frameMs: number) => void
   /** The space the board may use, measured by its parent. */
   width: number
   height: number
   theme: GameTheme
   demo?: boolean
-  /** The round is paused, or a card is over it: Quick Eye stops counting frames, a memorise bar holds. */
+  /** The round is paused, or a card is over it: a memorise bar holds. */
   paused?: boolean
-  /** A tap on the answer's reveal moves on: Quick Eye's field, a choice's worked line (on with the next trial). */
+  /** A tap on the answer's reveal moves on: a choice's worked line (on with the next trial). */
   onSkipReveal?: () => void
   /** Demo only: each tap target's view, by the index a tap on it sends. */
   registerTarget?: (index: number, node: RNView | null) => void
@@ -55,20 +54,10 @@ export function BrainBoard(props: BoardProps) {
   const { view } = props
   if (view.kind === 'grid') return <GridBoard {...props} view={view} />
   if (view.kind === 'choice') return <ChoiceBoard {...props} view={view} />
-  return (
-    <QuickEyeBoard
-      view={view}
-      onTap={props.onTap}
-      onExposure={props.onExposure}
-      onSkipReveal={props.onSkipReveal}
-      width={props.width}
-      height={props.height}
-      theme={props.theme}
-      demo={props.demo}
-      paused={props.paused}
-      registerTarget={props.registerTarget}
-    />
-  )
+  if (view.kind === 'setMatch') return <SetMatchBoard {...props} view={view} />
+  if (view.kind === 'codeBreak') return <CodeBreakBoard {...props} view={view} />
+  if (view.kind === 'makeNumber') return <MakeNumberBoard {...props} view={view} />
+  return <MazeBoard {...props} view={view} />
 }
 
 /**
@@ -975,7 +964,7 @@ export function ChoiceBoard({ view, onTap, width, height, theme, demo, onSkipRev
               styles.stimulus,
               { minHeight: stimH, paddingHorizontal: padX, paddingVertical: padY },
               // Color Word's frame lure: a ring in a third colour, inside the card's edge.
-              frame ? { borderWidth: frame, borderColor: INK_COLORS[st.frame ?? 'red'] } : null,
+              frame ? { borderWidth: frame, borderColor: INK_COLORS[st.frame ?? 'black'] } : null,
               enter,
             ]}
             testID={demo || (!st.tokens && !st.terms) ? undefined : 'brain-stimulus'}

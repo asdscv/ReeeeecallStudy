@@ -2,7 +2,7 @@
   "title": "Latihan Otak",
   "subtitle": "Permainan fokus dan memori untuk kebiasaan aktivitas otak yang rutin",
   "disclaimer": "Fitur ini bukan perangkat medis dan tidak dimaksudkan untuk mendiagnosis, mengobati, menyembuhkan, atau mencegah kondisi medis apa pun.",
-  "worry": "Jika kamu khawatir tentang daya ingatmu, bicarakan dengan dokter atau layanan kesehatan setempat, alih-alih bermain lebih banyak.",
+  "worry": "Jika khawatir tentang ingatan, konsultasikan dengan dokter atau klinik memori setempat.",
   "training": {
     "title": "Latihan hari ini",
     "desc": "{{count}} permainan · sekitar {{minutes}} menit",
@@ -43,10 +43,8 @@
     "level": "Lv. {{level}}",
     "best": "Terbaik Lv. {{level}}",
     "new": "Baru",
-    "quickEyeLevel": "Tahap {{stage}} · kecepatan {{speed}}",
     "record": "Terbaik {{value}} poin",
     "settings": "Pengaturan",
-    "research": "Dasar penelitian",
     "howItWorks": "Setiap teka-teki dibuat baru. Jawab benar, berikutnya sedikit lebih sulit; salah, jadi lebih mudah. Level hanya menunjukkan kemampuanmu di permainan itu — bukan ukuran daya ingat atau kesehatan otak."
   },
   "settings": {
@@ -57,9 +55,6 @@
     "timing_1_5": "1,5×",
     "timing_2": "2×",
     "timing_0": "Tanpa batas",
-    "centerOnly": "Mata Cepat: tengah saja",
-    "centerOnlyHelp": "Aktifkan jika bintang di tepi sulit terlihat. Kamu hanya menjawab gambar di tengah.",
-    "flash": "Mata Cepat menampilkan gambar dengan sangat singkat. Jika kamu sensitif terhadap cahaya berkedip, mainlah dengan santai.",
     "close": "Tutup",
     "sound": "Efek suara",
     "soundHelp": "Suara singkat saat jawaban benar atau salah.",
@@ -73,10 +68,6 @@
     "reasoning": "Penalaran"
   },
   "games": {
-    "quickEye": {
-      "name": "Mata Cepat",
-      "desc": "Lihat bentuk di tengah dan tangkap sekilas ke arah mana bintang muncul."
-    },
     "memoryGrid": {
       "name": "Kotak Kilat",
       "desc": "Latihan mengingat posisi: ingat kotak yang menyala, lalu ketuk."
@@ -108,6 +99,22 @@
     "series": {
       "name": "Pola Angka",
       "desc": "Temukan polanya dan pilih angka berikutnya."
+    },
+    "setMatch": {
+      "name": "Cari Trio",
+      "desc": "Cari tiga kartu yang setiap cirinya semua sama atau semua berbeda."
+    },
+    "codeBreak": {
+      "name": "Tebak Kode",
+      "desc": "S: angka dan posisi benar. B: angka benar, posisi salah. Gunakan petunjuk untuk menebak kode."
+    },
+    "makeNumber": {
+      "name": "Buat Angka",
+      "desc": "Gunakan setiap angka tepat satu kali untuk mencapai target."
+    },
+    "mazeRun": {
+      "name": "Labirin",
+      "desc": "Gambar jalur menuju bendera. Mundur saat menemui jalan buntu."
     }
   },
   "play": {
@@ -183,59 +190,75 @@
     "newBestReverse": "{{count}} terbalik!",
     "newBestReverse_one": "{{count}} terbalik!",
     "newBestReverse_other": "{{count}} terbalik!",
-    "lookalikeBadge": "Gambar mirip"
-  },
-  "quickEye": {
-    "watch": "Lihat ke tengah",
-    "what": "Apa yang ada di tengah?",
-    "where": "Ke arah mana bintangnya?",
-    "sameOrDifferent": "Apakah dua gambar di tengah sama?",
-    "same": "Sama",
-    "different": "Beda",
-    "circle": "Lingkaran",
-    "square": "Persegi",
-    "stage": "Tahap {{stage}}",
-    "dir": {
-      "0": "Atas",
-      "1": "Kanan atas",
-      "2": "Kanan",
-      "3": "Kanan bawah",
-      "4": "Bawah",
-      "5": "Kiri bawah",
-      "6": "Kiri",
-      "7": "Kiri atas"
+    "lookalikeBadge": "Gambar mirip",
+    "setMatchFind": "Pilih tiga kartu: setiap ciri semua sama atau semua berbeda",
+    "setMatchNone": "Tidak ada trio",
+    "setPicked_one": "{{count}} dipilih",
+    "setPicked_other": "{{count}} dipilih",
+    "setCard_one": "{{count}} bentuk",
+    "setCard_other": "{{count}} bentuk",
+    "setBroken": "Periksa {{attributes}}. Dua sama dan satu berbeda bukan trio.",
+    "setAttribute": {
+      "shape": "Bentuk",
+      "count": "Jumlah",
+      "color": "Warna",
+      "fill": "Isian"
     },
-    "speedLevel": "Level kecepatan {{level}}",
-    "knob": {
-      "wider": "Sekarang lihat lebih lebar",
-      "ring2": "Sampai lingkar tengah",
-      "ring3": "Sampai lingkar luar",
-      "crowd": "Cari bintang di antara segitiga",
-      "moreCrowd": "Segitiganya makin banyak",
-      "similar": "Bentuk di tengah makin mirip",
-      "sameDiff": "Sama atau beda?"
+    "setShape": {
+      "circle": "Lingkaran",
+      "triangle": "Segitiga",
+      "square": "Persegi",
+      "diamond": "Belah ketupat"
     },
-    "stageUp": {
-      "title": "Tahap baru",
-      "stage": "Tahap {{stage}}",
-      "ease": "Tahap baru dimulai sedikit lebih lambat",
-      "continue": "Lanjut"
+    "setColor": {
+      "blue": "Biru",
+      "vermillion": "Merah jingga",
+      "black": "Hitam"
     },
-    "gauge": "{{count}} jawaban benar lagi, jadi lebih cepat",
-    "speedUp": "Satu langkah lebih cepat",
-    "topSpeed": "Kecepatan tertinggi",
-    "hold": "Pertahankan kecepatan tertinggi {{n}}/14",
-    "wasHere": "Ada di sini",
-    "nearMiss": "Hampir, tepat di sebelahnya",
-    "missFast": "Yang tadi cepat sekali",
-    "slowerStart": "Sedikit lebih cepat",
-    "legEnd": "Bagian selesai",
-    "nextGoal": "Berikutnya: bertahan di sekitar level kecepatan {{level}}",
-    "landscapeHint": "Miringkan ponsel atau pakai tablet agar terlihat lebih lebar",
-    "revealA11y": "Jawaban: {{center}}, bintang di {{dir}}",
-    "warmup": "Bersiap-siap",
-    "gauge_other": "{{count}} jawaban benar lagi, jadi lebih cepat",
-    "gauge_one": "{{count}} jawaban benar lagi, jadi lebih cepat"
+    "setFill": {
+      "solid": "Penuh",
+      "striped": "Bergaris",
+      "outline": "Garis tepi"
+    },
+    "codeBreakGuess_one": "Tebak kode {{length}} digit · sisa {{count}} tebakan",
+    "codeBreakGuess_other": "Tebak kode {{length}} digit · sisa {{count}} tebakan",
+    "codeGuesses": "Tebakan {{used}}/{{total}}",
+    "codeRepeats": "Angka boleh berulang",
+    "codeDistinct": "Angka tidak berulang",
+    "codeHistory": "Tebakan dan petunjuk",
+    "codeFirstGuess": "Masukkan tebakan pertama",
+    "codeFeedback": "{{strikes}} S · {{balls}} B",
+    "codeEntry": "Tebakan saat ini",
+    "codeNotes": "Tandai angka yang dicoret",
+    "codeNote": "Ubah catatan {{digit}}",
+    "codeAnswer": "Kode: {{code}}",
+    "erase": "Hapus",
+    "submit": "Periksa",
+    "undo": "Urungkan",
+    "clear": "Kosongkan",
+    "makeNumberSigns": "Pilih tanda untuk membuat {{target}}",
+    "makeNumberTarget": "Gunakan semua angka untuk membuat {{target}}",
+    "makeTarget": "Target {{target}}",
+    "makeFixed": "Pertahankan urutan · pilih tanda",
+    "makeAny": "Setiap angka sekali · urutan bebas",
+    "makeTries_one": "Sisa {{count}} percobaan",
+    "makeTries_other": "Sisa {{count}} percobaan",
+    "makeExpression": "Ekspresi Anda",
+    "makeValue": "Hasilnya {{value}}. Coba ubah.",
+    "mazeRunGo": "Gambar jalur menuju bendera",
+    "mazeRunKeys_one": "Ambil {{count}} kunci sesuai urutan lalu menuju bendera",
+    "mazeRunKeys_other": "Ambil {{count}} kunci sesuai urutan lalu menuju bendera",
+    "mazeRunMemorize": "Ingat dinding dan jalur",
+    "mazeMemorise": "Dinding akan segera tersembunyi",
+    "mazeDrag": "Seret atau ketuk sel tetangga · mundur untuk menghapus",
+    "mazeBumps_one": "Sisa {{count}} benturan",
+    "mazeBumps_other": "Sisa {{count}} benturan",
+    "mazeStart": "Mulai",
+    "mazeGoal": "Bendera · tujuan",
+    "mazeKey_one": "Kunci {{count}}",
+    "mazeKey_other": "Kunci {{count}}",
+    "memorizeNumbers": "Ingat posisi angka · 1 sampai {{max}}",
+    "memoryBadge": "Ingatan kartu tertutup"
   },
   "summary": {
     "livesOut": "Ronde selesai",
@@ -258,49 +281,25 @@
     "voided": "Layar terus tersendat, jadi ronde dihentikan"
   },
   "colors": {
-    "red": "MERAH",
     "blue": "BIRU",
-    "green": "HIJAU",
-    "yellow": "KUNING",
+    "orange": "JINGGA",
     "purple": "UNGU",
-    "orange": "JINGGA"
+    "black": "HITAM",
+    "brown": "COKELAT",
+    "gray": "ABU-ABU"
   },
   "intro": {
     "howTo": "Cara bermain",
     "replay": "Putar ulang",
     "start": "Mulai",
-    "practiceNote": "4 soal pertama adalah latihan — tidak mengurangi kesempatan dan tidak menambah skor.",
+    "practiceNote": "Beberapa soal pertama adalah latihan. Kesempatan dan poin tidak berkurang.",
     "level": "Level",
-    "speed": "Kecepatan",
-    "stage": "Tahap",
     "rounds": "Dimainkan",
     "best": "Skor terbaik",
     "welcomeBack": "Selamat datang kembali. Beberapa soal pertama akan menemukan levelmu lagi.",
     "firstPlacement": "Beberapa soal pertama mencari level awal yang pas."
   },
   "mechanics": {
-    "quickEye": {
-      "periphery": {
-        "title": "Cari bintangnya",
-        "body": "Sebuah bintang juga muncul di luar. Pilih gambar tengah, lalu sisi tempat bintang itu muncul."
-      },
-      "distractors": {
-        "title": "Bintang di antara segitiga",
-        "body": "Segitiga juga muncul. Pilih sisi tempat satu bintang itu muncul."
-      },
-      "similar": {
-        "title": "Bentuk mirip",
-        "body": "Sudut persegi makin membulat sehingga makin mirip lingkaran."
-      },
-      "sameDiff": {
-        "title": "Sama atau beda?",
-        "body": "Dua bentuk muncul di tengah. Pilih apakah keduanya sama."
-      },
-      "clearView": {
-        "title": "Layar lebih jelas",
-        "body": "Penutupnya berubah, jadi beberapa soal pertama dimulai sedikit lebih lambat."
-      }
-    },
     "oddOneOut": {
       "rotation": {
         "title": "Yang terputar",
@@ -316,7 +315,7 @@
       },
       "glyphs": {
         "title": "Huruf yang mengecoh",
-        "body": "Huruf yang mirip, seperti b dan d atau 6 dan 9."
+        "body": "Huruf yang mirip, seperti b dan d atau O dan Q."
       },
       "colorNoise": {
         "title": "Abaikan warna",
@@ -381,6 +380,10 @@
       "unmarked": {
         "title": "Tanpa tanda",
         "body": "Angka yang sudah ditemukan tidak memudar. Ingat sendiri sampai mana kamu mengetuk."
+      },
+      "memory": {
+        "title": "Ingatan kartu tertutup",
+        "body": "Ingat posisinya. Setelah kartu tertutup, ketuk dari 1 berurutan. Kartu salah terbuka sebentar."
       }
     },
     "memoryGrid": {
@@ -397,6 +400,10 @@
       "reverse": {
         "title": "Terbalik",
         "body": "Ketuk kotak dengan urutan terbalik, mulai dari yang terakhir menyala. Mulai sekarang selalu terbalik."
+      },
+      "faster": {
+        "title": "Kedip lebih cepat",
+        "body": "Kotak menyala berurutan lebih cepat. Jangan sampai urutannya terlewat."
       }
     },
     "series": {
@@ -479,6 +486,22 @@
       "missingTerm": {
         "title": "Cari yang kosong",
         "body": "Sekarang ? bisa ada di tengah deret. Pilih angka yang mengisinya."
+      },
+      "primes": {
+        "title": "Bilangan prima berurutan",
+        "body": "Muncul aturan: bilangan prima (hanya habis dibagi 1 dan dirinya sendiri) berurutan."
+      },
+      "product": {
+        "title": "Kalikan dua angka sebelumnya",
+        "body": "Muncul aturan: tiap angka adalah hasil kali dua angka sebelumnya."
+      },
+      "digitSum": {
+        "title": "Tambah digitnya",
+        "body": "Muncul aturan: tiap angka adalah angka sebelumnya ditambah tiap digitnya."
+      },
+      "diffPrimes": {
+        "title": "Selisih bilangan prima",
+        "body": "Muncul aturan: selisihnya bilangan prima berurutan."
       }
     },
     "pairs": {
@@ -554,6 +577,94 @@
         "title": "Dua digit × dua digit",
         "body": "Ada soal perkalian dua angka dua digit."
       }
+    },
+    "setMatch": {
+      "color": {
+        "title": "Warna ikut bermain",
+        "body": "Selain bentuk dan jumlah, ketiga warna harus semua sama atau semua berbeda."
+      },
+      "fill": {
+        "title": "Isian ikut bermain",
+        "body": "Perhatikan penuh, garis, dan tepi. Setiap ciri harus semua sama atau semua berbeda."
+      },
+      "none": {
+        "title": "Trio mungkin tidak ada",
+        "body": "Jika tidak ada tiga kartu yang membentuk trio, pilih Tidak ada trio."
+      },
+      "oneSet": {
+        "title": "Tepat satu trio",
+        "body": "Temukan satu trio di antara kartu yang mirip."
+      }
+    },
+    "codeBreak": {
+      "three": {
+        "title": "Kode tiga digit",
+        "body": "Kini tebak tiga digit. S berarti angka dan posisi benar; B berarti angka benar di posisi lain."
+      },
+      "four": {
+        "title": "Kode empat digit",
+        "body": "Gunakan petunjuk sebelumnya untuk menebak empat digit."
+      },
+      "five": {
+        "title": "Kode lima digit",
+        "body": "Kini lima digit. Simpulkan posisi sekaligus angkanya."
+      },
+      "zero": {
+        "title": "Nol ikut bermain",
+        "body": "Kode boleh berisi 0, termasuk di posisi pertama."
+      },
+      "repeats": {
+        "title": "Angka boleh berulang",
+        "body": "Satu angka dapat muncul beberapa kali. Gunakan petunjuk untuk menentukan jumlahnya."
+      }
+    },
+    "makeNumber": {
+      "multiply": {
+        "title": "Perkalian ikut bermain",
+        "body": "Gunakan ×. Perkalian didahulukan dari tambah dan kurang."
+      },
+      "divide": {
+        "title": "Pembagian ikut bermain",
+        "body": "Gunakan juga ÷. Hitung × dan ÷ lebih dahulu, dari kiri ke kanan."
+      },
+      "anyOrder": {
+        "title": "Pilih urutannya",
+        "body": "Ketuk angka dalam urutan bebas. Gunakan setiap ubin tepat sekali."
+      },
+      "brackets": {
+        "title": "Gunakan kurung",
+        "body": "Hitung isi kurung lebih dahulu. Target ini memerlukan kurung."
+      },
+      "target24": {
+        "title": "Buat 24",
+        "body": "Gunakan empat angka sekali untuk membuat 24. Coba urutan dan kurung lain."
+      },
+      "fraction": {
+        "title": "Pecahan di tengah langkah",
+        "body": "Hasil antara boleh berupa pecahan. Hasil akhir harus sesuai target."
+      }
+    },
+    "mazeRun": {
+      "winding": {
+        "title": "Lebih banyak percabangan",
+        "body": "Jalur makin berliku. Mundur saat menemui jalan buntu."
+      },
+      "keys": {
+        "title": "Ambil kunci dahulu",
+        "body": "Ambil kunci berurutan lalu menuju bendera. Kunci tetap tersimpan saat mundur."
+      },
+      "moreKeys": {
+        "title": "Lebih banyak kunci",
+        "body": "Ambil semua kunci sesuai urutan nomor."
+      },
+      "hidden": {
+        "title": "Ingat dindingnya",
+        "body": "Dinding tersembunyi setelah pratinjau. Bergerak dari ingatan. Sisa benturan ditampilkan terpisah."
+      },
+      "hiddenKeys": {
+        "title": "Kunci dari ingatan",
+        "body": "Di labirin tersembunyi, ambil kunci berurutan sebelum mencapai bendera."
+      }
     }
   },
   "rule": {
@@ -608,17 +719,9 @@
       "title": "Tujuh dalam ingatan",
       "body": "Mengingat 7 di Urutan atau Kotak Kilat."
     },
-    "quickEyeStage5": {
-      "title": "Mata Cepat tahap 5",
-      "body": "Mencapai tahap 5 Mata Cepat."
-    },
-    "quickEyeStage10": {
-      "title": "Mata Cepat tahap 10",
-      "body": "Mencapai tahap 10 Mata Cepat."
-    },
     "allGames": {
       "title": "Semua game",
-      "body": "Mencoba ke-9 game."
+      "body": "Mencoba semua game."
     },
     "firstSession": {
       "title": "Sesi pertama",
