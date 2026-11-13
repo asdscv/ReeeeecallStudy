@@ -352,7 +352,10 @@ describe('the board games\' new round logic (GAMES_DIFFICULTY_PLAN §2.3-2.9)', 
     for (const c of placement) expect(unseen.filter((t) => !c.ctx.blockRules.includes(t)).every((t) => hasBit(useBrainStore.getState().meta.seen, mechanicInfo(t)!.bit))).toBe(true)
     // No card met cold in placement; the round's seed and its last trials ride along.
     expect(new Set(calls.map((c) => c.ctx.roundSeed)).size).toBe(1)
-    expect(calls[2].ctx.recent.map((t) => t.level)).toEqual([calls[0].level, calls[1].level])
+    // Repeated puzzle signatures can make create() retry with the SAME context. Those are
+    // not extra trials; inspect distinct trial contexts rather than three generator calls.
+    const trials = calls.filter((c, i) => i === 0 || c.ctx !== calls[i - 1].ctx)
+    expect(trials[2].ctx.recent.map((t) => t.level)).toEqual([trials[0].level, trials[1].level])
     restore()
   })
 

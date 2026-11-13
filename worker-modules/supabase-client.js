@@ -31,7 +31,7 @@ export function createSupabaseClient(env) {
   // and its title — the translation's title is the only record of the phrase it was written for.
   // Newest first: prod caps a response at 1,000 rows, and the oldest are the cheapest to lose.
   async function getPlannedArticles() {
-    const url = `${restUrl}/contents?select=target_query,deck_family,title,locale&target_query=not.is.null&order=created_at.desc&limit=1000`
+    const url = `${restUrl}/contents?select=target_query,deck_family,title,locale,tags&target_query=not.is.null&order=created_at.desc&limit=1000`
     const res = await fetch(url, {
       headers: {
         apikey: config.serviceKey,

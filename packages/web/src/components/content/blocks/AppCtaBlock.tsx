@@ -1,6 +1,8 @@
+import { brainGuide, brainGuidePath, brainGuideLoginPath, brainCtaCopy } from '@reeeeecall/shared/lib/brain-content'
+import { useAuthStore } from '../../../stores/auth-store'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowRight, Layers } from 'lucide-react'
+import { ArrowRight, Layers, Brain } from 'lucide-react'
 import type { AppCtaBlock as AppCtaBlockType } from '../../../types/content-blocks'
 import { playStoreUrlWithReferrer } from '@reeeeecall/shared/lib/app-store-links'
 import { StoreBadges } from '../../common/AppDownload'
@@ -14,11 +16,15 @@ export function AppCtaBlock({ props }: { props: AppCtaBlockType['props'] }) {
   const { t, i18n } = useTranslation('content')
   const trackEvent = useTrackEvent()
   const { position, campaign, deckFamily } = props
-  const deck = useOfficialDeck(deckFamily, i18n.language)
+  const brain = brainGuide(props.brainGuide)
+  const copy = brainCtaCopy(props.locale || i18n.language)
+  const user = useAuthStore((s) => s.user)
+  const brainHref = brain && (user ? brainGuidePath(brain.id) : brainGuideLoginPath(brain.id))
+  const deck = useOfficialDeck(brain ? undefined : deckFamily, i18n.language)
   // No deck carries English meanings — English readers get the English word list for the exam level.
   const hub = isDeckLanguage(i18n.language.slice(0, 2)) ? null : vocabHubForFamily(deckFamily)
 
-  const track = (target: 'ios' | 'android' | 'web' | 'deck' | 'hub') =>
+  const track = (target: 'ios' | 'android' | 'web' | 'deck' | 'hub' | 'brain') =>
     trackEvent({ category: 'content', action: 'app_cta_click', label: `${position}:${target}` })
 
   const utm = (content: string) => new URLSearchParams({
@@ -30,8 +36,14 @@ export function AppCtaBlock({ props }: { props: AppCtaBlockType['props'] }) {
 
   return (
     <aside className="my-10 rounded-2xl border border-border bg-accent/40 p-6 sm:p-8" data-app-cta={position}>
-      <h3 className="text-lg sm:text-xl font-bold text-foreground mb-2">{t(`appCta.${position}.title`)}</h3>
-      <p className="text-muted-foreground leading-relaxed mb-5">{t(`appCta.${position}.description`)}</p>
+      <h3 className="text-lg sm:text-xl font-bold text-foreground mb-2">{brain ? copy.title : t(`appCta.${position}.title`)}</h3>
+      <p className="text-muted-foreground leading-relaxed mb-5">{brain ? copy.description : t(`appCta.${position}.description`)}</p>
+      {brainHref && (
+        <Link to={`${brainHref}${brainHref.includes('?') ? '&' : '?'}${utm(`brain_${position}`)}`} onClick={() => track('brain')}
+          className="mb-5 inline-flex min-h-14 items-center gap-3 rounded-xl bg-brand px-5 py-3 font-semibold text-white no-underline hover:bg-brand-hover" data-app-cta-brain={brain?.id}>
+          <Brain className="h-5 w-5" aria-hidden="true" />{copy.button}<ArrowRight className="h-4 w-4" aria-hidden="true" />
+        </Link>
+      )}
       {deck && (
         <Link
           to={`/d/${deck.id}?${utm(`deck_${position}`)}`}
@@ -52,7 +64,7 @@ export function AppCtaBlock({ props }: { props: AppCtaBlockType['props'] }) {
           </span>
         </Link>
       )}
-      {!deck && hub && (
+      {!brain && !deck && hub && (
         <Link
           to={`${vocabHubPath(hub)}?${utm(`hub_${position}`)}`}
           onClick={() => track('hub')}
@@ -77,14 +89,14 @@ export function AppCtaBlock({ props }: { props: AppCtaBlockType['props'] }) {
           playStoreHref={playStoreUrlWithReferrer({ source: 'blog', medium: MEDIUM, campaign, content: position })}
           onClick={track}
         />
-        <Link
+        {!brain && <Link
           to={`/auth/login?${utm(position)}`}
           onClick={() => track('web')}
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand hover:text-brand-hover no-underline"
         >
           {t('appCta.web')}
           <ArrowRight className="w-4 h-4" />
-        </Link>
+        </Link>}
       </div>
     </aside>
   )

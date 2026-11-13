@@ -1,3 +1,4 @@
+vi.mock('../brain-content.js', async (original) => ({ ...await original(), planBrainTopic: vi.fn().mockResolvedValue(null) }))
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 vi.mock('../logger.js', () => ({ createLogger: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() }))

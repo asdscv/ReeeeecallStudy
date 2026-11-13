@@ -1,3 +1,5 @@
+import { brainGuideForQuery, isUnsupportedBrainQuery } from '../packages/shared/lib/brain-content.ts'
+import { brainTopic } from './brain-content.js'
 // Daily keyword planner: pick today's article from what Google already shows us for.
 //
 // Search Console lists queries where the site gets impressions but no clicks — usually because
@@ -40,7 +42,7 @@ export const DECK_BOOST = 2
 
 const SITE = {
   name: 'ReeeeecallStudy',
-  what_it_is: 'A flashcard app with spaced repetition for memorizing: exam preparation (TOEIC, IELTS, TOEFL, JLPT, HSK, TOPIK, SAT, 수능, professional certifications), vocabulary and language learning. Its website publishes free study guides.',
+  what_it_is: 'A flashcard app with spaced repetition for memorizing: exam preparation (TOEIC, IELTS, TOEFL, JLPT, HSK, TOPIK, SAT, 수능, professional certifications), vocabulary and language learning. It also offers 12 adaptive brain games for puzzle practice (Odd One Out, Number Hunt, memory grids, sequences, number patterns, matching cards, colour words, arithmetic, Set Match, Bulls and Cows, make-a-number puzzles and mazes). Its website publishes practical study and game guides, without medical or IQ claims.',
 }
 
 export function normalizeQuery(q) {
@@ -103,9 +105,9 @@ export function buildKeywordJevRequest(candidates, written = []) {
     const q = `\`candidates[${i}].query\``
     questions[`fit_${i}`] = {
       type: 'noul',
-      instructions: `Would a person who typed ${q} into Google be well served by a practical study guide published by \`site\`? Yes means they are studying — preparing for an exam, learning a language or vocabulary, or memorizing material — and a guide can genuinely answer the query.`,
+      instructions: `Would a person who typed ${q} into Google be well served by a practical study guide published by \`site\`? Yes means they are studying, learning a language, memorizing material, OR seeking rules, worked examples or practice for one of our actual brain games. Reject diagnosis, dementia prevention/treatment, IQ tests and promised health benefits. A practical guide must directly answer the query.`,
       criteria: {
-        true: 'A learner\'s question that a study guide can answer.',
+        true: 'A learner’s study question or a player’s brain-game question that a practical guide can answer.',
         false: 'The searcher wants something else: a specific product or download, news, entertainment, a person, homework answers to copy, or a topic unrelated to studying and memorizing.',
       },
     }
@@ -210,11 +212,13 @@ export function chooseKeyword(candidates, answers, opts = KEYWORD_PLANNER, { com
     const duplicate = comparedWithWritten ? (noulOf(answers[`dup_${i}`]) ?? 1) : 0
     const locale = choiceOf(answers[`lang_${i}`])
     const format = choiceOf(answers[`format_${i}`])
-    const family = familyForQuery(choiceOf(answers[`deck_${i}`]), c.query)
+    const brain = brainGuideForQuery(c.query)
+    const family = brain ? null : familyForQuery(choiceOf(answers[`deck_${i}`]), c.query)
     const deckFamily = family ? formatDeckFamily(family) : null
-    return { ...c, fit, brand, duplicate, locale, format, deckFamily, score: c.impressions * fit * (deckFamily ? DECK_BOOST : 1) }
+    return { ...c, fit, brand, duplicate, locale, format, deckFamily, brainGuide: brain?.id ?? null, score: c.impressions * fit * (deckFamily || brain ? DECK_BOOST : 1) }
   })
   const eligible = judged
+    .filter((j) => !isUnsupportedBrainQuery(j.query))
     .filter((j) => j.fit >= opts.minFit)
     .filter((j) => j.brand < opts.maxBrand)
     .filter((j) => j.duplicate < (opts.maxDuplicate ?? 0.5))
@@ -226,6 +230,8 @@ export function chooseKeyword(candidates, answers, opts = KEYWORD_PLANNER, { com
 }
 
 export function topicFromKeyword(pick) {
+  const brain = brainGuideForQuery(pick.query)
+  if (brain) return brainTopic(brain, pick.query, pick.locale, pick.format)
   return {
     id: slugify(pick.query).replace(/^-+|-+$/g, '') || `search-query-${Date.now()}`,
     category: 'exam preparation and studying',
