@@ -1,3 +1,4 @@
+import { rememberBrainAuthReturn, consumeBrainAuthReturn } from '../../../lib/brain-auth-return'
 import { render, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
@@ -38,6 +39,7 @@ const renderCallback = () =>
 
 beforeEach(() => {
   vi.clearAllMocks()
+  sessionStorage.clear()
   vi.useFakeTimers()
   // Reset captured hash to empty (no hash)
   _setCapturedHash('')
@@ -327,5 +329,34 @@ describe('Error view', () => {
     await user.click(btn)
 
     expect(mockNavigate).toHaveBeenCalledWith('/auth/login', { replace: true })
+  })
+})
+
+
+describe('brain article return after OAuth', () => {
+  it('returns to the game after sign-in and consumes the destination', () => {
+    rememberBrainAuthReturn('/brain/play/codeBreak')
+    let callback: AuthCallback = () => {}
+    mockOnAuthStateChange.mockImplementation((cb: AuthCallback) => {
+      callback = cb
+      return { data: { subscription: { unsubscribe: mockUnsubscribe } } }
+    })
+    renderCallback()
+    act(() => callback('SIGNED_IN', fakeSession))
+    expect(mockNavigate).toHaveBeenCalledWith('/brain/play/codeBreak', { replace: true })
+    expect(consumeBrainAuthReturn()).toBeNull()
+  })
+
+  it('password recovery takes priority over a pending game return', () => {
+    rememberBrainAuthReturn('/brain/play/codeBreak')
+    let callback: AuthCallback = () => {}
+    mockOnAuthStateChange.mockImplementation((cb: AuthCallback) => {
+      callback = cb
+      return { data: { subscription: { unsubscribe: mockUnsubscribe } } }
+    })
+    renderCallback()
+    act(() => callback('PASSWORD_RECOVERY', fakeSession))
+    expect(mockNavigate).toHaveBeenCalledWith('/auth/reset-password', { replace: true })
+    expect(consumeBrainAuthReturn()).toBeNull()
   })
 })

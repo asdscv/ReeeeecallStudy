@@ -1,3 +1,4 @@
+import { brainGuide, brainGuideLoginPath, brainCtaCopy } from '../../packages/shared/lib/brain-content.ts'
 import { escapeHtml } from './helpers.js'
 import { APP_STORE_URL, playStoreUrlWithReferrer } from '../../packages/shared/lib/app-store-links.ts'
 
@@ -41,8 +42,11 @@ export function renderBlocksToHtml(blocks, { articleTitle, deckLink } = {}) {
       }
       case 'app_cta': {
         const play = playStoreUrlWithReferrer({ source: 'blog', medium: 'app_cta', campaign: p.campaign || '', content: p.position })
-        const deck = deckLink ? `<a href="${escapeHtml(deckLink.href)}">${escapeHtml(deckLink.label)}</a> · ` : ''
-        parts.push(`<aside>${deck}<a href="${escapeHtml(APP_STORE_URL)}">App Store</a> · <a href="${escapeHtml(play)}">Google Play</a></aside>`)
+        const guide = brainGuide(p.brainGuide)
+        const copy = brainCtaCopy(p.locale || 'en')
+        const brain = guide ? `<h3>${escapeHtml(copy.title)}</h3><p>${escapeHtml(copy.description)}</p><a href="${escapeHtml(brainGuideLoginPath(guide.id))}&amp;utm_source=blog&amp;utm_medium=app_cta&amp;utm_campaign=${encodeURIComponent(p.campaign || '')}">${escapeHtml(copy.button)}</a> · ` : ''
+        const deck = !guide && deckLink ? `<a href="${escapeHtml(deckLink.href)}">${escapeHtml(deckLink.label)}</a> · ` : ''
+        parts.push(`<aside>${brain}${deck}<a href="${escapeHtml(APP_STORE_URL)}">App Store</a> · <a href="${escapeHtml(play)}">Google Play</a></aside>`)
         break
       }
       case 'cta':

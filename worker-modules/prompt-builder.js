@@ -1,8 +1,9 @@
+import { brainPromptSection } from './brain-content.js'
 import { parseDeckFamily, deckListingFilter } from '../packages/shared/lib/official-deck-family.ts'
 
 // 3-layer prompt builder for AI content generation
 
-const SYSTEM_PROMPT = `You are an expert educational content writer for ReeeeecallStudy, a smart flashcard learning platform that uses spaced repetition (SRS).
+const SYSTEM_PROMPT = `You are an expert educational content writer for ReeeeecallStudy, a learning platform with spaced repetition (SRS) flashcards and recreational brain games.
 
 You write engaging, practical articles about learning, studying, and exam preparation. Your content is informative and actionable.
 
@@ -75,7 +76,7 @@ Each block has "type" and "props":
 - NEVER present made-up study results as facts
 - Only mention well-known, widely accepted concepts (e.g., "spaced repetition improves long-term retention")
 - Use general, qualitative descriptions instead of specific numbers (e.g., "research suggests significant improvement" instead of "studies show 85% improvement")
-- The CTA should naturally tie the article topic to ReeeeecallStudy's flashcard/SRS features
+- The CTA should tie the topic to the matching ReeeeecallStudy feature: flashcards for study assignments, the actual game for brain-game assignments.
 
 ## Clear Answers and Reliable Explanations
 
@@ -208,7 +209,7 @@ Keywords to incorporate: ${keywords}
 Target audience: ${topic.audience}
 Suggested tags: ${topic.tags.join(', ')}
 
-Write a unique, insightful article about ${translated ? 'that need' : `"${topic.titleHint}"`} within the "${topic.category}" domain. Focus on practical value for ${topic.audience}. Naturally mention how spaced repetition and flashcard-based tools can help with this topic where appropriate.`
+Write a unique, insightful article about ${translated ? 'that need' : `"${topic.titleHint}"`} within the "${topic.category}" domain. Focus on practical value for ${topic.audience}. ${topic.brainGuide ? 'This is a brain-game guide: teach the game, not flashcards or learning-outcome claims.' : 'Naturally mention how spaced repetition and flashcard-based tools can help with this topic where appropriate.'}`
 
   let titleAvoidance = ''
   if (previousTitles.length > 0) {
@@ -226,7 +227,7 @@ Write a unique, insightful article about ${translated ? 'that need' : `"${topic.
   // Rehearsal: the Korean and Japanese editions kept "spaced repetition" in English mid-sentence.
   const terms = locale === 'en' ? '' : `\n\n${NATIVE_TERMS}`
   return {
-    system: SYSTEM_PROMPT,
-    user: `${topicContext}${searchQuerySection(topic, locale, deckWords)}${titleAvoidance}\n\n## Language\n\n${localeInstruction}${terms}`,
+    system: topic.brainGuide ? SYSTEM_PROMPT + '\n\nFor a Brain Game Assignment, the game rules and engine example are the factual source. Skip the learning-science/research-framing requirements above. Do not make medical, IQ or promised memory-improvement claims or use numerical benefit/title examples. The CTA invites play, not flashcard creation. For this game guide, 600-900 useful words are enough: replace the general 900-word minimum and per-paragraph word minimums above. Do not pad a simple rule with invented examples or promised benefits.' : SYSTEM_PROMPT,
+    user: `${topicContext}${brainPromptSection(topic, locale)}${searchQuerySection(topic, locale, deckWords)}${titleAvoidance}\n\n## Language\n\n${localeInstruction}${terms}`,
   }
 }

@@ -1,3 +1,4 @@
+import { consumeBrainAuthReturn } from '../../lib/brain-auth-return'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -38,25 +39,28 @@ export function AuthCallback() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
         // Highest priority: explicit recovery event
+        consumeBrainAuthReturn()
         safeNavigate('/auth/reset-password')
       } else if (event === 'SIGNED_IN') {
         if (isRecovery) {
           // Hash-based fallback: SIGNED_IN fired but hash says recovery
+          consumeBrainAuthReturn()
           safeNavigate('/auth/reset-password')
         } else {
           // 세션이 실제로 생긴 지점. 여기서 첫 접점을 계정에 새긴다 — 서버도
           // write-once 라 재로그인마다 불려도 값이 바뀌지 않는다.
           void attachAttributionToProfile()
-          safeNavigate('/dashboard')
+          safeNavigate(consumeBrainAuthReturn() || '/dashboard')
         }
       } else if (event === 'INITIAL_SESSION') {
         if (session) {
           if (isRecovery) {
+            consumeBrainAuthReturn()
             safeNavigate('/auth/reset-password')
           } else {
             // OAuth PKCE flow: session already established via code exchange
             void attachAttributionToProfile()
-            safeNavigate('/dashboard')
+            safeNavigate(consumeBrainAuthReturn() || '/dashboard')
           }
         }
         // No session → ignore, wait for SIGNED_IN/PASSWORD_RECOVERY

@@ -1,3 +1,4 @@
+import { brainGuide, type BrainGuideId } from './brain-content'
 // Where readers leave a guide, and the app CTA that meets them there.
 //
 // A searcher leaves at two predictable points: right after the first direct answer (they got
@@ -9,7 +10,7 @@ export type DropOffPosition = 'answer' | 'wrap_up'
 
 export interface AppCtaBlock {
   type: 'app_cta'
-  props: { position: DropOffPosition; campaign: string; deckFamily?: string }
+  props: { position: DropOffPosition; campaign: string; deckFamily?: string; brainGuide?: BrainGuideId; locale?: string }
 }
 
 const MIN_BLOCKS = 6
@@ -20,6 +21,8 @@ export function withDropOffCtas<T extends { type: string }>(
   blocks: readonly T[],
   campaign: string,
   deckFamily?: string | null,
+  brainTarget?: string | null,
+  locale?: string,
 ): Array<T | AppCtaBlock> {
   if (blocks.length < MIN_BLOCKS) return [...blocks]
 
@@ -50,10 +53,11 @@ export function withDropOffCtas<T extends { type: string }>(
     insertBefore.set(wrapAt, 'wrap_up')
   }
 
+  const brain = brainGuide(brainTarget)
   const out: Array<T | AppCtaBlock> = []
   blocks.forEach((block, i) => {
     const position = insertBefore.get(i)
-    if (position) out.push({ type: 'app_cta', props: { position, campaign, ...(deckFamily ? { deckFamily } : {}) } })
+    if (position) out.push({ type: 'app_cta', props: { position, campaign, ...(brain ? { brainGuide: brain.id, locale } : deckFamily ? { deckFamily } : {}) } })
     out.push(block)
   })
   return out

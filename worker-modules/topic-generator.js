@@ -1,3 +1,5 @@
+import { brainGuideForQuery, isUnsupportedBrainQuery } from '../packages/shared/lib/brain-content.ts'
+import { brainTopic } from './brain-content.js'
 // AI-powered dynamic topic generation with static registry fallback
 
 import { callAI } from './ai-client.js'
@@ -7,7 +9,7 @@ import { info, warn } from './logger.js'
 
 const TOPIC_GENERATION_SYSTEM_PROMPT = `You are a topic planner for an educational blog targeting REAL STUDENTS and TEST TAKERS — people actively preparing for exams, learning languages, or studying for professional certifications.
 
-## CRITICAL RULE: Every topic MUST be directly useful to someone who is studying for a specific exam, learning a language, or preparing for a professional certification. Do NOT generate generic academic theory, philosophy, art criticism, or abstract topics that no student would search for.
+## CRITICAL RULE: Every topic MUST be directly useful to someone studying for a specific exam, learning a language, preparing for a professional certification, or learning to play one of our actual brain games. Do NOT generate generic academic theory, philosophy, art criticism, or abstract topics that no student would search for.
 
 Generate topic ideas from these categories (follow the distribution):
 
@@ -23,6 +25,7 @@ Generate topic ideas from these categories (follow the distribution):
 - **Medical/science study**: anatomy memorization, pharmacology, biology, chemistry
 
 ### PRIORITY 3 — At most 1-2 topics:
+- **Recreational brain-game guides**: rules, worked examples and play strategies for our actual games: Set Match, Code Break (Bulls and Cows), Make the Number, Maze Run, Number Hunt, Flash Grid, Sequence, Number Pattern, Match Pairs, Color Word, Quick Math and Odd One Out. Only practical game questions; never IQ tests, medical or promised health outcomes. Never Quick Eye (removed).
 - **Study methods**: Only if tied to a SPECIFIC exam or subject (e.g., "How to use flashcards for TOEIC vocabulary" not "The science of memory")
 - **Exam anxiety & planning**: Study schedules, test-day strategies
 
@@ -48,7 +51,7 @@ Return a JSON object:
 }
 
 ## Rules
-- Each topic must target someone who would search for it while studying for an exam or learning a language
+- Each topic must target someone searching while studying, learning a language, or looking for rules and worked examples for one of our brain games
 - titleHint should be specific enough that a student would click on it (e.g., "IELTS Speaking Part 2: How to Structure Your Answer" not "Improving Your Speaking Skills")
 - Include 3-5 keywords per topic that real students would search on Google/Naver/YouTube
 - Include 3 tags per topic (lowercase, hyphenated)
@@ -80,7 +83,7 @@ Generate ${count} fresh, diverse topics that are DIFFERENT from the above.`
     }
 
     const validTopics = result.topics
-      .filter(t => t.category && t.titleHint && Array.isArray(t.keywords) && Array.isArray(t.tags))
+      .filter(t => t.category && t.titleHint && Array.isArray(t.keywords) && Array.isArray(t.tags) && !isUnsupportedBrainQuery(t.titleHint))
       .map(t => ({
         id: slugify(t.titleHint),
         category: t.category,
@@ -88,6 +91,7 @@ Generate ${count} fresh, diverse topics that are DIFFERENT from the above.`
         keywords: t.keywords.slice(0, 5),
         tags: t.tags.slice(0, 5).map(tag => tag.toLowerCase().replace(/\s+/g, '-')),
         audience: t.audience || 'students and lifelong learners',
+        ...(brainGuideForQuery(t.titleHint) ? brainTopic(brainGuideForQuery(t.titleHint), t.titleHint, DEFAULT_LOCALE) : {}),
       }))
 
     if (validTopics.length < count * 0.5) {

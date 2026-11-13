@@ -1,3 +1,4 @@
+import { brainGuideLoginPath } from '../packages/shared/lib/brain-content.ts'
 // Block schema validation for AI-generated content
 
 import { PIPELINE_DEFAULTS } from './config.js'
@@ -226,13 +227,13 @@ export function validateArticle(article) {
  * @param {object} article - Validated article with slug and content_blocks
  * @param {string} locale  - Locale code (e.g. "en", "ko", "zh", "ja", "es")
  */
-export function enrichCtaUrls(article, locale) {
+export function enrichCtaUrls(article, locale, brainGuide = null) {
   if (!article?.content_blocks || !article.slug) return
 
   for (const block of article.content_blocks) {
     if (block.type === 'cta' && block.props) {
       block.props.buttonUrl = buildCtaUrl(
-        block.props.buttonUrl || '/auth/login',
+        brainGuideLoginPath(brainGuide) || block.props.buttonUrl || '/auth/login',
         article.slug,
         locale,
         'cta',
