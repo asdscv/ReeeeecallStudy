@@ -139,6 +139,13 @@ export const pairs: BrainGameDef<PairsState> = {
     }
   },
   signature: (s) => `pr:${s.cards.join('')}`,
+  mechanics(s) {
+    const pairCount = s.cards.length / 2
+    const tags = [4, 6, 8, 10, 12].filter((n) => pairCount >= n).map((n) => `pairs.board${n}`)
+    if (s.level >= 10) tags.push('pairs.oneFamily')
+    if (s.previewMs === 0) tags.push('pairs.noPreview')
+    return tags
+  },
   solution(s) {
     if (s.phase !== 'play') return null
     const partner = (i: number) => s.cards.findIndex((c, j) => j !== i && c === s.cards[i] && !s.matched[j])

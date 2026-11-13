@@ -123,4 +123,12 @@ export const schulte: BrainGameDef<SchulteState> = {
   },
   signature: (s) => `sc:${s.order}:${s.values.join(',')}`,
   solution: (s) => (schulte.outcome(s) === null ? [s.values.indexOf(nextValue(s))] : null),
+  mechanics(s) {
+    const tags: string[] = []
+    // A reshuffle grid is one size smaller on purpose; its size change is not "bigger grid" news.
+    for (let n = 4; n <= 6; n++) if (s.n >= n) tags.push(`schulte.grid${n}`)
+    if (s.order === 'desc') tags.push('schulte.descending')
+    if (s.shuffleEach) tags.push('schulte.reshuffle')
+    return tags
+  },
 }

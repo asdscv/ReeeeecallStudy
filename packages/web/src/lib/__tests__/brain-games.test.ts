@@ -231,13 +231,14 @@ describe('staircase', () => {
     expect(Math.abs(simulate('quickEye', 8, 2) - 0.8)).toBeLessThan(0.05)
   })
 
-  it('takes double steps in the first 8 trials of a round, never below the floor, no ceiling for games', () => {
-    expect(stepLevel('speed', 5, true, 1, 0)).toBeCloseTo(5.3)
-    expect(stepLevel('speed', 5, true, 1, 8)).toBeCloseTo(5.15)
-    expect(stepLevel('speed', 1.2, false, 0, 10)).toBe(1)
-    expect(stepLevel('quickEye', 11.9, true, 1, 10)).toBe(12)
+  it('uncertainty scales both steps by k (the ratio — the target — unchanged); never below the floor', () => {
+    expect(stepLevel('speed', 5, true, 1, 2)).toBeCloseTo(5.3)
+    expect(stepLevel('speed', 5, true, 1)).toBeCloseTo(5.15)
+    expect(stepLevel('speed', 5, false, 0, 2)).toBeCloseTo(3.3)
+    expect(stepLevel('speed', 1.2, false, 0)).toBe(1)
+    expect(stepLevel('quickEye', 11.9, true, 1)).toBe(12)
     let level = 1
-    for (let i = 0; i < 2000; i++) level = stepLevel('speed', level, true, 1, 10)
+    for (let i = 0; i < 2000; i++) level = stepLevel('speed', level, true, 1)
     expect(level).toBeGreaterThan(250)
   })
 
@@ -278,13 +279,24 @@ describe('Today\'s Training plan', () => {
 
   it('runs a 10-session core course, then refreshers at 11 and 35 months', () => {
     let p = emptyProgress()
+    // Mon/Wed/Fri from Monday 2026-01-05: the 10th session is Monday 2026-02-02.
+    const days = ['2026-01-05', '2026-01-07', '2026-01-09', '2026-01-12', '2026-01-14', '2026-01-16', '2026-01-19', '2026-01-21', '2026-01-23', '2026-02-02']
+    for (const day of days) p = recordSession(p, 22, day, null)
+    expect(p.sessions.coreDoneOn).toBe('2026-02-02')
+    expect(courseStatus(p, '2026-06-01')).toMatchObject({ phase: 'maintenance', nextBoosterOn: '2027-01-02' })
+    expect(courseStatus(p, '2027-01-04')).toMatchObject({ phase: 'booster', booster: { index: 1, done: 0, total: 4 } })
+    for (const day of ['2027-01-04', '2027-01-06', '2027-01-08', '2027-01-11']) p = recordSession(p, 22, day, 1)
+    expect(courseStatus(p, '2027-01-20')).toMatchObject({ phase: 'maintenance', nextBoosterOn: '2029-01-02' })
+    expect(courseStatus(p, '2029-01-03')).toMatchObject({ phase: 'booster', booster: { index: 2 } })
+  })
+
+  it('a session past three in a week is welcome but moves the course no further (EVIDENCE §3)', () => {
+    let p = emptyProgress()
     for (let i = 0; i < 10; i++) p = recordSession(p, 22, '2026-01-15', null)
-    expect(p.sessions.coreDoneOn).toBe('2026-01-15')
-    expect(courseStatus(p, '2026-06-01')).toMatchObject({ phase: 'maintenance', nextBoosterOn: '2026-12-15' })
-    expect(courseStatus(p, '2026-12-20')).toMatchObject({ phase: 'booster', booster: { index: 1, done: 0, total: 4 } })
-    for (let i = 0; i < 4; i++) p = recordSession(p, 22, '2026-12-20', 1)
-    expect(courseStatus(p, '2027-01-10')).toMatchObject({ phase: 'maintenance', nextBoosterOn: '2028-12-15' })
-    expect(courseStatus(p, '2029-01-01')).toMatchObject({ phase: 'booster', booster: { index: 2 } })
+    expect(p.sessions.total).toBe(10)
+    expect(p.sessions.course).toBe(3)
+    expect(p.sessions.coreDoneOn).toBeNull()
+    expect(courseStatus(p, '2026-01-15')).toMatchObject({ phase: 'core', coreDone: 3 })
   })
 })
 

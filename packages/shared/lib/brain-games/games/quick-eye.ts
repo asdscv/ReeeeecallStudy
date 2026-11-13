@@ -253,6 +253,14 @@ export const quickEye: BrainGameDef<QuickEyeState> = {
           : {}),
     }
   },
+  mechanics(s) {
+    const tags: string[] = []
+    if (s.target) tags.push('quickEye.periphery')
+    if (s.distractors.length > 0) tags.push('quickEye.distractors')
+    if (s.center.length === 2) tags.push('quickEye.sameDiff')
+    else if (s.centerOptions[1]?.startsWith('square:') && Number(s.centerOptions[1].split(':')[1]) > 0) tags.push('quickEye.similar')
+    return tags
+  },
   solution(s) {
     if (s.phase === 'answerCenter') return s.targetDir === null ? [s.correctCenter] : [s.correctCenter, s.targetDir]
     if (s.phase === 'answerLocation') return s.targetDir === null ? null : [s.targetDir]

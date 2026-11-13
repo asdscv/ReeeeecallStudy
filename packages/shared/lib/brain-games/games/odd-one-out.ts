@@ -20,6 +20,8 @@ export interface OddOneOutState {
   phase: 'find' | 'done'
   picked: number | null
   timedOut: boolean
+  /** Look-alike tier of a symbol round (0-3); null on a rotation round. */
+  tier: number | null
 }
 
 /** Pairs that look more alike the higher the tier. Letters and CJK render the same everywhere. */
@@ -55,6 +57,7 @@ export const oddOneOut: BrainGameDef<OddOneOutState> = {
     let odd: string
     let baseRotate = 0
     let oddRotate = 0
+    let tier: number | null = null
     if (rotateRound) {
       common = odd = rng.pick(ROTATABLE)
       baseRotate = rng.pick([0, 0, 90, 180, 270])
@@ -62,7 +65,7 @@ export const oddOneOut: BrainGameDef<OddOneOutState> = {
       oddRotate = baseRotate + angle * (rng.chance(0.5) ? 1 : -1)
     } else {
       const top = Math.min(LOOKALIKES.length - 1, Math.floor(level / 5))
-      const tier = rng.int(Math.max(0, top - 1), top)
+      tier = rng.int(Math.max(0, top - 1), top)
       const pair = rng.pick(LOOKALIKES[tier])
       ;[common, odd] = rng.chance(0.5) ? [pair[0], pair[1]] : [pair[1], pair[0]]
     }
@@ -78,6 +81,7 @@ export const oddOneOut: BrainGameDef<OddOneOutState> = {
       phase: 'find',
       picked: null,
       timedOut: false,
+      tier,
     }
   },
   pendingMs: () => null,
@@ -118,4 +122,11 @@ export const oddOneOut: BrainGameDef<OddOneOutState> = {
   },
   signature: (s) => `oo:${s.common}:${s.odd}:${s.oddRotate}:${s.oddIndex}`,
   solution: (s) => (s.phase === 'find' ? [s.oddIndex] : null),
+  mechanics(s) {
+    const tags: string[] = []
+    for (let n = 4; n <= 7; n++) if (s.cols >= n) tags.push(`oddOneOut.grid${n}`)
+    if (s.tier === null) tags.push('oddOneOut.rotation')
+    else if (s.tier >= 1) tags.push(['', 'oddOneOut.lookalike', 'oddOneOut.nearTwin', 'oddOneOut.glyphs'][s.tier])
+    return tags
+  },
 }

@@ -13,14 +13,14 @@ interface Pattern {
   hints: number[]
 }
 
-type Rule = (rng: Rng, level: number, count: number) => Pattern
+type Rule = (rng: Rng, level: number, count: number) => Pattern & { tag?: string }
 
 const arithmetic: Rule = (rng, level, count) => {
   const d = rng.int(1, 3 + Math.floor(level / 2)) * (level >= 3 && rng.chance(0.35) ? -1 : 1)
   const start = d < 0 ? rng.int(-d * count + 1, -d * count + 20 + level * 2) : rng.int(1, 10 + level * 2)
   const terms = Array.from({ length: count }, (_, i) => start + d * i)
   const next = start + d * count
-  return { terms, next, hints: [next + d, next - d, next + 1] }
+  return { terms, next, hints: [next + d, next - d, next + 1], ...(d < 0 ? { tag: 'series.descending' } : {}) }
 }
 
 const geometric: Rule = (rng, level, count) => {
@@ -96,15 +96,15 @@ const doublePlus: Rule = (rng, _level, count) => {
   return { terms, next, hints: [next - c, next + c, terms[terms.length - 1] * 2] }
 }
 
-const RULES: readonly { from: number; rule: Rule }[] = [
+const RULES: readonly { from: number; rule: Rule; tag?: string }[] = [
   { from: 1, rule: arithmetic },
-  { from: 4, rule: geometric },
-  { from: 6, rule: alternating },
-  { from: 8, rule: growingStep },
-  { from: 10, rule: fibonacci },
-  { from: 12, rule: squares },
-  { from: 14, rule: interleaved },
-  { from: 16, rule: doublePlus },
+  { from: 4, rule: geometric, tag: 'series.geometric' },
+  { from: 6, rule: alternating, tag: 'series.alternating' },
+  { from: 8, rule: growingStep, tag: 'series.growing' },
+  { from: 10, rule: fibonacci, tag: 'series.fibonacci' },
+  { from: 12, rule: squares, tag: 'series.squares' },
+  { from: 14, rule: interleaved, tag: 'series.interleaved' },
+  { from: 16, rule: doublePlus, tag: 'series.doublePlus' },
 ]
 
 export const series = choiceGame('series', (level, rng) => {
@@ -125,5 +125,6 @@ export const series = choiceGame('series', (level, rng) => {
     picked: null,
     timedOut: false,
     sig: `se:${row}`,
+    tags: [pick.tag ?? pattern.tag].filter((x): x is string => typeof x === 'string'),
   }
 })

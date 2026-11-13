@@ -16,6 +16,8 @@ export interface MemoryGridState {
   picked: number[]
   wrong: number | null
   timedOut: boolean
+  /** Cells wanted beyond what the board holds — past that the show time shortens instead. */
+  overflow: number
 }
 
 const MIN_SHOW_MS = 500
@@ -50,6 +52,7 @@ export const memoryGrid: BrainGameDef<MemoryGridState> = {
       picked: [],
       wrong: null,
       timedOut: false,
+      overflow,
     }
   },
   pendingMs: (s) => (s.phase === 'show' ? s.showMs : null),
@@ -95,4 +98,10 @@ export const memoryGrid: BrainGameDef<MemoryGridState> = {
   },
   signature: (s) => `mg:${s.n}:${s.targets.join(',')}`,
   solution: (s) => (s.phase === 'recall' ? s.targets.filter((t) => !s.picked.includes(t)) : null),
+  mechanics(s) {
+    const tags: string[] = []
+    for (let n = 4; n <= 7; n++) if (s.n >= n) tags.push(`memoryGrid.grid${n}`)
+    if (s.overflow > 0) tags.push('memoryGrid.fastShow')
+    return tags
+  },
 }

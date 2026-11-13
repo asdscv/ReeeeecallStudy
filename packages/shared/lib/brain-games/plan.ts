@@ -114,7 +114,7 @@ export interface CourseStatus {
 
 export function courseStatus(p: BrainProgress, today: string): CourseStatus {
   const s = p.sessions
-  const coreDone = Math.min(CORE_COURSE_SESSIONS, s.total)
+  const coreDone = Math.min(CORE_COURSE_SESSIONS, s.course)
   if (!s.coreDoneOn) {
     return { phase: 'core', coreDone, coreTotal: CORE_COURSE_SESSIONS, booster: null, nextBoosterOn: null }
   }

@@ -201,6 +201,11 @@ export interface BrainGameDef<S> {
    */
   solution(s: S): number[] | null
   /**
+   * The rules and board changes (mechanics.ts tags) this generated trial uses, read right after
+   * create() — so the round can introduce a rule the first time it actually appears.
+   */
+  mechanics(s: S): readonly string[]
+  /**
    * Quick Eye only: the platform reports how long the stimulus was really on screen. `lenient`
    * accepts any real exposure (after repeated voids on a device whose frames never match exactly).
    */

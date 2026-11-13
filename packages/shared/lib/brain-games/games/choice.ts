@@ -11,6 +11,8 @@ export interface ChoiceState {
   picked: number | null
   timedOut: boolean
   sig: string
+  /** Mechanics (mechanics.ts) this trial uses. */
+  tags?: string[]
 }
 
 export function choiceGame(
@@ -45,6 +47,7 @@ export function choiceGame(
     },
     signature: (s) => s.sig,
     solution: (s) => (done(s) ? null : [s.correctIndex]),
+    mechanics: (s) => s.tags ?? [],
   }
 }
 

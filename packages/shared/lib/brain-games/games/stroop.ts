@@ -28,5 +28,6 @@ export const stroop = choiceGame('stroop', (level, rng) => {
     picked: null,
     timedOut: false,
     sig: `st:${rule}:${word}:${ink}:${colors.join(',')}`,
+    tags: [...(optionCount >= 3 ? [`stroop.options${optionCount}`] : []), ...(rule === 'word' ? ['stroop.word'] : [])],
   }
 }, { maxLevel: 30 })

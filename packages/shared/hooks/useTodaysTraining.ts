@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { type BrainGameId, type PlanSlot, createRng, localDayKey, planTodaysSession, plannedMinutes, todaysPlanSeed } from '../lib/brain-games'
+import { type AchievementId, type BrainGameId, type BrainMeta, type PlanSlot, achievementBit, createRng, dayDiff, earnedBySession, emptyMeta, localDayKey, planTodaysSession, plannedMinutes, setBit, todaysPlanSeed } from '../lib/brain-games'
 import { useBrainStore } from '../stores/brain-store'
 import type { RoundStats } from './useBrainRound'
 
@@ -58,6 +58,7 @@ function init(): TrainingState {
 
 export function useTodaysTraining() {
   const [state, setState] = useState(init)
+  const [achievements, setAchievements] = useState<AchievementId[]>([])
 
   const onRoundOver = useCallback((gameId: BrainGameId, stats: RoundStats) => {
     setState((s) => {
@@ -94,7 +95,20 @@ export function useTodaysTraining() {
     // Minutes actually played — a session left paused through a phone call, or sitting on the
     // "next game" screen overnight, must not record hours. Capped at half again the plan.
     const minutes = Math.min(state.activeMs / 60_000, plannedMinutes(state.slots) * 1.5)
-    useBrainStore.getState().completeSession(minutes, state.slots.map((slot) => slot.gameId))
+    const store = useBrainStore.getState()
+    const today = localDayKey()
+    // Days since the last session before this one (for "back again" — never framed as a gap punished).
+    const lastDay = store.progress.sessions.recentDays.filter((d) => d < today).slice(-1)[0]
+    const daysAway = lastDay ? dayDiff(lastDay, today) : 0
+    store.completeSession(minutes, state.slots.map((slot) => slot.gameId))
+    const after = useBrainStore.getState()
+    const meta = (after as { meta?: BrainMeta }).meta ?? emptyMeta()
+    const earned = earnedBySession(after.progress, today, meta, daysAway)
+    if (earned.length) {
+      const updateMeta = (after as { updateMeta?: (fn: (m: BrainMeta) => BrainMeta) => void }).updateMeta
+      updateMeta?.((m) => ({ ...m, ach: earned.reduce((mask, a) => setBit(mask, achievementBit(a)), m.ach) }))
+      setAchievements(earned)
+    }
   }, [state.phase, state.activeMs, state.slots])
 
   /** From the "next game" screen into the next slot. */
@@ -121,6 +135,8 @@ export function useTodaysTraining() {
     startedAt: state.startedAt,
     /** Minutes actually played so far. */
     activeMinutes: state.activeMs / 60_000,
+    /** Achievements the finished session earned (first session, a week at 3/3, the core course, a comeback). */
+    achievements,
     onRoundOver,
     continueSession,
   }

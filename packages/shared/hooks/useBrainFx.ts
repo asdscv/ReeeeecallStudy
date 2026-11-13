@@ -97,7 +97,8 @@ export function useBrainFx(r: BrainRound, onFx: (fx: BrainFx) => void) {
       if (lives !== null && cur.lives !== null && lives < cur.lives) {
         // A second wrong tap on the same number leaves its tone unchanged; the lives still drop.
         if (!missed) emit.current({ kind: 'miss', cell: tones.indexOf('wrong') })
-        if (!r.practice) emit.current({ kind: 'lifeLost', left: lives })
+        // Practice and placement spend no chances: the miss shows, the heart does not go.
+        if (!r.practice && !r.placing) emit.current({ kind: 'lifeLost', left: lives })
       }
       cur.lives = lives
     } else if (view.kind === 'quickEye') {
@@ -126,7 +127,8 @@ export function useBrainFx(r: BrainRound, onFx: (fx: BrainFx) => void) {
       r.gameId === 'quickEye'
         ? exposureMsFor(res.levelAfter) < exposureMsFor(res.levelBefore)
         : Math.floor(res.levelAfter + 1e-9) > Math.floor(res.levelBefore + 1e-9)
-    if (!res.practice && up) emit.current({ kind: 'levelUp', level: Math.floor(res.levelAfter + 1e-9) })
+    // Not during placement: its big early jumps are finding the start, not a level earned.
+    if (!res.practice && res.kind !== 'placement' && up) emit.current({ kind: 'levelUp', level: Math.floor(res.levelAfter + 1e-9) })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [r.result])
 

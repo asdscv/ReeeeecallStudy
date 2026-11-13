@@ -31,6 +31,11 @@ export interface SessionLog {
   /** Local days (YYYY-MM-DD) of the most recent completed sessions, oldest first (last 12). */
   recentDays: string[]
   total: number
+  /**
+   * Sessions counted toward the core course and its refreshers: at most WEEKLY_GOAL a week. A fourth
+   * session in a week is welcome but earns nothing more (EVIDENCE §3) — not even course progress.
+   */
+  course: number
   minutes: number
   /** Local day the 10-session core course was completed. */
   coreDoneOn: string | null
@@ -74,7 +79,7 @@ export const BOOSTER_SESSIONS = 4
 export const BOOSTER_MONTHS = [11, 35] as const
 
 const emptyQuickEye = (): QuickEyeProgress => ({ variant: 1, recentMs: [], recentOk: '', thresholdMs: null })
-const emptySessions = (): SessionLog => ({ recentDays: [], total: 0, minutes: 0, coreDoneOn: null, booster: { index: 0, sessions: 0 }, recentGames: [] })
+const emptySessions = (): SessionLog => ({ recentDays: [], total: 0, course: 0, minutes: 0, coreDoneOn: null, booster: { index: 0, sessions: 0 }, recentGames: [] })
 
 export function emptyProgress(): BrainProgress {
   return {
@@ -191,11 +196,23 @@ export function updateSettings(p: BrainProgress, patch: Partial<BrainSettings>):
  * A completed Today's Training session. Counts toward the core course, then toward a refresher
  * when one is open (see `courseStatus` in plan.ts).
  */
+/** Monday of the week `day` falls in (the week the 3-a-week goal counts). */
+function mondayOf(day: string): string {
+  const [y, m, d] = day.split('-').map(Number)
+  const date = new Date(Date.UTC(y, m - 1, d))
+  date.setUTCDate(date.getUTCDate() - ((date.getUTCDay() + 6) % 7))
+  return date.toISOString().slice(0, 10)
+}
+
 export function recordSession(p: BrainProgress, minutes: number, today: string, boosterOpen: number | null, games: BrainGameId[] = []): BrainProgress {
   const s = p.sessions
   const total = s.total + 1
+  // Only the first WEEKLY_GOAL sessions of a week move the course on.
+  const monday = mondayOf(today)
+  const counts = s.recentDays.filter((day) => day >= monday && day <= today).length < WEEKLY_GOAL
+  const course = s.course + (counts ? 1 : 0)
   let booster = s.booster
-  if (boosterOpen !== null) {
+  if (boosterOpen !== null && counts) {
     booster = booster.index === boosterOpen ? { index: boosterOpen, sessions: booster.sessions + 1 } : { index: boosterOpen, sessions: 1 }
   }
   return {
@@ -203,8 +220,9 @@ export function recordSession(p: BrainProgress, minutes: number, today: string, 
     sessions: {
       recentDays: [...s.recentDays, today].slice(-12),
       total,
+      course,
       minutes: s.minutes + Math.max(0, Math.round(minutes)),
-      coreDoneOn: s.coreDoneOn ?? (total >= CORE_COURSE_SESSIONS ? today : null),
+      coreDoneOn: s.coreDoneOn ?? (course >= CORE_COURSE_SESSIONS ? today : null),
       booster,
       recentGames: [...s.recentGames, ...games].slice(-9),
     },
@@ -267,6 +285,8 @@ export function parseProgress(raw: string | null | undefined): BrainProgress {
     const sessions: SessionLog = {
       recentDays: Array.isArray(se.recentDays) ? se.recentDays.filter(isDay).slice(-12) : [],
       total: num(se.total),
+      // Records from before the weekly cap: every session counted then.
+      course: typeof se.course === 'number' ? Math.round(num(se.course)) : Math.min(num(se.total), CORE_COURSE_SESSIONS),
       minutes: num(se.minutes),
       coreDoneOn: isDay(se.coreDoneOn) ? se.coreDoneOn : null,
       booster: { index: Math.round(num(booster.index)), sessions: Math.round(num(booster.sessions)) },

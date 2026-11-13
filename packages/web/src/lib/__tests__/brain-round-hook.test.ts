@@ -7,16 +7,16 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
-import { emptyProgress, quickEyeMaxLevel, brainGame, DEFAULT_CONTEXT, type BrainProgress } from '@reeeeecall/shared/lib/brain-games'
+import { emptyHistory, emptyMeta, emptyProgress, hasBit, mechanicInfo, quickEyeMaxLevel, brainGame, DEFAULT_CONTEXT, type BrainMeta, type BrainProgress } from '@reeeeecall/shared/lib/brain-games'
 import { useBrainRound, type PlatformContext } from '@reeeeecall/shared/hooks/useBrainRound'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
 
 const PLATFORM: PlatformContext = { maxCols: 5, minExposureMs: 33, ringSlots: [8, 16, 16] }
 
-function seed(patch: (p: BrainProgress) => BrainProgress = (p) => p) {
+function seed(patch: (p: BrainProgress) => BrainProgress = (p) => p, meta: BrainMeta = emptyMeta()) {
   const p = emptyProgress()
-  // Every game already practised: the tests start on counted trials.
-  useBrainStore.setState({ progress: patch({ ...p, practiced: ['memoryGrid', 'sequence', 'quickEye', 'oddOneOut', 'stroop', 'schulte', 'pairs', 'math', 'series'] }), storageKey: 'test' })
+  // Every game already practised: the tests start on counted trials. Fresh meta and history each time.
+  useBrainStore.setState({ progress: patch({ ...p, practiced: ['memoryGrid', 'sequence', 'quickEye', 'oddOneOut', 'stroop', 'schulte', 'pairs', 'math', 'series'] }), meta, history: emptyHistory(), storageKey: 'test' })
 }
 
 beforeEach(() => {
@@ -48,36 +48,31 @@ describe('memorise phases and pause', () => {
 })
 
 describe('rounds always end', () => {
-  it('relaxed timing: a partial span answer is forgiven once per length, then costs a chance', () => {
-    seed((p) => ({ ...p, settings: { ...p.settings, timing: 2 } }))
-    const { result } = renderHook(() => useBrainRound('sequence', PLATFORM))
-    for (let guard = 0; guard < 2000 && !result.current.over; guard++) {
-      const taps = result.current.solution
-      // Enter the first tile of each sequence, then wait it out.
-      if (taps && taps.length && result.current.view.kind === 'grid' && result.current.view.prompt.params?.done === 0) act(() => result.current.tap(taps[0]))
-      else advance(200)
-    }
-    expect(result.current.stats.endedBy).toBe('lives')
-    expect(result.current.stats.trials).toBe(3)
-  })
-
-  it('relaxed timing: a span trial left blank costs a chance, so waiting cannot loop forever', () => {
+  it('relaxed timing: a timeout never costs a chance (EVIDENCE §4.3), and the round still ends — at its cap, not as cleared', () => {
     seed((p) => ({ ...p, settings: { ...p.settings, timing: 2 } }))
     const { result } = renderHook(() => useBrainRound('memoryGrid', PLATFORM))
-    for (let i = 0; i < 40 && !result.current.over; i++) advance(10_000)
+    for (let i = 0; i < 80 && !result.current.over; i++) advance(10_000)
     expect(result.current.over).toBe(true)
-    expect(result.current.stats.endedBy).toBe('lives')
+    expect(result.current.stats.endedBy).toBe('cap')
+    expect(result.current.stats.cleared).toBe(false)
+    expect(result.current.lives).toBe(2)
   })
 
   it('a span round that keeps passing stops at its cap', () => {
     seed()
     const { result } = renderHook(() => useBrainRound('sequence', PLATFORM))
-    for (let guard = 0; guard < 4000 && !result.current.over; guard++) {
+    for (let guard = 0; guard < 6000 && !result.current.over; guard++) {
+      if (result.current.intro) {
+        act(() => result.current.ackIntro())
+        continue
+      }
       const taps = result.current.solution
       if (taps && taps.length) act(() => result.current.tap(taps[0]))
       else advance(100)
     }
     expect(result.current.stats.endedBy).toBe('cap')
+    expect(result.current.stats.cleared).toBe(true)
+    // The reverse-order card came up once, and its trial did not count.
     expect(result.current.stats.trials).toBe(14)
   })
 })
@@ -197,5 +192,227 @@ describe('active time', () => {
     advance(1000)
     act(() => result.current.stop())
     expect(result.current.stats.activeMs).toBe(3000)
+  })
+})
+
+describe('placement and rule cards in a round', () => {
+  it("a game never played starts by finding the level: no chances spent, then the staircase takes over higher than 1", () => {
+    seed()
+    const { result } = renderHook(() => useBrainRound('oddOneOut', PLATFORM))
+    // The first placement trial may land on a turned-shape round (level 4+, 35%): its rule card comes first.
+    if (result.current.intro) act(() => result.current.ackIntro())
+    // Either way the level stays hidden: it is "finding your start" until the staircase takes over.
+    expect(result.current.placing).toBe(true)
+    let placementTrials = 0
+    for (let guard = 0; guard < 400 && result.current.trialKind !== 'counted'; guard++) {
+      if (result.current.intro) {
+        act(() => result.current.ackIntro())
+        continue
+      }
+      const taps = result.current.solution
+      if (taps && taps.length && !result.current.result) {
+        if (result.current.trialKind === 'placement') placementTrials++
+        act(() => result.current.tap(taps[0]))
+      } else advance(100)
+    }
+    expect(placementTrials).toBeGreaterThanOrEqual(8)
+    expect(result.current.lives).toBe(3)
+    // A perfect player is placed well above the floor (it used to be level 1 for a whole round).
+    expect(result.current.level).toBeGreaterThan(5)
+  })
+
+  it('a rule met for the first time stops its trial with a card; the trial waits and does not count', () => {
+    seed((p) => ({ ...p, games: { ...p.games, stroop: { level: 12, bestLevel: 12, rounds: 40, wins: 30 } } }))
+    const { result } = renderHook(() => useBrainRound('stroop', PLATFORM))
+    let sawCard = false
+    for (let guard = 0; guard < 600 && !sawCard; guard++) {
+      if (result.current.intro) {
+        sawCard = true
+        break
+      }
+      const taps = result.current.solution
+      if (taps && taps.length && !result.current.result) act(() => result.current.tap(taps[0]))
+      else advance(100)
+    }
+    expect(sawCard).toBe(true)
+    expect(result.current.intro?.tag).toBe('stroop.word')
+    expect(result.current.timer).toBeNull()
+    expect(result.current.solution).toBeNull()
+    advance(60_000)
+    expect(result.current.result).toBeNull()
+    act(() => result.current.ackIntro())
+    expect(result.current.intro).toBeNull()
+    const taps = result.current.solution as number[]
+    act(() => result.current.tap(taps[0]))
+    expect(result.current.result?.practice).toBe(true)
+    expect(result.current.result?.points).toBe(0)
+  })
+})
+
+/** Plays a round perfectly (or with misses every `missEvery` trials), acknowledging rule cards. */
+function playRound(result: { current: ReturnType<typeof useBrainRound> }, opts: { missEvery?: number; maxTrials?: number } = {}) {
+  let judged = 0
+  for (let guard = 0; guard < 8000 && !result.current.done; guard++) {
+    const r = result.current
+    if (r.intro) {
+      act(() => r.ackIntro())
+      continue
+    }
+    if (opts.maxTrials !== undefined && judged >= opts.maxTrials && !r.over) {
+      act(() => r.stop())
+      continue
+    }
+    const taps = r.solution
+    if (taps && taps.length && !r.result) {
+      const miss = opts.missEvery !== undefined && (judged + 1) % opts.missEvery === 0
+      const view = r.view
+      const wrong = view.kind === 'choice' ? (taps[0] + 1) % view.options.length : view.kind === 'grid' ? view.cells.findIndex((_c, i) => !taps.includes(i)) : taps[0]
+      act(() => r.tap(miss && wrong >= 0 ? wrong : taps[0]))
+      if (result.current.result) judged++
+    } else advance(100)
+  }
+}
+
+describe('game logic across rounds', () => {
+  it('practice ends after two right in a row, and a half-done practice resumes rather than restarts', () => {
+    seed((p) => ({ ...p, practiced: p.practiced.filter((g) => g !== 'math') }))
+    const { result } = renderHook(() => useBrainRound('math', PLATFORM))
+    expect(result.current.trialKind).toBe('practice')
+    for (let i = 0; i < 2; i++) {
+      act(() => result.current.tap((result.current.solution as number[])[0]))
+      advance(800)
+    }
+    expect(result.current.trialKind).not.toBe('practice')
+    // Saved the moment it ends — the round may be closed before it finishes (a tab shut mid-round).
+    expect(useBrainStore.getState().progress.practiced).toContain('math')
+    // Resume: one practice trial done earlier → three left.
+    seed((p) => ({ ...p, practiced: p.practiced.filter((g) => g !== 'stroop') }), { ...emptyMeta(), practice: { stroop: 1 } })
+    const second = renderHook(() => useBrainRound('stroop', PLATFORM))
+    expect(second.result.current.practiceDone).toBe(1)
+    // One more practice trial, wrong, then the round is abandoned without an end: the count is kept,
+    // and two tried with one wrong is not a finished practice.
+    act(() => second.result.current.tap(((second.result.current.solution as number[])[0] + 1) % 2))
+    expect(useBrainStore.getState().meta.practice.stroop).toBe(2)
+    expect(useBrainStore.getState().progress.practiced).not.toContain('stroop')
+    act(() => second.result.current.stop())
+    expect(useBrainStore.getState().progress.practiced).not.toContain('stroop')
+  })
+
+  it('the next round starts from the round estimate — never back at level 1 — and a 2-trial quit leaves the start alone', () => {
+    seed()
+    const first = renderHook(() => useBrainRound('stroop', PLATFORM))
+    playRound(first.result, { missEvery: 6 })
+    const after = useBrainStore.getState()
+    const start = after.progress.games.stroop?.level ?? 1
+    expect(start).toBeGreaterThan(4)
+    expect(after.meta.sk.stroop?.n).toBeGreaterThan(10)
+    // A quick open-and-leave (2 counted trials) must not drain the start level.
+    const quick = renderHook(() => useBrainRound('stroop', PLATFORM))
+    playRound(quick.result, { maxTrials: 2 })
+    expect(useBrainStore.getState().progress.games.stroop?.level).toBeCloseTo(start, 5)
+  })
+
+  it('short rounds never drag the start down — not through the stored level, not through the estimate', () => {
+    const today = Math.floor(new Date('2026-11-12T10:00:00').getTime() / 86_400_000)
+    seed(
+      (p) => ({ ...p, games: { ...p.games, stroop: { level: 9.5, bestLevel: 11, rounds: 60, wins: 50 } } }),
+      { ...emptyMeta(), sk: { stroop: { mu: 10, sd: 1, n: 60, day: today } } },
+    )
+    const opens: number[] = []
+    for (let i = 0; i < 4; i++) {
+      const r = renderHook(() => useBrainRound('stroop', PLATFORM))
+      opens.push(r.result.current.stats.levelStart)
+      // Two misses, then away.
+      playRound(r.result, { missEvery: 1, maxTrials: 2 })
+      r.unmount()
+    }
+    expect(opens).toEqual([9.5, 9.5, 9.5, 9.5])
+    expect(useBrainStore.getState().meta.sk.stroop!.mu).toBe(10)
+  })
+
+  it('a strong clear (90%+) starts the next round right at the estimate — momentum, not the usual drop', () => {
+    seed((p) => ({ ...p, games: { ...p.games, stroop: { level: 6, bestLevel: 6, rounds: 60, wins: 50 } } }))
+    const first = renderHook(() => useBrainRound('stroop', PLATFORM))
+    playRound(first.result)
+    expect(first.result.current.stats.cleared).toBe(true)
+    const mu = useBrainStore.getState().meta.sk.stroop!.mu
+    const next = renderHook(() => useBrainRound('stroop', PLATFORM))
+    expect(next.result.current.stats.levelStart).toBeCloseTo(mu, 5)
+  })
+
+  it("a first span round: practice at the floor, then the other span game's seed (two below its longest passed)", () => {
+    seed(
+      (p) => ({ ...p, practiced: p.practiced.filter((g) => g !== 'sequence'), games: { ...p.games, memoryGrid: { level: 6, bestLevel: 8, rounds: 30, wins: 20 } } }),
+      { ...emptyMeta(), sk: { memoryGrid: { mu: 7, sd: 1, n: 30, day: 1 } } },
+    )
+    const { result } = renderHook(() => useBrainRound('sequence', PLATFORM))
+    expect(result.current.trialKind).toBe('practice')
+    expect(result.current.level).toBe(1)
+    for (let guard = 0; guard < 4000 && result.current.trialKind === 'practice'; guard++) {
+      const taps = result.current.solution
+      if (taps && taps.length && !result.current.result) act(() => result.current.tap(taps[0]))
+      else advance(100)
+    }
+    expect(result.current.level).toBe(5)
+    // Practice met no rule card's rule: the reverse rule is still unseen.
+    expect(hasBit(useBrainStore.getState().meta.seen, mechanicInfo('sequence.reverse')!.bit)).toBe(false)
+  })
+
+  it('a rule card is shown once: the next round does not stop for it again', () => {
+    seed((p) => ({ ...p, games: { ...p.games, schulte: { level: 6, bestLevel: 6, rounds: 50, wins: 40 } } }))
+    const a = renderHook(() => useBrainRound('schulte', PLATFORM))
+    let sawDescending = false
+    for (let guard = 0; guard < 20000 && !a.result.current.over; guard++) {
+      const r = a.result.current
+      if (r.intro) {
+        if (r.intro.tag === 'schulte.descending') sawDescending = true
+        act(() => r.ackIntro())
+        continue
+      }
+      if (sawDescending && r.result) {
+        act(() => r.stop())
+        continue
+      }
+      const taps = r.solution
+      if (taps && taps.length && !r.result) act(() => r.tap(taps[0]))
+      else advance(100)
+    }
+    expect(sawDescending).toBe(true)
+    const bit = mechanicInfo('schulte.descending')?.bit as number
+    expect(hasBit(useBrainStore.getState().meta.seen, bit)).toBe(true)
+    const b = renderHook(() => useBrainRound('schulte', PLATFORM))
+    let again = 0
+    for (let guard = 0; guard < 20000 && b.result.current.trialInRound < 10 && !b.result.current.over; guard++) {
+      const r = b.result.current
+      if (r.intro?.tag === 'schulte.descending') again++
+      if (r.intro) {
+        act(() => r.ackIntro())
+        continue
+      }
+      const taps = r.solution
+      if (taps && taps.length && !r.result) act(() => r.tap(taps[0]))
+      else advance(100)
+    }
+    expect(again).toBe(0)
+  })
+
+  it('a strong cleared round earns a tier (once) and achievements, and the score shows its parts', () => {
+    seed((p) => ({ ...p, games: { ...p.games, stroop: { level: 9, bestLevel: 9, rounds: 60, wins: 50 } } }), { ...emptyMeta(), sk: { stroop: { mu: 9, sd: 1, n: 60, day: 1000 } }, seen: 'ffffffffffffffff' })
+    const { result } = renderHook(() => useBrainRound('stroop', PLATFORM))
+    playRound(result)
+    const s = result.current.stats
+    expect(s.cleared).toBe(true)
+    expect(s.tierUp).not.toBeNull()
+    expect(s.achievements).toEqual(expect.arrayContaining(['firstClear', 'cleanRound', 'streak10']))
+    expect(s.score.clear).toBeGreaterThan(0)
+    expect(s.score.clean).toBeGreaterThan(0)
+    const parts = s.score.base + s.score.speed + s.score.combo + s.score.clear + s.score.clean
+    expect(Math.abs(parts - s.points)).toBeLessThan(s.trials + 2)
+    const tier = useBrainStore.getState().meta.tier.stroop
+    expect(tier).toBe(s.tierUp)
+    // Played again the same way: no second tier-up for the same tier, no repeat achievements.
+    const again = renderHook(() => useBrainRound('stroop', PLATFORM))
+    playRound(again.result)
+    expect(again.result.current.stats.achievements).not.toContain('firstClear')
   })
 })

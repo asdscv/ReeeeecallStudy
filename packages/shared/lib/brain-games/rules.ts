@@ -17,9 +17,10 @@ import type { GameGroup } from './types'
  *     closer to the 75% threshold the ACTIVE training used
  *   - span tasks (Flash Grid, Sequence): the Corsi stop rule — two tries at each length; one right
  *     moves up a length, both wrong ends the round (Kessels 2000)
- * The first 8 trials of a round take double steps (same ratio) so a returning player finds their
- * level quickly. The level is never reset to 1: the next round starts a little below where this one
- * finished.
+ * How unsure the game still is of the player's level scales both steps by the same factor (skill.ts
+ * — ratio, and so target, unchanged), and a game never played starts with a short placement
+ * (placement.ts). The level is never reset to 1: the next round starts a little below the round's
+ * own estimate (the mean of its reversal levels).
  */
 export interface GroupRules {
   /** Misses a round absorbs. For span games this is per length and refills on each step up. */
@@ -44,9 +45,6 @@ export const GROUP_RULES: Record<GameGroup, GroupRules> = {
   span: { lives: 2, up: 1, down: 0, roundCap: 14, min: 1, max: Infinity, restartDrop: 2 },
 }
 
-/** Trials at the start of a round that take double steps. */
-export const WARMUP_TRIALS = 8
-
 /** Trials in a first-ever practice round: no lives, no level change, no score. */
 export const PRACTICE_TRIALS = 4
 
@@ -59,14 +57,14 @@ export function targetAccuracy(group: GameGroup): number {
 /**
  * The level after one judged trial.
  *
- * `trialInRound` is 0-based. A near miss on a multi-tap grid (most cells right) costs less than a
- * blank — the step down scales with how much was wrong, which keeps the ratio's spirit for partial
- * credit without letting a half-right round count as right.
+ * `k` scales both steps by how unsure the game still is of the player's level (skill.ts): big steps
+ * while unsure, base steps once settled. Scaling both keeps their ratio — and so the target
+ * accuracy — unchanged. A near miss on a multi-tap grid (most cells right) costs less than a blank:
+ * the step down scales with how much was wrong.
  */
-export function stepLevel(group: GameGroup, level: number, correct: boolean, accuracy: number, trialInRound: number): number {
+export function stepLevel(group: GameGroup, level: number, correct: boolean, accuracy: number, k = 1): number {
   const r = GROUP_RULES[group]
   if (group === 'span') return clampLevel(group, correct ? level + r.up : level)
-  const k = trialInRound < WARMUP_TRIALS ? 2 : 1
   const next = correct ? level + r.up * k : level - r.down * k * (1 - accuracy * 0.5)
   return clampLevel(group, round2(next))
 }
