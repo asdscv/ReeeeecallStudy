@@ -7,7 +7,6 @@ import {
   type BrainSaveDocs,
   type BrainSettings,
   type RemoteBrainSave,
-  QUICK_EYE_MAX_VARIANT,
   emptyHistory,
   emptyMeta,
   emptyProgress,
@@ -80,7 +79,7 @@ interface BrainStore {
    */
   beginRound(id: BrainGameId): void
   /** One judged trial; `level` is the level after it. */
-  record(id: BrainGameId, round: { level: number; correct: boolean; points: number; shownMs?: number }): void
+  record(id: BrainGameId, round: { level: number; correct: boolean; points: number }): void
   /** A round of play ended: keep its score if best, and set where the next round starts. */
   finishRun(
     mode: BrainGameId | 'mix',
@@ -89,11 +88,6 @@ interface BrainStore {
     round?: { level: number; accuracy: number },
   ): { isNewBest: boolean; best: number }
   practiced(id: BrainGameId): void
-  /**
-   * Quick Eye's placement sent a slow first start to variant 1 (the centre alone): set the variant
-   * and empty its trial window. Never a promotion — those come from the window (recordRound).
-   */
-  setQuickEyeVariant(variant: number): void
   setSettings(patch: Partial<BrainSettings>): void
   /** A completed Today's Training session, with the games it used (for the rotation). */
   completeSession(minutes: number, games?: BrainGameId[]): void
@@ -500,7 +494,6 @@ export const useBrainStore = create<BrainStore>((set, get) => {
           // put the account back near level 1, the very thing the cloud copy is for.
           const g = progress.games[id]
           if (g) progress = { ...progress, games: { ...progress.games, [id]: { ...g, level: taken, bestLevel: Math.max(g.bestLevel, taken) } } }
-          if (id === 'quickEye') progress = { ...progress, quickEye: before.quickEye }
         }
       }
       commitProgress(progress)
@@ -523,11 +516,6 @@ export const useBrainStore = create<BrainStore>((set, get) => {
     practiced(id) {
       const progress = markPracticed(get().progress, id)
       if (progress !== get().progress) commitProgress(progress)
-    },
-    setQuickEyeVariant(variant) {
-      const p = get().progress
-      const v = Math.max(1, Math.min(QUICK_EYE_MAX_VARIANT, Math.round(variant)))
-      commitProgress({ ...p, quickEye: { ...p.quickEye, variant: v, recentMs: [], recentOk: '', thresholdMs: null } })
     },
     setSettings(patch) {
       commitProgress(updateSettings(get().progress, patch))

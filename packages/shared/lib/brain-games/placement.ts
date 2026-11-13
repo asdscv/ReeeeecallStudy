@@ -8,7 +8,7 @@ import { MECHANICS } from './mechanics'
  *
  * ZEST (King-Smith 1994; QUEST, Watson & Pelli 1983): a posterior over the level, updated after
  * every answer with a psychometric function whose target point is the SAME accuracy the staircase
- * converges to (85% speed, 80% Quick Eye). Trials are placed on the easy side of the posterior
+ * converges to (85%). Trials are placed on the easy side of the posterior
  * (its 30th percentile for three trials, then the 45th), never more than a few levels above the
  * last one, and spend no chances. Then the ordinary staircase takes over from the posterior mean
  * less half its spread — its equilibrium untouched.
@@ -52,8 +52,7 @@ export interface PlacementOptions {
   maxTrials: number
   /**
    * The share of the prior spread flat over the whole range, so a player far above the guess can
-   * still be found. Unset keeps the old prior, whose tail was only ~0.2% of its mass (Quick Eye
-   * keeps it until its own plan moves).
+   * still be found. Unset keeps the old prior, whose tail was only ~0.2% of its mass.
    */
   tailMass?: number
   hotMove?: number
@@ -217,7 +216,6 @@ export interface ZestPlan {
  *   exactly 3 boards, graded).
  * - probe: Match Pairs' ladder of up to four boards (useBrainRound).
  * - fast: the span games' fast entry — +2 per first-try pass until the first miss (useBrainRound).
- * Quick Eye keeps its own placement (useBrainRound) until its plan adopts these fixes.
  */
 export type PlacementPlan = ZestPlan | { method: 'probe' } | { method: 'fast' }
 
@@ -232,6 +230,19 @@ export const PLACEMENT: Partial<Record<BrainGameId, PlacementPlan>> = {
   pairs: { method: 'probe' },
   memoryGrid: { method: 'fast' },
   sequence: { method: 'fast' },
+  // The thinking games (2026-11-13). A trial is a whole puzzle (20 s to a few minutes), so fewer
+  // placement trials, hot after two right (one for Code Break, whose trial is a whole code) — a
+  // capable adult meets real challenge within about four trials, never a long run of easy ones
+  // (owner: «한 자리 수 덧셈 10개 하면 지루하지 않나»). `hi` is each game's top band.
+  setMatch: zest(24, { minTrials: 6, maxTrials: 10, hotAfter: 2, hotMove: 5 }),
+  makeNumber: zest(21, { minTrials: 5, maxTrials: 8, hotAfter: 2, hotMove: 5 }),
+  mazeRun: zest(24, { minTrials: 5, maxTrials: 8, hotAfter: 2, hotMove: 5 }),
+  // Code Break hands over at the posterior mean (handoverK 0), still never above the hardest code
+  // solved: three or four codes leave the posterior wide, and a quarter of its spread below the mean
+  // handed one sharp player in four over below L7 after a single unlucky miss — then +0.45 a code
+  // (doubled steps, kMax 1.5) is a dozen easy codes back up. At 0: one in sixteen; a slow player's
+  // handover moves 3.4 → 3.5 (persona simulation, brain-code-break-ladder.test.ts).
+  codeBreak: zest(21, { minTrials: 3, maxTrials: 4, hotAfter: 1, hotMove: 6, handoverK: 0 }),
 }
 
 /** A board game's ZEST plan (a fallback for a speed game added without one). */

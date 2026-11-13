@@ -13,6 +13,8 @@ import {
   SCHULTE_BANDS,
   SCHULTE_HINT_MS,
   SCHULTE_MAX_LEVEL,
+  SCHULTE_MEMORY,
+  schulteMemoryLimitMs,
   SCHULTE_TRACKING,
   schulte,
   schulteBand,
@@ -26,7 +28,7 @@ const DESKTOP: CreateContext = DEFAULT_CONTEXT
 const PHONE: CreateContext = { ...DEFAULT_CONTEXT, maxCols: maxColsFor(358), maxRows: 7 }
 const SMALL: CreateContext = { ...DEFAULT_CONTEXT, maxCols: 4, maxRows: 6 }
 const NARROW: CreateContext = { ...DEFAULT_CONTEXT, maxCols: 3, maxRows: 5 }
-const ALL_RULES = ['schulte.descending', 'schulte.alternate', 'schulte.alternateOpposite', 'schulte.reshuffle']
+const ALL_RULES = ['schulte.descending', 'schulte.alternate', 'schulte.alternateOpposite', 'schulte.reshuffle', 'schulte.memory']
 const LEVELS = Array.from({ length: SCHULTE_MAX_LEVEL }, (_, i) => i + 1)
 
 const view = (s: SchulteState) => schulte.view(s) as GridView
@@ -55,9 +57,10 @@ function playThrough(s0: SchulteState): { taps: [number, boolean][]; end: Schult
   let s = s0
   const taps: [number, boolean][] = []
   for (let guard = 0; guard < 200 && !schulte.outcome(s); guard++) {
+    while (schulte.pendingMs(s) !== null) s = schulte.advance(s)
     const at = schulte.solution(s)![0]
     const cell = view(s).cells[at]
-    taps.push([Number(cell.label), cell.boxed === true])
+    taps.push([Number(s.values[at]), cell.boxed === true])
     s = schulte.tap(s, at)
     while (schulte.pendingMs(s) !== null) s = schulte.advance(s)
   }
@@ -69,7 +72,7 @@ const wrongCell = (s: SchulteState) => s.sequence[s.sequence.length - 1]
 describe('Number Hunt: what each board asks', () => {
   it('every mode taps in its own order, and following solution() wins', () => {
     const expected = (s: SchulteState): [number, boolean][] => {
-      const cells = s.n * s.n
+      const cells = s.values.length
       const r = Array.from({ length: cells }, (_, i) => i)
       const lo = Math.min(...s.values)
       switch (s.mode) {
@@ -99,7 +102,7 @@ describe('Number Hunt: what each board asks', () => {
         }
       }
     }
-    expect([...modes].sort()).toEqual(['alt', 'altOpp', 'asc', 'desc', 'shuffle', 'skip', 'two'])
+    expect([...modes].sort()).toEqual(['alt', 'altOpp', 'asc', 'desc', 'memory', 'shuffle', 'skip', 'two'])
   })
 
   it('a reshuffle board moves every number after each tap, one size smaller than the level board', () => {
@@ -156,7 +159,8 @@ describe('Number Hunt: what each board asks', () => {
       for (const c of v.cells.filter((x) => !x.boxed)) expect(c.ink).toBeUndefined()
       expect(v.prompt.key).toBe(mode === 'alt' ? 'play.tapAlternate' : 'play.tapAlternateOpposite')
       while (!schulte.outcome(s)) {
-        const at = schulte.solution(s)![0]
+        while (schulte.pendingMs(s) !== null) s = schulte.advance(s)
+    const at = schulte.solution(s)![0]
         const cv = view(s)
         expect(cv.chip?.ink).toBe(cv.cells[at].boxed ? 'amber' : 'neutral')
         if (mode === 'altOpp') expect(cv.chip?.text).toBe(cv.cells[at].boxed ? '↓' : '↑')
@@ -203,7 +207,8 @@ describe('Number Hunt: what each board asks', () => {
     for (const s0 of boards.slice(0, 20)) {
       let s = s0
       while (!schulte.outcome(s)) {
-        const at = schulte.solution(s)![0]
+        while (schulte.pendingMs(s) !== null) s = schulte.advance(s)
+    const at = schulte.solution(s)![0]
         s = schulte.tap(s, at)
         if (schulte.outcome(s)) break
         expect(view(s).cells[at].tone).toBe('correct')
@@ -306,7 +311,7 @@ describe('Number Hunt: which board, how often', () => {
     for (const level of [...LEVELS, 17.99, 18, 30]) {
       for (const s of sample(level, 120, PHONE)) expect(s.n, `phone L${level}`).toBeLessThanOrEqual(5)
       for (const s of sample(level, 60, SMALL)) expect(s.n).toBeLessThanOrEqual(4)
-      for (const s of sample(level, 30, NARROW)) expect(s.n).toBe(3)
+      for (const s of sample(level, 30, NARROW)) { expect(s.cols).toBeLessThanOrEqual(3); expect(s.rows).toBeLessThanOrEqual(5) }
       const desk = sample(level, 200)
       if (level < 18) for (const s of desk) expect(s.n, `desktop L${level}`).toBeLessThanOrEqual(5)
       else expect(desk.some((s) => s.n === 6), `desktop L${level}`).toBe(true)
@@ -385,12 +390,12 @@ describe('Number Hunt: the clock', () => {
         expect(gain, `L${level} ${m.mode}`).toBeGreaterThanOrEqual(1.05)
       }
     }
-    expect([...SCHULTE_BANDS]).toEqual([1, 3, 5, 6, 8, 9, 10, 11, 12, 13, 14, 16, 18])
+    expect([...SCHULTE_BANDS]).toEqual([1, 3, 5, 6, 8, 9, 10, 11, 12, 13, 14, 16, 18, ...SCHULTE_MEMORY.map((m) => m.level)])
   })
 
-  it('the level stops at 24 on every screen, above the master tier', () => {
+  it('the level stops at 26 on every screen, above the master tier', () => {
     for (const ctx of [DESKTOP, PHONE, SMALL, NARROW]) {
-      expect(schulte.maxLevel!(ctx)).toBe(24)
+      expect(schulte.maxLevel!(ctx)).toBe(26)
       expect(TIERS.schulte[5]).toBeLessThan(schulte.maxLevel!(ctx))
     }
   })
@@ -414,12 +419,45 @@ describe('Number Hunt: rules the round has not introduced', () => {
 
   it('the one rule the round lets through still comes up at a level past it', () => {
     // A strong first round at L13: counting down is the lowest unmet rule, and no L10-13 board counts down.
-    const l13 = sample(13, 600, { ...DESKTOP, blockRules: ['schulte.alternate', 'schulte.alternateOpposite', 'schulte.reshuffle'] })
+    const l13 = sample(13, 600, { ...DESKTOP, blockRules: ['schulte.alternate', 'schulte.alternateOpposite', 'schulte.reshuffle', 'schulte.memory'] })
     expect(share(l13, (s) => s.mode === 'desc')).toBeGreaterThan(0.1)
     expect(share(l13, (s) => s.mode === 'altOpp' || s.mode === 'alt' || s.mode === 'shuffle')).toBe(0)
     // At L15 two series is the lowest unmet rule; the level's own boards are reshuffle and opposite.
-    const l15 = sample(15, 600, { ...DESKTOP, blockRules: ['schulte.alternateOpposite', 'schulte.reshuffle'] })
+    const l15 = sample(15, 600, { ...DESKTOP, blockRules: ['schulte.alternateOpposite', 'schulte.reshuffle', 'schulte.memory'] })
     expect(share(l15, (s) => s.mode === 'alt')).toBeGreaterThan(0.1)
     expect(share(l15, (s) => s.mode === 'altOpp' || s.mode === 'shuffle')).toBe(0)
+  })
+})
+
+
+describe('Number Hunt: face-down memory', () => {
+  it('starts at four cards, grows within the screen, and shortens previews at each repeated size', () => {
+    for (const ctx of [DESKTOP, PHONE, SMALL, NARROW]) {
+      let previous: SchulteState | null = null
+      for (const row of SCHULTE_MEMORY) {
+        let s = own(row.level, 41, ctx)
+        expect(s.mode).toBe('memory')
+        expect(s.cols).toBeLessThanOrEqual(ctx.maxCols)
+        expect(s.rows).toBeLessThanOrEqual(ctx.maxRows)
+        if (previous && s.values.length === previous.values.length) expect(s.previewMs).toBeLessThan(previous.previewMs)
+        expect(schulte.pendingMs(s)).toBe(row.previewMs)
+        expect(schulte.acceptsInput(s)).toBe(false)
+        expect(schulte.tap(s, 0)).toBe(s)
+        expect(view(s).cells.every((c) => c.label !== undefined)).toBe(true)
+        expect(schulte.timeLimitMs(s)).toBe(schulteMemoryLimitMs(s.values.length))
+        previous = s
+        s = schulte.advance(s)
+        expect(schulte.acceptsInput(s)).toBe(true)
+        expect(view(s).cells.every((c) => c.label === undefined && c.tone === 'faceDown')).toBe(true)
+        const wrong = s.sequence[1]
+        const missed = schulte.tap(s, wrong)
+        expect(missed.mistakes).toBe(s.mistakes + 1)
+        expect(view(missed).cells[wrong].label).toBe(String(s.values[wrong]))
+        expect(view(schulte.advance(missed)).cells[wrong].label).toBeUndefined()
+        const correct = schulte.tap(s, s.sequence[0])
+        expect(view(correct).cells[s.sequence[0]].label).toBe('1')
+      }
+      expect(own(19, 1, ctx).values).toHaveLength(4)
+    }
   })
 })

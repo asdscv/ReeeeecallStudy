@@ -20,8 +20,6 @@ import {
   localDayKey,
   planToday,
   plannedMinutes,
-  quickEyeStage,
-  researchContent,
   todaysPlanSeed,
   weekProgress,
   type AchievementId,
@@ -38,19 +36,19 @@ import { WeekRing } from '../../components/brain/WeekRing'
 import { Sparkline } from '../../components/brain/Sparkline'
 import { useBrainHydrated } from '../../components/brain/useBrainHydrated'
 import { FX, gameIcon } from '../../components/brain/brain-ui'
-import { ACHIEVEMENT_ICONS, TierBar, TierMedal, qeSpeedLevel, tierA11y, tierName, tierStanding } from '../../components/brain/tier-ui'
+import { ACHIEVEMENT_ICONS, TierBar, TierMedal, tierA11y, tierName, tierStanding } from '../../components/brain/tier-ui'
 import type { BrainStackParamList } from '../../navigation/types'
 
 type Nav = NativeStackNavigationProp<BrainStackParamList, 'BrainHome'>
 
 /**
  * Today's Training first — the bounded session the research counts — then every game as its own
- * card in its own colours, how it works, the research basis and the disclaimer. Progress is shown
+ * card in its own colours, how it works and a short disclaimer. Progress is shown
  * as sessions this week and course steps, never as a streak or a "brain score".
  */
 export function BrainHomeScreen() {
   const theme = useTheme()
-  const { t, i18n } = useTranslation('brain')
+  const { t } = useTranslation('brain')
   const navigation = useNavigation<Nav>()
   const { width } = useWindowDimensions()
   useBrainHydrated()
@@ -66,7 +64,6 @@ export function BrainHomeScreen() {
   // The line-up that will actually play: the same seed all day, until a session is finished.
   const { focus, slots: plan } = planToday(progress, createRng(todaysPlanSeed(progress, today)))
   const minutes = plannedMinutes(plan)
-  const research = researchContent(i18n.language)
   // Two cards a row on a tablet.
   const twoUp = width >= 600
 
@@ -231,22 +228,6 @@ export function BrainHomeScreen() {
 
         <Text style={[styles.body, { color: theme.colors.textSecondary }]}>{t('home.howItWorks')}</Text>
 
-        {research ? (
-          <Pressable
-            onPress={() => navigation.navigate('BrainResearch')}
-            style={({ pressed }) => [
-              styles.research,
-              { backgroundColor: theme.colors.surfaceElevated, borderColor: pressed ? theme.colors.primary : theme.colors.border },
-            ]}
-            accessibilityRole="button"
-            testID="brain-research-link"
-          >
-            <Feather name="book-open" size={22} color={theme.colors.primary} />
-            <Text style={[styles.researchText, { color: theme.colors.text }]}>{t('home.research')}</Text>
-            <Feather name="chevron-right" size={22} color={theme.colors.textTertiary} />
-          </Pressable>
-        ) : null}
-
         <View style={styles.footer}>
           <Text style={[styles.fine, { color: theme.colors.textSecondary }]}>{t('disclaimer')}</Text>
           <Text style={[styles.fine, { color: theme.colors.textSecondary }]}>{t('worry')}</Text>
@@ -257,12 +238,11 @@ export function BrainHomeScreen() {
     </Screen>
   )
 
-  /** The level, small: "Lv. 7.3" — Quick Eye "Stage 3 · speed 7" (a speed level, never a flash time). */
+  /** The level, small: "Lv. 7.3". */
   function levelLabel(game: BrainGameEntry): string {
     const p = gameProgress(progress, game.id)
     // A placement left part-way (n = 0) has no level yet — never its interim probe level.
     if (p.rounds === 0 || meta.sk[game.id]?.n === 0) return t('home.new')
-    if (game.id === 'quickEye') return t('home.quickEyeLevel', { stage: quickEyeStage(progress.quickEye.variant, progress.settings.centerOnly), speed: qeSpeedLevel(p.level) })
     return t('home.level', { level: displayLevel(p.level).toFixed(1) })
   }
 }
@@ -484,8 +464,6 @@ const styles = StyleSheet.create({
   achTitle: { fontSize: 15, fontWeight: '800' },
   achBody: { fontSize: 13, lineHeight: 18 },
   spark: { width: 96, opacity: 0.9 },
-  research: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 60, paddingHorizontal: 16, borderRadius: 14, borderWidth: 1 },
-  researchText: { flex: 1, fontSize: 17, fontWeight: '600' },
   footer: { gap: 8, paddingTop: 4 },
   fine: { fontSize: 13, lineHeight: 19 },
 })

@@ -18,26 +18,22 @@ const GLIDE = Easing.bezier(0.3, 0.7, 0.2, 1)
  * How to play, shown rather than told: the real engine plays an easy round on the real board, and
  * a fingertip makes each tap. It loops until the player starts; under reduce motion it holds each
  * frame longer and the fingertip jumps instead of gliding.
- *
- * Quick Eye demonstrates the player's own stage (`variant`; a new player's is the first one with
- * the star, the task the round really opens with).
  */
-export function DemoPlayer({ gameId, width, centerOnly = false, variant }: { gameId: BrainGameId; width: number; centerOnly?: boolean; variant?: number }) {
+export function DemoPlayer({ gameId, width }: { gameId: BrainGameId; width: number }) {
   const { t } = useTranslation('brain')
   const reduced = useReducedMotion()
   const theme = GAME_THEMES[gameId]
   const boardWidth = Math.max(200, Math.min(width - 32, 300))
-  // A player on Quick Eye's "centre only" setting sees the centre-only task demonstrated. At most
-  // 4×4: an easy board, the same on every screen.
+  // At most 4×4: an easy board, the same on every screen.
   const frames = useMemo(
-    () => buildDemo(gameId, { maxCols: Math.min(4, maxColsFor(boardWidth)), maxRows: DEMO_MAX_ROWS, centerOnly, ...(variant !== undefined ? { variant } : {}) }),
-    [gameId, boardWidth, centerOnly, variant],
+    () => buildDemo(gameId, { maxCols: Math.min(4, maxColsFor(boardWidth)), maxRows: DEMO_MAX_ROWS }),
+    [gameId, boardWidth],
   )
   const [i, setI] = useState(0)
   const [run, setRun] = useState(0)
-  // The frames differ in height (Quick Eye's answers replace its box, a choice's options appear):
-  // hold the tallest seen so far, so the page under the demo never jumps.
-  const [minH, setMinH] = useState(gameId === 'quickEye' ? Math.min(BOARD_MAX_H, boardWidth) : 160)
+  // The frames differ in height (a choice's options appear): hold the tallest seen so far, so the
+  // page under the demo never jumps.
+  const [minH, setMinH] = useState(160)
   const frame = frames[Math.min(i, frames.length - 1)]
 
   useEffect(() => {
@@ -120,7 +116,6 @@ export function DemoPlayer({ gameId, width, centerOnly = false, variant }: { gam
         <BrainBoard
           view={frame.view}
           onTap={noop}
-          onExposure={noop}
           width={boardWidth}
           height={Math.min(BOARD_MAX_H, boardWidth)}
           theme={theme}

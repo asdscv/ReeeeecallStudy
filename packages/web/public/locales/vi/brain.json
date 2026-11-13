@@ -2,7 +2,7 @@
   "title": "Luyện trí não",
   "subtitle": "Trò chơi tập trung và ghi nhớ cho thói quen hoạt động trí não đều đặn",
   "disclaimer": "Tính năng này không phải là thiết bị y tế và không nhằm mục đích chẩn đoán, điều trị, chữa khỏi hoặc phòng ngừa bất kỳ bệnh lý nào.",
-  "worry": "Nếu bạn lo lắng về trí nhớ của mình, hãy trao đổi với bác sĩ hoặc cơ sở y tế tại địa phương thay vì chơi thêm.",
+  "worry": "Nếu lo lắng về trí nhớ, hãy trao đổi với bác sĩ hoặc cơ sở tư vấn gần bạn.",
   "training": {
     "title": "Bài luyện hôm nay",
     "desc": "{{count}} trò chơi · khoảng {{minutes}} phút",
@@ -43,10 +43,8 @@
     "level": "Cấp {{level}}",
     "best": "Cao nhất cấp {{level}}",
     "new": "Mới",
-    "quickEyeLevel": "Màn {{stage}} · tốc độ {{speed}}",
     "record": "Cao nhất {{value}} điểm",
     "settings": "Cài đặt",
-    "research": "Cơ sở nghiên cứu",
     "howItWorks": "Mỗi câu đố đều được tạo mới. Đúng thì câu sau khó hơn một chút, sai thì dễ hơn. Cấp độ chỉ cho thấy kỹ năng của bạn ở trò chơi đó — không phải thước đo trí nhớ hay sức khỏe não bộ."
   },
   "settings": {
@@ -57,9 +55,6 @@
     "timing_1_5": "1,5×",
     "timing_2": "2×",
     "timing_0": "Không giới hạn",
-    "centerOnly": "Nhanh mắt: chỉ ở giữa",
-    "centerOnlyHelp": "Bật lên nếu khó nhìn thấy ngôi sao ở rìa. Bạn chỉ cần trả lời hình ở giữa.",
-    "flash": "Nhanh mắt hiện hình ảnh trong thời gian rất ngắn. Nếu bạn nhạy cảm với ánh sáng nhấp nháy, hãy chơi vừa sức.",
     "close": "Đóng",
     "sound": "Hiệu ứng âm thanh",
     "soundHelp": "Phát tiếng ngắn khi trả lời đúng hoặc sai.",
@@ -73,10 +68,6 @@
     "reasoning": "Suy luận"
   },
   "games": {
-    "quickEye": {
-      "name": "Nhanh mắt",
-      "desc": "Nhìn hình ở giữa và nhận ra ngay ngôi sao vừa lóe lên ở hướng nào."
-    },
     "memoryGrid": {
       "name": "Ô sáng",
       "desc": "Luyện nhớ vị trí: ghi nhớ các ô vừa sáng rồi chạm vào chúng."
@@ -108,6 +99,22 @@
     "series": {
       "name": "Quy luật số",
       "desc": "Tìm quy luật và chọn số tiếp theo."
+    },
+    "setMatch": {
+      "name": "Tìm bộ ba",
+      "desc": "Tìm ba thẻ có từng đặc điểm đều giống nhau hoặc đều khác nhau."
+    },
+    "codeBreak": {
+      "name": "Đoán mã số",
+      "desc": "S: đúng số và vị trí. B: đúng số, sai vị trí. Dùng gợi ý để tìm mã."
+    },
+    "makeNumber": {
+      "name": "Tạo số",
+      "desc": "Dùng mỗi số đúng một lần để tạo số đích."
+    },
+    "mazeRun": {
+      "name": "Mê cung",
+      "desc": "Vẽ đường đến lá cờ. Có thể quay lại khi gặp ngõ cụt."
     }
   },
   "play": {
@@ -183,59 +190,75 @@
     "newBestReverse": "Ngược {{count}} ô!",
     "newBestReverse_one": "Ngược {{count}} ô!",
     "newBestReverse_other": "Ngược {{count}} ô!",
-    "lookalikeBadge": "Hình na ná"
-  },
-  "quickEye": {
-    "watch": "Nhìn vào giữa",
-    "what": "Ở giữa có gì?",
-    "where": "Ngôi sao ở hướng nào?",
-    "sameOrDifferent": "Hai hình ở giữa có giống nhau không?",
-    "same": "Giống",
-    "different": "Khác",
-    "circle": "Hình tròn",
-    "square": "Hình vuông",
-    "stage": "Màn {{stage}}",
-    "dir": {
-      "0": "Trên",
-      "1": "Trên bên phải",
-      "2": "Phải",
-      "3": "Dưới bên phải",
-      "4": "Dưới",
-      "5": "Dưới bên trái",
-      "6": "Trái",
-      "7": "Trên bên trái"
+    "lookalikeBadge": "Hình na ná",
+    "setMatchFind": "Chọn ba thẻ: từng đặc điểm đều giống hoặc đều khác",
+    "setMatchNone": "Không có bộ",
+    "setPicked_one": "Đã chọn {{count}} thẻ",
+    "setPicked_other": "Đã chọn {{count}} thẻ",
+    "setCard_one": "{{count}} hình",
+    "setCard_other": "{{count}} hình",
+    "setBroken": "Kiểm tra {{attributes}}. Hai giống và một khác không tạo thành bộ.",
+    "setAttribute": {
+      "shape": "Hình",
+      "count": "Số lượng",
+      "color": "Màu",
+      "fill": "Kiểu tô"
     },
-    "speedLevel": "Mức tốc độ {{level}}",
-    "knob": {
-      "wider": "Giờ hãy nhìn rộng hơn",
-      "ring2": "Ra tới vòng giữa",
-      "ring3": "Ra tới vòng ngoài",
-      "crowd": "Tìm ngôi sao giữa các tam giác",
-      "moreCrowd": "Thêm nhiều tam giác",
-      "similar": "Các hình ở giữa trông giống nhau hơn",
-      "sameDiff": "Giống hay khác?"
+    "setShape": {
+      "circle": "Tròn",
+      "triangle": "Tam giác",
+      "square": "Vuông",
+      "diamond": "Thoi"
     },
-    "stageUp": {
-      "title": "Màn mới",
-      "stage": "Màn {{stage}}",
-      "ease": "Màn mới nên lúc đầu sẽ hiện chậm hơn một chút",
-      "continue": "Tiếp tục"
+    "setColor": {
+      "blue": "Xanh dương",
+      "vermillion": "Đỏ cam",
+      "black": "Đen"
     },
-    "gauge": "Đúng thêm {{count}} câu nữa là nhanh hơn một bậc",
-    "speedUp": "Nhanh hơn một bậc",
-    "topSpeed": "Tốc độ cao nhất",
-    "hold": "Giữ tốc độ cao nhất {{n}}/14",
-    "wasHere": "Nó ở đây",
-    "nearMiss": "Tiếc quá, ngay bên cạnh",
-    "missFast": "Lần này nhanh quá",
-    "slowerStart": "Nhanh hơn một chút",
-    "legEnd": "Hết chặng",
-    "nextGoal": "Mục tiêu tiếp theo: giữ đều quanh mức tốc độ {{level}}",
-    "landscapeHint": "Xoay ngang điện thoại hoặc dùng máy tính bảng để thấy rộng hơn",
-    "revealA11y": "Đáp án: {{center}}, ngôi sao ở {{dir}}",
-    "warmup": "Đang chuẩn bị",
-    "gauge_other": "Đúng thêm {{count}} câu nữa là nhanh hơn một bậc",
-    "gauge_one": "Đúng thêm {{count}} câu nữa là nhanh hơn một bậc"
+    "setFill": {
+      "solid": "Tô kín",
+      "striped": "Sọc",
+      "outline": "Viền"
+    },
+    "codeBreakGuess_one": "Đoán mã {{length}} chữ số · còn {{count}} lượt",
+    "codeBreakGuess_other": "Đoán mã {{length}} chữ số · còn {{count}} lượt",
+    "codeGuesses": "Lượt {{used}}/{{total}}",
+    "codeRepeats": "Có thể lặp số",
+    "codeDistinct": "Không lặp số",
+    "codeHistory": "Các lượt đoán và gợi ý",
+    "codeFirstGuess": "Nhập lượt đoán đầu tiên",
+    "codeFeedback": "{{strikes}} S · {{balls}} B",
+    "codeEntry": "Số đang nhập",
+    "codeNotes": "Đánh dấu số loại trừ",
+    "codeNote": "Đổi dấu loại số {{digit}}",
+    "codeAnswer": "Mã: {{code}}",
+    "erase": "Xóa",
+    "submit": "Xác nhận",
+    "undo": "Hoàn tác",
+    "clear": "Xóa hết",
+    "makeNumberSigns": "Chọn dấu để tạo {{target}}",
+    "makeNumberTarget": "Dùng tất cả các số để tạo {{target}}",
+    "makeTarget": "Đích {{target}}",
+    "makeFixed": "Giữ thứ tự này · chọn dấu",
+    "makeAny": "Mỗi số một lần · thứ tự tùy ý",
+    "makeTries_one": "Còn {{count}} lượt",
+    "makeTries_other": "Còn {{count}} lượt",
+    "makeExpression": "Biểu thức của bạn",
+    "makeValue": "Biểu thức này bằng {{value}}. Hãy sửa lại.",
+    "mazeRunGo": "Vẽ đường đến lá cờ",
+    "mazeRunKeys_one": "Nhặt {{count}} chìa theo thứ tự rồi đến cờ",
+    "mazeRunKeys_other": "Nhặt {{count}} chìa theo thứ tự rồi đến cờ",
+    "mazeRunMemorize": "Nhớ các bức tường và lối đi",
+    "mazeMemorise": "Tường sắp ẩn đi",
+    "mazeDrag": "Kéo hoặc chạm ô bên cạnh · quay lại để xóa đường",
+    "mazeBumps_one": "Còn {{count}} lần va tường",
+    "mazeBumps_other": "Còn {{count}} lần va tường",
+    "mazeStart": "Xuất phát",
+    "mazeGoal": "Cờ · đích",
+    "mazeKey_one": "Chìa số {{count}}",
+    "mazeKey_other": "Chìa số {{count}}",
+    "memorizeNumbers": "Nhớ vị trí các số · 1 đến {{max}}",
+    "memoryBadge": "Nhớ thẻ úp"
   },
   "summary": {
     "livesOut": "Kết thúc lượt",
@@ -258,49 +281,25 @@
     "voided": "Màn hình liên tục bị giật nên vòng chơi đã dừng"
   },
   "colors": {
-    "red": "ĐỎ",
     "blue": "XANH DƯƠNG",
-    "green": "XANH LÁ",
-    "yellow": "VÀNG",
+    "orange": "CAM",
     "purple": "TÍM",
-    "orange": "CAM"
+    "black": "ĐEN",
+    "brown": "NÂU",
+    "gray": "XÁM"
   },
   "intro": {
     "howTo": "Cách chơi",
     "replay": "Xem lại",
     "start": "Bắt đầu",
-    "practiceNote": "4 câu đầu là luyện tập: không mất lượt và không tính điểm.",
+    "practiceNote": "Vài câu đầu là luyện tập. Không mất lượt hay điểm.",
     "level": "Cấp",
-    "speed": "Tốc độ",
-    "stage": "Màn",
     "rounds": "Đã chơi",
     "best": "Điểm cao nhất",
     "welcomeBack": "Chào mừng trở lại. Vài câu đầu sẽ tìm lại mức phù hợp.",
     "firstPlacement": "Vài câu đầu sẽ tìm mức bắt đầu phù hợp."
   },
   "mechanics": {
-    "quickEye": {
-      "periphery": {
-        "title": "Tìm cả ngôi sao",
-        "body": "Một ngôi sao cũng hiện ra ở bên ngoài. Chọn hình ở giữa, rồi chọn phía có ngôi sao."
-      },
-      "distractors": {
-        "title": "Ngôi sao giữa các tam giác",
-        "body": "Các hình tam giác cũng hiện ra. Chọn phía có ngôi sao duy nhất."
-      },
-      "similar": {
-        "title": "Hình gần giống",
-        "body": "Góc hình vuông tròn dần, gần giống hình tròn hơn."
-      },
-      "sameDiff": {
-        "title": "Giống hay khác?",
-        "body": "Hai hình hiện ra ở giữa. Chọn xem chúng giống hay khác nhau."
-      },
-      "clearView": {
-        "title": "Màn hình rõ hơn rồi",
-        "body": "Lớp che đã thay đổi nên vài câu đầu sẽ bắt đầu chậm hơn một chút."
-      }
-    },
     "oddOneOut": {
       "rotation": {
         "title": "Hình bị xoay",
@@ -316,7 +315,7 @@
       },
       "glyphs": {
         "title": "Chữ dễ nhầm",
-        "body": "Những chữ trông giống nhau, như b và d hoặc 6 và 9."
+        "body": "Những chữ trông giống nhau, như b và d hoặc O và Q."
       },
       "colorNoise": {
         "title": "Bỏ qua màu",
@@ -381,6 +380,10 @@
       "unmarked": {
         "title": "Không đánh dấu",
         "body": "Số đã tìm thấy không mờ đi. Hãy tự nhớ mình đã chạm đến đâu."
+      },
+      "memory": {
+        "title": "Nhớ thẻ úp",
+        "body": "Nhớ vị trí. Khi thẻ úp xuống, chạm từ 1 theo thứ tự. Thẻ sai sẽ hiện thoáng qua."
       }
     },
     "memoryGrid": {
@@ -397,6 +400,10 @@
       "reverse": {
         "title": "Chạm ngược",
         "body": "Chạm theo thứ tự ngược, bắt đầu từ ô sáng cuối cùng. Từ giờ luôn là thứ tự ngược."
+      },
+      "faster": {
+        "title": "Nháy nhanh hơn",
+        "body": "Các ô sáng lên nối tiếp nhau nhanh hơn. Đừng để lỡ thứ tự."
       }
     },
     "series": {
@@ -479,6 +486,22 @@
       "missingTerm": {
         "title": "Tìm chỗ trống",
         "body": "Giờ dấu ? có thể nằm giữa dãy. Chọn số điền vào chỗ trống."
+      },
+      "primes": {
+        "title": "Số nguyên tố liên tiếp",
+        "body": "Xuất hiện quy luật: các số nguyên tố (chỉ chia hết cho 1 và chính nó) nối tiếp nhau."
+      },
+      "product": {
+        "title": "Nhân hai số trước",
+        "body": "Xuất hiện quy luật: mỗi số bằng tích hai số trước."
+      },
+      "digitSum": {
+        "title": "Cộng các chữ số",
+        "body": "Xuất hiện quy luật: mỗi số bằng số trước cộng với từng chữ số của nó."
+      },
+      "diffPrimes": {
+        "title": "Khoảng cách là số nguyên tố",
+        "body": "Xuất hiện quy luật: các khoảng cách là những số nguyên tố liên tiếp."
       }
     },
     "pairs": {
@@ -554,6 +577,94 @@
         "title": "Hai chữ số × hai chữ số",
         "body": "Có bài nhân hai số có hai chữ số với nhau."
       }
+    },
+    "setMatch": {
+      "color": {
+        "title": "Thêm màu sắc",
+        "body": "Ngoài hình và số lượng, ba màu cũng phải đều giống hoặc đều khác."
+      },
+      "fill": {
+        "title": "Thêm kiểu tô",
+        "body": "Xem cả tô kín, sọc và viền. Mỗi đặc điểm phải đều giống hoặc đều khác."
+      },
+      "none": {
+        "title": "Có thể không có bộ",
+        "body": "Nếu không có ba thẻ tạo thành bộ, chọn Không có bộ."
+      },
+      "oneSet": {
+        "title": "Chỉ một bộ",
+        "body": "Tìm bộ duy nhất giữa các thẻ gần giống nhau."
+      }
+    },
+    "codeBreak": {
+      "three": {
+        "title": "Mã ba chữ số",
+        "body": "Giờ đoán ba chữ số. S là đúng số và vị trí; B là đúng số ở vị trí khác."
+      },
+      "four": {
+        "title": "Mã bốn chữ số",
+        "body": "Dùng các gợi ý trước để đoán bốn chữ số."
+      },
+      "five": {
+        "title": "Mã năm chữ số",
+        "body": "Tăng lên năm chữ số. Hãy suy luận cả vị trí của chúng."
+      },
+      "zero": {
+        "title": "Thêm số 0",
+        "body": "Mã có thể chứa số 0, kể cả ở đầu."
+      },
+      "repeats": {
+        "title": "Số có thể lặp lại",
+        "body": "Một số có thể xuất hiện nhiều lần. Dùng gợi ý để tìm số lần."
+      }
+    },
+    "makeNumber": {
+      "multiply": {
+        "title": "Thêm phép nhân",
+        "body": "Có thể dùng ×. Nhân trước, cộng trừ sau."
+      },
+      "divide": {
+        "title": "Thêm phép chia",
+        "body": "Dùng thêm ÷. Tính × và ÷ trước, từ trái sang phải."
+      },
+      "anyOrder": {
+        "title": "Đổi thứ tự số",
+        "body": "Chạm số theo thứ tự tùy ý. Dùng mỗi thẻ đúng một lần."
+      },
+      "brackets": {
+        "title": "Dùng ngoặc",
+        "body": "Tính trong ngoặc trước. Cần dùng ngoặc để tạo số đích."
+      },
+      "target24": {
+        "title": "Tạo số 24",
+        "body": "Dùng bốn số mỗi số một lần để tạo 24. Thử đổi thứ tự và ngoặc."
+      },
+      "fraction": {
+        "title": "Phân số ở bước giữa",
+        "body": "Kết quả giữa có thể là phân số. Chỉ cần đáp án cuối bằng số đích."
+      }
+    },
+    "mazeRun": {
+      "winding": {
+        "title": "Thêm ngã rẽ",
+        "body": "Đường quanh co hơn. Quay lại khi gặp ngõ cụt."
+      },
+      "keys": {
+        "title": "Nhặt chìa khóa trước",
+        "body": "Nhặt chìa theo số rồi đến cờ. Quay lại không làm mất chìa đã nhặt."
+      },
+      "moreKeys": {
+        "title": "Thêm chìa khóa",
+        "body": "Nhặt tất cả chìa theo thứ tự số."
+      },
+      "hidden": {
+        "title": "Nhớ các bức tường",
+        "body": "Tường ẩn sau khi xem trước. Di chuyển theo trí nhớ. Số lần được va tường hiển thị riêng."
+      },
+      "hiddenKeys": {
+        "title": "Nhặt chìa theo trí nhớ",
+        "body": "Trong mê cung ẩn tường, nhặt chìa theo số rồi đến cờ."
+      }
     }
   },
   "rule": {
@@ -608,17 +719,9 @@
       "title": "Nhớ được bảy",
       "body": "Nhớ được 7 ô ở Nhớ thứ tự hoặc Ô sáng."
     },
-    "quickEyeStage5": {
-      "title": "Nhanh mắt màn 5",
-      "body": "Lên đến màn 5 của Nhanh mắt."
-    },
-    "quickEyeStage10": {
-      "title": "Nhanh mắt màn 10",
-      "body": "Lên đến màn 10 của Nhanh mắt."
-    },
     "allGames": {
       "title": "Mọi trò chơi",
-      "body": "Đã thử cả 9 trò chơi."
+      "body": "Đã thử tất cả trò chơi."
     },
     "firstSession": {
       "title": "Buổi đầu tiên",

@@ -2,7 +2,7 @@
   "title": "Entrenamiento mental",
   "subtitle": "Juegos de concentración y memoria para un hábito regular de actividad mental",
   "disclaimer": "Esta función no es un dispositivo médico y no está destinada a diagnosticar, tratar, curar ni prevenir ninguna afección médica.",
-  "worry": "Si te preocupa tu memoria, en lugar de jugar más, habla con un médico o con un servicio de salud de tu zona.",
+  "worry": "Si te preocupa tu memoria, consulta a un médico o a un centro de memoria cercano.",
   "training": {
     "title": "Entrenamiento de hoy",
     "desc": "{{count}} juegos · unos {{minutes}} min",
@@ -43,10 +43,8 @@
     "level": "Nv. {{level}}",
     "best": "Mejor Nv. {{level}}",
     "new": "Nuevo",
-    "quickEyeLevel": "Etapa {{stage}} · velocidad {{speed}}",
     "record": "Mejor: {{value}} pts",
     "settings": "Ajustes",
-    "research": "Estudios de referencia",
     "howItWorks": "Cada reto se crea desde cero. Si aciertas, el siguiente es un poco más difícil; si fallas, se suaviza. El nivel solo muestra tu habilidad en ese juego: no mide la memoria ni la salud cerebral."
   },
   "settings": {
@@ -57,9 +55,6 @@
     "timing_1_5": "1,5×",
     "timing_2": "2×",
     "timing_0": "Sin límite",
-    "centerOnly": "Ojo rápido: solo el centro",
-    "centerOnlyHelp": "Actívalo si te cuesta ver la estrella de los bordes. Solo responderás la imagen del centro.",
-    "flash": "Ojo rápido muestra imágenes durante muy poco tiempo. Si eres sensible a las luces intermitentes, tómatelo con calma.",
     "close": "Cerrar",
     "sound": "Efectos de sonido",
     "soundHelp": "Un sonido breve al acertar o fallar.",
@@ -73,10 +68,6 @@
     "reasoning": "Razonamiento"
   },
   "games": {
-    "quickEye": {
-      "name": "Ojo rápido",
-      "desc": "Mira la figura del centro y capta de un vistazo hacia dónde apareció la estrella."
-    },
     "memoryGrid": {
       "name": "Cuadrícula flash",
       "desc": "Práctica de memoria espacial: recuerda las casillas que se iluminaron y tócalas."
@@ -108,6 +99,22 @@
     "series": {
       "name": "Patrón numérico",
       "desc": "Descubre la regla y elige el siguiente número."
+    },
+    "setMatch": {
+      "name": "Encuentra el trío",
+      "desc": "Encuentra tres cartas: cada rasgo debe ser igual en las tres o distinto en las tres."
+    },
+    "codeBreak": {
+      "name": "Código secreto",
+      "desc": "S: cifra y posición correctas. B: cifra correcta en otra posición. Deduce el código."
+    },
+    "makeNumber": {
+      "name": "Crea el número",
+      "desc": "Usa cada número una sola vez para llegar al objetivo."
+    },
+    "mazeRun": {
+      "name": "Laberinto",
+      "desc": "Traza un camino hasta la bandera. Puedes retroceder en los callejones sin salida."
     }
   },
   "play": {
@@ -183,59 +190,75 @@
     "newBestReverse": "¡{{count}} al revés!",
     "newBestReverse_one": "¡{{count}} al revés!",
     "newBestReverse_other": "¡{{count}} al revés!",
-    "lookalikeBadge": "Parecidos"
-  },
-  "quickEye": {
-    "watch": "Mira el centro",
-    "what": "¿Qué había en el centro?",
-    "where": "¿En qué dirección estaba la estrella?",
-    "sameOrDifferent": "¿Eran iguales las dos imágenes del centro?",
-    "same": "Iguales",
-    "different": "Diferentes",
-    "circle": "Círculo",
-    "square": "Cuadrado",
-    "stage": "Etapa {{stage}}",
-    "dir": {
-      "0": "Arriba",
-      "1": "Arriba a la derecha",
-      "2": "Derecha",
-      "3": "Abajo a la derecha",
-      "4": "Abajo",
-      "5": "Abajo a la izquierda",
-      "6": "Izquierda",
-      "7": "Arriba a la izquierda"
+    "lookalikeBadge": "Parecidos",
+    "setMatchFind": "Elige tres cartas: cada rasgo igual en todas o distinto en todas",
+    "setMatchNone": "No hay trío",
+    "setPicked_one": "{{count}} elegidas",
+    "setPicked_other": "{{count}} elegidas",
+    "setCard_one": "{{count}} figuras",
+    "setCard_other": "{{count}} figuras",
+    "setBroken": "Revisa {{attributes}}. Dos iguales y uno distinto no forman un trío.",
+    "setAttribute": {
+      "shape": "Forma",
+      "count": "Cantidad",
+      "color": "Color",
+      "fill": "Relleno"
     },
-    "speedLevel": "Nivel de velocidad {{level}}",
-    "knob": {
-      "wider": "Ahora mira más amplio",
-      "ring2": "Hasta el anillo del medio",
-      "ring3": "Hasta el anillo exterior",
-      "crowd": "Busca la estrella entre triángulos",
-      "moreCrowd": "Más triángulos",
-      "similar": "Las figuras del centro se parecen más",
-      "sameDiff": "¿Iguales o diferentes?"
+    "setShape": {
+      "circle": "Círculo",
+      "triangle": "Triángulo",
+      "square": "Cuadrado",
+      "diamond": "Rombo"
     },
-    "stageUp": {
-      "title": "Nueva etapa",
-      "stage": "Etapa {{stage}}",
-      "ease": "Una etapa nueva empieza un poco más despacio",
-      "continue": "Continuar"
+    "setColor": {
+      "blue": "Azul",
+      "vermillion": "Bermellón",
+      "black": "Negro"
     },
-    "gauge": "{{count}} aciertos más y irá más rápido",
-    "speedUp": "Un paso más rápido",
-    "topSpeed": "Velocidad máxima",
-    "hold": "Mantén la velocidad máxima {{n}}/14",
-    "wasHere": "Estaba aquí",
-    "nearMiss": "Casi, justo al lado",
-    "missFast": "Esa fue rápida",
-    "slowerStart": "Un poco más rápido",
-    "legEnd": "Fin del tramo",
-    "nextGoal": "Siguiente: mantente cerca del nivel de velocidad {{level}}",
-    "landscapeHint": "Gira el teléfono o usa una tableta para verlo más amplio",
-    "revealA11y": "Respuesta: {{center}}, estrella: {{dir}}",
-    "warmup": "Preparándonos",
-    "gauge_one": "{{count}} acierto más y irá más rápido",
-    "gauge_other": "{{count}} aciertos más y irá más rápido"
+    "setFill": {
+      "solid": "Sólido",
+      "striped": "Rayado",
+      "outline": "Contorno"
+    },
+    "codeBreakGuess_one": "Adivina el código de {{length}} cifras · {{count}} intentos",
+    "codeBreakGuess_other": "Adivina el código de {{length}} cifras · {{count}} intentos",
+    "codeGuesses": "Intentos {{used}}/{{total}}",
+    "codeRepeats": "Se pueden repetir cifras",
+    "codeDistinct": "Sin cifras repetidas",
+    "codeHistory": "Intentos y pistas",
+    "codeFirstGuess": "Introduce tu primer intento",
+    "codeFeedback": "{{strikes}} S · {{balls}} B",
+    "codeEntry": "Intento actual",
+    "codeNotes": "Marcar cifras descartadas",
+    "codeNote": "Marcar o desmarcar {{digit}}",
+    "codeAnswer": "Código: {{code}}",
+    "erase": "Borrar",
+    "submit": "Confirmar",
+    "undo": "Deshacer",
+    "clear": "Limpiar",
+    "makeNumberSigns": "Elige los signos para crear {{target}}",
+    "makeNumberTarget": "Usa todos los números para crear {{target}}",
+    "makeTarget": "Objetivo {{target}}",
+    "makeFixed": "Mantén el orden y elige los signos",
+    "makeAny": "Cada número una vez, en cualquier orden",
+    "makeTries_one": "Quedan {{count}} intentos",
+    "makeTries_other": "Quedan {{count}} intentos",
+    "makeExpression": "Tu expresión",
+    "makeValue": "Esta expresión da {{value}}. Prueba a cambiarla.",
+    "mazeRunGo": "Traza un camino hasta la bandera",
+    "mazeRunKeys_one": "Recoge {{count}} llaves en orden y llega a la bandera",
+    "mazeRunKeys_other": "Recoge {{count}} llaves en orden y llega a la bandera",
+    "mazeRunMemorize": "Recuerda las paredes y los caminos",
+    "mazeMemorise": "Las paredes se ocultarán pronto",
+    "mazeDrag": "Arrastra o toca una casilla vecina; retrocede para borrar",
+    "mazeBumps_one": "Quedan {{count}} choques",
+    "mazeBumps_other": "Quedan {{count}} choques",
+    "mazeStart": "Inicio",
+    "mazeGoal": "Bandera · meta",
+    "mazeKey_one": "Llave {{count}}",
+    "mazeKey_other": "Llave {{count}}",
+    "memorizeNumbers": "Recuerda las posiciones · del 1 al {{max}}",
+    "memoryBadge": "Memoriza boca abajo"
   },
   "summary": {
     "livesOut": "Ronda terminada",
@@ -258,49 +281,25 @@
     "voided": "La pantalla se trababa una y otra vez, así que la ronda se detuvo"
   },
   "colors": {
-    "red": "ROJO",
     "blue": "AZUL",
-    "green": "VERDE",
-    "yellow": "AMARILLO",
+    "orange": "NARANJA",
     "purple": "MORADO",
-    "orange": "NARANJA"
+    "black": "NEGRO",
+    "brown": "MARRÓN",
+    "gray": "GRIS"
   },
   "intro": {
     "howTo": "Cómo se juega",
     "replay": "Ver de nuevo",
     "start": "Empezar",
-    "practiceNote": "Las 4 primeras son de práctica: no gastan oportunidades ni suman puntos.",
+    "practiceNote": "Los primeros ejercicios son de práctica. No pierdes oportunidades ni puntos.",
     "level": "Nivel",
-    "speed": "Velocidad",
-    "stage": "Etapa",
     "rounds": "Partidas",
     "best": "Mejor puntuación",
     "welcomeBack": "Bienvenido de nuevo. Las primeras preguntas volverán a encontrar tu nivel.",
     "firstPlacement": "Las primeras preguntas buscan el nivel inicial adecuado."
   },
   "mechanics": {
-    "quickEye": {
-      "periphery": {
-        "title": "Busca la estrella",
-        "body": "Una estrella aparece también fuera. Elige la figura del centro y luego el lado donde estaba la estrella."
-      },
-      "distractors": {
-        "title": "Estrella entre triángulos",
-        "body": "También aparecen triángulos. Elige el lado donde estaba la única estrella."
-      },
-      "similar": {
-        "title": "Formas parecidas",
-        "body": "Las esquinas del cuadrado se redondean y se parece más a un círculo."
-      },
-      "sameDiff": {
-        "title": "¿Iguales o distintas?",
-        "body": "Aparecen dos figuras en el centro. Di si son iguales o distintas."
-      },
-      "clearView": {
-        "title": "Una pantalla más nítida",
-        "body": "La cubierta cambió, así que las primeras empiezan un poco más despacio."
-      }
-    },
     "oddOneOut": {
       "rotation": {
         "title": "La que está girada",
@@ -316,7 +315,7 @@
       },
       "glyphs": {
         "title": "Letras engañosas",
-        "body": "Letras que se parecen, como b y d o 6 y 9."
+        "body": "Letras que se parecen, como b y d u O y Q."
       },
       "colorNoise": {
         "title": "Ignora los colores",
@@ -381,6 +380,10 @@
       "unmarked": {
         "title": "Sin marcas",
         "body": "Los números encontrados no se atenúan. Recuerda por dónde vas."
+      },
+      "memory": {
+        "title": "Memoria boca abajo",
+        "body": "Memoriza las posiciones. Al girarse las cartas, toca desde el 1 en orden. Una carta incorrecta se muestra un instante."
       }
     },
     "memoryGrid": {
@@ -397,6 +400,10 @@
       "reverse": {
         "title": "Al revés",
         "body": "Toca las casillas en orden inverso, empezando por la última que se iluminó. A partir de ahora, siempre al revés."
+      },
+      "faster": {
+        "title": "Destellos más rápidos",
+        "body": "Las casillas se encienden una tras otra más deprisa. No pierdas el orden."
       }
     },
     "series": {
@@ -479,6 +486,22 @@
       "missingTerm": {
         "title": "Encuentra el hueco",
         "body": "Ahora el ? puede estar dentro de la fila. Elige el número que lo completa."
+      },
+      "primes": {
+        "title": "Primos en orden",
+        "body": "Aparece una regla de números primos —divisibles solo entre 1 y sí mismos— uno tras otro."
+      },
+      "product": {
+        "title": "Multiplica los dos anteriores",
+        "body": "Aparece una regla en la que cada número es el producto de los dos anteriores."
+      },
+      "digitSum": {
+        "title": "Suma sus cifras",
+        "body": "Aparece una regla en la que cada número es el anterior más cada una de sus cifras."
+      },
+      "diffPrimes": {
+        "title": "Saltos primos",
+        "body": "Aparece una regla en la que los saltos son números primos, uno tras otro."
       }
     },
     "pairs": {
@@ -554,6 +577,94 @@
         "title": "Dos cifras × dos cifras",
         "body": "Ahora se multiplican dos números de dos cifras."
       }
+    },
+    "setMatch": {
+      "color": {
+        "title": "Añadimos el color",
+        "body": "Además de forma y cantidad, los tres colores deben ser iguales o distintos entre sí."
+      },
+      "fill": {
+        "title": "Añadimos el relleno",
+        "body": "Mira también sólido, rayado y contorno. Cada rasgo debe ser igual o distinto en las tres."
+      },
+      "none": {
+        "title": "Puede que no haya trío",
+        "body": "Si no hay tres cartas que formen un trío, elige «No hay trío»."
+      },
+      "oneSet": {
+        "title": "Un solo trío",
+        "body": "Encuentra el único trío entre cartas parecidas."
+      }
+    },
+    "codeBreak": {
+      "three": {
+        "title": "Código de tres cifras",
+        "body": "Ahora son tres cifras. S indica cifra y posición correctas; B, cifra en otra posición."
+      },
+      "four": {
+        "title": "Código de cuatro cifras",
+        "body": "Usa las pistas anteriores para deducir cuatro cifras."
+      },
+      "five": {
+        "title": "Código de cinco cifras",
+        "body": "Ahora son cinco cifras. Deduce también sus posiciones."
+      },
+      "zero": {
+        "title": "Añadimos el cero",
+        "body": "El código puede contener 0, incluso al principio."
+      },
+      "repeats": {
+        "title": "Las cifras pueden repetirse",
+        "body": "Una cifra puede aparecer varias veces. Deduce también cuántas veces."
+      }
+    },
+    "makeNumber": {
+      "multiply": {
+        "title": "Añadimos la multiplicación",
+        "body": "Puedes usar ×. Multiplica antes de sumar o restar."
+      },
+      "divide": {
+        "title": "Añadimos la división",
+        "body": "Usa también ÷. Resuelve × y ÷ primero, de izquierda a derecha."
+      },
+      "anyOrder": {
+        "title": "Elige el orden",
+        "body": "Toca los números en el orden que quieras. Usa cada ficha una vez."
+      },
+      "brackets": {
+        "title": "Usa paréntesis",
+        "body": "Resuelve primero los paréntesis. Este objetivo los necesita."
+      },
+      "target24": {
+        "title": "Crea el 24",
+        "body": "Usa los cuatro números una vez para crear 24. Prueba otros órdenes y paréntesis."
+      },
+      "fraction": {
+        "title": "Fracciones en el camino",
+        "body": "Los resultados intermedios pueden ser fracciones. El final debe ser el objetivo."
+      }
+    },
+    "mazeRun": {
+      "winding": {
+        "title": "Más bifurcaciones",
+        "body": "Los caminos se retuercen más. Retrocede si llegas a un callejón sin salida."
+      },
+      "keys": {
+        "title": "Recoge primero las llaves",
+        "body": "Recoge las llaves en orden y llega a la bandera. Al retroceder conservas las llaves."
+      },
+      "moreKeys": {
+        "title": "Más llaves",
+        "body": "Recoge todas las llaves en orden."
+      },
+      "hidden": {
+        "title": "Recuerda las paredes",
+        "body": "Las paredes se ocultan tras la vista previa. Avanza de memoria; los choques restantes se muestran aparte."
+      },
+      "hiddenKeys": {
+        "title": "Llaves de memoria",
+        "body": "En el laberinto oculto, recoge las llaves en orden antes de llegar a la bandera."
+      }
     }
   },
   "rule": {
@@ -608,17 +719,9 @@
       "title": "Siete de memoria",
       "body": "Recordaste 7 en Secuencia o Cuadrícula flash."
     },
-    "quickEyeStage5": {
-      "title": "Ojo rápido: etapa 5",
-      "body": "Llegaste a la etapa 5 de Ojo rápido."
-    },
-    "quickEyeStage10": {
-      "title": "Ojo rápido: etapa 10",
-      "body": "Llegaste a la etapa 10 de Ojo rápido."
-    },
     "allGames": {
       "title": "Todos los juegos",
-      "body": "Probaste los 9 juegos."
+      "body": "Probaste todos los juegos."
     },
     "firstSession": {
       "title": "Primera sesión",

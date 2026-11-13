@@ -2,7 +2,6 @@ import {
   TIER_COUNT,
   brainGame,
   gameProgress,
-  quickEyeIndex,
   tierProgress,
   type BrainGameId,
   type BrainMeta,
@@ -10,23 +9,16 @@ import {
 } from '@reeeeecall/shared/lib/brain-games'
 
 /**
- * How the screens show a game's tier and Quick Eye's speed: per game only, never summed or
- * averaged across games, and Quick Eye never in milliseconds (EVIDENCE #25, #27).
+ * How the screens show a game's tier: per game only, never summed or averaged across games
+ * (EVIDENCE #25, #27).
  */
 
-/** Quick Eye's speed level as the player sees it: a whole number 0-11 (no "/12", never ms). */
-export function quickEyeSpeedLevel(level: number): number {
-  return Math.max(0, Math.min(11, Math.round(level)))
-}
-
-/** The value a game's tiers are measured on (speed games their estimate, span games the length passed twice, Quick Eye its stage index). */
+/** The value a game's tiers are measured on (speed games their estimate, span games the length passed twice). */
 export function tierValue(gameId: BrainGameId, meta: BrainMeta, progress: BrainProgress): number {
   if (brainGame(gameId).group === 'span') return meta.span2[gameId] ?? 0
   // An unfinished placement's estimate (n 0) is a guess in progress, not a standing: no progress yet.
   const est = meta.sk[gameId]
-  const value = est ? (est.n > 0 ? est.mu : 0) : gameProgress(progress, gameId).level
-  if (gameId === 'quickEye') return quickEyeIndex(progress.quickEye.variant, value)
-  return value
+  return est ? (est.n > 0 ? est.mu : 0) : gameProgress(progress, gameId).level
 }
 
 export interface TierStanding {

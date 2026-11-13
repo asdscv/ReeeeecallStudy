@@ -3,13 +3,13 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { Star, Crown, RotateCcw, LayoutGrid, Target, Flame, ListChecks, TrendingUp, Timer, Hourglass, Check } from 'lucide-react'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
-import { GAME_THEMES, brainGame, displayLevel, gameHistory, gameProgress, quickEyeBarLevel, roundStars, type BrainGameId, type GameTheme } from '@reeeeecall/shared/lib/brain-games'
+import { GAME_THEMES, brainGame, displayLevel, gameHistory, gameProgress, roundStars, type BrainGameId, type GameTheme } from '@reeeeecall/shared/lib/brain-games'
 import type { RoundStats, ScoreParts } from '@reeeeecall/shared/hooks/useBrainRound'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
 import { Confetti, GameCanvas } from './GameCanvas'
 import { useCountUp } from './useCountUp'
 import { focusIfKeyboard } from './brain-ui'
-import { quickEyeSpeedLevel, tierLook, tierStanding } from './tier-ui'
+import { tierLook, tierStanding } from './tier-ui'
 import { TierMedal, TierMeter } from './TierBadge'
 import { AchievementCards } from './AchievementsGrid'
 import { sfx } from './sfx'
@@ -19,10 +19,6 @@ import { sfx } from './sfx'
  * counting up and where it came from, the level it moved to, the game's tier, and the recent trend.
  * One celebration per round — a new tier first, then an achievement, then a personal best; the
  * others show as quiet lines. The level is this game's record only, never a measure of memory.
- *
- * Quick Eye's leg has no stars (its staircase holds every player near 80% right, so accuracy stars
- * would say nothing): «end of leg», the speed level from → to, a stage reached, and the next goal —
- * staying near the speed level that passes the stage.
  */
 export function RoundSummary({ gameId, stats, onAgain }: { gameId: BrainGameId; stats: RoundStats; onAgain: () => void }) {
   const { t } = useTranslation('brain')
@@ -33,22 +29,18 @@ export function RoundSummary({ gameId, stats, onAgain }: { gameId: BrainGameId; 
   const best = progress.bestRuns[gameId]
   const trend = gameHistory(history, gameId)
   const accuracy = stats.trials > 0 ? Math.round((stats.correct / stats.trials) * 100) : 0
-  // Quick Eye's level is its speed level, a whole number: higher is better, like every other game.
-  const qe = gameId === 'quickEye'
-  const stars = qe ? 0 : roundStars(stats.trials, stats.correct)
+  const stars = roundStars(stats.trials, stats.correct)
   const score = useCountUp(stats.points)
   const title =
     stats.endedBy === 'void'
       ? t('summary.voided')
       : stats.endedBy === 'stop'
         ? t('summary.stopped')
-        : qe
-          ? t('quickEye.legEnd')
-          : stats.cleared
-            ? t('summary.cleared')
-            : t('summary.livesOut')
-  const from = qe ? quickEyeSpeedLevel(stats.levelStart) : displayLevel(stats.levelStart)
-  const to = qe ? quickEyeSpeedLevel(stats.levelEnd) : displayLevel(stats.levelEnd)
+        : stats.cleared
+          ? t('summary.cleared')
+          : t('summary.livesOut')
+  const from = displayLevel(stats.levelStart)
+  const to = displayLevel(stats.levelEnd)
   const seconds = Math.round(stats.activeMs / 1000)
   const standing = tierStanding(gameId, meta, progress)
   const hasRounds = gameProgress(progress, gameId).rounds > 0 || standing.tier > 0
@@ -126,13 +118,7 @@ export function RoundSummary({ gameId, stats, onAgain }: { gameId: BrainGameId; 
         {hasRounds && <TierMeter standing={standing} accent={theme.accent} testId="brain-summary-tier" />}
 
         {/* A placement stopped part-way has no level yet — its probe levels are not progress. */}
-        {stats.trials > 0 && stats.placement !== 'partial' && <LevelCard from={from} to={to} qe={qe} span={brainGame(gameId).group === 'span'} theme={theme} stage={qe ? stats.stageReached : null} />}
-
-        {qe && stats.trials > 0 && stats.placement !== 'partial' && (
-          <p className="text-center text-base font-medium text-white/85" data-testid="brain-summary-next-goal">
-            {t('quickEye.nextGoal', { level: quickEyeBarLevel(progress.quickEye.variant) })}
-          </p>
-        )}
+        {stats.trials > 0 && stats.placement !== 'partial' && <LevelCard from={from} to={to} span={brainGame(gameId).group === 'span'} theme={theme} />}
 
         <ScoreBreakdown score={stats.score} total={stats.points} />
 
@@ -260,17 +246,16 @@ function RelaxCard({ onDone }: { onDone: () => void }) {
   )
 }
 
-function LevelCard({ from, to, qe, span, theme, stage = null }: { from: number; to: number; qe: boolean; span: boolean; theme: GameTheme; stage?: number | null }) {
+function LevelCard({ from, to, span, theme }: { from: number; to: number; span: boolean; theme: GameTheme }) {
   const { t } = useTranslation('brain')
   const up = to > from
-  const fmt = (v: number) => (qe ? String(v) : v.toFixed(1))
-  // The bar shows where in the current whole level the player now stands (Quick Eye: how far along
-  // its speed levels).
-  const frac = qe ? to / 11 : to - Math.floor(to)
+  const fmt = (v: number) => v.toFixed(1)
+  // The bar shows where in the current whole level the player now stands.
+  const frac = to - Math.floor(to)
   return (
     <div className="rounded-2xl bg-white/[0.07] border border-white/10 p-4" data-testid="brain-summary-level">
       <div className="flex items-baseline justify-between">
-        <span className="text-sm font-semibold text-white/80">{qe ? t('intro.speed') : t('intro.level')}</span>
+        <span className="text-sm font-semibold text-white/80">{t('intro.level')}</span>
         <span className="text-lg font-bold tabular-nums">
           {fmt(from)} <span className="text-white/50">→</span> <span style={{ color: up ? '#86EFAC' : '#fff' }}>{fmt(to)}</span>
         </span>
@@ -282,12 +267,6 @@ function LevelCard({ from, to, qe, span, theme, stage = null }: { from: number; 
         </div>
       )}
       {up && <p className="mt-2 text-sm font-medium text-[#86EFAC]">{t('summary.improved')}</p>}
-      {/* Quick Eye: a stage reached this leg (the speed level eases back three steps with it, so say why). */}
-      {stage !== null && (
-        <p className="mt-2 text-sm font-medium text-[#86EFAC]" data-testid="brain-summary-stage">
-          {t('quickEye.stageUp.title')} · {t('quickEye.stage', { stage })}
-        </p>
-      )}
     </div>
   )
 }

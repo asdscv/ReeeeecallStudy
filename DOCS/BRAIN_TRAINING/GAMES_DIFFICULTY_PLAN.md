@@ -1,5 +1,9 @@
 # BUILD PLAN: 두뇌 트레이닝, 8 games that are simple but actually hard (Quick Eye is planned separately)
 
+> 2026-11-13: Quick Eye was removed from the product by the owner («빠른 눈 아예 빼자»). Its mentions below are history; `placementCeiling` (kept only for it) is gone too. See `GAME_LOGIC.md` «빠른 눈 제거».
+>
+> 2026-11-13 (later): the ceilings of §3.2 Number Pattern (28 families, top band 30–31), §3.5 Color Word (a colour-vision-safe palette for everyone), §3.6 Flash Grid (7×6, 7×7, half-lit whole-screen boards, up to 20 cells), §3.7 Sequence (a ladder of more tiles and faster flashes, never over 3/s) and §3.8 Match Pairs (30, 36, 42 cards) were raised past this plan. See `GAME_LOGIC.md` «천장 높이기».
+
 ## 1) 한 줄 요약
 
 8개 게임 모두 레벨 숫자가 아니라 **실제 문제 내용**으로 다시 깐다. 빠른 계산은 L2부터 받아올림·내림이 반드시 있고, 25단계 뒤에는 자릿수가 늘어난다. 저장 형식을 v2로 올리고 배치를 고쳐서, 옛 기록이 있는 사람도 첫 라운드에서 자기 수준(보통 성인은 L13 안팎)에 바로 들어간다. RPG·메타 진행은 없고, 어려움은 게임 안에서만 만든다.

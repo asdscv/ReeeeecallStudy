@@ -105,13 +105,13 @@ describe('choiceGame', () => {
   const base = (over: Partial<ChoiceState> = {}): ChoiceState => ({
     prompt: { key: 'play.solve' },
     stimulus: { tokens: [6, '+', 4, '×', 7], terms: [1, 2, null, 4], cue: 'word', frame: 'blue', reveal: { lines: ['6 + 28 = 34'], highlight: [2, 4] } },
-    options: [{ value: 28, text: '28' }, { value: 34, text: '34' }, { value: 44, text: '44', color: 'red' }, { value: 70, text: '70' }],
+    options: [{ value: 28, text: '28' }, { value: 34, text: '34' }, { value: 44, text: '44', color: 'orange' }, { value: 70, text: '70' }],
     correctIndex: 1,
     limitMs: 9000,
     picked: null,
     timedOut: false,
     sig: 'x',
-    info: { kind: 'b13', carry: 'red' },
+    info: { kind: 'b13', carry: 'orange' },
     ...over,
   })
   const game = (over: Partial<ChoiceState> = {}) => choiceGame('math', () => base(over), { maxLevel: 41 })
@@ -123,8 +123,8 @@ describe('choiceGame', () => {
     expect(before.stimulus).toMatchObject({ tokens: [6, '+', 4, '×', 7], terms: [1, 2, null, 4], cue: 'word', frame: 'blue' })
     expect(before.stimulus.reveal).toBeUndefined()
     expect(before.stimulus.hidden).toBeUndefined()
-    expect(before.options[2]).toEqual({ value: 44, text: '44', color: 'red' })
-    expect(def.trialInfo?.(s)).toEqual({ kind: 'b13', carry: 'red' })
+    expect(before.options[2]).toEqual({ value: 44, text: '44', color: 'orange' })
+    expect(def.trialInfo?.(s)).toEqual({ kind: 'b13', carry: 'orange' })
     expect(def.maxLevel?.(DEFAULT_CONTEXT)).toBe(41)
     const after = def.view(def.tap(s, 0)) as ChoiceView
     expect(after.stimulus.reveal).toEqual({ lines: ['6 + 28 = 34'], highlight: [2, 4] })

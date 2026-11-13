@@ -10,7 +10,6 @@ import {
   dayNumber,
   gameProgress,
   localDayKey,
-  quickEyeIndex,
   tierProgress,
   type AchievementId,
   type BrainGameId,
@@ -44,8 +43,6 @@ export const ACHIEVEMENT_ICONS: Record<AchievementId, FeatherName> = {
   streak20: 'activity',
   flawlessHunt: 'crosshair',
   span7: 'layers',
-  quickEyeStage5: 'aperture',
-  quickEyeStage10: 'eye',
   allGames: 'grid',
   firstSession: 'play-circle',
   weekGoal: 'calendar',
@@ -53,14 +50,6 @@ export const ACHIEVEMENT_ICONS: Record<AchievementId, FeatherName> = {
   comeback: 'rotate-ccw',
   goldTier: 'award',
   masterTier: 'star',
-}
-
-/**
- * Quick Eye's shown level: a whole speed level 0-11 — never milliseconds, never "/12" (a ms
- * threshold reads as an assessment; EVIDENCE #25).
- */
-export function qeSpeedLevel(level: number): number {
-  return Math.max(0, Math.min(11, Math.round(level)))
 }
 
 export function tierName(t: TFunction, tier: number): string {
@@ -72,9 +61,7 @@ export function tierValue(game: BrainGameId, meta: BrainMeta, progress: BrainPro
   if (brainGame(game).group === 'span') return meta.span2[game] ?? 0
   // An unfinished placement's estimate (n 0) is a guess in progress, not a standing: no progress yet.
   const est = meta.sk[game]
-  const value = est ? (est.n > 0 ? est.mu : 0) : gameProgress(progress, game).level
-  if (game === 'quickEye') return quickEyeIndex(progress.quickEye.variant, value)
-  return value
+  return est ? (est.n > 0 ? est.mu : 0) : gameProgress(progress, game).level
 }
 
 export interface TierStanding {

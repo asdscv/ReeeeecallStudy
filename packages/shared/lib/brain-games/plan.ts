@@ -27,7 +27,7 @@ export interface PlanSlot {
   gameId: BrainGameId
   /** Time budget for this game. When a round ends with under a minute left, the session moves on. */
   minutes: number
-  /** Most rounds in this slot (Quick Eye: 4). */
+  /** Most rounds in this slot. */
   maxRounds: number
 }
 
@@ -39,15 +39,19 @@ const LENGTHS = {
   5: { counts: [2, 3, 3, 4], minSlot: 1, slowMin: 1.5 },
   20: { counts: [3, 4, 4, 5, 5, 6], minSlot: 2.5, slowMin: 3 },
 } as const
-/** Games whose single trial is long (a whole board): they need a bigger slot to be worth starting. */
-const SLOW: readonly BrainGameId[] = ['schulte', 'pairs', 'quickEye']
+/**
+ * Games whose single trial is long (a whole board or puzzle): they need a bigger slot to be worth
+ * starting. Code Break (a whole code), Make the Number and Maze Run run 20 s to a few minutes a trial.
+ */
+const SLOW: readonly BrainGameId[] = ['schulte', 'pairs', 'codeBreak', 'makeNumber', 'mazeRun']
 const FOCI: readonly SessionFocus[] = ['mixed', 'mixed', 'speed', 'memory', 'thinking']
 const FOCUS_SKILLS: Record<Exclude<SessionFocus, 'mixed'>, readonly string[]> = {
   speed: ['speed', 'attention'],
   memory: ['memory'],
   thinking: ['reasoning', 'attention', 'speed'],
 }
-const THINKING: readonly BrainGameId[] = ['series', 'math', 'stroop']
+/** A «thinking» day: the reasoning games, the four thinking games (2026-11-13) among them. */
+const THINKING: readonly BrainGameId[] = ['series', 'math', 'stroop', 'setMatch', 'codeBreak', 'makeNumber', 'mazeRun']
 
 const skillOf = (id: BrainGameId) => BRAIN_GAMES.find((g) => g.id === id)!.skill
 
@@ -78,18 +82,18 @@ function splitMinutes(games: readonly BrainGameId[], total: number, minSlot: num
  *
  * - The day's focus (mixed, speed, memory, thinking) leans the picks; mixed avoids two games of the
  *   same kind.
- * - Games used longest ago in Today's Training come first, so all nine keep turning up.
- * - Quick Eye — the task closest to the studied training — is in at least every other session, at
- *   any position, not pinned to the start.
+ * - Games used longest ago in Today's Training come first, so every game keeps turning up. No game
+ *   is guaranteed a place: none is modelled on a studied training (Quick Eye, the one that was, was
+ *   removed by the owner 2026-11-13).
  * - Each game plays until its time is up (the round ends after the trial in play); slow games
- *   (Number Hunt, Match Pairs, Quick Eye) get a slot big enough for a few boards.
+ *   (Number Hunt, Match Pairs, Code Break, Make the Number, Maze Run) get a slot big enough for a
+ *   few boards.
  */
 export function planToday(p: BrainProgress, rng: Rng): { focus: SessionFocus; slots: PlanSlot[] } {
   const total: 5 | 20 = p.settings.sessionMinutes === 20 ? 20 : 5
   const shape = LENGTHS[total]
   const focus = rng.pick(FOCI)
   const count: number = rng.pick(shape.counts)
-  const withQuickEye = p.sessions.total % 2 === 0 || rng.chance(0.5)
 
   const recent = p.sessions.recentGames
   // How recently a game was used in Today's Training: 0 = not lately, up to 9 = the last game played.
@@ -97,8 +101,8 @@ export function planToday(p: BrainProgress, rng: Rng): { focus: SessionFocus; sl
     const at = recent.lastIndexOf(id)
     return at < 0 ? 0 : Math.max(0, 10 - (recent.length - at))
   }
-  const picked: BrainGameId[] = withQuickEye ? ['quickEye'] : []
-  const pool = rng.shuffle(BRAIN_GAMES.map((g) => g.id).filter((id) => id !== 'quickEye'))
+  const picked: BrainGameId[] = []
+  const pool = rng.shuffle(BRAIN_GAMES.map((g) => g.id))
   while (picked.length < count) {
     const usedSkills = new Set(picked.map(skillOf))
     const scored = pool

@@ -17,7 +17,6 @@ import { sfx } from '../../components/brain/sfx'
 import { useBrainHydrated } from '../../components/brain/useBrainHydrated'
 import { AchievementCards } from '../../components/brain/AchievementsGrid'
 import { TierBadge } from '../../components/brain/TierBadge'
-import { quickEyeSpeedLevel } from '../../components/brain/tier-ui'
 
 /** `/brain/training` — Today's Training. Waits for the player's progress, which plans the session. */
 export function BrainTrainingPage() {
@@ -238,10 +237,8 @@ function SessionEnd({
               const start = placed[id]
               const showLevel = start !== null
               const startLevel = start ?? l.start
-              // Quick Eye's level is its speed level, a whole number (never milliseconds): higher is better.
-              const qe = id === 'quickEye'
-              const from = qe ? quickEyeSpeedLevel(startLevel) : displayLevel(startLevel)
-              const to = qe ? quickEyeSpeedLevel(l.end) : displayLevel(l.end)
+              const from = displayLevel(startLevel)
+              const to = displayLevel(l.end)
               const better = to > from
               const tierUp = tierUps[id]
               const Icon = BRAIN_ICONS[brainGame(id).icon]
@@ -261,9 +258,9 @@ function SessionEnd({
                   </span>
                   {showLevel && (
                     <span className="flex items-center gap-1.5 text-base tabular-nums shrink-0" style={{ color: better ? '#86EFAC' : 'rgba(255,255,255,0.8)' }}>
-                      {qe ? t('quickEye.speedLevel', { level: from }) : from.toFixed(1)}
+                      {from.toFixed(1)}
                       <ArrowRight className="w-4 h-4" aria-hidden="true" />
-                      {qe ? to : to.toFixed(1)}
+                      {to.toFixed(1)}
                     </span>
                   )}
                 </li>
