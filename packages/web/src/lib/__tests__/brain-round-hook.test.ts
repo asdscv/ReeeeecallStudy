@@ -509,7 +509,7 @@ describe('the board games\' new round logic (GAMES_DIFFICULTY_PLAN §2.3-2.9)', 
     expect(result.current.lives).toBe(2)
   })
 
-  it("Match Pairs' probe ladder: L3 → L6 → L9 → L12, no score, then the staircase half a level below where the passes reached", () => {
+  it("Match Pairs' probe ladder: L3 → L6 → L9 → L12, no score, then the staircase half a level below the last board passed", () => {
     seed()
     const { result } = renderHook(() => useBrainRound('pairs', PLATFORM))
     const boards: number[] = []
@@ -528,14 +528,15 @@ describe('the board games\' new round logic (GAMES_DIFFICULTY_PLAN §2.3-2.9)', 
       } else advance(100)
     }
     expect(boards).toEqual([3, 6, 9, 12])
-    // Four clean clears: 12 + 3 = 15, the staircase starts at 14.5, unsure.
-    expect(result.current.level).toBeCloseTo(14.5)
+    // Four clean clears: the last board passed is L12, so the staircase starts at 11.5, unsure (its
+    // bigger steps climb from there). It used to start at 15 − 0.5 — a board never shown.
+    expect(result.current.level).toBeCloseTo(11.5)
     expect(result.current.stats.points).toBe(0)
     expect(result.current.stats.trials).toBe(0)
     expect(result.current.lives).toBe(3)
   })
 
-  it('the probe stops on a clear with two informed misses (+1) or on a failed board; none passed starts at L2', () => {
+  it('the probe stops on a clear with two informed misses or on a failed board, half a level below the last board passed; none passed starts at L2', () => {
     const def = brainGame('pairs').def
     const realOutcome = def.outcome.bind(def)
     /** Plays the probe; `board(n, outcome)` may change the n-th board's outcome (1-based). */
@@ -571,10 +572,10 @@ describe('the board games\' new round logic (GAMES_DIFFICULTY_PLAN §2.3-2.9)', 
       spy.mockRestore()
       return out
     }
-    // Board 2 (L6) cleared with two informed misses: +1 → 7, stop → 6.5.
-    expect(probe((n, o) => (n === 2 ? { ...o, informedMisses: 2 } : o))).toMatchObject({ boards: [3, 6], level: 6.5 })
-    // Board 2 failed: stop at the level the passes reached (6) → 5.5.
-    expect(probe((n, o) => (n === 2 ? { ...o, correct: false } : o))).toMatchObject({ boards: [3, 6], level: 5.5 })
+    // Board 2 (L6) cleared with two informed misses: stop, the last board passed is L6 → 5.5.
+    expect(probe((n, o) => (n === 2 ? { ...o, informedMisses: 2 } : o))).toMatchObject({ boards: [3, 6], level: 5.5 })
+    // Board 2 failed: the last board passed is L3 → 2.5 (never half a level under the board just failed).
+    expect(probe((n, o) => (n === 2 ? { ...o, correct: false } : o))).toMatchObject({ boards: [3, 6], level: 2.5 })
     // The first board failed: none passed → L2.
     expect(probe((n, o) => (n === 1 ? { ...o, correct: false } : o))).toMatchObject({ boards: [3], level: 2 })
   })

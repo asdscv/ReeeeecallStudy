@@ -29,11 +29,15 @@ export interface PlacementState {
   maxMove: number
   /** A bigger step cap while the player is hot (see placementLevel); none = maxMove always. */
   hotMove?: number
+  /** Right answers in a row that make the player hot (default 3). */
+  hotAfter?: number
   minTrials: number
   maxTrials: number
   slope: number
   lapse: number
   target: number
+  /** The hardest level answered right so far (null: none yet) — the handover never goes above it. */
+  best: number | null
 }
 
 export interface PlacementOptions {
@@ -53,6 +57,8 @@ export interface PlacementOptions {
    */
   tailMass?: number
   hotMove?: number
+  /** Right answers in a row that make the player hot (default 3). */
+  hotAfter?: number
 }
 
 export function startPlacement(o: PlacementOptions): PlacementState {
@@ -78,11 +84,13 @@ export function startPlacement(o: PlacementOptions): PlacementState {
     lastWeight: 1,
     maxMove: o.maxMove,
     hotMove: o.hotMove,
+    hotAfter: o.hotAfter,
     minTrials: o.minTrials,
     maxTrials: o.maxTrials,
     slope: o.slope,
     lapse: 0.05,
     target: o.target,
+    best: null,
   }
 }
 
@@ -106,10 +114,16 @@ function percentile(p: PlacementState, q: number): number {
  * time) is hot too, even inside the first three trials: Number Hunt places in three boards, so it
  * can never have three right before it stops (simulated: a fast player hands over at ~13.1, not ~10).
  * `hotMove` (default: the state's) widens the step cap while hot.
+ *
+ * The 8-14-trial board games are hot after TWO right in a row (`hotAfter`): after right answers at
+ * L3 and L5.7 the 30th percentile only reached L6.6, so a sharp player spent a third trial on
+ * nearly the same problem before the jumps began — five easy problems after practice instead of
+ * four (persona simulation, .audit/brain-sim.ts).
  */
 export function placementLevel(p: PlacementState, hotMove: number | undefined = p.hotMove): number {
   const strong = p.lastWeight > 1 && p.last.length > 0 && p.last[p.last.length - 1]
-  const hot = (p.last.length === 3 && p.last.every(Boolean)) || strong
+  const run = Math.min(3, p.hotAfter ?? 3)
+  const hot = (p.last.length >= run && p.last.slice(-run).every(Boolean)) || strong
   const want = percentile(p, hot ? 0.65 : p.n < 3 ? 0.3 : 0.45)
   const move = hotMove !== undefined && hot ? Math.max(p.maxMove, hotMove) : p.maxMove
   const capped = p.lastLevel === null ? want : Math.min(want, p.lastLevel + move)
@@ -141,7 +155,8 @@ export function updatePlacement(p: PlacementState, level: number, correct: boole
   // Keep the numbers in range.
   const max = Math.max(...post)
   const norm = max > 0 ? post.map((w) => w / max) : p.post
-  return { ...p, post: norm, n: p.n + 1, last: [...p.last, correct].slice(-3), lastLevel: level, lastWeight: weight }
+  const best = correct ? Math.max(p.best ?? level, level) : p.best
+  return { ...p, post: norm, n: p.n + 1, last: [...p.last, correct].slice(-3), lastLevel: level, lastWeight: weight, best }
 }
 
 /** Eight trials, longer while the last three are all right (up to the maximum). */
@@ -166,6 +181,19 @@ export function placementResult(p: PlacementState, handoverK = 0.5): { level: nu
   return { level: Math.max(p.lo, mean - handoverK * sd), sd }
 }
 
+/**
+ * The handover the round uses: `placementResult`, but never above the hardest level the player
+ * actually answered right in placement (the floor when none was). A short series leaves the
+ * posterior wide, and its flat tail then carries the mean past everything shown: Number Hunt's three
+ * boards passed at L3 → 5.4 → 6.2 handed a slow player over at 8.9, and about one slow 75-year-old
+ * in three started round 1 on boards they had never cleared (persona simulation, .audit/brain-sim.ts).
+ * A strong series is unaffected — its handover already sits below its last right answer.
+ */
+export function placementHandover(p: PlacementState, handoverK = 0.5): { level: number; sd: number } {
+  const r = placementResult(p, handoverK)
+  return { level: Math.min(r.level, p.best ?? p.lo), sd: r.sd }
+}
+
 // ── how each game finds its start (GAMES_DIFFICULTY_PLAN §2.3) ───────────────
 
 /** ZEST: the posterior search above. */
@@ -177,6 +205,8 @@ export interface ZestPlan {
   maxTrials: number
   tailMass: number
   hotMove: number
+  /** Right answers in a row that make the player hot (placementLevel); unset: 3. */
+  hotAfter?: number
   handoverK: number
   /** Number Hunt: a board's evidence is graded by how much of its time it took (useBrainRound). */
   graded?: true
@@ -194,10 +224,10 @@ export type PlacementPlan = ZestPlan | { method: 'probe' } | { method: 'fast' }
 const zest = (hi: number, extra: Partial<ZestPlan> = {}): ZestPlan => ({ method: 'zest', hi, minTrials: 8, maxTrials: 14, tailMass: 0.2, hotMove: 4, handoverK: 0.25, ...extra })
 
 export const PLACEMENT: Partial<Record<BrainGameId, PlacementPlan>> = {
-  math: zest(26),
-  series: zest(20),
-  oddOneOut: zest(24),
-  stroop: zest(24),
+  math: zest(26, { hotAfter: 2 }),
+  series: zest(20, { hotAfter: 2 }),
+  oddOneOut: zest(24, { hotAfter: 2 }),
+  stroop: zest(24, { hotAfter: 2 }),
   schulte: zest(20, { minTrials: 3, maxTrials: 3, hotMove: 5, graded: true }),
   pairs: { method: 'probe' },
   memoryGrid: { method: 'fast' },

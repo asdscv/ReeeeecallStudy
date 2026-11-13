@@ -33,8 +33,8 @@ import {
   mechanicInfo,
   nextSd,
   placementDone,
+  placementHandover,
   placementLevel,
-  placementResult,
   quickEyeBase,
   quickEyeHold,
   quickEyeIndex,
@@ -332,8 +332,8 @@ const SHORT_ROUND = { speed: 5, quickEye: 5, span: 2 }
 const SETUP_CAP_MS = 120_000
 /** A span game away this long re-enters fast (§2.6). */
 const FAST_ENTRY_AFTER_DAYS = 14
-/** Match Pairs' probe ladder: the first board's level, the step after a clean clear, the most boards. */
-const PROBE = { start: 3, clean: 3, messy: 1, boards: 4, sd: 2, none: 2 } as const
+/** Match Pairs' probe ladder: the first board's level, the step after a clean clear, the most boards, the sd it hands over with, the start when no board passed. */
+const PROBE = { start: 3, clean: 3, boards: 4, sd: 2, none: 2 } as const
 
 type CtxSource = Pick<State, 'platform' | 'centerOnly' | 'lives' | 'minExposureMs'> & Partial<Pick<State, 'roundSeed' | 'recent'>>
 
@@ -522,16 +522,19 @@ function placementWeight(state: State, round: State['round'], outcome: RoundOutc
 
 /**
  * One Match Pairs probe board (§2.7) — a placement board: no lives, no score, no round stats. A
- * clean clear (at most one informed miss) goes +3 to the next board; a clear with more goes +1 and
- * stops; a failed board stops. After at most four boards the staircase takes over half a level
- * below the level the passes reached (L2 if none passed), unsure (sd 2).
+ * clean clear (at most one informed miss) goes +3 to the next board; a clear with more stops; a
+ * failed board stops. After at most four boards the staircase takes over half a level below the
+ * last board actually passed (L2 if none passed), unsure (sd 2) — the plan's rule. It used to take
+ * over half a level below the level the passes had REACHED (the failed board, or a messy pass + 1),
+ * which put an average 70-year-old 2.5 levels and a slow 75-year-old 2 levels above their own
+ * level for round 1: 69-72% right, one round in five over before 8 boards (persona simulation).
  */
 function judgeProbe(state: State, round: State['round'], outcome: RoundOutcome, timedOut: boolean, base: Omit<TrialResult, 'practice' | 'points' | 'levelAfter'>): State {
   const probe = state.probe as NonNullable<State['probe']>
   const cap = levelCap(state.gameId, state)
   const board = probe.board + 1
   const clean = outcome.correct && (outcome.informedMisses ?? 0) <= 1
-  const level = outcome.correct ? probe.level + (clean ? PROBE.clean : PROBE.messy) : probe.level
+  const level = probe.level + PROBE.clean
   const passed = probe.passed || outcome.correct
   // A placement board even when a rule card opened it (no level-up fx, and it is saved as a placement trial).
   const res = { ...base, kind: 'placement' as const, practice: false, points: 0 }
@@ -546,7 +549,9 @@ function judgeProbe(state: State, round: State['round'], outcome: RoundOutcome, 
   if (clean && board < PROBE.boards && level <= cap) {
     return { ...common, probe: { board, level, passed }, result: { ...res, levelAfter: level } }
   }
-  const start = passed ? Math.max(GROUP_RULES[state.group].min, Math.min(cap, level) - 0.5) : Math.min(cap, PROBE.none)
+  // The last board passed: this one, or (it failed) the clean pass before it, which was PROBE.clean lower.
+  const lastPassed = outcome.correct ? probe.level : probe.passed ? probe.level - PROBE.clean : null
+  const start = lastPassed === null ? Math.min(cap, PROBE.none) : Math.max(GROUP_RULES[state.group].min, Math.min(cap, lastPassed) - 0.5)
   return {
     ...common,
     probe: null,
@@ -651,7 +656,7 @@ function judgeTrial(state: State, round: State['round'], now: number, timedOut: 
     const view = def.view(round)
     const place = updatePlacement(state.place, state.level, outcome.correct, guessRate(view), placementWeight(state, round, outcome, rt, timedOut))
     const finished = placementDone(place)
-    const handover = finished ? placementResult(place, handoverK(state.gameId)) : null
+    const handover = finished ? placementHandover(place, handoverK(state.gameId)) : null
     const levelAfter = Math.min(cap, handover ? handover.level : placementLevel(place))
     const asked = view.kind === 'quickEye' && view.asksLocation
     return {
@@ -1004,6 +1009,7 @@ function init({ gameId, platform }: { gameId: BrainGameId; platform: PlatformCon
         maxTrials: plan.maxTrials,
         tailMass: plan.tailMass,
         hotMove: plan.hotMove,
+        hotAfter: plan.hotAfter,
       })
       // Nothing known: the first placement trial is never above practice level + 2.
       if (seed === null) placeStart = 3
@@ -1143,7 +1149,11 @@ function finishRound(s: State) {
   const short = s.counted < SHORT_ROUND[group] && !s.placed
   const accuracy = s.stats.trials > 0 ? s.stats.correct / s.stats.trials : 0
   const countedAccuracy = s.counted > 0 ? s.countedCorrect / s.counted : 0
-  const earlyWipe = s.stats.endedBy === 'lives' && s.counted < 8
+  // A span round always ends on its chances (the Corsi stop rule: two misses at one length), usually
+  // within 5-7 trials — for every player, the sharpest too. That is the test working, not a struggle:
+  // counted as one, it offered relaxed timing after almost every memory round from the second on
+  // (persona simulation: 52-99% of rounds), and relaxed timing never lengthens their exposures anyway.
+  const earlyWipe = group !== 'span' && s.stats.endedBy === 'lives' && s.counted < 8
   const wipes = s.counted === 0 && !s.placed ? meta.wipes[id] ?? 0 : earlyWipe ? (meta.wipes[id] ?? 0) + 1 : 0
 
   // The estimate: the round's reversal mean, else a step toward where the round ended.
@@ -1184,7 +1194,7 @@ function finishRound(s: State) {
   // A placement (or Match Pairs' probe) stopped part-way: keep what it found so far, and run it again
   // next time from there.
   const interrupted =
-    s.placementTrials > 0 && s.counted === 0 ? (s.place ? placementResult(s.place, handoverK(id)) : s.probe ? { level: s.probe.level } : null) : null
+    s.placementTrials > 0 && s.counted === 0 ? (s.place ? placementHandover(s.place, handoverK(id)) : s.probe ? { level: s.probe.level } : null) : null
   // Finished = no practice trial left (two right in a row, or all four) — not merely two tried.
   const practiceFinished = !progress.practiced.includes(id) && s.practiceDone > 0 && s.practiceLeft === 0
   const updated = (m: BrainMeta): BrainMeta => {
