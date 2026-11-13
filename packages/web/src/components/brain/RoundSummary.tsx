@@ -1,37 +1,47 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { Star, Crown, RotateCcw, LayoutGrid, Target, Flame, ListChecks, TrendingUp, Timer } from 'lucide-react'
+import { Star, Crown, RotateCcw, LayoutGrid, Target, Flame, ListChecks, TrendingUp, Timer, Hourglass, Check } from 'lucide-react'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
-import { GAME_THEMES, brainGame, displayLevel, gameHistory, quickEyeMaxLevel, quickEyeMsAt, roundStars, type BrainGameId, type GameTheme } from '@reeeeecall/shared/lib/brain-games'
-import type { RoundStats } from '@reeeeecall/shared/hooks/useBrainRound'
+import { GAME_THEMES, brainGame, displayLevel, gameHistory, gameProgress, roundStars, type BrainGameId, type GameTheme } from '@reeeeecall/shared/lib/brain-games'
+import type { RoundStats, ScoreParts } from '@reeeeecall/shared/hooks/useBrainRound'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
 import { Confetti, GameCanvas } from './GameCanvas'
 import { useCountUp } from './useCountUp'
 import { focusIfKeyboard } from './brain-ui'
+import { quickEyeSpeedLevel, tierLook, tierStanding } from './tier-ui'
+import { TierMedal, TierMeter } from './TierBadge'
+import { AchievementCards } from './AchievementsGrid'
 import { sfx } from './sfx'
 
 /**
  * The end of a free-practice round, on the game's canvas: stars for how the round went, the score
- * counting up, the level it moved to, a personal best when there is one, and the recent trend.
- * The level is this game's record only, never a measure of memory (the copy says so).
+ * counting up and where it came from, the level it moved to, the game's tier, and the recent trend.
+ * One celebration per round — a new tier first, then an achievement, then a personal best; the
+ * others show as quiet lines. The level is this game's record only, never a measure of memory.
  */
 export function RoundSummary({ gameId, stats, onAgain }: { gameId: BrainGameId; stats: RoundStats; onAgain: () => void }) {
   const { t } = useTranslation('brain')
   const theme = GAME_THEMES[gameId]
   const history = useBrainStore((s) => s.history)
-  const best = useBrainStore((s) => s.progress.bestRuns[gameId])
+  const progress = useBrainStore((s) => s.progress)
+  const meta = useBrainStore((s) => s.meta)
+  const best = progress.bestRuns[gameId]
   const trend = gameHistory(history, gameId)
   const accuracy = stats.trials > 0 ? Math.round((stats.correct / stats.trials) * 100) : 0
   const stars = roundStars(stats.trials, stats.correct)
   const score = useCountUp(stats.points)
   const title =
-    stats.endedBy === 'cap' ? t('summary.cleared') : stats.endedBy === 'stop' ? t('summary.stopped') : stats.endedBy === 'void' ? t('summary.voided') : t('summary.livesOut')
-  // Quick Eye's level is its flash time: shorter is better.
+    stats.endedBy === 'void' ? t('summary.voided') : stats.cleared ? t('summary.cleared') : stats.endedBy === 'stop' ? t('summary.stopped') : t('summary.livesOut')
+  // Quick Eye's level is its speed level, a whole number: higher is better, like every other game.
   const qe = gameId === 'quickEye'
-  const from = qe ? quickEyeMsAt(stats.levelStart) : displayLevel(stats.levelStart)
-  const to = qe ? quickEyeMsAt(stats.levelEnd) : displayLevel(stats.levelEnd)
+  const from = qe ? quickEyeSpeedLevel(stats.levelStart) : displayLevel(stats.levelStart)
+  const to = qe ? quickEyeSpeedLevel(stats.levelEnd) : displayLevel(stats.levelEnd)
   const seconds = Math.round(stats.activeMs / 1000)
+  const standing = tierStanding(gameId, meta, progress)
+  const hasRounds = gameProgress(progress, gameId).rounds > 0 || standing.tier > 0
+  const hero: 'tier' | 'achievement' | 'best' | null = stats.tierUp ? 'tier' : stats.achievements.length > 0 ? 'achievement' : stats.isNewBest ? 'best' : null
+  const confetti = stats.tierUp ? [tierLook(stats.tierUp).solid, '#FFFFFF', '#FDE68A', theme.accent] : ['#FDE68A', theme.accent, '#FFFFFF', '#FB7185', '#86EFAC']
 
   const again = useRef<HTMLButtonElement>(null)
   useEffect(() => {
@@ -42,15 +52,24 @@ export function RoundSummary({ gameId, stats, onAgain }: { gameId: BrainGameId; 
     const timers = Array.from({ length: stars }, (_, i) => setTimeout(() => sfx.play({ kind: 'hit', cell: 0, step: 3 + i * 2 }), 450 + i * 220))
     return () => timers.forEach(clearTimeout)
   }, [stars])
+  // A new tier or an achievement gets the fanfare here (a personal best already had it as the round ended).
+  useEffect(() => {
+    if (hero !== 'tier' && hero !== 'achievement') return
+    if (stats.isNewBest) return
+    const tm = setTimeout(() => sfx.play({ kind: 'newBest' }), 300)
+    return () => clearTimeout(tm)
+  }, [hero, stats.isNewBest])
 
   return (
     <GameCanvas theme={theme} testId="brain-summary">
-      {stats.isNewBest && <Confetti colors={['#FDE68A', theme.accent, '#FFFFFF', '#FB7185', '#86EFAC']} />}
+      {hero && <Confetti colors={confetti} />}
       <div className="max-w-md mx-auto px-4 py-8 min-h-dvh flex flex-col justify-center gap-5">
         <div className="text-center space-y-2">
           <p className="text-base font-semibold" style={{ color: theme.accent }}>{t(`games.${gameId}.name`)}</p>
           <h1 className="bfx-rise text-4xl font-extrabold">{title}</h1>
         </div>
+
+        {stats.tierUp && <TierUp tier={stats.tierUp} game={t(`games.${gameId}.name`)} />}
 
         {stars > 0 && (
           <div className="flex items-end justify-center gap-3" role="img" aria-label={t('summary.stars', { value: stars })}>
@@ -74,16 +93,30 @@ export function RoundSummary({ gameId, stats, onAgain }: { gameId: BrainGameId; 
           {!stats.isNewBest && best !== undefined && best > stats.points && (
             <p className="mt-2 text-base text-white/75" data-testid="brain-summary-best">{t('home.record', { value: formatCount(best) })}</p>
           )}
+          {/* A personal best under a bigger moment is a line, not a second celebration. */}
+          {stats.isNewBest && hero !== 'best' && (
+            <p className="mt-2 flex items-center justify-center gap-1.5 text-base font-semibold text-[#FDE68A]" data-testid="brain-new-best">
+              <Crown className="w-4 h-4" aria-hidden="true" />
+              {t('summary.newBest')}
+            </p>
+          )}
         </div>
 
-        {stats.isNewBest && (
+        {hero === 'best' && (
           <p className="bfx-pop flex items-center justify-center gap-2 mx-auto px-5 py-2.5 rounded-full text-lg font-extrabold text-slate-900" style={{ background: 'linear-gradient(90deg,#FDE68A,#FCD34D)' }} data-testid="brain-new-best">
             <Crown className="w-5 h-5" aria-hidden="true" />
             {t('summary.newBest')}
           </p>
         )}
 
-        {stats.trials > 0 && <LevelCard from={from} to={to} qe={qe} qeLevel={stats.levelEnd} span={brainGame(gameId).group === 'span'} theme={theme} />}
+        <AchievementCards ids={stats.achievements} delayMs={stats.tierUp ? 700 : 300} />
+
+        {hasRounds && <TierMeter standing={standing} accent={theme.accent} testId="brain-summary-tier" />}
+
+        {/* A placement stopped part-way has no level yet — its probe levels are not progress. */}
+        {stats.trials > 0 && stats.placement !== 'partial' && <LevelCard from={from} to={to} qe={qe} span={brainGame(gameId).group === 'span'} theme={theme} />}
+
+        <ScoreBreakdown score={stats.score} total={stats.points} />
 
         <div className="grid grid-cols-2 gap-2">
           <Stat icon={<ListChecks className="w-5 h-5" aria-hidden="true" />} label={t('summary.trials')} value={formatCount(stats.trials)} />
@@ -101,6 +134,8 @@ export function RoundSummary({ gameId, stats, onAgain }: { gameId: BrainGameId; 
             <Sparkline values={trend.map((h) => h.level)} color={theme.accent} />
           </div>
         )}
+
+        {stats.suggestRelax && <RelaxCard onDone={() => focusIfKeyboard(again.current)} />}
 
         <div className="flex flex-col gap-2 pt-2">
           <button
@@ -128,13 +163,92 @@ export function RoundSummary({ gameId, stats, onAgain }: { gameId: BrainGameId; 
   )
 }
 
-function LevelCard({ from, to, qe, qeLevel, span, theme }: { from: number; to: number; qe: boolean; qeLevel: number; span: boolean; theme: GameTheme }) {
+/** A tier reached this round: the medal, its name, and which game — said once, here. */
+function TierUp({ tier, game }: { tier: number; game: string }) {
   const { t } = useTranslation('brain')
-  const up = qe ? to < from : to > from
-  const fmt = (v: number) => (qe ? `${v}ms` : v.toFixed(1))
-  // The bar shows where in the current whole level the player now stands (Quick Eye: how far down
-  // its ladder of flash times).
-  const frac = qe ? qeLevel / quickEyeMaxLevel(33) : to - Math.floor(to)
+  const name = t(`tiers.t${tier}`)
+  return (
+    <div className="flex flex-col items-center text-center gap-3" role="status" data-testid="brain-tier-up">
+      <TierMedal tier={tier} />
+      <p className="bfx-rise text-3xl font-extrabold" style={{ color: tierLook(tier).solid }}>{t('tiers.up', { tier: name })}</p>
+      <p className="text-base text-white/85 max-w-xs">{t('tiers.upBody', { game, tier: name })}</p>
+    </div>
+  )
+}
+
+const SCORE_ROWS: readonly (keyof ScoreParts)[] = ['base', 'speed', 'combo', 'clear', 'clean']
+
+/** Where the round's points came from — only the parts that scored, then the total. */
+function ScoreBreakdown({ score, total }: { score: ScoreParts; total: number }) {
+  const { t } = useTranslation('brain')
+  const rows = SCORE_ROWS.map((k) => [k, Math.round(score[k])] as const).filter(([, v]) => v > 0)
+  if (rows.length === 0) return null
+  return (
+    <div className="rounded-2xl bg-white/[0.07] border border-white/10 px-4 py-3" data-testid="brain-score-breakdown">
+      <table className="w-full text-base">
+        <caption className="text-left text-sm font-semibold text-white/80 pb-1.5">{t('breakdown.title')}</caption>
+        <tbody>
+          {rows.map(([k, v]) => (
+            <tr key={k}>
+              <th scope="row" className="py-1 text-left font-normal text-white/80">{t(`breakdown.${k}`)}</th>
+              <td className="py-1 text-right font-semibold tabular-nums">{k === 'base' ? '' : '+'}{formatCount(v)}</td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr className="border-t border-white/15">
+            <th scope="row" className="pt-2 text-left font-bold">{t('breakdown.total')}</th>
+            <td className="pt-2 text-right font-extrabold tabular-nums">{formatCount(total)}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  )
+}
+
+/** Rounds in a row ended early on chances: relaxed timing is offered — a suggestion, never switched on for the player. */
+function RelaxCard({ onDone }: { onDone: () => void }) {
+  const { t } = useTranslation('brain')
+  const setSettings = useBrainStore((s) => s.setSettings)
+  const [on, setOn] = useState(false)
+  return (
+    <div className="rounded-2xl bg-white/[0.07] border border-white/10 p-4 space-y-3" data-testid="brain-relax">
+      <p className="flex items-start gap-2 text-base text-white/90">
+        <Hourglass className="w-5 h-5 mt-0.5 shrink-0" aria-hidden="true" />
+        {t('relax.suggest')}
+      </p>
+      <div aria-live="polite">
+        {on ? (
+          <p className="flex items-center gap-2 min-h-12 text-base font-semibold text-[#86EFAC]" data-testid="brain-relax-on">
+            <Check className="w-5 h-5" aria-hidden="true" />
+            {t('relax.on')}
+          </p>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              setSettings({ timing: 1.5 })
+              setOn(true)
+              onDone()
+            }}
+            className="w-full min-h-12 rounded-xl bg-white/15 hover:bg-white/25 text-base font-bold text-white border-none cursor-pointer"
+            data-testid="brain-relax-turn-on"
+          >
+            {t('relax.turnOn')}
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function LevelCard({ from, to, qe, span, theme }: { from: number; to: number; qe: boolean; span: boolean; theme: GameTheme }) {
+  const { t } = useTranslation('brain')
+  const up = to > from
+  const fmt = (v: number) => (qe ? String(v) : v.toFixed(1))
+  // The bar shows where in the current whole level the player now stands (Quick Eye: how far along
+  // its speed levels).
+  const frac = qe ? to / 11 : to - Math.floor(to)
   return (
     <div className="rounded-2xl bg-white/[0.07] border border-white/10 p-4" data-testid="brain-summary-level">
       <div className="flex items-baseline justify-between">

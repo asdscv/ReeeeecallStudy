@@ -2,11 +2,13 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 're
 import { useTranslation } from 'react-i18next'
 import { X, Play, Trophy, Gauge, Sparkles } from 'lucide-react'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
-import { GAME_THEMES, brainGame, displayLevel, gameProgress, quickEyeMsAt, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
+import { GAME_THEMES, brainGame, dayNumber, displayLevel, gameProgress, localDayKey, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
 import { BRAIN_ICONS, cardBackground, focusIfKeyboard } from './brain-ui'
 import { DemoPlayer } from './DemoPlayer'
 import { GameCanvas } from './GameCanvas'
+import { TierMeter } from './TierBadge'
+import { quickEyeSpeedLevel, tierStanding } from './tier-ui'
 
 /**
  * Before a game: what it is, a demo of how it plays, where the player stands, and one big start.
@@ -32,10 +34,19 @@ export function GameIntro({
   const entry = brainGame(gameId)
   const Icon = BRAIN_ICONS[entry.icon]
   const progress = useBrainStore((s) => s.progress)
+  const meta = useBrainStore((s) => s.meta)
   const p = gameProgress(progress, gameId)
   const best = progress.bestRuns[gameId]
   const firstTime = !progress.practiced.includes(gameId)
   const qe = gameId === 'quickEye'
+  const standing = tierStanding(gameId, meta, progress)
+  const played = p.rounds > 0 || standing.tier > 0
+  const est = meta.sk[gameId]
+  // The round's first trials find the start (the engine's own condition: never played, or a
+  // placement left part-way). Match Pairs and the span games start from a guess instead.
+  const placementNext = entry.group !== 'span' && gameId !== 'pairs' && ((p.rounds === 0 && !est) || (est !== undefined && est.n === 0))
+  // Back after two weeks or more: the first trials re-find the level (bigger steps), never "your level dropped".
+  const welcomeBack = !placementNext && est !== undefined && est.day > 0 && dayNumber(localDayKey()) - est.day >= 14
 
   const measure = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(360)
@@ -93,6 +104,11 @@ export function GameIntro({
           {steps && <p className="text-base font-semibold" style={{ color: theme.accent }}>{t('training.slot', { index: steps.index + 1, total: steps.games.length })}</p>}
           <h1 className="text-4xl font-extrabold tracking-tight">{t(`games.${gameId}.name`)}</h1>
           <p className="text-lg text-white/80 max-w-md">{t(`games.${gameId}.desc`)}</p>
+          {played && (
+            <div className="w-full mt-2">
+              <TierMeter standing={standing} accent={theme.accent} compact testId="brain-intro-tier" />
+            </div>
+          )}
         </section>
 
         <section className="mt-5 space-y-2" aria-labelledby="brain-howto">
@@ -101,12 +117,24 @@ export function GameIntro({
         </section>
 
         <div className="mt-4 grid grid-cols-3 gap-2">
-          <IntroStat icon={<Gauge className="w-5 h-5" aria-hidden="true" />} label={qe ? t('intro.speed') : t('intro.level')} value={qe ? (p.rounds > 0 ? `${quickEyeMsAt(p.level)}ms` : '—') : p.rounds > 0 ? displayLevel(p.level).toFixed(1) : '—'} accent={theme.accent} />
+          {/* No level yet for a game never played or a placement left part-way (n = 0) — not its interim probe level. */}
+          <IntroStat
+            icon={<Gauge className="w-5 h-5" aria-hidden="true" />}
+            label={qe ? t('intro.speed') : t('intro.level')}
+            value={p.rounds === 0 || est?.n === 0 ? '—' : qe ? String(quickEyeSpeedLevel(p.level)) : displayLevel(p.level).toFixed(1)}
+            accent={theme.accent}
+          />
           <IntroStat icon={<Sparkles className="w-5 h-5" aria-hidden="true" />} label={qe ? t('intro.stage') : t('intro.rounds')} value={qe ? String(progress.quickEye.variant) : formatCount(p.rounds)} accent={theme.accent} />
           <IntroStat icon={<Trophy className="w-5 h-5" aria-hidden="true" />} label={t('intro.best')} value={best ? formatCount(best) : '—'} accent={theme.accent} />
         </div>
 
-        {firstTime && <p className="mt-4 text-center text-base text-white/80">{t('intro.practiceNote')}</p>}
+        {(firstTime || placementNext || welcomeBack) && (
+          <div className="mt-4 space-y-1.5 text-center text-base text-white/80" data-testid="brain-intro-notes">
+            {firstTime && <p>{t('intro.practiceNote')}</p>}
+            {placementNext && <p>{t('intro.firstPlacement')}</p>}
+            {welcomeBack && <p>{t('intro.welcomeBack')}</p>}
+          </div>
+        )}
 
         {/* Start stays in reach on short screens: it rides the bottom edge until the page ends. */}
         <div className="sticky bottom-0 -mx-4 px-4 pt-6 pb-4" style={{ background: `linear-gradient(to top, ${theme.canvasFrom} 55%, transparent)` }}>

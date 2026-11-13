@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { X, Play, Clock, Target, ListChecks, ArrowRight, Home } from 'lucide-react'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
-import { GAME_THEMES, TRAINING_THEME, brainGame, courseStatus, displayLevel, localDayKey, quickEyeMsAt, weekProgress, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
+import { GAME_THEMES, TRAINING_THEME, brainGame, courseStatus, displayLevel, localDayKey, weekProgress, type AchievementId, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
 import { useTodaysTraining } from '@reeeeecall/shared/hooks/useTodaysTraining'
 import type { RoundStats } from '@reeeeecall/shared/hooks/useBrainRound'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
@@ -15,6 +15,9 @@ import { WeekRing } from '../../components/brain/WeekRing'
 import { BRAIN_ICONS, cardBackground, focusIfKeyboard } from '../../components/brain/brain-ui'
 import { sfx } from '../../components/brain/sfx'
 import { useBrainHydrated } from '../../components/brain/useBrainHydrated'
+import { AchievementCards } from '../../components/brain/AchievementsGrid'
+import { TierBadge } from '../../components/brain/TierBadge'
+import { quickEyeSpeedLevel } from '../../components/brain/tier-ui'
 
 /** `/brain/training` — Today's Training. Waits for the player's progress, which plans the session. */
 export function BrainTrainingPage() {
@@ -30,7 +33,26 @@ function Training() {
   const trackEvent = useTrackEvent()
   const [stage, setStage] = useState<'lineup' | 'intro' | 'play'>('lineup')
   const [askingStop, setAskingStop] = useState(false)
-  const onOver = useCallback((stats: RoundStats) => s.onRoundOver(s.slot.gameId, stats), [s])
+  // What the session's rounds earned on the way — told once, at the session's end (no results
+  // screen between rounds here).
+  const [earned, setEarned] = useState<{ achievements: AchievementId[]; tierUps: Partial<Record<BrainGameId, number>> }>({ achievements: [], tierUps: {} })
+  // Placement per game: the level its climb started from once placement found it, or null while a
+  // placement stopped part-way has no level to show yet. Games that never placed are not listed.
+  const [placed, setPlaced] = useState<PlacedLevels>({})
+  const onOver = useCallback(
+    (stats: RoundStats) => {
+      const gameId = s.slot.gameId
+      if (stats.achievements.length || stats.tierUp) {
+        setEarned((e) => ({
+          achievements: [...e.achievements, ...stats.achievements.filter((a) => !e.achievements.includes(a))],
+          tierUps: stats.tierUp ? { ...e.tierUps, [gameId]: Math.max(stats.tierUp, e.tierUps[gameId] ?? 0) } : e.tierUps,
+        }))
+      }
+      if (stats.placement !== 'none') setPlaced((p) => ({ ...p, [gameId]: stats.placement === 'done' ? stats.levelStart : null }))
+      s.onRoundOver(gameId, stats)
+    },
+    [s],
+  )
   const reported = useRef(false)
   useEffect(() => {
     if (s.phase === 'done' && !reported.current) {
@@ -80,8 +102,12 @@ function Training() {
       </>
     )
   }
-  return <SessionEnd done={s.phase === 'done'} totals={s.totals} activeMinutes={s.activeMinutes} />
+  const achievements = [...earned.achievements, ...s.achievements.filter((a) => !earned.achievements.includes(a))]
+  return <SessionEnd done={s.phase === 'done'} totals={s.totals} activeMinutes={s.activeMinutes} achievements={achievements} tierUps={earned.tierUps} placed={placed} />
 }
+
+/** Per game: where its climb started once placement found it, or null while placement is unfinished. */
+type PlacedLevels = Partial<Record<BrainGameId, number | null>>
 
 /** The session's line-up before it starts: four games, about how long, one start. */
 function Lineup({ games, minutes, onStart, onClose }: { games: BrainGameId[]; minutes: number; onStart: () => void; onClose: () => void }) {
@@ -144,8 +170,22 @@ function Lineup({ games, minutes, onStart, onClose }: { games: BrainGameId[]; mi
   )
 }
 
-/** Session complete (or stopped): the week ring fills, the course moves, each game's change. */
-function SessionEnd({ done, totals, activeMinutes }: { done: boolean; totals: ReturnType<typeof useTodaysTraining>['totals']; activeMinutes: number }) {
+/** Session complete (or stopped): the week ring fills, the course moves, each game's change, what was earned. */
+function SessionEnd({
+  done,
+  totals,
+  activeMinutes,
+  achievements,
+  tierUps,
+  placed,
+}: {
+  done: boolean
+  totals: ReturnType<typeof useTodaysTraining>['totals']
+  activeMinutes: number
+  achievements: AchievementId[]
+  tierUps: Partial<Record<BrainGameId, number>>
+  placed: PlacedLevels
+}) {
   const { t } = useTranslation('brain')
   const progress = useBrainStore((st) => st.progress)
   const today = localDayKey()
@@ -192,28 +232,46 @@ function SessionEnd({ done, totals, activeMinutes }: { done: boolean; totals: Re
         {levels.length > 0 && (
           <ul className="space-y-2">
             {levels.map(([id, l]) => {
-              // Quick Eye's level is its flash time: shorter is better.
+              // A placement stopped part-way has no level yet (its probe levels are not progress):
+              // no change is shown. A finished one counts from where the climb started.
+              const start = placed[id]
+              const showLevel = start !== null
+              const startLevel = start ?? l.start
+              // Quick Eye's level is its speed level, a whole number (never milliseconds): higher is better.
               const qe = id === 'quickEye'
-              const from = qe ? quickEyeMsAt(l.start) : displayLevel(l.start)
-              const to = qe ? quickEyeMsAt(l.end) : displayLevel(l.end)
-              const better = qe ? to < from : to > from
+              const from = qe ? quickEyeSpeedLevel(startLevel) : displayLevel(startLevel)
+              const to = qe ? quickEyeSpeedLevel(l.end) : displayLevel(l.end)
+              const better = to > from
+              const tierUp = tierUps[id]
               const Icon = BRAIN_ICONS[brainGame(id).icon]
               return (
                 <li key={id} className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.07] border border-white/10">
                   <span className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ background: cardBackground(GAME_THEMES[id]) }}>
                     {Icon && <Icon className="w-5 h-5 text-white" aria-hidden="true" />}
                   </span>
-                  <span className="flex-1 text-base font-semibold">{t(`games.${id}.name`)}</span>
-                  <span className="flex items-center gap-1.5 text-base tabular-nums" style={{ color: better ? '#86EFAC' : 'rgba(255,255,255,0.8)' }}>
-                    {qe ? `${from}ms` : from.toFixed(1)}
-                    <ArrowRight className="w-4 h-4" aria-hidden="true" />
-                    {qe ? `${to}ms` : to.toFixed(1)}
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-base font-semibold truncate">{t(`games.${id}.name`)}</span>
+                    {/* A tier reached during the session — said here, since rounds in a session have no results screen. */}
+                    {tierUp ? (
+                      <span className="block mt-1">
+                        <TierBadge tier={tierUp} size="sm" label={t('tiers.up', { tier: t(`tiers.t${tierUp}`) })} testId={`brain-training-tier-up-${id}`} />
+                      </span>
+                    ) : null}
                   </span>
+                  {showLevel && (
+                    <span className="flex items-center gap-1.5 text-base tabular-nums shrink-0" style={{ color: better ? '#86EFAC' : 'rgba(255,255,255,0.8)' }}>
+                      {qe ? t('quickEye.speedLevel', { level: from }) : from.toFixed(1)}
+                      <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                      {qe ? to : to.toFixed(1)}
+                    </span>
+                  )}
                 </li>
               )
             })}
           </ul>
         )}
+
+        <AchievementCards ids={achievements} delayMs={600} />
 
         <Link
           to="/brain"

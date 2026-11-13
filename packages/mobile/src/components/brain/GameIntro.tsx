@@ -4,12 +4,13 @@ import Animated from 'react-native-reanimated'
 import { Feather } from '@expo/vector-icons'
 import { useTranslation } from 'react-i18next'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
-import { GAME_THEMES, displayLevel, gameProgress, quickEyeMsAt, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
+import { GAME_THEMES, displayLevel, gameProgress, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
 import { CanvasButton, GameCanvas, GradientFill, StatTile } from './GameCanvas'
 import { DemoPlayer } from './DemoPlayer'
 import { useMotion } from './motion'
-import { gameIcon } from './brain-ui'
+import { gameIcon, type FeatherName } from './brain-ui'
+import { TierBar, TierMedal, backAfterBreak, opensWithPlacement, qeSpeedLevel, tierA11y, tierName, tierStanding } from './tier-ui'
 
 const PADDING = 16
 
@@ -38,7 +39,12 @@ export function GameIntro({
   const { t } = useTranslation('brain')
   const theme = GAME_THEMES[gameId]
   const progress = useBrainStore((s) => s.progress)
+  const meta = useBrainStore((s) => s.meta)
   const p = gameProgress(progress, gameId)
+  const standing = tierStanding(gameId, meta, progress)
+  // What the first trials will be: placement for a game never played, a re-fit after two weeks away.
+  const placementNote = opensWithPlacement(gameId, meta, progress)
+  const welcomeBack = !placementNote && backAfterBreak(gameId, meta)
   const best = progress.bestRuns[gameId]
   const firstTime = !progress.practiced.includes(gameId)
   const qe = gameId === 'quickEye'
@@ -83,6 +89,21 @@ export function GameIntro({
               <Text style={styles.name} accessibilityRole="header" maxFontSizeMultiplier={1.4}>
                 {t(`games.${gameId}.name`)}
               </Text>
+              {/* This game's tier, and how far toward the next — this game's record only. */}
+              <View style={styles.tier} accessible accessibilityLabel={`${t('tiers.label')} ${tierA11y(t, standing)}`} testID="brain-intro-tier">
+                <View style={styles.tierChip}>
+                  <TierMedal tier={standing.tier} size={22} />
+                  <Text style={styles.tierChipText} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+                    {tierName(t, standing.tier)}
+                  </Text>
+                </View>
+                <View style={styles.tierBar}>
+                  <TierBar frac={standing.frac} color={theme.accent} height={6} />
+                  <Text style={styles.tierNext} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+                    {standing.next === null ? t('tiers.max') : `${t('tiers.next')} · ${tierName(t, standing.next)}`}
+                  </Text>
+                </View>
+              </View>
               <Text style={styles.desc} maxFontSizeMultiplier={1.5}>
                 {t(`games.${gameId}.desc`)}
               </Text>
@@ -99,7 +120,9 @@ export function GameIntro({
               <StatTile
                 icon="activity"
                 label={qe ? t('intro.speed') : t('intro.level')}
-                value={qe ? (p.rounds > 0 ? `${formatCount(quickEyeMsAt(p.level))}ms` : '—') : p.rounds > 0 ? displayLevel(p.level).toFixed(1) : '—'}
+                // Quick Eye: its speed level 0-11 — never a flash time. No level yet for a game never
+                // played or a placement left part-way (n = 0) — not its interim probe level.
+                value={p.rounds > 0 && meta.sk[gameId]?.n !== 0 ? (qe ? formatCount(qeSpeedLevel(p.level)) : displayLevel(p.level).toFixed(1)) : '—'}
                 accent={theme.accent}
                 center
               />
@@ -107,10 +130,12 @@ export function GameIntro({
               <StatTile icon="award" label={t('intro.best')} value={best ? formatCount(best) : '—'} accent={theme.accent} center />
             </View>
 
-            {firstTime ? (
-              <Text style={styles.note} maxFontSizeMultiplier={1.5}>
-                {t('intro.practiceNote')}
-              </Text>
+            {firstTime || placementNote || welcomeBack ? (
+              <View style={styles.notes}>
+                {firstTime ? <Note icon="edit-3" text={t('intro.practiceNote')} /> : null}
+                {placementNote ? <Note icon="compass" text={t('intro.firstPlacement')} testID="brain-intro-placement" /> : null}
+                {welcomeBack ? <Note icon="sunrise" text={t('intro.welcomeBack')} testID="brain-intro-welcome-back" /> : null}
+              </View>
             ) : null}
           </ScrollView>
 
@@ -129,6 +154,17 @@ export function GameIntro({
         {overlay}
       </View>
     </GameCanvas>
+  )
+}
+
+function Note({ icon, text, testID }: { icon: FeatherName; text: string; testID?: string }) {
+  return (
+    <View style={styles.noteRow} testID={testID}>
+      <Feather name={icon} size={18} color="rgba(255,255,255,0.8)" style={styles.noteIcon} />
+      <Text style={styles.note} maxFontSizeMultiplier={1.5}>
+        {text}
+      </Text>
+    </View>
   )
 }
 
@@ -152,7 +188,15 @@ const styles = StyleSheet.create({
   section: { gap: 8 },
   kicker: { color: 'rgba(255,255,255,0.72)', fontSize: 14, fontWeight: '700', letterSpacing: 1 },
   stats: { flexDirection: 'row', gap: 8 },
-  note: { color: 'rgba(255,255,255,0.82)', fontSize: 16, lineHeight: 23, textAlign: 'center' },
+  tier: { alignItems: 'center', gap: 8, marginTop: 2, marginBottom: 2, alignSelf: 'stretch' },
+  tierChip: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingLeft: 6, paddingRight: 14, paddingVertical: 5, borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.12)', maxWidth: '100%' },
+  tierChipText: { color: '#FFFFFF', fontSize: 16, fontWeight: '800', flexShrink: 1 },
+  tierBar: { width: '70%', maxWidth: 260, gap: 4 },
+  tierNext: { color: 'rgba(255,255,255,0.7)', fontSize: 13, textAlign: 'center' },
+  notes: { gap: 10, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.07)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)', padding: 14 },
+  noteRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+  noteIcon: { marginTop: 2 },
+  note: { flex: 1, color: 'rgba(255,255,255,0.86)', fontSize: 16, lineHeight: 23 },
   bottom: {},
   fade: { position: 'absolute', left: 0, right: 0, top: -24, height: 24 },
   bottomBar: { paddingHorizontal: PADDING, paddingTop: 4, paddingBottom: 12 },

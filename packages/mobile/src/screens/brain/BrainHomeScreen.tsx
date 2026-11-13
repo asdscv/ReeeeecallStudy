@@ -6,6 +6,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
 import {
+  ACHIEVEMENTS,
   BRAIN_GAMES,
   GAME_THEMES,
   TRAINING_THEME,
@@ -14,14 +15,14 @@ import {
   displayLevel,
   gameHistory,
   gameProgress,
+  hasAchievement,
   localDayKey,
   planTodaysSession,
   plannedMinutes,
-  quickEyeMaxLevel,
-  quickEyeMsAt,
   researchContent,
   todaysPlanSeed,
   weekProgress,
+  type AchievementId,
   type BrainGameEntry,
 } from '@reeeeecall/shared/lib/brain-games'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
@@ -34,13 +35,11 @@ import { GradientFill } from '../../components/brain/GameCanvas'
 import { WeekRing } from '../../components/brain/WeekRing'
 import { Sparkline } from '../../components/brain/Sparkline'
 import { useBrainHydrated } from '../../components/brain/useBrainHydrated'
-import { gameIcon } from '../../components/brain/brain-ui'
+import { FX, gameIcon } from '../../components/brain/brain-ui'
+import { ACHIEVEMENT_ICONS, TierBar, TierMedal, qeSpeedLevel, tierA11y, tierName, tierStanding } from '../../components/brain/tier-ui'
 import type { BrainStackParamList } from '../../navigation/types'
 
 type Nav = NativeStackNavigationProp<BrainStackParamList, 'BrainHome'>
-
-/** Quick Eye's levels are flash times on the 33ms floor the phone uses (mobilePlatform). */
-const QE_FLOOR_MS = 33
 
 /**
  * Today's Training first — the bounded session the research counts — then every game as its own
@@ -55,6 +54,7 @@ export function BrainHomeScreen() {
   useBrainHydrated()
   const progress = useBrainStore((s) => s.progress)
   const history = useBrainStore((s) => s.history)
+  const meta = useBrainStore((s) => s.meta)
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   const today = localDayKey()
@@ -182,6 +182,18 @@ export function BrainHomeScreen() {
           ))}
         </View>
 
+        {/* Achievements: every one listed, earned ones in colour — never a count or a total. */}
+        <View style={styles.sectionHead}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.text }]} accessibilityRole="header">
+            {t('achievements.title')}
+          </Text>
+        </View>
+        <View style={styles.achGrid} testID="brain-achievements">
+          {ACHIEVEMENTS.map((id) => (
+            <AchievementTile key={id} id={id} earned={hasAchievement(meta, id)} columns={width >= 600 ? 3 : 2} />
+          ))}
+        </View>
+
         <Text style={[styles.body, { color: theme.colors.textSecondary }]}>{t('home.howItWorks')}</Text>
 
         {research ? (
@@ -210,30 +222,85 @@ export function BrainHomeScreen() {
     </Screen>
   )
 
+  /** The level, small: "Lv. 7.3" — Quick Eye "Stage 3 · speed 7" (a speed level, never a flash time). */
   function levelLabel(game: BrainGameEntry): string {
     const p = gameProgress(progress, game.id)
-    if (p.rounds === 0) return t('home.new')
-    if (game.id === 'quickEye') return t('home.quickEyeLevel', { stage: progress.quickEye.variant, ms: formatCount(quickEyeMsAt(p.level, QE_FLOOR_MS)) })
+    // A placement left part-way (n = 0) has no level yet — never its interim probe level.
+    if (p.rounds === 0 || meta.sk[game.id]?.n === 0) return t('home.new')
+    if (game.id === 'quickEye') return t('home.quickEyeLevel', { stage: progress.quickEye.variant, speed: qeSpeedLevel(p.level) })
     return t('home.level', { level: displayLevel(p.level).toFixed(1) })
   }
+}
+
+/**
+ * One achievement on the hub. Earned: in colour with its title and line. Not yet: dimmed, with
+ * "not yet" — the line still says what it takes, so nothing is a mystery box.
+ */
+function AchievementTile({ id, earned, columns }: { id: AchievementId; earned: boolean; columns: number }) {
+  const theme = useTheme()
+  const { t } = useTranslation('brain')
+  const title = t(`achievements.${id}.title`)
+  const body = t(`achievements.${id}.body`)
+  const width = columns === 3 ? '31.8%' : '48.4%'
+  return (
+    <View
+      style={[styles.ach, { width }, earned ? styles.achEarned : { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}
+      accessible
+      accessibilityLabel={`${title}, ${earned ? t('achievements.earned') : t('achievements.locked')}. ${body}`}
+      testID={`brain-achievement-${id}`}
+    >
+      {earned ? <GradientFill from={TRAINING_THEME.cardFrom} to={TRAINING_THEME.cardTo} light={0.05} /> : null}
+      <View style={styles.achTop}>
+        <View style={[styles.achIcon, earned ? styles.achIconEarned : { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}>
+          <Feather name={earned ? ACHIEVEMENT_ICONS[id] : 'lock'} size={18} color={earned ? '#0F172A' : theme.colors.textTertiary} />
+        </View>
+        {earned ? null : (
+          <Text style={[styles.achLocked, { color: theme.colors.textSecondary }]} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+            {t('achievements.locked')}
+          </Text>
+        )}
+      </View>
+      <Text style={[styles.achTitle, { color: earned ? '#FFFFFF' : theme.colors.textSecondary }]} maxFontSizeMultiplier={1.4}>
+        {title}
+      </Text>
+      {/* Dimmed by colour and the lock, not by fading the text: the line stays readable. */}
+      <Text style={[styles.achBody, { color: earned ? 'rgba(255,255,255,0.88)' : theme.colors.textSecondary }]} maxFontSizeMultiplier={1.4}>
+        {body}
+      </Text>
+    </View>
+  )
 }
 
 function GameCard({ game, twoUp, levelLabel, onPress, trend }: { game: BrainGameEntry; twoUp: boolean; levelLabel: string; onPress: () => void; trend: number[] }) {
   const { t } = useTranslation('brain')
   const progress = useBrainStore((s) => s.progress)
+  const meta = useBrainStore((s) => s.meta)
   const theme = GAME_THEMES[game.id]
   const p = gameProgress(progress, game.id)
   const played = p.rounds > 0
   const best = progress.bestRuns[game.id]
   const icon = gameIcon(game.id)
-  // How far into the current whole level (Quick Eye: down its ladder of flash times).
-  const frac = game.id === 'quickEye' ? p.level / quickEyeMaxLevel(QE_FLOOR_MS) : p.level - Math.floor(p.level)
+  // This game's tier and the way to the next — per game only, never added up across games.
+  const standing = tierStanding(game.id, meta, progress)
+  // A placement left part-way (n = 0) has no level yet: shown like a game never played — "new",
+  // no level and no tier bar — never its interim probe level. A tier earned stays.
+  const placing = meta.sk[game.id]?.n === 0
+  const fresh = !played || (placing && standing.tier === 0)
+  const showLevel = played && !placing
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [styles.card, twoUp && styles.cardHalf, pressed && styles.pressed]}
       accessibilityRole="button"
-      accessibilityLabel={[t(`games.${game.id}.name`), levelLabel, t(`games.${game.id}.desc`), best ? t('home.record', { value: formatCount(best) }) : null].filter(Boolean).join(', ')}
+      accessibilityLabel={[
+        t(`games.${game.id}.name`),
+        fresh ? t('home.new') : `${t('tiers.label')} ${tierA11y(t, standing)}`,
+        showLevel ? levelLabel : null,
+        t(`games.${game.id}.desc`),
+        best ? t('home.record', { value: formatCount(best) }) : null,
+      ]
+        .filter(Boolean)
+        .join(', ')}
       testID={`brain-game-${game.id}`}
     >
       <GradientFill from={theme.cardFrom} to={theme.cardTo} />
@@ -244,12 +311,21 @@ function GameCard({ game, twoUp, levelLabel, onPress, trend }: { game: BrainGame
         <View style={styles.cardIcon}>
           <Feather name={icon} size={24} color="#FFFFFF" />
         </View>
-        <View style={[styles.chip, played ? styles.chipPlayed : styles.chipNew]}>
-          {!played ? <Feather name="star" size={13} color="#0F172A" /> : null}
-          <Text style={[styles.chipText, { color: played ? '#FFFFFF' : '#0F172A' }]} numberOfLines={1} maxFontSizeMultiplier={1.3}>
-            {levelLabel}
-          </Text>
-        </View>
+        {!fresh ? (
+          <View style={[styles.chip, styles.chipPlayed]} testID={`brain-game-${game.id}-tier`}>
+            <TierMedal tier={standing.tier} size={20} />
+            <Text style={[styles.chipText, { color: '#FFFFFF' }]} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+              {tierName(t, standing.tier)}
+            </Text>
+          </View>
+        ) : (
+          <View style={[styles.chip, styles.chipNew]}>
+            <Feather name="star" size={13} color="#0F172A" />
+            <Text style={[styles.chipText, { color: '#0F172A' }]} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+              {t('home.new')}
+            </Text>
+          </View>
+        )}
       </View>
       <View style={styles.cardMid}>
         <Text style={styles.cardName} numberOfLines={1} maxFontSizeMultiplier={1.4}>
@@ -261,13 +337,21 @@ function GameCard({ game, twoUp, levelLabel, onPress, trend }: { game: BrainGame
       </View>
       <View style={styles.cardFoot}>
         <View style={styles.flex}>
-          {played ? (
+          {!fresh ? (
             <View style={styles.levelTrack}>
-              <View style={[styles.levelFill, { width: `${Math.max(4, Math.min(1, frac) * 100)}%` }]} />
+              <TierBar frac={standing.frac} color={standing.next === null ? FX.gold : '#FFFFFF'} track="rgba(255,255,255,0.25)" height={6} />
             </View>
           ) : null}
           <View style={styles.meta}>
-            <Text style={styles.metaText} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+            {showLevel ? (
+              <>
+                <Text style={[styles.metaText, styles.metaLevel]} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+                  {levelLabel}
+                </Text>
+                <Text style={styles.metaText}>·</Text>
+              </>
+            ) : null}
+            <Text style={[styles.metaText, styles.flexShrink]} numberOfLines={1} maxFontSizeMultiplier={1.3}>
               {t(`skills.${game.skill}`)}
             </Text>
             {best ? (
@@ -344,10 +428,19 @@ const styles = StyleSheet.create({
   cardName: { color: '#FFFFFF', fontSize: 20, fontWeight: '800' },
   cardDesc: { color: 'rgba(255,255,255,0.88)', fontSize: 14, lineHeight: 20 },
   cardFoot: { flexDirection: 'row', alignItems: 'flex-end', gap: 12, marginTop: 12 },
-  levelTrack: { height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.25)', overflow: 'hidden', marginBottom: 6 },
-  levelFill: { height: 6, borderRadius: 3, backgroundColor: '#FFFFFF' },
-  meta: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  levelTrack: { marginBottom: 6 },
+  meta: { flexDirection: 'row', alignItems: 'center', gap: 4, flexWrap: 'wrap' },
   metaText: { color: 'rgba(255,255,255,0.88)', fontSize: 14 },
+  metaLevel: { fontSize: 13, fontWeight: '700', fontVariant: ['tabular-nums'] },
+  achGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  ach: { borderRadius: 18, borderWidth: 1, overflow: 'hidden', padding: 14, gap: 6 },
+  achEarned: { borderColor: 'transparent', boxShadow: '0 10px 20px -12px rgba(49,46,129,0.6)' },
+  achTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 6, marginBottom: 2 },
+  achIcon: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
+  achIconEarned: { backgroundColor: FX.gold, borderColor: 'rgba(255,255,255,0.6)' },
+  achLocked: { fontSize: 12, fontWeight: '700', flexShrink: 1 },
+  achTitle: { fontSize: 15, fontWeight: '800' },
+  achBody: { fontSize: 13, lineHeight: 18 },
   spark: { width: 96, opacity: 0.9 },
   research: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 60, paddingHorizontal: 16, borderRadius: 14, borderWidth: 1 },
   researchText: { flex: 1, fontSize: 17, fontWeight: '600' },

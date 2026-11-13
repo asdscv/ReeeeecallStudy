@@ -7,12 +7,13 @@ import { useTranslation } from 'react-i18next'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
 import {
   GAME_THEMES,
+  TIER_COUNT,
   TRAINING_THEME,
   courseStatus,
   displayLevel,
   localDayKey,
-  quickEyeMsAt,
   weekProgress,
+  type AchievementId,
   type BrainGameId,
   type PlanSlot,
 } from '@reeeeecall/shared/lib/brain-games'
@@ -27,9 +28,7 @@ import { useBrainHydrated } from '../../components/brain/useBrainHydrated'
 import { celebrateHaptic } from '../../components/brain/fx-haptics'
 import { useMotion } from '../../components/brain/motion'
 import { FX, flushBrainStorage, gameIcon } from '../../components/brain/brain-ui'
-
-/** Quick Eye's levels are flash times on the 33ms floor the phone uses (mobilePlatform). */
-const QE_FLOOR_MS = 33
+import { AchievementCard, TIER_COLORS, TierMedal, qeSpeedLevel, tierName } from '../../components/brain/tier-ui'
 
 /**
  * Today's Training: the line-up, then each game's intro (with the session's steps), its rounds,
@@ -51,8 +50,26 @@ function Training() {
   const [askingStop, setAskingStop] = useState(false)
   const { onRoundOver, continueSession } = s
   const gameId = s.slot.gameId
+  // What the session's rounds earned on the way — told once, at the session's end (no results
+  // screen between rounds here).
+  const [earned, setEarned] = useState<{ achievements: AchievementId[]; tierUps: Partial<Record<BrainGameId, number>> }>({ achievements: [], tierUps: {} })
+  // Placement per game: the level its climb started from once placement found it, or null while a
+  // placement stopped part-way has no level to show yet. Games that never placed are not listed.
+  const [placed, setPlaced] = useState<PlacedLevels>({})
   // No summary between rounds: the session moves on by itself, and the end screen sums it up.
-  const onOver = useCallback((stats: RoundStats) => onRoundOver(gameId, stats), [onRoundOver, gameId])
+  const onOver = useCallback(
+    (stats: RoundStats) => {
+      if (stats.achievements.length || stats.tierUp) {
+        setEarned((e) => ({
+          achievements: [...e.achievements, ...stats.achievements.filter((a) => !e.achievements.includes(a))],
+          tierUps: stats.tierUp ? { ...e.tierUps, [gameId]: Math.max(stats.tierUp, e.tierUps[gameId] ?? 0) } : e.tierUps,
+        }))
+      }
+      if (stats.placement !== 'none') setPlaced((p) => ({ ...p, [gameId]: stats.placement === 'done' ? stats.levelStart : null }))
+      onRoundOver(gameId, stats)
+    },
+    [onRoundOver, gameId],
+  )
   const games = s.slots.map((slot) => slot.gameId)
   const stepsLabel = t('training.title')
   const leave = useCallback(() => navigation.goBack(), [navigation])
@@ -126,8 +143,22 @@ function Training() {
       />
     )
   }
-  return <SessionEnd done={s.phase === 'done'} totals={s.totals} activeMinutes={s.activeMinutes} onHome={leave} />
+  const achievements = [...earned.achievements, ...s.achievements.filter((a) => !earned.achievements.includes(a))]
+  return (
+    <SessionEnd
+      done={s.phase === 'done'}
+      totals={s.totals}
+      activeMinutes={s.activeMinutes}
+      achievements={achievements}
+      tierUps={earned.tierUps}
+      placed={placed}
+      onHome={leave}
+    />
+  )
 }
+
+/** Per game: where its climb started once placement found it, or null while placement is unfinished. */
+type PlacedLevels = Partial<Record<BrainGameId, number | null>>
 
 /** The session's line-up before it starts: four games, about how long, one start. */
 function Lineup({ slots, minutes, onStart, onClose }: { slots: PlanSlot[]; minutes: number; onStart: () => void; onClose: () => void }) {
@@ -201,8 +232,29 @@ function LineupRow({ index, slot }: { index: number; slot: PlanSlot }) {
   )
 }
 
-/** Session complete (or stopped): the week ring fills, the course moves, each game's change. */
-function SessionEnd({ done, totals, activeMinutes, onHome }: { done: boolean; totals: TrainingTotals; activeMinutes: number; onHome: () => void }) {
+/**
+ * Session complete (or stopped): the week ring fills, the course moves, what the session earned,
+ * each game's change.
+ */
+function SessionEnd({
+  done,
+  totals,
+  activeMinutes,
+  achievements,
+  tierUps,
+  placed,
+  onHome,
+}: {
+  done: boolean
+  totals: TrainingTotals
+  activeMinutes: number
+  /** Earned in the session's rounds, then by finishing it (those arrive a moment after the screen opens). */
+  achievements: AchievementId[]
+  /** The highest tier each game reached during the session. */
+  tierUps: Partial<Record<BrainGameId, number>>
+  placed: PlacedLevels
+  onHome: () => void
+}) {
   const { t } = useTranslation('brain')
   // Read after the session was recorded, so the week and the course already include it.
   const progress = useBrainStore((st) => st.progress)
@@ -246,6 +298,14 @@ function SessionEnd({ done, totals, activeMinutes, onHome }: { done: boolean; to
           </View>
         ) : null}
 
+        {achievements.length > 0 ? (
+          <View style={styles.list} testID="brain-training-achievements">
+            {achievements.map((id, i) => (
+              <AchievementCard key={id} id={id} delay={250 + i * 160} />
+            ))}
+          </View>
+        ) : null}
+
         <View style={styles.stats}>
           <StatTile icon="clock" label={t('summary.minutes')} value={formatCount(minutes)} center />
           <StatTile icon="list" label={t('summary.trials')} value={formatCount(totals.trials)} center />
@@ -255,31 +315,64 @@ function SessionEnd({ done, totals, activeMinutes, onHome }: { done: boolean; to
         {levels.length > 0 ? (
           <View style={styles.list}>
             {levels.map(([id, l]) => {
-              // Quick Eye's level is its flash time: shorter is better.
+              // A placement stopped part-way has no level yet (its probe levels are not progress):
+              // no change is shown. A finished one counts from where the climb started.
+              const start = placed[id]
+              const showLevel = start !== null
+              // Quick Eye: its speed level 0-11 (higher is better) — never a flash time.
               const qe = id === 'quickEye'
-              const from = qe ? quickEyeMsAt(l.start, QE_FLOOR_MS) : displayLevel(l.start)
-              const to = qe ? quickEyeMsAt(l.end, QE_FLOOR_MS) : displayLevel(l.end)
-              const better = qe ? to < from : to > from
-              const fmt = (v: number) => (qe ? `${formatCount(v)}ms` : v.toFixed(1))
+              const startLevel = start ?? l.start
+              const from = qe ? qeSpeedLevel(startLevel) : displayLevel(startLevel)
+              const to = qe ? qeSpeedLevel(l.end) : displayLevel(l.end)
+              const better = to > from
+              const fmt = (v: number) => (qe ? formatCount(v) : v.toFixed(1))
               const theme = GAME_THEMES[id]
+              const change = qe ? `${t('quickEye.speedLevel', { level: from })} → ${formatCount(to)}` : `${fmt(from)} → ${fmt(to)}`
+              const tierUp = tierUps[id]
+              const tierUpText = tierUp ? t('tiers.up', { tier: tierName(t, tierUp) }) : null
+              const changeColor = better ? FX.goodText : 'rgba(255,255,255,0.8)'
               return (
-                <View key={id} style={styles.row} accessible accessibilityLabel={`${t(`games.${id}.name`)} ${fmt(from)} → ${fmt(to)}`}>
+                <View
+                  key={id}
+                  style={styles.row}
+                  accessible
+                  accessibilityLabel={[t(`games.${id}.name`), tierUpText, showLevel ? change : null].filter(Boolean).join(', ')}
+                >
                   <View style={[styles.rowIcon, styles.rowIconSmall]}>
                     <GradientFill from={theme.cardFrom} to={theme.cardTo} width={44} height={44} light={0.06} />
                     <Feather name={gameIcon(id)} size={20} color="#FFFFFF" />
                   </View>
-                  <Text style={[styles.rowName, styles.flex]} numberOfLines={1} maxFontSizeMultiplier={1.4}>
-                    {t(`games.${id}.name`)}
-                  </Text>
-                  <View style={styles.change}>
-                    <Text style={[styles.changeText, { color: better ? FX.goodText : 'rgba(255,255,255,0.8)' }]} maxFontSizeMultiplier={1.3}>
-                      {fmt(from)}
+                  <View style={styles.flex}>
+                    <Text style={styles.rowName} numberOfLines={1} maxFontSizeMultiplier={1.4}>
+                      {t(`games.${id}.name`)}
                     </Text>
-                    <Feather name="arrow-right" size={15} color={better ? FX.goodText : 'rgba(255,255,255,0.8)'} />
-                    <Text style={[styles.changeText, { color: better ? FX.goodText : 'rgba(255,255,255,0.8)' }]} maxFontSizeMultiplier={1.3}>
-                      {fmt(to)}
-                    </Text>
+                    {/* A tier reached during the session — said here, since rounds in a session have no results screen. */}
+                    {tierUp && tierUpText ? (
+                      <View style={styles.tierUp} testID={`brain-training-tier-up-${id}`}>
+                        <TierMedal tier={tierUp} size={18} />
+                        <Text style={[styles.tierUpText, { color: TIER_COLORS[Math.min(TIER_COUNT, tierUp)] }]} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+                          {tierUpText}
+                        </Text>
+                      </View>
+                    ) : null}
                   </View>
+                  {showLevel ? (
+                    <View style={styles.change}>
+                      {/* Quick Eye's numbers are its speed level, so say so once. */}
+                      {qe ? (
+                        <Text style={styles.changeUnit} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+                          {t('intro.speed')}
+                        </Text>
+                      ) : null}
+                      <Text style={[styles.changeText, { color: changeColor }]} maxFontSizeMultiplier={1.3}>
+                        {fmt(from)}
+                      </Text>
+                      <Feather name="arrow-right" size={15} color={changeColor} />
+                      <Text style={[styles.changeText, { color: changeColor }]} maxFontSizeMultiplier={1.3}>
+                        {fmt(to)}
+                      </Text>
+                    </View>
+                  ) : null}
                 </View>
               )
             })}
@@ -322,4 +415,7 @@ const styles = StyleSheet.create({
   stats: { flexDirection: 'row', gap: 8 },
   change: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   changeText: { fontSize: 16, fontVariant: ['tabular-nums'] },
+  changeUnit: { color: 'rgba(255,255,255,0.65)', fontSize: 14, flexShrink: 1 },
+  tierUp: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
+  tierUpText: { fontSize: 14, fontWeight: '800', flexShrink: 1 },
 })

@@ -23,6 +23,7 @@ export function brainStorageFor(userId: string): BrainStorage {
   const key = `reeeeecall-brain:${userId}`
   return {
     key,
+    userId,
     load: () => {
       try {
         return localStorage.getItem(key)
@@ -51,6 +52,32 @@ export function brainStorageFor(userId: string): BrainStorage {
         // Same as progress.
       }
     },
+    loadMeta: () => {
+      try {
+        return localStorage.getItem(`${key}:meta`)
+      } catch {
+        return null
+      }
+    },
+    saveMeta: (raw) => {
+      try {
+        localStorage.setItem(`${key}:meta`, raw)
+      } catch {
+        // Same as progress.
+      }
+    },
+  }
+}
+
+/** The account was deleted: its brain record leaves this browser too (the server row goes with the account). */
+export function forgetBrainOnDevice(userId: string) {
+  const key = `reeeeecall-brain:${userId}`
+  for (const k of [key, `${key}:history`, `${key}:meta`]) {
+    try {
+      localStorage.removeItem(k)
+    } catch {
+      // Blocked storage: nothing was kept there either.
+    }
   }
 }
 

@@ -33,6 +33,8 @@ import { getMySubscription, type MySubscription } from '../services/billing'
 import { formatCount } from '@reeeeecall/shared/lib/ai/server-client'
 import type { SrsSettings } from '@reeeeecall/shared/types/database'
 import { DEFAULT_SRS_SETTINGS } from '@reeeeecall/shared/types/database'
+import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
+import { forgetBrainOnDevice } from '../components/brain/brain-ui'
 
 const PRIVACY_POLICY_URL = 'https://reeeeecallstudy.xyz/privacy-policy.html'
 const TERMS_OF_SERVICE_URL = 'https://reeeeecallstudy.xyz/terms-of-service.html'
@@ -310,6 +312,9 @@ export function SettingsScreen() {
                 Alert.alert(t('alerts.error'), t('account.deleteFailed'))
                 return
               }
+              // The account's brain record leaves this device with it (the server row went with the account).
+              useBrainStore.getState().resetForSignOut()
+              if (user) forgetBrainOnDevice(user.id)
               await signOut()
             } catch {
               Alert.alert(t('alerts.error'), t('account.deleteFailed'))

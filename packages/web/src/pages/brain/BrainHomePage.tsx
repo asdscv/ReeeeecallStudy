@@ -15,8 +15,6 @@ import {
   localDayKey,
   planTodaysSession,
   plannedMinutes,
-  quickEyeMaxLevel,
-  quickEyeMsAt,
   researchContent,
   todaysPlanSeed,
   weekProgress,
@@ -26,6 +24,9 @@ import { BRAIN_ICONS, cardBackground } from '../../components/brain/brain-ui'
 import { BrainSettingsDialog } from '../../components/brain/BrainSettingsDialog'
 import { Sparkline } from '../../components/brain/RoundSummary'
 import { WeekRing } from '../../components/brain/WeekRing'
+import { TierBadge, TierBar } from '../../components/brain/TierBadge'
+import { AchievementsGrid } from '../../components/brain/AchievementsGrid'
+import { quickEyeSpeedLevel, tierStanding } from '../../components/brain/tier-ui'
 import { useBrainHydrated } from '../../components/brain/useBrainHydrated'
 
 /**
@@ -38,6 +39,7 @@ export function BrainHomePage() {
   useBrainHydrated()
   const progress = useBrainStore((s) => s.progress)
   const history = useBrainStore((s) => s.history)
+  const meta = useBrainStore((s) => s.meta)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const today = localDayKey()
   const week = weekProgress(progress, today)
@@ -142,17 +144,18 @@ export function BrainHomePage() {
             const Icon = BRAIN_ICONS[game.icon]
             const theme = GAME_THEMES[game.id]
             const p = gameProgress(progress, game.id)
-            const played = p.rounds > 0
+            const standing = tierStanding(game.id, meta, progress)
+            const played = p.rounds > 0 || standing.tier > 0
+            // A placement left part-way (n = 0) has no level yet: shown like a game never played —
+            // "new", no level and no tier bar — never its interim probe level. A tier earned stays.
+            const placing = meta.sk[game.id]?.n === 0
+            const fresh = !played || (placing && standing.tier === 0)
             const qe = game.id === 'quickEye'
             const best = progress.bestRuns[game.id]
             const trend = gameHistory(history, game.id).map((h) => h.level)
-            const levelLabel = !played
-              ? t('home.new')
-              : qe
-                ? t('home.quickEyeLevel', { stage: progress.quickEye.variant, ms: quickEyeMsAt(p.level) })
-                : t('home.level', { level: displayLevel(p.level).toFixed(1) })
-            // How far into the current whole level (Quick Eye: along its 12 speed steps).
-            const frac = qe ? p.level / quickEyeMaxLevel(33) : p.level - Math.floor(p.level)
+            const levelLabel = qe
+              ? t('home.quickEyeLevel', { stage: progress.quickEye.variant, speed: quickEyeSpeedLevel(p.level) })
+              : t('home.level', { level: displayLevel(p.level).toFixed(1) })
             return (
               <li key={game.id}>
                 <Link
@@ -168,10 +171,14 @@ export function BrainHomePage() {
                     <span className="w-12 h-12 rounded-2xl bg-white/20 ring-1 ring-white/25 flex items-center justify-center">
                       {Icon && <Icon className="w-6 h-6" aria-hidden="true" />}
                     </span>
-                    <span className={`px-2.5 py-1 rounded-full text-sm font-bold ${played ? 'bg-white/20' : 'bg-white text-slate-900'}`}>
-                      {!played && <Sparkles className="inline w-3.5 h-3.5 mr-1 -mt-0.5" aria-hidden="true" />}
-                      {levelLabel}
-                    </span>
+                    {!fresh ? (
+                      <TierBadge tier={standing.tier} size="sm" testId={`brain-tier-${game.id}`} />
+                    ) : (
+                      <span className="px-2.5 py-1 rounded-full text-sm font-bold bg-white text-slate-900">
+                        <Sparkles className="inline w-3.5 h-3.5 mr-1 -mt-0.5" aria-hidden="true" />
+                        {t('home.new')}
+                      </span>
+                    )}
                   </div>
                   <div className="relative mt-3 flex-1">
                     <p className="text-xl font-extrabold">{t(`games.${game.id}.name`)}</p>
@@ -179,19 +186,23 @@ export function BrainHomePage() {
                   </div>
                   <div className="relative mt-3 flex items-end justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      {/* Span games move a whole length at a time: no part-way bar for them. */}
-                      {played && game.group !== 'span' && (
-                        <div className="h-1.5 rounded-full bg-white/25 overflow-hidden" aria-hidden="true">
-                          <div className="h-full rounded-full bg-white" style={{ width: `${Math.max(4, frac * 100)}%` }} />
-                        </div>
-                      )}
-                      <p className="mt-1.5 text-sm text-white/85 flex items-center gap-1">
-                        {t(`skills.${game.skill}`)}
+                      {/* The way to this game's next tier — its own ladder, never a total across games. */}
+                      {!fresh && <TierBar standing={standing} fill="#FFFFFF" track="rgba(255,255,255,0.25)" height="h-1.5" />}
+                      <p className="mt-1.5 text-sm text-white/85 flex flex-wrap items-center gap-x-1 gap-y-0.5">
+                        {played && !placing && (
+                          <>
+                            <span className="font-semibold text-white tabular-nums" data-testid={`brain-level-${game.id}`}>{levelLabel}</span>
+                            <span aria-hidden="true">·</span>
+                          </>
+                        )}
+                        <span>{t(`skills.${game.skill}`)}</span>
                         {best ? (
                           <>
                             <span aria-hidden="true">·</span>
-                            <Trophy className="w-3.5 h-3.5" aria-hidden="true" />
-                            {t('home.record', { value: formatCount(best) })}
+                            <span className="inline-flex items-center gap-1 whitespace-nowrap">
+                              <Trophy className="w-3.5 h-3.5" aria-hidden="true" />
+                              {t('home.record', { value: formatCount(best) })}
+                            </span>
                           </>
                         ) : null}
                       </p>
@@ -208,6 +219,8 @@ export function BrainHomePage() {
           })}
         </ul>
       </section>
+
+      <AchievementsGrid />
 
       <p className="text-base text-muted-foreground leading-relaxed">{t('home.howItWorks')}</p>
 

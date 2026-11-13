@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { View, Text, Pressable, StyleSheet, AccessibilityInfo, AppState, BackHandler, Platform, useWindowDimensions } from 'react-native'
+import { View, Text, Pressable, ScrollView, StyleSheet, AccessibilityInfo, AppState, BackHandler, Platform, useWindowDimensions } from 'react-native'
 import Animated, {
   Easing,
   ReduceMotion,
@@ -14,7 +14,7 @@ import Animated, {
 import { Feather } from '@expo/vector-icons'
 import { useTranslation } from 'react-i18next'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
-import { GAME_THEMES, comboMultiplier, quickEyeMsAt, streakTier, type BrainGameId, type GameTheme } from '@reeeeecall/shared/lib/brain-games'
+import { GAME_THEMES, comboMultiplier, streakTier, type BrainGameId, type GameTheme } from '@reeeeecall/shared/lib/brain-games'
 import { useBrainRound, type RoundStats } from '@reeeeecall/shared/hooks/useBrainRound'
 import { useBrainFx, type BrainFx } from '@reeeeecall/shared/hooks/useBrainFx'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
@@ -24,11 +24,14 @@ import { BrainBoard } from './BrainBoard'
 import { CanvasButton, CanvasOverlay, CanvasSheet, Countdown, GameCanvas } from './GameCanvas'
 import { brainHaptic } from './fx-haptics'
 import { useMotion } from './motion'
-import { FX, MAX_BOARD_WIDTH, flushBrainStorage, mobilePlatform } from './brain-ui'
+import { CANVAS_INK, FX, MAX_BOARD_WIDTH, flushBrainStorage, mobilePlatform, type FeatherName } from './brain-ui'
+import { qeSpeedLevel } from './tier-ui'
 
 const PADDING = 16
 /** In-round text may grow with the system font, but only so far: the board must keep its room. */
 const HUD_SCALE = 1.3
+/** How long a bigger board's notice stays up. */
+const TOAST_MS = 3000
 
 /**
  * One round of one game, full screen on the game's canvas — shared by free practice and Today's
@@ -169,9 +172,10 @@ function Round({
       }
       if (fx.kind === 'wrong') setBurst({ id, ok: false })
       if ((fx.kind === 'correct' || fx.kind === 'wrong') && fx.practice) {
-        // The last practice trial's verdict: say the counted round starts next.
+        // The last practice trial's verdict: say the counted round starts next. (A rule card's
+        // unscored trial is "practice" to the effects too, but it is not the tutorial ending.)
         const cur = live.current.r
-        if (cur.practiceDone >= cur.practiceTotal) setBanner({ id, text: t('play.practiceDone') })
+        if (cur.result?.kind === 'practice' && cur.practiceDone >= cur.practiceTotal) setBanner({ id, text: t('play.practiceDone') })
       }
       if (fx.kind === 'lifeLost') setHeartHit(id)
       if (fx.kind === 'levelUp') setBanner({ id, text: gameId === 'quickEye' ? t('play.fasterBanner') : t('play.levelUpBanner', { level: fx.level }) })
@@ -233,10 +237,12 @@ function Round({
     live.current.r.stop()
   }, [])
 
-  // Android's back button: the stop sheet (the round paused under it), never straight out.
+  // Android's back button: the stop sheet (the round paused under it), never straight out. Under a
+  // new-rule card it does nothing — the card holds the trial until it has been read.
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
       const { r: cur, confirming: asking } = live.current
+      if (cur.intro) return true
       if (asking) cancelStop()
       // The "round over" stamp holds for a moment; the results come next by themselves.
       else if (!cur.over) askStop()
@@ -252,7 +258,8 @@ function Round({
   useEffect(() => {
     const away = () => {
       const cur = live.current.r
-      if (cur.over || cur.paused) return
+      // A rule card already holds the trial with its clock stopped; it is still there on return.
+      if (cur.over || cur.paused || cur.intro) return
       if (cur.canPause) cur.pause()
       else wantPause.current = true
     }
@@ -275,9 +282,12 @@ function Round({
   // ── What the HUD says ──────────────────────────────────────────────────────
   // Number Hunt spends a life per wrong tap inside its grid: show them going as they go.
   const liveLives = gameId === 'schulte' && typeof r.view.prompt.params?.lives === 'number' && !r.result ? Number(r.view.prompt.params.lives) : r.lives
-  const levelText =
-    gameId === 'quickEye'
-      ? `${t('quickEye.stage', { stage: variant })} · ${t('quickEye.flashMs', { ms: formatCount(quickEyeMsAt(r.level, platform.minExposureMs)) })}`
+  // Placement moves the level in big jumps while it finds the start: no number then, so the jumps
+  // are not read as a score (the line keeps its room, so the board does not move when it returns).
+  const levelText = r.placing
+    ? ' '
+    : gameId === 'quickEye'
+      ? `${t('quickEye.stage', { stage: variant })} · ${t('quickEye.speedLevel', { level: qeSpeedLevel(r.level) })}`
       : t('home.level', { level: r.level.toFixed(1) })
   const result = r.result
   const resultText = !result
@@ -293,15 +303,36 @@ function Round({
           : t('play.wrong')
   const resultColor = !result || result.void ? 'rgba(255,255,255,0.7)' : result.correct ? FX.goodText : FX.badText
   const tier = streakTier(r.stats.streak)
-  const capProgress = r.roundCap !== null && !r.practice ? r.trialInRound / r.roundCap : null
+  const capProgress = r.roundCap !== null && !r.practice && !r.placing ? r.trialInRound / r.roundCap : null
   const practiceCount = Math.min(r.practiceTotal, r.practiceDone + (result ? 0 : 1))
+  // The quiet line under the board when nothing else is said: what kind of trial this is.
+  const hint =
+    r.trialKind === 'practice' ? t('play.practiceHint') : r.trialKind === 'intro' ? t('rule.unscored') : r.placing ? t('placement.hint') : null
 
   // VoiceOver has no live regions: say the verdict out loud (TalkBack hears the polite region).
   useEffect(() => {
     if (Platform.OS === 'ios' && resultText) AccessibilityInfo.announceForAccessibility(resultText)
   }, [resultText, r.trialId])
 
-  const covered = r.paused || confirming || ending
+  // A bigger board's notice: shown for ~3s from the trial that brought it, then gone — its seconds
+  // (and VoiceOver's announcement) counted from when a rule card on the same trial has been read,
+  // not under the card.
+  const toastId = r.toast?.id ?? null
+  const ruleUp = r.intro !== null
+  const [toastSeen, setToastSeen] = useState<number | null>(null)
+  useEffect(() => {
+    if (toastId === null || ruleUp) return
+    const tm = setTimeout(() => setToastSeen(toastId), TOAST_MS)
+    return () => clearTimeout(tm)
+  }, [toastId, ruleUp])
+  const toast = r.toast && !ruleUp && r.toast.id !== toastSeen && !r.over ? r.toast : null
+  const toastText = toast ? { title: `${t('rule.change')} · ${t(`mechanics.${toast.copy}.title`)}`, body: t(`mechanics.${toast.copy}.body`) } : null
+  const toastSpoken = toastText ? `${toastText.title}. ${toastText.body}` : null
+  useEffect(() => {
+    if (Platform.OS === 'ios' && toastSpoken) AccessibilityInfo.announceForAccessibility(toastSpoken)
+  }, [toastSpoken])
+
+  const covered = r.paused || confirming || ending || r.intro !== null
 
   return (
     <View style={styles.root}>
@@ -317,7 +348,14 @@ function Round({
             <Text style={styles.gameName} numberOfLines={1} maxFontSizeMultiplier={HUD_SCALE}>
               {t(`games.${gameId}.name`)}
             </Text>
-            <Text style={[styles.level, { color: theme.accent }]} numberOfLines={1} maxFontSizeMultiplier={HUD_SCALE} testID="brain-level">
+            <Text
+              style={[styles.level, { color: theme.accent }]}
+              numberOfLines={1}
+              maxFontSizeMultiplier={HUD_SCALE}
+              accessibilityElementsHidden={r.placing}
+              importantForAccessibility={r.placing ? 'no' : 'auto'}
+              testID="brain-level"
+            >
               {levelText}
             </Text>
           </View>
@@ -332,51 +370,60 @@ function Round({
           />
         </View>
 
-        {/* Score, run and chances. */}
-        <View style={[styles.scoreRow, compact && styles.scoreRowCompact]}>
-          <View style={styles.scoreBox}>
-            <Text
-              style={[styles.score, compact && styles.scoreCompact, { textShadowColor: theme.glow }]}
-              maxFontSizeMultiplier={1.15}
-              accessibilityLabel={`${t('play.score')} ${formatCount(r.stats.points)}`}
-              testID="brain-score"
-            >
-              {formatCount(r.stats.points)}
-            </Text>
-            <Text style={styles.scoreLabel} maxFontSizeMultiplier={1.15}>
-              {t('play.score')}
-            </Text>
-            {pops.map((p) => (
-              <ScorePop key={p.id} text={p.text} color={theme.accent} onDone={() => setPops((list) => list.filter((x) => x.id !== p.id))} />
-            ))}
+        {/* Score, run and chances — then the round's bars; a board notice lies over both for a moment. */}
+        <View>
+          <View style={[styles.scoreRow, compact && styles.scoreRowCompact]}>
+            <View style={styles.scoreBox}>
+              <Text
+                style={[styles.score, compact && styles.scoreCompact, { textShadowColor: theme.glow }]}
+                maxFontSizeMultiplier={1.15}
+                accessibilityLabel={`${t('play.score')} ${formatCount(r.stats.points)}`}
+                testID="brain-score"
+              >
+                {formatCount(r.stats.points)}
+              </Text>
+              <Text style={styles.scoreLabel} maxFontSizeMultiplier={1.15}>
+                {t('play.score')}
+              </Text>
+              {pops.map((p) => (
+                <ScorePop key={p.id} text={p.text} color={theme.accent} onDone={() => setPops((list) => list.filter((x) => x.id !== p.id))} />
+              ))}
+            </View>
+
+            {tier > 0 && !r.practice ? (
+              <Streak
+                tier={tier}
+                streak={r.stats.streak}
+                label={t('play.streakCount', { value: r.stats.streak })}
+                narrow={screen.width < 400 || r.maxLives > 3 || r.placing}
+              />
+            ) : (
+              <View />
+            )}
+
+            {/* Chances — or, while none can be lost, a pill saying why: practice, a new rule, placement. */}
+            {r.trialKind === 'practice' ? (
+              <HudPill text={t('play.practice', { done: practiceCount, total: r.practiceTotal })} testID="brain-lives" />
+            ) : r.trialKind === 'intro' ? (
+              <HudPill icon="info" text={t('rule.label')} testID="brain-rule-pill" />
+            ) : r.placing ? (
+              <HudPill icon="compass" text={t('placement.label')} testID="brain-placement-pill" />
+            ) : (
+              <Hearts lives={liveLives} max={r.maxLives} hit={heartHit} label={t(r.group === 'span' ? 'play.livesSpan' : 'play.lives', { value: liveLives })} />
+            )}
           </View>
 
-          {tier > 0 && !r.practice ? (
-            <Streak tier={tier} streak={r.stats.streak} label={t('play.streakCount', { value: r.stats.streak })} narrow={screen.width < 400 || r.maxLives > 3} />
-          ) : (
-            <View />
-          )}
-
-          {r.practice ? (
-            <View style={styles.practicePill} testID="brain-lives">
-              <Text style={styles.practiceText} numberOfLines={1} maxFontSizeMultiplier={HUD_SCALE}>
-                {t('play.practice', { done: practiceCount, total: r.practiceTotal })}
-              </Text>
-            </View>
-          ) : (
-            <Hearts lives={liveLives} max={r.maxLives} hit={heartHit} label={t(r.group === 'span' ? 'play.livesSpan' : 'play.lives', { value: liveLives })} />
-          )}
-        </View>
-
-        {/* The round's progress (capped rounds), then this trial's clock. */}
-        <View style={[styles.bars, compact && styles.barsCompact]}>
-          {/* Its room is kept during practice too, so the board does not resize when practice ends. */}
-          {capProgress !== null ? (
-            <CapBar progress={capProgress} now={r.trialInRound} max={r.roundCap ?? 0} label={t('play.trial', { done: r.trialInRound, total: r.roundCap ?? 0 })} />
-          ) : r.roundCap !== null ? (
-            <View style={styles.capSpacer} />
-          ) : null}
-          <TimerBar key={r.trialId} timer={r.timer} accent={theme.accent} />
+          {/* The round's progress (capped rounds), then this trial's clock. */}
+          <View style={[styles.bars, compact && styles.barsCompact]}>
+            {/* Its room is kept during practice too, so the board does not resize when practice ends. */}
+            {capProgress !== null ? (
+              <CapBar progress={capProgress} now={r.trialInRound} max={r.roundCap ?? 0} label={t('play.trial', { done: r.trialInRound, total: r.roundCap ?? 0 })} />
+            ) : r.roundCap !== null ? (
+              <View style={styles.capSpacer} />
+            ) : null}
+            <TimerBar key={r.trialId} timer={r.timer} accent={theme.accent} />
+          </View>
+          {toast && toastText ? <BoardNotice key={toast.id} title={toastText.title} body={toastText.body} theme={theme} /> : null}
         </View>
 
         <View style={[styles.body, compact && styles.bodyCompact]}>
@@ -390,27 +437,29 @@ function Round({
           >
             {boardHeight === null ? null : (
               <BrainBoard
-                key={r.trialId}
+                // Sibling keys share one namespace: trial ids and effect ids both count from 1.
+                key={`board-${r.trialId}`}
                 view={r.view}
                 onTap={r.tap}
                 onExposure={r.reportExposure}
                 width={boardWidth}
                 height={boardHeight}
                 theme={theme}
-                paused={r.paused}
+                // A rule card holds the trial as a pause does (Quick Eye stops counting frames).
+                paused={r.paused || r.intro !== null}
               />
             )}
             {/* The verdict, big and brief, over the board. */}
-            {burst ? <Burst key={burst.id} ok={burst.ok} /> : null}
+            {burst ? <Burst key={`burst-${burst.id}`} ok={burst.ok} /> : null}
           </View>
           <View style={[styles.resultRow, compact && styles.resultRowCompact]} accessibilityLiveRegion="polite" pointerEvents="none">
             {banner ? (
               <BannerPill key={banner.id} text={banner.text} />
             ) : result && resultText ? (
               <ResultLine key={r.trialId} text={resultText} color={resultColor} />
-            ) : r.practice ? (
-              <Text style={styles.hint} numberOfLines={2} adjustsFontSizeToFit maxFontSizeMultiplier={HUD_SCALE}>
-                {t('play.practiceHint')}
+            ) : hint ? (
+              <Text style={styles.hint} numberOfLines={2} adjustsFontSizeToFit maxFontSizeMultiplier={HUD_SCALE} testID="brain-hint">
+                {hint}
               </Text>
             ) : null}
           </View>
@@ -445,7 +494,17 @@ function Round({
         />
       ) : null}
 
-      {ending ? <RoundOver endedBy={r.stats.endedBy} cleared={t('play.roundCleared')} over={r.stats.endedBy === 'void' ? t('summary.voided') : t('play.roundOver')} theme={theme} /> : null}
+      {r.intro && !ending ? <RuleCard key={r.intro.tag} copy={r.intro.copy} theme={theme} onAck={r.ackIntro} /> : null}
+
+      {ending ? (
+        <RoundOver
+          endedBy={r.stats.endedBy}
+          cleared={r.stats.cleared}
+          clearedLabel={t('play.roundCleared')}
+          over={r.stats.endedBy === 'void' ? t('summary.voided') : t('play.roundOver')}
+          theme={theme}
+        />
+      ) : null}
     </View>
   )
 }
@@ -649,13 +708,14 @@ function Burst({ ok }: { ok: boolean }) {
   )
 }
 
-function RoundOver({ endedBy, cleared, over, theme }: { endedBy: RoundStats['endedBy']; cleared: string; over: string; theme: GameTheme }) {
+/** "Cleared" is the engine's word (the cap reached with at least half right), not just the cap. */
+function RoundOver({ endedBy, cleared, clearedLabel, over, theme }: { endedBy: RoundStats['endedBy']; cleared: boolean; clearedLabel: string; over: string; theme: GameTheme }) {
   const pop = useMotion('pop', endedBy)
   const rise = useMotion('rise', endedBy)
   return (
     <CanvasOverlay testID="brain-round-over" theme={theme}>
       <Animated.View style={[styles.stamp, pop]}>
-        {endedBy === 'cap' ? (
+        {cleared ? (
           <Feather name="award" size={48} color={FX.gold} />
         ) : endedBy === 'lives' ? (
           <Feather name="heart" size={48} color={FX.heart} />
@@ -664,8 +724,95 @@ function RoundOver({ endedBy, cleared, over, theme }: { endedBy: RoundStats['end
         )}
       </Animated.View>
       <Animated.Text style={[styles.overlayTitle, rise]} accessibilityRole="header" maxFontSizeMultiplier={1.4}>
-        {endedBy === 'cap' ? cleared : over}
+        {cleared ? clearedLabel : over}
       </Animated.Text>
+    </CanvasOverlay>
+  )
+}
+
+/** In the hearts' place while no chance can be lost: practice, a rule's trial, placement. */
+function HudPill({ text, icon, testID }: { text: string; icon?: FeatherName; testID: string }) {
+  return (
+    <View style={styles.practicePill} accessible accessibilityLabel={text} testID={testID}>
+      {icon ? <Feather name={icon} size={15} color="#FFFFFF" /> : null}
+      <Text style={styles.practiceText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7} maxFontSizeMultiplier={HUD_SCALE}>
+        {text}
+      </Text>
+    </View>
+  )
+}
+
+/**
+ * A bigger board's notice — "What's new · Bigger grid" and its line — laid over the score row and
+ * the bars for a moment. It never moves the board, never covers the prompt or a tile, and never
+ * takes a touch.
+ */
+function BoardNotice({ title, body, theme }: { title: string; body: string; theme: GameTheme }) {
+  const pop = useMotion('pop', title)
+  return (
+    <View pointerEvents="none" style={styles.noticeWrap} accessibilityLiveRegion="polite" testID="brain-board-notice">
+      <Animated.View style={[styles.notice, { borderColor: theme.accent }, pop]} accessible accessibilityLabel={`${title}. ${body}`}>
+        <Text style={[styles.noticeTitle, { color: theme.cardFrom }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} maxFontSizeMultiplier={1.15}>
+          {title}
+        </Text>
+        <Text style={styles.noticeBody} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.8} maxFontSizeMultiplier={1.15}>
+          {body}
+        </Text>
+      </Animated.View>
+    </View>
+  )
+}
+
+/**
+ * A rule the player has not met yet: a white card over the board, which holds the trial with its
+ * clock stopped until "Got it". The trial after it is unscored (the card says so). The pause
+ * button is off meanwhile, and Android's back button waits for the card.
+ */
+function RuleCard({ copy, theme, onAck }: { copy: string; theme: GameTheme; onAck: () => void }) {
+  const { t } = useTranslation('brain')
+  const pop = useMotion('pop', copy)
+  const title = useRef<React.ComponentRef<typeof Text>>(null)
+  // Screen readers start on the card's title, not wherever they were on the board.
+  useEffect(() => {
+    const tm = setTimeout(() => {
+      if (title.current) AccessibilityInfo.sendAccessibilityEvent(title.current, 'focus')
+    }, 350)
+    return () => clearTimeout(tm)
+  }, [copy])
+  return (
+    <CanvasOverlay testID="brain-rule-card" theme={theme}>
+      <ScrollView style={styles.ruleScroll} contentContainerStyle={styles.ruleScrollContent} showsVerticalScrollIndicator={false} bounces={false}>
+        <Animated.View style={[styles.ruleCard, pop]}>
+          <View style={[styles.ruleLabel, { backgroundColor: theme.accent }]}>
+            <Feather name="info" size={14} color={CANVAS_INK} />
+            <Text style={styles.ruleLabelText} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+              {t('rule.label')}
+            </Text>
+          </View>
+          <Text ref={title} style={styles.ruleTitle} accessibilityRole="header" maxFontSizeMultiplier={1.4}>
+            {t(`mechanics.${copy}.title`)}
+          </Text>
+          <Text style={styles.ruleBody} maxFontSizeMultiplier={1.4}>
+            {t(`mechanics.${copy}.body`)}
+          </Text>
+          <Text style={styles.ruleNote} maxFontSizeMultiplier={1.4}>
+            {t('rule.unscored')}
+          </Text>
+          <Pressable
+            onPress={() => {
+              haptics.tap()
+              onAck()
+            }}
+            style={({ pressed }) => [styles.ruleButton, { backgroundColor: theme.cardFrom }, pressed && styles.ruleButtonPressed]}
+            accessibilityRole="button"
+            testID="brain-rule-ok"
+          >
+            <Text style={styles.ruleButtonText} numberOfLines={1} adjustsFontSizeToFit maxFontSizeMultiplier={1.3}>
+              {t('rule.gotIt')}
+            </Text>
+          </Pressable>
+        </Animated.View>
+      </ScrollView>
     </CanvasOverlay>
   )
 }
@@ -736,8 +883,42 @@ const styles = StyleSheet.create({
   streakHot: { boxShadow: '0 0 18px rgba(245,158,11,0.55)' },
   streakText: { color: '#FFFFFF', fontSize: 15, fontWeight: '800', flexShrink: 1 },
   streakMult: { color: 'rgba(255,255,255,0.85)', fontSize: 13, fontWeight: '700' },
-  practicePill: { height: 36, paddingHorizontal: 12, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.15)', justifyContent: 'center' },
-  practiceText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
+  practicePill: {
+    height: 36,
+    paddingHorizontal: 12,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    flexShrink: 1,
+  },
+  practiceText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700', flexShrink: 1 },
+  noticeWrap: { position: 'absolute', top: 0, left: PADDING, right: PADDING, alignItems: 'center', zIndex: 5, elevation: 5 },
+  notice: {
+    maxWidth: '100%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    borderWidth: 2,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    gap: 1,
+    boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
+  },
+  noticeTitle: { fontSize: 14, lineHeight: 18, fontWeight: '800' },
+  noticeBody: { color: '#334155', fontSize: 13, lineHeight: 17 },
+  ruleScroll: { width: '100%', maxWidth: 420, flexGrow: 0 },
+  ruleScrollContent: { flexGrow: 1, justifyContent: 'center', paddingVertical: 24 },
+  ruleCard: { backgroundColor: '#FFFFFF', borderRadius: 24, padding: 22, gap: 12, boxShadow: '0 24px 60px rgba(0,0,0,0.45)' },
+  ruleLabel: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
+  ruleLabelText: { color: CANVAS_INK, fontSize: 13, fontWeight: '800', letterSpacing: 0.3 },
+  ruleTitle: { color: CANVAS_INK, fontSize: 26, lineHeight: 32, fontWeight: '800', letterSpacing: -0.3 },
+  ruleBody: { color: '#334155', fontSize: 17, lineHeight: 25 },
+  ruleNote: { color: '#64748B', fontSize: 14, lineHeight: 20 },
+  ruleButton: { minHeight: 60, borderRadius: 18, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20, marginTop: 6 },
+  ruleButtonPressed: { transform: [{ scale: 0.97 }] },
+  ruleButtonText: { color: '#FFFFFF', fontSize: 20, fontWeight: '800' },
   hearts: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   heart: { width: 26, height: 26, alignItems: 'center', justifyContent: 'center' },
   bars: { paddingHorizontal: PADDING, paddingTop: 8, gap: 6 },

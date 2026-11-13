@@ -33,7 +33,7 @@
     "level": "Cấp {{level}}",
     "best": "Cao nhất cấp {{level}}",
     "new": "Mới",
-    "quickEyeLevel": "Màn {{stage}} · {{ms}} ms",
+    "quickEyeLevel": "Màn {{stage}} · tốc độ {{speed}}",
     "record": "Cao nhất {{value}} điểm",
     "settings": "Cài đặt",
     "research": "Cơ sở nghiên cứu",
@@ -169,7 +169,7 @@
       "6": "Trái",
       "7": "Trên bên trái"
     },
-    "flashMs": "Hiện {{ms}} ms"
+    "speedLevel": "Mức tốc độ {{level}}"
   },
   "summary": {
     "livesOut": "Kết thúc lượt",
@@ -208,6 +208,257 @@
     "speed": "Tốc độ",
     "stage": "Màn",
     "rounds": "Đã chơi",
-    "best": "Điểm cao nhất"
+    "best": "Điểm cao nhất",
+    "welcomeBack": "Chào mừng trở lại. Vài câu đầu sẽ tìm lại mức phù hợp.",
+    "firstPlacement": "Vài câu đầu sẽ tìm mức bắt đầu phù hợp."
+  },
+  "mechanics": {
+    "quickEye": {
+      "periphery": {
+        "title": "Tìm cả ngôi sao",
+        "body": "Một ngôi sao cũng hiện ra ở bên ngoài. Chọn hình ở giữa, rồi chọn phía có ngôi sao."
+      },
+      "distractors": {
+        "title": "Ngôi sao giữa các tam giác",
+        "body": "Các hình tam giác cũng hiện ra. Chọn phía có ngôi sao duy nhất."
+      },
+      "similar": {
+        "title": "Hình gần giống",
+        "body": "Góc hình vuông tròn dần, gần giống hình tròn hơn."
+      },
+      "sameDiff": {
+        "title": "Giống hay khác?",
+        "body": "Hai hình hiện ra ở giữa. Chọn xem chúng giống hay khác nhau."
+      }
+    },
+    "oddOneOut": {
+      "rotation": {
+        "title": "Hình bị xoay",
+        "body": "Tất cả là cùng một hình. Chạm vào hình quay khác hướng. Đôi khi cả bảng đều nghiêng."
+      },
+      "lookalike": {
+        "title": "Hình na ná",
+        "body": "Hình khác biệt ngày càng giống các hình còn lại."
+      },
+      "nearTwin": {
+        "title": "Gần như sinh đôi",
+        "body": "Chỉ khác một chi tiết nhỏ, như nụ cười hay kim đồng hồ."
+      },
+      "glyphs": {
+        "title": "Chữ dễ nhầm",
+        "body": "Những chữ trông giống nhau, như b và d hoặc 6 và 9."
+      }
+    },
+    "board": {
+      "biggerGrid": {
+        "title": "Bảng lớn hơn",
+        "body": "Giờ có nhiều ô hơn."
+      },
+      "moreNumbers": {
+        "title": "Thêm số",
+        "body": "Giờ có nhiều số hơn, thời gian cũng tăng theo."
+      },
+      "moreCards": {
+        "title": "Thêm thẻ",
+        "body": "Nhiều cặp hơn, thời gian và số lần được sai cũng tăng theo."
+      },
+      "moreChoices": {
+        "title": "Thêm lựa chọn",
+        "body": "Có thêm một màu để chọn."
+      }
+    },
+    "schulte": {
+      "descending": {
+        "title": "Đếm ngược",
+        "body": "Chạm từ số lớn nhất xuống đến 1."
+      },
+      "reshuffle": {
+        "title": "Số đổi chỗ",
+        "body": "Mỗi lần chạm, các số đổi chỗ. Bù lại, bảng nhỏ hơn một cỡ."
+      }
+    },
+    "memoryGrid": {
+      "fastShow": {
+        "title": "Hiện ngắn hơn",
+        "body": "Bảng đã lớn nhất. Từ giờ các ô sáng trong thời gian ngắn hơn."
+      }
+    },
+    "sequence": {
+      "reverse": {
+        "title": "Chạm ngược",
+        "body": "Chạm theo thứ tự ngược, bắt đầu từ ô sáng cuối cùng."
+      }
+    },
+    "series": {
+      "descending": {
+        "title": "Số giảm dần",
+        "body": "Các số cũng có thể giảm đều mỗi bước."
+      },
+      "geometric": {
+        "title": "Nhân lên",
+        "body": "Xuất hiện quy luật: mỗi số bằng số trước nhân với cùng một số."
+      },
+      "alternating": {
+        "title": "Lên rồi xuống",
+        "body": "Xuất hiện quy luật cộng rồi trừ xen kẽ."
+      },
+      "growing": {
+        "title": "Khoảng cách tăng dần",
+        "body": "Xuất hiện quy luật: số cộng thêm lớn dần mỗi lần."
+      },
+      "fibonacci": {
+        "title": "Hai số trước",
+        "body": "Xuất hiện quy luật: mỗi số bằng tổng hai số trước."
+      },
+      "squares": {
+        "title": "Bình phương",
+        "body": "Xuất hiện quy luật dựa trên số nhân với chính nó."
+      },
+      "interleaved": {
+        "title": "Hai dãy đan xen",
+        "body": "Hai quy luật thay phiên nhau. Hãy đọc cách một số."
+      },
+      "doublePlus": {
+        "title": "Gấp đôi rồi cộng",
+        "body": "Xuất hiện quy luật: số trước nhân đôi rồi cộng thêm cùng một số."
+      }
+    },
+    "pairs": {
+      "oneFamily": {
+        "title": "Cùng một chủ đề",
+        "body": "Giờ mọi hình đều thuộc một chủ đề, như con vật hay trái cây."
+      },
+      "noPreview": {
+        "title": "Không xem trước",
+        "body": "Không cho xem thẻ lúc đầu nữa. Hãy nhớ khi lật."
+      }
+    },
+    "stroop": {
+      "word": {
+        "title": "Đổi quy tắc",
+        "body": "Khi được hỏi chữ NÓI gì, hãy chọn màu mà chữ đó gọi tên, không phải màu mực."
+      }
+    },
+    "math": {
+      "sub": {
+        "title": "Có phép trừ",
+        "body": "Giờ có cả bài trừ."
+      },
+      "mul": {
+        "title": "Có phép nhân",
+        "body": "Giờ có cả bài nhân."
+      },
+      "div": {
+        "title": "Có phép chia",
+        "body": "Có cả bài chia. Kết quả luôn chia hết."
+      },
+      "twoStep": {
+        "title": "Hai bước",
+        "body": "Có bài phải tính hai bước. Nếu có + và × thì nhân trước; nếu có ? thì chọn số điền vào."
+      }
+    }
+  },
+  "rule": {
+    "label": "Quy tắc mới",
+    "gotIt": "Đã hiểu",
+    "unscored": "Câu này không tính điểm và không mất lượt.",
+    "change": "Điều mới"
+  },
+  "placement": {
+    "label": "Đang tìm mức bắt đầu",
+    "hint": "Vài câu để tìm mức phù hợp. Không mất lượt nào."
+  },
+  "tiers": {
+    "none": "Chưa có hạng",
+    "t1": "Đồng",
+    "t2": "Bạc",
+    "t3": "Vàng",
+    "t4": "Bạch kim",
+    "t5": "Kim cương",
+    "t6": "Bậc thầy",
+    "label": "Hạng",
+    "next": "Đến hạng tiếp theo",
+    "up": "Đạt hạng {{tier}}!",
+    "upBody": "Bạn đã đạt hạng {{tier}} ở {{game}}.",
+    "max": "Hạng cao nhất"
+  },
+  "achievements": {
+    "title": "Thành tích",
+    "earned": "Thành tích",
+    "locked": "Chưa đạt",
+    "firstClear": {
+      "title": "Hoàn thành vòng đầu",
+      "body": "Chơi hết một vòng."
+    },
+    "cleanRound": {
+      "title": "Hoàn thành không mất lượt",
+      "body": "Kết thúc một vòng mà không mất lượt nào."
+    },
+    "streak10": {
+      "title": "10 câu liên tiếp",
+      "body": "Trả lời đúng 10 câu liên tiếp."
+    },
+    "streak20": {
+      "title": "20 câu liên tiếp",
+      "body": "Trả lời đúng 20 câu liên tiếp."
+    },
+    "flawlessHunt": {
+      "title": "Không chạm sai",
+      "body": "Hoàn thành Tìm số 5×5 trở lên mà không chạm sai lần nào."
+    },
+    "span7": {
+      "title": "Nhớ được bảy",
+      "body": "Nhớ được 7 ô ở Nhớ thứ tự hoặc Ô sáng."
+    },
+    "quickEyeStage5": {
+      "title": "Nhanh mắt màn 5",
+      "body": "Lên đến màn 5 của Nhanh mắt."
+    },
+    "quickEyeStage10": {
+      "title": "Nhanh mắt màn 10",
+      "body": "Lên đến màn 10 của Nhanh mắt."
+    },
+    "allGames": {
+      "title": "Mọi trò chơi",
+      "body": "Đã thử cả 9 trò chơi."
+    },
+    "firstSession": {
+      "title": "Buổi đầu tiên",
+      "body": "Hoàn thành Bài luyện hôm nay lần đầu."
+    },
+    "weekGoal": {
+      "title": "3 lần tuần này",
+      "body": "Làm Bài luyện hôm nay 3 lần trong một tuần."
+    },
+    "coreCourse": {
+      "title": "Xong khóa cơ bản",
+      "body": "Hoàn thành khóa cơ bản 10 buổi."
+    },
+    "comeback": {
+      "title": "Trở lại",
+      "body": "Quay lại sau hơn 2 tuần và hoàn thành một buổi."
+    },
+    "goldTier": {
+      "title": "Vàng đầu tiên",
+      "body": "Đạt hạng Vàng ở một trò chơi."
+    },
+    "masterTier": {
+      "title": "Bậc thầy đầu tiên",
+      "body": "Đạt hạng Bậc thầy ở một trò chơi."
+    }
+  },
+  "breakdown": {
+    "title": "Chi tiết điểm",
+    "base": "Điểm cơ bản",
+    "speed": "Tốc độ",
+    "combo": "Liên tiếp",
+    "clear": "Thưởng hoàn thành",
+    "clean": "Thưởng không mất lượt",
+    "total": "Tổng"
+  },
+  "relax": {
+    "suggest": "Mấy vòng gần đây kết thúc sớm. Bật thêm thời gian nhé?",
+    "turnOn": "Bật thời gian ×1,5",
+    "on": "Đã bật thêm thời gian"
   }
 }

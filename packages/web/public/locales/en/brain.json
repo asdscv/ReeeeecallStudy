@@ -33,7 +33,7 @@
     "level": "Lv. {{level}}",
     "best": "Best Lv. {{level}}",
     "new": "New",
-    "quickEyeLevel": "Stage {{stage}} · {{ms}} ms",
+    "quickEyeLevel": "Stage {{stage}} · speed {{speed}}",
     "record": "Best {{value}} pts",
     "settings": "Settings",
     "research": "Research basis",
@@ -169,7 +169,7 @@
       "6": "Left",
       "7": "Up left"
     },
-    "flashMs": "Flash {{ms}} ms"
+    "speedLevel": "Speed level {{level}}"
   },
   "summary": {
     "livesOut": "Round over",
@@ -208,6 +208,257 @@
     "speed": "Speed",
     "stage": "Stage",
     "rounds": "Played",
-    "best": "Best score"
+    "best": "Best score",
+    "welcomeBack": "Welcome back. The first few questions will find your level again.",
+    "firstPlacement": "The first few questions find the right starting level."
+  },
+  "mechanics": {
+    "quickEye": {
+      "periphery": {
+        "title": "Find the star",
+        "body": "A star flashes outside too. Pick the centre picture, then the side the star was on."
+      },
+      "distractors": {
+        "title": "Star among triangles",
+        "body": "Triangles flash as well. Pick the side the one star was on."
+      },
+      "similar": {
+        "title": "Close shapes",
+        "body": "The square's corners get rounder, closer to a circle."
+      },
+      "sameDiff": {
+        "title": "Same or different?",
+        "body": "Two shapes flash in the centre. Say whether they match."
+      }
+    },
+    "oddOneOut": {
+      "rotation": {
+        "title": "The turned one",
+        "body": "All the same picture. Tap the one turned a different way. Sometimes the whole grid is tilted."
+      },
+      "lookalike": {
+        "title": "Look-alikes",
+        "body": "The odd one now looks more like the rest."
+      },
+      "nearTwin": {
+        "title": "Near twins",
+        "body": "Only a tiny detail differs, like a smile or a clock hand."
+      },
+      "glyphs": {
+        "title": "Tricky letters",
+        "body": "Letters that look alike, like b and d or 6 and 9."
+      }
+    },
+    "board": {
+      "biggerGrid": {
+        "title": "Bigger grid",
+        "body": "More cells now."
+      },
+      "moreNumbers": {
+        "title": "More numbers",
+        "body": "More numbers now, with more time to match."
+      },
+      "moreCards": {
+        "title": "More cards",
+        "body": "More pairs now, with more time and slips to match."
+      },
+      "moreChoices": {
+        "title": "More choices",
+        "body": "One more colour to choose from."
+      }
+    },
+    "schulte": {
+      "descending": {
+        "title": "Count down",
+        "body": "Tap from the biggest number down to 1."
+      },
+      "reshuffle": {
+        "title": "Shuffle mode",
+        "body": "Numbers move after every tap. The grid is one size smaller."
+      }
+    },
+    "memoryGrid": {
+      "fastShow": {
+        "title": "Shorter look",
+        "body": "The board is full size. Now the cells stay lit for less time."
+      }
+    },
+    "sequence": {
+      "reverse": {
+        "title": "Backwards",
+        "body": "Tap the tiles in reverse, starting from the last one lit."
+      }
+    },
+    "series": {
+      "descending": {
+        "title": "Going down",
+        "body": "Numbers can also shrink by the same amount each step."
+      },
+      "geometric": {
+        "title": "Multiply",
+        "body": "A rule where each number is the last one times the same number."
+      },
+      "alternating": {
+        "title": "Up and down",
+        "body": "A rule that adds, then subtracts, in turn."
+      },
+      "growing": {
+        "title": "Growing steps",
+        "body": "A rule where the amount added grows each time."
+      },
+      "fibonacci": {
+        "title": "The two before",
+        "body": "A rule where each number is the sum of the two before it."
+      },
+      "squares": {
+        "title": "Squares",
+        "body": "A rule built on numbers times themselves."
+      },
+      "interleaved": {
+        "title": "Two in one",
+        "body": "Two patterns take turns. Read every other number."
+      },
+      "doublePlus": {
+        "title": "Double and add",
+        "body": "A rule that doubles the last number, then adds the same amount."
+      }
+    },
+    "pairs": {
+      "oneFamily": {
+        "title": "One theme",
+        "body": "All pictures now come from one theme, like animals or fruit."
+      },
+      "noPreview": {
+        "title": "No peek",
+        "body": "No first look at the cards now. Learn them as you flip."
+      }
+    },
+    "stroop": {
+      "word": {
+        "title": "Rule switch",
+        "body": "When asked what it SAYS, pick the colour the word names, not its ink."
+      }
+    },
+    "math": {
+      "sub": {
+        "title": "Subtraction",
+        "body": "Take-away problems join the mix."
+      },
+      "mul": {
+        "title": "Multiplication",
+        "body": "Times problems join the mix."
+      },
+      "div": {
+        "title": "Division",
+        "body": "Sharing problems join. Answers always come out whole."
+      },
+      "twoStep": {
+        "title": "Two steps",
+        "body": "Problems with two steps now. With + and × together, do × first; with a ?, pick what fills it."
+      }
+    }
+  },
+  "rule": {
+    "label": "New rule",
+    "gotIt": "Got it",
+    "unscored": "This one doesn't count toward points or chances.",
+    "change": "What's new"
+  },
+  "placement": {
+    "label": "Finding your start",
+    "hint": "A few questions to find the right level. No chances are used."
+  },
+  "tiers": {
+    "none": "No tier yet",
+    "t1": "Bronze",
+    "t2": "Silver",
+    "t3": "Gold",
+    "t4": "Platinum",
+    "t5": "Diamond",
+    "t6": "Master",
+    "label": "Tier",
+    "next": "To the next tier",
+    "up": "{{tier}} reached!",
+    "upBody": "You reached {{tier}} in {{game}}.",
+    "max": "Top tier"
+  },
+  "achievements": {
+    "title": "Achievements",
+    "earned": "Achievement",
+    "locked": "Not yet",
+    "firstClear": {
+      "title": "First clear",
+      "body": "Played a round to the end."
+    },
+    "cleanRound": {
+      "title": "Clean clear",
+      "body": "Finished a round without losing a chance."
+    },
+    "streak10": {
+      "title": "10 in a row",
+      "body": "Got 10 right in a row."
+    },
+    "streak20": {
+      "title": "20 in a row",
+      "body": "Got 20 right in a row."
+    },
+    "flawlessHunt": {
+      "title": "No wrong taps",
+      "body": "Finished a 5×5 or bigger Number Hunt without a wrong tap."
+    },
+    "span7": {
+      "title": "Seven to remember",
+      "body": "Remembered 7 in Sequence or Flash Grid."
+    },
+    "quickEyeStage5": {
+      "title": "Quick Eye stage 5",
+      "body": "Reached stage 5 of Quick Eye."
+    },
+    "quickEyeStage10": {
+      "title": "Quick Eye stage 10",
+      "body": "Reached stage 10 of Quick Eye."
+    },
+    "allGames": {
+      "title": "Every game",
+      "body": "Tried all 9 games."
+    },
+    "firstSession": {
+      "title": "First session",
+      "body": "Finished Today's Training for the first time."
+    },
+    "weekGoal": {
+      "title": "3 this week",
+      "body": "Did Today's Training 3 times in one week."
+    },
+    "coreCourse": {
+      "title": "Core course done",
+      "body": "Finished the 10-session core course."
+    },
+    "comeback": {
+      "title": "Back again",
+      "body": "Came back after more than 2 weeks and finished a session."
+    },
+    "goldTier": {
+      "title": "First Gold",
+      "body": "Reached Gold in a game."
+    },
+    "masterTier": {
+      "title": "First Master",
+      "body": "Reached Master in a game."
+    }
+  },
+  "breakdown": {
+    "title": "Score breakdown",
+    "base": "Base",
+    "speed": "Speed",
+    "combo": "Run",
+    "clear": "Clear bonus",
+    "clean": "Clean bonus",
+    "total": "Total"
+  },
+  "relax": {
+    "suggest": "Your last rounds ended early. Want to turn on extra time?",
+    "turnOn": "Turn on 1.5× time",
+    "on": "Extra time is on"
   }
 }

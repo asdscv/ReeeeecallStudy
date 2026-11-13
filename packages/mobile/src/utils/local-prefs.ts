@@ -26,6 +26,7 @@ const KEYS = {
   // Suffixed with the user id — SecureStore keys allow [A-Za-z0-9._-], which a UUID fits.
   brainProgress: 'brain-progress',
   brainHistory: 'brain-history',
+  brainMeta: 'brain-meta',
 } as const
 
 function read(key: string): string | null {
@@ -91,5 +92,22 @@ export const localPrefs = {
   },
   setBrainHistory(userId: string, raw: string): void {
     write(`${KEYS.brainHistory}.${userId}`, raw)
+  },
+
+  /**
+   * Brain-game meta (skill estimates, tiers, rules seen, achievements), per user — a third value,
+   * because progress is already near SecureStore's ~2KB per value (see meta.ts; ~400B worst case).
+   */
+  getBrainMeta(userId: string): string | null {
+    return read(`${KEYS.brainMeta}.${userId}`)
+  },
+  setBrainMeta(userId: string, raw: string): void {
+    write(`${KEYS.brainMeta}.${userId}`, raw)
+  },
+  /** The account was deleted: its brain record leaves this device too. */
+  clearBrain(userId: string): void {
+    for (const k of [KEYS.brainProgress, KEYS.brainHistory, KEYS.brainMeta]) {
+      SecureStore.deleteItemAsync(`${k}.${userId}`).catch(() => {})
+    }
   },
 }

@@ -33,7 +33,7 @@
     "level": "Lv. {{level}}",
     "best": "Terbaik Lv. {{level}}",
     "new": "Baru",
-    "quickEyeLevel": "Tahap {{stage}} · {{ms}} md",
+    "quickEyeLevel": "Tahap {{stage}} · kecepatan {{speed}}",
     "record": "Terbaik {{value}} poin",
     "settings": "Pengaturan",
     "research": "Dasar penelitian",
@@ -169,7 +169,7 @@
       "6": "Kiri",
       "7": "Kiri atas"
     },
-    "flashMs": "Kilatan {{ms}} md"
+    "speedLevel": "Level kecepatan {{level}}"
   },
   "summary": {
     "livesOut": "Ronde selesai",
@@ -208,6 +208,257 @@
     "speed": "Kecepatan",
     "stage": "Tahap",
     "rounds": "Dimainkan",
-    "best": "Skor terbaik"
+    "best": "Skor terbaik",
+    "welcomeBack": "Selamat datang kembali. Beberapa soal pertama akan menemukan levelmu lagi.",
+    "firstPlacement": "Beberapa soal pertama mencari level awal yang pas."
+  },
+  "mechanics": {
+    "quickEye": {
+      "periphery": {
+        "title": "Cari bintangnya",
+        "body": "Sebuah bintang juga muncul di luar. Pilih gambar tengah, lalu sisi tempat bintang itu muncul."
+      },
+      "distractors": {
+        "title": "Bintang di antara segitiga",
+        "body": "Segitiga juga muncul. Pilih sisi tempat satu bintang itu muncul."
+      },
+      "similar": {
+        "title": "Bentuk mirip",
+        "body": "Sudut persegi makin membulat sehingga makin mirip lingkaran."
+      },
+      "sameDiff": {
+        "title": "Sama atau beda?",
+        "body": "Dua bentuk muncul di tengah. Pilih apakah keduanya sama."
+      }
+    },
+    "oddOneOut": {
+      "rotation": {
+        "title": "Yang terputar",
+        "body": "Semua gambarnya sama. Ketuk yang menghadap arah lain. Kadang seluruh papan miring."
+      },
+      "lookalike": {
+        "title": "Mirip",
+        "body": "Yang berbeda makin mirip dengan yang lain."
+      },
+      "nearTwin": {
+        "title": "Hampir kembar",
+        "body": "Hanya detail kecil yang berbeda, seperti senyum atau jarum jam."
+      },
+      "glyphs": {
+        "title": "Huruf yang mengecoh",
+        "body": "Huruf yang mirip, seperti b dan d atau 6 dan 9."
+      }
+    },
+    "board": {
+      "biggerGrid": {
+        "title": "Papan lebih besar",
+        "body": "Sekarang kotaknya lebih banyak."
+      },
+      "moreNumbers": {
+        "title": "Angka bertambah",
+        "body": "Angkanya lebih banyak, waktunya juga bertambah."
+      },
+      "moreCards": {
+        "title": "Kartu bertambah",
+        "body": "Pasangannya lebih banyak, dengan waktu dan kesempatan salah yang ikut bertambah."
+      },
+      "moreChoices": {
+        "title": "Pilihan bertambah",
+        "body": "Ada satu warna lagi untuk dipilih."
+      }
+    },
+    "schulte": {
+      "descending": {
+        "title": "Hitung mundur",
+        "body": "Ketuk dari angka terbesar sampai 1."
+      },
+      "reshuffle": {
+        "title": "Mode acak",
+        "body": "Posisi angka berubah setiap kali diketuk. Sebagai gantinya, papannya satu ukuran lebih kecil."
+      }
+    },
+    "memoryGrid": {
+      "fastShow": {
+        "title": "Tampil lebih singkat",
+        "body": "Papan sudah paling besar. Sekarang kotak menyala lebih singkat."
+      }
+    },
+    "sequence": {
+      "reverse": {
+        "title": "Terbalik",
+        "body": "Ketuk kotak dengan urutan terbalik, mulai dari yang terakhir menyala."
+      }
+    },
+    "series": {
+      "descending": {
+        "title": "Angka menurun",
+        "body": "Angka juga bisa berkurang dengan jumlah yang sama tiap langkah."
+      },
+      "geometric": {
+        "title": "Kali",
+        "body": "Muncul aturan: tiap angka adalah angka sebelumnya dikali angka yang sama."
+      },
+      "alternating": {
+        "title": "Naik turun",
+        "body": "Muncul aturan yang menambah lalu mengurangi secara bergantian."
+      },
+      "growing": {
+        "title": "Selisih bertambah",
+        "body": "Muncul aturan: angka yang ditambahkan makin besar tiap kali."
+      },
+      "fibonacci": {
+        "title": "Dua angka sebelumnya",
+        "body": "Muncul aturan: tiap angka adalah jumlah dua angka sebelumnya."
+      },
+      "squares": {
+        "title": "Kuadrat",
+        "body": "Muncul aturan yang memakai angka dikali dirinya sendiri."
+      },
+      "interleaved": {
+        "title": "Dua jadi satu",
+        "body": "Dua aturan bergantian. Baca selang satu angka."
+      },
+      "doublePlus": {
+        "title": "Dua kali lalu tambah",
+        "body": "Muncul aturan: angka sebelumnya dikali dua lalu ditambah jumlah yang sama."
+      }
+    },
+    "pairs": {
+      "oneFamily": {
+        "title": "Satu tema",
+        "body": "Sekarang semua gambar dari satu tema, seperti hewan atau buah."
+      },
+      "noPreview": {
+        "title": "Tanpa intip",
+        "body": "Kartu tidak diperlihatkan di awal. Ingat sambil membaliknya."
+      }
+    },
+    "stroop": {
+      "word": {
+        "title": "Aturan berganti",
+        "body": "Saat diminta ARTI kata, pilih warna yang disebut kata itu, bukan warna tintanya."
+      }
+    },
+    "math": {
+      "sub": {
+        "title": "Ada pengurangan",
+        "body": "Sekarang ada soal pengurangan juga."
+      },
+      "mul": {
+        "title": "Ada perkalian",
+        "body": "Sekarang ada soal perkalian juga."
+      },
+      "div": {
+        "title": "Ada pembagian",
+        "body": "Ada soal pembagian juga. Hasilnya selalu bulat."
+      },
+      "twoStep": {
+        "title": "Dua langkah",
+        "body": "Sekarang ada soal dua langkah. Jika ada + dan ×, kerjakan × dulu; jika ada ?, pilih angka yang mengisinya."
+      }
+    }
+  },
+  "rule": {
+    "label": "Aturan baru",
+    "gotIt": "Mengerti",
+    "unscored": "Soal ini tidak dihitung untuk skor maupun kesempatan.",
+    "change": "Yang baru"
+  },
+  "placement": {
+    "label": "Mencari level awalmu",
+    "hint": "Beberapa soal untuk menemukan level yang pas. Kesempatan tidak berkurang."
+  },
+  "tiers": {
+    "none": "Belum ada peringkat",
+    "t1": "Perunggu",
+    "t2": "Perak",
+    "t3": "Emas",
+    "t4": "Platinum",
+    "t5": "Berlian",
+    "t6": "Master",
+    "label": "Peringkat",
+    "next": "Menuju peringkat berikutnya",
+    "up": "{{tier}} tercapai!",
+    "upBody": "Kamu mencapai {{tier}} di {{game}}.",
+    "max": "Peringkat tertinggi"
+  },
+  "achievements": {
+    "title": "Pencapaian",
+    "earned": "Pencapaian",
+    "locked": "Belum",
+    "firstClear": {
+      "title": "Ronde pertama tuntas",
+      "body": "Memainkan satu ronde sampai selesai."
+    },
+    "cleanRound": {
+      "title": "Tuntas tanpa salah",
+      "body": "Menyelesaikan ronde tanpa kehilangan kesempatan."
+    },
+    "streak10": {
+      "title": "10 beruntun",
+      "body": "Menjawab benar 10 kali berturut-turut."
+    },
+    "streak20": {
+      "title": "20 beruntun",
+      "body": "Menjawab benar 20 kali berturut-turut."
+    },
+    "flawlessHunt": {
+      "title": "Tanpa salah ketuk",
+      "body": "Menyelesaikan Buru Angka 5×5 atau lebih tanpa salah ketuk."
+    },
+    "span7": {
+      "title": "Tujuh dalam ingatan",
+      "body": "Mengingat 7 di Urutan atau Kotak Kilat."
+    },
+    "quickEyeStage5": {
+      "title": "Mata Cepat tahap 5",
+      "body": "Mencapai tahap 5 Mata Cepat."
+    },
+    "quickEyeStage10": {
+      "title": "Mata Cepat tahap 10",
+      "body": "Mencapai tahap 10 Mata Cepat."
+    },
+    "allGames": {
+      "title": "Semua game",
+      "body": "Mencoba ke-9 game."
+    },
+    "firstSession": {
+      "title": "Sesi pertama",
+      "body": "Menyelesaikan Latihan hari ini untuk pertama kalinya."
+    },
+    "weekGoal": {
+      "title": "3 kali minggu ini",
+      "body": "Melakukan Latihan hari ini 3 kali dalam seminggu."
+    },
+    "coreCourse": {
+      "title": "Kursus dasar selesai",
+      "body": "Menyelesaikan kursus dasar 10 sesi."
+    },
+    "comeback": {
+      "title": "Kembali lagi",
+      "body": "Kembali setelah lebih dari 2 minggu dan menyelesaikan satu sesi."
+    },
+    "goldTier": {
+      "title": "Emas pertama",
+      "body": "Mencapai Emas di satu game."
+    },
+    "masterTier": {
+      "title": "Master pertama",
+      "body": "Mencapai Master di satu game."
+    }
+  },
+  "breakdown": {
+    "title": "Rincian skor",
+    "base": "Dasar",
+    "speed": "Kecepatan",
+    "combo": "Beruntun",
+    "clear": "Bonus tuntas",
+    "clean": "Bonus tanpa salah",
+    "total": "Total"
+  },
+  "relax": {
+    "suggest": "Beberapa ronde terakhirmu cepat berakhir. Mau tambah waktu?",
+    "turnOn": "Aktifkan waktu 1,5×",
+    "on": "Waktu tambahan aktif"
   }
 }

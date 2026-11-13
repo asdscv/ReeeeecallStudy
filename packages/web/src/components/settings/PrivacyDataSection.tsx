@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { supabase } from '../../lib/supabase'
 import { useAuthStore } from '../../stores/auth-store'
+import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
+import { forgetBrainOnDevice } from '../brain/brain-ui'
 import { isAnalyticsOptedOut, setAnalyticsOptOut } from '../../lib/analytics-consent'
 
 // Privacy & data controls (GDPR): analytics opt-out (stops client-side telemetry) and
@@ -32,6 +34,9 @@ export function PrivacyDataSection() {
         setDeleting(false)
         return
       }
+      const uid = useAuthStore.getState().user?.id
+      useBrainStore.getState().resetForSignOut()
+      if (uid) forgetBrainOnDevice(uid)
       await signOut()
       navigate('/')
     } catch {

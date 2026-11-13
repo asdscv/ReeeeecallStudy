@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useReducedMotion } from 'motion/react'
-import { X, Pause, Play, Heart, Flame, Check, Trophy, Flag, HeartCrack, Volume2, VolumeX } from 'lucide-react'
+import { X, Pause, Play, Heart, Flame, Check, Trophy, Flag, HeartCrack, Volume2, VolumeX, Lightbulb, Compass } from 'lucide-react'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
-import { GAME_THEMES, comboMultiplier, maxColsFor, quickEyeMsAt, streakTier, type BrainGameId, type GameTheme } from '@reeeeecall/shared/lib/brain-games'
+import { GAME_THEMES, comboMultiplier, maxColsFor, streakTier, type BrainGameId, type GameTheme } from '@reeeeecall/shared/lib/brain-games'
 import { useBrainRound, type RoundStats } from '@reeeeecall/shared/hooks/useBrainRound'
 import { useBrainFx, type BrainFx } from '@reeeeecall/shared/hooks/useBrainFx'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
 import { BrainBoard } from './BrainBoard'
 import { Countdown, GameCanvas } from './GameCanvas'
 import { webPlatform } from './brain-ui'
+import { RuleCard } from './RuleCard'
+import { quickEyeSpeedLevel } from './tier-ui'
 import { sfx } from './sfx'
 
 /**
@@ -134,6 +136,17 @@ function Round({ gameId, onOver, caption, width, theme }: { gameId: BrainGameId;
     const tm = setTimeout(() => setBurst(null), 650)
     return () => clearTimeout(tm)
   }, [burst])
+  // A bigger board's notice shows for a few seconds after it first appears (a new `id`), then goes —
+  // its seconds counted from when a rule card on the same trial has been read, not under the card.
+  const toastId = r.toast?.id ?? null
+  const ruleUp = r.intro !== null
+  const [toastGone, setToastGone] = useState<number | null>(null)
+  useEffect(() => {
+    if (toastId === null || ruleUp) return
+    const tm = setTimeout(() => setToastGone(toastId), 3200)
+    return () => clearTimeout(tm)
+  }, [toastId, ruleUp])
+  const toast = r.toast && !ruleUp && r.toast.id !== toastGone ? r.toast : null
 
   // On `done`, not `over`: one render later the personal-best flag is settled. A round that ran
   // out holds its "round over" stamp for a moment first.
@@ -210,7 +223,12 @@ function Round({ gameId, onOver, caption, width, theme }: { gameId: BrainGameId;
     return () => window.removeEventListener('keydown', onKey)
   })
 
-  const levelText = gameId === 'quickEye' ? `${t('quickEye.stage', { stage: variant })} · ${t('quickEye.flashMs', { ms: quickEyeMsAt(r.level) })}` : t('home.level', { level: r.level.toFixed(1) })
+  // While placement finds the start, the level jumps around: it is not shown (not read as a score).
+  const levelText = r.placing
+    ? null
+    : gameId === 'quickEye'
+      ? `${t('quickEye.stage', { stage: variant })} · ${t('quickEye.speedLevel', { level: quickEyeSpeedLevel(r.level) })}`
+      : t('home.level', { level: r.level.toFixed(1) })
   const resultText = !r.result
     ? null
     : r.result.void
@@ -223,7 +241,9 @@ function Round({ gameId, onOver, caption, width, theme }: { gameId: BrainGameId;
             : t('play.timeUp')
           : t('play.wrong')
   const tier = streakTier(r.stats.streak)
-  const capProgress = r.roundCap !== null && !r.practice ? r.trialInRound / r.roundCap : null
+  const capProgress = r.roundCap !== null && !r.practice && !r.placing ? r.trialInRound / r.roundCap : null
+  // Under the score row: what kind of trial this is, when it is not a counted one.
+  const hint = r.trialKind === 'practice' ? t('play.practiceHint') : r.trialKind === 'intro' ? t('rule.unscored') : r.placing ? t('placement.hint') : null
 
   return (
     <>
@@ -241,7 +261,7 @@ function Round({ gameId, onOver, caption, width, theme }: { gameId: BrainGameId;
         <div className="flex-1 min-w-0 text-center">
           {caption && <p className="text-sm text-white/70 truncate">{caption}</p>}
           <h1 className="text-lg font-bold truncate">{t(`games.${gameId}.name`)}</h1>
-          <p className="text-sm font-medium" style={{ color: theme.accent }} data-testid="brain-level">{levelText}</p>
+          {levelText && <p className="text-sm font-medium" style={{ color: theme.accent }} data-testid="brain-level">{levelText}</p>}
         </div>
         <button
           type="button"
@@ -255,84 +275,109 @@ function Round({ gameId, onOver, caption, width, theme }: { gameId: BrainGameId;
         </button>
       </header>
 
-      {/* Score, run and chances. */}
-      <div className="flex items-center justify-between gap-3 min-h-12">
-        <div className="relative min-w-16">
-          <p className="text-3xl font-black tabular-nums leading-none" style={{ textShadow: `0 0 24px ${theme.glow}` }} data-testid="brain-score">
-            {formatCount(r.stats.points)}
-          </p>
-          <p className="text-xs font-semibold uppercase tracking-wider text-white/60 mt-1">{t('play.score')}</p>
-          {pops.map((p) => (
-            <span
-              key={p.id}
-              className="absolute top-0 text-xl font-extrabold pointer-events-none whitespace-nowrap"
-              style={{ left: 'calc(100% + 8px)', color: theme.accent, animation: reduced ? 'none' : 'bfx-float 900ms ease-out forwards' }}
-              onAnimationEnd={() => setPops((list) => list.filter((x) => x.id !== p.id))}
-              aria-hidden="true"
+      {/* Score, run and chances, then the round's bars — a bigger board's notice lies over them for a moment. */}
+      <div className="relative">
+        <div className="flex items-center justify-between gap-3 min-h-12">
+          <div className="relative min-w-16">
+            <p className="text-3xl font-black tabular-nums leading-none" style={{ textShadow: `0 0 24px ${theme.glow}` }} data-testid="brain-score">
+              {formatCount(r.stats.points)}
+            </p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-white/60 mt-1">{t('play.score')}</p>
+            {pops.map((p) => (
+              <span
+                key={p.id}
+                className="absolute top-0 text-xl font-extrabold pointer-events-none whitespace-nowrap"
+                style={{ left: 'calc(100% + 8px)', color: theme.accent, animation: reduced ? 'none' : 'bfx-float 900ms ease-out forwards' }}
+                onAnimationEnd={() => setPops((list) => list.filter((x) => x.id !== p.id))}
+                aria-hidden="true"
+              >
+                {p.text}
+              </span>
+            ))}
+          </div>
+
+          {tier > 0 && !r.practice ? (
+            <div
+              key={`streak-${tier}`}
+              className="bfx-pop flex items-center gap-1 px-3 h-10 rounded-full text-base font-bold whitespace-nowrap shrink-0"
+              style={{ background: tier >= 3 ? 'linear-gradient(90deg,#F59E0B,#EF4444)' : tier === 2 ? 'rgba(251,146,60,0.9)' : 'rgba(255,255,255,0.14)' }}
+              aria-label={t('play.streakCount', { value: r.stats.streak })}
+              data-testid="brain-streak"
             >
-              {p.text}
+              <Flame className="w-5 h-5" aria-hidden="true" />
+              {/* Narrow phones get the flame and the number; the words and multiplier from sm up. */}
+              <span className="sm:hidden tabular-nums" aria-hidden="true">{r.stats.streak}</span>
+              <span className="hidden sm:inline" aria-hidden="true">{t('play.streakCount', { value: r.stats.streak })}</span>
+              <span className="hidden sm:inline text-white/80 text-sm" aria-hidden="true">×{comboMultiplier(r.stats.streak)}</span>
+            </div>
+          ) : (
+            <div />
+          )}
+
+          {r.trialKind === 'practice' ? (
+            <p className="text-sm font-semibold px-3 h-10 flex items-center rounded-full bg-white/15" data-testid="brain-lives">
+              {t('play.practice', { done: Math.min(r.practiceTotal, r.practiceDone + (r.result ? 0 : 1)), total: r.practiceTotal })}
+            </p>
+          ) : r.trialKind === 'intro' ? (
+            <p className="text-sm font-semibold px-3 h-10 flex items-center gap-1.5 rounded-full whitespace-nowrap" style={{ background: theme.accent, color: theme.cardTo }} data-testid="brain-lives">
+              <Lightbulb className="w-4 h-4" aria-hidden="true" />
+              {t('rule.label')}
+            </p>
+          ) : r.placing ? (
+            <p className="text-sm font-semibold px-3 h-10 flex items-center gap-1.5 rounded-full bg-white/15 whitespace-nowrap" data-testid="brain-lives">
+              <Compass className="w-4 h-4" aria-hidden="true" />
+              {t('placement.label')}
+            </p>
+          ) : (
+            <span
+              key={`hearts-${heartHit}`}
+              className={`flex items-center gap-1 shrink-0 ${heartHit ? 'bfx-shake' : ''}`}
+              role="img"
+              aria-label={t(r.group === 'span' ? 'play.livesSpan' : 'play.lives', { value: liveLives })}
+              data-testid="brain-lives"
+            >
+              {Array.from({ length: r.maxLives }, (_, i) =>
+                i < liveLives ? (
+                  <Heart key={i} className={`${r.maxLives > 3 ? 'w-5 h-5' : 'w-6 h-6'} fill-[#FB7185] text-[#FB7185] drop-shadow-[0_0_8px_rgba(251,113,133,0.6)]`} aria-hidden="true" />
+                ) : (
+                  <HeartCrack key={i} className={`${r.maxLives > 3 ? 'w-5 h-5' : 'w-6 h-6'} text-white/30`} aria-hidden="true" />
+                ),
+              )}
             </span>
-          ))}
+          )}
         </div>
 
-        {tier > 0 && !r.practice ? (
-          <div
-            key={tier}
-            className="bfx-pop flex items-center gap-1 px-3 h-10 rounded-full text-base font-bold whitespace-nowrap shrink-0"
-            style={{ background: tier >= 3 ? 'linear-gradient(90deg,#F59E0B,#EF4444)' : tier === 2 ? 'rgba(251,146,60,0.9)' : 'rgba(255,255,255,0.14)' }}
-            aria-label={t('play.streakCount', { value: r.stats.streak })}
-            data-testid="brain-streak"
-          >
-            <Flame className="w-5 h-5" aria-hidden="true" />
-            {/* Narrow phones get the flame and the number; the words and multiplier from sm up. */}
-            <span className="sm:hidden tabular-nums" aria-hidden="true">{r.stats.streak}</span>
-            <span className="hidden sm:inline" aria-hidden="true">{t('play.streakCount', { value: r.stats.streak })}</span>
-            <span className="hidden sm:inline text-white/80 text-sm" aria-hidden="true">×{comboMultiplier(r.stats.streak)}</span>
-          </div>
-        ) : (
-          <div />
-        )}
+        {hint && <p className="text-center text-sm text-white/75 mt-1" data-testid="brain-trial-hint">{hint}</p>}
 
-        {r.practice ? (
-          <p className="text-sm font-semibold px-3 h-10 flex items-center rounded-full bg-white/15" data-testid="brain-lives">
-            {t('play.practice', { done: Math.min(r.practiceTotal, r.practiceDone + (r.result ? 0 : 1)), total: r.practiceTotal })}
-          </p>
-        ) : (
-          <span
-            key={heartHit}
-            className={`flex items-center gap-1 shrink-0 ${heartHit ? 'bfx-shake' : ''}`}
-            role="img"
-            aria-label={t(r.group === 'span' ? 'play.livesSpan' : 'play.lives', { value: liveLives })}
-            data-testid="brain-lives"
-          >
-            {Array.from({ length: r.maxLives }, (_, i) =>
-              i < liveLives ? (
-                <Heart key={i} className={`${r.maxLives > 3 ? 'w-5 h-5' : 'w-6 h-6'} fill-[#FB7185] text-[#FB7185] drop-shadow-[0_0_8px_rgba(251,113,133,0.6)]`} aria-hidden="true" />
-              ) : (
-                <HeartCrack key={i} className={`${r.maxLives > 3 ? 'w-5 h-5' : 'w-6 h-6'} text-white/30`} aria-hidden="true" />
-              ),
-            )}
-          </span>
-        )}
-      </div>
-
-      {r.practice && <p className="text-center text-sm text-white/75 mt-1">{t('play.practiceHint')}</p>}
-
-      {/* The round's progress (capped rounds), then this trial's clock. */}
-      <div className="mt-3 space-y-1.5">
-        {capProgress !== null && (
-          <div
-            className="h-1.5 rounded-full bg-white/10 overflow-hidden"
-            role="progressbar"
-            aria-valuemin={0}
-            aria-valuemax={r.roundCap ?? 0}
-            aria-valuenow={r.trialInRound}
-            aria-label={t('play.trial', { done: r.trialInRound, total: r.roundCap ?? 0 })}
-          >
-            <div className="h-full rounded-full transition-[width] duration-300" style={{ width: `${capProgress * 100}%`, background: 'rgba(255,255,255,0.55)' }} />
-          </div>
-        )}
-        <TimerBar key={r.trialId} timer={r.timer} accent={theme.accent} />
+        {/* The round's progress (capped rounds), then this trial's clock. */}
+        <div className="mt-3 space-y-1.5">
+          {capProgress !== null && (
+            <div
+              className="h-1.5 rounded-full bg-white/10 overflow-hidden"
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={r.roundCap ?? 0}
+              aria-valuenow={r.trialInRound}
+              aria-label={t('play.trial', { done: r.trialInRound, total: r.roundCap ?? 0 })}
+            >
+              <div className="h-full rounded-full transition-[width] duration-300" style={{ width: `${capProgress * 100}%`, background: 'rgba(255,255,255,0.55)' }} />
+            </div>
+          )}
+          <TimerBar key={r.trialId} timer={r.timer} accent={theme.accent} />
+        </div>
+        {/* A bigger board's notice: over the score row and the bars, just under the header, for a few
+            seconds — never over the prompt or the board, and never in the way of a tap. At most three
+            lines of body, so it stays inside the HUD and the gap above the prompt. */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex justify-center" role="status" aria-live="polite">
+          {toast && (
+            <p key={toast.id} className="bfx-pop max-w-[min(100%,26rem)] px-4 py-1.5 rounded-2xl bg-slate-950/90 border border-white/15 backdrop-blur-sm text-center shadow-[0_10px_30px_rgba(0,0,0,0.35)]" data-testid="brain-toast">
+              <span className="block truncate text-sm leading-5 font-bold" style={{ color: theme.accent }}>
+                {t('rule.change')} · {t(`mechanics.${toast.copy}.title`)}
+              </span>
+              <span className="block line-clamp-3 text-[13px] leading-[17px] text-white/85">{t(`mechanics.${toast.copy}.body`)}</span>
+            </p>
+          )}
+        </div>
       </div>
 
       <section className="relative flex flex-col items-center justify-center gap-5 pt-6 pb-10">
@@ -340,10 +385,11 @@ function Round({ gameId, onOver, caption, width, theme }: { gameId: BrainGameId;
           {t(r.view.prompt.key, r.view.prompt.params)}
         </p>
         <div className="relative w-full">
-          <BrainBoard key={r.trialId} view={r.view} onTap={r.tap} onExposure={r.reportExposure} width={width} theme={theme} />
+          {/* Sibling keys share one namespace: trial ids and effect ids both count from 1. */}
+          <BrainBoard key={`board-${r.trialId}`} view={r.view} onTap={r.tap} onExposure={r.reportExposure} width={width} theme={theme} />
           {/* Level-up and streak news, over the top of the board — the prompt and the verdict line stay readable. */}
           {banner && (
-            <div key={banner.id} className="pointer-events-none absolute inset-x-0 top-3 z-10 flex justify-center" role="status">
+            <div key={`banner-${banner.id}`} className="pointer-events-none absolute inset-x-0 top-3 z-10 flex justify-center" role="status">
               <span className="bfx-pop px-5 py-2.5 rounded-full text-lg font-extrabold text-slate-900 shadow-[0_10px_30px_rgba(0,0,0,0.35)]" style={{ background: `linear-gradient(90deg, #FDE68A, ${theme.accent})` }} data-testid="brain-banner">
                 {banner.text}
               </span>
@@ -351,7 +397,7 @@ function Round({ gameId, onOver, caption, width, theme }: { gameId: BrainGameId;
           )}
           {/* The verdict, big and brief, over the board. */}
           {burst && (
-            <div key={burst.id} className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
+            <div key={`burst-${burst.id}`} className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
               <span
                 className="bfx-pop flex items-center justify-center w-24 h-24 rounded-full"
                 style={{ background: burst.ok ? 'rgba(34,197,94,0.92)' : 'rgba(239,68,68,0.92)', boxShadow: burst.ok ? '0 0 60px rgba(34,197,94,0.6)' : '0 0 60px rgba(239,68,68,0.5)', animation: 'bfx-pop 240ms cubic-bezier(.2,.9,.3,1.3), bfx-pulse 650ms ease-out' }}
@@ -374,6 +420,9 @@ function Round({ gameId, onOver, caption, width, theme }: { gameId: BrainGameId;
           )}
         </div>
       </section>
+
+      {/* A rule met for the first time: the trial waits, clock stopped, until the player has read it. */}
+      {r.intro && !r.over && <RuleCard key={r.intro.tag} copy={r.intro.copy} theme={theme} onAck={r.ackIntro} />}
 
       {r.paused && !sheetWanted && (
         <Overlay testId="brain-paused">
@@ -419,9 +468,9 @@ function Round({ gameId, onOver, caption, width, theme }: { gameId: BrainGameId;
       {ending && (
         <Overlay testId="brain-round-over">
           <span className="bfx-pop flex items-center justify-center w-24 h-24 rounded-full bg-white/15">
-            {r.stats.endedBy === 'cap' ? <Trophy className="w-12 h-12" style={{ color: '#FDE68A' }} aria-hidden="true" /> : r.stats.endedBy === 'lives' ? <HeartCrack className="w-12 h-12 text-[#FB7185]" aria-hidden="true" /> : <Flag className="w-12 h-12" aria-hidden="true" />}
+            {r.stats.cleared ? <Trophy className="w-12 h-12" style={{ color: '#FDE68A' }} aria-hidden="true" /> : r.stats.endedBy === 'lives' ? <HeartCrack className="w-12 h-12 text-[#FB7185]" aria-hidden="true" /> : <Flag className="w-12 h-12" aria-hidden="true" />}
           </span>
-          <p className="bfx-rise text-3xl font-extrabold text-center">{r.stats.endedBy === 'cap' ? t('play.roundCleared') : r.stats.endedBy === 'void' ? t('summary.voided') : t('play.roundOver')}</p>
+          <p className="bfx-rise text-3xl font-extrabold text-center">{r.stats.endedBy === 'void' ? t('summary.voided') : r.stats.cleared ? t('play.roundCleared') : t('play.roundOver')}</p>
         </Overlay>
       )}
     </>
