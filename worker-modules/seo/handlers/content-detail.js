@@ -1,3 +1,4 @@
+import { brainGuideFromTags } from '../../../packages/shared/lib/brain-content.ts'
 import { contentCanonicalUrl } from '../../../packages/shared/lib/content-canonical.ts'
 // Content detail page bot handler — extracted from worker.js handleContentDetailBot
 import {
@@ -93,7 +94,7 @@ export async function handleContentDetailBot(slug, url, env) {
   const tags = article.tags || []
   const articleSection = tags[0] || 'Education'
   const deckLink = await resolveDeckLink(article, restUrl, anonKey)
-  const bodyHtml = renderBlocksToHtml(withDropOffCtas(blocks, slug, article.deck_family), { deckLink })
+  const bodyHtml = renderBlocksToHtml(withDropOffCtas(blocks, slug, article.deck_family, brainGuideFromTags(article.tags)?.id, article.locale), { deckLink })
     + `\n${wordListsLink(article.locale)}`
 
   const canonicalUrl = contentCanonicalUrl(SITE_URL, slug, article.locale, article.canonical_url)

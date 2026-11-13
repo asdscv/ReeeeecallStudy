@@ -1,3 +1,4 @@
+import { brainGuideFromTags } from '@reeeeecall/shared/lib/brain-content'
 import { useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -99,7 +100,7 @@ export function ContentDetailPage() {
       />
 
       <article className="max-w-3xl mx-auto px-4 py-10 sm:py-16" data-speakable>
-        <BlockRenderer blocks={withDropOffCtas(currentArticle.content_blocks, currentArticle.slug, currentArticle.deck_family)} />
+        <BlockRenderer blocks={withDropOffCtas(currentArticle.content_blocks, currentArticle.slug, currentArticle.deck_family, brainGuideFromTags(currentArticle.tags)?.id, currentArticle.locale)} />
       </article>
 
       {relatedArticles.length > 0 && (

@@ -1,3 +1,4 @@
+import { rememberBrainAuthReturn } from '../../lib/brain-auth-return'
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -60,8 +61,10 @@ export function LoginPage() {
   const handleOAuthLogin = async (provider: 'google' | 'apple') => {
     setOauthLoading(provider)
     setError(null)
+    rememberBrainAuthReturn(new URLSearchParams(window.location.search).get('redirect'))
     const { error } = await signInWithProvider(provider)
     if (error) {
+      rememberBrainAuthReturn(null)
       setError(t('oauthError'))
       setOauthLoading(null)
     }

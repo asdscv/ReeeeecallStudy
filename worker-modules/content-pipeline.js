@@ -1,3 +1,5 @@
+import { planBrainTopic, validateBrainArticle, brainExampleBlock } from './brain-content.js'
+import { brainContentTags } from '../packages/shared/lib/brain-content.ts'
 import { contentCanonicalUrl } from '../packages/shared/lib/content-canonical.ts'
 // Content generation pipeline orchestrator
 
@@ -57,7 +59,8 @@ export async function runContentPipeline(env, cron) {
     }
     if (topics.length === 0) {
       try {
-        const deckTopic = await planDeckTopic(db)
+        const brain = await planBrainTopic(db)
+        const deckTopic = brain || await planDeckTopic(db) || await planBrainTopic(db, { allowConsecutive: true })
         if (deckTopic) {
           topics.push(deckTopic)
           info('Deck guide planned', { query: deckTopic.targetQuery, deck: deckTopic.deckFamily })
@@ -231,7 +234,7 @@ function buildImagePrompt(topic) {
   return `A modern, clean editorial illustration for a blog article about "${topic.titleHint}" in the context of ${topic.category}. Abstract, minimal style with soft gradients and geometric shapes. No text, no letters, no words. Professional, educational tone. Vibrant but not overwhelming colors.`
 }
 
-async function generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl, runState, deckWords = null) {
+export async function generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl, runState, deckWords = null) {
   info('Generating content', { locale, topic: topic.id || topic.titleHint })
 
   const prompt = buildPrompt(topic, locale, {
@@ -240,18 +243,28 @@ async function generateForLocale(env, db, topic, locale, recentContent, sharedSl
   })
   let article = null
 
+  let feedback = []
   // Retry generation up to maxValidationRetries times
   for (let attempt = 0; attempt < PIPELINE_DEFAULTS.maxValidationRetries; attempt++) {
-    const raw = await callAI(env, prompt.system, prompt.user)
+    const raw = await callAI(env, prompt.system, prompt.user + (feedback.length ? `\n\nCorrect the following errors from the previous draft:\n${feedback.join('\n')}` : ''))
 
     // Use shared slug from default locale if available (for other locales)
     if (sharedSlug && locale !== DEFAULT_LOCALE) {
       raw.slug = sharedSlug
     }
 
+    if (topic.brainGuide) raw.tags = [...new Set([...brainContentTags(topic.brainGuide), ...(Array.isArray(raw.tags) ? raw.tags.filter((tag) => typeof tag === 'string' && tag !== 'brain-training' && !tag.startsWith('brain-game-')) : [])])]
     const validation = validateArticle(raw)
+    validation.errors.push(...validateBrainArticle(raw, topic))
+    validation.valid = validation.errors.length === 0
+    feedback = validation.errors
     if (validation.valid) {
-      enrichCtaUrls(raw, locale)
+      const example = brainExampleBlock(topic, locale)
+      if (example) {
+        const after = raw.content_blocks.findIndex((b) => b.type === 'paragraph')
+        raw.content_blocks.splice(after >= 0 ? after + 1 : 1, 0, example)
+      }
+      enrichCtaUrls(raw, locale, topic.brainGuide)
       article = raw
       break
     }
