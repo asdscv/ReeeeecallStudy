@@ -3,18 +3,24 @@
 > 내부 문서. 앱·스토어·광고의 모든 건강 관련 문장은 여기 출처가 있어야 한다(표시광고법 제5조: 요청 시 15일 안에 실증 자료 제출).
 > 2026-11-12 조사: 1차 출처 탐색 3갈래 → 갈래마다 독립 교차검증 → 설계안 → 임상방법론·소비자보호 관점 비판 검토. 아래 «적용한 비판»은 출시본에 반영된 것이다.
 
+## 빠른 눈 제거 (2026-11-13, 대표 결정) — 이 문서 전체에 우선
+
+- 대표: «지금 빠른 눈 아예 빼자 게임 너무 허접하다». 「빠른 눈」(Quick Eye)은 제품에서 **완전히 뺐다** — 게임 목록·오늘의 훈련·등급·업적·설정·데모·연구 근거 페이지·8개 로케일 문구 어디에도 없다(`GAME_LOGIC.md` «빠른 눈 제거»).
+- 빠른 눈은 앱에서 **유일하게** 연구 훈련(ACTIVE·IHAMS의 처리속도 훈련)을 본뜬 게임이었다. 이제 **앱의 어떤 게임도 연구에서 시험한 훈련을 본뜨지 않는다.**
+- **게이트**: 앱·스토어·푸시·광고·SNS·고객 응대·연구 근거 페이지 어디에도 «연구에서 쓰인 훈련을 본떴다/참고했다», «처리속도 훈련», «ACTIVE 방식» 등 게임이 연구 훈련과 같거나 비슷하다고 암시하는 문구를 쓰지 않는다. 연구를 빌린 것은 **방법**(가중 상하법, 코르시 규칙)과 **일정**(주 3회 이하, 10세션 기본 과정과 약 1·3년 뒤 복습)뿐이고, 일정을 말할 때는 «게임은 그 연구의 훈련이 아니고 이 일정이 이 게임들로 시험된 적이 없다»를 함께 적는다(내부 문구 원칙).
+- 후속 대표 결정: 연구 근거 페이지와 홈 링크를 웹·앱에서 제거했다. 기존 웹 주소는 홈으로 돌려보내며, 홈에는 의료기기가 아니라는 고지와 상담 안내 한 문장씩만 둔다. 내부 근거·설계 기록은 이 문서에 남긴다.
+- 이 문서의 빠른 눈 관련 내용(§2.2 1번, §2.3, §3의 빠른 눈 슬롯, §5 깜박임의 마스크 조항, §6.5·§6.6 원안의 빠른 눈 문장, 부록 B·C)은 **기록**이며 현재 제품에 적용되지 않는다. 출시 전이던 «단계 건너뛰기» 작업(같은 날)은 게임과 함께 버렸다.
+- 옛 저장의 빠른 눈 기록은 읽기·병합에서 그대로 살아남지만(아직 빠른 눈이 있는 앱 버전 보호) 화면에 쓰이지 않는다.
+
 ## 출시본에 들어간 주장과 출처
 
 | 화면 문장(요지) | 출처 |
 |---|---|
-| 빠른 눈은 ACTIVE·IHAMS의 처리속도 훈련 «방식»을 참고했다(효과 주장 아님, 같은 프로그램 아님, 미검증) | Ball 2002; Ball 2013; Wolinsky 2013; Edwards 2018; Owsley 2013 |
-| 노출 시간 사다리 500→17ms, 변형 사다리(주변 링·방해물·유사도·같음/다름) | Owsley 2013; Ball 2013; Wolinsky 2013(9단계 모핑, 방해물 최대 47) |
-| 목표 정답률: 빠른 눈 80%(+0.25/−1.0), 다른 게임 85%(+0.15/−0.85, 같은 그림은 보폭만 2배 +0.30/−1.70) — 원 연구 75%에서 «제품 결정»으로 상향 | Kaernbach 1991; Levitt 1971; Wilson 2019(85%는 이론적 경험칙) |
-| 순서·공간 기억: 길이마다 기회 2번, 1초에 1개 | Kessels 2000 |
-| 주 3회 이하가 더 나았다(연구 간 비교, 불확실), 30분 미만 근거 약함 — 오늘의 훈련 20~25분은 이보다 짧다고 명시 | Lampit 2014 |
-| 기본 과정 10세션, 복습 과정 약 11·35개월 | Ball 2002; Ball 2013 |
+| 목표 정답률: 대부분의 게임 85%(+0.15/−0.85, 같은 그림은 보폭만 2배 +0.30/−1.70) — 85%는 «제품 결정»(기회 3번 라운드가 너무 빨리 끝나지 않게) | Kaernbach 1991; Levitt 1971; Wilson 2019(85%는 이론적 경험칙) |
+| 순서·공간 기억: 길이마다 기회 2번 | Kessels 2000 |
+| 주 3회 이하가 더 나았다(연구 간 비교, 불확실), 30분 미만 근거 약함 — 오늘의 훈련 5분·20분은 둘 다 이보다 짧다고 명시 | Lampit 2014 |
+| 기본 과정 10세션, 복습 과정 약 11·35개월 — 그 연구의 «일정»만 빌렸고, 게임은 그 훈련이 아니며 이 일정이 이 게임들로 시험된 적 없음(2026-11-13) | Ball 2002; Ball 2013 |
 | 훈련 과제는 늘지만 다른 능력·일상 전이 근거는 약하다 | Simons 2016; Owen 2010; Melby-Lervåg 2016 |
-| 처리속도: 훈련과 거의 같은 검사에서 향상, 10년 뒤 일부 차이, 기억으로 전이 없음, 원 연구 10~12시간 vs 앱 약 4시간 | Ball 2002; Rebok 2014; Edwards 2018 |
 | 코크란: 효과 작고 1년 유지 근거 없음 | Gates 2020 |
 | 인지훈련이 치매를 예방한다는 것은 확인되지 않았다 | WHO 2026(5년 치매 발생 HR 1.00); Gates 2019; Coe 2026·Dickens 2026(논쟁) |
 | 만 60세 이상 보건소(치매안심센터) 무료 인지 선별검사(ko만) | 보건복지부 치매관리 사업 안내 |
@@ -32,7 +38,6 @@
 ## 남은 일
 
 - 법무 검토 또는 식약처 질의 → 게이트 콘텐츠 공개 여부 결정
-- 빠른 눈 진급 기준(V5–9 ≤200ms, V10+ ≤250ms)은 Edwards 2006 노인 규준 원문 확인 후 확정, 출시 후 사용자 중앙값으로 조정
 - 게임별 실제 수렴 정답률 로그, 60세 이상 라운드 완료율·D7/D28 재방문 확인. 목숨 수 A/B는 효과 주장 근거로 쓰지 않는다
 - 어려운 내용 개편(2026-11-13, `GAMES_DIFFICULTY_PLAN.md`)의 기준 시간·칸당 탐색 시간·판 종류 배율·나눠 보여 주기 길이는 **모델 값**이다. 출시 뒤 종류별 반응시간 중앙값과 수렴 정답률로 다시 맞춘다(§4.5). 시험은 문제 내용의 성질을 확인할 뿐 사람을 잰 것이 아니다
 - 개편 문구의 es·id·ja·th·vi·zh 번역은 원어민 검수 전(§6.2)
@@ -41,6 +46,8 @@
 ---
 
 ## 부록 A. 설계 명세(비판 검토 전 원안)
+
+> 2026-11-13: 빠른 눈 제거(맨 위 «빠른 눈 제거»). 이 부록의 빠른 눈 관련 내용은 기록일 뿐 현재 제품에 적용되지 않는다.
 
 # 두뇌 트레이닝 재설계 설계 명세 (근거 기반 v2)
 
@@ -79,7 +86,7 @@ ReeeeecallStudy: web React, Expo iOS/Android, 8개 로케일
 | **Odd One Out** (시각 탐색) | 유지, 속도 계열 | 처리속도·시각 탐색 | 계단법 규칙(§4) 적용. 칸 크기 하한(§5) |
 | **Number Hunt** (슐테 표) | 유지, 속도 계열 | 처리속도 | 칸이 작아지는 방식으로 어렵게 하지 않는다. 폰에서는 최대 5×5. "빠름"은 본인 중앙값 기준 |
 | **Flash Grid** (공간 작업기억) | **변경** | 작업기억은 다른 능력으로 옮겨가지 않음 [Melby-Lervåg 2016] | Corsi 규칙(§4.3). 이름표는 "공간 기억 연습". 불 켜지는 간격은 1초에 1개 이하 |
-| **Sequence** (Corsi형) | **변경** | 위와 같음 | Corsi 규칙: 길이마다 2번 기회, 1초에 1개 제시 [Kessels 2000] |
+| **Sequence** (Corsi형) | **변경** | 위와 같음 | Corsi 규칙: 길이마다 2번 기회 [Kessels 2000]. L1–5는 1초에 1개 제시(표준 시행), L6부터는 대표 결정으로 빨라진다(아래 §5 «제시 속도») |
 | **Match Pairs** | 유지, 다양성용으로 강등 | 특정 근거 없음. FINGER의 관계 기억 과제와 비슷할 뿐 | 오늘의 훈련 기본 순환에서 빈도를 낮춘다 |
 | **Color Word** (스트룹) | 유지, 다양성용으로 강등 | 실행기능·주의 영역은 유의하지 않음 [Lampit 2014] | 색각이상에 안전한 팔레트 + 모양 모드. 시간 여유 설정 |
 | **Quick Math** | 유지, 다양성용 | 직접 근거 없음 | 시간 여유 ×1.5 / ×2 / 끔 |
@@ -87,10 +94,10 @@ ReeeeecallStudy: web React, Expo iOS/Android, 8개 로케일
 
 ### 2.2 새 게임
 
-1. **「빠른 눈」 / Quick Eye (대표 게임, 필수)**: UFOV형 처리속도·분할주의 과제. 사양은 §2.3. 상표인 UFOV, Double Decision, BrainHQ, Road Tour는 UI와 마케팅에 쓰지 않는다.
+1. ~~**「빠른 눈」 / Quick Eye (대표 게임, 필수)**~~ — **2026-11-13 제거(대표 결정)**: UFOV형 처리속도·분할주의 과제. 사양은 §2.3. 상표인 UFOV, Double Decision, BrainHQ, Road Tour는 UI와 마케팅에 쓰지 않는다.
 2. **「규칙 바꾸기」 / Switch (2단계, 선택)**: 과제 전환(set-shifting) 게임. FINGER 과제 목록 중 우리에게 가장 크게 빠진 영역이다 [Ngandu 2015]. 예시: 숫자 카드가 위에 나오면 홀/짝, 아래에 나오면 5보다 큰지/작은지로 답한다. 효과 주장은 하지 않는다.
 
-### 2.3 「빠른 눈」 상세 사양
+### 2.3 「빠른 눈」 상세 사양 — 2026-11-13 제거, 아래는 기록
 
 출처는 Ball 2002, Ball 2013, Owsley 2013, Wolinsky 2013, Edwards 2018이다. ACTIVE 강사 매뉴얼의 정확한 ms 사다리, 계단 폭, 마스크 길이는 공개된 1차 자료에서 찾지 못했다. 그래서 아래 값 일부는 [제품 결정]이다.
 
@@ -225,7 +232,7 @@ ReeeeecallStudy: web React, Expo iOS/Android, 8개 로케일
 - **[제품 결정 개정 2026-11-13]** 빠른 눈은 목숨 없이 본 문제 20개짜리 구간으로 바뀌었다(`GROUP_RULES.quickEye.lives = 0`, 상한 20). 구간은 상한·오늘의 훈련 시간 예산·사용자 중지·무효 연속으로만 끝난다. 위 표의 «목숨 5개 / 30시행»은 #44 A/B용 설정값으로만 남기고 효과 주장의 근거로 쓰지 않는다. 80% 목표는 목숨 때문이 아니라 [제품 결정]으로 유지한다(#41 주석).
 - 기억 범위 게임 다음 라운드는 max(2, 최고 통과 길이 − 2)에서 시작한다.
 - Corsi 중단 규칙은 표준 실시 절차일 뿐, 목숨 규칙으로 "검증"된 것은 아니다. 연구마다 중단 규칙이 다르다(정정 사항 반영).
-- **[제품 결정 2026-11-13] 기억 범위 게임의 빠른 진입.** 첫 라운드, 14일 이상 쉬고 돌아온 라운드, 실력 추정치를 다시 연 라운드(`n = 0`)에서만, 첫 실수 전까지: 첫 시도에 맞히면 길이 +2(다음 규칙 레벨은 넘지 않음 — 순서 기억의 거꾸로 L4), 첫 실수는 기회를 쓰지 않고 길이 −1 뒤 표준 Corsi(길이마다 2번). 순간 기억은 3칸, 순서 기억은 연습 뒤 4개(L2)에서 시작. 등급·업적·`spanPassed`에는 **실제로 맞힌 길이만** 센다. 근거: 표준 Corsi는 길이 2~3부터 한 칸씩 올라가 성인이 자기 길이에 닿기 전에 지루해진다. 빠른 진입은 시작점만 바꾸고 중단 규칙·제시 속도(1초에 1개)는 그대로다. 연구에서 검증된 절차가 아니다.
+- **[제품 결정 2026-11-13] 기억 범위 게임의 빠른 진입.** 첫 라운드, 14일 이상 쉬고 돌아온 라운드, 실력 추정치를 다시 연 라운드(`n = 0`)에서만, 첫 실수 전까지: 첫 시도에 맞히면 길이 +2(다음 규칙 레벨은 넘지 않음 — 순서 기억의 거꾸로 L4), 첫 실수는 기회를 쓰지 않고 길이 −1 뒤 표준 Corsi(길이마다 2번). 순간 기억은 3칸, 순서 기억은 연습 뒤 4개(L2)에서 시작. 등급·업적·`spanPassed`에는 **실제로 맞힌 길이만** 센다. 근거: 표준 Corsi는 길이 2~3부터 한 칸씩 올라가 성인이 자기 길이에 닿기 전에 지루해진다. 빠른 진입은 시작점만 바꾸고 중단 규칙·제시 속도는 그대로다(빠른 진입이 닿는 L4까지는 1초에 1개). 연구에서 검증된 절차가 아니다.
 - **[제품 결정 2026-11-13] 같은 그림 찾기의 탐색 사다리.** 연습 뒤 L3 → L6 → L9 → L12 판을 최대 4개, 배치 시행으로(목숨·점수·통계 없음). 본 카드끼리의 실수(정보 있는 실수) 1번 이하로 끝내면 +3·계속, 2번 이상이면 +1·멈춤, 실패하면 멈춤. 계단은 «통과로 올라간 레벨(통과마다 +3 또는 +1) − 0.5»(하나도 통과 못 하면 L2), sd 2에서. 판 하나가 수십 초라 ZEST 8문제는 너무 길다. 처음 뒤집는 카드는 여전히 실수가 아니다(#39).
 - 같은 그림의 판마다 «실수 N번까지»는 목숨이 아니라 그 판의 허용치다(하트가 아니라 점으로 표시). 라운드 목숨 3개 규칙은 그대로다.
 
@@ -261,10 +268,10 @@ ReeeeecallStudy: web React, Expo iOS/Android, 8개 로케일
 | 비텍스트 대비 | 켜진 칸과 꺼진 칸 ≥ 3:1. 색이 아닌 단서(테두리·아이콘)를 함께 쓴다 | WCAG 1.4.11 |
 | 글자 크기 | 시스템 글자 크기(Dynamic Type / fontScale)를 따라 **200%까지 잘림 없이** 커져야 한다. 본문 기본 17pt [제품 결정]. 게임 숫자·자극은 별도로 크게(≥ 28pt) [제품 결정]. 노인이 선호한 읽기 글자 크기는 약 10.5~15pt였고, 20pt는 근거가 없다(정정 반영) | WCAG 1.4.4; Hou 2022 |
 | 시간 제한 | 시간 제한 게임에 여유 설정 ×1.5 / ×2 / 끔. "빠름" 판정은 **본인의 최근 정답 20개 반응시간 중앙값**보다 빠를 때. 절대 ms 기준을 쓰지 않는다 | WCAG 2.2.1; Apple HIG; Der 2006 |
-| 깜박임 | 1초에 3회 이하. 빠른 눈의 마스크는 평균 밝기를 맞추고 시행 간격 ≥ 1초. 첫 실행 때 광과민성 안내 | WCAG 2.3.1 |
-| 제시 속도 | 기억 범위 게임은 1초에 1개 이하 | Kessels 2000 |
+| 깜박임 | 1초에 3회 이하(순서 기억의 빨라진 제시도 이 한도 안). 빠른 눈의 마스크·시행 간격·광과민성 안내 조항은 2026-11-13 게임 제거로 해당 없음 — 남은 게임은 초당 3회 이하라 WCAG 2.3.1 기준 아래 | WCAG 2.3.1 |
+| 제시 속도 | 순간 기억: 한꺼번에 보여 주고(1,000 + 칸당 180ms, 최대 3초), 나눠 보일 때 묶음 시작 간격 ≥ 1초. 순서 기억: L1–5는 1초에 1개(표준 시행). **[대표 결정 2026-11-13 «카드 갯수 늘리기 + 카드 더 빨리 순서 파밧»]** L6부터 레벨마다 칸이 하나 늘거나 깜빡임이 빨라져 750 → 600 → 480 → 400 → 340ms(켜짐 70%)까지 — 표준 시행이 아니고 연구로 검증된 속도도 아니며, 화면·문구에서 표준 검사처럼 말하지 않는다. 어떤 레벨도 깜빡임 간격 340ms 밑(초당 3회 초과)으로 가지 않는다(WCAG 2.3.1; `brain-span-ladder.test.ts`가 잰다) | Kessels 2000(L1–5); 제품 결정(L6+); WCAG 2.3.1 |
 | 움직임 | 움직이는 표적을 쓰지 않는다. "동작 줄이기" 설정을 따른다. 모든 라운드에 일시정지 버튼 | WCAG 2.2.2; Apple HIG |
-| 색 | Color Word는 색각이상에 안전한 팔레트 + 모양/글자 모드(아직 미구현). 2026-11-13부터 보기 색칠(L8)·테두리 미끼(L14)는 **혼동 쌍 제외** 조건에서만 낸다: `theme.ts` `INK_CONFUSABLE` — `INK_COLORS`를 Viénot 1999·Machado 2009 적록 색각이상(제1·제2) 시뮬레이션으로 CIEDE2000 < 20인 쌍(빨강·초록·노랑·주황끼리, 파랑·보라; 나머지 쌍은 모두 49 이상), 시험이 다시 계산한다. 청황(제3, 약 1/10,000)은 빠져 있다 — 넣으면 초록에 안전한 색이 하나뿐이라 규칙을 못 지킨다. L1의 두 색은 혼동 쌍이 아니다. 숫자 순서의 둘째 줄은 노랑 글씨 **와 네모 테두리**, 다른 하나 찾기의 색 섞임은 밝기로 고른 중립·노랑·하늘(빨강·초록 대비 없음) | 정정 사항(미연구 항목); Viénot 1999; Machado 2009 |
+| 색 | **[대표 결정 2026-11-13 «나 적록색맹인데 색 자체가 너무 구분이 안됨»]** Color Word 잉크는 **모두에게 같은** 색각이상 안전 팔레트 6색: 파랑(남색 #1E3A8A)·주황·보라·검정·갈색·회색 — 빨강·초록·노랑 없음(설정이 아니라 기본값). 흰 카드 위 대비 ≥ 3.5:1(주황 3.56·보라 3.63이 최저, 40px 이상 글자·24px 굵은 보기 기준 3:1 충족). 정상 시각과 Viénot 1999·Machado 2009 제1·제2 색각이상, Machado 2009 제3(청황) 시뮬레이션 모두에서 어느 쌍도 CIEDE2000 21 이상 떨어진다(가장 가까운 쌍: 주황–갈색 21.7 제2, 보라–회색 22.1 제3). 그래서 `theme.ts` `INK_CONFUSABLE`(< 20인 쌍)은 비어 있고, 보기 색칠(L8)·테두리 미끼(L14)의 **혼동 쌍 제외** 규칙은 색을 바꿀 때를 위한 안전장치로 남는다. 시험(`brain-stroop-ladder.test.ts`)이 대비·거리·표를 다시 계산한다. 모양/글자 모드는 아직 미구현. 숫자 순서의 둘째 줄은 노랑 글씨 **와 네모 테두리**, 다른 하나 찾기의 색 섞임은 밝기로 고른 중립·노랑·하늘(빨강·초록 대비 없음) | 정정 사항(미연구 항목); Viénot 1999; Machado 2009 |
 | 처음 사용 | 게임마다 시범 화면 + 점수 없는 연습 시행. 텍스트와 그림 안내를 8개 로케일 모두에. "쉽게 시작" 선택지 | Turunen 2019; WHO 2026 |
 | 진입 | 큰 "오늘의 훈련 시작" 버튼 하나로 세션 전체를 순서대로 진행 | Turunen 2019(Zhang: "더 단순했으면") |
 
@@ -313,16 +320,18 @@ ReeeeecallStudy: web React, Expo iOS/Android, 8개 로케일
 ### 6.5 스토어 문구 초안
 
 **KO**
-> 두뇌 트레이닝 — 집중력·기억 게임으로 꾸준한 두뇌 활동 습관을 만드세요. 「빠른 눈」을 포함한 9가지 게임은 실력에 맞춰 난이도가 자동으로 조절되고, 주 3회·20분 정도의 「오늘의 훈련」으로 계획을 세워 기록을 확인할 수 있습니다. 큰 버튼, 글자 크기 조절, 시간 여유 설정을 지원합니다.
+> 두뇌 트레이닝 — 집중력·기억 게임으로 꾸준한 두뇌 활동 습관을 만드세요. 모든 게임은 실력에 맞춰 난이도가 자동으로 조절되고, 주 3회·한 번에 5분 또는 20분의 「오늘의 훈련」으로 계획을 세워 기록을 확인할 수 있습니다. 큰 버튼, 글자 크기 조절, 시간 여유 설정을 지원합니다.
 > 이 앱은 의료기기가 아니며 질병의 진단·치료·예방을 목적으로 하지 않습니다.
 
 **EN**
-> Brain Training — build a regular brain-activity habit with focus and memory games. Nine games, including Quick Eye, adjust their difficulty to you automatically. Plan about three 20-minute sessions a week and track your game records. Large buttons, adjustable text size and relaxed timing are built in.
+> Brain Training — build a regular brain-activity habit with focus and memory games. Every game adjusts its difficulty to you automatically. Plan about three sessions a week, 5 or 20 minutes each, and track your game records. Large buttons, adjustable text size and relaxed timing are built in.
 > This app is not a medical device and does not diagnose, treat, cure, or prevent any medical condition.
 
-App Review 메모: "General brain games for wellness/education. No diagnosis, treatment, prevention or assessment claims; no cognitive score."
+App Review 메모: "General brain games for wellness/education. No diagnosis, treatment, prevention or assessment claims; no cognitive score. No game is presented as a studied training programme."
 
 ### 6.6 「연구 근거」 페이지 전문
+
+> 2026-11-13: 앱에 실린 문안의 정본은 `packages/shared/lib/brain-games/research-content.ts`다(빠른 눈 문단·처리속도 결과 문단 삭제, 참고문헌 7개). 아래 원안의 빠른 눈 문장은 지웠다 — 다시 쓰지 않는다.
 
 **[KO] 연구 근거**
 
@@ -330,10 +339,10 @@ App Review 메모: "General brain games for wellness/education. No diagnosis, tr
 > 두뇌 트레이닝은 집중력과 기억을 쓰는 게임으로 꾸준한 두뇌 활동 습관을 만들도록 돕는 기능입니다. 의료기기가 아니며, 질병의 진단·치료·예방을 목적으로 하지 않습니다.
 >
 > **어떤 연구를 참고했나요 — 효과가 아니라 "방법"입니다**
-> - **「빠른 눈」**: 미국의 대규모 노인 인지훈련 연구(ACTIVE)와 후속 연구(IHAMS)에서 쓰인 처리속도 훈련 방식을 참고했습니다. 화면 가운데와 가장자리에 그림이 아주 짧게 나타나면 무엇이 어디에 있었는지 고르는 과제로, 실력에 따라 보이는 시간이 짧아지고 방해물이 늘어납니다. 이 연구들에서 처리속도 훈련을 받은 사람들은 같은 종류의 과제 점수가 크게 올랐고, 그 향상은 10년 뒤에도 일부 남아 있었습니다. 다만 그 연구는 강사가 진행하는 수업이었고, 이 앱의 게임은 그 프로그램과 같지 않으며 연구로 검증되지 않았습니다.
+> - 이 앱의 게임은 어느 것도 연구에서 시험한 훈련 프로그램을 본뜬 것이 아니며, 연구로 검증되지 않았습니다. 아래는 게임을 만들 때 빌려 온 방법입니다.
 > - **난이도 자동 조절**: 정답률이 일정 수준(약 80~85%)에 머물도록 난이도를 조금씩 올리고 내리는 심리학의 '가중 상하법'을 썼습니다. 연구에 따르면 쉬운 수준에 머무는 것보다 실력에 맞춘 난이도가 훈련 과제 향상에 더 효과적이었습니다.
 > - **주 3회, 20~30분**: 여러 연구를 모은 분석에서 주 3회 이하로 훈련한 연구들이 그보다 자주 한 연구들보다 결과가 좋았고, 30분 미만 세션은 근거가 약했습니다. 그래서 매일 짧게 하기보다 주 3회 정도의 「오늘의 훈련」을 기본으로 했습니다.
-> - **기본 과정과 복습 과정**: 위 연구는 10회 수업 뒤 약 1년, 3년 시점에 복습 수업을 했습니다. 이 구조를 빌려 10세션 기본 과정과 복습 과정을 만들었습니다.
+> - **기본 과정과 복습 과정**: 미국의 대규모 노인 인지훈련 연구(ACTIVE)는 10회 수업 뒤 약 1년, 3년 시점에 복습 수업을 했습니다. 10세션 기본 과정과 복습 과정은 이 «일정»만 빌린 것으로, 게임 내용은 그 연구의 훈련과 다르고 이 일정이 이 게임들로 시험된 적도 없습니다.
 >
 > **연구가 보여 준 것과 보여 주지 못한 것**
 > - 인지훈련을 하면 **훈련한 과제는** 확실히 잘하게 됩니다. 하지만 다른 능력이나 일상생활로 옮겨 간다는 근거는 약합니다.
@@ -356,10 +365,10 @@ App Review 메모: "General brain games for wellness/education. No diagnosis, tr
 > Brain Training helps you build a regular brain-activity habit with games that use focus and memory. It is not a medical device and is not intended to diagnose, treat, cure, or prevent any medical condition.
 >
 > **What research we drew on — for methods, not results**
-> - **Quick Eye** is modeled on the speed-of-processing training used in a large US study of older adults (ACTIVE) and a follow-up trial (IHAMS). Pictures flash briefly in the centre and edges of the screen and you report what and where they were; display time shortens and distractors increase as you improve. People in those studies improved strongly on this kind of task, and part of the gain was still measurable ten years later. Those studies used trainer-led classes; our game is not the same program and has not been tested in a study.
+> - None of the games in this app is modelled on a training programme tested in a study, and none has been tested in one. These are the methods we borrowed to build them.
 > - **Automatic difficulty** uses a weighted up-down rule from psychology that keeps your accuracy around 80–85%. Research found that difficulty matched to your level improved trained tasks more than staying at an easy level.
 > - **Three sessions a week, 20–30 minutes**: in a pooled analysis, studies that trained three times a week or less did better than those that trained more often, and sessions under 30 minutes had weak evidence. So the default is about three "Today's Training" sessions a week, not a daily streak.
-> - **Core course and refresher course**: the study above added refresher classes about one and three years after ten sessions. We borrowed that structure.
+> - **Core course and refresher course**: a large US study of older adults (ACTIVE) added refresher classes about one and three years after ten sessions. Our course and refreshers borrow only that calendar; the games are not that study's training, and the schedule has never been tested with them.
 >
 > **What the research shows — and what it doesn't**
 > - Brain training reliably makes you better at **the trained tasks**. Evidence that this carries over to other abilities or everyday life is weak.

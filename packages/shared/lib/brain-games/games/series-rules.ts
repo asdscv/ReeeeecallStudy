@@ -5,9 +5,13 @@ import type { Rng } from '../rng'
  * from, and the readings that keep every row to one answer.
  *
  * A row is one to three interleaved lines (line r holds terms r, r + L, r + 2L, …), each following
- * one family. Bands 1–20 bring in a family each; band 21 moves the gap inside the row; from 22 two
- * families are interleaved (22–23 from bands 4–12, 24–25 from 9–16 and 26–28 from 13–20, the gap
- * anywhere; 28 shows the fewest terms that still settle both lines).
+ * one family. Bands 1–20 bring in a family each (some bands two of one kind: triangular numbers
+ * beside growing steps, ×k − c beside ×k + c, primes beside the mixed lines, products of the two
+ * before beside the three before added, digit sums beside the cycle, prime gaps beside the gaps
+ * added — owner 2026-11-13 «더 다양한 규칙»); band 21 moves the gap inside the row; from 22 two
+ * families are interleaved (22–23 from bands 4–12, 24–25 from 9–16 and 26–29 from 13–20, the gap
+ * anywhere; 28–29 show the fewest terms that still settle both lines), and 30–31, the top, put one
+ * of the newest families (primes, products, digit sums, prime gaps) under a second hard line.
  *
  * Readings are every rule a player might see in a row: each ladder family, "repeat the last
  * difference" and "repeat the last ratio", on the whole row or on its lines read every other or
@@ -52,6 +56,12 @@ export type SeriesFamilyId =
   | 'diffFib'
   | 'square'
   | 'cube'
+  | 'tri'
+  | 'altMinus'
+  | 'prime'
+  | 'product'
+  | 'digitSum'
+  | 'diffPrime'
 
 export interface SeriesFamily {
   id: SeriesFamilyId
@@ -149,6 +159,24 @@ function sumWorked(lag: number): (terms: readonly number[]) => (i: number) => st
   }
 }
 
+/** The primes below 1000 (a sieve) and each one's place among them. */
+export const PRIMES: readonly number[] = (() => {
+  const composite = new Uint8Array(1000)
+  const out: number[] = []
+  for (let n = 2; n < 1000; n++) {
+    if (composite[n]) continue
+    out.push(n)
+    for (let m = n * n; m < 1000; m += n) composite[m] = 1
+  }
+  return out
+})()
+const PRIME_AT: ReadonlyMap<number, number> = new Map(PRIMES.map((p, i) => [p, i]))
+
+/** A whole number's digits, most significant first (0 → [0]). */
+const digitsOf = (n: number): number[] => String(Math.abs(Math.trunc(n))).split('').map(Number)
+/** The sum of a whole number's digits. */
+export const digitSum = (n: number): number => digitsOf(n).reduce((a, d) => a + d, 0)
+
 const powerWorked = (e: number, n0: number, k: number) => (terms: readonly number[]) => (i: number) =>
   `${Array.from({ length: e }, () => String(n0 + i)).join(' × ')}${k > 0 ? ` + ${k}` : k < 0 ? ` − ${-k}` : ''} = ${terms[i]}`
 
@@ -231,6 +259,21 @@ const FAMILY_LIST: readonly SeriesFamily[] = [
       const inc = rng.int(1, 2)
       const line = checked(lineOf(fromDiffs(rng.int(1, 20), range(len - 1).map((i) => step0 + inc * i))), ADD_MAX)
       return line && [line]
+    },
+  },
+  {
+    // Triangular numbers n(n + 1)/2 — 1, 3, 6, 10, 15 — the step growing by one: read as growing
+    // steps (the same rule), drawn so the classic row turns up as itself.
+    id: 'tri',
+    band: 6,
+    tag: 'series.growing',
+    params: 3,
+    lines: 1,
+    max: ADD_MAX,
+    length: () => 6,
+    make: (rng, len) => {
+      const n0 = rng.int(1, 10)
+      return [lineOf(range(len).map((i) => ((n0 + i) * (n0 + i + 1)) / 2))]
     },
   },
   {
@@ -333,6 +376,29 @@ const FAMILY_LIST: readonly SeriesFamily[] = [
     },
   },
   {
+    // Mixed signs: multiply, then take away (×2, −3, ×2, −3 …) — up and down in one row, rising
+    // overall. Read as two steps taking turns, like altOps.
+    id: 'altMinus',
+    band: 11,
+    tag: 'series.altOps',
+    params: 3,
+    lines: 1,
+    max: MUL_MAX,
+    length: () => 6,
+    make: (rng, len, level) => {
+      const mul = { op: '×' as const, v: level >= 16 ? rng.pick([2, 3]) : 2 }
+      const c = rng.int(1, 9)
+      const sub = { op: '−' as const, v: c }
+      const mulFirst = rng.chance(0.5)
+      const steps = range(len - 1).map((i) => ((i % 2 === 0) === mulFirst ? mul : sub))
+      // What the subtraction leaves stays above c, so every pair of steps rises: from c + 1 when the
+      // row multiplies first, 2c + 1 when it takes away first.
+      const start = rng.int(0, 8) + (mulFirst ? c + 1 : 2 * c + 1)
+      const line = checked(lineOf(fromSteps(start, steps), steps), MUL_MAX)
+      return line && [line]
+    },
+  },
+  {
     id: 'mixed',
     band: 12,
     tag: 'series.mixedLines',
@@ -351,6 +417,21 @@ const FAMILY_LIST: readonly SeriesFamily[] = [
       const geo = lineOf(fromSteps(rng.int(1, sMax), steps), steps)
       const arith = arithLine(rng, 20, 90, signed(rng, 2, 9), geoFirst ? lb : la)
       return geoFirst ? [geo, arith] : [arith, geo]
+    },
+  },
+  {
+    // Consecutive primes from 2 … 41. Its rule is no step, so the reveal names it (a prompt, no
+    // worked line). Two parameters on the reading side: one prime alone fits by chance.
+    id: 'prime',
+    band: 12,
+    tag: 'series.primes',
+    params: 2,
+    lines: 1,
+    max: ADD_MAX,
+    length: (rng) => rng.int(5, 6),
+    make: (rng, len) => {
+      const j0 = rng.int(0, 12)
+      return [lineOf(PRIMES.slice(j0, j0 + len), undefined, () => undefined)]
     },
   },
   {
@@ -385,6 +466,26 @@ const FAMILY_LIST: readonly SeriesFamily[] = [
       const terms = [rng.int(1, 9), rng.int(1, 9), rng.int(1, 9)]
       while (terms.length < len) terms.push(terms[terms.length - 1] + terms[terms.length - 2] + terms[terms.length - 3])
       const line = checked(lineOf(terms, additive(terms), sumWorked(3)(terms)), ADD_MAX)
+      return line && [line]
+    },
+  },
+  {
+    // Each term the two before multiplied: 2, 3, 6, 18, 108. Between tiles the step is "× the term
+    // two back" (the first step, before any product, as a difference).
+    id: 'product',
+    band: 14,
+    tag: 'series.product',
+    params: 2,
+    lines: 1,
+    max: MUL_MAX,
+    length: (rng) => rng.int(5, 6),
+    make: (rng, len) => {
+      const terms = [rng.int(2, 5), rng.int(2, 6)]
+      while (terms.length < len) terms.push(terms[terms.length - 1] * terms[terms.length - 2])
+      const steps: SeriesStep[] = range(len - 1).map((i) => (i === 0 ? additive(terms.slice(0, 2))[0] : { op: '×' as const, v: terms[i - 1] }))
+      const worked = (i: number) =>
+        i >= 2 ? `${terms[i - 2]} × ${terms[i - 1]} = ${terms[i]}` : i === 1 ? `${terms[2]} ÷ ${terms[0]} = ${terms[1]}` : `${terms[2]} ÷ ${terms[1]} = ${terms[0]}`
+      const line = checked(lineOf(terms, steps, worked), MUL_MAX)
       return line && [line]
     },
   },
@@ -442,6 +543,26 @@ const FAMILY_LIST: readonly SeriesFamily[] = [
     },
   },
   {
+    // Each term the one before plus its own digits: 47 → 47 + 4 + 7 = 58. From two digits (a single
+    // digit doubles), with at least three different steps so no simpler rule stands in for it.
+    id: 'digitSum',
+    band: 17,
+    tag: 'series.digitSum',
+    params: 2,
+    lines: 1,
+    max: ADD_MAX,
+    length: (rng) => rng.int(5, 6),
+    make: (rng, len) => {
+      const terms = [rng.int(10, 79)]
+      while (terms.length < len) terms.push(terms[terms.length - 1] + digitSum(terms[terms.length - 1]))
+      if (new Set(diffsOf(terms)).size < 3) return null
+      const worked = (i: number) =>
+        i >= 1 ? `${terms[i - 1]} + ${digitsOf(terms[i - 1]).join(' + ')} = ${terms[i]}` : `${terms[1]} − ${digitsOf(terms[0]).join(' − ')} = ${terms[0]}`
+      const line = checked(lineOf(terms, additive(terms), worked), ADD_MAX)
+      return line && [line]
+    },
+  },
+  {
     id: 'diffLines',
     band: 18,
     tag: 'series.diffLines',
@@ -473,6 +594,22 @@ const FAMILY_LIST: readonly SeriesFamily[] = [
       const diffs = [rng.int(1, 5), rng.int(1, 5)]
       while (diffs.length < len - 1) diffs.push(diffs[diffs.length - 1] + diffs[diffs.length - 2])
       const line = checked(lineOf(fromDiffs(rng.int(1, 20), diffs.slice(0, len - 1))), ADD_MAX)
+      return line && [line]
+    },
+  },
+  {
+    // The gaps are consecutive primes (+2, +3, +5, +7, +11 … or from a later prime): nested — the
+    // rule lives one level down, in the gaps.
+    id: 'diffPrime',
+    band: 19,
+    tag: 'series.diffPrimes',
+    params: 3,
+    lines: 1,
+    max: ADD_MAX,
+    length: (rng) => rng.int(6, 7),
+    make: (rng, len) => {
+      const j0 = rng.int(0, 4)
+      const line = checked(lineOf(fromDiffs(rng.int(1, 20), PRIMES.slice(j0, j0 + len - 1))), ADD_MAX)
       return line && [line]
     },
   },
@@ -740,6 +877,79 @@ function power(e: number): Single {
   }
 }
 
+/**
+ * Consecutive primes. Counted from three shown terms (two primes side by side fit by chance — 2, 3
+ * or 5, 7 in any counting row); primes below 1000 only, the most a player could name.
+ */
+const primes = guessed(
+  'primes',
+  byParams(2),
+  (seq) => seq.length >= 2 && seq.every((t, i) => PRIME_AT.has(t) && (i === 0 || PRIME_AT.get(t) === (PRIME_AT.get(seq[i - 1]) as number) + 1)),
+  (row, gap) => {
+    const out: number[] = []
+    const left = shown(row, gap - 1) ? PRIME_AT.get(at(row, gap - 1)) : undefined
+    const right = shown(row, gap + 1) ? PRIME_AT.get(at(row, gap + 1)) : undefined
+    if (left !== undefined && left + 1 < PRIMES.length) out.push(PRIMES[left + 1])
+    if (right !== undefined && right >= 1) out.push(PRIMES[right - 1])
+    return out
+  },
+)
+
+/** t[i+1] = t[i] + its digits. Counted from three shown terms, like primes. */
+const digitStep = guessed(
+  'digitSum',
+  byParams(2),
+  (seq) => seq.length >= 2 && seq.every((t, i) => i === 0 || (Number.isInteger(seq[i - 1]) && seq[i - 1] >= 0 && t === seq[i - 1] + digitSum(seq[i - 1]))),
+  (row, gap) => {
+    const out: number[] = []
+    if (shown(row, gap - 1)) out.push(at(row, gap - 1) + digitSum(at(row, gap - 1)))
+    if (shown(row, gap + 1)) {
+      // Every c with c + digits(c) = the term after (a four-digit number's digits add to ≤ 36).
+      const r = at(row, gap + 1)
+      for (let c = Math.max(0, r - 37); c < r; c++) if (c + digitSum(c) === r) out.push(c)
+    }
+    return out
+  },
+)
+
+/** t[i+2] = t[i] · t[i+1]: each term the two before multiplied. */
+const product = guessed(
+  'product',
+  byParams(2),
+  (seq) => seq.length >= 3 && seq.every((t, i) => i < 2 || t === seq[i - 2] * seq[i - 1]),
+  (row, gap) => {
+    const out: number[] = []
+    if (shown(row, gap - 2) && shown(row, gap - 1)) out.push(at(row, gap - 2) * at(row, gap - 1))
+    if (shown(row, gap - 1) && shown(row, gap + 1) && at(row, gap - 1) !== 0) out.push(at(row, gap + 1) / at(row, gap - 1))
+    if (shown(row, gap + 1) && shown(row, gap + 2) && at(row, gap + 1) !== 0) out.push(at(row, gap + 2) / at(row, gap + 1))
+    return out
+  },
+)
+
+/** The gaps are consecutive primes. Counted once two gap-to-gap steps are shown (four terms). */
+const diffPrimes = guessed(
+  'diffPrimes',
+  byParams(3),
+  (seq) => {
+    if (seq.length < 3) return false
+    const d = diffsOf(seq)
+    const j0 = PRIME_AT.get(d[0])
+    return j0 !== undefined && d.every((x, i) => PRIMES[j0 + i] === x)
+  },
+  (row, gap) => {
+    const out: number[] = []
+    for (const i of pairs(row)) {
+      const j = PRIME_AT.get(at(row, i + 1) - at(row, i))
+      // The prime the first gap would be, if this gap is the (i+1)-th.
+      const j0 = j === undefined ? -1 : j - i
+      if (j0 < 0) continue
+      if (shown(row, gap - 1) && j0 + gap - 1 < PRIMES.length) out.push(at(row, gap - 1) + PRIMES[j0 + gap - 1])
+      if (shown(row, gap + 1) && j0 + gap < PRIMES.length) out.push(at(row, gap + 1) - PRIMES[j0 + gap])
+    }
+    return out
+  },
+)
+
 /** Rules a single line can follow. Arithmetic and geometric double as "repeat the last difference / ratio". */
 const SINGLES: readonly Single[] = [
   linear('arithmetic', [1, -2, 1]),
@@ -758,6 +968,10 @@ const SINGLES: readonly Single[] = [
   growFactor,
   power(2),
   power(3),
+  primes,
+  digitStep,
+  product,
+  diffPrimes,
 ]
 
 /** A reading of a whole row. */
@@ -850,6 +1064,10 @@ const PAIR_POOL: Readonly<Record<number, readonly number[]>> = {
   26: [13, 14, 16, 19, 20],
   28: [13, 14, 16, 19, 20],
 }
+/** The top band (30–31): one of these families under a second line from TOP_SECOND. */
+export const SERIES_TOP_BAND = 30
+export const SERIES_TOP_FIRST: readonly SeriesFamilyId[] = ['prime', 'product', 'digitSum', 'diffPrime']
+const TOP_SECOND: readonly number[] = [13, 14, 16, 19, 20]
 /**
  * Band 21 hides a term of a family from bands 9–20 (the example in the plan is squares). Not the
  * ×3 / halving rows of band 7: there "repeat the ratio" is the whole rule, inside the row or not.
@@ -858,7 +1076,7 @@ const MISSING_POOL = FAMILY_LIST.filter((f) => f.band >= 9 && f.band <= 20).map(
 
 export const SERIES_MISSING_FROM = 21
 /** Bands whose gap may sit anywhere (when series.missingTerm is not blocked). */
-export const GAP_ANYWHERE: ReadonlySet<number> = new Set([21, 24, 26, 28])
+export const GAP_ANYWHERE: ReadonlySet<number> = new Set([21, 24, 26, 28, SERIES_TOP_BAND])
 
 function pickAvoiding<T>(rng: Rng, items: readonly T[], avoid: (x: T) => boolean): T {
   const fresh = items.filter((x) => !avoid(x))
@@ -873,6 +1091,15 @@ function drawFamilies(band: number, rng: Rng, avoid: ReadonlySet<SeriesFamilyId>
   const avoidBands = new Set([...avoid].map((f) => SERIES_FAMILIES[f].band))
   if (band < SERIES_MISSING_FROM) return [pickAvoiding(rng, familiesOfBand(band), (f) => avoid.has(f.id)).id]
   if (band === SERIES_MISSING_FROM) return [pickAvoiding(rng, MISSING_POOL, (f) => avoidBands.has(SERIES_FAMILIES[f].band))]
+  if (band >= SERIES_TOP_BAND) {
+    const first = pickAvoiding(rng, SERIES_TOP_FIRST, (f) => avoidBands.has(SERIES_FAMILIES[f].band))
+    const second = pickAvoiding(
+      rng,
+      TOP_SECOND.filter((b) => b !== SERIES_FAMILIES[first].band),
+      (b) => avoidBands.has(b),
+    )
+    return rng.shuffle([first, rng.pick(familiesOfBand(second)).id])
+  }
   const pool = PAIR_POOL[band] ?? PAIR_POOL[22]
   const first = pickAvoiding(rng, pool, (b) => avoidBands.has(b))
   const second = pickAvoiding(
@@ -892,6 +1119,11 @@ export function interleave(lines: readonly SeriesLine[]): number[] {
 
 /** Tries before giving up on a band's draw (each is far more likely to succeed than not). */
 const TRIES = 200
+/**
+ * Tries on one draw of families before drawing again — so a family whose rows are rejected more
+ * often (growing steps beside triangular numbers) still comes up as often as it is drawn.
+ */
+const TRIES_PER_DRAW = 25
 
 /**
  * One row of this band: its families drawn, built, the gap placed (at the end unless `gapInside`),
@@ -900,8 +1132,9 @@ const TRIES = 200
  */
 export function buildSeriesRow(band: number, level: number, rng: Rng, opts: { gapInside: boolean; avoid?: ReadonlySet<SeriesFamilyId> }): SeriesRowSpec {
   const avoid = opts.avoid ?? new Set<SeriesFamilyId>()
+  let families: SeriesFamilyId[] = []
   for (let attempt = 0; attempt < TRIES; attempt++) {
-    const families = drawFamilies(band, rng, avoid)
+    if (attempt % TRIES_PER_DRAW === 0) families = drawFamilies(band, rng, avoid)
     let lines: SeriesLine[] | null
     let gap: number
     if (families.length === 1) {
@@ -914,6 +1147,7 @@ export function buildSeriesRow(band: number, level: number, rng: Rng, opts: { ga
       // it is checked once on its own) — below band 28 one more again, unless a four-parameter
       // family already makes the row long — and the shorter line is lengthened to keep the
       // alternation. The gap's line is drawn; with the gap at the end it holds the last term.
+      // Bands 28 and up show the fewest.
       const [fa, fb] = families.map((id) => SERIES_FAMILIES[id])
       const p = Math.max(fa.params, fb.params)
       const m = p + 1 + (band < 28 && p <= 3 ? 1 : 0)
@@ -995,7 +1229,7 @@ export function seriesWrongs(spec: SeriesRowSpec): number[] {
 }
 
 /** The rule shown after answering: each term's step to the next of its line, the lines, and the gap worked out. */
-export function seriesReveal(spec: SeriesRowSpec): { gaps: string[]; groups?: number[]; lines?: string[] } {
+export function seriesReveal(spec: SeriesRowSpec): { gaps: string[]; groups?: number[]; lines?: string[]; prompt?: { key: string } } {
   const { lines, terms, gap } = spec
   const L = lines.length
   const gaps = terms.map((_, i) => {
@@ -1005,7 +1239,10 @@ export function seriesReveal(spec: SeriesRowSpec): { gaps: string[]; groups?: nu
   // Two-line gaps (diffLines): colour alternate gaps, so the two lines of gaps stand apart.
   const groups = L > 1 ? terms.map((_, i) => i % L) : spec.families[0] === 'diffLines' ? terms.map((_, i) => i % 2) : undefined
   const worked = workedFor(lines[gap % L], Math.floor(gap / L))
-  return { gaps, ...(groups ? { groups } : {}), ...(worked ? { lines: [worked] } : {}) }
+  // A rule with no step to work out (primes) is named instead.
+  const gapFamily = spec.families.length === L ? spec.families[gap % L] : spec.families[0]
+  const named = gapFamily === 'prime' ? { prompt: { key: 'mechanics.series.primes.title' } } : {}
+  return { gaps, ...(groups ? { groups } : {}), ...(worked ? { lines: [worked] } : {}), ...named }
 }
 
 function workedFor(line: SeriesLine, i: number): string | undefined {

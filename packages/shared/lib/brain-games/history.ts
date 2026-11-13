@@ -1,5 +1,5 @@
 import type { BrainGameId } from './types'
-import { isBrainGameId } from './catalog'
+import { isSavedGameId } from './catalog'
 import { migrateLevelV1 } from './scale'
 
 /**
@@ -11,8 +11,11 @@ import { migrateLevelV1 } from './scale'
 export type HistoryEntry = [day: number, level10: number, accuracy: number]
 
 export interface BrainHistory {
-  /** 2 since the hard-content change (levels on the v2 scale); older entries are converted once on reading. */
-  v: 2
+  /**
+   * 3 since the thinking games (2026-11-13; sync.ts BRAIN_HISTORY_FORMAT says why); 2 since the
+   * hard-content change (levels on the v2 scale). Older entries are converted once on reading.
+   */
+  v: 3
   rounds: Partial<Record<BrainGameId, HistoryEntry[]>>
 }
 
@@ -20,7 +23,7 @@ export const HISTORY_PER_GAME = 8
 const EPOCH = Date.UTC(2024, 0, 1)
 
 export function emptyHistory(): BrainHistory {
-  return { v: 2, rounds: {} }
+  return { v: 3, rounds: {} }
 }
 
 export function dayNumber(day: string): number {
@@ -61,7 +64,7 @@ function rescaleEntry(id: BrainGameId, [day, level10, accuracy]: HistoryEntry): 
   return [day, Math.max(0, Math.min(5_000, Math.round(migrateLevelV1(id, level10 / 10) * 10))), accuracy]
 }
 
-/** Reads any version and returns v2: entries of a history older than v2 move to the v2 level scale, once. */
+/** Reads any version and returns v3: entries of a history older than v2 move to the v2 level scale, once (v2 → v3 changes nothing). */
 export function parseHistory(raw: string | null | undefined): BrainHistory {
   if (!raw) return emptyHistory()
   try {
@@ -69,11 +72,12 @@ export function parseHistory(raw: string | null | undefined): BrainHistory {
     const oldScale = !(typeof data.v === 'number' && data.v >= 2)
     const rounds: BrainHistory['rounds'] = {}
     for (const [id, list] of Object.entries(data.rounds ?? {})) {
-      if (!isBrainGameId(id) || !Array.isArray(list)) continue
+      // A removed game's entries (RETIRED_GAME_IDS) are kept for older app versions; nothing shows them.
+      if (!isSavedGameId(id) || !Array.isArray(list)) continue
       const entries = list.filter(isEntry).slice(-HISTORY_PER_GAME)
-      rounds[id] = oldScale ? entries.map((e) => rescaleEntry(id, e)) : entries
+      rounds[id as BrainGameId] = oldScale ? entries.map((e) => rescaleEntry(id as BrainGameId, e)) : entries
     }
-    return { v: 2, rounds }
+    return { v: 3, rounds }
   } catch {
     return emptyHistory()
   }

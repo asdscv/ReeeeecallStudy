@@ -251,8 +251,8 @@ export function MainDrawer() {
           width: 280,
           backgroundColor: theme.colors.surfaceElevated,
         },
-        // Off on full-screen surfaces: the 40pt edge zone sat on top of Quick Eye's left-hand
-        // direction button and the first column of game grids.
+        // Off on full-screen surfaces: the 40pt edge zone sat on top of the first column of game
+        // grids.
         swipeEnabled: !isFullscreenScreen(getFocusedRouteNameFromRoute(route)),
         swipeEdgeWidth: 40,
       })}

@@ -2,7 +2,7 @@
   "title": "脳トレ",
   "subtitle": "集中・記憶のゲームで続ける、脳を使う習慣",
   "disclaimer": "この機能は医療機器ではなく、いかなる病気や症状の診断・治療・治癒・予防を目的とするものでもありません。",
-  "worry": "記憶力が心配なときは、ゲームを増やすよりも、医師やお住まいの地域の保健窓口に相談してください。",
+  "worry": "記憶が気になるときは、医師や地域の相談窓口にご相談ください。",
   "training": {
     "title": "今日のトレーニング",
     "desc": "ゲーム{{count}}つ · 約{{minutes}}分",
@@ -43,10 +43,8 @@
     "level": "Lv. {{level}}",
     "best": "最高 Lv. {{level}}",
     "new": "NEW",
-    "quickEyeLevel": "ステージ{{stage}} · スピード {{speed}}",
     "record": "最高 {{value}}点",
     "settings": "設定",
-    "research": "研究の根拠",
     "howItWorks": "問題は毎回新しく作られます。正解すると次は少し難しく、間違えると少し易しくなります。レベルはそのゲームの腕前を示すだけで、記憶力や脳の健康を測るものではありません。"
   },
   "settings": {
@@ -57,9 +55,6 @@
     "timing_1_5": "1.5倍",
     "timing_2": "2倍",
     "timing_0": "制限なし",
-    "centerOnly": "クイックアイ: 中央のみ",
-    "centerOnlyHelp": "端に出る星が見えにくい場合はオンにしてください。中央の絵だけに答えます。",
-    "flash": "クイックアイでは絵がごく短い時間だけ表示されます。光の点滅に敏感な方は無理をしないでください。",
     "close": "閉じる",
     "sound": "効果音",
     "soundHelp": "正解・不正解のときに短い音が鳴ります。",
@@ -73,10 +68,6 @@
     "reasoning": "推理"
   },
   "games": {
-    "quickEye": {
-      "name": "クイックアイ",
-      "desc": "中央の形を見ながら、まわりに一瞬出た星がどちらにあったかをひと目でとらえる練習です。"
-    },
     "memoryGrid": {
       "name": "瞬間記憶",
       "desc": "位置を覚える練習: 光ったマスを覚えて、タップしましょう。"
@@ -108,6 +99,22 @@
     "series": {
       "name": "規則さがし",
       "desc": "規則を見つけて、次の数を選びましょう。"
+    },
+    "setMatch": {
+      "name": "セット探し",
+      "desc": "それぞれの特徴がすべて同じか、すべて異なる3枚を探します。"
+    },
+    "codeBreak": {
+      "name": "数字当て",
+      "desc": "数字と位置が合えばストライク、数字だけならボール。ヒントで暗証番号を当てます。"
+    },
+    "makeNumber": {
+      "name": "数字を作ろう",
+      "desc": "すべての数字を1回ずつ使って目標の数を作ります。"
+    },
+    "mazeRun": {
+      "name": "迷路",
+      "desc": "道をなぞって旗まで進みます。行き止まりでは引き返せます。"
     }
   },
   "play": {
@@ -184,59 +191,74 @@
     "newBestReverse_one": "逆順で{{count}}個！",
     "newBestReverse_other": "逆順で{{count}}個！",
     "lookalikeBadge": "似た絵",
-    "practiceHintNoLives": "練習です。点数には入りません。"
-  },
-  "quickEye": {
-    "watch": "中央を見て",
-    "what": "中央に何がありましたか？",
-    "where": "星はどの方向にありましたか？",
-    "sameOrDifferent": "中央の2つの絵は同じでしたか？",
-    "same": "同じ",
-    "different": "違う",
-    "circle": "丸",
-    "square": "四角",
-    "stage": "ステージ{{stage}}",
-    "dir": {
-      "0": "上",
-      "1": "右上",
-      "2": "右",
-      "3": "右下",
-      "4": "下",
-      "5": "左下",
-      "6": "左",
-      "7": "左上"
+    "setMatchFind": "各特徴がすべて同じか、すべて異なる3枚を選んでください",
+    "setMatchNone": "セットなし",
+    "setPicked_one": "{{count}}枚選択",
+    "setPicked_other": "{{count}}枚選択",
+    "setCard_one": "図形{{count}}個",
+    "setCard_other": "図形{{count}}個",
+    "setBroken": "{{attributes}}を確認。2枚だけ同じではセットになりません。",
+    "setAttribute": {
+      "shape": "形",
+      "count": "個数",
+      "color": "色",
+      "fill": "塗り"
     },
-    "speedLevel": "スピードレベル {{level}}",
-    "knob": {
-      "wider": "今度はもっと広く見て",
-      "ring2": "中間の輪まで",
-      "ring3": "外側の輪まで",
-      "crowd": "三角の中から星をさがす",
-      "moreCrowd": "三角が増えます",
-      "similar": "中央の形がもっと似てきます",
-      "sameDiff": "同じ？ 違う？"
+    "setShape": {
+      "circle": "丸",
+      "triangle": "三角",
+      "square": "四角",
+      "diamond": "ひし形"
     },
-    "stageUp": {
-      "title": "新しいステージ",
-      "stage": "ステージ{{stage}}",
-      "ease": "新しいステージなので、最初は少しゆっくり見せます",
-      "continue": "続ける"
+    "setColor": {
+      "blue": "青",
+      "vermillion": "朱色",
+      "black": "黒"
     },
-    "gauge": "あと{{count}}問正解で1段速くなります",
-    "speedUp": "1段速くなりました",
-    "topSpeed": "最高速度",
-    "hold": "最高速度キープ {{n}}/14",
-    "wasHere": "ここにありました",
-    "nearMiss": "おしい、すぐとなりでした",
-    "missFast": "今のは速かったですね",
-    "slowerStart": "少し速くなります",
-    "legEnd": "区間終了",
-    "nextGoal": "次の目標：スピードレベル{{level}}あたりを安定して",
-    "landscapeHint": "スマホを横向きにするか、タブレットだともっと広く見えます",
-    "revealA11y": "正解：{{center}}、星は{{dir}}",
-    "warmup": "準備中",
-    "gauge_other": "あと{{count}}問正解で1段速くなります",
-    "gauge_one": "あと{{count}}問正解で1段速くなります"
+    "setFill": {
+      "solid": "塗りつぶし",
+      "striped": "しま模様",
+      "outline": "輪郭のみ"
+    },
+    "codeBreakGuess_one": "{{length}}桁を当ててください · 残り{{count}}回",
+    "codeBreakGuess_other": "{{length}}桁を当ててください · 残り{{count}}回",
+    "codeGuesses": "試行 {{used}}/{{total}}",
+    "codeRepeats": "同じ数字も使えます",
+    "codeDistinct": "数字は重複しません",
+    "codeHistory": "これまでの試行とヒント",
+    "codeFirstGuess": "数字を押して試してみましょう",
+    "codeFeedback": "{{strikes}}ストライク · {{balls}}ボール",
+    "codeEntry": "入力中の数字",
+    "codeNotes": "除外する数字のメモ",
+    "codeNote": "{{digit}}の除外メモを切り替え",
+    "codeAnswer": "答え {{code}}",
+    "erase": "消す",
+    "submit": "決定",
+    "undo": "戻す",
+    "clear": "クリア",
+    "makeNumberSigns": "記号を選んで{{target}}を作ってください",
+    "makeNumberTarget": "全部の数字で{{target}}を作ってください",
+    "makeTarget": "目標 {{target}}",
+    "makeFixed": "この順番で記号を選びます",
+    "makeAny": "各数字を1回ずつ、順番は自由",
+    "makeTries_one": "残り{{count}}回",
+    "makeTries_other": "残り{{count}}回",
+    "makeExpression": "作成中の式",
+    "makeValue": "この式は{{value}}になります。直してみましょう。",
+    "mazeRunGo": "道をなぞって旗まで進んでください",
+    "mazeRunKeys_one": "{{count}}個の鍵を番号順に集めてから旗へ",
+    "mazeRunKeys_other": "{{count}}個の鍵を番号順に集めてから旗へ",
+    "mazeRunMemorize": "壁と道を覚えてください",
+    "mazeMemorise": "まもなく壁が隠れます",
+    "mazeDrag": "ドラッグか隣のマスをタップ。戻ると消えます",
+    "mazeBumps_one": "あと{{count}}回ぶつかれます",
+    "mazeBumps_other": "あと{{count}}回ぶつかれます",
+    "mazeStart": "スタート",
+    "mazeGoal": "旗・ゴール",
+    "mazeKey_one": "{{count}}番の鍵",
+    "mazeKey_other": "{{count}}番の鍵",
+    "memorizeNumbers": "数字の位置を覚えてください · 1〜{{max}}",
+    "memoryBadge": "裏返して記憶"
   },
   "summary": {
     "livesOut": "ラウンド終了",
@@ -259,50 +281,25 @@
     "voided": "画面が何度も止まったため、ラウンドを中断しました"
   },
   "colors": {
-    "red": "あか",
     "blue": "あお",
-    "green": "みどり",
-    "yellow": "きいろ",
+    "orange": "オレンジ",
     "purple": "むらさき",
-    "orange": "オレンジ"
+    "black": "くろ",
+    "brown": "ちゃいろ",
+    "gray": "はいいろ"
   },
   "intro": {
     "howTo": "遊び方",
     "replay": "もう一度見る",
     "start": "スタート",
-    "practiceNote": "最初の4問は練習です。チャンスは減らず、点数も入りません。",
+    "practiceNote": "最初の数問は練習です。チャンスや得点は減りません。",
     "level": "レベル",
-    "speed": "速さ",
-    "stage": "ステージ",
     "rounds": "プレイ回数",
     "best": "最高スコア",
     "welcomeBack": "おかえりなさい。最初の何問かで、合うレベルをもう一度探します。",
-    "firstPlacement": "最初の何問かで、合うスタートレベルを探します。",
-    "practiceNoteNoLives": "最初の数問は練習です。点数には入りません。"
+    "firstPlacement": "最初の何問かで、合うスタートレベルを探します。"
   },
   "mechanics": {
-    "quickEye": {
-      "periphery": {
-        "title": "星もさがそう",
-        "body": "中央の図形といっしょに、外側にも星が一瞬出ます。中央の図形を選んでから、星があった方向も選んでください。"
-      },
-      "distractors": {
-        "title": "三角形の中の星",
-        "body": "三角形もいっしょに出ます。ひとつだけの星があった方向を選んでください。"
-      },
-      "similar": {
-        "title": "似た形",
-        "body": "四角の角が丸くなり、円に近づきます。"
-      },
-      "sameDiff": {
-        "title": "同じ？ちがう？",
-        "body": "中央に図形が2つ出ます。同じかちがうかを選んでください。"
-      },
-      "clearView": {
-        "title": "画面がくっきりしました",
-        "body": "目隠しの模様が変わったので、最初の数問は少しゆっくり始めます。"
-      }
-    },
     "oddOneOut": {
       "rotation": {
         "title": "向きがちがう1つ",
@@ -318,7 +315,7 @@
       },
       "glyphs": {
         "title": "まぎらわしい文字",
-        "body": "bとd、6と9のような似た文字が出ます。"
+        "body": "bとd、OとQのような似た文字が出ます。"
       },
       "colorNoise": {
         "title": "色は関係ありません",
@@ -383,6 +380,10 @@
       "unmarked": {
         "title": "しるしなし",
         "body": "見つけた数字がうすくなりません。どこまでタップしたか覚えておいてください。"
+      },
+      "memory": {
+        "title": "裏返して記憶",
+        "body": "位置を覚え、カードが裏返ったら1から順番に押します。間違えたカードは少しだけ見えます。"
       }
     },
     "memoryGrid": {
@@ -399,6 +400,10 @@
       "reverse": {
         "title": "逆の順に",
         "body": "見た順番とは逆に、最後に光ったマスからタップしてください。これからはずっと逆の順です。"
+      },
+      "faster": {
+        "title": "もっと速く光ります",
+        "body": "マスが前より速く続けて光ります。順番を見逃さないで。"
       }
     },
     "series": {
@@ -481,6 +486,22 @@
       "missingTerm": {
         "title": "空欄をさがす",
         "body": "これからは ? が列の途中にも出ます。空欄に入る数を選んでください。"
+      },
+      "primes": {
+        "title": "順にならぶ素数",
+        "body": "1とその数自身でしか割り切れない数（素数）が順にならぶルールが出ます。"
+      },
+      "product": {
+        "title": "前の2つの数をかける",
+        "body": "前の2つの数をかけて次の数をつくるルールが出ます。"
+      },
+      "digitSum": {
+        "title": "各位の数字をたす",
+        "body": "その数に各位の数字をたして次の数をつくるルールが出ます。"
+      },
+      "diffPrimes": {
+        "title": "間隔が素数",
+        "body": "間隔が素数の順に大きくなるルールが出ます。"
       }
     },
     "pairs": {
@@ -556,19 +577,105 @@
         "title": "2けた × 2けた",
         "body": "2けたの数どうしのかけ算が出ます。"
       }
+    },
+    "setMatch": {
+      "color": {
+        "title": "色も見ましょう",
+        "body": "形と個数に色が加わります。色も全部同じか全部違う必要があります。"
+      },
+      "fill": {
+        "title": "塗り方も見ましょう",
+        "body": "塗りつぶし・しま・輪郭にも注目。各特徴が全部同じか全部違えばセットです。"
+      },
+      "none": {
+        "title": "セットがないことも",
+        "body": "どの3枚もセットにならないときは「セットなし」を押します。"
+      },
+      "oneSet": {
+        "title": "セットは1つだけ",
+        "body": "似たカードの中から唯一のセットを探しましょう。"
+      }
+    },
+    "codeBreak": {
+      "three": {
+        "title": "3桁の数字",
+        "body": "今度は3桁。数字と位置が合えばストライク、数字だけならボールです。"
+      },
+      "four": {
+        "title": "4桁の数字",
+        "body": "これまでのヒントを合わせて4桁を当てましょう。"
+      },
+      "five": {
+        "title": "5桁の数字",
+        "body": "5桁になります。数字だけでなく位置も推理しましょう。"
+      },
+      "zero": {
+        "title": "0も登場",
+        "body": "暗証番号に0も使われます。先頭が0の場合もあります。"
+      },
+      "repeats": {
+        "title": "数字が重複します",
+        "body": "同じ数字が複数回出ることがあります。個数もヒントから考えましょう。"
+      }
+    },
+    "makeNumber": {
+      "multiply": {
+        "title": "掛け算も使えます",
+        "body": "×が使えます。掛け算を足し算・引き算より先に計算します。"
+      },
+      "divide": {
+        "title": "割り算も使えます",
+        "body": "÷も使えます。×と÷を左から先に計算します。"
+      },
+      "anyOrder": {
+        "title": "数字の順番も自由",
+        "body": "好きな順番で数字を押します。全部の数字を1回ずつ使ってください。"
+      },
+      "brackets": {
+        "title": "括弧を使いましょう",
+        "body": "括弧の中を先に計算します。この目標には括弧が必要です。"
+      },
+      "target24": {
+        "title": "24を作ろう",
+        "body": "4つの数字を1回ずつ使って24に。順番や括弧を工夫しましょう。"
+      },
+      "fraction": {
+        "title": "途中に分数も",
+        "body": "途中の計算が割り切れなくても大丈夫。最後が目標の数なら正解です。"
+      }
+    },
+    "mazeRun": {
+      "winding": {
+        "title": "分かれ道が増えます",
+        "body": "道が複雑になります。行き止まりでは来た道を戻りましょう。"
+      },
+      "keys": {
+        "title": "先に鍵を集めましょう",
+        "body": "番号順に鍵を集めてから旗へ。戻っても集めた鍵は残ります。"
+      },
+      "moreKeys": {
+        "title": "鍵が増えます",
+        "body": "すべての鍵を番号順に集めてください。"
+      },
+      "hidden": {
+        "title": "壁を覚えましょう",
+        "body": "少しすると壁が隠れます。道を覚えて進みましょう。ぶつかれる残り回数も表示されます。"
+      },
+      "hiddenKeys": {
+        "title": "覚えた道で鍵集め",
+        "body": "壁が隠れる迷路でも、鍵を番号順に集めてから旗へ進みます。"
+      }
     }
   },
   "rule": {
     "label": "新しいルール",
     "gotIt": "わかりました",
     "unscored": "この問題は点数とチャンスに入りません。",
-    "change": "変わった点",
-    "unscoredNoLives": "この問題は点数に入りません。"
+    "change": "変わった点"
   },
   "placement": {
     "label": "スタートレベルを探しています",
-    "hint": "何問かで合うレベルを探しています。チャンスは減りません。",
-    "hintNoLives": "何問かで、ちょうどいいレベルを探しています。"
+    "hint": "何問かで合うレベルを探しています。チャンスは減りません。"
   },
   "tiers": {
     "none": "ランクなし",
@@ -612,17 +719,9 @@
       "title": "7つを記憶",
       "body": "順番記憶か瞬間記憶で7つを覚えきりました。"
     },
-    "quickEyeStage5": {
-      "title": "クイックアイ ステージ5",
-      "body": "クイックアイのステージ5に上がりました。"
-    },
-    "quickEyeStage10": {
-      "title": "クイックアイ ステージ10",
-      "body": "クイックアイのステージ10に上がりました。"
-    },
     "allGames": {
       "title": "すべてのゲーム",
-      "body": "9つのゲームをすべてプレイしました。"
+      "body": "すべてのゲームをプレイしました。"
     },
     "firstSession": {
       "title": "はじめてのトレーニング",

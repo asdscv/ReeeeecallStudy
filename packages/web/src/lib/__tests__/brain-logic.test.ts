@@ -8,6 +8,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import {
   ACHIEVEMENTS,
+  ACHIEVEMENT_BITS,
   BRAIN_GAMES,
   DEFAULT_CONTEXT,
   MECHANICS,
@@ -22,7 +23,6 @@ import {
   brainGame,
   createRng,
   crossGameSeed,
-  quickEyeTierStage,
   earnedByRound,
   emptyMeta,
   emptyProgress,
@@ -34,7 +34,6 @@ import {
   orMask,
   parseMeta,
   pCorrect,
-  placementCeiling,
   placementDone,
   placementLevel,
   placementResult,
@@ -146,7 +145,7 @@ describe('placement', () => {
     expect([PLACEMENT.pairs, PLACEMENT.memoryGrid, PLACEMENT.sequence].map((x) => x?.method)).toEqual(['probe', 'fast', 'fast'])
   })
 
-  it('the flat tail is really the share asked for; unset keeps the old prior (Quick Eye)', () => {
+  it('the flat tail is really the share asked for; unset keeps the old prior', () => {
     const p = startPlacement({ lo: 1, hi: 26, mu0: 3, sigma0: 9, target: 0.85, slope: 2, maxMove: 3, minTrials: 8, maxTrials: 14, tailMass: 0.2 })
     const total = p.post.reduce((a, b) => a + b, 0)
     // The top of the range keeps at least the flat share of mass per point.
@@ -174,7 +173,6 @@ describe('placement', () => {
   it('rule gating: placement and practice block every unseen rule; a counted trial lets only the lowest through, two cards a round, three counted trials apart', () => {
     const fresh = { shown: 0, countedSinceLast: null }
     for (const { id } of BRAIN_GAMES) {
-      if (id === 'quickEye') continue
       const rules = MECHANICS.filter((m) => m.game === id && m.kind === 'rule' && !m.retired)
       const tags = rules.map((m) => m.tag).sort()
       const live = [...rules].sort((a, b) => a.from - b.from)
@@ -209,7 +207,6 @@ describe('skill estimate', () => {
   it('k is 1 once settled, up to kMax while unsure; span never scales', () => {
     expect(stepMultiplier('speed', SKILL.speed.floor)).toBe(1)
     expect(stepMultiplier('speed', 100)).toBe(SKILL.speed.kMax)
-    expect(stepMultiplier('quickEye', 1.2)).toBeCloseTo(2)
     expect(stepMultiplier('span', 10)).toBe(1)
     // A game's own kMax (Match Pairs 1.5) caps it lower.
     expect(stepMultiplier('speed', 100, 1.5)).toBe(1.5)
@@ -223,8 +220,8 @@ describe('skill estimate', () => {
     expect(nextSd('speed', 2, false, 3)).toBeCloseTo(2 * 0.92)
     expect(nextSd('speed', 2, true, 0)).toBeCloseTo(2 * 0.7)
     expect(nextSd('speed', SKILL.speed.floor, false, 0)).toBe(SKILL.speed.floor)
-    // Only the speed group; Quick Eye keeps shrinking.
-    expect(nextSd('quickEye', 2, false, 6)).toBeCloseTo(2 * 0.92)
+    // Only the speed group; the span group keeps shrinking.
+    expect(nextSd('span', 2, false, 6)).toBeCloseTo(2 * 0.92)
   })
 
   it('uncertainty grows with days away, capped at sd0 — a return re-finds the level, a week off barely moves it', () => {
@@ -252,7 +249,7 @@ describe('skill estimate', () => {
 
 describe('mechanics (new rules and board changes)', () => {
   // Desktop 7×7 and a phone 5×7 (the boards that reach every grid size).
-  const contexts = [DEFAULT_CONTEXT, { ...DEFAULT_CONTEXT, maxCols: maxColsFor(358), maxRows: 7, ringSlots: [8, 16, 16] }]
+  const contexts = [DEFAULT_CONTEXT, { ...DEFAULT_CONTEXT, maxCols: maxColsFor(358), maxRows: 7 }]
   // No longer made (retired): nothing produces them.
   const live = MECHANICS.filter((m) => !m.retired)
 
@@ -265,25 +262,28 @@ describe('mechanics (new rules and board changes)', () => {
       expect(Object.keys(m).filter((k) => !allowed.has(k)), m.tag).toEqual([])
       expect('pending' in m, m.tag).toBe(false)
     }
-    // Retired: only Odd One Out's emoji near-twins (§2.10).
-    expect(MECHANICS.filter((m) => m.retired).map((m) => m.tag)).toEqual(['oddOneOut.nearTwin'])
+    // Retired: Quick Eye's five (the game was removed, owner 2026-11-13), Odd One Out's turned glyph
+    // (owner 2026-11-13) and its emoji near-twins (§2.10).
+    expect(MECHANICS.filter((m) => m.retired).map((m) => m.tag)).toEqual([
+      'quickEye.periphery', 'quickEye.distractors', 'quickEye.similar', 'quickEye.sameDiff',
+      'oddOneOut.rotation', 'oddOneOut.nearTwin', 'quickEye.clearView',
+    ])
+    // Every mechanic of a game no longer in the catalogue is retired.
+    for (const m of MECHANICS) if (!BRAIN_GAMES.some((g) => g.id === m.game)) expect(m.retired, m.tag).toBe(true)
   })
 
   it('every live mechanic is produced by some trial, and games report only registered ones', () => {
     const produced = new Set<string>()
     for (const { id, def } of BRAIN_GAMES) {
-      const levels = id === 'quickEye' ? Array.from({ length: 13 }, (_, i) => i) : [...Array.from({ length: 41 }, (_, i) => i + 1), 50, 60]
+      const levels = [...Array.from({ length: 41 }, (_, i) => i + 1), 50, 60]
       for (const ctx of contexts) {
         for (const level of levels) {
-          for (let variant = 1; variant <= 16; variant++) {
-            if (id !== 'quickEye' && variant > 1) break
-            for (let seed = 1; seed <= (id === 'quickEye' ? 6 : 25); seed++) {
-              const s = def.create(level, createRng(seed * 977 + level), { ...ctx, variant })
-              for (const tag of def.mechanics(s)) {
-                expect(mechanicInfo(tag), `${id} reported unknown tag ${tag}`).toBeDefined()
-                expect(mechanicInfo(tag)?.game).toBe(id)
-                produced.add(tag)
-              }
+          for (let seed = 1; seed <= 25; seed++) {
+            const s = def.create(level, createRng(seed * 977 + level), ctx)
+            for (const tag of def.mechanics(s)) {
+              expect(mechanicInfo(tag), `${id} reported unknown tag ${tag}`).toBeDefined()
+              expect(mechanicInfo(tag)?.game).toBe(id)
+              produced.add(tag)
             }
           }
         }
@@ -294,11 +294,11 @@ describe('mechanics (new rules and board changes)', () => {
   })
 
   it('a rule never appears below its stated level (cards come when the rule really starts)', () => {
-    for (const m of live.filter((x) => x.kind === 'rule' && x.game !== 'quickEye')) {
-      const def = brainGame(m.game).def
+    for (const m of live.filter((x) => x.kind === 'rule')) {
+      const def = brainGame(m.game as Parameters<typeof brainGame>[0]).def
       for (let seed = 1; seed <= 200; seed++) {
         // Span levels act as whole lengths (rounded), so stay a full step below.
-        const level = Math.max(1, m.from - (brainGame(m.game).group === 'span' ? 1 : 0.5))
+        const level = Math.max(1, m.from - (brainGame(m.game as Parameters<typeof brainGame>[0]).group === 'span' ? 1 : 0.5))
         const s = def.create(level, createRng(seed), DEFAULT_CONTEXT)
         expect(def.mechanics(s).includes(m.tag), `${m.tag} at ${level}`).toBe(false)
       }
@@ -324,25 +324,59 @@ describe('mechanics (new rules and board changes)', () => {
       // Each has its own copy, `mechanics.<game>.<name>`.
       expect(mechanicInfo(tag)?.copy, tag).toBe(tag)
     })
-    expect(MECHANICS.length).toBe(49 + appended.length)
+    // The released table ends there (bit 80); later blocks only append after it.
+    expect(MECHANICS.length).toBeGreaterThanOrEqual(49 + appended.length)
     const rules = ['math.missing', 'series.missingTerm', 'oddOneOut.mirror', 'oddOneOut.absent', 'schulte.alternate', 'schulte.alternateOpposite', 'stroop.labelInk', 'pairs.triples']
     for (const tag of appended) expect(mechanicInfo(tag)?.kind, tag).toBe(rules.includes(tag) ? 'rule' : 'board')
   })
 
-  it('placement ceilings count only live rules', () => {
-    const none = () => false
-    for (const { id } of BRAIN_GAMES) {
-      const rules = live.filter((m) => m.game === id && m.kind === 'rule').sort((a, b) => a.from - b.from)
-      expect(placementCeiling(id, none), id).toBe(rules.length >= 3 ? rules[2].from - 0.01 : Infinity)
-    }
+  it("the thinking games' block (2026-11-13): appended after the released table, one contiguous block in this order, rules where a new kind of content starts", () => {
+    const block: [tag: string, kind: 'rule' | 'board', from: number, copy: string][] = [
+      ['setMatch.board6', 'board', 2, 'board.moreCards'],
+      ['setMatch.board9', 'board', 6, 'board.moreCards'],
+      ['setMatch.color', 'rule', 4, 'setMatch.color'],
+      ['setMatch.board12', 'board', 7, 'board.moreCards'],
+      ['setMatch.fill', 'rule', 8, 'setMatch.fill'],
+      ['setMatch.oneSet', 'board', 13, 'setMatch.oneSet'],
+      ['setMatch.none', 'rule', 16, 'setMatch.none'],
+      ['setMatch.board15', 'board', 18, 'board.moreCards'],
+      ['codeBreak.three', 'board', 4, 'codeBreak.three'],
+      ['codeBreak.four', 'board', 8, 'codeBreak.four'],
+      ['codeBreak.zero', 'board', 12, 'codeBreak.zero'],
+      ['codeBreak.repeats', 'rule', 13, 'codeBreak.repeats'],
+      ['codeBreak.five', 'board', 19, 'codeBreak.five'],
+      ['makeNumber.target24', 'board', 16, 'makeNumber.target24'],
+      ['makeNumber.tiles4', 'board', 2, 'board.moreNumbers'],
+      ['makeNumber.multiply', 'rule', 4, 'makeNumber.multiply'],
+      ['makeNumber.divide', 'rule', 7, 'makeNumber.divide'],
+      ['makeNumber.brackets', 'rule', 13, 'makeNumber.brackets'],
+      ['makeNumber.tiles5', 'board', 3, 'board.moreNumbers'],
+      ['makeNumber.fraction', 'rule', 17, 'makeNumber.fraction'],
+      // Maze Run's ladder (games/maze-run.ts): sizes, keys from L11, hidden walls from L16, both from L21.
+      ['mazeRun.grid6', 'board', 3, 'board.biggerGrid'],
+      ['mazeRun.grid8', 'board', 5, 'board.biggerGrid'],
+      ['mazeRun.keys', 'rule', 11, 'mazeRun.keys'],
+      ['mazeRun.twoKeys', 'board', 13, 'mazeRun.moreKeys'],
+      ['mazeRun.hidden', 'rule', 16, 'mazeRun.hidden'],
+      ['mazeRun.threeKeys', 'board', 15, 'mazeRun.moreKeys'],
+      ['mazeRun.hiddenKeys', 'board', 21, 'mazeRun.hiddenKeys'],
+    ]
+    const first = mechanicInfo(block[0][0])!.bit
+    expect(first, 'after the released table (bits 0-80)').toBeGreaterThan(80)
+    block.forEach(([tag, kind, from, copy], i) => {
+      const m = mechanicInfo(tag)
+      expect(m, tag).toMatchObject({ bit: first + i, kind, from, copy })
+      expect(m?.retired, tag).toBeUndefined()
+    })
   })
+
 })
 
 describe('tiers', () => {
   // A phone 5×7, and 4 columns × 7 rows (Match Pairs' and Flash Grid's narrower boards).
   const phones = [
-    { ...DEFAULT_CONTEXT, maxCols: maxColsFor(358), maxRows: 7, ringSlots: [8, 16, 16] },
-    { ...DEFAULT_CONTEXT, maxCols: 4, maxRows: 7, ringSlots: [8, 16, 16] },
+    { ...DEFAULT_CONTEXT, maxCols: maxColsFor(358), maxRows: 7 },
+    { ...DEFAULT_CONTEXT, maxCols: 4, maxRows: 7 },
   ]
 
   it('six thresholds per game, rising, and every one reachable below the level ceiling on a phone', () => {
@@ -350,7 +384,6 @@ describe('tiers', () => {
       const t = TIERS[id]
       expect(t).toHaveLength(TIER_COUNT)
       for (let i = 1; i < t.length; i++) expect(t[i]).toBeGreaterThan(t[i - 1])
-      if (id === 'quickEye') continue
       for (const ctx of phones) {
         const cap = def.maxLevel?.(ctx) ?? Infinity
         expect(t[5], `${id} master below its cap on ${ctx.maxCols}x${ctx.maxRows}`).toBeLessThan(cap)
@@ -360,7 +393,7 @@ describe('tiers', () => {
 
   it('thresholds sit where the puzzle changes (GAMES_DIFFICULTY_PLAN §2.10)', () => {
     expect(TIERS).toMatchObject({
-      oddOneOut: [3, 7, 10, 13, 17, 26],
+      oddOneOut: [6, 11, 16, 21, 26, 31],
       schulte: [3, 6, 10, 14, 16, 21],
       stroop: [3, 7, 10, 14, 20, 27],
       math: [3, 6, 10, 13, 18, 23],
@@ -381,7 +414,7 @@ describe('tiers', () => {
 
   it('standing and its inverse round-trip', () => {
     for (const { id } of BRAIN_GAMES) {
-      for (const lv of [2, 5, 9, 13].filter((x) => x <= TIERS[id][5])) expect(levelAtStanding(id, standing(id, lv))).toBeCloseTo(Math.max(id === 'quickEye' ? 0 : 1, lv), 6)
+      for (const lv of [2, 5, 9, 13].filter((x) => x <= TIERS[id][5])) expect(levelAtStanding(id, standing(id, lv))).toBeCloseTo(Math.max(1, lv), 6)
     }
   })
 })
@@ -405,7 +438,7 @@ describe('achievements', () => {
     expect(got).toEqual(expect.arrayContaining(['firstClear', 'cleanRound', 'streak10']))
     const meta = { ...emptyMeta(), ach: got.reduce((m, a) => setBit(m, achievementBit(a)), '') }
     expect(earnedByRound(facts, emptyProgress(), meta)).toEqual([])
-    expect(ACHIEVEMENTS.length).toBeLessThanOrEqual(15)
+    expect(ACHIEVEMENT_BITS.length).toBeLessThanOrEqual(15)
   })
 
   it('a round under half right is not "cleared"', () => {
@@ -415,18 +448,33 @@ describe('achievements', () => {
     expect(earnedByRound({ ...facts, correct: 12 }, emptyProgress(), emptyMeta())).not.toContain('firstClear')
   })
 
-  it('centre-only Quick Eye: the field stages are one stage (the puzzle on screen never changed)', () => {
-    expect(quickEyeTierStage(9, true)).toBe(1)
-    expect(quickEyeTierStage(10, true)).toBe(2)
-    expect(quickEyeTierStage(9, false)).toBe(9)
-    const p = { ...emptyProgress(), quickEye: { ...emptyProgress().quickEye, variant: 9 }, settings: { ...emptyProgress().settings, centerOnly: true } }
-    const facts = { gameId: 'quickEye' as const, endedBy: 'stop' as const, cleared: false, trials: 3, correct: 3, livesLost: 0, bestStreak: 3, spanLength: 0, flawlessHunt: false }
-    expect(earnedByRound(facts, p, emptyMeta())).not.toContain('quickEyeStage5')
-
+  it("Quick Eye's two stage achievements are retired (the game was removed, owner 2026-11-13): their bits stay, never earned or listed", () => {
+    // Append-only: the bits after them never moved.
+    expect(ACHIEVEMENT_BITS.indexOf('quickEyeStage5')).toBe(6)
+    expect(ACHIEVEMENT_BITS.indexOf('quickEyeStage10')).toBe(7)
+    expect(achievementBit('allGames')).toBe(8)
+    expect(achievementBit('masterTier')).toBe(14)
+    expect(ACHIEVEMENTS as readonly string[]).not.toContain('quickEyeStage5')
+    expect(ACHIEVEMENTS as readonly string[]).not.toContain('quickEyeStage10')
+    expect(ACHIEVEMENTS).toHaveLength(ACHIEVEMENT_BITS.length - 2)
+    // An old save far along the old stages, with a gold Quick Eye tier: nothing comes of either.
+    const p = { ...emptyProgress(), quickEye: { ...emptyProgress().quickEye, variant: 16 } }
+    const facts = { gameId: 'stroop' as const, endedBy: 'stop' as const, cleared: false, trials: 3, correct: 3, livesLost: 0, bestStreak: 3, spanLength: 0, flawlessHunt: false }
+    const got: string[] = earnedByRound(facts, p, { ...emptyMeta(), tier: { quickEye: 6 } as BrainMeta['tier'] })
+    expect(got).not.toContain('quickEyeStage5')
+    expect(got).not.toContain('quickEyeStage10')
+    expect(got).not.toContain('goldTier')
+    expect(got).not.toContain('masterTier')
+    // A bit already earned in an old save stays set (and is simply not listed).
+    const old = parseMeta(serializeMeta({ ...emptyMeta(), ach: setBit('', 6) }))
+    expect(hasBit(old.ach, 6)).toBe(true)
   })
 
-  it('a Quick Eye estimate never seeds a board game (it is a speed level, not a tier-scale level)', () => {
-    expect(crossGameSeed({ ...emptyMeta(), sk: { quickEye: { mu: 8, sd: 1, n: 120, day: 1 } } }, 'oddOneOut')).toBeNull()
+  it("an old save's Quick Eye estimate never seeds a board game, and its meta still reads and round-trips", () => {
+    const meta = parseMeta(JSON.stringify({ v: 2, sk: { quickEye: { mu: 8, sd: 1, n: 120, day: 1 } }, tier: { quickEye: 4 }, rt: { quickEye: 900 } }))
+    expect((meta.sk as Record<string, unknown>).quickEye).toEqual({ mu: 8, sd: 1, n: 120, day: 1 })
+    expect(parseMeta(serializeMeta(meta))).toEqual(meta)
+    expect(crossGameSeed(meta, 'oddOneOut')).toBeNull()
   })
 })
 
@@ -445,7 +493,7 @@ describe('meta record', () => {
       sk: Object.fromEntries(BRAIN_GAMES.map((g) => [g.id, { mu: 12.34, sd: 1.5, n: 1234, day: 1050 }])),
       tier: Object.fromEntries(BRAIN_GAMES.map((g) => [g.id, 4])),
       seen: MECHANICS.reduce((mask, _m, i) => setBit(mask, i), ''),
-      ach: ACHIEVEMENTS.reduce((mask, _a, i) => setBit(mask, i), ''),
+      ach: ACHIEVEMENT_BITS.reduce((mask, _a, i) => setBit(mask, i), ''),
       practice: Object.fromEntries(BRAIN_GAMES.map((g) => [g.id, 4])),
       wipes: Object.fromEntries(BRAIN_GAMES.map((g) => [g.id, 1])),
       rt: Object.fromEntries(BRAIN_GAMES.map((g) => [g.id, 1234])),

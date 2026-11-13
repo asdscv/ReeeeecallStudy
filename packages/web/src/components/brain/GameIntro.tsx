@@ -2,30 +2,13 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 're
 import { useTranslation } from 'react-i18next'
 import { X, Play, Trophy, Gauge, Sparkles } from 'lucide-react'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
-import { GAME_THEMES, GROUP_RULES, brainGame, dayNumber, displayLevel, gameProgress, localDayKey, quickEyeStage, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
+import { GAME_THEMES, brainGame, dayNumber, displayLevel, gameProgress, localDayKey, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
 import { BRAIN_ICONS, cardBackground, focusIfKeyboard } from './brain-ui'
 import { DemoPlayer } from './DemoPlayer'
 import { GameCanvas } from './GameCanvas'
 import { TierMeter } from './TierBadge'
-import { quickEyeSpeedLevel, tierStanding } from './tier-ui'
-
-/** Quick Eye's «turn the phone sideways» line is shown once on this device. */
-const LANDSCAPE_HINT_KEY = 'reeeeecall-brain:qe-landscape-hint'
-
-/**
- * Whether Quick Eye's intro shows the landscape line: once per device, and only where it helps —
- * a phone or tablet held upright, with the periphery on (the outer ring is small on a portrait phone).
- */
-function wantsLandscapeHint(gameId: BrainGameId, centerOnly: boolean): boolean {
-  if (gameId !== 'quickEye' || centerOnly) return false
-  if (window.innerWidth >= 768 || window.innerHeight <= window.innerWidth) return false
-  try {
-    return localStorage.getItem(LANDSCAPE_HINT_KEY) === null
-  } catch {
-    return false
-  }
-}
+import { tierStanding } from './tier-ui'
 
 /**
  * Before a game: what it is, a demo of how it plays, where the player stands, and one big start.
@@ -55,7 +38,6 @@ export function GameIntro({
   const p = gameProgress(progress, gameId)
   const best = progress.bestRuns[gameId]
   const firstTime = !progress.practiced.includes(gameId)
-  const qe = gameId === 'quickEye'
   const standing = tierStanding(gameId, meta, progress)
   const played = p.rounds > 0 || standing.tier > 0
   const est = meta.sk[gameId]
@@ -64,16 +46,6 @@ export function GameIntro({
   const placementNext = entry.group !== 'span' && gameId !== 'pairs' && ((p.rounds === 0 && !est) || (est !== undefined && est.n === 0))
   // Back after two weeks or more: the first trials re-find the level (bigger steps), never "your level dropped".
   const welcomeBack = !placementNext && est !== undefined && est.day > 0 && dayNumber(localDayKey()) - est.day >= 14
-  const centerOnly = progress.settings.centerOnly
-  const [landscapeHint] = useState(() => wantsLandscapeHint(gameId, centerOnly))
-  useEffect(() => {
-    if (!landscapeHint) return
-    try {
-      localStorage.setItem(LANDSCAPE_HINT_KEY, '1')
-    } catch {
-      // Blocked storage: the line may show again next time, which is harmless.
-    }
-  }, [landscapeHint])
 
   const measure = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(360)
@@ -131,7 +103,6 @@ export function GameIntro({
           {steps && <p className="text-base font-semibold" style={{ color: theme.accent }}>{t('training.slot', { index: steps.index + 1, total: steps.games.length })}</p>}
           <h1 className="text-4xl font-extrabold tracking-tight">{t(`games.${gameId}.name`)}</h1>
           <p className="text-lg text-white/80 max-w-md">{t(`games.${gameId}.desc`)}</p>
-          {landscapeHint && <p className="text-sm text-white/60 max-w-md" data-testid="brain-intro-landscape">{t('quickEye.landscapeHint')}</p>}
           {played && (
             <div className="w-full mt-2">
               <TierMeter standing={standing} accent={theme.accent} compact testId="brain-intro-tier" />
@@ -141,24 +112,24 @@ export function GameIntro({
 
         <section className="mt-5 space-y-2" aria-labelledby="brain-howto">
           <h2 id="brain-howto" className="text-sm font-semibold uppercase tracking-wider text-white/70">{t('intro.howTo')}</h2>
-          <DemoPlayer gameId={gameId} width={width} centerOnly={centerOnly} variant={qe ? progress.quickEye.variant : undefined} />
+          <DemoPlayer gameId={gameId} width={width} />
         </section>
 
         <div className="mt-4 grid grid-cols-3 gap-2">
           {/* No level yet for a game never played or a placement left part-way (n = 0) — not its interim probe level. */}
           <IntroStat
             icon={<Gauge className="w-5 h-5" aria-hidden="true" />}
-            label={qe ? t('intro.speed') : t('intro.level')}
-            value={p.rounds === 0 || est?.n === 0 ? '—' : qe ? String(quickEyeSpeedLevel(p.level)) : displayLevel(p.level).toFixed(1)}
+            label={t('intro.level')}
+            value={p.rounds === 0 || est?.n === 0 ? '—' : displayLevel(p.level).toFixed(1)}
             accent={theme.accent}
           />
-          <IntroStat icon={<Sparkles className="w-5 h-5" aria-hidden="true" />} label={qe ? t('intro.stage') : t('intro.rounds')} value={qe ? String(quickEyeStage(progress.quickEye.variant, centerOnly)) : formatCount(p.rounds)} accent={theme.accent} />
+          <IntroStat icon={<Sparkles className="w-5 h-5" aria-hidden="true" />} label={t('intro.rounds')} value={formatCount(p.rounds)} accent={theme.accent} />
           <IntroStat icon={<Trophy className="w-5 h-5" aria-hidden="true" />} label={t('intro.best')} value={best ? formatCount(best) : '—'} accent={theme.accent} />
         </div>
 
         {(firstTime || placementNext || welcomeBack) && (
           <div className="mt-4 space-y-1.5 text-center text-base text-white/80" data-testid="brain-intro-notes">
-            {firstTime && <p>{t(GROUP_RULES[brainGame(gameId).group].lives === 0 ? 'intro.practiceNoteNoLives' : 'intro.practiceNote')}</p>}
+            {firstTime && <p>{t('intro.practiceNote')}</p>}
             {placementNext && <p>{t('intro.firstPlacement')}</p>}
             {welcomeBack && <p>{t('intro.welcomeBack')}</p>}
           </div>

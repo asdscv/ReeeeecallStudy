@@ -14,7 +14,8 @@ import { choiceGame, type ChoiceState } from './choice'
  * (L14), and a cue that comes later and later until it arrives with the word (L16, L18). Past L19
  * only the clock tightens; the puzzle stops changing at L34.
  */
-export const BRAIN_COLORS: readonly BrainColor[] = ['red', 'blue', 'green', 'yellow', 'purple', 'orange']
+/** The colour-vision-safe six (theme.ts INK_COLORS): no red, green or yellow. */
+export const BRAIN_COLORS: readonly BrainColor[] = ['blue', 'orange', 'purple', 'black', 'brown', 'gray']
 
 /** Past this only the clock would move, and the staircase stops (the clock is 1.6s there). */
 export const STROOP_MAX_LEVEL = 34

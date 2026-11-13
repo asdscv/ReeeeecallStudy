@@ -4,14 +4,21 @@
  * value every rule a player might read in the row agrees on, no distractor is explained by any of
  * them, the naive strategies (repeat the last difference, repeat the last ratio, pick a middle
  * option) fail most of the time, and the band mix, the clock and the missing-term gating hold.
+ * The 2026-11-13 families (triangular numbers, ×k − c, primes, products of the two before, digit
+ * sums, prime gaps) and the top band 30–31 are held to the same checks.
  */
 import { describe, it, expect, vi } from 'vitest'
 import { DEFAULT_CONTEXT, createRng, type ChoiceView, type CreateContext, type RecentTrial } from '@reeeeecall/shared/lib/brain-games'
+import { MECHANICS } from '@reeeeecall/shared/lib/brain-games'
 import { SERIES_BANDS, SERIES_MAX_LEVEL, series, seriesLimitMs, seriesPar } from '@reeeeecall/shared/lib/brain-games/games/series'
 import {
   GAP_ANYWHERE,
+  PRIMES,
   SERIES_FAMILIES,
+  SERIES_TOP_BAND,
+  SERIES_TOP_FIRST,
   buildSeriesRow,
+  digitSum,
   isSeriesFamily,
   seriesExplainedBy,
   seriesReadings,
@@ -82,7 +89,7 @@ const bandOf = (level: number) => SERIES_BANDS.filter((b) => b <= Math.floor(lev
 /** A trial's families by the band that brings each in (Number Pattern's "family" — ×3 and halving are one). */
 const familyBands = (t: Trial) => [...new Set(t.families.map((f) => SERIES_FAMILIES[f].band))]
 /** Families whose lines multiply — their tails may run to four digits. */
-const MULTIPLIES: ReadonlySet<SeriesFamilyId> = new Set(['geo', 'triple', 'halve', 'dbl', 'altOps', 'mixed', 'growF', 'cycle'])
+const MULTIPLIES: ReadonlySet<SeriesFamilyId> = new Set(['geo', 'triple', 'halve', 'dbl', 'altOps', 'altMinus', 'mixed', 'growF', 'cycle', 'product'])
 
 /** Collects failures, so a loop over thousands of trials makes one assertion (and stays fast). */
 function collect() {
@@ -98,9 +105,9 @@ const SLOW = 60_000
 const show = (t: Trial) => `B${t.band} ${t.families.join('+')}: ${t.row.map((x) => x ?? '?').join(', ')} [${t.options}] marked ${t.answer}`
 
 describe('Number Pattern: every row has one answer, and it is marked', () => {
-  it('readings agree on the marked option; no distractor is explained by any reading; all ≥ 0 (L1–28, 400 each)', () => {
+  it('readings agree on the marked option; no distractor is explained by any reading; all ≥ 0 (L1–31, 400 each)', () => {
     const c = collect()
-    for (const level of [...LEVELS, 2.5, 13.75, 21.4, 27.9]) {
+    for (const level of [...LEVELS, 2.5, 13.75, 21.4, 27.9, 29.5, 30.8]) {
       for (const t of chain(level, 400, 11)) {
         const at = () => `L${level} ${show(t)}`
         c.check(t.row.filter((x) => x === null).length === 1, at)
@@ -134,7 +141,7 @@ describe('Number Pattern: every row has one answer, and it is marked', () => {
 
 describe('Number Pattern: the band mix', () => {
   it('mostly the current band, never more than three bands below, never above; placement all current', () => {
-    for (const level of [...LEVELS, 4.5, 12.3, 21.8, 26.6]) {
+    for (const level of [...LEVELS, 4.5, 12.3, 21.8, 26.6, 30.5]) {
       const cur = bandOf(level)
       const trials = chain(level, 1500, 3)
       const idx = trials.map((t) => bandIndex(t.band))
@@ -164,7 +171,7 @@ describe('Number Pattern: the band mix', () => {
   }, SLOW)
 
   it('no family twice in a row unless it is the current band', () => {
-    for (const level of [5, 9, 14, 21, 22, 25, 28]) {
+    for (const level of [5, 9, 14, 21, 22, 25, 28, 31]) {
       const trials = chain(level, 1500, 23)
       const cur = bandOf(level)
       const repeats = trials.filter((t, i) => i >= 1 && t.band !== cur && familyBands(t).some((b) => familyBands(trials[i - 1]).includes(b)))
@@ -173,30 +180,37 @@ describe('Number Pattern: the band mix', () => {
   })
 
   it('the first trial after crossing into a level comes from the new band', () => {
-    for (const level of [5, 13, 21, 22, 24, 28]) {
+    for (const level of [5, 13, 21, 22, 24, 28, 30]) {
       const recent: RecentTrial[] = [{ level: level - 0.2, kind: 'b1' }]
       for (let seed = 0; seed < 100; seed++) expect(trial(level + 0.1, seed, { recent }).band).toBe(bandOf(level))
     }
   })
 
-  it('accepts any level: fractions, below 1, past the cap (28) and junk', () => {
-    expect(series.maxLevel!(DEFAULT_CONTEXT)).toBe(28)
+  it('accepts any level: fractions, below 1, past the cap (31) and junk', () => {
+    expect(series.maxLevel!(DEFAULT_CONTEXT)).toBe(31)
+    expect(SERIES_MAX_LEVEL).toBe(31)
     expect(trial(0.2, 1, { trialKind: 'placement' }).band).toBe(1)
-    expect(trial(120, 1, { trialKind: 'placement' }).band).toBe(28)
+    expect(trial(120, 1, { trialKind: 'placement' }).band).toBe(30)
     expect(trial(Number.NaN, 1).band).toBe(1)
     expect(trial(2.99, 1, { trialKind: 'placement' }).band).toBe(2)
   })
 
-  it('L22+ changes every two levels: bands 22, 24, 26, 28, each its own content', () => {
+  it('L22+ changes every two levels: bands 22, 24, 26, 28, 30, each its own content', () => {
     const bandAt = (level: number) => new Set(Array.from({ length: 40 }, (_, seed) => trial(level, seed, { trialKind: 'placement' }).band))
-    for (const [level, band] of [[22, 22], [23.9, 22], [24, 24], [25.5, 24], [26, 26], [27.99, 26], [28, 28]] as const) expect(bandAt(level), `L${level}`).toEqual(new Set([band]))
-    // 22–23 interleave two families from bands 4–12 (gap at the end); 24–25 from 9–16; 26–28 from 13–20, gap anywhere.
-    const pools: Record<number, [number, number]> = { 22: [4, 12], 24: [9, 16], 26: [13, 20], 28: [13, 20] }
-    for (const band of [22, 24, 26, 28]) {
+    for (const [level, band] of [[22, 22], [23.9, 22], [24, 24], [25.5, 24], [26, 26], [27.99, 26], [28, 28], [29.9, 28], [30, 30], [31, 30]] as const) {
+      expect(bandAt(level), `L${level}`).toEqual(new Set([band]))
+    }
+    // 22–23 interleave two families from bands 4–12 (gap at the end); 24–25 from 9–16; 26–29 from
+    // 13–20, gap anywhere; 30–31 one of the newest families (primes, products, digit sums, prime
+    // gaps) under a line from 13–20.
+    const pools: Record<number, [number, number]> = { 22: [4, 12], 24: [9, 16], 26: [13, 20], 28: [13, 20], 30: [12, 20] }
+    for (const band of [22, 24, 26, 28, 30]) {
       const trials = atBand(band, 300, 1)
       for (const t of trials) {
         expect(t.families, show(t)).toHaveLength(2)
+        expect(new Set(familyBands(t)).size, show(t)).toBe(2)
         expect(familyBands(t).every((b) => b >= pools[band][0] && b <= pools[band][1]), show(t)).toBe(true)
+        if (band === SERIES_TOP_BAND) expect(t.families.some((f) => SERIES_TOP_FIRST.includes(f)), show(t)).toBe(true)
       }
       expect(trials.some((t) => t.gap < t.row.length - 1), `B${band} gap inside`).toBe(band !== 22)
       if (band === 22) expect(trials.every((t) => t.gap === t.row.length - 1)).toBe(true)
@@ -204,13 +218,16 @@ describe('Number Pattern: the band mix', () => {
     // Band 28 shows fewer terms than 26 (down to free parameters + 2).
     const mean = (band: number) => atBand(band, 400, 2).reduce((a, t) => a + t.shown.length, 0) / 400
     expect(mean(28)).toBeLessThan(mean(26))
+    // Every new family turns up in the top band.
+    expect(new Set(atBand(30, 400, 3).flatMap((t) => t.families.filter((f) => SERIES_TOP_FIRST.includes(f))))).toEqual(new Set(SERIES_TOP_FIRST))
   })
 })
 
 describe('Number Pattern: each band is what the plan says (placement mode)', () => {
   const BAND_FAMILY: Record<number, SeriesFamilyId[]> = {
-    1: ['up'], 2: ['up2'], 3: ['down'], 4: ['geo'], 5: ['alt'], 6: ['grow'], 7: ['triple', 'halve'], 8: ['inter'], 9: ['fib'], 10: ['dbl'],
-    11: ['altOps'], 12: ['mixed'], 13: ['growF'], 14: ['trib'], 15: ['three'], 16: ['diffGrow'], 17: ['cycle'], 18: ['diffLines'], 19: ['diffFib'], 20: ['square', 'cube'],
+    1: ['up'], 2: ['up2'], 3: ['down'], 4: ['geo'], 5: ['alt'], 6: ['grow', 'tri'], 7: ['triple', 'halve'], 8: ['inter'], 9: ['fib'], 10: ['dbl'],
+    11: ['altOps', 'altMinus'], 12: ['mixed', 'prime'], 13: ['growF'], 14: ['trib', 'product'], 15: ['three'], 16: ['diffGrow'], 17: ['cycle', 'digitSum'],
+    18: ['diffLines'], 19: ['diffFib', 'diffPrime'], 20: ['square', 'cube'],
   }
 
   it('≥ 50 distinct rows per band, every band its own family', () => {
@@ -228,10 +245,26 @@ describe('Number Pattern: each band is what the plan says (placement mode)', () 
     const diffs = (xs: number[]) => xs.slice(1).map((x, i) => x - xs[i])
     const every = (xs: number[], k: number, r: number) => xs.filter((_, i) => i % k === r)
     const constant = (xs: number[]) => xs.every((x) => x === xs[0])
+    const consecutivePrimes = (xs: number[]) => {
+      const j0 = PRIMES.indexOf(xs[0])
+      return j0 >= 0 && xs.every((x, i) => PRIMES[j0 + i] === x)
+    }
+    // The 2026-11-13 families, each read on its own numbers.
+    const NEW: Partial<Record<SeriesFamilyId, (full: number[], d: number[], t: Trial) => boolean>> = {
+      prime: (full, _d, t) => consecutivePrimes(full) && full[0] <= 41 && t.shown.length >= 4,
+      product: (full) => full.every((x, i) => i < 2 || x === full[i - 1] * full[i - 2]) && full[0] >= 2 && full[1] >= 2,
+      digitSum: (full, d) => full.every((x, i) => i === 0 || x === full[i - 1] + digitSum(full[i - 1])) && full[0] >= 10 && new Set(d).size >= 3,
+      diffPrime: (_full, d, t) => consecutivePrimes(d) && t.shown.length >= 5,
+    }
     for (const band of SERIES_BANDS.slice(0, 20)) {
       for (const t of atBand(band, 300, 3)) {
         const full = t.row.map((x) => x ?? t.answer)
         const d = diffs(full)
+        const own = NEW[t.families[0]]
+        if (own) {
+          c.check(own(full, d, t), () => show(t))
+          continue
+        }
         const ok: Record<number, () => boolean> = {
           1: () => constant(d) && d[0] >= 1 && d[0] <= 3 && t.shown.length === 4,
           2: () => constant(d) && d[0] >= 4 && d[0] <= 12 && full[0] >= 10 && full[0] <= 99,
@@ -345,7 +378,7 @@ describe('Number Pattern: the clock', () => {
   })
 
   it("limit = the trial's band par × (1.15 − 0.35·frac(L)); bands 1–3 never under 14.8 s; no other floor", () => {
-    for (const level of [1, 1.5, 2.99, 3.4, 4, 4.75, 12.25, 13.5, 20.9, 21, 23.5, 27.99, 28]) {
+    for (const level of [1, 1.5, 2.99, 3.4, 4, 4.75, 12.25, 13.5, 20.9, 21, 23.5, 27.99, 28, 29.5, 31]) {
       const frac = level - Math.floor(level)
       const wrong = chain(level, 200, 17).filter((t) => {
         const raw = Math.round(seriesPar(t.band) * (1.15 - 0.35 * frac))
@@ -361,7 +394,7 @@ describe('Number Pattern: the clock', () => {
 
 describe('Number Pattern: the missing term', () => {
   it('with series.missingTerm blocked no row has a gap inside, and the tag never appears', () => {
-    for (const level of [21, 21.5, 22, 24, 25.5, 26, 28]) {
+    for (const level of [21, 21.5, 22, 24, 25.5, 26, 28, 30.5]) {
       for (const trialKind of ['counted', 'placement', 'intro'] as const) {
         const leaked = chain(level, 200, 19, { blockRules: ['series.missingTerm'], trialKind }).filter((t) => t.gap !== t.row.length - 1 || t.tags.includes('series.missingTerm'))
         expect(leaked.map(show), `L${level} ${trialKind}`).toEqual([])
@@ -410,7 +443,10 @@ describe('Number Pattern: what the player sees', () => {
         c.check(reveal.gaps!.length === t.row.length && reveal.gaps![t.row.length - 1] === '', () => `${show(t)} ${reveal.gaps}`)
         c.check(reveal.gaps!.slice(0, -1).filter((g) => g !== '').every((g) => /^([+−×÷]\d+|×\d[+−]\d)$/.test(g)), () => `${show(t)} ${reveal.gaps}`)
         if (t.families.length > 1 || ['inter', 'mixed', 'three'].includes(t.families[0])) c.check(reveal.groups !== undefined && new Set(reveal.groups).size >= 2, () => show(t))
-        c.check(reveal.lines !== undefined && reveal.lines[0].endsWith(`= ${t.answer}`), () => `${show(t)} ${reveal.lines}`)
+        // The gap worked out — or, for a prime, the rule named (a prime has no step to work out).
+        const gapIsPrime = (t.families.length > 1 ? t.families[t.gap % 2] : t.families[0]) === 'prime'
+        if (gapIsPrime) c.check(reveal.lines === undefined && reveal.prompt?.key === 'mechanics.series.primes.title', () => `${show(t)} ${JSON.stringify(reveal)}`)
+        else c.check(reveal.lines !== undefined && reveal.lines[0].endsWith(`= ${t.answer}`) && reveal.prompt === undefined, () => `${show(t)} ${reveal.lines}`)
       }
     }
     expect(c.out).toEqual([])
@@ -429,6 +465,56 @@ describe('Number Pattern: what the player sees', () => {
         const spec = buildSeriesRow(band, band, createRng(band * 7 + i), { gapInside: GAP_ANYWHERE.has(band) })
         expect(spec.families[0] === 'up' && spec.terms.join() === '2,4,6,8,10', `B${band} seed ${i}`).toBe(false)
       }
+    }
+  })
+})
+
+describe('Number Pattern: the 2026-11-13 families (owner «더 다양한 규칙»)', () => {
+  it('each new rule is read where it holds — and two shown terms alone are no reading', () => {
+    expect(seriesReadings([2, 3, 5, 7, null])).toEqual([11])
+    expect(seriesReadings([13, 17, 19, 23, null])).toEqual([29])
+    expect(seriesReadings([11, 13, null, 19, 23])).toEqual([17])
+    expect(seriesReadings([2, 3, 6, 18, null])).toEqual([108])
+    expect(seriesReadings([2, null, 6, 18, 108])).toEqual([3])
+    expect(seriesReadings([19, 29, 40, 44, null])).toEqual([52])
+    expect(seriesReadings([1, 3, 6, 11, 18, null])).toEqual([29])
+    expect(seriesReadings([1, 3, 6, 10, 15, null])).toEqual([21])
+    expect(seriesReadings([9, 18, 15, 30, 27, null])).toEqual([54])
+    expect(seriesExplainedBy([2, 3, 5, 7, null], 11)).toContain('primes')
+    expect(seriesExplainedBy([2, 3, 6, 18, null], 108)).toContain('product')
+    expect(seriesExplainedBy([19, 29, 40, 44, null], 52)).toContain('digitSum')
+    expect(seriesExplainedBy([1, 3, 6, 11, 18, null], 29)).toContain('diffPrimes')
+    // Two primes, two terms a digit sum apart: not enough to read a rule from.
+    expect(seriesReadings([5, 7, null])).toEqual([])
+    expect(seriesReadings([12, 15, null])).toEqual([])
+  })
+
+  it('every family is reachable, 28 in all, and each new tag is told from the band that brings it', () => {
+    const reached = new Set<SeriesFamilyId>()
+    for (const band of SERIES_BANDS) for (const t of atBand(band, 200, 13)) for (const f of t.families) reached.add(f)
+    expect(reached).toEqual(new Set(Object.keys(SERIES_FAMILIES)))
+    expect(reached.size).toBe(28)
+    const from = Object.fromEntries(MECHANICS.filter((m) => m.game === 'series').map((m) => [m.tag, m.from]))
+    for (const f of Object.values(SERIES_FAMILIES)) if (f.tag) expect(from[f.tag], `${f.id} ${f.tag}`).toBeLessThanOrEqual(f.band)
+    expect([from['series.primes'], from['series.product'], from['series.digitSum'], from['series.diffPrimes']]).toEqual([12, 14, 17, 19])
+    for (const tag of ['series.primes', 'series.product', 'series.digitSum', 'series.diffPrimes']) expect(MECHANICS.find((m) => m.tag === tag)).toMatchObject({ kind: 'board', copy: tag })
+  })
+
+  it('the reveal: a product steps by × the term two back; a digit sum works the digits out', () => {
+    const products = atBand(14, 300, 17).filter((t) => t.families[0] === 'product')
+    const sums = atBand(17, 300, 17).filter((t) => t.families[0] === 'digitSum')
+    expect(products.length).toBeGreaterThan(50)
+    expect(sums.length).toBeGreaterThan(50)
+    for (const t of products) {
+      const full = t.row.map((x) => x ?? t.answer)
+      const reveal = (series.view(series.tap(t.s, t.s.correctIndex)) as ChoiceView).stimulus.reveal!
+      for (let i = 1; i + 1 < full.length; i++) expect(reveal.gaps![i], show(t)).toBe(`×${full[i - 1]}`)
+      expect(reveal.lines![0], show(t)).toBe(`${full.at(-3)} × ${full.at(-2)} = ${t.answer}`)
+    }
+    for (const t of sums) {
+      const reveal = (series.view(series.tap(t.s, t.s.correctIndex)) as ChoiceView).stimulus.reveal!
+      const before = t.row.at(-2) as number
+      expect(reveal.lines![0], show(t)).toBe(`${before} + ${String(before).split('').join(' + ')} = ${t.answer}`)
     }
   })
 })

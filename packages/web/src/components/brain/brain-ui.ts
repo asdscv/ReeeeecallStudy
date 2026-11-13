@@ -1,4 +1,4 @@
-import { Aperture, LayoutGrid, Repeat, Copy, Hash, Eye, Droplet, PlusCircle, TrendingUp, type LucideIcon } from 'lucide-react'
+import { Aperture, Compass, LayoutGrid, Layers, Lock, Repeat, Copy, Hash, Eye, Droplet, PlusCircle, Target, TrendingUp, type LucideIcon } from 'lucide-react'
 import { INK_COLORS, maxRowsFor, type CellInk } from '@reeeeecall/shared/lib/brain-games'
 import type { BrainStorage } from '@reeeeecall/shared/stores/brain-store'
 import type { PlatformContext } from '@reeeeecall/shared/hooks/useBrainRound'
@@ -14,6 +14,11 @@ export const BRAIN_ICONS: Record<string, LucideIcon> = {
   droplet: Droplet,
   'plus-circle': PlusCircle,
   'trending-up': TrendingUp,
+  // The thinking games (2026-11-13): Set Match, Code Break, Make the Number, Maze Run.
+  layers: Layers,
+  lock: Lock,
+  target: Target,
+  compass: Compass,
 }
 
 /** Ink colours for the colour-word game (shared with the app). */
@@ -114,19 +119,14 @@ export function cardBackground(theme: { cardFrom: string; cardTo: string }): str
 }
 
 /**
- * The web's platform context. Quick Eye starts at 33ms (two 60Hz frames) — a browser's frame
- * timing is not trustworthy enough at one frame without hardware checks — and keeps the inner ring
- * to the 8 radial positions on small screens, where 16 stimuli would overlap the centre box.
+ * The web's platform context.
  *
  * `maxRows`: the tallest grid that keeps 56px cells in the board's height, less the strip a tall
  * board carries above it (Flash Grid's «N칸» and waves) — so a portrait 5×7 board is only offered
  * where it fits without scrolling.
  */
 export function webPlatform(_boardWidth: number, maxCols: number, maxRows = maxRowsFor(boardHeight() - BOARD_STRIP_H)): PlatformContext & { maxRows: number } {
-  // Decided by the screen, as the app does (its screenShortSide) — not by the board, which is
-  // capped at 560px and would always read as "small".
-  const small = Math.min(window.innerWidth, window.innerHeight) < 600
-  return { maxCols, maxRows, minExposureMs: 33, ringSlots: small ? [8, 16, 16] : [16, 16, 16] }
+  return { maxCols, maxRows }
 }
 
 /**

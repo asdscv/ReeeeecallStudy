@@ -13,10 +13,6 @@ import type { GameGroup } from './types'
  * With lives, a 73% target meant a 3-life round lasted ~11 trials and nearly every round ended in
  * failure (expected trials ≈ lives / (1 − p)). So the targets are higher:
  *   - speed / variety games: 85% (+0.15 / −0.85), 3 lives, a round "clears" at 20 trials
- *   - Quick Eye: 80% (+0.25 / −1.0), NO lives (`lives: 0`): a leg of 20 trials ends at its cap,
- *     the time budget or the player's stop, never on misses. The 80% target is a product decision
- *     (the trials tracked 75%); with no lives it stays for continuity, not because a round could
- *     run out. The lives count stays a setting for an A/B test, never evidence of an effect.
  *   - span tasks (Flash Grid, Sequence): the Corsi stop rule — two tries at each length; one right
  *     moves up a length, both wrong ends the round (Kessels 2000)
  * How unsure the game still is of the player's level scales both steps by the same factor (skill.ts
@@ -25,7 +21,7 @@ import type { GameGroup } from './types'
  * own estimate (the mean of its reversal levels).
  */
 export interface GroupRules {
-  /** Misses a round absorbs. For span games this is per length and refills on each step up. 0 = no lives at all. */
+  /** Misses a round absorbs. For span games this is per length and refills on each step up. */
   lives: number
   /** Level change on a right answer, and on a wrong one (span: wrong does not move the level). */
   up: number
@@ -43,7 +39,6 @@ export interface GroupRules {
 
 export const GROUP_RULES: Record<GameGroup, GroupRules> = {
   speed: { lives: 3, up: 0.15, down: 0.85, roundCap: 20, min: 1, max: Infinity, restartDrop: 0.5 },
-  quickEye: { lives: 0, up: 0.25, down: 1.0, roundCap: 20, min: 0, max: 12, restartDrop: 1.0 },
   span: { lives: 2, up: 1, down: 0, roundCap: 14, min: 1, max: Infinity, restartDrop: 2 },
 }
 

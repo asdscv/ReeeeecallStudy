@@ -4,26 +4,32 @@ import type { BrainGameDef, CellInk, CellView, CreateContext, GridView, RecentTr
 /**
  * Every cell is the same except one. Find it. Selective attention.
  *
- * The level picks what the odd one is (GAMES_DIFFICULTY_PLAN §3.3), not just how big the board is:
- * a pop-out (L1-2), a same-colour look-alike (L3), the same glyph turned (L5, the turn shrinking
- * every level), confusable glyphs (L7), colour noise to ignore (L10), the one mirror image among
- * glyphs all turned at random (L12), boards with no odd one at all (L16, «없음»), and near-identical
- * CJK characters (L17). Kinds are drawn by weight, never the same one three times running; past
- * L25 only the clock tightens, to a floor.
+ * A level is a content tier and a board size (owner, 2026-11-13: «난이도 올릴 때 전체 카드 갯수
+ * 올리도록», «처음에는 4개 카드에서 찾기, 그 다음에 9개 16개 25개 36개»). Inside every tier the board
+ * grows one size a level — 2×2, 3×3, 4×4, 5×5, 6×6, as far as the screen allows — and the next tier
+ * starts again at 4 cards: a pop-out (L1-5), same-colour look-alikes (L6-10), confusable letters
+ * (L11-15), the one mirror image among glyphs all turned at random (L16-20), mirror images and
+ * near-identical CJK characters in colour noise (L21-25), and those again on boards that may have no
+ * odd one at all (L26-31, «없음», with a 7×7 step where the screen allows). Past L31 only the clock
+ * tightens, to a floor. No board asks for the one turned glyph: a turn alone is not the puzzle
+ * (owner: «하나만 회전되어 있는거 찾기 빼자»; `oddOneOut.rotation` is retired).
  */
-export type OddKind = 'pop' | 'lookalike' | 'rotation' | 'glyph' | 'noise' | 'mirror' | 'twin'
+export type OddKind = 'pop' | 'lookalike' | 'glyph' | 'noise' | 'mirror' | 'twin'
 
 export interface OddOneOutState {
+  /** The level this board was built at (its tier's first level when it opens new content — see `arriving`). */
   level: number
+  /** Content tier, 1-6. */
+  tier: number
   cols: number
   rows: number
   kind: OddKind
   common: string
-  /** The odd cell's label (the common one on an empty board, and on rotation and mirror boards). */
+  /** The odd cell's label (the common one on an empty board, and on mirror boards). */
   odd: string
-  /** Per cell, degrees; 0 is upright. */
+  /** Per cell, degrees; 0 is upright. Only mirror boards turn their cells. */
   rotations: number[]
-  /** Per cell ink on colour-noise boards; empty otherwise. */
+  /** Per cell ink on colour-noise boards (tier 5 on); empty otherwise. */
   inks: CellInk[]
   /** Mirror boards: the odd one is drawn mirrored. */
   mirror: boolean
@@ -34,6 +40,8 @@ export interface OddOneOutState {
    * presence never gives an empty board away.
    */
   none: boolean
+  /** The rules open on this board — 'm' mirror images, 'n' «없음» — carried in ctx.recent with the tier. */
+  open: string
   oddIndex: number
   limitMs: number
   phase: 'find' | 'done'
@@ -41,139 +49,164 @@ export interface OddOneOutState {
   timedOut: boolean
 }
 
-const RULE = { rotation: 'oddOneOut.rotation', mirror: 'oddOneOut.mirror', absent: 'oddOneOut.absent' } as const
+const RULE = { mirror: 'oddOneOut.mirror', absent: 'oddOneOut.absent' } as const
 
-/** Past this the puzzle is only its clock, and the clock is at its floor on the biggest board. */
-export const ODD_MAX_LEVEL = 32
+/** Content tiers, five levels each (the last one open-ended); every tier starts again at 2×2. */
+export const ODD_TIER_COUNT = 6
+export const ODD_TIER_LEVELS = 5
 
-/** L1-2: the pair differs in shape AND colour — the only pop-out in the game (no colour-only pairs anywhere). */
+/** The highest level on any screen: where a 7×7 desktop's clock reaches its floor (maxLevel). */
+export const ODD_MAX_LEVEL = 39
+
+/** Tier 1: the pair differs in shape AND colour — the only pop-out in the game (no colour-only pairs anywhere). */
 export const POP_PAIRS: readonly (readonly [string, string])[] = [
   ['🍎', '🍌'], ['🌸', '🍀'], ['⚽', '🏀'], ['🍓', '🍇'],
   ['🐸', '🐷'], ['🍋', '🍆'], ['💧', '🔥'], ['🥕', '🥦'],
 ]
 
-/** L3-6: same colour, similar outline. The last emoji in the game (none from L7). */
+/** Tier 2: same colour, similar outline. The last emoji in the game (none from tier 3). */
 export const LOOKALIKE_PAIRS: readonly (readonly [string, string])[] = [
   ['🍊', '🍑'], ['🐯', '🦁'], ['🐭', '🐹'], ['🍋', '🍈'], ['🐸', '🐢'], ['🍒', '🍓'],
 ]
 
-/** L7+: confusable glyphs — mirror images, a turned digit, one stroke more or less. */
+/**
+ * Tier 3: confusable letters — mirror images (b/d, p/q) and one stroke more or less (E/F, O/Q, C/G).
+ * No turned pair (6/9 was one): a turn alone is not the puzzle.
+ */
 export const GLYPH_PAIRS: readonly (readonly [string, string])[] = [
-  ['b', 'd'], ['p', 'q'], ['E', 'F'], ['6', '9'], ['C', 'G'],
+  ['b', 'd'], ['p', 'q'], ['E', 'F'], ['O', 'Q'], ['C', 'G'],
 ]
 
-/** L17+: characters that differ only in a stroke's length (system CJK fonts; no bundled font). */
+/** Tier 5 on: characters that differ only in a stroke's length (system CJK fonts; no bundled font). */
 export const TWIN_PAIRS: readonly (readonly [string, string])[] = [
   ['日', '曰'], ['土', '士'], ['未', '末'], ['人', '入'],
 ]
-
-/** No rotational symmetry, so a turned copy can never look identical. Letters only: no emoji from L7. */
-export const ROTATABLE: readonly string[] = ['F', 'R', 'G', 'J', 'L', 'P', '4', '7']
 
 /** No mirror symmetry under any turn: a mirrored copy is never the same glyph turned. */
 export const MIRROR_GLYPHS: readonly string[] = ['F', 'P', 'G', 'J']
 
 const INKS: readonly CellInk[] = ['neutral', 'amber', 'cyan']
 
-/**
- * The content band a level is in (the rows of the plan's §3.3 table): 1-2 · 3-4 · 5 · 6 · 7-9 ·
- * 10-11 · 12-15 · 16 · 17 · 18-19 · 20-21 · 22-23 · 24-25 · 26+.
- */
-export function oddOneOutBand(level: number): number {
-  const starts = [1, 3, 5, 6, 7, 10, 12, 16, 17, 18, 20, 22, 24, 26]
-  const lv = Math.floor(level)
-  let band = 1
-  starts.forEach((s, i) => {
-    if (lv >= s) band = i + 1
-  })
-  return band
+/** What each tier draws, by weight: one kind, or two (never the same one three times running). */
+const TIER_KINDS: readonly Partial<Record<OddKind, number>>[] = [
+  { pop: 1 },
+  { lookalike: 1 },
+  { glyph: 1 },
+  { mirror: 1 },
+  { mirror: 0.5, twin: 0.5 },
+  { mirror: 0.5, twin: 0.5 },
+]
+/** The tier mirror boards start in, and the one from which every board is in colour noise. */
+const MIRROR_TIER = 4
+const INKED_TIER = 5
+
+/** The content tier (1-6) a level is in. */
+export function oddOneOutTier(level: number): number {
+  const lv = Math.max(1, Math.floor(level))
+  return Math.min(ODD_TIER_COUNT, Math.floor((lv - 1) / ODD_TIER_LEVELS) + 1)
 }
 
-/** How far the odd one is turned on a rotation board: 120° at L5, × 0.86 a level, never under 15°. */
-export function oddTurn(level: number): number {
-  return Math.max(15, 120 * Math.pow(0.86, level - 5))
+/** A tier's first level — its 2×2 board. */
+export function oddTierStart(tier: number): number {
+  return 1 + (tier - 1) * ODD_TIER_LEVELS
+}
+
+/** The board side a level asks for before the screen caps it: 2 + its step in the tier (the last tier adds 7×7). */
+export function oddOneOutSide(level: number): number {
+  const tier = oddOneOutTier(level)
+  const step = Math.max(1, Math.floor(level)) - oddTierStart(tier)
+  return 2 + Math.min(step, tier === ODD_TIER_COUNT ? 5 : 4)
 }
 
 /** The kinds a level draws from, by weight, before rule gating and the no-three-in-a-row rule. */
 export function oddKindWeights(level: number): Partial<Record<OddKind, number>> {
-  const lv = Math.floor(level)
-  if (lv < 3) return { pop: 1 }
-  if (lv < 5) return { lookalike: 1 }
-  if (lv < 7) return { rotation: 0.5, lookalike: 0.5 }
-  if (lv < 10) return { glyph: 0.6, rotation: 0.4 }
-  if (lv < 12) return { noise: 0.4, glyph: 0.3, rotation: 0.3 }
-  if (lv < 17) return { mirror: 0.2, noise: 0.3, glyph: 0.25, rotation: 0.25 }
-  if (lv < 20) return { mirror: 0.2, twin: 0.2, noise: 0.2, glyph: 0.2, rotation: 0.2 }
-  return { mirror: 0.3, twin: 0.2, noise: 0.15, glyph: 0.15, rotation: 0.2 }
+  return TIER_KINDS[oddOneOutTier(level) - 1]
 }
 
-/** Share of boards with no odd one, once the «없음» rule is in play. */
+/** Share of boards with no odd one, once the «없음» rule is in play: a quarter on its first three sizes, then a third. */
 export function oddAbsentShare(level: number): number {
   const lv = Math.floor(level)
-  return lv < 16 ? 0 : lv < 22 ? 0.25 : 1 / 3
+  const from = oddTierStart(ODD_TIER_COUNT)
+  return lv < from ? 0 : lv < from + 3 ? 0.25 : 1 / 3
 }
 
-/** Search cost per cell for a kind (ms) — the clock's slope. Modelled, to be recalibrated (EVIDENCE §4.5). */
-function itemMs(kind: OddKind, level: number, inked: boolean): number {
-  switch (kind) {
-    case 'pop':
-      return 200
-    case 'rotation':
-      return 150 + 6000 / oddTurn(level)
-    case 'noise':
-      return 300
-    case 'mirror':
-      return 600
-    case 'twin':
-      return inked ? 300 : 260
-    default:
-      return 260
-  }
-}
+/** Search cost per card (ms) — the clock's slope; colour noise adds INK_MS. Modelled, to be recalibrated (EVIDENCE §4.5). */
+const ITEM_MS: Record<OddKind, number> = { pop: 130, lookalike: 240, glyph: 270, noise: 270, twin: 300, mirror: 600 }
+const INK_MS = 30
 
 /**
- * The input clock: max(900 + 45·cells, (3000 + cells·itemMs) × 0.925^(L−1)).
+ * The clock's shape: a base (orienting, the tap) of 4 s; each tier × 0.87 on the base and × 0.72 on
+ * the per-card cost; each board step × 0.93; past the last tier's 7×7 step × 0.925 a level.
+ */
+const CLOCK = { base: 4000, tierBase: 0.87, tierItem: 0.72, step: 0.93, deep: 0.925 } as const
+
+/**
+ * The input clock: max(900 + 45·cells, (4000·0.87^(T−1) + cells·itemMs·0.72^(T−1)) × 0.93^step × 0.925^deep),
+ * T the tier, `step` the level's place in it (fractions too, so a level's clock tightens toward the
+ * next one), capped at 5, and `deep` the levels past the last tier's 7×7 step. A bigger board gets
+ * more time in all but less per card, so each size is harder than the one before (a screen that caps
+ * the board still gets a 7% tighter clock); a new tier starts on 4 cards with its harder content.
  *
  * An empty board has to be searched to the end, so the plan gives it 1.4× its kind's clock. But the
  * timer bar drains at 1/limit: a bar running 1.4× slower than that kind's usual one would say «this
  * board is empty» before the player has looked. So once the «없음» button is on the board (`none`),
- * every board — empty or not — gets the same 1 + 0.4·(empty share): 1.1× at L16–21, 1.13× from L22.
+ * every board — empty or not — gets the same 1 + 0.4·(empty share): 1.1× at L26-28, 1.13× from L29.
  * The average clock is the plan's (75% × 1 + 25% × 1.4 = 1.1), and the bar gives nothing away.
  */
 export function oddOneOutLimitMs(kind: OddKind, level: number, cells: number, opts: { none?: boolean; inked?: boolean } = {}): number {
   const lv = Math.min(ODD_MAX_LEVEL, Math.max(1, level))
-  const ms = Math.max(900 + 45 * cells, (3000 + cells * itemMs(kind, lv, opts.inked === true)) * Math.pow(0.925, lv - 1))
+  const tier = oddOneOutTier(lv)
+  const step = lv - oddTierStart(tier)
+  const perCard = ITEM_MS[kind] + (opts.inked ? INK_MS : 0)
+  const raw =
+    (CLOCK.base * CLOCK.tierBase ** (tier - 1) + cells * perCard * CLOCK.tierItem ** (tier - 1)) *
+    CLOCK.step ** Math.min(step, 5) *
+    CLOCK.deep ** Math.max(0, step - 5)
+  const ms = Math.max(900 + 45 * cells, raw)
   return Math.round(opts.none ? ms * (1 + 0.4 * oddAbsentShare(lv)) : ms)
 }
 
 /**
- * The board's side: 3×3 to L2, 4×4 to L5, 5×5 from L6, 6×6 from L12, 7×7 from L18, as far as the
- * screen allows (a phone stays 5×5). A screen known to be short (fewer than 7 rows) keeps a row
- * free for the «없음» button.
+ * The board's side, as far as the screen allows (a phone stays at 5×5, and climbs by the next tier
+ * instead). A screen known to be short (fewer than 7 rows) keeps a row free for the «없음» button.
  */
 function gridSide(level: number, ctx: Pick<CreateContext, 'maxCols' | 'maxRows'>, none: boolean): number {
-  const lv = Math.floor(level)
-  const want = lv < 3 ? 3 : lv < 6 ? 4 : lv < 12 ? 5 : lv < 18 ? 6 : 7
   const maxRows = ctx.maxRows ?? 7
   const rows = maxRows >= 7 ? 7 : maxRows - (none ? 1 : 0)
-  return Math.max(3, Math.min(want, ctx.maxCols, rows))
+  return Math.max(2, Math.min(oddOneOutSide(level), ctx.maxCols, rows))
 }
 
 /**
- * The kind for this board. A blocked rule's share goes to that level's plain content (rotation:
- * look-alikes to L6, glyphs after; mirror: glyphs), and a kind the last two boards both had sits
- * this one out while any other remains.
+ * Whether this board opens content the round has not shown, though the level is past its tier's
+ * first board: none of the last trials (ctx.recent, each carrying its tier and open rules) was in
+ * this tier or above with every rule open now. Climbing a level at a time never gets here — a tier
+ * starts on 2×2 anyway — but a jump does: placement handing over mid-tier, or a rule (mirror,
+ * «없음») opening on a tier the round was playing without it. A round's first trial has nothing to
+ * compare with, and a trial the round built before this rule existed (no carry) counts as seen.
  */
-function pickKind(level: number, rng: Rng, recent: readonly RecentTrial[], blocked: (tag: string) => boolean): OddKind {
-  const w = new Map(Object.entries(oddKindWeights(level)) as [OddKind, number][])
-  const move = (from: OddKind, to: OddKind) => {
-    const x = w.get(from)
-    if (x === undefined) return
-    w.delete(from)
-    w.set(to, (w.get(to) ?? 0) + x)
+function arriving(recent: readonly RecentTrial[], tier: number, open: string): boolean {
+  const covers = (r: RecentTrial) => {
+    const t = Number.parseInt(r.carry ?? '', 10)
+    if (!Number.isFinite(t)) return true
+    return t >= tier && [...open].every((rule) => r.carry!.includes(rule))
   }
-  if (blocked(RULE.rotation)) move('rotation', Math.floor(level) < 7 ? 'lookalike' : 'glyph')
-  if (blocked(RULE.mirror)) move('mirror', 'glyph')
+  return recent.length > 0 && !recent.some(covers)
+}
+
+/**
+ * The kind for this board. A blocked mirror's share goes to that tier's plain content (letters, in
+ * colour noise from tier 5), and a kind the last two boards both had sits this one out while any
+ * other remains. A mirror just opened is shown at once (`forceMirror`), on the smallest board.
+ */
+function pickKind(tier: number, rng: Rng, recent: readonly RecentTrial[], mirrorOpen: boolean, forceMirror: boolean): OddKind {
+  if (forceMirror) return 'mirror'
+  const w = new Map(Object.entries(TIER_KINDS[tier - 1]) as [OddKind, number][])
+  const mirror = w.get('mirror')
+  if (!mirrorOpen && mirror !== undefined) {
+    const to: OddKind = tier >= INKED_TIER ? 'noise' : 'glyph'
+    w.delete('mirror')
+    w.set(to, (w.get(to) ?? 0) + mirror)
+  }
   const [a, b] = recent.slice(-2)
   if (a && b && a.kind === b.kind && w.has(a.kind as OddKind) && w.size > 1) w.delete(a.kind as OddKind)
   const total = [...w.values()].reduce((s, x) => s + x, 0)
@@ -197,6 +230,20 @@ function noiseInks(cells: number, oddIndex: number, rng: Rng): CellInk[] {
   return inks
 }
 
+/**
+ * A mirror board's turns: every cell at a random 45° step, the others always at two angles or more —
+ * so there is no «upright» for the odd one to break, and only its mirroring tells it apart.
+ */
+function mirrorTurns(cells: number, oddIndex: number, rng: Rng): number[] {
+  const turns = range(cells).map(() => rng.int(0, 7) * 45)
+  const others = range(cells).filter((i) => i !== oddIndex)
+  if (others.every((i) => turns[i] === turns[others[0]])) {
+    const i = rng.pick(others)
+    turns[i] = (turns[i] + 45 * rng.int(1, 7)) % 360
+  }
+  return turns
+}
+
 const pairOf = (pairs: readonly (readonly [string, string])[], rng: Rng): [string, string] => {
   const p = rng.pick(pairs)
   return rng.chance(0.5) ? [p[0], p[1]] : [p[1], p[0]]
@@ -205,11 +252,18 @@ const pairOf = (pairs: readonly (readonly [string, string])[], rng: Rng): [strin
 export const oddOneOut: BrainGameDef<OddOneOutState> = {
   id: 'oddOneOut',
   create(level, rng, ctx) {
-    const lv = Number.isFinite(level) ? Math.min(ODD_MAX_LEVEL, Math.max(1, level)) : 1
-    const whole = Math.floor(lv)
+    const asked = Number.isFinite(level) ? Math.min(ODD_MAX_LEVEL, Math.max(1, level)) : 1
+    const tier = oddOneOutTier(asked)
     const blocked = (tag: string) => (ctx.blockRules ?? []).includes(tag)
-    const none = whole >= 16 && !blocked(RULE.absent)
-    const kind = pickKind(lv, rng, ctx.recent ?? [], blocked)
+    const recent = ctx.recent ?? []
+    const mirrorOpen = tier >= MIRROR_TIER && !blocked(RULE.mirror)
+    const none = tier === ODD_TIER_COUNT && !blocked(RULE.absent)
+    const open = `${mirrorOpen ? 'm' : ''}${none ? 'n' : ''}`
+    // New content starts on its tier's first board; placement measures, and practice is level 1.
+    const trial = ctx.trialKind ?? 'counted'
+    const fresh = (trial === 'counted' || trial === 'intro') && arriving(recent, tier, open)
+    const lv = fresh && Math.floor(asked) > oddTierStart(tier) ? oddTierStart(tier) : asked
+    const kind = pickKind(tier, rng, recent, mirrorOpen, fresh && mirrorOpen && !recent.some((r) => r.carry?.includes('m')))
     const side = gridSide(lv, ctx, none)
     const cells = side * side
     const absent = none && rng.chance(oddAbsentShare(lv))
@@ -218,7 +272,6 @@ export const oddOneOut: BrainGameDef<OddOneOutState> = {
     let common: string
     let odd: string
     let rotations = range(cells).map(() => 0)
-    let inks: CellInk[] = []
     let mirror = false
     switch (kind) {
       case 'pop':
@@ -228,36 +281,23 @@ export const oddOneOut: BrainGameDef<OddOneOutState> = {
         ;[common, odd] = pairOf(LOOKALIKE_PAIRS, rng)
         break
       case 'glyph':
-        ;[common, odd] = pairOf(GLYPH_PAIRS, rng)
-        break
       case 'noise':
         ;[common, odd] = pairOf(GLYPH_PAIRS, rng)
-        inks = noiseInks(cells, oddIndex, rng)
         break
       case 'twin':
         ;[common, odd] = pairOf(TWIN_PAIRS, rng)
-        // From L24 the twins sit inside colour noise.
-        if (whole >= 24) inks = noiseInks(cells, oddIndex, rng)
         break
-      case 'rotation': {
-        common = odd = rng.pick(ROTATABLE)
-        const turn = oddTurn(lv)
-        // From L18 every cell is tilted a little, never as far as the odd one is turned: the odd
-        // one stays at least `turn` from upright, the rest within half of it (and ±8°).
-        const tilt = whole >= 18 ? Math.min(8, turn / 2) : 0
-        rotations = range(cells).map(() => (tilt ? Math.round((rng.next() * 2 - 1) * tilt) : 0))
-        if (!absent) rotations[oddIndex] = (rng.chance(0.5) ? 1 : -1) * Math.round(turn + rng.next() * tilt)
-        break
-      }
       case 'mirror':
         common = odd = rng.pick(MIRROR_GLYPHS)
-        rotations = range(cells).map(() => rng.int(0, 7) * 45)
+        rotations = mirrorTurns(cells, oddIndex, rng)
         mirror = !absent
         break
     }
+    const inks = tier >= INKED_TIER ? noiseInks(cells, oddIndex, rng) : []
     if (absent) odd = common
     return {
       level: lv,
+      tier,
       cols: side,
       rows: side,
       kind,
@@ -268,6 +308,7 @@ export const oddOneOut: BrainGameDef<OddOneOutState> = {
       mirror,
       absent,
       none,
+      open,
       oddIndex,
       limitMs: oddOneOutLimitMs(kind, lv, cells, { none, inked: inks.length > 0 }),
       phase: 'find',
@@ -290,13 +331,16 @@ export const oddOneOut: BrainGameDef<OddOneOutState> = {
     return { correct, accuracy: correct ? 1 : 0 }
   },
   timeLimitMs: (s) => s.limitMs,
-  // Where the slowest kind (mirror, 600ms a cell) meets the floor on this screen's deepest board:
-  // L32 on a 7×7 desktop, L30 on a 5×5 phone — never at or below the master tier (26).
+  // Where the slowest board (a mirror in colour noise) meets the clock's floor on this screen's
+  // biggest last-tier board: L39 on a 7×7 desktop and a 5×5 phone, L38 on 4 or 3 columns — always
+  // above the master tier (31).
   maxLevel(ctx) {
     const side = gridSide(ODD_MAX_LEVEL, ctx, true)
     const cells = side * side
-    const at = 1 + Math.log((900 + 45 * cells) / (3000 + cells * 600)) / Math.log(0.925)
-    return Math.max(27, Math.min(ODD_MAX_LEVEL, Math.ceil(at)))
+    for (let lv = oddTierStart(ODD_TIER_COUNT) + 5; lv < ODD_MAX_LEVEL; lv++) {
+      if (oddOneOutLimitMs('mirror', lv, cells, { inked: true }) <= 900 + 45 * cells) return Math.max(32, lv)
+    }
+    return ODD_MAX_LEVEL
   },
   view(s) {
     const count = s.cols * s.rows
@@ -328,9 +372,8 @@ export const oddOneOut: BrainGameDef<OddOneOutState> = {
       view.extra = { key: 'play.noneOdd', index: count, ...(tone ? { tone } : {}) }
     }
     // After a miss: the odd one beside a typical one, both upright (a mirror image stays mirrored).
-    // Not on a rotation board — upright, the two are the same glyph; the pulsing cell shows it.
     const missed = done && !(s.picked === s.oddIndex && !s.timedOut)
-    if (missed && !s.absent && s.kind !== 'rotation') {
+    if (missed && !s.absent) {
       view.missChip = { odd: { label: s.odd, tone: 'idle', ...(s.mirror ? { mirror: true } : {}) }, common: { label: s.common, tone: 'idle' } }
     }
     return view
@@ -343,9 +386,6 @@ export const oddOneOut: BrainGameDef<OddOneOutState> = {
     switch (s.kind) {
       case 'lookalike':
         tags.push('oddOneOut.lookalike')
-        break
-      case 'rotation':
-        tags.push(RULE.rotation)
         break
       case 'glyph':
       case 'noise':
@@ -362,5 +402,5 @@ export const oddOneOut: BrainGameDef<OddOneOutState> = {
     if (s.none) tags.push(RULE.absent)
     return tags
   },
-  trialInfo: (s) => ({ kind: s.kind }),
+  trialInfo: (s) => ({ kind: s.kind, carry: `${s.tier}${s.open}` }),
 }

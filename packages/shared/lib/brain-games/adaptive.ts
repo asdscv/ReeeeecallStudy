@@ -31,13 +31,3 @@ export function recentMedian(values: readonly number[], n = 20): number | null {
   const mid = sorted.length >> 1
   return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2
 }
-
-/**
- * Quick Eye's points for a right answer, before the run bonus: by stage and speed level, never by
- * reaction time (answers are untimed). Opening a stage eases the level back three steps, so a stage
- * is worth four levels: the first answers of a new stage still score more (+40 − 30), and a
- * stage-up never reads as a step back. V1 at level 11 scores 120.
- */
-export function quickEyeBase(variant: number, level: number): number {
-  return 10 + 10 * Math.max(0, Math.round(level)) + 40 * (Math.max(1, Math.round(variant)) - 1)
-}

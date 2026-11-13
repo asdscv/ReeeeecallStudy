@@ -1,7 +1,7 @@
 import type { BrainGameId, GameGroup } from './types'
 import type { BrainMeta, SkillEstimate } from './meta'
 import { GROUP_RULES } from './rules'
-import { brainGame } from './catalog'
+import { brainGame, isBrainGameId } from './catalog'
 import { TIERS, levelAtStanding, standing } from './tiers'
 
 /**
@@ -34,7 +34,6 @@ export interface SkillParams {
 
 export const SKILL: Record<GameGroup, SkillParams> = {
   speed: { sd0: 9, floor: 1.0, kMax: 3, c: 0.3, drop: 0.5 },
-  quickEye: { sd0: 4, floor: 0.6, kMax: 2, c: 0.1, drop: 1.0 },
   // Span games move one whole length per pass (Corsi); no step scaling.
   span: { sd0: 3, floor: 1, kMax: 1, c: 0.15, drop: 2 },
 }
@@ -102,10 +101,10 @@ export function startFromEstimate(group: GameGroup, mu: number, sd: number, opts
 export function crossGameSeed(meta: BrainMeta, target: BrainGameId): number | null {
   const targetRole = brainGame(target).role
   const samples: { s: number; rho: number }[] = []
-  for (const [id, est] of Object.entries(meta.sk) as [BrainGameId, SkillEstimate][]) {
-    // Quick Eye's estimate is a speed level within a stage, not a level on its tier scale — and a
-    // different skill from every board game — so it never seeds one.
-    if (id === target || id === 'quickEye' || !est || est.n < 20) continue
+  for (const [id, est] of Object.entries(meta.sk) as [string, SkillEstimate][]) {
+    // Games in the catalogue only: an old save can still hold a removed game's estimate (Quick Eye's
+    // was a speed level within a stage, never a level on a tier scale), which never seeds one.
+    if (id === target || !isBrainGameId(id) || !est || est.n < 20) continue
     const sameKind = brainGame(id).role === targetRole || (isSpeedKind(id) && isSpeedKind(target))
     samples.push({ s: standing(id, est.mu), rho: sameKind ? 0.6 : 0.4 })
   }
@@ -116,4 +115,4 @@ export function crossGameSeed(meta: BrainMeta, target: BrainGameId): number | nu
   return Math.min(TIERS[target][1], levelAtStanding(target, s))
 }
 
-const isSpeedKind = (id: BrainGameId) => id === 'quickEye' || id === 'oddOneOut' || id === 'schulte'
+const isSpeedKind = (id: BrainGameId) => id === 'oddOneOut' || id === 'schulte'

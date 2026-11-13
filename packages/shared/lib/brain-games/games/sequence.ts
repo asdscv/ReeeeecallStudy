@@ -2,14 +2,20 @@ import { clamp, range, type Rng } from '../rng'
 import type { BrainGameDef, CellView, CreateContext, GridView } from '../types'
 
 /**
- * Tiles flash one after another; repeat the order. Sequential memory span — the Corsi block task:
- * the level IS the length (level 1 = 3 tiles, L = length − 2), presented at one tile per second as
- * the standard administration does (Kessels 2000), never faster (GAMES_DIFFICULTY_PLAN §3.7).
+ * Tiles flash one after another; repeat the order. Sequential memory span on Corsi blocks, with
+ * the Corsi stop rule (rules.ts: two tries a level, both missed ends the round).
  *
- * Forward up to 5 tiles on 3×3; from L4 (6 tiles) always in reverse — a rule card, then for good;
- * from L5 on 4×4 where the screen has room. A tile never repeats, three tiles never sweep along a
- * straight line, and from 5 tiles the path crosses itself at least once, so it cannot be held as one
- * simple shape. The cap is every tile of the board once.
+ * The level is a row of SEQUENCE_LADDER: how many tiles, on how big a board, how fast. L1–5 are
+ * the standard administration's lengths at one tile a second (Kessels 2000): forward 3–5 tiles on
+ * 3×3, from L4 (6 tiles) always in reverse — a rule card, then for good — and from L5 on 4×4. Past
+ * that the owner's «카드 갯수 늘리기 + 카드 더 빨리 순서 파밧» (2026-11-13): each level either adds a
+ * tile or speeds the flashes up, and from L8 the board is 5×5 where the screen has room. The
+ * flashes never come faster than three a second (flash + gap ≥ 340ms, EVIDENCE §5 / WCAG 2.3.1).
+ * A screen too small for a row's board plays the same tiles at the same pace on the biggest board
+ * it holds; the cap is the last row whose tiles fit that board once each.
+ *
+ * A tile never repeats, three tiles never sweep along a straight line, and from 5 tiles the path
+ * crosses itself at least once, so it cannot be held as one simple shape.
  */
 export interface SequenceState {
   n: number
@@ -28,6 +34,41 @@ export interface SequenceState {
   timedOut: boolean
 }
 
+/** One level: tiles in the sequence, the board side it wants, and one flash plus the gap after it. */
+export interface SequenceRung {
+  length: number
+  side: 3 | 4 | 5
+  intervalMs: number
+}
+
+/**
+ * The level table, L1 first. Every row adds a tile, speeds the flashes up, or brings a rule or a
+ * bigger board; reverse from L4 (SEQUENCE_REVERSE_FROM).
+ */
+export const SEQUENCE_LADDER: readonly SequenceRung[] = [
+  { length: 3, side: 3, intervalMs: 1000 },
+  { length: 4, side: 3, intervalMs: 1000 },
+  { length: 5, side: 3, intervalMs: 1000 },
+  { length: 6, side: 3, intervalMs: 1000 },
+  { length: 7, side: 4, intervalMs: 1000 },
+  { length: 7, side: 4, intervalMs: 750 },
+  { length: 8, side: 4, intervalMs: 750 },
+  { length: 8, side: 5, intervalMs: 600 },
+  { length: 9, side: 5, intervalMs: 600 },
+  { length: 9, side: 5, intervalMs: 480 },
+  { length: 10, side: 5, intervalMs: 480 },
+  { length: 10, side: 5, intervalMs: 400 },
+  { length: 11, side: 5, intervalMs: 400 },
+  { length: 11, side: 5, intervalMs: 340 },
+  { length: 12, side: 5, intervalMs: 340 },
+  { length: 13, side: 5, intervalMs: 340 },
+]
+
+/** The quickest a flash may follow the one before: under three a second (WCAG 2.3.1). */
+export const SEQUENCE_MIN_INTERVAL_MS = 340
+/** The share of each interval a tile stays lit (700 + 300 at one a second). */
+const FLASH_SHARE = 0.7
+/** One a second (L1–5): 700ms lit, 300ms dark. */
 export const SEQUENCE_FLASH_MS = 700
 export const SEQUENCE_GAP_MS = 300
 export const SEQUENCE_LEAD_MS = 1000
@@ -35,19 +76,32 @@ export const SEQUENCE_LEAD_MS = 1000
 export const SEQUENCE_REVERSE_FROM = 4
 /** From this level the board is 4×4, on a screen with room for it (mechanics `sequence.grid4`). */
 export const SEQUENCE_GRID4_FROM = 5
+/** From this level the board is 5×5, on a screen with room for it (mechanics `sequence.grid5`). */
+export const SEQUENCE_GRID5_FROM = 8
+/** From this level the flashes come faster than one a second (mechanics `sequence.faster`). */
+export const SEQUENCE_FASTER_FROM = 6
 const REVERSE_RULE = 'sequence.reverse'
 /** Rejection sampling stops here; a search then finds a sequence that keeps every rule. */
 const MAX_TRIES = 300
 
-/** The biggest board this screen gives Sequence: 4×4, or 3×3 on a screen narrower than 4 cells. */
-function boardSide(ctx: Pick<CreateContext, 'maxCols' | 'maxRows'>): number {
-  return Math.min(ctx.maxCols, ctx.maxRows ?? 7) >= 4 ? 4 : 3
+/** The biggest board this screen gives Sequence: 5×5, 4×4, or 3×3 on a screen narrower than 4 cells. */
+function screenSide(ctx: Pick<CreateContext, 'maxCols' | 'maxRows'>): number {
+  return Math.max(3, Math.min(5, ctx.maxCols, ctx.maxRows ?? 7))
 }
 
-/** Every tile once: n² tiles is length n² − 2 + 2. */
+/** The last row whose tiles fit this screen's biggest board once each. */
 export function sequenceMaxLevel(ctx: Pick<CreateContext, 'maxCols' | 'maxRows'>): number {
-  const n = boardSide(ctx)
-  return n * n - 2
+  const n = screenSide(ctx)
+  let lv = 0
+  while (lv < SEQUENCE_LADDER.length && SEQUENCE_LADDER[lv].length <= n * n) lv++
+  return lv
+}
+
+/** A row's flash and gap: 70% of the interval lit, the rest dark. */
+export function sequenceTiming(intervalMs: number): { flashMs: number; gapMs: number } {
+  const interval = Math.max(SEQUENCE_MIN_INTERVAL_MS, intervalMs)
+  const flashMs = Math.round(interval * FLASH_SHARE)
+  return { flashMs, gapMs: interval - flashMs }
 }
 
 function point(n: number, tile: number): [number, number] {
@@ -117,14 +171,23 @@ function levelOf(level: number, ctx: Pick<CreateContext, 'maxCols' | 'maxRows'>)
   return clamp(Math.round(Number.isFinite(level) ? level : 1), 1, sequenceMaxLevel(ctx))
 }
 
+/** A level's row on this screen: the table's, its board no bigger than the screen holds. */
+export function sequenceRung(level: number, ctx: Pick<CreateContext, 'maxCols' | 'maxRows'>): SequenceRung & { level: number } {
+  const lv = levelOf(level, ctx)
+  const rung = SEQUENCE_LADDER[lv - 1]
+  return { ...rung, side: Math.min(rung.side, screenSide(ctx)) as 3 | 4 | 5, level: lv }
+}
+
 export const sequence: BrainGameDef<SequenceState> = {
   id: 'sequence',
   maxLevel: (ctx) => sequenceMaxLevel(ctx),
-  spanLength: (level, ctx) => levelOf(level, ctx) + 2,
+  spanLength: (level, ctx) => sequenceRung(level, ctx).length,
   create(level, rng, ctx) {
-    const lv = levelOf(level, ctx)
-    const length = lv + 2
-    const n = lv >= SEQUENCE_GRID4_FROM ? boardSide(ctx) : 3
+    const rung = sequenceRung(level, ctx)
+    const lv = rung.level
+    const length = rung.length
+    const n = rung.side
+    const { flashMs, gapMs } = sequenceTiming(rung.intervalMs)
     let seq: number[] | null = null
     for (let tries = 0; tries < MAX_TRIES && !seq; tries++) {
       const draw = rng.sample(range(n * n), length)
@@ -136,8 +199,8 @@ export const sequence: BrainGameDef<SequenceState> = {
       // Always reversed from L4 — unless the round is not introducing that rule yet (§2.4): then the
       // same length, forward.
       reverse: lv >= SEQUENCE_REVERSE_FROM && !ctx.blockRules.includes(REVERSE_RULE),
-      flashMs: SEQUENCE_FLASH_MS,
-      gapMs: SEQUENCE_GAP_MS,
+      flashMs,
+      gapMs,
       leadMs: SEQUENCE_LEAD_MS,
       phase: 'watch',
       step: -1,
@@ -204,8 +267,13 @@ export const sequence: BrainGameDef<SequenceState> = {
     if (s.reverse) view.badge = { key: 'play.reverseBadge' }
     return view
   },
-  signature: (s) => `sq:${s.n}:${s.reverse ? 'r' : 'f'}:${s.seq.join(',')}`,
-  mechanics: (s) => [...(s.n >= 4 ? ['sequence.grid4'] : []), ...(s.reverse ? ['sequence.reverse'] : [])],
+  signature: (s) => `sq:${s.n}:${s.reverse ? 'r' : 'f'}:${s.flashMs + s.gapMs}:${s.seq.join(',')}`,
+  mechanics: (s) => [
+    ...(s.n >= 4 ? ['sequence.grid4'] : []),
+    ...(s.n >= 5 ? ['sequence.grid5'] : []),
+    ...(s.flashMs + s.gapMs < 1000 ? ['sequence.faster'] : []),
+    ...(s.reverse ? ['sequence.reverse'] : []),
+  ],
   solution(s) {
     if (s.phase !== 'input') return null
     const order = s.reverse ? [...s.seq].reverse() : s.seq

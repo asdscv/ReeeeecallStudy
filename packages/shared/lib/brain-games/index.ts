@@ -6,32 +6,9 @@ export * from './progress'
 export * from './catalog'
 export * from './plan'
 export { BRAIN_COLORS } from './games/stroop'
-export {
-  QUICK_EYE_LADDER_MS,
-  QUICK_EYE_MAX_VARIANT,
-  QUICK_EYE_VARIANTS,
-  FIELD_RINGS,
-  exposureMsFor,
-  quickEyeVariant,
-  radialSlot,
-  shapePair,
-  advanceBarMs,
-  quickEyeThreshold,
-  quickEyeAdvance,
-  quickEyeMaxLevel,
-  quickEyeMsAt,
-  QUICK_EYE_BARS_MS,
-  QUICK_EYE_HOLD_NEED,
-  QUICK_EYE_HOLD_WINDOW,
-  QE_PLACES,
-  quickEyeBarLevel,
-  quickEyeHold,
-  quickEyePlace,
-} from './games/quick-eye'
-export * from './games/quick-eye-art'
-export * from './quick-eye-journey'
-export { researchContent, type ResearchContent, type ResearchSection } from './research-content'
-export { quickEyeGeometry, quickEyeBox, slotPosition, QUICK_EYE_BOX_RADIUS } from './games/quick-eye-geometry'
+// Maze Run's board layout: cells never under MAZE_MIN_CELL dp, a hidden maze's never under
+// MAZE_HIDDEN_MIN_CELL (the platforms size the board from them), and its colour-blind-safe colours.
+export { MAZE_COLORS, MAZE_HIDDEN_MIN_CELL, MAZE_MIN_CELL, mazeFit } from './games/maze-run'
 export * from './theme'
 export * from './history'
 export { buildDemo, type DemoFrame } from './demo'

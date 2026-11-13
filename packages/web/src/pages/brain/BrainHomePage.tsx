@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Settings, Play, ChevronRight, BookOpen, Trophy, Clock, Sparkles } from 'lucide-react'
+import { Settings, Play, Trophy, Clock, Sparkles } from 'lucide-react'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
 import {
   BRAIN_GAMES,
@@ -16,8 +16,6 @@ import {
   localDayKey,
   planToday,
   plannedMinutes,
-  quickEyeStage,
-  researchContent,
   todaysPlanSeed,
   weekProgress,
 } from '@reeeeecall/shared/lib/brain-games'
@@ -28,16 +26,16 @@ import { Sparkline } from '../../components/brain/RoundSummary'
 import { WeekRing } from '../../components/brain/WeekRing'
 import { TierBadge, TierBar } from '../../components/brain/TierBadge'
 import { AchievementsGrid } from '../../components/brain/AchievementsGrid'
-import { quickEyeSpeedLevel, tierStanding } from '../../components/brain/tier-ui'
+import { tierStanding } from '../../components/brain/tier-ui'
 import { useBrainHydrated } from '../../components/brain/useBrainHydrated'
 
 /**
  * `/brain` — Today's Training first (the bounded session the research counts), every game below
- * as its own card in its own colours, then the research basis and the disclaimer. Progress is
+ * as its own card in its own colours, then a short disclaimer. Progress is
  * shown as sessions this week and course steps, never as a streak or a "brain score".
  */
 export function BrainHomePage() {
-  const { t, i18n } = useTranslation('brain')
+  const { t } = useTranslation('brain')
   useBrainHydrated()
   const progress = useBrainStore((s) => s.progress)
   const history = useBrainStore((s) => s.history)
@@ -49,7 +47,6 @@ export function BrainHomePage() {
   const course = courseStatus(progress, today)
   const { focus, slots: plan } = planToday(progress, createRng(todaysPlanSeed(progress, today)))
   const minutes = plannedMinutes(plan)
-  const research = researchContent(i18n.language)
 
   const courseChip =
     course.phase === 'booster' && course.booster
@@ -178,12 +175,9 @@ export function BrainHomePage() {
             // "new", no level and no tier bar — never its interim probe level. A tier earned stays.
             const placing = meta.sk[game.id]?.n === 0
             const fresh = !played || (placing && standing.tier === 0)
-            const qe = game.id === 'quickEye'
             const best = progress.bestRuns[game.id]
             const trend = gameHistory(history, game.id).map((h) => h.level)
-            const levelLabel = qe
-              ? t('home.quickEyeLevel', { stage: quickEyeStage(progress.quickEye.variant, progress.settings.centerOnly), speed: quickEyeSpeedLevel(p.level) })
-              : t('home.level', { level: displayLevel(p.level).toFixed(1) })
+            const levelLabel = t('home.level', { level: displayLevel(p.level).toFixed(1) })
             return (
               <li key={game.id}>
                 <Link
@@ -251,18 +245,6 @@ export function BrainHomePage() {
       <AchievementsGrid />
 
       <p className="text-base text-muted-foreground leading-relaxed">{t('home.howItWorks')}</p>
-
-      {research && (
-        <Link
-          to="/brain/research"
-          className="flex items-center gap-3 p-4 min-h-14 rounded-2xl border border-border bg-card no-underline hover:border-brand"
-          data-testid="brain-research-link"
-        >
-          <BookOpen className="w-5 h-5 text-brand-active" aria-hidden="true" />
-          <span className="flex-1 text-base font-medium text-foreground">{t('home.research')}</span>
-          <ChevronRight className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
-        </Link>
-      )}
 
       <footer className="space-y-2 pb-4 text-sm text-muted-foreground">
         <p>{t('disclaimer')}</p>

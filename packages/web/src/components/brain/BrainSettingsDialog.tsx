@@ -4,9 +4,8 @@ import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 
 /**
- * Relaxed timing and Quick Eye's centre-only mode. Choice reaction time slows with age, so timed
- * games can be given 1.5× or 2× the time (a timeout then costs no chance) or no limit at all; and
- * a player whose visual field makes the edges unfair can drop the periphery.
+ * Relaxed timing and sound. Choice reaction time slows with age, so timed games can be given 1.5×
+ * or 2× the time (a timeout then costs no chance) or no limit at all.
  */
 const TIMING_KEY: Record<TimingMode, string> = { 1: 'settings.timing_1', 1.5: 'settings.timing_1_5', 2: 'settings.timing_2', 0: 'settings.timing_0' }
 
@@ -54,20 +53,6 @@ export function BrainSettingsDialog({ open, onOpenChange }: { open: boolean; onO
           </label>
           <p className="text-sm text-muted-foreground">{t('settings.soundHelp')}</p>
         </section>
-        <section className="space-y-2">
-          <label className="flex items-center justify-between gap-3 min-h-12 cursor-pointer">
-            <span className="text-base font-medium text-foreground">{t('settings.centerOnly')}</span>
-            <input
-              type="checkbox"
-              checked={settings.centerOnly}
-              onChange={(e) => setSettings({ centerOnly: e.target.checked })}
-              className="w-6 h-6 accent-[var(--brand)] cursor-pointer"
-              data-testid="brain-center-only"
-            />
-          </label>
-          <p className="text-sm text-muted-foreground">{t('settings.centerOnlyHelp')}</p>
-        </section>
-        <p className="text-sm text-muted-foreground border-t border-border pt-3">{t('settings.flash')}</p>
       </DialogContent>
     </Dialog>
   )

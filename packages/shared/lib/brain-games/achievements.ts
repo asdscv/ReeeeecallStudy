@@ -3,7 +3,6 @@ import type { BrainMeta } from './meta'
 import type { BrainProgress } from './progress'
 import { BRAIN_GAMES } from './catalog'
 import { hasBit } from './meta'
-import { quickEyeTierStage } from './tiers'
 import { weekProgress } from './plan'
 
 /**
@@ -11,10 +10,11 @@ import { weekProgress } from './plan'
  * coming back, all stated as game facts ("cleared a round without losing a chance"). They never
  * reward day streaks, play volume, playing more than three sessions a week, totals, percentiles
  * or anything said about the brain (EVIDENCE: §3 progress display; Hamari & Eranti 2011 on the
- * badge and its logic agreeing). Append-only: the index is the bit in BrainMeta.ach.
+ * badge and its logic agreeing). Append-only: the index in ACHIEVEMENT_BITS is the bit in
+ * BrainMeta.ach — a retired id keeps its place so the bits after it never move.
  * Copy: `brain` namespace, `achievements.<id>.title/body`.
  */
-export const ACHIEVEMENTS = [
+export const ACHIEVEMENT_BITS = [
   'firstClear',
   'cleanRound',
   'streak10',
@@ -32,10 +32,22 @@ export const ACHIEVEMENTS = [
   'masterTier',
 ] as const
 
-export type AchievementId = (typeof ACHIEVEMENTS)[number]
+/**
+ * Never earned or shown again: Quick Eye's stage milestones (the game was removed by the owner
+ * 2026-11-13). A bit already set in an old save stays set and is simply not listed.
+ */
+export const RETIRED_ACHIEVEMENTS = ['quickEyeStage5', 'quickEyeStage10'] as const
+
+/** An achievement that can still be earned and is shown. */
+export type AchievementId = Exclude<(typeof ACHIEVEMENT_BITS)[number], (typeof RETIRED_ACHIEVEMENTS)[number]>
+
+const isLive = (id: (typeof ACHIEVEMENT_BITS)[number]): id is AchievementId => !(RETIRED_ACHIEVEMENTS as readonly string[]).includes(id)
+
+/** Every achievement still earned and shown, in bit order — what the screens list. */
+export const ACHIEVEMENTS: readonly AchievementId[] = ACHIEVEMENT_BITS.filter(isLive)
 
 export function achievementBit(id: AchievementId): number {
-  return ACHIEVEMENTS.indexOf(id)
+  return ACHIEVEMENT_BITS.indexOf(id)
 }
 
 export function hasAchievement(meta: BrainMeta, id: AchievementId): boolean {
@@ -68,11 +80,9 @@ export function earnedByRound(f: RoundFacts, progress: BrainProgress, meta: Brai
   if (f.bestStreak >= 20) out.push('streak20')
   if (f.flawlessHunt) out.push('flawlessHunt')
   if (f.spanLength >= 7) out.push('span7')
-  const qeStage = quickEyeTierStage(progress.quickEye.variant, progress.settings.centerOnly)
-  if (qeStage >= 5) out.push('quickEyeStage5')
-  if (qeStage >= 10) out.push('quickEyeStage10')
   if (BRAIN_GAMES.every((g) => (progress.games[g.id]?.rounds ?? 0) > 0)) out.push('allGames')
-  const tiers = Object.values(meta.tier).filter((t): t is number => typeof t === 'number')
+  // Games in the catalogue only: an old save's tier for a removed game (Quick Eye) earns nothing.
+  const tiers = BRAIN_GAMES.map((g) => meta.tier[g.id]).filter((t): t is number => typeof t === 'number')
   if (tiers.some((t) => t >= 3)) out.push('goldTier')
   if (tiers.some((t) => t >= 6)) out.push('masterTier')
   return out.filter((id) => !hasAchievement(meta, id))

@@ -3,10 +3,11 @@
  * level table (cards, set size, picture family, preview, mistake budget), that every level builds on
  * three-, four- and five-column screens, that the preview is only a hint, the informed-miss rule on
  * pairs and triples, the tap that cuts a mismatch short — and that it stays hard: a player who keeps
- * half of what they see fails at least 30% of boards from L6.
+ * half of what they see fails at least 30% of boards from L6. Past L18 the boards grow (owner
+ * 2026-11-13 «카드 갯수 더 늘리기»): 30 cards to L21 on five columns, 36 and 42 on a 6×6 / 7×6 screen.
  */
 import { describe, it, expect, vi } from 'vitest'
-import { DEFAULT_CONTEXT, TIERS, createRng, maxColsFor, type CreateContext, type GridView, type RecentTrial, type Rng } from '@reeeeecall/shared/lib/brain-games'
+import { DEFAULT_CONTEXT, MECHANICS, TIERS, createRng, maxColsFor, type CreateContext, type GridView, type RecentTrial, type Rng } from '@reeeeecall/shared/lib/brain-games'
 import {
   PAIRS_FAMILIES,
   PAIRS_FAMILY_CLASS,
@@ -79,11 +80,20 @@ describe('Match Pairs: the level table', () => {
       'L16 T8 4x6 lookalike - b4',
       'L17 T10 5x6 distinct - b4',
       'L18 T10 5x6 lookalike - b4',
+      // The higher ceiling: 15 pairs, triples with one mistake fewer, 18 pairs, 12 triples, 21, 14.
+      'L19 P15 5x6 distinct - b5',
+      'L20 P15 5x6 lookalike - b5',
+      'L21 T10 5x6 lookalike - b3',
+      'L22 P18 6x6 distinct - b5',
+      'L23 P18 6x6 lookalike - b5',
+      'L24 T12 6x6 lookalike - b4',
+      'L25 P21 7x6 lookalike - b5',
+      'L26 T14 7x6 lookalike - b4',
     ])
     for (const r of PAIRS_LADDER) expect(r.cols * r.rows).toBe(r.sets * r.size)
     // Each level differs from the one below in something the player meets. L13 is L12 with one
-    // mistake fewer allowed — the plan's own row, so the budget counts as a difference.
-    for (let lv = 2; lv <= 18; lv++) {
+    // mistake fewer allowed — the plan's own row, so the budget counts as a difference (L21 too).
+    for (let lv = 2; lv <= 26; lv++) {
       const a = pairsBoard(lv - 1, DESKTOP)
       const b = pairsBoard(lv, DESKTOP)
       const key = (x: typeof a) => `${x.sets}:${x.size}:${x.family}:${x.preview}:${x.budget}`
@@ -108,7 +118,8 @@ describe('Match Pairs: the level table', () => {
   it('every level up to the cap builds on 3-, 4- and 5-column screens, and solution() clears it', () => {
     for (const [name, ctx] of Object.entries(SCREENS)) {
       const cap = pairsMaxLevel(ctx)
-      expect(cap, name).toBe(ctx.maxCols >= 5 ? 18 : 16)
+      // Five columns: L21 (30 cards); a screen that holds 6×6 or 7×6 as it is (or turned): L24, L26.
+      expect(cap, name).toBe({ DESKTOP: 26, LAPTOP: 21, PHONE: 21, SHORT_PHONE: 21, FOUR: 16, SMALL: 16, NARROW: 16 }[name])
       for (let lv = 1; lv <= cap; lv++) {
         const rung = PAIRS_LADDER[lv - 1]
         for (let seed = 1; seed <= 8; seed++) {
@@ -139,7 +150,11 @@ describe('Match Pairs: the level table', () => {
       const v = view(make(level, 1, ctx))
       return `${v.cols}x${v.rows}`
     }
-    expect([2, 4, 6, 9, 11, 14, 15, 17].map((l) => dims(l, DESKTOP))).toEqual(['4x2', '4x3', '4x4', '4x5', '4x6', '3x6', '4x6', '5x6'])
+    expect([2, 4, 6, 9, 11, 14, 15, 17, 19, 22, 25].map((l) => dims(l, DESKTOP))).toEqual(['4x2', '4x3', '4x4', '4x5', '4x6', '3x6', '4x6', '5x6', '5x6', '6x6', '7x6'])
+    // A 6×7 screen holds 6×6 and takes 7×6 turned (6 wide, 7 tall); a 6×6 one stops at L24.
+    expect(dims(25, { ...DEFAULT_CONTEXT, maxCols: 6, maxRows: 7 })).toBe('6x7')
+    expect(pairsMaxLevel({ ...DEFAULT_CONTEXT, maxCols: 6, maxRows: 7 })).toBe(26)
+    expect(pairsMaxLevel({ ...DEFAULT_CONTEXT, maxCols: 6, maxRows: 6 })).toBe(24)
     // A laptop window with five rows of cells: the tall boards lie down.
     expect([9, 11, 14, 15, 17].map((l) => dims(l, LAPTOP))).toEqual(['4x5', '6x4', '6x3', '6x4', '6x5'])
     // Five columns, four rows: nothing turned fits five wide, so the board keeps its shape.
@@ -153,11 +168,12 @@ describe('Match Pairs: the level table', () => {
     expect(TIERS.pairs[5]).toBeLessThan(pairsMaxLevel(FOUR))
     expect(TIERS.pairs[5]).toBeLessThan(pairsMaxLevel(PHONE))
     expect(pairs.maxLevel!(FOUR)).toBe(16)
-    expect(pairs.maxLevel!(PHONE)).toBe(18)
+    expect(pairs.maxLevel!(PHONE)).toBe(21)
+    expect(pairs.maxLevel!(DESKTOP)).toBe(26)
   })
 
   it('the clock is 6000 + 6000 per pair, or 6000 + 9000 per set of three', () => {
-    for (let lv = 1; lv <= 18; lv++) {
+    for (let lv = 1; lv <= 26; lv++) {
       const s = make(lv, 5)
       const sets = s.cards.length / s.size
       expect(pairs.timeLimitMs(s), `L${lv}`).toBe(6000 + (s.size === 3 ? 9000 : 6000) * sets)
@@ -186,7 +202,7 @@ describe('Match Pairs: preview, blocked rules and tags', () => {
         expect(view(after).cells.every((c) => c.tone === 'faceDown')).toBe(true)
       }
     }
-    for (let lv = 3; lv <= 18; lv++) expect(make(lv, 1).previewMs, `L${lv}`).toBe(0)
+    for (let lv = 3; lv <= 26; lv++) expect(make(lv, 1).previewMs, `L${lv}`).toBe(0)
   })
 
   it('a blocked no-preview rule keeps the preview; blocked triples become pairs with as many cards and the same clock', () => {
@@ -194,7 +210,7 @@ describe('Match Pairs: preview, blocked rules and tags', () => {
     expect(noPeek.previewMs).toBe(PAIRS_PREVIEW_MS)
     expect(pairs.mechanics(noPeek)).not.toContain('pairs.noPreview')
     expect(settle(noPeek).seen.some(Boolean)).toBe(false)
-    for (const lv of [14, 15, 16, 17, 18]) {
+    for (const lv of [14, 15, 16, 17, 18, 21, 24, 26]) {
       const triples = make(lv, 2)
       const blocked = make(lv, 2, { ...DESKTOP, blockRules: ['pairs.triples'] })
       expect(blocked.size, `L${lv}`).toBe(2)
@@ -220,16 +236,26 @@ describe('Match Pairs: preview, blocked rules and tags', () => {
     expect(tags(11)).toContain('pairs.board12')
     expect(tags(13.9)).not.toContain('pairs.triples')
     expect(tags(14)).toContain('pairs.triples')
+    // The bigger boards, each from its level on a screen that holds it (30 cards from L17's triples).
+    expect(tags(16)).not.toContain('pairs.board15')
+    expect(tags(17)).toContain('pairs.board15')
+    expect(tags(21)).not.toContain('pairs.board18')
+    expect(tags(22)).toContain('pairs.board18')
+    expect(tags(24)).not.toContain('pairs.board21')
+    expect(tags(25)).toContain('pairs.board21')
+    const from = Object.fromEntries(MECHANICS.filter((m) => m.game === 'pairs').map((m) => [m.tag, m.from]))
+    expect([from['pairs.board15'], from['pairs.board18'], from['pairs.board21']]).toEqual([17, 22, 25])
   })
 })
 
 describe('Match Pairs: pictures', () => {
   it('distinct and look-alike boards draw one family of their class; mixed boards mix the distinct ones', () => {
-    for (let lv = 1; lv <= 18; lv++) {
+    for (let lv = 1; lv <= 26; lv++) {
       const rung = PAIRS_LADDER[lv - 1]
+      const ctx = lv <= pairsMaxLevel(PHONE) ? PHONE : DESKTOP
       let multi = 0
       for (let seed = 1; seed <= 40; seed++) {
-        const s = make(lv, seed, PHONE)
+        const s = make(lv, seed, ctx)
         const fams = new Set(s.cards.map(familyOf))
         expect(fams.has(undefined), `L${lv}: a face from no family`).toBe(false)
         const classes = new Set([...fams].map((f) => PAIRS_FAMILY_CLASS[f as PairsFamilyName]))
@@ -304,8 +330,8 @@ describe('Match Pairs: pictures', () => {
     }
     expect(all).not.toContain('🫐')
     expect(all).not.toContain('🛻')
-    // The biggest boards: 15 pairs (blocked triples at L17-18), 12 pairs on three columns.
-    for (const list of Object.values(PAIRS_FAMILIES)) expect(list.length).toBeGreaterThanOrEqual(15)
+    // The biggest boards: 21 pairs (L25, and blocked triples at L26), 12 pairs on three columns.
+    for (const list of Object.values(PAIRS_FAMILIES)) expect(list.length).toBeGreaterThanOrEqual(21)
   })
 })
 
@@ -504,7 +530,8 @@ describe('Match Pairs: hard enough', () => {
   })
 
   it('and stays fair: a player who keeps almost everything clears nearly every board, to the top', () => {
-    for (let lv = 1; lv <= 18; lv++) expect(failShare(lv, 0.95, PHONE, 200), `L${lv}`).toBeLessThanOrEqual(0.05)
+    for (let lv = 1; lv <= pairsMaxLevel(PHONE); lv++) expect(failShare(lv, 0.95, PHONE, 200), `L${lv}`).toBeLessThanOrEqual(0.05)
+    for (let lv = pairsMaxLevel(PHONE) + 1; lv <= pairsMaxLevel(DESKTOP); lv++) expect(failShare(lv, 0.95, DESKTOP, 200), `L${lv}`).toBeLessThanOrEqual(0.05)
     // The early boards are gentle even at half: L1-3 fail under 20%.
     for (let lv = 1; lv <= 3; lv++) expect(failShare(lv, 0.5, PHONE, 500), `L${lv}`).toBeLessThan(0.2)
   })
