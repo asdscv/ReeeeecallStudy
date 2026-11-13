@@ -22,15 +22,19 @@ import { areHapticsEnabled } from '../../utils/haptics'
  *   same every trial, so it says "now" without saying where; a stage reached is a success. A near
  *   miss and a faster step are not felt: the near miss is shown ("right next to it") rather than
  *   buzzed as a wrong, and a step comes every few answers — a buzz that often is noise.
+ * - Flash Grid's waves are a stimulus too, like Sequence's playback: not felt.
+ * - Number Hunt's second series (the boxed numbers) answers with a tap of its own (a soft impact on
+ *   iOS, a context click on Android), as web gives it its own voice; a right «없음» (Odd One Out)
+ *   has a firm click of its own in place of the usual right-answer tap.
  * - Buzzes keep ≥80ms apart; the notification-type ones (success, warning, error) ≥400ms.
  */
-type Kind = 'hit' | 'flip' | 'tick' | 'ready' | 'go' | 'correct' | 'miss' | 'wrong' | 'lifeLost' | 'success'
+type Kind = 'hit' | 'hitAlt' | 'flip' | 'tick' | 'ready' | 'go' | 'correct' | 'none' | 'miss' | 'wrong' | 'lifeLost' | 'success'
 
-const RANK: Record<Kind, number> = { hit: 1, flip: 1, tick: 1, ready: 1, go: 2, correct: 3, miss: 3, wrong: 4, success: 4, lifeLost: 5 }
+const RANK: Record<Kind, number> = { hit: 1, hitAlt: 1, flip: 1, tick: 1, ready: 1, go: 2, correct: 3, none: 3.5, miss: 3, wrong: 4, success: 4, lifeLost: 5 }
 /** The kinds iOS plays as a notification pattern (and Android as Confirm / Reject). */
 const NOTIFICATION = new Set<Kind>(['miss', 'wrong', 'lifeLost', 'success'])
 /** A verdict ends a trial; a hit inside the same moment is dropped. */
-const VERDICT = new Set<Kind>(['correct', 'miss', 'wrong', 'lifeLost', 'success'])
+const VERDICT = new Set<Kind>(['correct', 'none', 'miss', 'wrong', 'lifeLost', 'success'])
 
 const MIN_GAP_MS = 80
 const NOTIFICATION_GAP_MS = 400
@@ -38,11 +42,13 @@ const HIT_VS_VERDICT_MS = 40
 
 const IOS: Record<Kind, () => Promise<void>> = {
   hit: () => Haptics.selectionAsync(),
+  hitAlt: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft),
   flip: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft),
   tick: () => Haptics.selectionAsync(),
   ready: () => Haptics.selectionAsync(),
   go: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium),
   correct: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
+  none: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid),
   miss: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning),
   wrong: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning),
   lifeLost: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error),
@@ -51,6 +57,7 @@ const IOS: Record<Kind, () => Promise<void>> = {
 
 const ANDROID: Partial<Record<Kind, Haptics.AndroidHaptics>> = {
   hit: Haptics.AndroidHaptics.Virtual_Key,
+  hitAlt: Haptics.AndroidHaptics.Context_Click,
   flip: Haptics.AndroidHaptics.Segment_Tick,
   tick: Haptics.AndroidHaptics.Clock_Tick,
   ready: Haptics.AndroidHaptics.Clock_Tick,
@@ -83,7 +90,7 @@ function play(kind: Kind) {
 }
 
 function buzz(kind: Kind) {
-  if (kind === 'hit' || kind === 'flip') {
+  if (kind === 'hit' || kind === 'hitAlt' || kind === 'flip') {
     // One macrotask later, so a verdict from the same tap (same render) can claim the moment.
     if (pendingHit === null) {
       pendingHit = kind
@@ -113,12 +120,16 @@ function buzz(kind: Kind) {
 export function brainHaptic(fx: BrainFx, game?: BrainGameId) {
   switch (fx.kind) {
     case 'hit':
+      return buzz(fx.alt ? 'hitAlt' : 'hit')
     case 'select':
       return buzz('hit')
     case 'flip':
       return buzz('flip')
     case 'correct':
       return buzz('correct')
+    case 'noneCorrect':
+      // Sent just before its 'correct', in the same moment: it outranks it, so it is the one felt.
+      return buzz('none')
     case 'wrong':
       return buzz('wrong')
     case 'miss':
@@ -135,7 +146,7 @@ export function brainHaptic(fx: BrainFx, game?: BrainGameId) {
     case 'newBest':
       return buzz('success')
     default:
-      // reveal, flash, stimulus, nearMiss, void, roundEnd: nothing to feel.
+      // reveal, wave, flash, stimulus, nearMiss, void, roundEnd: nothing to feel.
       return
   }
 }

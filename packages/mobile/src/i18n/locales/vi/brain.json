@@ -157,7 +157,33 @@
     "stopTitle": "Dừng ở đây?",
     "stopBody": "Mọi kết quả đến giờ đã được lưu.",
     "keepPlaying": "Chơi tiếp",
-    "stopNow": "Dừng"
+    "stopNow": "Dừng",
+    "missingTerm": "Số nào điền vào chỗ trống?",
+    "noneOdd": "Không có",
+    "findOddOrNone": "Chạm vào cái khác biệt, hoặc “Không có”",
+    "noneWas": "Không có cái nào khác",
+    "tapRange": "Chạm từ {{from}} đến {{to}} · tiếp theo: {{next}}",
+    "tapSkip": "Chạm lần lượt các số tăng {{step}} mỗi lần",
+    "nextHint": "Tiếp theo: {{next}}",
+    "tapAlternate": "Trắng ↔ vàng xen kẽ",
+    "tapAlternateOpposite": "Trắng tăng dần, vàng giảm dần",
+    "cueInk": "Màu",
+    "cueWord": "Nghĩa",
+    "inkWas": "Màu chữ: {{color}}",
+    "findTriples": "Tìm 3 hình giống nhau",
+    "newCardFree": "Thẻ mới — không sao",
+    "budget": "Còn được sai {{left}} lần",
+    "cells": "{{count}} ô",
+    "cells_one": "{{count}} ô",
+    "cells_other": "{{count}} ô",
+    "newBestCells": "{{count}} ô!",
+    "newBestCells_one": "{{count}} ô!",
+    "newBestCells_other": "{{count}} ô!",
+    "reverseBadge": "Ngược",
+    "newBestReverse": "Ngược {{count}} ô!",
+    "newBestReverse_one": "Ngược {{count}} ô!",
+    "newBestReverse_other": "Ngược {{count}} ô!",
+    "lookalikeBadge": "Hình na ná"
   },
   "quickEye": {
     "watch": "Nhìn vào giữa",
@@ -278,7 +304,7 @@
     "oddOneOut": {
       "rotation": {
         "title": "Hình bị xoay",
-        "body": "Tất cả là cùng một hình. Chạm vào hình quay khác hướng. Đôi khi cả bảng đều nghiêng."
+        "body": "Tất cả là cùng một hình. Chạm vào hình quay khác hướng."
       },
       "lookalike": {
         "title": "Hình na ná",
@@ -291,6 +317,22 @@
       "glyphs": {
         "title": "Chữ dễ nhầm",
         "body": "Những chữ trông giống nhau, như b và d hoặc 6 và 9."
+      },
+      "colorNoise": {
+        "title": "Bỏ qua màu",
+        "body": "Mỗi ô một màu. Đừng để ý màu, hãy chạm vào hình có hình dạng khác."
+      },
+      "mirror": {
+        "title": "Hình bị lật",
+        "body": "Tất cả đều bị xoay, điều đó không sao — hãy tìm hình bị lật như trong gương."
+      },
+      "absent": {
+        "title": "Có thể không có",
+        "body": "Có bảng không có hình nào khác. Xem hết, nếu không có thì chạm “Không có”."
+      },
+      "glyphTwin": {
+        "title": "Chữ gần như giống hệt",
+        "body": "Những chữ chỉ khác nhau một nét nhỏ."
       }
     },
     "board": {
@@ -304,7 +346,7 @@
       },
       "moreCards": {
         "title": "Thêm thẻ",
-        "body": "Nhiều cặp hơn, thời gian và số lần được sai cũng tăng theo."
+        "body": "Nhiều cặp hơn, thời gian cũng tăng theo."
       },
       "moreChoices": {
         "title": "Thêm lựa chọn",
@@ -319,18 +361,42 @@
       "reshuffle": {
         "title": "Số đổi chỗ",
         "body": "Mỗi lần chạm, các số đổi chỗ. Bù lại, bảng nhỏ hơn một cỡ."
+      },
+      "twoDigit": {
+        "title": "Số có hai chữ số",
+        "body": "Các số giờ có hai chữ số. Chạm từ số nhỏ nhất trở lên."
+      },
+      "skipCount": {
+        "title": "Đếm cách quãng",
+        "body": "Các số tăng 2 hoặc 3 mỗi lần. Hãy tự đếm số tiếp theo."
+      },
+      "alternate": {
+        "title": "Chạm xen kẽ",
+        "body": "Xen kẽ số trắng và số vàng có khung: trắng 1 → vàng 1 → trắng 2 → vàng 2 …"
+      },
+      "alternateOpposite": {
+        "title": "Ngược chiều",
+        "body": "Số trắng tăng từ 1, số vàng giảm từ số lớn nhất: trắng 1 → vàng 8 → trắng 2 → vàng 7 …"
+      },
+      "unmarked": {
+        "title": "Không đánh dấu",
+        "body": "Số đã tìm thấy không mờ đi. Hãy tự nhớ mình đã chạm đến đâu."
       }
     },
     "memoryGrid": {
       "fastShow": {
         "title": "Hiện ngắn hơn",
-        "body": "Bảng đã lớn nhất. Từ giờ các ô sáng trong thời gian ngắn hơn."
+        "body": "Mỗi đợt ô sáng trong thời gian ngắn hơn."
+      },
+      "waves": {
+        "title": "Hiện từng phần",
+        "body": "Các ô sáng lên thành 2–3 đợt. Xem hết rồi chạm tất cả."
       }
     },
     "sequence": {
       "reverse": {
         "title": "Chạm ngược",
-        "body": "Chạm theo thứ tự ngược, bắt đầu từ ô sáng cuối cùng."
+        "body": "Chạm theo thứ tự ngược, bắt đầu từ ô sáng cuối cùng. Từ giờ luôn là thứ tự ngược."
       }
     },
     "series": {
@@ -356,15 +422,63 @@
       },
       "squares": {
         "title": "Bình phương",
-        "body": "Xuất hiện quy luật dựa trên số nhân với chính nó."
+        "body": "Xuất hiện quy luật dựa trên số nhân với chính nó, đôi khi cộng hoặc trừ thêm một chút."
       },
       "interleaved": {
         "title": "Hai dãy đan xen",
         "body": "Hai quy luật thay phiên nhau. Hãy đọc cách một số."
       },
       "doublePlus": {
-        "title": "Gấp đôi rồi cộng",
-        "body": "Xuất hiện quy luật: số trước nhân đôi rồi cộng thêm cùng một số."
+        "title": "Nhân rồi cộng",
+        "body": "Xuất hiện quy luật: số trước nhân lên vài lần rồi cộng hoặc trừ cùng một số."
+      },
+      "halving": {
+        "title": "Giảm một nửa",
+        "body": "Xuất hiện quy luật giảm một nửa, hoặc gấp ba, mỗi lần."
+      },
+      "altOps": {
+        "title": "Hai phép tính xen kẽ",
+        "body": "Hai phép tính khác nhau lần lượt thay phiên."
+      },
+      "mixedLines": {
+        "title": "Dãy cộng và dãy nhân",
+        "body": "Đọc cách một số: một dãy cộng hoặc trừ, dãy kia nhân."
+      },
+      "growFactor": {
+        "title": "Số nhân tăng dần",
+        "body": "Số đem nhân tăng thêm 1 mỗi lần."
+      },
+      "tribonacci": {
+        "title": "Ba số trước",
+        "body": "Cộng ba số trước để ra số tiếp theo."
+      },
+      "threeLines": {
+        "title": "Ba dãy đan xen",
+        "body": "Ba quy luật lần lượt thay phiên. Hãy đọc cách hai số."
+      },
+      "diffGrowing": {
+        "title": "Khoảng cách của khoảng cách",
+        "body": "Mức tăng của khoảng cách cũng lớn dần."
+      },
+      "opCycle": {
+        "title": "Ba phép tính lặp lại",
+        "body": "Ba phép tính lặp lại theo đúng thứ tự."
+      },
+      "diffLines": {
+        "title": "Khoảng cách chia hai dãy",
+        "body": "Đọc các khoảng cách cách một: mỗi dãy có quy luật riêng."
+      },
+      "diffFib": {
+        "title": "Tổng hai khoảng cách",
+        "body": "Mỗi khoảng cách bằng tổng hai khoảng cách trước."
+      },
+      "cubes": {
+        "title": "Lập phương",
+        "body": "Xuất hiện quy luật dựa trên tích của ba số giống nhau, đôi khi cộng hoặc trừ thêm một chút."
+      },
+      "missingTerm": {
+        "title": "Tìm chỗ trống",
+        "body": "Giờ dấu ? có thể nằm giữa dãy. Chọn số điền vào chỗ trống."
       }
     },
     "pairs": {
@@ -375,12 +489,36 @@
       "noPreview": {
         "title": "Không xem trước",
         "body": "Không cho xem thẻ lúc đầu nữa. Hãy nhớ khi lật."
+      },
+      "lookalike": {
+        "title": "Hình na ná",
+        "body": "Các hình có dáng giống nhau sẽ xuất hiện cùng lúc."
+      },
+      "triples": {
+        "title": "Tìm bộ ba",
+        "body": "Tìm 3 hình giống nhau. Nếu thẻ thứ hai khác, các thẻ sẽ úp lại ngay."
       }
     },
     "stroop": {
       "word": {
         "title": "Đổi quy tắc",
-        "body": "Khi được hỏi chữ NÓI gì, hãy chọn màu mà chữ đó gọi tên, không phải màu mực."
+        "body": "Dấu hiệu “Nghĩa”: chọn màu mà chữ gọi tên. Dấu hiệu “Màu”: chọn màu của chữ."
+      },
+      "shuffle": {
+        "title": "Nút đổi chỗ",
+        "body": "Giờ các nút đổi chỗ sau mỗi câu."
+      },
+      "labelInk": {
+        "title": "Đừng tin màu của nút",
+        "body": "Các nút cũng có màu. Hãy chọn theo tên màu được viết, không theo màu của nút."
+      },
+      "switchOften": {
+        "title": "Quy tắc đổi thường hơn",
+        "body": "Mỗi lần hãy xem dấu hiệu trên thẻ (Màu / Nghĩa)."
+      },
+      "frame": {
+        "title": "Bỏ qua viền",
+        "body": "Màu viền thẻ không bao giờ là đáp án."
       }
     },
     "math": {
@@ -397,8 +535,24 @@
         "body": "Có cả bài chia. Kết quả luôn chia hết."
       },
       "twoStep": {
-        "title": "Hai bước",
-        "body": "Có bài phải tính hai bước. Nếu có + và × thì nhân trước; nếu có ? thì chọn số điền vào."
+        "title": "Nhân, chia trước",
+        "body": "Khi có + hoặc − cùng với × hoặc ÷, hãy tính × và ÷ trước. Ví dụ: 6 + 4 × 7 = 6 + 28"
+      },
+      "missing": {
+        "title": "Điền chỗ trống",
+        "body": "Chọn số điền vào chỗ ? trong phép tính."
+      },
+      "threeDigit": {
+        "title": "Số có ba chữ số",
+        "body": "Có thêm phép tính với số có ba chữ số."
+      },
+      "parens": {
+        "title": "Trong ngoặc trước",
+        "body": "Khi có ngoặc, hãy tính phần trong ngoặc trước."
+      },
+      "bigMul": {
+        "title": "Hai chữ số × hai chữ số",
+        "body": "Có bài nhân hai số có hai chữ số với nhau."
       }
     }
   },

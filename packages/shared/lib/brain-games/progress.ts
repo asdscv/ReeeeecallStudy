@@ -1,6 +1,7 @@
 import type { BrainGameId } from './types'
 import { GROUP_RULES, TIMING_MODES, type TimingMode } from './rules'
 import { quickEyeAdvance, QUICK_EYE_MAX_VARIANT, QUICK_EYE_WINDOW } from './games/quick-eye'
+import { V2_RESCALED, migrateLevelV1 } from './scale'
 
 /**
  * What survives between sessions — small on purpose. Mobile keeps it in SecureStore, which caps a
@@ -62,7 +63,8 @@ export interface BrainSettings {
 }
 
 export interface BrainProgress {
-  v: 1
+  /** 2 since the hard-content change (levels on the v2 scale); a v1 record is converted once on reading. */
+  v: 2
   games: Partial<Record<BrainGameId, GameProgress>>
   totalRounds: number
   totalPoints: number
@@ -98,7 +100,7 @@ const emptySessions = (): SessionLog => ({ recentDays: [], total: 0, course: 0, 
 
 export function emptyProgress(): BrainProgress {
   return {
-    v: 1,
+    v: 2,
     games: {},
     totalRounds: 0,
     totalPoints: 0,
@@ -252,29 +254,39 @@ export function serializeProgress(p: BrainProgress): string {
 const num = (v: unknown, min = 0): number => (typeof v === 'number' && Number.isFinite(v) ? Math.max(min, v) : min)
 const isDay = (v: unknown): v is string => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)
 
-/** Tolerant: anything unreadable becomes an empty record rather than a crash on launch. */
+/**
+ * Tolerant: anything unreadable becomes an empty record rather than a crash on launch.
+ *
+ * Reads v1 or v2 and always returns v2. A v1 record's board-game levels are converted to the v2
+ * scale (scale.ts) and their best scores cleared — earned on easier content, the precedent Quick
+ * Eye's field change set. Converting happens only on a v1 document, so reading the result again
+ * changes nothing.
+ */
 export function parseProgress(raw: string | null | undefined): BrainProgress {
   if (!raw) return emptyProgress()
   try {
-    const data = JSON.parse(raw) as Partial<BrainProgress>
-    if (!data || data.v !== 1 || typeof data.games !== 'object' || data.games === null) return emptyProgress()
+    const data = JSON.parse(raw) as Partial<Omit<BrainProgress, 'v'>> & { v?: unknown }
+    if (!data || (data.v !== 1 && data.v !== 2) || typeof data.games !== 'object' || data.games === null) return emptyProgress()
+    const oldScale = data.v === 1
     const games: BrainProgress['games'] = {}
-    // v1 records (written before Today's Training existed, so without `sessions`) measured the span
-    // games on another scale: Flash Grid had 3 + ⌊(L−1)·0.6⌋ cells and Sequence 3 + ⌊(L−1)·0.45⌋
-    // tiles, where the level is now the length − 2. Convert, or a v1 level 6 would open at 8 tiles.
-    const v1 = data.sessions === undefined
+    // Older still: v1 records written before Today's Training existed (so without `sessions`)
+    // measured the span games on another scale: Flash Grid had 3 + ⌊(L−1)·0.6⌋ cells and Sequence
+    // 3 + ⌊(L−1)·0.45⌋ tiles, where the level is now the length − 2. Convert, or a level 6 would
+    // open at 8 tiles.
+    const preSessions = oldScale && data.sessions === undefined
     for (const [id, g] of Object.entries(data.games)) {
       if (!g || typeof g.level !== 'number' || !Number.isFinite(g.level)) continue
       const min = id === 'quickEye' ? 0 : 1
       // A sane ceiling as well as a floor: a corrupted or edited level (1e308) would otherwise make
       // the games build absurd puzzles. No game's level means anything past these.
       const max = id === 'quickEye' ? GROUP_RULES.quickEye.max : 500
-      const span = v1 && (id === 'memoryGrid' || id === 'sequence')
+      const span = preSessions && (id === 'memoryGrid' || id === 'sequence')
       const toLength = (lv: number) => (span ? Math.max(1, 1 + Math.floor((lv - 1) * (id === 'memoryGrid' ? 0.6 : 0.45))) : lv)
+      const rescale = (lv: number) => (oldScale ? migrateLevelV1(id as BrainGameId, toLength(lv)) : lv)
       const clampLv = (lv: number) => Math.min(max, Math.max(min, Number.isFinite(lv) ? lv : min))
       games[id as BrainGameId] = {
-        level: clampLv(toLength(g.level)),
-        bestLevel: clampLv(toLength(Number(g.bestLevel) || g.level)),
+        level: clampLv(rescale(g.level)),
+        bestLevel: clampLv(rescale(Number(g.bestLevel) || g.level)),
         rounds: num(g.rounds),
         wins: num(g.wins),
       }
@@ -285,6 +297,7 @@ export function parseProgress(raw: string | null | undefined): BrainProgress {
         if (typeof v === 'number' && Number.isFinite(v) && v > 0) bestRuns[mode as BrainGameId | 'mix'] = v
       }
     }
+    if (oldScale) for (const id of V2_RESCALED) delete bestRuns[id]
     const qe = (data.quickEye ?? {}) as Partial<QuickEyeProgress>
     const quickEye: QuickEyeProgress = {
       variant: Math.min(QUICK_EYE_MAX_VARIANT, Math.max(1, Math.round(num(qe.variant, 1)))),
@@ -322,7 +335,7 @@ export function parseProgress(raw: string | null | undefined): BrainProgress {
     }
     const timing = data.settings && TIMING_MODES.includes(data.settings.timing) ? data.settings.timing : 1
     return {
-      v: 1,
+      v: 2,
       games,
       totalRounds: num(data.totalRounds),
       totalPoints: num(data.totalPoints),

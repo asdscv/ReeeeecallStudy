@@ -157,7 +157,33 @@
     "stopTitle": "Berhenti di sini?",
     "stopBody": "Semua yang sudah dimainkan tersimpan.",
     "keepPlaying": "Lanjut main",
-    "stopNow": "Berhenti"
+    "stopNow": "Berhenti",
+    "missingTerm": "Angka berapa yang mengisi yang kosong?",
+    "noneOdd": "Tidak ada",
+    "findOddOrNone": "Ketuk yang berbeda, atau “Tidak ada”",
+    "noneWas": "Memang tidak ada",
+    "tapRange": "Ketuk {{from}} → {{to}} berurutan · berikutnya: {{next}}",
+    "tapSkip": "Ketuk berurutan, naik {{step}} setiap kali",
+    "nextHint": "Berikutnya: {{next}}",
+    "tapAlternate": "Putih ↔ kuning bergantian",
+    "tapAlternateOpposite": "Putih naik, kuning turun",
+    "cueInk": "Warna",
+    "cueWord": "Arti",
+    "inkWas": "Warna tulisan: {{color}}",
+    "findTriples": "Cari 3 yang sama",
+    "newCardFree": "Kartu baru — tidak apa-apa",
+    "budget": "Sisa salah: {{left}}",
+    "cells": "{{count}} kotak",
+    "cells_one": "{{count}} kotak",
+    "cells_other": "{{count}} kotak",
+    "newBestCells": "{{count}} kotak!",
+    "newBestCells_one": "{{count}} kotak!",
+    "newBestCells_other": "{{count}} kotak!",
+    "reverseBadge": "Terbalik",
+    "newBestReverse": "{{count}} terbalik!",
+    "newBestReverse_one": "{{count}} terbalik!",
+    "newBestReverse_other": "{{count}} terbalik!",
+    "lookalikeBadge": "Gambar mirip"
   },
   "quickEye": {
     "watch": "Lihat ke tengah",
@@ -278,7 +304,7 @@
     "oddOneOut": {
       "rotation": {
         "title": "Yang terputar",
-        "body": "Semua gambarnya sama. Ketuk yang menghadap arah lain. Kadang seluruh papan miring."
+        "body": "Semua gambarnya sama. Ketuk yang menghadap arah lain."
       },
       "lookalike": {
         "title": "Mirip",
@@ -291,6 +317,22 @@
       "glyphs": {
         "title": "Huruf yang mengecoh",
         "body": "Huruf yang mirip, seperti b dan d atau 6 dan 9."
+      },
+      "colorNoise": {
+        "title": "Abaikan warna",
+        "body": "Warna tiap kotak berbeda. Abaikan warnanya, ketuk yang bentuknya lain."
+      },
+      "mirror": {
+        "title": "Yang terbalik",
+        "body": "Semuanya diputar, itu tidak apa-apa. Cari yang terbalik seperti di cermin."
+      },
+      "absent": {
+        "title": "Mungkin tidak ada",
+        "body": "Ada papan yang tidak punya yang berbeda. Periksa semua; jika memang tidak ada, ketuk “Tidak ada”."
+      },
+      "glyphTwin": {
+        "title": "Huruf yang nyaris sama",
+        "body": "Huruf yang hanya beda sedikit di satu goresan."
       }
     },
     "board": {
@@ -304,7 +346,7 @@
       },
       "moreCards": {
         "title": "Kartu bertambah",
-        "body": "Pasangannya lebih banyak, dengan waktu dan kesempatan salah yang ikut bertambah."
+        "body": "Pasangannya lebih banyak, waktunya juga bertambah."
       },
       "moreChoices": {
         "title": "Pilihan bertambah",
@@ -319,18 +361,42 @@
       "reshuffle": {
         "title": "Mode acak",
         "body": "Posisi angka berubah setiap kali diketuk. Sebagai gantinya, papannya satu ukuran lebih kecil."
+      },
+      "twoDigit": {
+        "title": "Angka dua digit",
+        "body": "Sekarang angkanya dua digit. Ketuk dari yang terkecil ke atas."
+      },
+      "skipCount": {
+        "title": "Hitung lompat",
+        "body": "Angkanya naik 2 atau 3. Hitung sendiri angka berikutnya."
+      },
+      "alternate": {
+        "title": "Bergantian",
+        "body": "Angka putih dan angka kuning berkotak bergantian: putih 1 → kuning 1 → putih 2 → kuning 2 …"
+      },
+      "alternateOpposite": {
+        "title": "Arah berlawanan",
+        "body": "Angka putih naik dari 1, angka kuning turun dari yang terbesar: putih 1 → kuning 8 → putih 2 → kuning 7 …"
+      },
+      "unmarked": {
+        "title": "Tanpa tanda",
+        "body": "Angka yang sudah ditemukan tidak memudar. Ingat sendiri sampai mana kamu mengetuk."
       }
     },
     "memoryGrid": {
       "fastShow": {
         "title": "Tampil lebih singkat",
-        "body": "Papan sudah paling besar. Sekarang kotak menyala lebih singkat."
+        "body": "Tiap tahap menyala lebih singkat."
+      },
+      "waves": {
+        "title": "Ditampilkan bertahap",
+        "body": "Kotak menyala dalam 2–3 tahap. Lihat semuanya, lalu ketuk semuanya."
       }
     },
     "sequence": {
       "reverse": {
         "title": "Terbalik",
-        "body": "Ketuk kotak dengan urutan terbalik, mulai dari yang terakhir menyala."
+        "body": "Ketuk kotak dengan urutan terbalik, mulai dari yang terakhir menyala. Mulai sekarang selalu terbalik."
       }
     },
     "series": {
@@ -356,15 +422,63 @@
       },
       "squares": {
         "title": "Kuadrat",
-        "body": "Muncul aturan yang memakai angka dikali dirinya sendiri."
+        "body": "Muncul aturan yang memakai angka dikali dirinya sendiri, kadang ditambah atau dikurangi sedikit."
       },
       "interleaved": {
         "title": "Dua jadi satu",
         "body": "Dua aturan bergantian. Baca selang satu angka."
       },
       "doublePlus": {
-        "title": "Dua kali lalu tambah",
-        "body": "Muncul aturan: angka sebelumnya dikali dua lalu ditambah jumlah yang sama."
+        "title": "Kali lalu tambah",
+        "body": "Muncul aturan: angka sebelumnya dikali lalu ditambah atau dikurangi jumlah yang sama."
+      },
+      "halving": {
+        "title": "Dibagi dua",
+        "body": "Muncul aturan yang membagi dua, atau mengalikan tiga, setiap langkah."
+      },
+      "altOps": {
+        "title": "Dua langkah bergantian",
+        "body": "Dua hitungan berbeda muncul bergantian."
+      },
+      "mixedLines": {
+        "title": "Deret tambah dan deret kali",
+        "body": "Baca selang satu angka: satu deret menambah atau mengurangi, yang lain mengali."
+      },
+      "growFactor": {
+        "title": "Pengali yang makin besar",
+        "body": "Angka pengalinya bertambah satu setiap kali."
+      },
+      "tribonacci": {
+        "title": "Tiga angka sebelumnya",
+        "body": "Jumlahkan tiga angka sebelumnya untuk mendapat angka berikutnya."
+      },
+      "threeLines": {
+        "title": "Tiga deret bercampur",
+        "body": "Tiga aturan bergantian. Baca selang dua angka."
+      },
+      "diffGrowing": {
+        "title": "Selisih dari selisih",
+        "body": "Pertambahan selisihnya juga makin besar."
+      },
+      "opCycle": {
+        "title": "Tiga langkah berulang",
+        "body": "Tiga hitungan berulang dengan urutan yang sama."
+      },
+      "diffLines": {
+        "title": "Selisih dalam dua deret",
+        "body": "Baca selisihnya selang satu: masing-masing punya aturan."
+      },
+      "diffFib": {
+        "title": "Selisih dari dua sebelumnya",
+        "body": "Tiap selisih adalah jumlah dua selisih sebelumnya."
+      },
+      "cubes": {
+        "title": "Pangkat tiga",
+        "body": "Muncul aturan yang memakai hasil kali tiga angka yang sama, kadang ditambah atau dikurangi sedikit."
+      },
+      "missingTerm": {
+        "title": "Cari yang kosong",
+        "body": "Sekarang ? bisa ada di tengah deret. Pilih angka yang mengisinya."
       }
     },
     "pairs": {
@@ -375,12 +489,36 @@
       "noPreview": {
         "title": "Tanpa intip",
         "body": "Kartu tidak diperlihatkan di awal. Ingat sambil membaliknya."
+      },
+      "lookalike": {
+        "title": "Gambar mirip",
+        "body": "Gambar yang bentuknya mirip muncul bersama."
+      },
+      "triples": {
+        "title": "Cari tiga",
+        "body": "Cari 3 gambar yang sama. Jika kartu kedua berbeda, kartunya langsung tertutup lagi."
       }
     },
     "stroop": {
       "word": {
         "title": "Aturan berganti",
-        "body": "Saat diminta ARTI kata, pilih warna yang disebut kata itu, bukan warna tintanya."
+        "body": "Tanda “Arti”: pilih warna yang disebut kata itu. Tanda “Warna”: pilih warna tulisannya."
+      },
+      "shuffle": {
+        "title": "Tombol berpindah",
+        "body": "Sekarang posisi tombol berubah di setiap soal."
+      },
+      "labelInk": {
+        "title": "Jangan tertipu warna tombol",
+        "body": "Tombolnya juga berwarna. Pilih berdasarkan nama warna yang tertulis, bukan warna tombolnya."
+      },
+      "switchOften": {
+        "title": "Aturan lebih sering berganti",
+        "body": "Selalu periksa tanda di atas kartu (Warna / Arti)."
+      },
+      "frame": {
+        "title": "Abaikan bingkai",
+        "body": "Warna bingkai kartu tidak pernah jadi jawaban."
       }
     },
     "math": {
@@ -397,8 +535,24 @@
         "body": "Ada soal pembagian juga. Hasilnya selalu bulat."
       },
       "twoStep": {
-        "title": "Dua langkah",
-        "body": "Sekarang ada soal dua langkah. Jika ada + dan ×, kerjakan × dulu; jika ada ?, pilih angka yang mengisinya."
+        "title": "Kali dan bagi dulu",
+        "body": "Jika ada + atau − bersama × atau ÷, hitung × dan ÷ dulu. Contoh: 6 + 4 × 7 = 6 + 28"
+      },
+      "missing": {
+        "title": "Isi yang kosong",
+        "body": "Pilih angka yang mengisi tempat ? di soal."
+      },
+      "threeDigit": {
+        "title": "Angka tiga digit",
+        "body": "Sekarang ada hitungan dengan angka tiga digit."
+      },
+      "parens": {
+        "title": "Kurung dulu",
+        "body": "Jika ada tanda kurung, hitung isi kurungnya dulu."
+      },
+      "bigMul": {
+        "title": "Dua digit × dua digit",
+        "body": "Ada soal perkalian dua angka dua digit."
       }
     }
   },

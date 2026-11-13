@@ -1,6 +1,6 @@
 import { AppState } from 'react-native'
 import type { Feather } from '@expo/vector-icons'
-import { brainGame, maxColsFor, type BrainColor, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
+import { brainGame, maxColsFor, maxRowsFor, type BrainColor, type BrainGameId, type CellInk } from '@reeeeecall/shared/lib/brain-games'
 import type { PlatformContext } from '@reeeeecall/shared/hooks/useBrainRound'
 import { flushBrainCloud, useBrainStore, type BrainStorage } from '@reeeeecall/shared/stores/brain-store'
 import { localPrefs } from '../../utils/local-prefs'
@@ -24,6 +24,20 @@ export const INK: Record<BrainColor, string> = {
   purple: '#9333ea',
   orange: '#ea580c',
 }
+
+/**
+ * A grid label's ink on the dark canvas (Odd One Out's colour noise, Number Hunt's second series)
+ * — the same as web: told apart by brightness and hue, never red against green. Colour is never
+ * the only cue that matters: the second series is also boxed.
+ */
+export const CELL_INK: Record<CellInk, string> = {
+  neutral: '#F8FAFC',
+  amber: '#FBBF24',
+  cyan: '#67E8F9',
+}
+
+/** The row above a grid (badge, chip, waves, budget) with its margin: kept out of the cells' height. */
+export const BOARD_STRIP_H = 44
 
 /** Text on the white cards and lit tiles of the canvas. */
 export const CANVAS_INK = '#0F172A'
@@ -132,10 +146,15 @@ export function brainStorageFor(userId: string): BrainStorage {
  * React Native's JS clock is jittery, so Quick Eye starts no shorter than two 60Hz frames (33ms).
  * A phone's inner ring is too short for 16 stimuli without crowding the centre box, so it carries
  * only the eight radial positions; a tablet's is not.
+ *
+ * `maxRows`: the tallest grid that keeps 56dp cells in the board's height, less the strip a tall
+ * board carries above it (Flash Grid's «N칸» and waves) — so a portrait 5×7 board is only offered
+ * where it fits without scrolling.
  */
-export function mobilePlatform(boardWidth: number, screenShortSide: number): PlatformContext {
+export function mobilePlatform(boardWidth: number, screenShortSide: number, boardHeight: number): PlatformContext & { maxRows: number } {
   return {
     maxCols: maxColsFor(boardWidth),
+    maxRows: maxRowsFor(boardHeight - BOARD_STRIP_H),
     minExposureMs: 33,
     ringSlots: screenShortSide >= 600 ? [16, 16, 16] : [8, 16, 16],
   }

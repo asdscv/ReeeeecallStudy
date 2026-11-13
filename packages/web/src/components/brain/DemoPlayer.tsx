@@ -7,6 +7,9 @@ import { BrainBoard } from './BrainBoard'
 
 const noop = () => {}
 
+/** The demo board's height (maxHeight below) holds four rows of its small cells comfortably. */
+const DEMO_MAX_ROWS = 4
+
 /**
  * How to play, shown rather than told: the real engine plays an easy round on the real board, and
  * a pointer makes each tap. It loops until the player starts; under reduced motion it holds each
@@ -19,7 +22,8 @@ export function DemoPlayer({ gameId, width, centerOnly = false, variant }: { gam
   // Inside the demo card's padding (16px each side) and border.
   const boardWidth = Math.min(width - 34, 300)
   const frames = useMemo(
-    () => buildDemo(gameId, { maxCols: Math.min(4, maxColsFor(boardWidth)), centerOnly, ...(variant !== undefined ? { variant } : {}) }),
+    // At most 4×4 (the demo box is 300×260): an easy board, the same on every screen.
+    () => buildDemo(gameId, { maxCols: Math.min(4, maxColsFor(boardWidth)), maxRows: DEMO_MAX_ROWS, centerOnly, ...(variant !== undefined ? { variant } : {}) }),
     [gameId, boardWidth, centerOnly, variant],
   )
   const [i, setI] = useState(0)

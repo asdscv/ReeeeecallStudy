@@ -1,5 +1,6 @@
 import type { BrainGameId } from './types'
 import { isBrainGameId } from './catalog'
+import { SPAN_LEVEL_CAP, V2_REPLACED, migrateLevelV1 } from './scale'
 
 /**
  * The game-logic state that sits beside progress: each game's skill estimate with its uncertainty,
@@ -20,7 +21,8 @@ export interface SkillEstimate {
 }
 
 export interface BrainMeta {
-  v: 1
+  /** 2 since the hard-content change (estimates on the v2 level scale); v1 is converted once on reading. */
+  v: 2
   /** Per game skill estimate. */
   sk: Partial<Record<BrainGameId, SkillEstimate>>
   /** Per game best tier reached, 0 (none) to 6 (master). Sticky: never lowered. */
@@ -42,7 +44,7 @@ export interface BrainMeta {
 }
 
 export function emptyMeta(): BrainMeta {
-  return { v: 1, sk: {}, tier: {}, seen: '', ach: '', practice: {}, wipes: {}, rt: {}, span2: {}, span1: {} }
+  return { v: 2, sk: {}, tier: {}, seen: '', ach: '', practice: {}, wipes: {}, rt: {}, span2: {}, span1: {} }
 }
 
 // ── hex bitmasks ────────────────────────────────────────────────────────────
@@ -95,32 +97,50 @@ function perGame<T>(raw: unknown, read: (v: unknown) => T | undefined): Partial<
 
 const intIn = (lo: number, hi: number) => (v: unknown) => (isNum(v) ? Math.max(lo, Math.min(hi, Math.round(v))) : undefined)
 
-/** Anything unreadable becomes an empty record rather than a crash; values are clamped to sane ranges. */
+/**
+ * Anything unreadable becomes an empty record rather than a crash; values are clamped to sane ranges.
+ *
+ * Reads v1 or v2 and always returns v2. On v1 the board games whose content was rebuilt get their
+ * estimate moved to the v2 scale and re-opened (sd 9, n 0 — the next round places or probes once);
+ * the span games keep theirs, clamped to the new cap. Tiers are sticky and stay as they are.
+ */
 export function parseMeta(raw: string | null | undefined): BrainMeta {
   if (!raw) return emptyMeta()
   try {
-    const d = JSON.parse(raw) as Partial<BrainMeta>
-    if (!d || d.v !== 1) return emptyMeta()
+    const d = JSON.parse(raw) as Partial<Omit<BrainMeta, 'v'>> & { v?: unknown }
+    if (!d || (d.v !== 1 && d.v !== 2)) return emptyMeta()
+    const oldScale = d.v === 1
+    const spanCap = (id: BrainGameId, v: number) => (oldScale && (id === 'memoryGrid' || id === 'sequence') ? Math.min(SPAN_LEVEL_CAP, v) : v)
+    const sk = perGame(d.sk, (v) => {
+      const s = v as Partial<SkillEstimate>
+      if (!s || !isNum(s.mu) || !isNum(s.sd)) return undefined
+      return {
+        mu: Math.max(0, Math.min(500, s.mu)),
+        sd: Math.max(0.1, Math.min(20, s.sd)),
+        n: isNum(s.n) ? Math.max(0, Math.round(s.n)) : 0,
+        day: isNum(s.day) ? Math.max(0, Math.min(40_000, Math.round(s.day))) : 0,
+      }
+    })
+    const span1 = perGame(d.span1, intIn(0, 99))
+    const span2 = perGame(d.span2, intIn(0, 99))
+    if (oldScale) {
+      for (const [id, est] of Object.entries(sk) as [BrainGameId, SkillEstimate][]) {
+        if (V2_REPLACED.includes(id)) sk[id] = { mu: migrateLevelV1(id, est.mu), sd: 9, n: 0, day: est.day }
+        else sk[id] = { ...est, mu: spanCap(id, est.mu) }
+      }
+      for (const map of [span1, span2]) for (const [id, v] of Object.entries(map) as [BrainGameId, number][]) map[id] = spanCap(id, v)
+    }
     return {
-      v: 1,
-      sk: perGame(d.sk, (v) => {
-        const s = v as Partial<SkillEstimate>
-        if (!s || !isNum(s.mu) || !isNum(s.sd)) return undefined
-        return {
-          mu: Math.max(0, Math.min(500, s.mu)),
-          sd: Math.max(0.1, Math.min(20, s.sd)),
-          n: isNum(s.n) ? Math.max(0, Math.round(s.n)) : 0,
-          day: isNum(s.day) ? Math.max(0, Math.min(40_000, Math.round(s.day))) : 0,
-        }
-      }),
+      v: 2,
+      sk,
       tier: perGame(d.tier, intIn(0, 6)),
       seen: isHex(d.seen) ? d.seen : '',
       ach: isHex(d.ach) ? d.ach : '',
       practice: perGame(d.practice, intIn(0, 99)),
       wipes: perGame(d.wipes, intIn(0, 99)),
       rt: perGame(d.rt, intIn(0, 60_000)),
-      span2: perGame(d.span2, intIn(0, 99)),
-      span1: perGame(d.span1, intIn(0, 99)),
+      span2,
+      span1,
     }
   } catch {
     return emptyMeta()

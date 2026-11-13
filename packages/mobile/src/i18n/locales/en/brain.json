@@ -157,7 +157,33 @@
     "stopTitle": "Stop here?",
     "stopBody": "Everything so far is saved.",
     "keepPlaying": "Keep playing",
-    "stopNow": "Stop"
+    "stopNow": "Stop",
+    "missingTerm": "Which number fills the gap?",
+    "noneOdd": "None",
+    "findOddOrNone": "Tap the different one, or “None”",
+    "noneWas": "There was none",
+    "tapRange": "Tap {{from}} → {{to}} in order · next: {{next}}",
+    "tapSkip": "Count up in {{step}}s",
+    "nextHint": "Next: {{next}}",
+    "tapAlternate": "White ↔ yellow in turn",
+    "tapAlternateOpposite": "White up, yellow down",
+    "cueInk": "Colour",
+    "cueWord": "Word",
+    "inkWas": "Ink: {{color}}",
+    "findTriples": "Find 3 of the same",
+    "newCardFree": "New card — no problem",
+    "budget": "Slips left: {{left}}",
+    "cells": "{{count}} cells",
+    "cells_one": "{{count}} cell",
+    "cells_other": "{{count}} cells",
+    "newBestCells": "{{count}} cells!",
+    "newBestCells_one": "{{count}} cell!",
+    "newBestCells_other": "{{count}} cells!",
+    "reverseBadge": "Reverse",
+    "newBestReverse": "{{count}} in reverse!",
+    "newBestReverse_one": "{{count}} in reverse!",
+    "newBestReverse_other": "{{count}} in reverse!",
+    "lookalikeBadge": "Look-alikes"
   },
   "quickEye": {
     "watch": "Look at the centre",
@@ -278,7 +304,7 @@
     "oddOneOut": {
       "rotation": {
         "title": "The turned one",
-        "body": "All the same picture. Tap the one turned a different way. Sometimes the whole grid is tilted."
+        "body": "All the same picture. Tap the one turned a different way."
       },
       "lookalike": {
         "title": "Look-alikes",
@@ -291,6 +317,22 @@
       "glyphs": {
         "title": "Tricky letters",
         "body": "Letters that look alike, like b and d or 6 and 9."
+      },
+      "colorNoise": {
+        "title": "Ignore the colours",
+        "body": "Colours vary. Tap the one with a different shape."
+      },
+      "mirror": {
+        "title": "The flipped one",
+        "body": "All are turned; that is fine. Find the one flipped like a mirror."
+      },
+      "absent": {
+        "title": "Maybe none",
+        "body": "Some boards have no different one. Check them all; if there is none, tap “None”."
+      },
+      "glyphTwin": {
+        "title": "Near-identical characters",
+        "body": "Characters where just one stroke is slightly different."
       }
     },
     "board": {
@@ -304,7 +346,7 @@
       },
       "moreCards": {
         "title": "More cards",
-        "body": "More pairs now, with more time and slips to match."
+        "body": "More pairs now, and more time."
       },
       "moreChoices": {
         "title": "More choices",
@@ -319,18 +361,42 @@
       "reshuffle": {
         "title": "Shuffle mode",
         "body": "Numbers move after every tap. The grid is one size smaller."
+      },
+      "twoDigit": {
+        "title": "Two-digit numbers",
+        "body": "The numbers have two digits now. Tap from the smallest up."
+      },
+      "skipCount": {
+        "title": "Counting in steps",
+        "body": "Numbers go up by 2 or 3. Count the next one yourself."
+      },
+      "alternate": {
+        "title": "Take turns",
+        "body": "White and yellow boxed numbers in turn: white 1 → yellow 1 → white 2 → yellow 2 …"
+      },
+      "alternateOpposite": {
+        "title": "Opposite directions",
+        "body": "White counts up from 1, yellow counts down from the top: white 1 → yellow 8 → white 2 → yellow 7 …"
+      },
+      "unmarked": {
+        "title": "No marks",
+        "body": "Found numbers stay as they are. Keep track yourself."
       }
     },
     "memoryGrid": {
       "fastShow": {
-        "title": "Shorter look",
-        "body": "The board is full size. Now the cells stay lit for less time."
+        "title": "Shown faster",
+        "body": "The parts light up more briefly."
+      },
+      "waves": {
+        "title": "Shown in parts",
+        "body": "The cells light up in 2–3 parts. Tap them all at the end."
       }
     },
     "sequence": {
       "reverse": {
         "title": "Backwards",
-        "body": "Tap the tiles in reverse, starting from the last one lit."
+        "body": "Tap the tiles in reverse, starting from the last one lit. From now on it is always reversed."
       }
     },
     "series": {
@@ -356,15 +422,63 @@
       },
       "squares": {
         "title": "Squares",
-        "body": "A rule built on numbers times themselves."
+        "body": "A rule built on numbers times themselves, sometimes plus or minus a little."
       },
       "interleaved": {
         "title": "Two in one",
         "body": "Two patterns take turns. Read every other number."
       },
       "doublePlus": {
-        "title": "Double and add",
-        "body": "A rule that doubles the last number, then adds the same amount."
+        "title": "Multiply and add",
+        "body": "A rule that multiplies the last number, then adds or subtracts the same amount."
+      },
+      "halving": {
+        "title": "Halving",
+        "body": "Rows that halve, or triple, appear."
+      },
+      "altOps": {
+        "title": "Two steps take turns",
+        "body": "Two different steps take turns."
+      },
+      "mixedLines": {
+        "title": "Adding and multiplying lines",
+        "body": "Read every other number: one line adds or subtracts, one multiplies."
+      },
+      "growFactor": {
+        "title": "A growing multiplier",
+        "body": "The multiplier grows by one each time."
+      },
+      "tribonacci": {
+        "title": "The three before",
+        "body": "Add the three before to get the next."
+      },
+      "threeLines": {
+        "title": "Three lines mixed",
+        "body": "Three rules take turns. Read every third number."
+      },
+      "diffGrowing": {
+        "title": "Gaps that grow in steps",
+        "body": "How much the gap grows also grows."
+      },
+      "opCycle": {
+        "title": "Three steps in a cycle",
+        "body": "Three steps repeat in order."
+      },
+      "diffLines": {
+        "title": "Gaps in two lines",
+        "body": "Read every other gap: each line has its own rule."
+      },
+      "diffFib": {
+        "title": "Gaps from the two before",
+        "body": "Each gap is the two gaps before it added together."
+      },
+      "cubes": {
+        "title": "Cubes",
+        "body": "A rule built on a number times itself, times itself again, sometimes plus or minus a little."
+      },
+      "missingTerm": {
+        "title": "Find the gap",
+        "body": "The ? can now sit inside the row. Pick the number that fills it."
       }
     },
     "pairs": {
@@ -375,12 +489,36 @@
       "noPreview": {
         "title": "No peek",
         "body": "No first look at the cards now. Learn them as you flip."
+      },
+      "lookalike": {
+        "title": "Look-alike pictures",
+        "body": "Similar-looking pictures appear together."
+      },
+      "triples": {
+        "title": "Find three",
+        "body": "Find 3 of the same. A wrong second card flips back."
       }
     },
     "stroop": {
       "word": {
         "title": "Rule switch",
-        "body": "When asked what it SAYS, pick the colour the word names, not its ink."
+        "body": "“Word” sign: pick the colour the word names. “Colour” sign: pick the ink."
+      },
+      "shuffle": {
+        "title": "Buttons move",
+        "body": "Buttons change places every question."
+      },
+      "labelInk": {
+        "title": "Don't trust button colours",
+        "body": "The buttons are coloured too. Pick by the colour name written, not the button's colour."
+      },
+      "switchOften": {
+        "title": "The rule switches more often",
+        "body": "Check the Colour / Word sign on the card every time."
+      },
+      "frame": {
+        "title": "Ignore the frame",
+        "body": "The frame colour is never the answer."
       }
     },
     "math": {
@@ -397,8 +535,24 @@
         "body": "Sharing problems join. Answers always come out whole."
       },
       "twoStep": {
-        "title": "Two steps",
-        "body": "Problems with two steps now. With + and × together, do × first; with a ?, pick what fills it."
+        "title": "Multiply and divide first",
+        "body": "With + or − next to × or ÷, do × and ÷ first: 6 + 4 × 7 = 6 + 28"
+      },
+      "missing": {
+        "title": "Fill the gap",
+        "body": "Pick the number that goes where the ? is."
+      },
+      "threeDigit": {
+        "title": "Three-digit numbers",
+        "body": "Three-digit numbers join in."
+      },
+      "parens": {
+        "title": "Brackets first",
+        "body": "Work out the brackets first."
+      },
+      "bigMul": {
+        "title": "Two digits × two digits",
+        "body": "Two-digit numbers are multiplied together."
       }
     }
   },

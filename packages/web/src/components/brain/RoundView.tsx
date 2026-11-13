@@ -97,6 +97,7 @@ const noop = () => {}
 
 function Round({ gameId, onOver, caption, width, theme, timeBudgetMs }: { gameId: BrainGameId; onOver: (stats: RoundStats) => void; caption?: string; width: number; theme: GameTheme; timeBudgetMs?: number }) {
   const { t } = useTranslation('brain')
+  // The board's columns from its width, its rows from the window's height (a portrait Flash Grid).
   const [platform] = useState(() => webPlatform(width, maxColsFor(width)))
   const r = useBrainRound(gameId, platform, { timeBudgetMs })
   const timing = useBrainStore((s) => s.progress.settings.timing)
@@ -515,6 +516,7 @@ function Round({ gameId, onOver, caption, width, theme, timeBudgetMs }: { gameId
             theme={theme}
             ready={quietNow && r.view.kind === 'quickEye' && r.view.phase === 'fixation'}
             onSkip={r.skipReveal}
+            paused={r.paused || r.intro !== null || r.stageUp !== null}
           />
           {/* Level-up and streak news, over the top of the board — the prompt and the verdict line stay readable. */}
           {shownBanner && (

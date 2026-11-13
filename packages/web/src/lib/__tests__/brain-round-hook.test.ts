@@ -7,8 +7,9 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
-import { emptyHistory, emptyMeta, emptyProgress, hasBit, mechanicInfo, quickEyeMaxLevel, brainGame, DEFAULT_CONTEXT, MECHANICS, setBit, type BrainMeta, type BrainProgress } from '@reeeeecall/shared/lib/brain-games'
-import { useBrainRound, type PlatformContext } from '@reeeeecall/shared/hooks/useBrainRound'
+import { dayNumber, emptyHistory, emptyMeta, emptyProgress, hasBit, mechanicInfo, parseMeta, parseProgress, quickEyeMaxLevel, brainGame, DEFAULT_CONTEXT, MECHANICS, setBit, type BrainMeta, type BrainProgress, type CreateContext, type RoundView } from '@reeeeecall/shared/lib/brain-games'
+import { useBrainRound, type PlatformContext, type RoundStats } from '@reeeeecall/shared/hooks/useBrainRound'
+import { useTodaysTraining } from '@reeeeecall/shared/hooks/useTodaysTraining'
 import { useBrainFx, type BrainFx } from '@reeeeecall/shared/hooks/useBrainFx'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
 
@@ -53,15 +54,17 @@ describe('memorise phases and pause', () => {
     const { result } = renderHook(() => useBrainRound('memoryGrid', PLATFORM))
     const view = result.current.view
     expect(view.kind === 'grid' && view.locked).toBe(true)
-    // Level 1: 3 cells for 1950ms. Pause at 1500ms, wait a minute, resume.
-    advance(1500)
+    // Level 1: 3 cells for 1540ms (its memorise bar says how long). Pause 450ms before the end, wait a minute, resume.
+    const showMs = view.kind === 'grid' ? (view.showBar?.ms ?? 0) : 0
+    expect(showMs).toBe(1540)
+    advance(showMs - 450)
     act(() => result.current.pause())
     advance(60_000)
     act(() => result.current.resume())
     advance(400)
     expect(result.current.view.kind === 'grid' && result.current.view.locked, 'still memorising just before the 450ms left run out').toBe(true)
     advance(100)
-    expect(result.current.view.kind === 'grid' && result.current.view.locked, 'recall starts when the original 1950ms are used up').toBe(false)
+    expect(result.current.view.kind === 'grid' && result.current.view.locked, 'recall starts when the original show time is used up').toBe(false)
   })
 })
 
@@ -254,7 +257,7 @@ describe('placement and rule cards in a round', () => {
       else advance(100)
     }
     expect(sawCard).toBe(true)
-    expect(result.current.intro?.tag).toBe('stroop.word')
+    expect(result.current.intro?.tag).toBe('stroop.labelInk')
     expect(result.current.timer).toBeNull()
     expect(result.current.solution).toBeNull()
     advance(60_000)
@@ -294,7 +297,7 @@ function playRound(result: { current: ReturnType<typeof useBrainRound> }, opts: 
 
 describe('time budget (Today\'s Training slots)', () => {
   it('when the slot time is up the round ends after the trial in play — a normal ending, not a quit, not a clear', () => {
-    seed()
+    seed((p) => ({ ...p, games: { ...p.games, stroop: { level: 6, bestLevel: 6, rounds: 60, wins: 50 } } }))
     const { result } = renderHook(() => useBrainRound('stroop', PLATFORM, { timeBudgetMs: 5_000 }))
     let judged = 0
     for (let guard = 0; guard < 2000 && !result.current.done; guard++) {
@@ -316,6 +319,369 @@ describe('time budget (Today\'s Training slots)', () => {
     expect(judged).toBeLessThan(20)
     // Never mid-trial: the last trial was judged before the round ended.
     expect(result.current.stats.trials).toBe(judged)
+    expect(result.current.stats.setupMs).toBe(0)
+  })
+
+  it("a first round never ends during placement, and its setup time is not the slot's play time", () => {
+    seed()
+    const { result } = renderHook(() => useBrainRound('stroop', PLATFORM, { timeBudgetMs: 5_000 }))
+    let placementTrials = 0
+    let countedTrials = 0
+    for (let guard = 0; guard < 4000 && !result.current.done; guard++) {
+      const r = result.current
+      if (r.intro) {
+        act(() => r.ackIntro())
+        continue
+      }
+      const taps = r.solution
+      if (taps && taps.length && !r.result) {
+        const kind = r.trialKind
+        act(() => r.tap(taps[0]))
+        if (kind === 'placement') placementTrials++
+        else if (kind === 'counted') countedTrials++
+      } else advance(100)
+    }
+    const s = result.current.stats
+    expect(s.endedBy).toBe('time')
+    // A perfect player's placement runs its full 14 trials — well past the 5s budget — and hands over.
+    expect(placementTrials).toBe(14)
+    expect(s.placement).toBe('done')
+    expect(countedTrials).toBeGreaterThan(2)
+    expect(s.setupMs).toBeGreaterThan(9_000)
+    expect(s.setupMs).toBeLessThan(s.activeMs)
+    // What is left after setup is about the budget (it ends after the trial in play).
+    expect(s.activeMs - s.setupMs).toBeGreaterThanOrEqual(5_000)
+    expect(s.activeMs - s.setupMs).toBeLessThan(7_000)
+  })
+
+  it("Today's Training keeps a round's setup time out of the slot", () => {
+    seed()
+    const { result } = renderHook(() => useTodaysTraining())
+    const slot = result.current.slot!
+    const full = slot.minutes * 60_000
+    expect(result.current.slotBudgetMs).toBe(full)
+    const stats = { trials: 3, correct: 2, points: 10, levelStart: 3, levelEnd: 4, endedBy: 'lives', activeMs: 50_000, setupMs: 40_000 } as RoundStats
+    act(() => result.current.onRoundOver(slot.gameId, stats))
+    // Only the 10s actually played count against the slot (another round of the same game follows).
+    expect(result.current.slotBudgetMs).toBe(Math.max(15_000, full - 10_000))
+  })
+})
+
+describe('the board games\' new round logic (GAMES_DIFFICULTY_PLAN §2.3-2.9)', () => {
+  /** Every ctx a game's create() was called with, from now on. */
+  function spyCreates(id: Parameters<typeof brainGame>[0]) {
+    const def = brainGame(id).def
+    const calls: { level: number; ctx: CreateContext }[] = []
+    const real = def.create.bind(def)
+    const spy = vi.spyOn(def, 'create').mockImplementation((level: number, rng, ctx: CreateContext) => {
+      calls.push({ level, ctx })
+      return real(level, rng, ctx)
+    })
+    return { calls, restore: () => spy.mockRestore() }
+  }
+
+  it('counted trials let only the lowest unseen rule through, and none for three counted trials after a card or once two were shown', () => {
+    seed((p) => ({ ...p, games: { ...p.games, schulte: { level: 13, bestLevel: 13, rounds: 50, wins: 40 } } }))
+    // What the round knew when each trial was built: counted trials so far and the cards shown.
+    const snap = { counted: 0, cards: [] as string[], cardAt: null as number | null }
+    const def = brainGame('schulte').def
+    const real = def.create.bind(def)
+    const calls: { ctx: CreateContext; at: typeof snap }[] = []
+    const spy = vi.spyOn(def, 'create').mockImplementation((level: number, rng, ctx: CreateContext) => {
+      calls.push({ ctx, at: { ...snap, cards: [...snap.cards] } })
+      return real(level, rng, ctx)
+    })
+    const { result } = renderHook(() => useBrainRound('schulte', PLATFORM))
+    const rules = MECHANICS.filter((m) => m.game === 'schulte' && m.kind === 'rule' && !m.retired).map((m) => m.tag)
+    expect(calls[0].ctx.trialKind).toBe('counted')
+    expect(calls[0].ctx.blockRules).not.toContain('schulte.descending')
+    expect(calls[0].ctx.blockRules).toContain('schulte.reshuffle')
+    expect(calls[0].ctx.maxRows).toBe(DEFAULT_CONTEXT.maxRows)
+    for (let guard = 0; guard < 40000 && result.current.trialInRound < 12 && !result.current.over; guard++) {
+      const r = result.current
+      snap.counted = r.trialInRound
+      if (r.intro) {
+        if (!snap.cards.includes(r.intro.tag)) {
+          snap.cards.push(r.intro.tag)
+          snap.cardAt = r.trialInRound
+        }
+        act(() => r.ackIntro())
+        continue
+      }
+      const taps = r.solution
+      if (taps && taps.length && !r.result) act(() => r.tap(taps[0]))
+      else advance(100)
+    }
+    spy.mockRestore()
+    expect(snap.cards.length).toBeGreaterThan(0)
+    let gated = 0
+    for (const { ctx, at } of calls.slice(1)) {
+      // (The games produce their rules from their own changes; until each honours blockRules a
+      // blocked rule can still show — what is checked here is what the round asked for.)
+      const notMet = rules.filter((t) => !at.cards.includes(t))
+      const closed = at.cards.length >= 2 || (at.cardAt !== null && at.counted - at.cardAt < 3)
+      if (closed) {
+        gated++
+        expect([...ctx.blockRules].sort(), JSON.stringify(at)).toEqual(notMet.sort())
+      } else {
+        expect(ctx.blockRules.length, JSON.stringify(at)).toBeGreaterThanOrEqual(notMet.length - 1)
+      }
+    }
+    expect(gated).toBeGreaterThan(0)
+  })
+
+  it('a first round of a board game: placement trials are built as placement with every rule blocked, the first at level 3', () => {
+    seed()
+    const { calls, restore } = spyCreates('oddOneOut')
+    const { result } = renderHook(() => useBrainRound('oddOneOut', PLATFORM))
+    expect(result.current.placing).toBe(true)
+    expect(calls[0].level).toBe(3)
+    const unseen = MECHANICS.filter((m) => m.game === 'oddOneOut' && m.kind === 'rule' && !m.retired).map((m) => m.tag).sort()
+    for (let guard = 0; guard < 2000 && result.current.trialKind !== 'counted'; guard++) {
+      // (A game that does not honour blockRules yet can still show a rule here: acknowledge it.)
+      if (result.current.intro) {
+        act(() => result.current.ackIntro())
+        continue
+      }
+      const taps = result.current.solution
+      if (taps && taps.length && !result.current.result) act(() => result.current.tap(taps[0]))
+      else advance(100)
+    }
+    const placement = calls.filter((c) => c.ctx.trialKind === 'placement')
+    expect(placement.length).toBeGreaterThanOrEqual(8)
+    expect([...placement[0].ctx.blockRules].sort()).toEqual(unseen)
+    // Every rule unseen at the round's start is blocked in placement (a card met meanwhile is seen, so drops out).
+    for (const c of placement) expect(unseen.filter((t) => !c.ctx.blockRules.includes(t)).every((t) => hasBit(useBrainStore.getState().meta.seen, mechanicInfo(t)!.bit))).toBe(true)
+    // No card met cold in placement; the round's seed and its last trials ride along.
+    expect(new Set(calls.map((c) => c.ctx.roundSeed)).size).toBe(1)
+    expect(calls[2].ctx.recent.map((t) => t.level)).toEqual([calls[0].level, calls[1].level])
+    restore()
+  })
+
+  it('Number Hunt places in three graded boards: a fast perfect player hands over well up', () => {
+    seed()
+    const { result } = renderHook(() => useBrainRound('schulte', PLATFORM))
+    let boards = 0
+    for (let guard = 0; guard < 20000 && result.current.trialKind !== 'counted'; guard++) {
+      const r = result.current
+      if (r.intro) {
+        act(() => r.ackIntro())
+        continue
+      }
+      const taps = r.solution
+      if (taps && taps.length && !r.result) {
+        act(() => r.tap(taps[0]))
+        if (result.current.result?.kind === 'placement') boards++
+      } else advance(100)
+    }
+    expect(boards).toBe(3)
+    expect(result.current.level).toBeGreaterThanOrEqual(12.5)
+  })
+
+  it('span fast entry: a first round jumps two lengths a pass (never past the reverse rule), and its first miss costs no chance', () => {
+    seed()
+    const { result } = renderHook(() => useBrainRound('sequence', PLATFORM))
+    expect(result.current.level).toBe(2)
+    const levels: number[] = []
+    let missed = false
+    for (let guard = 0; guard < 8000 && !missed && !result.current.over; guard++) {
+      const r = result.current
+      if (r.intro) {
+        act(() => r.ackIntro())
+        continue
+      }
+      const taps = r.solution
+      if (taps && taps.length && !r.result) {
+        if (r.trialKind === 'counted' && !levels.includes(r.level)) levels.push(r.level)
+        if (r.trialKind === 'counted' && r.level >= 6) {
+          // The first miss: a probe — one length back, both chances kept.
+          const v = r.view
+          const wrong = v.kind === 'grid' ? v.cells.findIndex((_c, i) => i !== taps[0]) : 0
+          act(() => r.tap(wrong))
+          missed = true
+          break
+        }
+        act(() => r.tap(taps[0]))
+      } else advance(100)
+    }
+    expect(levels).toEqual([2, 4, 6])
+    expect(result.current.result).toMatchObject({ correct: false, livesLost: 0, levelAfter: 5 })
+    expect(result.current.lives).toBe(2)
+  })
+
+  it("Match Pairs' probe ladder: L3 → L6 → L9 → L12, no score, then the staircase half a level below where the passes reached", () => {
+    seed()
+    const { result } = renderHook(() => useBrainRound('pairs', PLATFORM))
+    const boards: number[] = []
+    for (let guard = 0; guard < 40000 && result.current.trialKind !== 'counted' && !result.current.over; guard++) {
+      const r = result.current
+      if (r.intro) {
+        act(() => r.ackIntro())
+        continue
+      }
+      const taps = r.solution
+      if (taps && taps.length && !r.result) {
+        if (!boards.includes(r.level)) boards.push(r.level)
+        expect(r.placing).toBe(true)
+        act(() => r.tap(taps[0]))
+        if (result.current.result) expect(result.current.result.points).toBe(0)
+      } else advance(100)
+    }
+    expect(boards).toEqual([3, 6, 9, 12])
+    // Four clean clears: 12 + 3 = 15, the staircase starts at 14.5, unsure.
+    expect(result.current.level).toBeCloseTo(14.5)
+    expect(result.current.stats.points).toBe(0)
+    expect(result.current.stats.trials).toBe(0)
+    expect(result.current.lives).toBe(3)
+  })
+
+  it('the probe stops on a clear with two informed misses (+1) or on a failed board; none passed starts at L2', () => {
+    const def = brainGame('pairs').def
+    const realOutcome = def.outcome.bind(def)
+    /** Plays the probe; `board(n, outcome)` may change the n-th board's outcome (1-based). */
+    const probe = (board: (n: number, o: NonNullable<ReturnType<typeof realOutcome>>) => ReturnType<typeof realOutcome>) => {
+      let n = 0
+      let last: unknown = null
+      const spy = vi.spyOn(def, 'outcome').mockImplementation((s) => {
+        const o = realOutcome(s)
+        if (!o) return o
+        if (s !== last) {
+          last = s
+          n++
+        }
+        return board(n, o)
+      })
+      seed()
+      const { result, unmount } = renderHook(() => useBrainRound('pairs', PLATFORM))
+      const boards: number[] = []
+      for (let guard = 0; guard < 40000 && result.current.trialKind !== 'counted' && !result.current.over; guard++) {
+        const r = result.current
+        if (r.intro) {
+          act(() => r.ackIntro())
+          continue
+        }
+        const taps = r.solution
+        if (taps && taps.length && !r.result) {
+          if (!boards.includes(r.level)) boards.push(r.level)
+          act(() => r.tap(taps[0]))
+        } else advance(100)
+      }
+      const out = { boards, level: result.current.level, placement: result.current.stats.placement }
+      unmount()
+      spy.mockRestore()
+      return out
+    }
+    // Board 2 (L6) cleared with two informed misses: +1 → 7, stop → 6.5.
+    expect(probe((n, o) => (n === 2 ? { ...o, informedMisses: 2 } : o))).toMatchObject({ boards: [3, 6], level: 6.5 })
+    // Board 2 failed: stop at the level the passes reached (6) → 5.5.
+    expect(probe((n, o) => (n === 2 ? { ...o, correct: false } : o))).toMatchObject({ boards: [3, 6], level: 5.5 })
+    // The first board failed: none passed → L2.
+    expect(probe((n, o) => (n === 1 ? { ...o, correct: false } : o))).toMatchObject({ boards: [3], level: 2 })
+  })
+
+  it('a span game back after two weeks re-enters fast; one played yesterday climbs a length at a time', () => {
+    const away = (days: number) => {
+      seed(
+        (p) => ({ ...p, games: { ...p.games, memoryGrid: { level: 4, bestLevel: 5, rounds: 30, wins: 20 } } }),
+        { ...emptyMeta(), sk: { memoryGrid: { mu: 4, sd: 1, n: 30, day: dayNumber('2026-11-12') - days } } },
+      )
+      const { result, unmount } = renderHook(() => useBrainRound('memoryGrid', PLATFORM))
+      const levels: number[] = []
+      for (let guard = 0; guard < 8000 && levels.length < 3 && !result.current.over; guard++) {
+        const r = result.current
+        if (r.intro) {
+          act(() => r.ackIntro())
+          continue
+        }
+        const taps = r.solution
+        if (taps && taps.length && !r.result) {
+          if (!levels.includes(r.level)) levels.push(r.level)
+          for (const t of taps) if (!result.current.result) act(() => result.current.tap(t))
+        } else advance(100)
+      }
+      unmount()
+      return levels
+    }
+    const fast = away(20)
+    expect(fast[1] - fast[0]).toBeCloseTo(2, 6)
+    const slow = away(1)
+    expect(slow[1] - slow[0]).toBeCloseTo(1, 6)
+  })
+
+  it('a missed choice trial with a worked answer stays up 2.4s, skippable after 500ms', () => {
+    seed((p) => ({ ...p, games: { ...p.games, math: { level: 6, bestLevel: 6, rounds: 60, wins: 50 } } }))
+    const def = brainGame('math').def
+    const realView = def.view.bind(def)
+    const spy = vi.spyOn(def, 'view').mockImplementation((s) => {
+      const v = realView(s) as RoundView
+      return v.kind === 'choice' && def.outcome(s) ? { ...v, stimulus: { ...v.stimulus, reveal: { lines: ['worked'] } } } : v
+    })
+    const { result } = renderHook(() => useBrainRound('math', PLATFORM))
+    const wrongTap = () => {
+      const r = result.current
+      const v = r.view
+      act(() => r.tap(((r.solution as number[])[0] + 1) % (v.kind === 'choice' ? v.options.length : 2)))
+    }
+    wrongTap()
+    const trial = result.current.trialId
+    advance(1600)
+    expect(result.current.trialId, 'a plain miss would have moved on at 1500ms').toBe(trial)
+    advance(900)
+    expect(result.current.trialId).toBe(trial + 1)
+    // The next miss is skipped after 500ms.
+    wrongTap()
+    advance(300)
+    act(() => result.current.skipReveal())
+    advance(1)
+    expect(result.current.trialId).toBe(trial + 1)
+    advance(250)
+    act(() => result.current.skipReveal())
+    advance(1)
+    expect(result.current.trialId).toBe(trial + 2)
+    spy.mockRestore()
+  })
+
+  it("a right Number Pattern answer keeps the row's rule up 1.3s (plan §3.2), skippable after 500ms", () => {
+    seed((p) => ({ ...p, games: { ...p.games, series: { level: 6, bestLevel: 6, rounds: 60, wins: 50 } } }))
+    const { result } = renderHook(() => useBrainRound('series', PLATFORM))
+    const rightTap = () => {
+      const r = result.current
+      act(() => r.tap((r.solution as number[])[0]))
+    }
+    rightTap()
+    const v = result.current.view
+    expect(v.kind === 'choice' && (v.stimulus.reveal?.gaps?.length ?? 0) > 0, 'a right answer shows the gap labels').toBe(true)
+    const trial = result.current.trialId
+    advance(1000)
+    expect(result.current.trialId, 'a plain right answer would have moved on at 700ms').toBe(trial)
+    advance(400)
+    expect(result.current.trialId).toBe(trial + 1)
+    rightTap()
+    advance(300)
+    act(() => result.current.skipReveal())
+    advance(1)
+    expect(result.current.trialId).toBe(trial + 1)
+    advance(250)
+    act(() => result.current.skipReveal())
+    advance(1)
+    expect(result.current.trialId).toBe(trial + 2)
+  })
+
+  it("a v1 save shaped like the owner's (Quick Math L3, no estimate) opens on placement, from its converted level", () => {
+    const v1 = JSON.stringify({ v: 1, games: { math: { level: 3, bestLevel: 3.4, rounds: 120, wins: 100 } }, practiced: ['math'], sessions: {}, quickEyeField: 2 })
+    const progress = parseProgress(v1)
+    expect(progress.v).toBe(2)
+    expect(progress.games.math?.level).toBeCloseTo(2.35)
+    useBrainStore.setState({ progress, meta: parseMeta(JSON.stringify({ v: 1, seen: '' })), history: emptyHistory(), storageKey: 'test' })
+    const { calls, restore } = spyCreates('math')
+    const { result } = renderHook(() => useBrainRound('math', PLATFORM))
+    expect(result.current.placing).toBe(true)
+    expect(result.current.trialKind).toBe('placement')
+    // The seed is the converted record (mu0 = max(3, 2.35), sd 9): the search opens on the prior's
+    // easy side (its 30th percentile), not at the old record's band.
+    expect(calls[0].level).toBeGreaterThan(2.35)
+    expect(calls[0].level).toBeLessThanOrEqual(6)
+    restore()
   })
 })
 

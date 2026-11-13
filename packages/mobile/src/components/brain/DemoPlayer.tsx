@@ -10,6 +10,8 @@ import { FX } from './brain-ui'
 
 const noop = () => {}
 const BOARD_MAX_H = 240
+/** The demo board's height (BOARD_MAX_H) holds four rows of its small cells comfortably. */
+const DEMO_MAX_ROWS = 4
 const GLIDE = Easing.bezier(0.3, 0.7, 0.2, 1)
 
 /**
@@ -25,9 +27,10 @@ export function DemoPlayer({ gameId, width, centerOnly = false, variant }: { gam
   const reduced = useReducedMotion()
   const theme = GAME_THEMES[gameId]
   const boardWidth = Math.max(200, Math.min(width - 32, 300))
-  // A player on Quick Eye's "centre only" setting sees the centre-only task demonstrated.
+  // A player on Quick Eye's "centre only" setting sees the centre-only task demonstrated. At most
+  // 4×4: an easy board, the same on every screen.
   const frames = useMemo(
-    () => buildDemo(gameId, { maxCols: Math.min(4, maxColsFor(boardWidth)), centerOnly, ...(variant !== undefined ? { variant } : {}) }),
+    () => buildDemo(gameId, { maxCols: Math.min(4, maxColsFor(boardWidth)), maxRows: DEMO_MAX_ROWS, centerOnly, ...(variant !== undefined ? { variant } : {}) }),
     [gameId, boardWidth, centerOnly, variant],
   )
   const [i, setI] = useState(0)

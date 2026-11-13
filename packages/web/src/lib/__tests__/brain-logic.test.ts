@@ -5,16 +5,20 @@
  * changes and below every ceiling, cross-game seeding stays conservative, achievements are earned
  * once, and the compact meta record survives garbage.
  */
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import {
   ACHIEVEMENTS,
   BRAIN_GAMES,
   DEFAULT_CONTEXT,
   MECHANICS,
+  PLACEMENT,
+  RULE_CARDS_PER_ROUND,
+  RULE_CARD_GAP,
   SKILL,
   TIERS,
   TIER_COUNT,
   achievementBit,
+  blockedRules,
   brainGame,
   createRng,
   crossGameSeed,
@@ -26,6 +30,7 @@ import {
   levelAtStanding,
   maxColsFor,
   mechanicInfo,
+  nextSd,
   orMask,
   parseMeta,
   pCorrect,
@@ -44,8 +49,14 @@ import {
   tierFor,
   tierProgress,
   updatePlacement,
+  zestPlan,
+  type BrainGameId,
   type BrainMeta,
 } from '@reeeeecall/shared/lib/brain-games'
+
+// Thousands of sampled trials per test: a second or three here, several times that on a CI runner,
+// where the 5s default would time out.
+vi.setConfig({ testTimeout: 30_000 })
 
 /** A simulated player: answers at the psychometric function with their true level. */
 function runPlacement(theta: number, seed: number, opts: { target: number; slope: number; guess: number; hi: number; mu0?: number; sigma0?: number }) {
@@ -102,14 +113,95 @@ describe('placement', () => {
     expect(pCorrect(14, 10, 0.25, { slope: 2, lapse: 0.05, target: 0.85 })).toBeLessThan(0.85)
   })
 
-  it('stays below the third unseen rule, so a strong first round opens with at most two cards', () => {
-    const none = () => false
-    const ceiling = placementCeiling('schulte', none)
-    expect(ceiling).toBe(Infinity) // Number Hunt has only two rules
-    const mathCeiling = placementCeiling('math', none)
-    expect(mathCeiling).toBe(Infinity) // one card (two-step)
-    // All seen → no ceiling.
-    expect(placementCeiling('oddOneOut', () => true)).toBe(Infinity)
+  /**
+   * The real init path for a game never played (useBrainRound): nothing known, so the first trial is
+   * at level 3, then the plan's ZEST search; Number Hunt's three boards, each a strong pass.
+   */
+  function perfectHandover(id: BrainGameId, guess: number): { level: number; trials: number } {
+    const plan = zestPlan(id)
+    let p = startPlacement({ lo: 1, hi: plan.hi, mu0: 3, sigma0: 9, target: 0.85, slope: 2, maxMove: 3, minTrials: plan.minTrials, maxTrials: plan.maxTrials, tailMass: plan.tailMass, hotMove: plan.hotMove })
+    let trials = 0
+    while (!placementDone(p)) {
+      const x = trials === 0 ? 3 : placementLevel(p)
+      p = updatePlacement(p, x, true, guess, plan.graded ? 2 : 1)
+      trials++
+    }
+    return { level: placementResult(p, plan.handoverK).level, trials }
+  }
+
+  it('a perfect responder is carried to near the top of the search (GAMES_DIFFICULTY_PLAN §2.3)', () => {
+    for (const id of ['math', 'series', 'oddOneOut', 'stroop'] as const) {
+      const plan = zestPlan(id)
+      const { level, trials } = perfectHandover(id, 0.25)
+      expect(level, id).toBeGreaterThanOrEqual(plan.hi - 3.5)
+      // Continues while the last three are right, to the most trials.
+      expect(trials, id).toBe(14)
+    }
+    expect(PLACEMENT.math).toMatchObject({ method: 'zest', hi: 26, minTrials: 8, maxTrials: 14, tailMass: 0.2, hotMove: 4, handoverK: 0.25 })
+    expect([PLACEMENT.series, PLACEMENT.oddOneOut, PLACEMENT.stroop].map((x) => x && 'hi' in x && x.hi)).toEqual([20, 24, 24])
+    // Number Hunt: exactly three boards, each cleared in under half its time.
+    const hunt = perfectHandover('schulte', 0.02)
+    expect(hunt.trials).toBe(3)
+    expect(hunt.level).toBeGreaterThanOrEqual(12.5)
+    expect([PLACEMENT.pairs, PLACEMENT.memoryGrid, PLACEMENT.sequence].map((x) => x?.method)).toEqual(['probe', 'fast', 'fast'])
+  })
+
+  it('the flat tail is really the share asked for; unset keeps the old prior (Quick Eye)', () => {
+    const p = startPlacement({ lo: 1, hi: 26, mu0: 3, sigma0: 9, target: 0.85, slope: 2, maxMove: 3, minTrials: 8, maxTrials: 14, tailMass: 0.2 })
+    const total = p.post.reduce((a, b) => a + b, 0)
+    // The top of the range keeps at least the flat share of mass per point.
+    expect(p.post[p.post.length - 1] / total).toBeGreaterThanOrEqual(0.2 / p.post.length - 1e-12)
+    expect(total).toBeCloseTo(1, 9)
+    const old = startPlacement({ lo: 1, hi: 26, mu0: 3, sigma0: 9, target: 0.85, slope: 2, maxMove: 3, minTrials: 8, maxTrials: 12 })
+    expect(old.post[0]).toBeCloseTo(0.8 * Math.exp(-0.5 * (2 / 9) ** 2) + 0.2 / old.post.length, 9)
+  })
+
+  it('weight raises the likelihood; a strong pass allows the bigger step; the handover sits handoverK spreads below the mean', () => {
+    const start = startPlacement({ lo: 1, hi: 20, mu0: 3, sigma0: 9, target: 0.85, slope: 2, maxMove: 3, minTrials: 3, maxTrials: 3, tailMass: 0.2, hotMove: 5 })
+    const once = updatePlacement(start, 3, true, 0.02)
+    const twice = updatePlacement(once, 3, true, 0.02)
+    const weighted = updatePlacement(start, 3, true, 0.02, 2)
+    weighted.post.forEach((w, i) => expect(w).toBeCloseTo(twice.post[i], 9))
+    // After an ordinary right answer the step is capped at maxMove; after a strong one at hotMove.
+    expect(placementLevel(once)).toBeLessThanOrEqual(3 + 3)
+    expect(placementLevel(weighted)).toBeGreaterThan(3 + 3)
+    expect(placementLevel(weighted)).toBeLessThanOrEqual(3 + 5)
+    const a = placementResult(weighted, 0.5)
+    const b = placementResult(weighted, 0.25)
+    expect(b.level - a.level).toBeCloseTo(0.25 * a.sd, 6)
+  })
+
+  it('rule gating: placement and practice block every unseen rule; a counted trial lets only the lowest through, two cards a round, three counted trials apart', () => {
+    const fresh = { shown: 0, countedSinceLast: null }
+    for (const { id } of BRAIN_GAMES) {
+      if (id === 'quickEye') continue
+      const rules = MECHANICS.filter((m) => m.game === id && m.kind === 'rule' && !m.retired)
+      const tags = rules.map((m) => m.tag).sort()
+      const live = [...rules].sort((a, b) => a.from - b.from)
+      const none = () => false
+      expect(blockedRules(id, none, 'placement', fresh).sort(), id).toEqual(tags)
+      expect(blockedRules(id, none, 'practice', fresh).sort(), id).toEqual(tags)
+      const counted = blockedRules(id, none, 'counted', fresh)
+      expect(counted.sort(), id).toEqual(tags.filter((t) => t !== live[0]?.tag))
+      expect(blockedRules(id, none, 'intro', fresh).sort(), id).toEqual(counted)
+      // The card budget: two a round, then everything; under three counted trials since the last, everything.
+      expect(blockedRules(id, none, 'counted', { shown: RULE_CARDS_PER_ROUND, countedSinceLast: 10 }).sort(), id).toEqual(tags)
+      expect(blockedRules(id, none, 'counted', { shown: 1, countedSinceLast: RULE_CARD_GAP - 1 }).sort(), id).toEqual(tags)
+      expect(blockedRules(id, none, 'counted', { shown: 1, countedSinceLast: RULE_CARD_GAP }).sort(), id).toEqual(counted)
+      // Every rule met: nothing to block.
+      expect(blockedRules(id, () => true, 'placement', fresh), id).toEqual([])
+      // The lowest met: the next one in `from` order is let through.
+      if (live.length >= 2) {
+        const seen = (tag: string) => tag === live[0].tag
+        expect(blockedRules(id, seen, 'counted', fresh), id).not.toContain(live[1].tag)
+        expect(blockedRules(id, seen, 'counted', fresh), id).not.toContain(live[0].tag)
+      }
+    }
+    // Number Hunt's first card is the lowest rule (descending), never reshuffle.
+    expect(blockedRules('schulte', () => false, 'counted', fresh)).toContain('schulte.reshuffle')
+    expect(blockedRules('schulte', () => false, 'counted', fresh)).not.toContain('schulte.descending')
+    expect(RULE_CARDS_PER_ROUND).toBe(2)
+    expect(RULE_CARD_GAP).toBe(3)
   })
 })
 
@@ -119,6 +211,20 @@ describe('skill estimate', () => {
     expect(stepMultiplier('speed', 100)).toBe(SKILL.speed.kMax)
     expect(stepMultiplier('quickEye', 1.2)).toBeCloseTo(2)
     expect(stepMultiplier('span', 10)).toBe(1)
+    // A game's own kMax (Match Pairs 1.5) caps it lower.
+    expect(stepMultiplier('speed', 100, 1.5)).toBe(1.5)
+    expect(stepMultiplier('speed', SKILL.speed.floor, 1.5)).toBe(1)
+    expect(brainGame('pairs').steps).toEqual({ scale: 2, kMax: 1.5 })
+  })
+
+  it('a run of 4+ right answers re-opens the speed estimate a little (never past sd0); anything else shrinks it', () => {
+    expect(nextSd('speed', 2, false, 4)).toBeCloseTo(2.2)
+    expect(nextSd('speed', 8.5, false, 9)).toBe(SKILL.speed.sd0)
+    expect(nextSd('speed', 2, false, 3)).toBeCloseTo(2 * 0.92)
+    expect(nextSd('speed', 2, true, 0)).toBeCloseTo(2 * 0.7)
+    expect(nextSd('speed', SKILL.speed.floor, false, 0)).toBe(SKILL.speed.floor)
+    // Only the speed group; Quick Eye keeps shrinking.
+    expect(nextSd('quickEye', 2, false, 6)).toBeCloseTo(2 * 0.92)
   })
 
   it('uncertainty grows with days away, capped at sd0 — a return re-finds the level, a week off barely moves it', () => {
@@ -145,17 +251,34 @@ describe('skill estimate', () => {
 })
 
 describe('mechanics (new rules and board changes)', () => {
-  const contexts = [DEFAULT_CONTEXT, { ...DEFAULT_CONTEXT, maxCols: maxColsFor(358), ringSlots: [8, 16, 16] }]
+  // Desktop 7×7 and a phone 5×7 (the boards that reach every grid size).
+  const contexts = [DEFAULT_CONTEXT, { ...DEFAULT_CONTEXT, maxCols: maxColsFor(358), maxRows: 7, ringSlots: [8, 16, 16] }]
+  // No longer made (retired): nothing produces them.
+  const live = MECHANICS.filter((m) => !m.retired)
 
-  it('every registered mechanic is produced by some trial, and games report only registered ones', () => {
+  it('no entry is registered ahead of its game: every line is live or retired, nothing pending', () => {
+    // The hard-content block was registered with a temporary `pending` flag while each game was
+    // rebuilt; every game now produces its lines, so the flag is gone for good. Only the fields
+    // below exist — a new temporary flag would need a test of its own.
+    const allowed = new Set(['tag', 'game', 'kind', 'from', 'copy', 'retired'])
+    for (const m of MECHANICS) {
+      expect(Object.keys(m).filter((k) => !allowed.has(k)), m.tag).toEqual([])
+      expect('pending' in m, m.tag).toBe(false)
+    }
+    // Retired: only Odd One Out's emoji near-twins (§2.10).
+    expect(MECHANICS.filter((m) => m.retired).map((m) => m.tag)).toEqual(['oddOneOut.nearTwin'])
+  })
+
+  it('every live mechanic is produced by some trial, and games report only registered ones', () => {
     const produced = new Set<string>()
     for (const { id, def } of BRAIN_GAMES) {
+      const levels = id === 'quickEye' ? Array.from({ length: 13 }, (_, i) => i) : [...Array.from({ length: 41 }, (_, i) => i + 1), 50, 60]
       for (const ctx of contexts) {
-        for (const level of [0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 23, 25, 30]) {
+        for (const level of levels) {
           for (let variant = 1; variant <= 16; variant++) {
             if (id !== 'quickEye' && variant > 1) break
-            for (let seed = 1; seed <= 25; seed++) {
-              const s = def.create(id === 'quickEye' ? Math.min(level, 12) : Math.max(1, level), createRng(seed * 977 + level), { ...ctx, variant })
+            for (let seed = 1; seed <= (id === 'quickEye' ? 6 : 25); seed++) {
+              const s = def.create(level, createRng(seed * 977 + level), { ...ctx, variant })
               for (const tag of def.mechanics(s)) {
                 expect(mechanicInfo(tag), `${id} reported unknown tag ${tag}`).toBeDefined()
                 expect(mechanicInfo(tag)?.game).toBe(id)
@@ -166,12 +289,12 @@ describe('mechanics (new rules and board changes)', () => {
         }
       }
     }
-    const missing = MECHANICS.map((m) => m.tag).filter((t) => !produced.has(t))
+    const missing = live.map((m) => m.tag).filter((t) => !produced.has(t))
     expect(missing).toEqual([])
   })
 
   it('a rule never appears below its stated level (cards come when the rule really starts)', () => {
-    for (const m of MECHANICS.filter((x) => x.kind === 'rule' && x.game !== 'quickEye')) {
+    for (const m of live.filter((x) => x.kind === 'rule' && x.game !== 'quickEye')) {
       const def = brainGame(m.game).def
       for (let seed = 1; seed <= 200; seed++) {
         // Span levels act as whole lengths (rounded), so stay a full step below.
@@ -181,25 +304,78 @@ describe('mechanics (new rules and board changes)', () => {
       }
     }
   })
+
+  it('bits never move: one tag each, its game is its prefix, the hard-content block starts at 49', () => {
+    expect(new Set(MECHANICS.map((m) => m.tag)).size).toBe(MECHANICS.length)
+    for (const m of MECHANICS) expect(m.tag.split('.')[0], m.tag).toBe(m.game)
+    expect(mechanicInfo('quickEye.clearView')?.bit).toBe(48)
+    const appended = [
+      'math.missing', 'math.threeDigit', 'math.parens', 'math.bigMul',
+      'series.halving', 'series.altOps', 'series.mixedLines', 'series.growFactor', 'series.tribonacci', 'series.threeLines',
+      'series.diffGrowing', 'series.opCycle', 'series.diffLines', 'series.diffFib', 'series.cubes', 'series.missingTerm',
+      'oddOneOut.colorNoise', 'oddOneOut.mirror', 'oddOneOut.absent', 'oddOneOut.glyphTwin',
+      'schulte.twoDigit', 'schulte.skipCount', 'schulte.alternate', 'schulte.alternateOpposite', 'schulte.unmarked',
+      'stroop.shuffle', 'stroop.labelInk', 'stroop.switchOften', 'stroop.frame',
+      'memoryGrid.waves',
+      'pairs.lookalike', 'pairs.triples',
+    ]
+    appended.forEach((tag, i) => {
+      expect(mechanicInfo(tag)?.bit, tag).toBe(49 + i)
+      // Each has its own copy, `mechanics.<game>.<name>`.
+      expect(mechanicInfo(tag)?.copy, tag).toBe(tag)
+    })
+    expect(MECHANICS.length).toBe(49 + appended.length)
+    const rules = ['math.missing', 'series.missingTerm', 'oddOneOut.mirror', 'oddOneOut.absent', 'schulte.alternate', 'schulte.alternateOpposite', 'stroop.labelInk', 'pairs.triples']
+    for (const tag of appended) expect(mechanicInfo(tag)?.kind, tag).toBe(rules.includes(tag) ? 'rule' : 'board')
+  })
+
+  it('placement ceilings count only live rules', () => {
+    const none = () => false
+    for (const { id } of BRAIN_GAMES) {
+      const rules = live.filter((m) => m.game === id && m.kind === 'rule').sort((a, b) => a.from - b.from)
+      expect(placementCeiling(id, none), id).toBe(rules.length >= 3 ? rules[2].from - 0.01 : Infinity)
+    }
+  })
 })
 
 describe('tiers', () => {
+  // A phone 5×7, and 4 columns × 7 rows (Match Pairs' and Flash Grid's narrower boards).
+  const phones = [
+    { ...DEFAULT_CONTEXT, maxCols: maxColsFor(358), maxRows: 7, ringSlots: [8, 16, 16] },
+    { ...DEFAULT_CONTEXT, maxCols: 4, maxRows: 7, ringSlots: [8, 16, 16] },
+  ]
+
   it('six thresholds per game, rising, and every one reachable below the level ceiling on a phone', () => {
     for (const { id, def } of BRAIN_GAMES) {
       const t = TIERS[id]
       expect(t).toHaveLength(TIER_COUNT)
       for (let i = 1; i < t.length; i++) expect(t[i]).toBeGreaterThan(t[i - 1])
       if (id === 'quickEye') continue
-      const cap = def.maxLevel?.({ ...DEFAULT_CONTEXT, maxCols: maxColsFor(358) }) ?? Infinity
-      expect(t[5], `${id} master below its cap`).toBeLessThan(cap)
+      for (const ctx of phones) {
+        const cap = def.maxLevel?.(ctx) ?? Infinity
+        expect(t[5], `${id} master below its cap on ${ctx.maxCols}x${ctx.maxRows}`).toBeLessThan(cap)
+      }
     }
+  })
+
+  it('thresholds sit where the puzzle changes (GAMES_DIFFICULTY_PLAN §2.10)', () => {
+    expect(TIERS).toMatchObject({
+      oddOneOut: [3, 7, 10, 13, 17, 26],
+      schulte: [3, 6, 10, 14, 16, 21],
+      stroop: [3, 7, 10, 14, 20, 27],
+      math: [3, 6, 10, 13, 18, 23],
+      series: [3, 6, 9, 12, 15, 20],
+      pairs: [3, 6, 8, 11, 13, 15],
+      memoryGrid: [3, 4, 6, 7, 9, 12],
+      sequence: [2, 3, 4, 5, 6, 8],
+    })
   })
 
   it('tier and progress toward the next', () => {
     expect(tierFor('stroop', 2)).toBe(0)
     expect(tierFor('stroop', 8)).toBe(2)
     expect(tierFor('stroop', 99)).toBe(6)
-    expect(tierProgress('stroop', 5.5)).toMatchObject({ tier: 1, next: 8 })
+    expect(tierProgress('stroop', 5.5)).toMatchObject({ tier: 1, next: 7 })
     expect(tierProgress('stroop', 99).next).toBeNull()
   })
 
@@ -281,6 +457,6 @@ describe('meta record', () => {
     // Its own SecureStore value on mobile (~2KB).
     expect(raw.length).toBeLessThan(1900)
     expect(parseMeta('nope')).toEqual(emptyMeta())
-    expect(parseMeta('{"v":1,"sk":{"stroop":{"mu":1e308,"sd":-1},"x":{}},"tier":{"stroop":99},"seen":"zz"}')).toMatchObject({ sk: { stroop: { mu: 500, sd: 0.1 } }, tier: { stroop: 6 }, seen: '' })
+    expect(parseMeta('{"v":2,"sk":{"stroop":{"mu":1e308,"sd":-1},"x":{}},"tier":{"stroop":99},"seen":"zz"}')).toMatchObject({ sk: { stroop: { mu: 500, sd: 0.1 } }, tier: { stroop: 6 }, seen: '' })
   })
 })

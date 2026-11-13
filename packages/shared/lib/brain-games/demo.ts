@@ -27,7 +27,7 @@ const DEMO_SETUP: Record<BrainGameId, { level: number; seed: number; variant?: n
   sequence: { level: 1, seed: 2 },
   series: { level: 1, seed: 4 },
   pairs: { level: 1, seed: 9 },
-  stroop: { level: 1, seed: 6 },
+  stroop: { level: 1, seed: 7 },
   math: { level: 1, seed: 8 },
 }
 

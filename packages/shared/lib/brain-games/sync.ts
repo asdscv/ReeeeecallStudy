@@ -17,10 +17,15 @@ import { BRAIN_GAMES } from './catalog'
  * each game keeps the side with more trials. Never a reset to level 1.
  */
 
-/** The `v` this client writes and fully understands. A cloud copy with a higher `v` is read-only here. */
-export const BRAIN_PROGRESS_FORMAT = 1
-export const BRAIN_HISTORY_FORMAT = 1
-export const BRAIN_META_FORMAT = 1
+/**
+ * The `v` this client writes and fully understands. A cloud copy with a higher `v` is read-only here.
+ * 2: the hard-content change moved the board games' levels to a new scale (scale.ts). A v1 copy is
+ * converted once on reading; an app that only knows v1 stops syncing ('outdated') rather than push
+ * old-scale levels over it, and migration 288 refuses any write with a lower `v` than stored.
+ */
+export const BRAIN_PROGRESS_FORMAT = 2
+export const BRAIN_HISTORY_FORMAT = 2
+export const BRAIN_META_FORMAT = 2
 /** Mirrors the CHECKs in migration 288 (octet_length of the jsonb text). */
 export const BRAIN_SAVE_MAX_BYTES = 16_384
 
@@ -287,7 +292,7 @@ export function mergeProgress(local: BrainProgress, remote: BrainProgress, sides
 
   return {
     ...local,
-    v: 1,
+    v: 2,
     games,
     totalRounds: Math.max(local.totalRounds, remote.totalRounds),
     totalPoints: Math.max(local.totalPoints, remote.totalPoints),
@@ -332,7 +337,7 @@ export function mergeHistory(local: BrainHistory, remote: BrainHistory): BrainHi
     merged.sort((x, y) => x[0] - y[0] || (key(x) < key(y) ? -1 : key(x) > key(y) ? 1 : 0))
     rounds[id] = merged.slice(-HISTORY_PER_GAME)
   }
-  return { v: 1, rounds }
+  return { v: 2, rounds }
 }
 
 // ── meta ────────────────────────────────────────────────────────────────────
@@ -387,7 +392,7 @@ export function mergeMeta(local: BrainMeta, remote: BrainMeta, sides: GameSides 
   }
   return {
     ...local,
-    v: 1,
+    v: 2,
     sk,
     tier: maxPerGame(local.tier, remote.tier),
     seen: orMask(local.seen, remote.seen),

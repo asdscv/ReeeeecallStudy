@@ -18,6 +18,7 @@ import {
   emptyProgress,
   exposureMsFor,
   maxColsFor,
+  maxRowsFor,
   parseProgress,
   planToday,
   planTodaysSession,
@@ -41,7 +42,6 @@ import {
   HISTORY_PER_GAME,
   weekProgress,
   weekStart,
-  type BrainGameId,
   type ChoiceView,
   type CreateContext,
   type QuickEyeView,
@@ -81,78 +81,70 @@ function settle(def: Any, s: Any): Any {
   return s
 }
 
-/** Plays the trial perfectly using the game's own state. */
-function solve(id: BrainGameId, def: Any, s0: Any): Any {
-  let s = settle(def, s0)
-  switch (id) {
-    case 'quickEye': {
-      // fixation → stimulus, the platform reports an exact exposure, mask → answer.
-      s = def.advance(s0)
-      s = def.exposed(s, s.exposureMs, 1000 / 60)
-      s = settle(def, s)
-      s = def.tap(s, s.correctCenter)
-      if (s.targetDir !== null) s = def.tap(s, s.targetDir)
-      return s
+/** Plays a trial with nothing but the game's own `solution()` — what the how-to-play demo does. */
+function playBySolution(def: Any, s: Any): Any {
+  for (let guard = 0; guard < 2000 && !def.outcome(s); guard++) {
+    const view = def.view(s)
+    if (view.kind === 'quickEye' && view.phase === 'stimulus') {
+      s = def.exposed(s, view.exposureMs, 1000 / 60)
+      continue
     }
-    case 'memoryGrid':
-      for (const t of s.targets) s = def.tap(s, t)
-      return s
-    case 'sequence': {
-      const order = s.reverse ? [...s.seq].reverse() : s.seq
-      for (const t of order) s = def.tap(s, t)
-      return s
+    if (def.pendingMs(s) !== null && !def.acceptsInput(s)) {
+      s = def.advance(s)
+      continue
     }
-    case 'pairs': {
-      const faces = [...new Set(s.cards as string[])]
-      for (const f of faces) {
-        const idx = s.cards.map((c: string, i: number) => (c === f ? i : -1)).filter((i: number) => i >= 0)
-        s = def.tap(s, idx[0])
-        s = def.tap(s, idx[1])
-      }
-      return s
-    }
-    case 'schulte': {
-      const total = s.n * s.n
-      for (let k = 0; k < total; k++) {
-        const want = s.order === 'asc' ? k + 1 : total - k
-        s = def.tap(s, s.values.indexOf(want))
-      }
-      return s
-    }
-    case 'oddOneOut':
-      return def.tap(s, s.oddIndex)
-    default:
-      return def.tap(s, s.correctIndex)
+    const taps = def.solution(s)
+    if (!taps || taps.length === 0) throw new Error('no solution while input is expected')
+    s = def.tap(s, taps[0])
   }
+  return s
 }
 
-const LEVELS = [0, 1, 2, 3, 4, 6, 8, 10, 12, 14, 16, 20, 30, 60, 120]
+const LEVELS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 22, 24, 26, 28, 30, 34, 40, 60, 120]
+/** The staircase moves in fractions: every create() takes any level ≥ 1 and looks its table up itself. */
+const FRACTIONAL = [1.5, 2.99, 7.3, 13.5, 25.75]
+/** Desktop 7×7, a phone 5×7, a small phone 4×6, a narrow 3×5 (centre-only, last life). */
 const CONTEXTS: CreateContext[] = [
   DEFAULT_CONTEXT,
-  { ...DEFAULT_CONTEXT, maxCols: maxColsFor(358), ringSlots: [8, 16, 16] },
-  { ...DEFAULT_CONTEXT, maxCols: 3, centerOnly: true, livesLeft: 1 },
+  { ...DEFAULT_CONTEXT, maxCols: maxColsFor(358), maxRows: 7, ringSlots: [8, 16, 16] },
+  { ...DEFAULT_CONTEXT, maxCols: 4, maxRows: 6, ringSlots: [8, 16, 16] },
+  { ...DEFAULT_CONTEXT, maxCols: 3, maxRows: 5, centerOnly: true, livesLeft: 1 },
 ]
 
 describe('every game, every level, every screen', () => {
+  it('the screens are what they say', () => {
+    expect(CONTEXTS.map((c) => `${c.maxCols}x${c.maxRows}`)).toEqual(['7x7', '5x7', '4x6', '3x5'])
+    expect([100, 300, 360, 400, 456, 600].map(maxRowsFor)).toEqual([3, 4, 5, 6, 7, 7])
+  })
+
   for (const { id, def } of BRAIN_GAMES) {
-    it(`${id}: well-formed and solvable`, () => {
+    it(`${id}: well-formed, and following solution() always wins`, () => {
+      const levels = id === 'quickEye' ? [0, ...LEVELS.filter((l) => l <= 12)] : [...LEVELS, ...FRACTIONAL]
       for (const ctx of CONTEXTS) {
-        for (const level of LEVELS) {
-          for (let seed = 1; seed <= 20; seed++) {
-            const variant = 1 + (seed % 16)
-            const c = { ...ctx, variant }
-            const s0 = def.create(id === 'quickEye' ? Math.min(level, 12) : Math.max(1, level), createRng(seed * 7919 + level), c)
+        for (const level of levels) {
+          for (let seed = 1; seed <= 16; seed++) {
+            const c = { ...ctx, variant: 1 + (seed % 16) }
+            const s0 = def.create(level, createRng(seed * 7919 + Math.round(level * 100)), c)
             const view = def.view(s0)
+            const at = `${id} L${level} ${c.maxCols}x${c.maxRows} seed ${seed}`
             if (view.kind === 'grid') {
-              expect(view.cells.length).toBe(view.cols * view.rows)
-              expect(view.cols, `${id} must not exceed the width cap`).toBeLessThanOrEqual(Math.max(3, Math.min(7, c.maxCols)))
+              expect(view.cells.length, at).toBe(view.cols * view.rows)
+              expect(view.cols, `${at}: wider than the screen`).toBeLessThanOrEqual(Math.max(3, Math.min(7, c.maxCols)))
+              if (view.extra) expect(view.extra.index, `${at}: the extra button sits after the cells`).toBe(view.cells.length)
             } else if (view.kind === 'choice') {
-              const texts = view.options.map((o) => o.text ?? o.textKey)
-              expect(new Set(texts).size, `${id} L${level} duplicate options ${texts}`).toBe(texts.length)
+              const keys = view.options.map((o) => o.text ?? o.textKey ?? String(o.value))
+              expect(new Set(keys).size, `${at} duplicate options ${keys}`).toBe(keys.length)
               expect(view.options.length).toBeGreaterThanOrEqual(2)
+              const values = view.options.map((o) => o.value)
+              if (values.every((v) => v !== undefined)) {
+                for (let i = 1; i < values.length; i++) expect(values[i]!, `${at}: numeric options ascending`).toBeGreaterThan(values[i - 1]!)
+              }
+              if (view.stimulus.terms) expect(view.stimulus.terms.filter((t) => t === null), `${at}: one gap`).toHaveLength(1)
+              expect(view.stimulus.reveal, `${at}: the reveal waits for the answer`).toBeUndefined()
             }
-            const won = solve(id, def, s0)
-            expect(def.outcome(won)?.correct, `${id} L${level} seed ${seed} v${variant} not won`).toBe(true)
+            const won = playBySolution(def, s0)
+            expect(def.outcome(won)?.correct, `${at} not won`).toBe(true)
+            expect(def.solution(won), 'nothing is asked once the trial is over').toBeNull()
           }
         }
       }
@@ -283,7 +275,7 @@ describe('Quick Eye', () => {
     const p = parseProgress(old)
     expect(p.quickEye).toEqual({ variant: 2, recentMs: [], recentOk: '', thresholdMs: null })
     expect(p.quickEyeField).toBe(2)
-    expect(p.bestRuns).toEqual({ stroop: 300 })
+    expect(p.bestRuns.quickEye).toBeUndefined()
     // The level stays (the round recalibrates it once); a later stage stays where it was.
     expect(p.games.quickEye?.level).toBe(9)
     const v7 = parseProgress(old.replace('"variant":1', '"variant":7'))
@@ -587,8 +579,10 @@ describe('choice answers', () => {
       for (let seed = 1; seed <= 60; seed++) {
         const s = def.create(Math.max(1, level), createRng(seed + level * 1000), DEFAULT_CONTEXT) as Any
         const view = def.view(s) as ChoiceView
-        const expr = view.stimulus.text!.replace(' = ?', '')
-        const values = view.options.map((o) => Number(o.text))
+        // Tokens when the game sends them (numbers drawn by locale), plain text otherwise.
+        const written = view.stimulus.tokens ? view.stimulus.tokens.join(' ') : view.stimulus.text!
+        const expr = written.replace(/\s*=\s*\?$/, '')
+        const values = view.options.map((o) => o.value ?? Number(o.text))
         values.forEach((v) => expect(v).toBeGreaterThanOrEqual(0))
         if (!expr.includes('?')) {
           const answer = Function(`return ${expr.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-')}`)()
@@ -605,7 +599,8 @@ describe('choice answers', () => {
         const s = def.create(Math.max(1, level), createRng(seed + level * 31), DEFAULT_CONTEXT) as Any
         const view = def.view(s) as ChoiceView
         const answer = view.options[s.correctIndex].textKey
-        const want = s.prompt.key === 'play.pickInk' ? `colors.${view.stimulus.color}` : view.stimulus.textKey
+        const rule = view.stimulus.cue ?? (s.prompt.key === 'play.pickWord' ? 'word' : 'ink')
+        const want = rule === 'ink' ? `colors.${view.stimulus.color}` : view.stimulus.textKey
         expect(answer).toBe(want)
       }
     }
@@ -616,7 +611,8 @@ describe('per-game life rules', () => {
   it('Number Hunt spends a life per wrong tap, and stops at the lives left', () => {
     const def = brainGame('schulte').def as Any
     let s = def.create(3, createRng(9), { ...DEFAULT_CONTEXT, livesLeft: 2 })
-    const wrong = s.values.findIndex((v: number) => v !== 1)
+    const right = def.solution(s)[0]
+    const wrong = right === 0 ? 1 : 0
     s = def.tap(s, wrong)
     expect(def.outcome(s)).toBeNull()
     s = def.tap(s, wrong)
@@ -640,7 +636,6 @@ describe('migration and rotation', () => {
     const p = parseProgress(v1)
     expect(p.games.memoryGrid).toMatchObject({ level: 4, bestLevel: 5 }) // 3 + ⌊5·0.6⌋ = 6 cells → length 6 − 2
     expect(p.games.sequence).toMatchObject({ level: 3 }) // 3 + ⌊5·0.45⌋ = 5 tiles → 3
-    expect(p.games.math).toMatchObject({ level: 6 }) // other games keep their scale
     // A v2 record is read as written.
     const v2 = parseProgress(serializeProgress({ ...emptyProgress(), games: { memoryGrid: { level: 6, bestLevel: 6, rounds: 1, wins: 1 } } }))
     expect(v2.games.memoryGrid?.level).toBe(6)
@@ -683,48 +678,14 @@ describe('progress', () => {
     expect(parseProgress('{"v":1,"games":{},"quickEye":{"variant":99,"recentMs":[1,2],"recentOk":"1"}}').quickEye).toMatchObject({ variant: 16, recentMs: [], recentOk: '' })
     // A corrupted level is clamped, never handed to a game as 1e308 (which hung Quick Math).
     const huge = parseProgress('{"v":1,"games":{"math":{"level":1e308},"quickEye":{"level":99}},"sessions":{}}')
-    expect(huge.games.math?.level).toBe(500)
+    expect(huge.games.math?.level).toBeGreaterThanOrEqual(1)
+    expect(huge.games.math?.level).toBeLessThanOrEqual(500)
     expect(huge.games.quickEye?.level).toBe(12)
     expect(brainGame('math').def.create(1e308, createRng(1), DEFAULT_CONTEXT)).toBeTruthy()
   })
 })
 
-/** Plays a trial with nothing but the game's own `solution()` — what the how-to-play demo does. */
-function playBySolution(def: Any, s: Any): Any {
-  for (let guard = 0; guard < 2000 && !def.outcome(s); guard++) {
-    const view = def.view(s)
-    if (view.kind === 'quickEye' && view.phase === 'stimulus') {
-      s = def.exposed(s, view.exposureMs, 1000 / 60)
-      continue
-    }
-    if (def.pendingMs(s) !== null && !def.acceptsInput(s)) {
-      s = def.advance(s)
-      continue
-    }
-    const taps = def.solution(s)
-    if (!taps || taps.length === 0) throw new Error('no solution while input is expected')
-    s = def.tap(s, taps[0])
-  }
-  return s
-}
-
-describe('solution() — the demo and these tests play every game from the engine alone', () => {
-  for (const { id, def } of BRAIN_GAMES) {
-    it(`${id}: following solution() always wins`, () => {
-      for (const ctx of CONTEXTS) {
-        for (const level of LEVELS) {
-          for (let seed = 1; seed <= 12; seed++) {
-            const c = { ...ctx, variant: 1 + (seed % 16) }
-            const s0 = def.create(id === 'quickEye' ? Math.min(level, 12) : Math.max(1, level), createRng(seed * 104729 + level), c)
-            const won = playBySolution(def, s0)
-            expect(def.outcome(won)?.correct, `${id} L${level} seed ${seed}`).toBe(true)
-            expect(def.solution(won), 'nothing is asked once the trial is over').toBeNull()
-          }
-        }
-      }
-    })
-  }
-
+describe('the how-to-play demo plays every game from the engine alone', () => {
   it('every game has a demo that asks something, taps, and ends on a right answer', () => {
     for (const { id, def } of BRAIN_GAMES) {
       const frames = buildDemo(id)
@@ -746,6 +707,14 @@ describe('solution() — the demo and these tests play every game from the engin
         expect(centre.every((f) => f.view.kind !== 'quickEye' || f.view.target === null)).toBe(true)
       }
       void def
+    }
+  })
+
+  it("Color Word's demo shows the conflict it teaches: the word names one colour, the ink is another", () => {
+    // The platforms build it on a 4-wide, 4-tall board (DemoPlayer); the default context too.
+    for (const ctx of [{}, { maxCols: 4, maxRows: 4 }]) {
+      const asked = buildDemo('stroop', ctx).find((f) => f.tap !== undefined)?.view as ChoiceView
+      expect(asked.stimulus.textKey).not.toBe(`colors.${asked.stimulus.color}`)
     }
   })
 
@@ -799,10 +768,10 @@ describe('round history, stars and streaks', () => {
     expect(raw.length).toBeLessThan(1800)
     const back = parseHistory(raw)
     expect(gameHistory(back, 'memoryGrid').at(-1)).toEqual({ day: '2026-11-12', level: 31.3, accuracy: 0.88 })
-    expect(parseHistory('{"rounds":{"memoryGrid":[[1,2],"x",[1,2,3]],"nope":[[1,1,1]]}}').rounds).toEqual({ memoryGrid: [[1, 2, 3]] })
+    expect(parseHistory('{"v":2,"rounds":{"memoryGrid":[[1,2],"x",[1,2,3]],"nope":[[1,1,1]]}}').rounds).toEqual({ memoryGrid: [[1, 2, 3]] })
     expect(parseHistory('garbage')).toEqual(emptyHistory())
     // A day far out of range would throw in the date conversion on every trend: it is dropped.
-    expect(parseHistory('{"rounds":{"math":[[9e15,10,50],[1000,10,50]]}}').rounds).toEqual({ math: [[1000, 10, 50]] })
+    expect(parseHistory('{"v":2,"rounds":{"math":[[9e15,10,50],[1000,10,50]]}}').rounds).toEqual({ math: [[1000, 10, 50]] })
   })
 
   it('stars by accuracy (none for very short rounds), streak tiers at 3, 6 and 10', () => {

@@ -72,7 +72,9 @@ export function useTodaysTraining() {
         levels: { ...s.totals.levels, [gameId]: { start: prior?.start ?? stats.levelStart, end: stats.levelEnd } },
       }
       const activeMs = s.activeMs + stats.activeMs
-      const slotActiveMs = s.slotActiveMs + stats.activeMs
+      // Setup (practice, placement, rule-card trials — a first day's) is not the game's play time:
+      // it does not eat the slot. The session's minutes still count it.
+      const slotActiveMs = s.slotActiveMs + Math.max(0, stats.activeMs - stats.setupMs)
       if (stats.endedBy === 'stop') return { ...s, totals, activeMs, slotActiveMs, phase: 'quit' }
       const now = Date.now()
       const slot = s.slots[s.slotIndex]

@@ -32,6 +32,16 @@ const PADDING = 16
 const HUD_SCALE = 1.3
 /** How long a bigger board's notice stays up. */
 const TOAST_MS = 3000
+/**
+ * What the round's chrome takes from the screen's height before the board (header, score row, the
+ * bars, the prompt's two lines, the verdict line and the gaps between — see `styles`), at system
+ * text size; the HUD's text grows with the system's up to HUD_SCALE, which adds up to
+ * CHROME_PER_SCALE per whole step. The round is built before its board is measured, so its rows
+ * (maxRows) come from this.
+ */
+const CHROME_H = 268
+const CHROME_H_COMPACT = 232
+const CHROME_PER_SCALE = 120
 /** Quick Eye's stage-up preview: the new stage's flash, faint — on the dark scrim a quarter-opacity board all but vanished. */
 const PREVIEW_OPACITY = 0.5
 
@@ -69,7 +79,7 @@ interface RoundViewProps {
 export function RoundView({ countdown = true, ...props }: RoundViewProps) {
   const { t } = useTranslation('brain')
   const theme = GAME_THEMES[props.gameId]
-  const [width, setWidth] = useState<number | null>(null)
+  const [size, setSize] = useState<{ width: number; height: number } | null>(null)
   const [counting, setCounting] = useState(countdown)
 
   // During the countdown there is nothing to stop yet. In Today's Training Android's back button
@@ -90,17 +100,17 @@ export function RoundView({ countdown = true, ...props }: RoundViewProps) {
         style={styles.root}
         // Only the first measurement: the round's grid size is fixed when it starts.
         onLayout={(e) => {
-          const w = e.nativeEvent.layout.width
-          setWidth((prev) => prev ?? w)
+          const { width: w, height: h } = e.nativeEvent.layout
+          setSize((prev) => prev ?? { width: w, height: h })
         }}
       >
-        {width === null ? null : counting ? (
+        {size === null ? null : counting ? (
           <>
             <HudShell gameId={props.gameId} caption={props.caption} />
             <Countdown goLabel={t('play.go')} onDone={() => setCounting(false)} />
           </>
         ) : (
-          <Round {...props} width={width} theme={theme} />
+          <Round {...props} width={size.width} height={size.height} theme={theme} />
         )}
       </View>
     </GameCanvas>
@@ -141,14 +151,20 @@ function Round({
   confirmEmpty = false,
   stopBody,
   width,
+  height,
   theme,
   timeBudgetMs,
-}: RoundViewProps & { width: number; theme: GameTheme }) {
+}: RoundViewProps & { width: number; height: number; theme: GameTheme }) {
   const { t } = useTranslation('brain')
   const screen = useWindowDimensions()
   const compact = screen.height < 700
   const boardWidth = Math.min(width - PADDING * 2, MAX_BOARD_WIDTH)
-  const [platform] = useState(() => mobilePlatform(boardWidth, Math.min(screen.width, screen.height)))
+  // The board's columns from its width, its rows from the height the chrome leaves it (a portrait Flash Grid).
+  const [platform] = useState(() => {
+    const textScale = Math.min(HUD_SCALE, Math.max(1, screen.fontScale))
+    const boardSlot = height - (compact ? CHROME_H_COMPACT : CHROME_H) - Math.round((textScale - 1) * CHROME_PER_SCALE)
+    return mobilePlatform(boardWidth, Math.min(screen.width, screen.height), boardSlot)
+  })
   const r = useBrainRound(gameId, platform, { timeBudgetMs })
   const qe = gameId === 'quickEye'
   const timing = useBrainStore((s) => s.progress.settings.timing)

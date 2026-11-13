@@ -119,6 +119,8 @@ class Sfx {
   }
 
   private lastVerdict = 0
+  /** When Odd One Out's «없음» tone last played: its 'correct' (the same moment) adds no chime. */
+  private lastNone = -Infinity
 
   /** Filtered noise: a card flip or a whoosh. */
   private noise({ at = 0, dur = 0.06, gain = 0.05, freq = 3000, q = 0.8, sweepTo }: { at?: number; dur?: number; gain?: number; freq?: number; q?: number; sweepTo?: number } = {}) {
@@ -188,16 +190,35 @@ class Sfx {
     if (this.quiet && fx.kind !== 'fixation') return
     // The tap that finishes a trial plays only its verdict, not a hit and then the verdict.
     const now = performance.now()
-    if (fx.kind === 'correct' || fx.kind === 'wrong' || fx.kind === 'nearMiss') this.lastVerdict = now
+    if (fx.kind === 'correct' || fx.kind === 'wrong' || fx.kind === 'nearMiss' || fx.kind === 'noneCorrect') this.lastVerdict = now
     if (fx.kind === 'hit') {
       setTimeout(() => {
-        if (performance.now() - this.lastVerdict > 40) this.bell(note(4 + Math.min(fx.step, 8)), 0, 0.22, 0.12)
+        if (performance.now() - this.lastVerdict <= 40) return
+        // The run climbs a pentatonic step per hit. Number Hunt's second series (the boxed numbers)
+        // answers in a rounder, lower voice, so the two series are told apart by ear too.
+        if (fx.alt) {
+          const f = note(1 + Math.min(fx.step, 8))
+          this.tone(f, { dur: 0.2, gain: 0.13, attack: 0.008 })
+          this.tone(f / 2, { dur: 0.16, gain: 0.04 })
+        } else this.bell(note(4 + Math.min(fx.step, 8)), 0, 0.22, 0.12)
       }, 0)
       return
     }
     switch (fx.kind) {
       case 'reveal':
         this.noise({ dur: 0.35, gain: 0.04, freq: 600, sweepTo: 2400, q: 1.2 })
+        break
+      case 'wave': {
+        // Flash Grid's waves: the reveal's whoosh, a little higher each wave.
+        const lift = 1 + 0.25 * Math.max(0, fx.index)
+        this.noise({ dur: 0.3, gain: 0.04, freq: 600 * lift, sweepTo: 2000 * lift, q: 1.2 })
+        break
+      }
+      case 'noneCorrect':
+        // «없음» was right: an open fifth (C5 + G5) that rings out — calm, unlike the climbing chime.
+        this.lastNone = now
+        this.bell(note(5), 0, 0.55, 0.11)
+        this.bell(note(8), 0.0, 0.55, 0.08)
         break
       case 'flash':
         // A Simon tone per tile: the same cell always sings the same note.
@@ -214,6 +235,7 @@ class Sfx {
         this.tone(196, { dur: 0.2, gain: 0.16, wave: 'triangle', glideTo: 140 })
         break
       case 'correct': {
+        if (now - this.lastNone < 40) break
         // The chime climbs with the run (a semitone-ish pentatonic step per answer, capped).
         const base = 5 + Math.min(fx.streak - 1, 5)
         this.bell(note(base), 0, 0.3, 0.13)
