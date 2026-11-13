@@ -1,5 +1,6 @@
 import { createRng } from './rng'
 import { brainGame } from './catalog'
+import { QUICK_EYE_MAX_VARIANT } from './games/quick-eye'
 import { DEFAULT_CONTEXT, type BrainGameId, type CreateContext, type RoundView } from './types'
 
 /**
@@ -37,9 +38,11 @@ const RESULT_HOLD_MS = 1400
 export function buildDemo(gameId: BrainGameId, ctx: Partial<CreateContext> = {}): DemoFrame[] {
   const def = brainGame(gameId).def
   const setup = DEMO_SETUP[gameId]
-  // A player on Quick Eye's "centre only" setting sees the centre-only task demonstrated.
+  // Quick Eye demonstrates the player's own stage (from V2 — V1 is only ever practice), or the
+  // centre-only task for a player on that setting.
   const centerOnly = ctx.centerOnly === true
-  const variant = centerOnly ? 1 : (setup.variant ?? 1)
+  const variant =
+    gameId === 'quickEye' ? (centerOnly ? 1 : Math.max(2, Math.min(QUICK_EYE_MAX_VARIANT, Math.round(ctx.variant ?? setup.variant ?? 2)))) : (setup.variant ?? 1)
   const context: CreateContext = { ...DEFAULT_CONTEXT, maxCols: 4, ringSlots: [8, 16, 16], ...ctx, variant, centerOnly }
   let s = def.create(setup.level, createRng(setup.seed), context)
   const frames: DemoFrame[] = []

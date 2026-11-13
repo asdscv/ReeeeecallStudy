@@ -5,7 +5,7 @@
   "worry": "Jika kamu khawatir tentang daya ingatmu, bicarakan dengan dokter atau layanan kesehatan setempat, alih-alih bermain lebih banyak.",
   "training": {
     "title": "Latihan hari ini",
-    "desc": "Mata Cepat dan 3 permainan · sekitar {{minutes}} menit",
+    "desc": "{{count}} permainan · sekitar {{minutes}} menit",
     "start": "Mulai latihan hari ini",
     "week": "Minggu ini {{done}}/{{goal}}",
     "weekDone": "Target mingguan tercapai",
@@ -13,7 +13,7 @@
     "booster": "Penyegaran {{done}}/{{total}}",
     "boosterNext": "Penyegaran berikutnya: {{date}}",
     "minutes": "Total {{value}} menit",
-    "dose": "Rencananya sekitar tiga sesi 20 menit per minggu. Boleh main lebih banyak, tapi tidak ada tambahan apa pun.",
+    "dose": "Rencananya sekitar tiga sesi per minggu — pilih 5 atau 20 menit setiap kali. Boleh main lebih banyak, tapi tidak ada tambahan apa pun.",
     "slot": "Permainan {{index}}/{{total}}",
     "next": "Permainan berikutnya",
     "continue": "Lanjutkan",
@@ -25,7 +25,17 @@
     "kicker": "3 kali seminggu",
     "lineup": "Susunan hari ini",
     "minutesShort": "{{value}} mnt",
-    "stopBody": "Semua yang sudah dimainkan tersimpan, tetapi sesi yang tidak selesai tidak dihitung sebagai sesi lengkap."
+    "stopBody": "Semua yang sudah dimainkan tersimpan, tetapi sesi yang tidak selesai tidak dihitung sebagai sesi lengkap.",
+    "length": "Durasi sesi",
+    "minutesSeconds": "{{m}} mnt {{s}} dtk",
+    "focus": {
+      "mixed": "Hari ini sedikit semuanya",
+      "speed": "Hari ini fokus kecepatan",
+      "memory": "Hari ini fokus ingatan",
+      "thinking": "Hari ini fokus berpikir"
+    },
+    "desc_other": "{{count}} permainan · sekitar {{minutes}} menit",
+    "desc_one": "{{count}} permainan · sekitar {{minutes}} menit"
   },
   "home": {
     "freePlay": "Latihan bebas",
@@ -65,7 +75,7 @@
   "games": {
     "quickEye": {
       "name": "Mata Cepat",
-      "desc": "Lihat sekilas gambar di tengah dan bintang di tepi, lalu jawab apa dan di mana."
+      "desc": "Lihat bentuk di tengah dan tangkap sekilas ke arah mana bintang muncul."
     },
     "memoryGrid": {
       "name": "Kotak Kilat",
@@ -118,7 +128,7 @@
     "nextNumber": "Angka berikutnya?",
     "correct": "Benar",
     "wrong": "Belum tepat",
-    "timeUp": "Waktu habis",
+    "timeUp": "Waktu habis!",
     "timeUpForgiven": "Waktu habis · kesempatan tidak berkurang",
     "void": "Layar tersendat — kita tampilkan lagi",
     "points": "+{{value}}",
@@ -169,7 +179,37 @@
       "6": "Kiri",
       "7": "Kiri atas"
     },
-    "speedLevel": "Level kecepatan {{level}}"
+    "speedLevel": "Level kecepatan {{level}}",
+    "knob": {
+      "wider": "Sekarang lihat lebih lebar",
+      "ring2": "Sampai lingkar tengah",
+      "ring3": "Sampai lingkar luar",
+      "crowd": "Cari bintang di antara segitiga",
+      "moreCrowd": "Segitiganya makin banyak",
+      "similar": "Bentuk di tengah makin mirip",
+      "sameDiff": "Sama atau beda?"
+    },
+    "stageUp": {
+      "title": "Tahap baru",
+      "stage": "Tahap {{stage}}",
+      "ease": "Tahap baru dimulai sedikit lebih lambat",
+      "continue": "Lanjut"
+    },
+    "gauge": "{{count}} jawaban benar lagi, jadi lebih cepat",
+    "speedUp": "Satu langkah lebih cepat",
+    "topSpeed": "Kecepatan tertinggi",
+    "hold": "Pertahankan kecepatan tertinggi {{n}}/14",
+    "wasHere": "Ada di sini",
+    "nearMiss": "Hampir, tepat di sebelahnya",
+    "missFast": "Yang tadi cepat sekali",
+    "slowerStart": "Sedikit lebih cepat",
+    "legEnd": "Bagian selesai",
+    "nextGoal": "Berikutnya: bertahan di sekitar level kecepatan {{level}}",
+    "landscapeHint": "Miringkan ponsel atau pakai tablet agar terlihat lebih lebar",
+    "revealA11y": "Jawaban: {{center}}, bintang di {{dir}}",
+    "warmup": "Bersiap-siap",
+    "gauge_other": "{{count}} jawaban benar lagi, jadi lebih cepat",
+    "gauge_one": "{{count}} jawaban benar lagi, jadi lebih cepat"
   },
   "summary": {
     "livesOut": "Ronde selesai",
@@ -229,6 +269,10 @@
       "sameDiff": {
         "title": "Sama atau beda?",
         "body": "Dua bentuk muncul di tengah. Pilih apakah keduanya sama."
+      },
+      "clearView": {
+        "title": "Layar lebih jelas",
+        "body": "Penutupnya berubah, jadi beberapa soal pertama dimulai sedikit lebih lambat."
       }
     },
     "oddOneOut": {

@@ -92,6 +92,25 @@ describe('mergeProgress', () => {
     expect(gameProgress(mergeProgress(newer, more), 'quickEye').rounds).toBe(40)
   })
 
+  it('Quick Eye: variants 1 and 2 rank together — a slow start placed at 1 is not undone by an untouched or behind variant 2', () => {
+    const placed = { ...play(emptyProgress(), 'quickEye', 9, 0), quickEye: { variant: 1, recentMs: [100], recentOk: '1', thresholdMs: null } }
+    // A fresh device (every record starts at variant 2) and the copy pushed mid-placement (fewer trials).
+    const fresh = emptyProgress()
+    const midPlacement = play(emptyProgress(), 'quickEye', 6, 0)
+    for (const other of [fresh, midPlacement]) {
+      expect(mergeProgress(placed, other).quickEye.variant).toBe(1)
+      expect(mergeProgress(other, placed).quickEye.variant).toBe(1)
+    }
+    // Played on past it at variant 2 elsewhere (more trials): that side wins; and 3 still beats 1.
+    const passed = { ...play(emptyProgress(), 'quickEye', 30, 2), quickEye: { variant: 2, recentMs: [], recentOk: '', thresholdMs: null } }
+    expect(mergeProgress(placed, passed).quickEye.variant).toBe(2)
+    const v3 = { ...play(emptyProgress(), 'quickEye', 2, 2), quickEye: { variant: 3, recentMs: [], recentOk: '', thresholdMs: null } }
+    expect(mergeProgress(placed, v3).quickEye.variant).toBe(3)
+    // Neither played: the same answer from both sides.
+    const centreOnly = { ...emptyProgress(), quickEye: { ...emptyProgress().quickEye, variant: 1 } }
+    expect(mergeProgress(centreOnly, fresh).quickEye.variant).toBe(mergeProgress(fresh, centreOnly).quickEye.variant)
+  })
+
   it('bests are maxed, practice is a union, settings stay this device’s, the course is honest', () => {
     const r1 = markPracticed(recordRun(emptyProgress(), 'stroop', 50).progress, 'stroop')
     const r2 = updateSettings(markPracticed(recordRun(emptyProgress(), 'stroop', 80).progress, 'math'), { sound: false, timing: 2 })

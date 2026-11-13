@@ -5,7 +5,7 @@
   "worry": "Nếu bạn lo lắng về trí nhớ của mình, hãy trao đổi với bác sĩ hoặc cơ sở y tế tại địa phương thay vì chơi thêm.",
   "training": {
     "title": "Bài luyện hôm nay",
-    "desc": "Nhanh mắt và 3 trò chơi · khoảng {{minutes}} phút",
+    "desc": "{{count}} trò chơi · khoảng {{minutes}} phút",
     "start": "Bắt đầu bài luyện hôm nay",
     "week": "Tuần này {{done}}/{{goal}}",
     "weekDone": "Đã đạt mục tiêu tuần",
@@ -13,7 +13,7 @@
     "booster": "Ôn lại {{done}}/{{total}}",
     "boosterNext": "Lần ôn lại tiếp theo: {{date}}",
     "minutes": "Tổng cộng {{value}} phút",
-    "dose": "Kế hoạch là khoảng 3 buổi mỗi tuần, mỗi buổi 20 phút. Chơi nhiều hơn cũng được, nhưng không được thêm gì.",
+    "dose": "Kế hoạch là khoảng 3 buổi mỗi tuần, mỗi buổi chọn 5 hoặc 20 phút. Chơi nhiều hơn cũng được, nhưng không được thêm gì.",
     "slot": "Trò chơi {{index}}/{{total}}",
     "next": "Trò chơi tiếp theo",
     "continue": "Tiếp tục",
@@ -25,7 +25,17 @@
     "kicker": "3 lần mỗi tuần",
     "lineup": "Bài hôm nay",
     "minutesShort": "{{value}} phút",
-    "stopBody": "Kết quả đến giờ đã được lưu, nhưng buổi tập chưa xong sẽ không được tính là hoàn thành."
+    "stopBody": "Kết quả đến giờ đã được lưu, nhưng buổi tập chưa xong sẽ không được tính là hoàn thành.",
+    "length": "Thời lượng",
+    "minutesSeconds": "{{m}} phút {{s}} giây",
+    "focus": {
+      "mixed": "Hôm nay: mỗi thứ một chút",
+      "speed": "Hôm nay: tốc độ",
+      "memory": "Hôm nay: trí nhớ",
+      "thinking": "Hôm nay: suy luận"
+    },
+    "desc_other": "{{count}} trò chơi · khoảng {{minutes}} phút",
+    "desc_one": "{{count}} trò chơi · khoảng {{minutes}} phút"
   },
   "home": {
     "freePlay": "Luyện tự do",
@@ -65,7 +75,7 @@
   "games": {
     "quickEye": {
       "name": "Nhanh mắt",
-      "desc": "Nhìn thoáng qua một hình ở giữa và một ngôi sao ở rìa, rồi cho biết đó là gì và ở đâu."
+      "desc": "Nhìn hình ở giữa và nhận ra ngay ngôi sao vừa lóe lên ở hướng nào."
     },
     "memoryGrid": {
       "name": "Ô sáng",
@@ -118,7 +128,7 @@
     "nextNumber": "Số tiếp theo là gì?",
     "correct": "Chính xác",
     "wrong": "Chưa đúng",
-    "timeUp": "Hết giờ",
+    "timeUp": "Hết giờ!",
     "timeUpForgiven": "Hết giờ · không mất cơ hội",
     "void": "Màn hình bị giật — mình hiện lại nhé",
     "points": "+{{value}}",
@@ -169,7 +179,37 @@
       "6": "Trái",
       "7": "Trên bên trái"
     },
-    "speedLevel": "Mức tốc độ {{level}}"
+    "speedLevel": "Mức tốc độ {{level}}",
+    "knob": {
+      "wider": "Giờ hãy nhìn rộng hơn",
+      "ring2": "Ra tới vòng giữa",
+      "ring3": "Ra tới vòng ngoài",
+      "crowd": "Tìm ngôi sao giữa các tam giác",
+      "moreCrowd": "Thêm nhiều tam giác",
+      "similar": "Các hình ở giữa trông giống nhau hơn",
+      "sameDiff": "Giống hay khác?"
+    },
+    "stageUp": {
+      "title": "Màn mới",
+      "stage": "Màn {{stage}}",
+      "ease": "Màn mới nên lúc đầu sẽ hiện chậm hơn một chút",
+      "continue": "Tiếp tục"
+    },
+    "gauge": "Đúng thêm {{count}} câu nữa là nhanh hơn một bậc",
+    "speedUp": "Nhanh hơn một bậc",
+    "topSpeed": "Tốc độ cao nhất",
+    "hold": "Giữ tốc độ cao nhất {{n}}/14",
+    "wasHere": "Nó ở đây",
+    "nearMiss": "Tiếc quá, ngay bên cạnh",
+    "missFast": "Lần này nhanh quá",
+    "slowerStart": "Nhanh hơn một chút",
+    "legEnd": "Hết chặng",
+    "nextGoal": "Mục tiêu tiếp theo: giữ đều quanh mức tốc độ {{level}}",
+    "landscapeHint": "Xoay ngang điện thoại hoặc dùng máy tính bảng để thấy rộng hơn",
+    "revealA11y": "Đáp án: {{center}}, ngôi sao ở {{dir}}",
+    "warmup": "Đang chuẩn bị",
+    "gauge_other": "Đúng thêm {{count}} câu nữa là nhanh hơn một bậc",
+    "gauge_one": "Đúng thêm {{count}} câu nữa là nhanh hơn một bậc"
   },
   "summary": {
     "livesOut": "Kết thúc lượt",
@@ -229,6 +269,10 @@
       "sameDiff": {
         "title": "Giống hay khác?",
         "body": "Hai hình hiện ra ở giữa. Chọn xem chúng giống hay khác nhau."
+      },
+      "clearView": {
+        "title": "Màn hình rõ hơn rồi",
+        "body": "Lớp che đã thay đổi nên vài câu đầu sẽ bắt đầu chậm hơn một chút."
       }
     },
     "oddOneOut": {

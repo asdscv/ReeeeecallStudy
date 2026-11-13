@@ -5,7 +5,7 @@
   "worry": "If you are worried about your memory, please talk to a doctor or a local health service rather than playing more games.",
   "training": {
     "title": "Today's Training",
-    "desc": "Quick Eye and 3 games · about {{minutes}} min",
+    "desc": "{{count}} games · about {{minutes}} min",
     "start": "Start today's training",
     "week": "This week {{done}}/{{goal}}",
     "weekDone": "Weekly goal reached",
@@ -13,7 +13,7 @@
     "booster": "Refresher {{done}}/{{total}}",
     "boosterNext": "Next refresher: {{date}}",
     "minutes": "{{value}} min in total",
-    "dose": "About three 20-minute sessions a week is the plan. Playing more is fine, but it earns nothing extra.",
+    "dose": "About three sessions a week is the plan — pick 5 or 20 minutes each time. Playing more is fine, but it earns nothing extra.",
     "slot": "Game {{index}}/{{total}}",
     "next": "Next game",
     "continue": "Continue",
@@ -25,7 +25,17 @@
     "kicker": "3 times a week",
     "lineup": "Today's line-up",
     "minutesShort": "{{value}} min",
-    "stopBody": "Everything so far is saved, but an unfinished session doesn't count as a completed one."
+    "stopBody": "Everything so far is saved, but an unfinished session doesn't count as a completed one.",
+    "length": "Session length",
+    "minutesSeconds": "{{m}} min {{s}} s",
+    "focus": {
+      "mixed": "A bit of everything today",
+      "speed": "Speed day",
+      "memory": "Memory day",
+      "thinking": "Thinking day"
+    },
+    "desc_one": "{{count}} game · about {{minutes}} min",
+    "desc_other": "{{count}} games · about {{minutes}} min"
   },
   "home": {
     "freePlay": "Free practice",
@@ -65,7 +75,7 @@
   "games": {
     "quickEye": {
       "name": "Quick Eye",
-      "desc": "See a centre picture and a star at the edge for a split second, then say what and where."
+      "desc": "Watch the centre shape and catch, at a glance, which way the star flashed."
     },
     "memoryGrid": {
       "name": "Flash Grid",
@@ -118,7 +128,7 @@
     "nextNumber": "What comes next?",
     "correct": "Correct",
     "wrong": "Not quite",
-    "timeUp": "Time's up",
+    "timeUp": "Time's up!",
     "timeUpForgiven": "Time's up · no chance lost",
     "void": "The screen stuttered — let's show that again",
     "points": "+{{value}}",
@@ -169,7 +179,37 @@
       "6": "Left",
       "7": "Up left"
     },
-    "speedLevel": "Speed level {{level}}"
+    "speedLevel": "Speed level {{level}}",
+    "knob": {
+      "wider": "Now look wider",
+      "ring2": "Out to the middle ring",
+      "ring3": "Out to the outer ring",
+      "crowd": "Find the star among triangles",
+      "moreCrowd": "More triangles",
+      "similar": "The centre shapes look more alike",
+      "sameDiff": "Same or different?"
+    },
+    "stageUp": {
+      "title": "New stage",
+      "stage": "Stage {{stage}}",
+      "ease": "A new stage starts a little slower",
+      "continue": "Continue"
+    },
+    "gauge": "{{count}} more right and it gets faster",
+    "speedUp": "One step faster",
+    "topSpeed": "Top speed",
+    "hold": "Hold top speed {{n}}/14",
+    "wasHere": "It was here",
+    "nearMiss": "So close, right next to it",
+    "missFast": "That one was quick",
+    "slowerStart": "A little faster now",
+    "legEnd": "End of leg",
+    "nextGoal": "Next: stay near speed level {{level}}",
+    "landscapeHint": "Turn your phone sideways or use a tablet for a wider view",
+    "revealA11y": "Answer: {{center}}, star {{dir}}",
+    "warmup": "Getting ready",
+    "gauge_one": "{{count}} more right and it gets faster",
+    "gauge_other": "{{count}} more right and it gets faster"
   },
   "summary": {
     "livesOut": "Round over",
@@ -229,6 +269,10 @@
       "sameDiff": {
         "title": "Same or different?",
         "body": "Two shapes flash in the centre. Say whether they match."
+      },
+      "clearView": {
+        "title": "A clearer screen",
+        "body": "The cover changed, so the first few start a little slower."
       }
     },
     "oddOneOut": {

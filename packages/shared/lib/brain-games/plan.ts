@@ -17,8 +17,11 @@ import {
  * times a week did better than ones that trained more (Lampit 2014, a cross-study comparison), the
  * original training ran ten sessions over five or six weeks with refreshers about 11 and 35 months
  * later (Ball 2002), and endless short gamified play is the design that showed nothing (Owen 2010).
- * So a session is bounded: Quick Eye first, then three rotating games, about 22 minutes, then an
- * end screen. Sessions under 30 minutes have weak evidence; the research page says so plainly.
+ * So a session is bounded: a varied set of games, then an end screen. The player picks 5 minutes
+ * (the default) or 20 — a product decision (2026-11-13: 20 minutes was too long to start every
+ * time, and every session looked the same). The studies ran 20-75 minute
+ * sessions and sessions under 30 minutes had weak evidence; the research page says so plainly, and
+ * nothing in the app presents either length as a studied dose.
  */
 export interface PlanSlot {
   gameId: BrainGameId
@@ -28,40 +31,102 @@ export interface PlanSlot {
   maxRounds: number
 }
 
-export const QUICK_EYE_SLOT: PlanSlot = { gameId: 'quickEye', minutes: 10, maxRounds: 4 }
-export const GAME_SLOT_MINUTES = 4
+/** The day's emphasis — a light theme so sessions do not all feel alike. */
+export type SessionFocus = 'mixed' | 'speed' | 'memory' | 'thinking'
 
-const byRole = (role: string) => BRAIN_GAMES.filter((g) => g.role === role).map((g) => g.id)
+/** Per session length: how many games, the shortest slot, and slot sizes in half-minute steps. */
+const LENGTHS = {
+  5: { counts: [2, 3, 3, 4], minSlot: 1, slowMin: 1.5 },
+  20: { counts: [3, 4, 4, 5, 5, 6], minSlot: 2.5, slowMin: 3 },
+} as const
+/** Games whose single trial is long (a whole board): they need a bigger slot to be worth starting. */
+const SLOW: readonly BrainGameId[] = ['schulte', 'pairs', 'quickEye']
+const FOCI: readonly SessionFocus[] = ['mixed', 'mixed', 'speed', 'memory', 'thinking']
+const FOCUS_SKILLS: Record<Exclude<SessionFocus, 'mixed'>, readonly string[]> = {
+  speed: ['speed', 'attention'],
+  memory: ['memory'],
+  thinking: ['reasoning', 'attention', 'speed'],
+}
+const THINKING: readonly BrainGameId[] = ['series', 'math', 'stroop']
 
-/**
- * The candidate used longest ago in Today's Training (never used = longest), ties broken by the rng.
- * Not by trial count: a fast game piles up trials four times quicker than a slow one, so counting
- * trials kept steering the session back to the same slow games.
- */
-function leastPlayed(p: BrainProgress, ids: BrainGameId[], rng: Rng): BrainGameId {
-  const recent = p.sessions.recentGames
-  const lastUse = (id: BrainGameId) => recent.lastIndexOf(id)
-  const shuffled = rng.shuffle(ids)
-  return shuffled.reduce((best, id) => (lastUse(id) < lastUse(best) ? id : best), shuffled[0])
+const skillOf = (id: BrainGameId) => BRAIN_GAMES.find((g) => g.id === id)!.skill
+
+function matchesFocus(id: BrainGameId, focus: SessionFocus): boolean {
+  if (focus === 'mixed') return false
+  if (focus === 'thinking') return THINKING.includes(id)
+  return FOCUS_SKILLS[focus].includes(skillOf(id))
+}
+
+/** Split `total` minutes over the games in half-minute steps: everyone gets a floor, the rest by random weight. */
+function splitMinutes(games: readonly BrainGameId[], total: number, minSlot: number, slowMin: number, rng: Rng): number[] {
+  const units = Math.round(total * 2)
+  const floors = games.map((id) => Math.round((SLOW.includes(id) ? slowMin : minSlot) * 2))
+  let left = units - floors.reduce((a, b) => a + b, 0)
+  const weights = games.map(() => 0.7 + rng.next() * 0.7)
+  const sum = weights.reduce((a, b) => a + b, 0)
+  const extra = weights.map((w) => Math.floor((w / sum) * left))
+  left -= extra.reduce((a, b) => a + b, 0)
+  // The last half-minutes go to the heaviest weights.
+  const order = weights.map((w, i) => ({ w, i })).sort((a, b) => b.w - a.w)
+  for (let k = 0; left > 0; k = (k + 1) % order.length, left--) extra[order[k].i]++
+  return floors.map((f, i) => (f + extra[i]) / 2)
 }
 
 /**
- * The session line-up: Quick Eye, one speed game (Odd One Out / Number Hunt — the other
- * processing-speed tasks), one memory-span or reasoning game, and a third that is a variety game
- * (Match Pairs, Color Word, Quick Math — no specific evidence) only every other session.
+ * Today's session: a different mix every time — how many games, which ones, in what order, and how
+ * the minutes are split — within the length the player picked (5 or 20 minutes).
+ *
+ * - The day's focus (mixed, speed, memory, thinking) leans the picks; mixed avoids two games of the
+ *   same kind.
+ * - Games used longest ago in Today's Training come first, so all nine keep turning up.
+ * - Quick Eye — the task closest to the studied training — is in at least every other session, at
+ *   any position, not pinned to the start.
+ * - Each game plays until its time is up (the round ends after the trial in play); slow games
+ *   (Number Hunt, Match Pairs, Quick Eye) get a slot big enough for a few boards.
  */
+export function planToday(p: BrainProgress, rng: Rng): { focus: SessionFocus; slots: PlanSlot[] } {
+  const total: 5 | 20 = p.settings.sessionMinutes === 20 ? 20 : 5
+  const shape = LENGTHS[total]
+  const focus = rng.pick(FOCI)
+  const count: number = rng.pick(shape.counts)
+  const withQuickEye = p.sessions.total % 2 === 0 || rng.chance(0.5)
+
+  const recent = p.sessions.recentGames
+  // How recently a game was used in Today's Training: 0 = not lately, up to 9 = the last game played.
+  const recency = (id: BrainGameId) => {
+    const at = recent.lastIndexOf(id)
+    return at < 0 ? 0 : Math.max(0, 10 - (recent.length - at))
+  }
+  const picked: BrainGameId[] = withQuickEye ? ['quickEye'] : []
+  const pool = rng.shuffle(BRAIN_GAMES.map((g) => g.id).filter((id) => id !== 'quickEye'))
+  while (picked.length < count) {
+    const usedSkills = new Set(picked.map(skillOf))
+    const scored = pool
+      .filter((id) => !picked.includes(id))
+      .map((id) => ({
+        id,
+        // Lower is better: used longest ago, matching the focus, a new kind of game for a mixed day.
+        score: recency(id) - (matchesFocus(id, focus) ? 6 : 0) + (focus === 'mixed' && usedSkills.has(skillOf(id)) ? 4 : 0) + rng.next() * 2,
+      }))
+      .sort((a, b) => a.score - b.score)
+    if (scored.length === 0) break
+    picked.push(scored[0].id)
+  }
+  // Too many slow boards for a short session: drop games until every slot can hold its floor.
+  const floorOf = (id: BrainGameId) => (SLOW.includes(id) ? shape.slowMin : shape.minSlot)
+  while (picked.length > 1 && picked.reduce((a, id) => a + floorOf(id), 0) > total) picked.pop()
+
+  const games = rng.shuffle(picked)
+  const minutes = splitMinutes(games, total, shape.minSlot, shape.slowMin, rng)
+  // The label says what the session turned out to be: a focus only when most of its games fit it.
+  const fits = games.filter((id) => matchesFocus(id, focus)).length
+  const shown: SessionFocus = focus !== 'mixed' && fits * 2 >= games.length ? focus : 'mixed'
+  return { focus: shown, slots: games.map((gameId, i) => ({ gameId, minutes: minutes[i], maxRounds: 6 })) }
+}
+
+/** The line-up alone (see planToday). */
 export function planTodaysSession(p: BrainProgress, rng: Rng): PlanSlot[] {
-  const speed = leastPlayed(p, byRole('speed'), rng)
-  const spanOrReasoning = [...byRole('span'), ...byRole('reasoning')]
-  const second = leastPlayed(p, spanOrReasoning, rng)
-  const thirdPool = p.sessions.total % 2 === 0 ? byRole('variety') : spanOrReasoning.filter((id) => id !== second)
-  const third = leastPlayed(p, thirdPool, rng)
-  return [
-    QUICK_EYE_SLOT,
-    { gameId: speed, minutes: GAME_SLOT_MINUTES, maxRounds: 6 },
-    { gameId: second, minutes: GAME_SLOT_MINUTES, maxRounds: 6 },
-    { gameId: third, minutes: GAME_SLOT_MINUTES, maxRounds: 6 },
-  ]
+  return planToday(p, rng).slots
 }
 
 /**

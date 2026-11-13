@@ -19,13 +19,17 @@ export interface BoardProps {
   demo?: boolean
   /** The tallest the board may be (defaults to what is left of the window). */
   maxHeight?: number
+  /** Quick Eye: the fixation is running (the ready ring closes in). */
+  ready?: boolean
+  /** Quick Eye: move on from the answer's reveal (a tap on the board, Space / Enter). */
+  onSkip?: () => void
 }
 
 export function BrainBoard(props: BoardProps) {
   const { view } = props
   if (view.kind === 'grid') return <Grid {...props} view={view} />
   if (view.kind === 'choice') return <Choice {...props} view={view} />
-  return <QuickEyeBoard view={view} onTap={props.onTap} onExposure={props.onExposure} width={props.width} theme={props.theme} demo={props.demo} maxSize={props.maxHeight} />
+  return <QuickEyeBoard view={view} onTap={props.onTap} onExposure={props.onExposure} width={props.width} demo={props.demo} maxSize={props.maxHeight} ready={props.ready} onSkip={props.onSkip} />
 }
 
 // The same gap maxColsFor() assumes, or the widest grid would overflow its board.

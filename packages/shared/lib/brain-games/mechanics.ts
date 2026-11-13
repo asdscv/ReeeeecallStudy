@@ -24,7 +24,8 @@ export interface MechanicInfo {
 }
 
 export const MECHANICS: readonly MechanicInfo[] = [
-  // Quick Eye — by stage. Ring and crowd changes are silent: the stage-up banner covers them.
+  // Quick Eye — by stage. Ring and crowd changes need no card: the stage-up interstitial between
+  // trials says what is new (useBrainRound `stageUp`).
   { tag: 'quickEye.periphery', game: 'quickEye', kind: 'rule', from: 2, copy: 'quickEye.periphery' },
   { tag: 'quickEye.distractors', game: 'quickEye', kind: 'rule', from: 5, copy: 'quickEye.distractors' },
   { tag: 'quickEye.similar', game: 'quickEye', kind: 'rule', from: 10, copy: 'quickEye.similar' },
@@ -81,6 +82,9 @@ export const MECHANICS: readonly MechanicInfo[] = [
   { tag: 'math.mul', game: 'math', kind: 'board', from: 6, copy: 'math.mul' },
   { tag: 'math.div', game: 'math', kind: 'board', from: 10, copy: 'math.div' },
   { tag: 'math.twoStep', game: 'math', kind: 'rule', from: 14, copy: 'math.twoStep' },
+  // Quick Eye's redesigned field (mid-grey, matched mask): every trial reports it. Met silently in a
+  // first practice; for a returning player, a one-time notice and a recalibrated start.
+  { tag: 'quickEye.clearView', game: 'quickEye', kind: 'board', from: 1, copy: 'quickEye.clearView' },
 ]
 
 const BY_TAG = new Map(MECHANICS.map((m, i) => [m.tag, { ...m, bit: i }]))

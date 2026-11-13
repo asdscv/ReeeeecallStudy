@@ -9,6 +9,7 @@ import {
   ACHIEVEMENTS,
   BRAIN_GAMES,
   GAME_THEMES,
+  SESSION_MINUTES,
   TRAINING_THEME,
   courseStatus,
   createRng,
@@ -17,8 +18,9 @@ import {
   gameProgress,
   hasAchievement,
   localDayKey,
-  planTodaysSession,
+  planToday,
   plannedMinutes,
+  quickEyeStage,
   researchContent,
   todaysPlanSeed,
   weekProgress,
@@ -55,13 +57,14 @@ export function BrainHomeScreen() {
   const progress = useBrainStore((s) => s.progress)
   const history = useBrainStore((s) => s.history)
   const meta = useBrainStore((s) => s.meta)
+  const setSettings = useBrainStore((s) => s.setSettings)
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   const today = localDayKey()
   const week = weekProgress(progress, today)
   const course = courseStatus(progress, today)
   // The line-up that will actually play: the same seed all day, until a session is finished.
-  const plan = planTodaysSession(progress, createRng(todaysPlanSeed(progress, today)))
+  const { focus, slots: plan } = planToday(progress, createRng(todaysPlanSeed(progress, today)))
   const minutes = plannedMinutes(plan)
   const research = researchContent(i18n.language)
   // Two cards a row on a tablet.
@@ -108,7 +111,10 @@ export function BrainHomeScreen() {
                 {t('training.title')}
               </Text>
               <Text style={styles.heroDesc} maxFontSizeMultiplier={1.5}>
-                {t('training.desc', { minutes })}
+                {t('training.desc', { minutes, count: plan.length })}
+              </Text>
+              <Text style={styles.heroFocus} maxFontSizeMultiplier={1.4} testID="brain-training-focus">
+                {t(`training.focus.${focus}`)}
               </Text>
             </View>
             <WeekRing done={week.done} goal={week.goal} size={84} label={t('training.week', { done: week.done, goal: week.goal })} />
@@ -124,6 +130,35 @@ export function BrainHomeScreen() {
                 {i < plan.length - 1 ? <View style={styles.lineupDash} /> : null}
               </View>
             ))}
+          </View>
+
+          {/* Session length: a quick 5 minutes or the full 20 — remembered on this device. */}
+          <View style={styles.lengthRow}>
+            <Text style={styles.lengthLabel} maxFontSizeMultiplier={1.4}>
+              {t('training.length')}
+            </Text>
+            <View style={styles.lengthGroup} accessibilityRole="radiogroup" accessibilityLabel={t('training.length')}>
+              {SESSION_MINUTES.map((m) => {
+                const on = progress.settings.sessionMinutes === m
+                return (
+                  <Pressable
+                    key={m}
+                    onPress={() => {
+                      haptics.tap()
+                      setSettings({ sessionMinutes: m })
+                    }}
+                    style={[styles.lengthOption, on && styles.lengthOn]}
+                    accessibilityRole="radio"
+                    accessibilityState={{ checked: on }}
+                    testID={`brain-session-${m}`}
+                  >
+                    <Text style={[styles.lengthText, { color: on ? TRAINING_THEME.cardTo : '#FFFFFF' }]} maxFontSizeMultiplier={1.3}>
+                      {t('training.minutesShort', { value: m })}
+                    </Text>
+                  </Pressable>
+                )
+              })}
+            </View>
           </View>
 
           <Pressable
@@ -227,7 +262,7 @@ export function BrainHomeScreen() {
     const p = gameProgress(progress, game.id)
     // A placement left part-way (n = 0) has no level yet — never its interim probe level.
     if (p.rounds === 0 || meta.sk[game.id]?.n === 0) return t('home.new')
-    if (game.id === 'quickEye') return t('home.quickEyeLevel', { stage: progress.quickEye.variant, speed: qeSpeedLevel(p.level) })
+    if (game.id === 'quickEye') return t('home.quickEyeLevel', { stage: quickEyeStage(progress.quickEye.variant, progress.settings.centerOnly), speed: qeSpeedLevel(p.level) })
     return t('home.level', { level: displayLevel(p.level).toFixed(1) })
   }
 }
@@ -404,6 +439,13 @@ const styles = StyleSheet.create({
     boxShadow: '0 10px 30px rgba(0,0,0,0.25)',
   },
   startText: { fontSize: 18, fontWeight: '800', flexShrink: 1 },
+  heroFocus: { marginTop: 4, color: 'rgba(255,255,255,0.78)', fontSize: 14, fontWeight: '700' },
+  lengthRow: { marginTop: 18, flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 12 },
+  lengthLabel: { color: 'rgba(255,255,255,0.85)', fontSize: 14, fontWeight: '700' },
+  lengthGroup: { flexDirection: 'row', padding: 4, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.15)' },
+  lengthOption: { minHeight: 44, minWidth: 76, paddingHorizontal: 16, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  lengthOn: { backgroundColor: '#FFFFFF' },
+  lengthText: { fontSize: 16, fontWeight: '800' },
   heroFoot: { gap: 12 },
   course: { gap: 6 },
   courseText: { color: 'rgba(255,255,255,0.92)', fontSize: 14, fontWeight: '600' },

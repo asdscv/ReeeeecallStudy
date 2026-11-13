@@ -78,7 +78,8 @@ export function useTodaysTraining() {
       const slot = s.slots[s.slotIndex]
       const rounds = s.roundsInSlot + 1
       const left = slot.minutes * 60_000 - slotActiveMs
-      if (rounds < slot.maxRounds && left > 60_000) {
+      // Another round only when it ended early (chances out) with a real stretch of the slot left.
+      if (stats.endedBy !== 'time' && rounds < slot.maxRounds && left > 45_000) {
         return { ...s, totals, activeMs, slotActiveMs, roundsInSlot: rounds, roundKey: s.roundKey + 1 }
       }
       if (s.slotIndex + 1 < s.slots.length) return { ...s, totals, activeMs, slotActiveMs, phase: 'between' }
@@ -132,6 +133,8 @@ export function useTodaysTraining() {
     roundKey: state.roundKey,
     totals: state.totals,
     plannedMinutes: plannedMinutes(state.slots),
+    /** Play time left in this game's slot — the round in play gets it as its time budget. */
+    slotBudgetMs: slot ? Math.max(15_000, slot.minutes * 60_000 - state.slotActiveMs) : undefined,
     startedAt: state.startedAt,
     /** Minutes actually played so far. */
     activeMinutes: state.activeMs / 60_000,

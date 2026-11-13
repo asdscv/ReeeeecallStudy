@@ -5,7 +5,7 @@
   "worry": "기억력이 걱정되면 게임보다 가까운 치매안심센터나 의사와 상담하세요. 만 60세 이상은 보건소(치매안심센터)에서 무료로 인지 선별검사를 받을 수 있습니다.",
   "training": {
     "title": "오늘의 훈련",
-    "desc": "빠른 눈과 게임 3가지 · 약 {{minutes}}분",
+    "desc": "게임 {{count}}가지 · 약 {{minutes}}분",
     "start": "오늘의 훈련 시작",
     "week": "이번 주 {{done}}/{{goal}}회",
     "weekDone": "이번 주 목표 달성",
@@ -13,7 +13,7 @@
     "booster": "복습 과정 {{done}}/{{total}}",
     "boosterNext": "다음 복습 과정: {{date}}",
     "minutes": "누적 {{value}}분",
-    "dose": "주 3회, 한 번에 20분쯤이 기본이에요. 더 해도 되지만 추가 보상은 없어요.",
+    "dose": "주 3회가 기본이에요. 한 번에 5분이나 20분 중에서 고를 수 있어요. 더 해도 되지만 추가 보상은 없어요.",
     "slot": "게임 {{index}}/{{total}}",
     "next": "다음 게임",
     "continue": "계속하기",
@@ -25,7 +25,17 @@
     "kicker": "주 3회 루틴",
     "lineup": "오늘의 구성",
     "minutesShort": "{{value}}분",
-    "stopBody": "지금까지의 기록은 저장되지만, 끝까지 하지 않으면 완료한 훈련으로 세지 않아요."
+    "stopBody": "지금까지의 기록은 저장되지만, 끝까지 하지 않으면 완료한 훈련으로 세지 않아요.",
+    "length": "훈련 길이",
+    "minutesSeconds": "{{m}}분 {{s}}초",
+    "focus": {
+      "mixed": "오늘은 골고루",
+      "speed": "오늘은 속도 위주",
+      "memory": "오늘은 기억 위주",
+      "thinking": "오늘은 생각 위주"
+    },
+    "desc_other": "게임 {{count}}가지 · 약 {{minutes}}분",
+    "desc_one": "게임 {{count}}가지 · 약 {{minutes}}분"
   },
   "home": {
     "freePlay": "자유 연습",
@@ -65,7 +75,7 @@
   "games": {
     "quickEye": {
       "name": "빠른 눈",
-      "desc": "가운데 그림과 가장자리 별을 아주 잠깐 보고, 무엇이 어디 있었는지 맞혀요."
+      "desc": "가운데 모양을 보면서, 주변에 잠깐 뜬 별이 어느 쪽인지 한눈에 알아차리는 연습이에요."
     },
     "memoryGrid": {
       "name": "순간 기억",
@@ -118,7 +128,7 @@
     "nextNumber": "다음에 올 수는?",
     "correct": "정답",
     "wrong": "아쉬워요",
-    "timeUp": "시간이 지났어요",
+    "timeUp": "시간 끝!",
     "timeUpForgiven": "시간이 지났어요 · 기회는 그대로",
     "void": "화면이 끊겨서 다시 보여 드릴게요",
     "points": "+{{value}}",
@@ -169,7 +179,37 @@
       "6": "왼쪽",
       "7": "왼쪽 위"
     },
-    "speedLevel": "속도 레벨 {{level}}"
+    "speedLevel": "속도 레벨 {{level}}",
+    "knob": {
+      "wider": "이번엔 더 넓게 보기",
+      "ring2": "중간 고리까지",
+      "ring3": "바깥 고리까지",
+      "crowd": "세모 사이에서 별 찾기",
+      "moreCrowd": "세모가 더 많아져요",
+      "similar": "가운데 모양이 더 닮아요",
+      "sameDiff": "같을까, 다를까"
+    },
+    "stageUp": {
+      "title": "새 단계",
+      "stage": "{{stage}}단계",
+      "ease": "새 단계라 처음엔 조금 천천히 보여 줘요",
+      "continue": "계속"
+    },
+    "gauge": "{{count}}개 더 맞히면 한 칸 빨라져요",
+    "speedUp": "한 칸 빨라졌어요",
+    "topSpeed": "최고 속도",
+    "hold": "최고 속도 지키기 {{n}}/14",
+    "wasHere": "여기 있었어요",
+    "nearMiss": "아까워요, 바로 옆이었어요",
+    "missFast": "이번엔 빨랐어요",
+    "slowerStart": "조금 더 빨라져요",
+    "legEnd": "구간 끝",
+    "nextGoal": "다음 목표: 속도 레벨 {{level}} 근처를 꾸준히",
+    "landscapeHint": "폰을 가로로 들거나 태블릿이면 더 넓게 보여요",
+    "revealA11y": "정답: {{center}}, 별은 {{dir}}",
+    "warmup": "출발 준비 중",
+    "gauge_other": "{{count}}개 더 맞히면 한 칸 빨라져요",
+    "gauge_one": "{{count}}개 더 맞히면 한 칸 빨라져요"
   },
   "summary": {
     "livesOut": "라운드 끝",
@@ -229,6 +269,10 @@
       "sameDiff": {
         "title": "같아요? 달라요?",
         "body": "가운데에 그림이 두 개 떠요. 두 그림이 같은지 다른지 고르세요."
+      },
+      "clearView": {
+        "title": "화면이 또렷해졌어요",
+        "body": "가림막이 바뀌어서 처음 몇 문제는 조금 천천히 시작해요."
       }
     },
     "oddOneOut": {

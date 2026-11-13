@@ -188,12 +188,18 @@ function gameWinner(a: GameProgress | undefined, b: GameProgress | undefined): S
 /**
  * Quick Eye's variant ladder and its game record travel together (opening a variant eases the level
  * back, so the pair must not be split). Higher variant first — picking by trials alone could drop a
- * player from variant 6 back to 5 — then more trials.
+ * player from variant 6 back to 5 — then more trials. Variants 1 and 2 rank together: 2 is where
+ * every record starts (an empty one too) and 1 only where a slow first placement sends a player,
+ * so a fresh device's untouched variant 2 must not undo that placement — the side that played decides.
  */
 function quickEyeSide(local: BrainProgress, remote: BrainProgress): Side {
-  if (local.quickEye.variant !== remote.quickEye.variant) return local.quickEye.variant > remote.quickEye.variant ? 'local' : 'remote'
+  const rank = (v: number) => Math.max(2, v)
+  const [lv, rv] = [rank(local.quickEye.variant), rank(remote.quickEye.variant)]
+  if (lv !== rv) return lv > rv ? 'local' : 'remote'
   const a = local.games.quickEye
   const b = remote.games.quickEye
+  // Neither has played: the same answer on both devices, never "keep mine" on each.
+  if (!a && !b && local.quickEye.variant !== remote.quickEye.variant) return local.quickEye.variant > remote.quickEye.variant ? 'local' : 'remote'
   if (a && b && a.rounds === b.rounds && a.level === b.level) return tieSide({ a, q: local.quickEye }, { a: b, q: remote.quickEye })
   return gameWinner(a, b)
 }

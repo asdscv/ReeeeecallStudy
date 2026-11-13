@@ -5,7 +5,7 @@
   "worry": "如果担心自己的记忆力，与其多玩游戏，不如咨询医生或当地的医疗卫生服务机构。",
   "training": {
     "title": "今日训练",
-    "desc": "快眼和3个游戏 · 约{{minutes}}分钟",
+    "desc": "{{count}}个游戏 · 约{{minutes}}分钟",
     "start": "开始今日训练",
     "week": "本周 {{done}}/{{goal}}次",
     "weekDone": "已达成本周目标",
@@ -13,7 +13,7 @@
     "booster": "复习课程 {{done}}/{{total}}",
     "boosterNext": "下次复习课程: {{date}}",
     "minutes": "累计 {{value}} 分钟",
-    "dose": "计划是每周约3次、每次20分钟左右。多玩也没关系，但不会有额外奖励。",
+    "dose": "计划是每周约3次，每次可选5分钟或20分钟。多玩也没关系，但不会有额外奖励。",
     "slot": "游戏 {{index}}/{{total}}",
     "next": "下一个游戏",
     "continue": "继续",
@@ -25,7 +25,17 @@
     "kicker": "每周 3 次",
     "lineup": "今日安排",
     "minutesShort": "{{value}} 分钟",
-    "stopBody": "到目前为止的记录已保存，但没有完成的训练不算作完成一次。"
+    "stopBody": "到目前为止的记录已保存，但没有完成的训练不算作完成一次。",
+    "length": "训练时长",
+    "minutesSeconds": "{{m}}分{{s}}秒",
+    "focus": {
+      "mixed": "今天样样都练",
+      "speed": "今天以速度为主",
+      "memory": "今天以记忆为主",
+      "thinking": "今天以思考为主"
+    },
+    "desc_other": "{{count}}个游戏 · 约{{minutes}}分钟",
+    "desc_one": "{{count}}个游戏 · 约{{minutes}}分钟"
   },
   "home": {
     "freePlay": "自由练习",
@@ -65,7 +75,7 @@
   "games": {
     "quickEye": {
       "name": "快眼",
-      "desc": "中间的图案和边缘的星星只出现一瞬间，看完后说出是什么、在哪里。"
+      "desc": "盯住中间的形状，一眼看出周围闪现的星星在哪个方向。"
     },
     "memoryGrid": {
       "name": "瞬间记忆",
@@ -118,7 +128,7 @@
     "nextNumber": "下一个数是？",
     "correct": "正确",
     "wrong": "差一点",
-    "timeUp": "时间到",
+    "timeUp": "时间到！",
     "timeUpForgiven": "时间到 · 不扣机会",
     "void": "画面卡了一下，再显示一次",
     "points": "+{{value}}",
@@ -169,7 +179,37 @@
       "6": "左",
       "7": "左上"
     },
-    "speedLevel": "速度等级 {{level}}"
+    "speedLevel": "速度等级 {{level}}",
+    "knob": {
+      "wider": "这次看得更宽一些",
+      "ring2": "扩大到中间一圈",
+      "ring3": "扩大到最外圈",
+      "crowd": "在三角形中找星星",
+      "moreCrowd": "三角形变多了",
+      "similar": "中间的形状更像了",
+      "sameDiff": "一样还是不一样？"
+    },
+    "stageUp": {
+      "title": "新阶段",
+      "stage": "第{{stage}}阶段",
+      "ease": "新阶段开始时会稍微慢一点",
+      "continue": "继续"
+    },
+    "gauge": "再答对{{count}}题就快一档",
+    "speedUp": "快了一档",
+    "topSpeed": "最高速度",
+    "hold": "保持最高速度 {{n}}/14",
+    "wasHere": "就在这里",
+    "nearMiss": "好可惜，就在旁边",
+    "missFast": "这次太快了",
+    "slowerStart": "稍微快一点了",
+    "legEnd": "本段结束",
+    "nextGoal": "下一个目标：稳定在速度等级{{level}}左右",
+    "landscapeHint": "把手机横过来，或用平板，看得更宽",
+    "revealA11y": "答案：{{center}}，星星在{{dir}}",
+    "warmup": "准备出发",
+    "gauge_other": "再答对{{count}}题就快一档",
+    "gauge_one": "再答对{{count}}题就快一档"
   },
   "summary": {
     "livesOut": "本轮结束",
@@ -229,6 +269,10 @@
       "sameDiff": {
         "title": "相同还是不同？",
         "body": "中央会出现两个图形。选出它们是否相同。"
+      },
+      "clearView": {
+        "title": "画面更清晰了",
+        "body": "遮挡图案换了，所以前几题会稍慢一点开始。"
       }
     },
     "oddOneOut": {

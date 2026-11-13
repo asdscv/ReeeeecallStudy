@@ -68,7 +68,7 @@ function Training() {
   )
 
   if (s.phase === 'playing' && stage === 'lineup') {
-    return <Lineup games={games} minutes={s.plannedMinutes} onStart={() => setStage('intro')} onClose={() => navigate('/brain')} />
+    return <Lineup games={games} slotMinutes={s.slots.map((slot) => slot.minutes)} minutes={s.plannedMinutes} onStart={() => setStage('intro')} onClose={() => navigate('/brain')} />
   }
   if (s.phase === 'playing' && stage === 'intro') {
     return (
@@ -85,6 +85,7 @@ function Training() {
         gameId={s.slot.gameId}
         caption={`${t('training.title')} · ${t('training.slot', { index: s.slotIndex + 1, total: s.slots.length })}`}
         onOver={onOver}
+        timeBudgetMs={s.slotBudgetMs}
       />
     )
   }
@@ -110,7 +111,7 @@ function Training() {
 type PlacedLevels = Partial<Record<BrainGameId, number | null>>
 
 /** The session's line-up before it starts: four games, about how long, one start. */
-function Lineup({ games, minutes, onStart, onClose }: { games: BrainGameId[]; minutes: number; onStart: () => void; onClose: () => void }) {
+function Lineup({ games, slotMinutes, minutes, onStart, onClose }: { games: BrainGameId[]; slotMinutes: number[]; minutes: number; onStart: () => void; onClose: () => void }) {
   const { t } = useTranslation('brain')
   const progress = useBrainStore((st) => st.progress)
   const week = weekProgress(progress, localDayKey())
@@ -128,7 +129,7 @@ function Lineup({ games, minutes, onStart, onClose }: { games: BrainGameId[]; mi
         <section className="bfx-rise flex items-center justify-between gap-4 pt-4">
           <div>
             <h1 className="text-4xl font-extrabold tracking-tight">{t('training.title')}</h1>
-            <p className="mt-2 text-lg text-white/80">{t('training.desc', { minutes })}</p>
+            <p className="mt-2 text-lg text-white/80">{t('training.desc', { minutes, count: games.length })}</p>
           </div>
           <WeekRing done={week.done} goal={week.goal} label={t('training.week', { done: week.done, goal: week.goal })} color={TRAINING_THEME.accent} />
         </section>
@@ -147,7 +148,7 @@ function Lineup({ games, minutes, onStart, onClose }: { games: BrainGameId[]; mi
                 </span>
                 <span className="flex items-center gap-1 text-sm text-white/75 shrink-0">
                   <Clock className="w-4 h-4" aria-hidden="true" />
-                  {t('training.minutesShort', { value: i === 0 ? 10 : 4 })}
+                  {slotMinutes[i] % 1 ? t('training.minutesSeconds', { m: Math.floor(slotMinutes[i]), s: Math.round((slotMinutes[i] % 1) * 60) }) : t('training.minutesShort', { value: slotMinutes[i] })}
                 </span>
               </li>
             )

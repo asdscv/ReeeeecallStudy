@@ -4,7 +4,7 @@ import Animated from 'react-native-reanimated'
 import { Feather } from '@expo/vector-icons'
 import { useTranslation } from 'react-i18next'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
-import { GAME_THEMES, displayLevel, gameProgress, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
+import { GAME_THEMES, displayLevel, gameProgress, quickEyeStage, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
 import { CanvasButton, GameCanvas, GradientFill, StatTile } from './GameCanvas'
 import { DemoPlayer } from './DemoPlayer'
@@ -113,7 +113,9 @@ export function GameIntro({
               <Text style={styles.kicker} accessibilityRole="header" maxFontSizeMultiplier={1.4}>
                 {t('intro.howTo')}
               </Text>
-              {width !== null ? <DemoPlayer gameId={gameId} width={width} centerOnly={progress.settings.centerOnly} /> : null}
+              {width !== null ? (
+                <DemoPlayer gameId={gameId} width={width} centerOnly={progress.settings.centerOnly} variant={qe ? progress.quickEye.variant : undefined} />
+              ) : null}
             </View>
 
             <View style={styles.stats}>
@@ -126,10 +128,18 @@ export function GameIntro({
                 accent={theme.accent}
                 center
               />
-              <StatTile icon="layers" label={qe ? t('intro.stage') : t('intro.rounds')} value={qe ? formatCount(progress.quickEye.variant) : formatCount(p.rounds)} accent={theme.accent} center />
+              {/* Quick Eye's stage as the round's header shows it (on the centre-only setting, the centre task's). */}
+              <StatTile
+                icon="layers"
+                label={qe ? t('intro.stage') : t('intro.rounds')}
+                value={qe ? formatCount(quickEyeStage(progress.quickEye.variant, progress.settings.centerOnly)) : formatCount(p.rounds)}
+                accent={theme.accent}
+                center
+              />
               <StatTile icon="award" label={t('intro.best')} value={best ? formatCount(best) : '—'} accent={theme.accent} center />
             </View>
 
+            {/* No "turn your phone sideways" line for Quick Eye, unlike the web: the app is portrait-only. */}
             {firstTime || placementNote || welcomeBack ? (
               <View style={styles.notes}>
                 {firstTime ? <Note icon="edit-3" text={t('intro.practiceNote')} /> : null}

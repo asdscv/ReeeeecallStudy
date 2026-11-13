@@ -8,14 +8,20 @@ import type { BrainRound } from './useBrainRound'
  *
  * Derived from the round's own state (its view and result), never from the tap handler: a tap
  * that the engine ignores makes no sound, and a timeout sounds like a miss.
+ *
+ * Quick Eye's measured frames stay clean: while the stimulus and the mask are up the only event is
+ * 'stimulus' (silent, never felt), and 'fixation' — the ready cue — comes once as each fixation
+ * starts running, 500ms before the flash.
  */
 export type BrainFx =
   /** A memorise phase lit its cells (memory grid) or a pairs preview turned up. */
   | { kind: 'reveal' }
   /** One tile of a sequence lit, `index` in the order shown (Simon-style tone per cell). */
   | { kind: 'flash'; cell: number; index: number }
-  /** Quick Eye's stimulus is on screen. */
+  /** Quick Eye's stimulus is on screen. Never sounded or felt. */
   | { kind: 'stimulus' }
+  /** Quick Eye's fixation started running (a new trial, or again after a pause): the ready cue. Not in the demo. */
+  | { kind: 'fixation' }
   /** A right tap inside a multi-tap trial; `step` counts them, for a rising pitch. */
   | { kind: 'hit'; cell: number; step: number }
   /** A wrong tap inside a trial (Number Hunt costs a life for it). */
@@ -26,10 +32,14 @@ export type BrainFx =
   | { kind: 'select' }
   | { kind: 'correct'; streak: number; points: number; practice: boolean }
   | { kind: 'wrong'; timedOut: boolean; practice: boolean }
+  /** Quick Eye: a miss whose direction was one off the star's — sent INSTEAD of 'wrong' ("so close"). */
+  | { kind: 'nearMiss'; practice: boolean }
+  /** Quick Eye: a stage reached (the interstitial opens). `stage` as shown. */
+  | { kind: 'stageUp'; stage: number; variant: number }
   | { kind: 'lifeLost'; left: number }
   | { kind: 'levelUp'; level: number }
   | { kind: 'void' }
-  | { kind: 'roundEnd'; reason: 'lives' | 'cap' | 'stop' | 'void' | null }
+  | { kind: 'roundEnd'; reason: 'lives' | 'cap' | 'stop' | 'void' | 'time' | null }
   | { kind: 'newBest' }
 
 const HIT_TONES: readonly CellTone[] = ['correct', 'done', 'matched']
@@ -39,7 +49,7 @@ export function useBrainFx(r: BrainRound, onFx: (fx: BrainFx) => void) {
   useEffect(() => {
     emit.current = onFx
   })
-  const prev = useRef<{ trialId: number; tones: CellTone[]; phase: string | null; hits: number; flashes: number; lives: number | null; slips: number | null }>({
+  const prev = useRef<{ trialId: number; tones: CellTone[]; phase: string | null; hits: number; flashes: number; lives: number | null; slips: number | null; fixating: boolean }>({
     trialId: -1,
     tones: [],
     phase: null,
@@ -47,6 +57,7 @@ export function useBrainFx(r: BrainRound, onFx: (fx: BrainFx) => void) {
     flashes: 0,
     lives: null,
     slips: null,
+    fixating: false,
   })
 
   // Inside a trial: what the board did since the last render.
@@ -55,7 +66,7 @@ export function useBrainFx(r: BrainRound, onFx: (fx: BrainFx) => void) {
     const p = prev.current
     const fresh = p.trialId !== r.trialId
     if (fresh) {
-      prev.current = { trialId: r.trialId, tones: [], phase: null, hits: 0, flashes: 0, lives: null, slips: null }
+      prev.current = { trialId: r.trialId, tones: [], phase: null, hits: 0, flashes: 0, lives: null, slips: null, fixating: false }
     }
     const cur = prev.current
     if (view.kind === 'grid') {
@@ -102,6 +113,10 @@ export function useBrainFx(r: BrainRound, onFx: (fx: BrainFx) => void) {
       }
       cur.lives = lives
     } else if (view.kind === 'quickEye') {
+      // The fixation counts from when it runs (not under a rule card, a stage-up or a pause).
+      const fixating = r.quiet && view.phase === 'fixation'
+      if (fixating && !cur.fixating) emit.current({ kind: 'fixation' })
+      cur.fixating = fixating
       if (view.phase !== cur.phase) {
         if (view.phase === 'stimulus') emit.current({ kind: 'stimulus' })
         if (view.phase === 'answerLocation') emit.current({ kind: 'select' })
@@ -109,7 +124,7 @@ export function useBrainFx(r: BrainRound, onFx: (fx: BrainFx) => void) {
       cur.phase = view.phase
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [r.view, r.trialId])
+  }, [r.view, r.trialId, r.quiet])
 
   // The trial's verdict.
   const lastResult = useRef<unknown>(null)
@@ -119,6 +134,7 @@ export function useBrainFx(r: BrainRound, onFx: (fx: BrainFx) => void) {
     lastResult.current = res
     if (res.void) return emit.current({ kind: 'void' })
     if (res.correct) emit.current({ kind: 'correct', streak: r.stats.streak, points: res.points, practice: res.practice })
+    else if (r.view.kind === 'quickEye' && r.view.nearMiss) emit.current({ kind: 'nearMiss', practice: res.practice })
     else emit.current({ kind: 'wrong', timedOut: res.timedOut, practice: res.practice })
     if (res.livesLost > 0 && r.gameId !== 'schulte') emit.current({ kind: 'lifeLost', left: r.lives })
     // Whole steps only: the staircase moves in tenths, and a fanfare every tenth would be noise.
@@ -131,6 +147,15 @@ export function useBrainFx(r: BrainRound, onFx: (fx: BrainFx) => void) {
     if (!res.practice && res.kind !== 'placement' && up) emit.current({ kind: 'levelUp', level: Math.floor(res.levelAfter + 1e-9) })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [r.result])
+
+  // A Quick Eye stage reached: once per interstitial.
+  const stageUpId = useRef<number | null>(null)
+  useEffect(() => {
+    const up = r.stageUp
+    if (!up || up.id === stageUpId.current) return
+    stageUpId.current = up.id
+    emit.current({ kind: 'stageUp', stage: up.to, variant: up.variant })
+  }, [r.stageUp])
 
   const ended = useRef(false)
   useEffect(() => {

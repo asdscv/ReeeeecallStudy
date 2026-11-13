@@ -38,6 +38,8 @@ export interface BoardProps {
   demo?: boolean
   /** The round is paused (Quick Eye stops counting frames). */
   paused?: boolean
+  /** Quick Eye: a tap on the field during the answer's reveal (on with the next trial). */
+  onSkipReveal?: () => void
   /** Demo only: each tap target's view, by the index a tap on it sends. */
   registerTarget?: (index: number, node: RNView | null) => void
 }
@@ -51,6 +53,7 @@ export function BrainBoard(props: BoardProps) {
       view={view}
       onTap={props.onTap}
       onExposure={props.onExposure}
+      onSkipReveal={props.onSkipReveal}
       width={props.width}
       height={props.height}
       theme={props.theme}

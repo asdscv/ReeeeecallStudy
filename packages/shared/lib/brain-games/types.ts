@@ -15,8 +15,8 @@ export type BrainSkill = 'memory' | 'attention' | 'speed' | 'reasoning'
 
 /**
  * Which adaptive rule a game follows (see rules.ts). The groups exist because the research behind
- * them differs: Quick Eye is a speed-of-processing task tracked at 80% correct with five misses
- * allowed, span tasks follow the standard Corsi stop rule, and everything else tracks 85%.
+ * them differs: Quick Eye is a speed-of-processing task tracked at 80% correct in 20-trial legs with
+ * no lives, span tasks follow the standard Corsi stop rule, and everything else tracks 85%.
  */
 export type GameGroup = 'quickEye' | 'span' | 'speed'
 
@@ -86,6 +86,12 @@ export interface FieldSlot {
 }
 
 /**
+ * Quick Eye's stage groups (games/quick-eye.ts QE_PLACES): which tint the field takes and which
+ * colour the reveal uses. Internal ids — never shown as names.
+ */
+export type QePlaceId = 'dock' | 'shore' | 'pines' | 'tea' | 'lake'
+
+/**
  * Quick Eye — a briefly flashed display, answered afterwards.
  *
  * The platform owns the exposure: in `stimulus` it shows everything for `exposureMs`, counted in
@@ -94,6 +100,10 @@ export interface FieldSlot {
 export interface QuickEyeView {
   kind: 'quickEye'
   phase: 'fixation' | 'stimulus' | 'mask' | 'answerCenter' | 'answerLocation' | 'done'
+  /** The variant this trial was built on (practice: 1). */
+  variant: number
+  /** The stage group, for the field tint and the reveal colour (QE_FIELD_TINT, QE_REVEAL_ART). */
+  place: QePlaceId
   prompt: PromptView
   exposureMs: number
   /** Shape ids (see shapePair) shown in the centre box: one, or two for same/different. */
@@ -112,6 +122,10 @@ export interface QuickEyeView {
   correctCenter?: number
   pickedDirection?: number
   correctDirection?: number
+  /** Done: the picked direction was one off the target's (around the circle) — "right next to it". Display only. */
+  nearMiss?: boolean
+  /** Done: the trial did not count (dropped frames, a stalled screen) — no reveal, it is replaced. */
+  void?: boolean
 }
 
 export type RoundView = GridView | ChoiceView | QuickEyeView

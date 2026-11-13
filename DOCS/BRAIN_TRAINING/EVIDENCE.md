@@ -126,7 +126,7 @@ ReeeeecallStudy: web React, Expo iOS/Android, 8개 로케일
 - 사다리는 **ms로 정의**하고 실행할 때 프레임 수 = round(ms / 측정한 프레임 길이)로 바꾼다. 최소는 1프레임이다. 120Hz 기기에서도 ms 바닥 17ms를 지킨다.
 - 레벨 L은 0~12 사이 연속값이고, 표시할 때 반올림한다.
 
-**계단 폭** (가중 상하법, 목표 정답률 80%. 목숨 모드라서 ACTIVE의 75%보다 높였다. §4 참고)
+**계단 폭** (가중 상하법, 목표 정답률 80%. 목숨 모드라서 ACTIVE의 75%보다 높였다. §4 참고. 2026-11-13부터 빠른 눈은 목숨이 없고 80%는 [제품 결정]으로 유지한다 — §4.2 주석)
 - 정답이면 L += 0.25, 오답이면 L −= 1.0. 비율 1:4라서 수렴점은 80%다 [Kaernbach 1991].
 - 초기 단계: 그 변형의 첫 8시행 또는 반전 2회까지는 두 폭을 모두 2배로 한다(+0.5 / −2.0). 비율은 그대로 유지된다.
 - 첫 세션은 L=0(500ms)에서 시작한다. 이후 세션은 직전에 수렴한 L에서 1.0을 뺀 값으로 시작한다. 최고 기록이 아니라 수렴값 기준이다.
@@ -146,6 +146,13 @@ ReeeeecallStudy: web React, Expo iOS/Android, 8개 로케일
 - 넘어가면 L = max(0, 수렴값 − 3)으로 되돌린다. 약 2~3칸 쉬운 노출 시간에서 다시 시작한다는 뜻이다.
 - 같은 변형에 4세션 넘게 머물러도 강제로 올리지 않는다. 안에서 노출 시간 적응이 계속 돌기 때문이다.
 - 출시 후 사용자 중앙값이 1~2세션에 변형 1개씩 넘어가도록 기준값을 조정한다.
+- **[제품 결정 개정 2026-11-13 — 빠른 눈 재설계, `QUICK_EYE_REDESIGN.md`]** 위 기준과 시작점은 다음으로 바뀌었다(#33·#36 주석).
+  - 기준(`QUICK_EYE_BARS_MS`): V1 ≤ 100ms, V2 ≤ 167ms, V3–4 ≤ 200ms, V5–9 ≤ 250ms, V10 이상 ≤ 300ms. 중간 회색 판·평균 밝기 마스크로 같은 노출이 더 어려워져서 완화했다.
+  - 진급 경로 둘: (a) 반전점 6개 이상의 역치 ≤ 기준 + 최근 16시행 75% 이상, (b) «충분한 증거» — 최근 유효 16시행이 모두 기준 이하 노출이고 14개 이상 정답(역치는 그 16시행 노출의 기하평균). (b)는 플랫폼 바닥(33ms)에서 반전이 생기지 않아 진급이 막히던 문제를 푼다.
+  - 시작점: 새 기록은 V2부터. V1은 연습 시행(500→400→333→267ms)으로만 쓰고, 첫 배치(6–10시행, 267ms에서 시작)가 레벨 0.5 이하·별 위치 정답률 50% 미만이면 발표 없이 V1 경로로 내린다. 가운데만 설정은 V1 그대로.
+  - 판 휘도 0.185(장소 색조만 다름)·잉크 `#F3F0E8`·마스크 평균을 그 시행 자극 화면 평균에 맞춘다(Michelson 0.40). 준비 신호(fixation 시작의 고리·소리·진동)는 경계(alerting) 요소라 역치가 조금 낮게 나올 수 있다 — 매 시행 같아 계단 비교는 유지되고, 소리·진동 설정으로 끌 수 있다.
+  - 피드백은 600ms ✓/✗ 대신 공개 화면(정답 1000 / 절반 1400 / 오답 1600ms, 500ms 뒤부터 넘기기). 무효 시행은 500ms 뒤 다시 낸다 — 어느 경우든 다음 자극까지 1초 이상(1번 7항).
+  - 새 규칙 소개 시행 4개의 노출은 L−3, L−2, L−1, L(0 이상). 점수는 정답 1개당 `10 + 10·L + 40·(변형−1)` × 연속 배율(반응 시간 무관).
 
 **타이밍 구현**
 - **웹**
@@ -213,6 +220,7 @@ ReeeeecallStudy: web React, Expo iOS/Android, 8개 로케일
 | 기억 범위 게임 (Sequence, Flash Grid) | **길이마다 기회 2번** (하트 2개, 길이가 바뀌면 다시 채움) | 둘 중 하나라도 맞으면 길이 +1. 같은 길이에서 2번 다 틀리면 라운드 끝 | 없음 | 표준 Corsi 중단 규칙 [Kessels 2000] |
 
 - 초기 단계는 라운드 첫 8시행이다. 이때 두 폭을 모두 2배로 하고 비율은 유지한다.
+- **[제품 결정 개정 2026-11-13]** 빠른 눈은 목숨 없이 본 문제 20개짜리 구간으로 바뀌었다(`GROUP_RULES.quickEye.lives = 0`, 상한 20). 구간은 상한·오늘의 훈련 시간 예산·사용자 중지·무효 연속으로만 끝난다. 위 표의 «목숨 5개 / 30시행»은 #44 A/B용 설정값으로만 남기고 효과 주장의 근거로 쓰지 않는다. 80% 목표는 목숨 때문이 아니라 [제품 결정]으로 유지한다(#41 주석).
 - 기억 범위 게임 다음 라운드는 max(2, 최고 통과 길이 − 2)에서 시작한다.
 - Corsi 중단 규칙은 표준 실시 절차일 뿐, 목숨 규칙으로 "검증"된 것은 아니다. 연구마다 중단 규칙이 다르다(정정 사항 반영).
 
@@ -559,7 +567,7 @@ HR 0.75나 "치매 위험 n% 감소" 같은 수치는 어떤 경우에도 게시
     - Change: 「세션 시작 때 rAF 간격 60개의 중앙값으로 화면 주사율을 잰다.」
     - To: 「rAF 간격을 매 시행 직전 20개로 다시 재고, 바뀌면 프레임 수를 다시 계산한다. RN은 고정 주사율을 요청한다(iOS CADisplayLink preferredFrameRateRange, Android Surface.setFrameRate). 웹 바닥도 33ms로 시작하고, 포토다이오드나 고속 촬영으로 확인한 브라우저·기기 조합에서만 17ms를 허용한다 [제품 결정]」
 
-36. **(e) Advancement thresholds would trap most older users.** Older-adult UFOV norms for divided and selective attention (subtests 2–3) run roughly 100–350 ms (Edwards 2006 Arch Clin Neuropsychol 21:275-286; original to be checked). Requiring ≤100ms with 47 distractors would leave most 60+ users stuck at V5–V7 for good.
+36. **(e) Advancement thresholds would trap most older users.** [2026-11-13: bars now 100/167/200/250/300ms by variant, plus an evidence path (16 valid trials all at or under the bar, ≥14 right) — §2.3 note.] Older-adult UFOV norms for divided and selective attention (subtests 2–3) run roughly 100–350 ms (Edwards 2006 Arch Clin Neuropsychol 21:275-286; original to be checked). Requiring ≤100ms with 47 distractors would leave most 60+ users stuck at V5–V7 for good.
     - Change: 「역치 추정값이 V1에서는 ≤ 50ms, V2~V18에서는 ≤ 100ms이고」
     - To: 「역치 추정값이 V1 ≤ 50ms, V2–V4 ≤ 100ms, V5–V9 ≤ 200ms, V10–V18 ≤ 250ms이고 [제품 결정. UFOV 노인 규준을 참고했고, 출시 후 중앙값으로 조정]」
 
@@ -577,7 +585,7 @@ HR 0.75나 "치매 위험 n% 감소" 같은 수치는 어떤 경우에도 게시
 
 40. **(d/e) The spec does not say how lives interact with the time-boxed slots in 「오늘의 훈련」.** Add to §3/§4.1: 「게임 슬롯은 시간 기준(3~4분). 목숨으로 라운드가 끝나면 남은 시간에 새 라운드를 시작하고, 1분 미만이면 다음 게임으로 넘어간다. 빠른 눈은 최대 4라운드 또는 10분 중 먼저 오는 쪽」.
 
-41. **(a) Mark the 80% target as a product decision.**
+41. **(a) Mark the 80% target as a product decision.** [2026-11-13: Quick Eye no longer has lives — the 80% target stays as a product decision for continuity, not because of round length. See §4.2 note.]
     - Change: 「목표 정답률 80%. 목숨 모드라서 ACTIVE의 75%보다 높였다.」
     - To: 「목표 정답률 80% [제품 결정: ACTIVE·IHAMS·UFOV는 75%였다. 목숨 모드의 라운드 길이 때문에 올렸고, 원 프로토콜에서 벗어나는 지점이다]」
 

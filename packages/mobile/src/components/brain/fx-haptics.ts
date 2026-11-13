@@ -1,6 +1,7 @@
 import { Platform } from 'react-native'
 import * as Haptics from 'expo-haptics'
 import type { BrainFx } from '@reeeeecall/shared/hooks/useBrainFx'
+import type { BrainGameId } from '@reeeeecall/shared/lib/brain-games'
 import { areHapticsEnabled } from '../../utils/haptics'
 
 /**
@@ -13,13 +14,19 @@ import { areHapticsEnabled } from '../../utils/haptics'
  *   the system's touch feedback is off (the app has no sound, so a verdict must always be felt).
  * - Events of one moment are felt as one buzz, the strongest: a wrong answer that also costs a life
  *   is one Reject, not two. The tap that finishes a trial plays only the verdict, never its hit.
- * - Nothing buzzes for Quick Eye's flash or a Sequence playback: a buzz would blur the stimulus or
- *   tell the hand when to look.
+ * - Nothing buzzes for Quick Eye's flash, its mask or a Sequence playback: a buzz would blur the
+ *   stimulus or tell the hand when to look. The engine sends only the silent 'stimulus' event while
+ *   Quick Eye's display is measured; every other buzz is played within a tick of its event, so none
+ *   can land in those frames.
+ * - Quick Eye: its ready cue (the fixation starting, 500ms before the flash) is one light tick — the
+ *   same every trial, so it says "now" without saying where; a stage reached is a success. A near
+ *   miss and a faster step are not felt: the near miss is shown ("right next to it") rather than
+ *   buzzed as a wrong, and a step comes every few answers — a buzz that often is noise.
  * - Buzzes keep ≥80ms apart; the notification-type ones (success, warning, error) ≥400ms.
  */
-type Kind = 'hit' | 'flip' | 'tick' | 'go' | 'correct' | 'miss' | 'wrong' | 'lifeLost' | 'success'
+type Kind = 'hit' | 'flip' | 'tick' | 'ready' | 'go' | 'correct' | 'miss' | 'wrong' | 'lifeLost' | 'success'
 
-const RANK: Record<Kind, number> = { hit: 1, flip: 1, tick: 1, go: 2, correct: 3, miss: 3, wrong: 4, success: 4, lifeLost: 5 }
+const RANK: Record<Kind, number> = { hit: 1, flip: 1, tick: 1, ready: 1, go: 2, correct: 3, miss: 3, wrong: 4, success: 4, lifeLost: 5 }
 /** The kinds iOS plays as a notification pattern (and Android as Confirm / Reject). */
 const NOTIFICATION = new Set<Kind>(['miss', 'wrong', 'lifeLost', 'success'])
 /** A verdict ends a trial; a hit inside the same moment is dropped. */
@@ -33,6 +40,7 @@ const IOS: Record<Kind, () => Promise<void>> = {
   hit: () => Haptics.selectionAsync(),
   flip: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft),
   tick: () => Haptics.selectionAsync(),
+  ready: () => Haptics.selectionAsync(),
   go: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium),
   correct: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
   miss: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning),
@@ -45,6 +53,7 @@ const ANDROID: Partial<Record<Kind, Haptics.AndroidHaptics>> = {
   hit: Haptics.AndroidHaptics.Virtual_Key,
   flip: Haptics.AndroidHaptics.Segment_Tick,
   tick: Haptics.AndroidHaptics.Clock_Tick,
+  ready: Haptics.AndroidHaptics.Clock_Tick,
 }
 
 let pending: Kind | null = null
@@ -101,7 +110,7 @@ function buzz(kind: Kind) {
   }
 }
 
-export function brainHaptic(fx: BrainFx) {
+export function brainHaptic(fx: BrainFx, game?: BrainGameId) {
   switch (fx.kind) {
     case 'hit':
     case 'select':
@@ -116,11 +125,17 @@ export function brainHaptic(fx: BrainFx) {
       return buzz('miss')
     case 'lifeLost':
       return buzz('lifeLost')
+    case 'fixation':
+      return buzz('ready')
+    case 'stageUp':
+      return buzz('success')
     case 'levelUp':
+      // Quick Eye's flash gets one step shorter every few right answers: not a moment to celebrate.
+      return game === 'quickEye' ? undefined : buzz('success')
     case 'newBest':
       return buzz('success')
     default:
-      // reveal, flash, stimulus, void, roundEnd: nothing to feel.
+      // reveal, flash, stimulus, nearMiss, void, roundEnd: nothing to feel.
       return
   }
 }

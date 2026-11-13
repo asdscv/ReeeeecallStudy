@@ -16,6 +16,8 @@ export interface GameProgress {
 /**
  * Quick Eye's progression state: its variant and the last 24 valid trials. The threshold in ms is
  * kept for the advancement rule only — it is never shown (a ms threshold reads as an assessment).
+ * Every record starts at variant 2 (centre plus periphery); variant 1 is practice, the centre-only
+ * setting, and a slow first placement's path (useBrainRound).
  */
 export interface QuickEyeProgress {
   variant: number
@@ -45,12 +47,18 @@ export interface SessionLog {
   recentGames: BrainGameId[]
 }
 
+/** Today's Training length the player picked: a quick 5 minutes (the default) or the full 20. */
+export type SessionMinutes = 5 | 20
+export const SESSION_MINUTES: readonly SessionMinutes[] = [5, 20]
+
 export interface BrainSettings {
   timing: TimingMode
   /** Quick Eye without the periphery — for players with a visual-field loss. */
   centerOnly: boolean
   /** Game sounds (web). On by default; mobile uses the app's vibration setting instead. */
   sound: boolean
+  /** Today's Training length. Per device, like every setting. */
+  sessionMinutes: SessionMinutes
 }
 
 export interface BrainProgress {
@@ -68,6 +76,13 @@ export interface BrainProgress {
   /** Games whose practice round has been played. */
   practiced: BrainGameId[]
   quickEye: QuickEyeProgress
+  /**
+   * Which Quick Eye field the record was played on: 2 = the mid-grey field with a matched mask.
+   * Absent = the old dark field, whose trials (an afterimage made short flashes easy) are dropped
+   * once on reading. Top level, not inside `quickEye`: a client that predates it keeps unknown
+   * top-level fields when it syncs (sync.ts) but would strip a nested one.
+   */
+  quickEyeField?: 2
   sessions: SessionLog
   settings: BrainSettings
 }
@@ -78,7 +93,7 @@ export const BOOSTER_SESSIONS = 4
 /** Refreshers about 11 and 35 months after the core course, as the original training scheduled them. */
 export const BOOSTER_MONTHS = [11, 35] as const
 
-const emptyQuickEye = (): QuickEyeProgress => ({ variant: 1, recentMs: [], recentOk: '', thresholdMs: null })
+const emptyQuickEye = (): QuickEyeProgress => ({ variant: 2, recentMs: [], recentOk: '', thresholdMs: null })
 const emptySessions = (): SessionLog => ({ recentDays: [], total: 0, course: 0, minutes: 0, coreDoneOn: null, booster: { index: 0, sessions: 0 }, recentGames: [] })
 
 export function emptyProgress(): BrainProgress {
@@ -93,8 +108,9 @@ export function emptyProgress(): BrainProgress {
     bestRuns: {},
     practiced: [],
     quickEye: emptyQuickEye(),
+    quickEyeField: 2,
     sessions: emptySessions(),
-    settings: { timing: 1, centerOnly: false, sound: true },
+    settings: { timing: 1, centerOnly: false, sound: true, sessionMinutes: 5 },
   }
 }
 
@@ -280,6 +296,18 @@ export function parseProgress(raw: string | null | undefined): BrainProgress {
       quickEye.recentMs = []
       quickEye.recentOk = ''
     }
+    const centerOnly = data.settings?.centerOnly === true
+    // A record from the old dark field, once: its window measured flashes an afterimage made easy,
+    // so it is dropped (the stage stays; the round recalibrates the speed level). Its variant 1 —
+    // where every record used to start — becomes 2, where they start now (the centre-only setting
+    // keeps 1), and its best Quick Eye score, earned on that easier screen, is cleared.
+    if (data.quickEyeField !== 2) {
+      quickEye.recentMs = []
+      quickEye.recentOk = ''
+      quickEye.thresholdMs = null
+      if (quickEye.variant === 1 && !centerOnly) quickEye.variant = 2
+      delete bestRuns.quickEye
+    }
     const se = (data.sessions ?? {}) as Partial<SessionLog>
     const booster = se.booster && typeof se.booster === 'object' ? se.booster : { index: 0, sessions: 0 }
     const sessions: SessionLog = {
@@ -304,8 +332,9 @@ export function parseProgress(raw: string | null | undefined): BrainProgress {
       bestRuns,
       practiced: Array.isArray(data.practiced) ? data.practiced.filter((x): x is BrainGameId => typeof x === 'string') : [],
       quickEye,
+      quickEyeField: 2,
       sessions,
-      settings: { timing, centerOnly: data.settings?.centerOnly === true, sound: data.settings?.sound !== false },
+      settings: { timing, centerOnly, sound: data.settings?.sound !== false, sessionMinutes: data.settings?.sessionMinutes === 20 ? 20 : 5 },
     }
   } catch {
     return emptyProgress()

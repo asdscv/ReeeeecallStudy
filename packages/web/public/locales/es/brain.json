@@ -5,7 +5,7 @@
   "worry": "Si te preocupa tu memoria, en lugar de jugar más, habla con un médico o con un servicio de salud de tu zona.",
   "training": {
     "title": "Entrenamiento de hoy",
-    "desc": "Ojo rápido y 3 juegos · unos {{minutes}} min",
+    "desc": "{{count}} juegos · unos {{minutes}} min",
     "start": "Empezar el entrenamiento de hoy",
     "week": "Esta semana {{done}}/{{goal}}",
     "weekDone": "Objetivo semanal cumplido",
@@ -13,7 +13,7 @@
     "booster": "Repaso {{done}}/{{total}}",
     "boosterNext": "Próximo repaso: {{date}}",
     "minutes": "{{value}} min en total",
-    "dose": "El plan son unas tres sesiones de 20 minutos por semana. Puedes jugar más, pero no suma nada extra.",
+    "dose": "El plan son unas tres sesiones por semana: elige 5 o 20 minutos cada vez. Puedes jugar más, pero no suma nada extra.",
     "slot": "Juego {{index}}/{{total}}",
     "next": "Siguiente juego",
     "continue": "Continuar",
@@ -25,7 +25,17 @@
     "kicker": "3 veces por semana",
     "lineup": "Juegos de hoy",
     "minutesShort": "{{value}} min",
-    "stopBody": "Lo hecho queda guardado, pero una sesión sin terminar no cuenta como completada."
+    "stopBody": "Lo hecho queda guardado, pero una sesión sin terminar no cuenta como completada.",
+    "length": "Duración",
+    "minutesSeconds": "{{m}} min {{s}} s",
+    "focus": {
+      "mixed": "Hoy, un poco de todo",
+      "speed": "Hoy, velocidad",
+      "memory": "Hoy, memoria",
+      "thinking": "Hoy, razonamiento"
+    },
+    "desc_one": "{{count}} juego · unos {{minutes}} min",
+    "desc_other": "{{count}} juegos · unos {{minutes}} min"
   },
   "home": {
     "freePlay": "Práctica libre",
@@ -65,7 +75,7 @@
   "games": {
     "quickEye": {
       "name": "Ojo rápido",
-      "desc": "Ve durante un instante una imagen en el centro y una estrella en el borde, y di qué era y dónde estaba."
+      "desc": "Mira la figura del centro y capta de un vistazo hacia dónde apareció la estrella."
     },
     "memoryGrid": {
       "name": "Cuadrícula flash",
@@ -118,7 +128,7 @@
     "nextNumber": "¿Qué número sigue?",
     "correct": "Correcto",
     "wrong": "Casi",
-    "timeUp": "Se acabó el tiempo",
+    "timeUp": "¡Tiempo!",
     "timeUpForgiven": "Se acabó el tiempo · no pierdes oportunidad",
     "void": "La pantalla se trabó; te lo mostramos otra vez",
     "points": "+{{value}}",
@@ -169,7 +179,37 @@
       "6": "Izquierda",
       "7": "Arriba a la izquierda"
     },
-    "speedLevel": "Nivel de velocidad {{level}}"
+    "speedLevel": "Nivel de velocidad {{level}}",
+    "knob": {
+      "wider": "Ahora mira más amplio",
+      "ring2": "Hasta el anillo del medio",
+      "ring3": "Hasta el anillo exterior",
+      "crowd": "Busca la estrella entre triángulos",
+      "moreCrowd": "Más triángulos",
+      "similar": "Las figuras del centro se parecen más",
+      "sameDiff": "¿Iguales o diferentes?"
+    },
+    "stageUp": {
+      "title": "Nueva etapa",
+      "stage": "Etapa {{stage}}",
+      "ease": "Una etapa nueva empieza un poco más despacio",
+      "continue": "Continuar"
+    },
+    "gauge": "{{count}} aciertos más y irá más rápido",
+    "speedUp": "Un paso más rápido",
+    "topSpeed": "Velocidad máxima",
+    "hold": "Mantén la velocidad máxima {{n}}/14",
+    "wasHere": "Estaba aquí",
+    "nearMiss": "Casi, justo al lado",
+    "missFast": "Esa fue rápida",
+    "slowerStart": "Un poco más rápido",
+    "legEnd": "Fin del tramo",
+    "nextGoal": "Siguiente: mantente cerca del nivel de velocidad {{level}}",
+    "landscapeHint": "Gira el teléfono o usa una tableta para verlo más amplio",
+    "revealA11y": "Respuesta: {{center}}, estrella: {{dir}}",
+    "warmup": "Preparándonos",
+    "gauge_one": "{{count}} acierto más y irá más rápido",
+    "gauge_other": "{{count}} aciertos más y irá más rápido"
   },
   "summary": {
     "livesOut": "Ronda terminada",
@@ -229,6 +269,10 @@
       "sameDiff": {
         "title": "¿Iguales o distintas?",
         "body": "Aparecen dos figuras en el centro. Di si son iguales o distintas."
+      },
+      "clearView": {
+        "title": "Una pantalla más nítida",
+        "body": "La cubierta cambió, así que las primeras empiezan un poco más despacio."
       }
     },
     "oddOneOut": {

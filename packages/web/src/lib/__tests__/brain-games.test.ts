@@ -19,6 +19,7 @@ import {
   exposureMsFor,
   maxColsFor,
   parseProgress,
+  planToday,
   planTodaysSession,
   quickEyeAdvance,
   quickEyeThreshold,
@@ -44,6 +45,32 @@ import {
   type ChoiceView,
   type CreateContext,
   type QuickEyeView,
+  QE_FIELD_TINT,
+  QE_INK,
+  QE_STAR,
+  QE_STAR_CORE_R,
+  QE_STAR_SPIKE,
+  QE_TRIANGLE,
+  QE_TRIANGLE_BORDER,
+  QE_MASK_MICHELSON,
+  QUICK_EYE_MAX_VARIANT,
+  centerShapeScale,
+  contrastRatio,
+  polygonArea,
+  quickEyeBarLevel,
+  quickEyeBase,
+  quickEyeBox,
+  quickEyeGeometry,
+  quickEyeHold,
+  quickEyeInkFraction,
+  quickEyeKnob,
+  quickEyeMaskCells,
+  quickEyeMaskMean,
+  quickEyeMaskTones,
+  quickEyePlace,
+  quickEyeSpeedGauge,
+  relLum,
+  shapePair,
 } from '@reeeeecall/shared/lib/brain-games'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -185,9 +212,44 @@ describe('Quick Eye', () => {
     expect(t).not.toBeNull()
     expect(quickEyeAdvance(2, ms, ok).advance).toBe(t! <= advanceBarMs(2))
     expect(quickEyeAdvance(16, ms, ok).advance).toBe(false)
-    expect(advanceBarMs(1)).toBe(50)
-    expect(advanceBarMs(7)).toBe(200)
-    expect(advanceBarMs(12)).toBe(250)
+    // The bars, relaxed for the mid-grey field and its matched mask [product decision].
+    expect(advanceBarMs(1)).toBe(100)
+    expect(advanceBarMs(2)).toBe(167)
+    expect(advanceBarMs(3)).toBe(200)
+    expect(advanceBarMs(4)).toBe(200)
+    expect(advanceBarMs(7)).toBe(250)
+    expect(advanceBarMs(12)).toBe(300)
+    expect([1, 2, 4, 5, 9, 10, 16].map(quickEyeBarLevel)).toEqual([7, 5, 5, 4, 4, 3, 3])
+  })
+
+  it('opens the next variant on enough evidence without reversals: 16 trials all under the bar, 14+ right', () => {
+    const at33 = Array.from({ length: 16 }, () => 33)
+    // One miss in sixteen at the platform's shortest flash: no reversals to speak of, still a pass.
+    const oneMiss = at33.map((_, i) => i !== 7)
+    expect(quickEyeThreshold(at33, oneMiss)).toBeNull()
+    expect(quickEyeAdvance(3, at33, oneMiss)).toEqual({ advance: true, thresholdMs: 33 })
+    // Three misses (together, so the staircase path has too few reversals): not yet.
+    const threeMisses = at33.map((_, i) => i > 2)
+    expect(quickEyeAdvance(3, at33, threeMisses).advance).toBe(false)
+    // One of the sixteen shown above the bar: not enough evidence.
+    const oneSlow = at33.map((ms, i) => (i === 0 ? 267 : ms))
+    expect(quickEyeAdvance(3, oneSlow, oneMiss).advance).toBe(false)
+    // Fewer than sixteen: not yet; and the top variant has nowhere to go.
+    expect(quickEyeAdvance(3, at33.slice(1), oneMiss.slice(1)).advance).toBe(false)
+    expect(quickEyeAdvance(QUICK_EYE_MAX_VARIANT, at33, oneMiss).advance).toBe(false)
+    // At the bar itself counts (a measured 167 for V2's 167), and the threshold is their geometric mean.
+    const atBar = Array.from({ length: 16 }, (_, i) => (i % 2 ? 167 : 100))
+    expect(quickEyeAdvance(2, atBar, oneMiss)).toEqual({ advance: true, thresholdMs: Math.round(Math.sqrt(167 * 100)) })
+    expect(quickEyeAdvance(2, atBar.map((x) => (x === 167 ? 168 : x)), oneMiss).advance).toBe(true)
+    expect(quickEyeAdvance(2, atBar.map((x) => (x === 167 ? 169 : x)), oneMiss).advance).toBe(false)
+  })
+
+  it('"hold top speed" counts the right answers in the run of trials under the bar at the window\'s end', () => {
+    expect(quickEyeHold([], '', 3)).toEqual({ filled: 0, run: 0 })
+    // A slow trial breaks the run; older trials do not count.
+    expect(quickEyeHold([33, 267, 33, 33, 50], '11101', 3)).toEqual({ filled: 2, run: 3 })
+    expect(quickEyeHold(Array.from({ length: 24 }, () => 33), '1'.repeat(24), 5)).toEqual({ filled: 16, run: 16 })
+    expect(quickEyeHold([33, 33], [true, false], 5)).toEqual({ filled: 1, run: 2 })
   })
 
   it('advancing eases the exposure back three steps and clears the window', () => {
@@ -202,6 +264,194 @@ describe('Quick Eye', () => {
     expect(p.quickEye.variant).toBe(3)
     expect(p.games.quickEye?.level).toBe(4)
     expect(p.quickEye.recentMs).toEqual([])
+  })
+
+  it('new records start at variant 2; the field version is set', () => {
+    expect(emptyProgress().quickEye.variant).toBe(2)
+    expect(emptyProgress().quickEyeField).toBe(2)
+    expect(parseProgress(null).quickEye.variant).toBe(2)
+  })
+
+  it("a record from the old dark field is moved once: its window dropped, variant 1 to 2, its best score cleared — idempotent", () => {
+    const old = JSON.stringify({
+      v: 1,
+      games: { quickEye: { level: 9, bestLevel: 10, rounds: 80, wins: 60 } },
+      quickEye: { variant: 1, recentMs: [33, 50, 33], recentOk: '101', thresholdMs: 40 },
+      bestRuns: { quickEye: 900, stroop: 300 },
+      sessions: {},
+    })
+    const p = parseProgress(old)
+    expect(p.quickEye).toEqual({ variant: 2, recentMs: [], recentOk: '', thresholdMs: null })
+    expect(p.quickEyeField).toBe(2)
+    expect(p.bestRuns).toEqual({ stroop: 300 })
+    // The level stays (the round recalibrates it once); a later stage stays where it was.
+    expect(p.games.quickEye?.level).toBe(9)
+    const v7 = parseProgress(old.replace('"variant":1', '"variant":7'))
+    expect(v7.quickEye.variant).toBe(7)
+    expect(v7.quickEye.recentMs).toEqual([])
+    // Read again (and again): the same record — the move happens once.
+    expect(parseProgress(serializeProgress(p))).toEqual(p)
+    expect(parseProgress(serializeProgress(parseProgress(serializeProgress(p))))).toEqual(p)
+    // Centre-only keeps variant 1.
+    const centre = parseProgress(old.replace('"sessions":{}', '"sessions":{},"settings":{"centerOnly":true}'))
+    expect(centre.quickEye.variant).toBe(1)
+    // A record already on the new field at variant 1 (placement's slow-start path) is left alone.
+    const placed = JSON.stringify({ ...JSON.parse(old), quickEyeField: 2, quickEye: { variant: 1, recentMs: [100, 83], recentOk: '11', thresholdMs: null } })
+    const kept = parseProgress(placed)
+    expect(kept.quickEye).toEqual({ variant: 1, recentMs: [100, 83], recentOk: '11', thresholdMs: null })
+    expect(kept.bestRuns.quickEye).toBe(900)
+  })
+
+  it('points by stage and speed level never drop at a stage-up (V+1, level −3); V1 at level 11 is 120', () => {
+    expect(quickEyeBase(1, 11)).toBe(120)
+    for (let v = 1; v < QUICK_EYE_MAX_VARIANT; v++) {
+      for (let l = 0; l <= 11; l += 0.25) {
+        expect(quickEyeBase(v + 1, Math.max(0, l - 3)), `V${v} L${l}`).toBeGreaterThan(quickEyeBase(v, l))
+      }
+    }
+  })
+
+  it('the speed gauge says exactly how many right answers until the shown speed level rises (k = 1 and 2)', () => {
+    const max = 11
+    for (const k of [1, 2]) {
+      for (let l100 = 0; l100 <= 1100; l100++) {
+        const level = l100 / 100
+        const g = quickEyeSpeedGauge(level, k, max)
+        expect(g.shown).toBe(Math.min(11, Math.round(level)))
+        expect(g.atTop).toBe(Math.round(level) >= max)
+        if (g.atTop) continue
+        let lv = level
+        let n = 0
+        while (Math.round(lv) <= Math.round(level) && n < 50) {
+          lv = Math.min(max, stepLevel('quickEye', lv, true, 1, k))
+          n++
+        }
+        expect(g.toNext, `L${level} k${k}`).toBe(n)
+        expect(g.pips).toBeGreaterThanOrEqual(0)
+        expect(g.pips).toBeLessThanOrEqual(3)
+      }
+    }
+    // A quarter of a speed level per pip: just over a rung's lower edge none, the middle two.
+    expect(quickEyeSpeedGauge(2.5, 1, 11).pips).toBe(0)
+    expect(quickEyeSpeedGauge(3, 1, 11)).toMatchObject({ pips: 2, toNext: 2 })
+    expect(quickEyeSpeedGauge(3, 2, 11)).toMatchObject({ pips: 2, toNext: 1 })
+    expect(quickEyeSpeedGauge(11, 1, 11).atTop).toBe(true)
+  })
+
+  it('the stage groups, and what each new stage brings', () => {
+    expect([1, 2, 4, 5, 9, 10, 14, 15, 16].map((v) => quickEyePlace(v))).toEqual(['dock', 'shore', 'shore', 'pines', 'pines', 'tea', 'tea', 'lake', 'lake'])
+    expect(quickEyePlace(7, true)).toBe('dock')
+    expect(quickEyePlace(12, true)).toBe('tea')
+    expect([2, 3, 4, 5, 6, 9, 10, 14, 15, 16].map((v) => quickEyeKnob(v))).toEqual(['wider', 'ring2', 'ring3', 'crowd', 'moreCrowd', 'moreCrowd', 'similar', 'similar', 'sameDiff', 'similar'])
+    expect(quickEyeKnob(5, true)).toBeNull()
+    expect(quickEyeKnob(10, true)).toBe('similar')
+  })
+})
+
+describe('Quick Eye drawing (measuring frame)', () => {
+  it('star and triangle have the same area (±2%); the centre pair at every similarity too (±1%)', () => {
+    const star = polygonArea(QE_STAR)
+    expect(star).toBeCloseTo(1.1227, 3)
+    expect(Math.abs(polygonArea(QE_TRIANGLE) - star) / star).toBeLessThan(0.02)
+    // The mobile star — a core circle and five spikes — covers the same: the spikes are the star
+    // outside the inner pentagon, and the circle's bulge past each pentagon side stays inside a spike.
+    const pentagon = 5 * 0.5 * QE_STAR_SPIKE.apothem * 2 * QE_STAR_SPIKE.halfBase
+    const spikes = 5 * QE_STAR_SPIKE.halfBase * QE_STAR_SPIKE.height
+    expect(Math.abs(pentagon + spikes - star) / star).toBeLessThan(0.005)
+    expect(QE_STAR_SPIKE.apothem + QE_STAR_SPIKE.height).toBeCloseTo(1, 3)
+    expect(QE_STAR_CORE_R * Math.cos(Math.PI / 5)).toBeCloseTo(QE_STAR_SPIKE.apothem, 3)
+    // The mobile border triangle is the same triangle.
+    expect(QE_TRIANGLE_BORDER.halfBase * QE_TRIANGLE_BORDER.height).toBeCloseTo(polygonArea(QE_TRIANGLE), 2)
+    for (let sim = 1; sim <= 9; sim++) {
+      const [circle, square] = shapePair(sim)
+      const p = Number(square.split(':')[1]) / 100
+      const a = centerShapeScale(square)
+      const squareArea = a * a * (1 - (4 - Math.PI) * p * p)
+      const circleArea = (Math.PI / 4) * centerShapeScale(circle) ** 2
+      expect(Math.abs(squareArea - circleArea) / circleArea, `similarity ${sim}`).toBeLessThan(0.01)
+    }
+  })
+
+  it('every field tint is mid-grey (relative luminance 0.185 ± 0.01) and the ink stands 3:1 on it', () => {
+    for (const [place, tint] of Object.entries(QE_FIELD_TINT)) {
+      expect(Math.abs(relLum(tint) - 0.185), place).toBeLessThanOrEqual(0.01)
+      expect(contrastRatio(QE_INK, tint), place).toBeGreaterThanOrEqual(3)
+    }
+  })
+
+  it("the mask: Michelson ≤ 0.5, its area-weighted mean within 3% of the stimulus frame's, no regular pattern", () => {
+    const size = 340
+    const cell = 14
+    const cols = Math.ceil(size / cell)
+    const corner = 24
+    // Cells clipped to the field's rounded square, each weighted by the share left inside.
+    const inside = (x: number, y: number) => {
+      const qx = Math.max(Math.abs(x - size / 2) - (size / 2 - corner), 0)
+      const qy = Math.max(Math.abs(y - size / 2) - (size / 2 - corner), 0)
+      return Math.hypot(qx, qy) <= corner
+    }
+    const weight = (cx: number, cy: number) => {
+      let n = 0
+      for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) if (inside(cx * cell + (i + 0.5) * (cell / 4), cy * cell + (j + 0.5) * (cell / 4))) n++
+      return n / 16
+    }
+    for (const a of [0.02, 0.05, 0.1, 0.15]) {
+      for (const tint of Object.values(QE_FIELD_TINT)) {
+        const tones = quickEyeMaskTones(a, tint)
+        expect(tones).toHaveLength(6)
+        const lums = tones.map(relLum)
+        const michelson = (Math.max(...lums) - Math.min(...lums)) / (Math.max(...lums) + Math.min(...lums))
+        expect(michelson).toBeLessThanOrEqual(0.5)
+        expect(michelson).toBeCloseTo(QE_MASK_MICHELSON, 1)
+        const target = relLum(tint) * (1 - a) + relLum(QE_INK) * a
+        expect(Math.abs(relLum(quickEyeMaskMean(a, tint)) - target) / target).toBeLessThan(0.03)
+        for (let seed = 1; seed <= 100; seed += 33) {
+          let sum = 0
+          let w = 0
+          for (const c of quickEyeMaskCells(seed, cols, tones)) {
+            const k = weight(c.x, c.y)
+            sum += relLum(c.tone) * k
+            w += k
+          }
+          expect(Math.abs(sum / w - target) / target, `a ${a} ${tint} seed ${seed}`).toBeLessThan(0.03)
+        }
+      }
+    }
+    // Random order: neighbouring cells along rows and columns are not correlated (stripes and
+    // checks would be), and the order changes with the seed.
+    const tones = quickEyeMaskTones(0.08, QE_FIELD_TINT.shore)
+    const lag1 = (xs: number[][], dx: number, dy: number) => {
+      const all = xs.flat()
+      const mean = all.reduce((p, q) => p + q, 0) / all.length
+      let num = 0
+      let den = 0
+      for (let y = 0; y < xs.length; y++) {
+        for (let x = 0; x < xs[y].length; x++) {
+          den += (xs[y][x] - mean) ** 2
+          if (y + dy < xs.length && x + dx < xs[y].length) num += (xs[y][x] - mean) * (xs[y + dy][x + dx] - mean)
+        }
+      }
+      return num / den
+    }
+    const patterns = new Set<string>()
+    for (let seed = 1; seed <= 100; seed++) {
+      const cells = quickEyeMaskCells(seed, 24, tones)
+      const grid = Array.from({ length: 24 }, (_, y) => cells.filter((c) => c.y === y).sort((p, q) => p.x - q.x).map((c) => relLum(c.tone)))
+      expect(Math.abs(lag1(grid, 1, 0)), `seed ${seed} rows`).toBeLessThan(0.2)
+      expect(Math.abs(lag1(grid, 0, 1)), `seed ${seed} columns`).toBeLessThan(0.2)
+      patterns.add(cells.map((c) => c.tone).join(''))
+    }
+    expect(patterns.size).toBe(100)
+  })
+
+  it('the ink share counts the centre, the star, the triangles and the box border', () => {
+    const geo = { ...quickEyeGeometry(340, 112, 112, [8, 16, 16]), ...quickEyeBox(340, false) }
+    const field = 340 * 340 - (4 - Math.PI) * 24 * 24
+    const bare = quickEyeInkFraction({ center: ['circle'], target: null, distractors: [] }, geo, field)
+    const crowd = quickEyeInkFraction({ center: ['circle'], target: { ring: 0, slot: 0 }, distractors: Array.from({ length: 39 }, () => ({ ring: 1, slot: 0 })) }, geo, field)
+    expect(bare).toBeGreaterThan(0.02)
+    expect(bare).toBeLessThan(crowd)
+    expect(crowd).toBeLessThan(0.3)
   })
 })
 
@@ -252,20 +502,50 @@ describe('staircase', () => {
 })
 
 describe('Today\'s Training plan', () => {
-  it('opens with Quick Eye, then a speed game, then rotates; variety games every other session', () => {
-    const roles = (id: BrainGameId) => BRAIN_GAMES.find((g) => g.id === id)!.role
-    for (let seed = 1; seed < 60; seed++) {
-      let p = emptyProgress()
-      p = { ...p, sessions: { ...p.sessions, total: seed % 2 } }
-      const plan = planTodaysSession(p, createRng(seed))
-      expect(plan.map((s) => s.gameId)[0]).toBe('quickEye')
-      expect(roles(plan[1].gameId)).toBe('speed')
-      expect(['span', 'reasoning']).toContain(roles(plan[2].gameId))
-      if (seed % 2 === 0) expect(roles(plan[3].gameId)).toBe('variety')
-      else expect(['span', 'reasoning']).toContain(roles(plan[3].gameId))
-      expect(new Set(plan.map((s) => s.gameId)).size).toBe(4)
-      expect(plan.reduce((a, s) => a + s.minutes, 0)).toBe(22)
+  it('every session is a different mix: game count, games, order and minutes vary within the chosen length', () => {
+    const SLOW = ['schulte', 'pairs', 'quickEye']
+    for (const length of [5, 20] as const) {
+      const shapes = new Set<string>()
+      const splits = new Set<string>()
+      let quickEyeFirst = 0
+      let quickEyeIn = 0
+      for (let seed = 1; seed <= 80; seed++) {
+        let p = emptyProgress()
+        p = { ...p, sessions: { ...p.sessions, total: seed }, settings: { ...p.settings, sessionMinutes: length } }
+        const { focus, slots } = planToday(p, createRng(seed * 7919))
+        const ids = slots.map((s) => s.gameId)
+        // Exactly the chosen length, no game twice, each slot big enough for its game.
+        expect(slots.reduce((a, s) => a + s.minutes, 0)).toBe(length)
+        expect(new Set(ids).size).toBe(ids.length)
+        for (const s of slots) expect(s.minutes).toBeGreaterThanOrEqual(SLOW.includes(s.gameId) ? (length === 5 ? 1.5 : 3) : length === 5 ? 1 : 2.5)
+        expect(ids.length).toBeGreaterThanOrEqual(length === 5 ? 2 : 3)
+        expect(ids.length).toBeLessThanOrEqual(length === 5 ? 4 : 6)
+        // Quick Eye at least every other session (it is the task closest to the studied training).
+        if (seed % 2 === 0) expect(ids).toContain('quickEye')
+        if (ids.includes('quickEye')) quickEyeIn++
+        if (ids[0] === 'quickEye') quickEyeFirst++
+        if (focus === 'memory') expect(ids.some((id) => BRAIN_GAMES.find((g) => g.id === id)!.skill === 'memory')).toBe(true)
+        shapes.add(ids.join(','))
+        splits.add(slots.map((s) => s.minutes).join('/'))
+      }
+      expect(shapes.size).toBeGreaterThan(30)
+      expect(splits.size).toBeGreaterThan(5)
+      // Not pinned to the start, and not in every session either.
+      expect(quickEyeFirst).toBeLessThan(quickEyeIn)
+      expect(quickEyeIn).toBeLessThan(80)
     }
+    expect(emptyProgress().settings.sessionMinutes).toBe(5)
+  })
+
+  it('a game left out lately comes back: over a few sessions all nine turn up', () => {
+    let p = emptyProgress()
+    const seen = new Set<string>()
+    for (let i = 0; i < 6; i++) {
+      const slots = planTodaysSession(p, createRng(100 + i))
+      slots.forEach((s) => seen.add(s.gameId))
+      p = recordSession(p, 5, `2026-11-${String(2 + i * 2).padStart(2, '0')}`, null, slots.map((s) => s.gameId))
+    }
+    expect(seen.size).toBe(9)
   })
 
   it('counts sessions by week, Monday to Sunday', () => {
@@ -369,10 +649,11 @@ describe('migration and rotation', () => {
   it('rotates by the games recent sessions used, not by trial counts', () => {
     let p = emptyProgress()
     p = recordSession(p, 22, '2026-11-10', null, ['quickEye', 'oddOneOut', 'memoryGrid', 'pairs'])
+    const justUsed = ['oddOneOut', 'memoryGrid', 'pairs']
     for (let seed = 1; seed < 30; seed++) {
-      const plan = planTodaysSession(p, createRng(seed))
-      expect(plan[1].gameId).toBe('schulte')
-      expect(plan[2].gameId).not.toBe('memoryGrid')
+      const others = planTodaysSession(p, createRng(seed)).map((s) => s.gameId).filter((id) => id !== 'quickEye')
+      // Games the last session used give way to the ones it did not.
+      expect(others.filter((id) => justUsed.includes(id)).length).toBeLessThanOrEqual(others.filter((id) => !justUsed.includes(id)).length)
     }
   })
 })
@@ -465,6 +746,44 @@ describe('solution() — the demo and these tests play every game from the engin
         expect(centre.every((f) => f.view.kind !== 'quickEye' || f.view.target === null)).toBe(true)
       }
       void def
+    }
+  })
+
+  it("Quick Eye's demo plays the player's stage: V2 by default, the given variant, V1 only on centre-only", () => {
+    const shown = (ctx: Partial<CreateContext>) => (buildDemo('quickEye', ctx).find((f) => f.flash)?.view as QuickEyeView).variant
+    expect(shown({})).toBe(2)
+    expect(shown({ variant: 7 })).toBe(7)
+    expect(shown({ variant: 1 })).toBe(2)
+    expect(shown({ variant: 7, centerOnly: true })).toBe(1)
+  })
+
+  it('nearMiss and the reveal are display only: solution() and the outcome stay the same on every variant', () => {
+    const def = brainGame('quickEye').def as Any
+    for (const centerOnly of [false, true]) {
+      for (let variant = 1; variant <= QUICK_EYE_MAX_VARIANT; variant++) {
+        for (let seed = 1; seed <= 6; seed++) {
+          const s0 = def.create(3, createRng(seed * 131 + variant), { ...DEFAULT_CONTEXT, variant, centerOnly, ringSlots: [8, 16, 16] })
+          const won = playBySolution(def, s0)
+          const view = def.view(won) as QuickEyeView
+          expect(def.outcome(won)?.correct).toBe(true)
+          expect(view.nearMiss ?? false).toBe(false)
+          expect(view.variant).toBe(variant)
+          expect(view.place).toBe(quickEyePlace(variant, centerOnly))
+          if (s0.targetDir === null) continue
+          // To the answers: the centre right, then a direction one, two and seven steps round.
+          let s = def.advance(s0)
+          s = def.exposed(s, s.exposureMs, 1000 / 60)
+          s = settle(def, s)
+          expect(def.solution(s)).toEqual([s.correctCenter, s.targetDir])
+          s = def.tap(s, s.correctCenter)
+          for (const [step, near] of [[1, true], [2, false], [7, true]] as const) {
+            const done = def.tap(s, (s.targetDir + step) % 8)
+            expect((def.view(done) as QuickEyeView).nearMiss, `V${variant} step ${step}`).toBe(near)
+            expect(def.outcome(done)).toMatchObject({ correct: false, accuracy: 0.5 })
+            expect(def.solution(done)).toBeNull()
+          }
+        }
+      }
     }
   })
 })
