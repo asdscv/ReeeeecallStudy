@@ -44,25 +44,32 @@ function SectionCard({
         highlighted ? 'border-brand ring-2 ring-blue-100' : 'border-border'
       }`}
     >
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center gap-3 p-4 sm:p-5 text-left cursor-pointer hover:bg-muted transition group"
-      >
-        <span className="text-2xl shrink-0">{section.icon}</span>
-        <h2 className="text-base sm:text-lg font-semibold text-foreground flex-1">{t(section.title)}</h2>
+      {/* The copy-link button sits BESIDE the toggle, not inside it: a button nested in a button is
+          invalid and screen readers announce only one of them. It is also always visible now — it
+          used to appear only on mouse hover, so touch and keyboard users never had it. */}
+      <div className="flex items-center hover:bg-muted transition">
         <button
-          onClick={(e) => { e.stopPropagation(); onCopyLink(section.id) }}
-          className="p-1.5 text-content-tertiary hover:text-brand rounded-md hover:bg-brand/10 transition cursor-pointer opacity-0 group-hover:opacity-100 shrink-0"
-          title={t('copyLink')}
+          onClick={() => setOpen(!open)}
+          aria-expanded={open}
+          className="flex-1 min-w-0 flex items-center gap-3 p-4 sm:p-5 text-left cursor-pointer bg-transparent border-none"
         >
-          <Link2 className="w-4 h-4" />
+          <span className="text-2xl shrink-0">{section.icon}</span>
+          <h2 className="text-base sm:text-lg font-semibold text-foreground flex-1">{t(section.title)}</h2>
+          {open ? (
+            <ChevronUp className="w-5 h-5 text-content-tertiary shrink-0" aria-hidden="true" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-content-tertiary shrink-0" aria-hidden="true" />
+          )}
         </button>
-        {open ? (
-          <ChevronUp className="w-5 h-5 text-content-tertiary shrink-0" />
-        ) : (
-          <ChevronDown className="w-5 h-5 text-content-tertiary shrink-0" />
-        )}
-      </button>
+        <button
+          onClick={() => onCopyLink(section.id)}
+          className="w-11 h-11 mr-2 flex items-center justify-center text-content-tertiary hover:text-brand rounded-md hover:bg-brand/10 transition cursor-pointer shrink-0 bg-transparent border-none"
+          title={t('copyLink')}
+          aria-label={t('copyLink')}
+        >
+          <Link2 className="w-4 h-4" aria-hidden="true" />
+        </button>
+      </div>
 
       {open && (
         <div className="border-t border-border divide-y divide-border">
@@ -227,7 +234,8 @@ export function GuidePage() {
       <div className="flex items-center gap-3 mb-4 sm:mb-6">
         <button
           onClick={() => navigate(-1)}
-          className="p-2 text-content-tertiary hover:text-muted-foreground rounded-lg hover:bg-accent transition cursor-pointer"
+          aria-label={tCommon('actions.back')}
+          className="w-11 h-11 flex items-center justify-center text-content-tertiary hover:text-muted-foreground rounded-lg hover:bg-accent transition cursor-pointer"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
@@ -237,7 +245,8 @@ export function GuidePage() {
         </div>
         <button
           onClick={restartOnboarding}
-          className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition cursor-pointer shrink-0"
+          aria-label={tCommon('onboarding.restartOnboarding')}
+          className="flex items-center gap-1.5 px-3 py-2 min-h-11 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition cursor-pointer shrink-0"
         >
           <RotateCcw className="w-4 h-4" />
           <span className="hidden sm:inline">{tCommon('onboarding.restartOnboarding')}</span>

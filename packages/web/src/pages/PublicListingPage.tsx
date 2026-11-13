@@ -10,6 +10,10 @@ import { OfficialBadge } from '../components/common/OfficialBadge'
 import { buildListingDatasetJsonLd, buildListingBreadcrumbJsonLd, buildListingHreflangAlternates } from '../lib/marketplace-seo'
 import { SEO } from '../lib/seo-config'
 import type { PublicListingPreview } from '../types/database'
+import { OfficialWordList } from '../components/marketplace/OfficialWordList'
+import {
+  wordListPageLanguage, wordListHeading, wordListDescription, wordListHreflang,
+} from '@reeeeecall/shared/lib/listing-seo'
 
 export function PublicListingPage() {
   const { listingId } = useParams<{ listingId: string }>()
@@ -81,6 +85,33 @@ export function PublicListingPage() {
           <p className="text-muted-foreground text-lg mb-2">{t('marketplace:preview.notFound')}</p>
           <p className="text-content-tertiary text-sm">{t('marketplace:preview.notFoundDescription')}</p>
         </div>
+        <FooterSection />
+      </div>
+    )
+  }
+
+  // Official decks are word-list pages in the deck's own language — same content as the crawler HTML.
+  const pageLang = wordListPageLanguage(listing)
+  if (pageLang) {
+    const heading = wordListHeading(listing, pageLang)
+    const description = wordListDescription(listing, pageLang)
+    return (
+      <div className="min-h-screen bg-card">
+        <SEOHead
+          lang={pageLang}
+          title={`${heading} | ${SEO.BRAND_NAME}`}
+          description={description}
+          ogType="website"
+          canonicalUrl={`${SEO.SITE_URL}/d/${listing.id}`}
+          jsonLd={[
+            { ...buildListingDatasetJsonLd(listing), name: heading, description, inLanguage: pageLang },
+            buildListingBreadcrumbJsonLd(listing),
+          ]}
+          hreflangAlternates={wordListHreflang(listing, SEO.SITE_URL)}
+          keywords={[heading]}
+        />
+        <ContentNav backTo="/landing" backLabel={t('marketplace:preview.backToHome')} />
+        <OfficialWordList listing={listing} lang={pageLang} signedIn={!!user} />
         <FooterSection />
       </div>
     )
@@ -185,7 +216,7 @@ export function PublicListingPage() {
               <p className="text-muted-foreground mb-4">{t('marketplace:preview.viewInMarket')}</p>
               <Link
                 to={`/marketplace/${listing.id}`}
-                className="inline-block px-6 py-3 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand-hover transition no-underline"
+                className="inline-block px-6 py-3 bg-brand text-brand-foreground text-sm font-semibold rounded-lg hover:bg-brand-hover transition no-underline"
                 data-testid="cta-marketplace"
               >
                 {t('marketplace:detail.getDeck')}
@@ -197,7 +228,7 @@ export function PublicListingPage() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Link
                   to={`/auth/login?redirect=${encodeURIComponent(`/marketplace/${listing.id}`)}`}
-                  className="inline-block px-6 py-3 bg-brand text-white text-sm font-semibold rounded-lg hover:bg-brand-hover transition no-underline"
+                  className="inline-block px-6 py-3 bg-brand text-brand-foreground text-sm font-semibold rounded-lg hover:bg-brand-hover transition no-underline"
                   data-testid="cta-login"
                 >
                   {t('marketplace:preview.ctaLogin')}

@@ -1,322 +1,18 @@
-import { useState, useRef, useEffect, type ReactElement } from 'react'
-import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Menu, X, ChevronDown, BookOpen, Zap, BarChart2, Cpu, Layers, FileText, Compass, Store, TrendingUp, Link2, Archive, Clock, Award, Settings as SettingsIcon, Shield, HelpCircle, Target, Hand, type LucideIcon } from 'lucide-react'
+import { useCallback, useState } from 'react'
+import { Outlet, Link } from 'react-router-dom'
+import { Menu, BookOpen } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { aiHubEntries } from '@reeeeecall/shared/lib/ai/hub/catalog'
-import { useAuthStore } from '../../stores/auth-store'
 import { useAiHubEventBridge } from '../../hooks/useAiHubEventBridge'
 import { AppDownload } from './AppDownload'
-
-/**
- * 내비게이션 아이콘.
- *
- * 예전에는 이모지('📚','⚡'…)를 그대로 넣었다. 이모지는 OS·폰트마다 다르게 그려지고
- * 색을 못 따라가서, 메뉴가 활성인데 아이콘만 원색으로 남는다. 이름만 두고 여기서
- * lucide 로 그린다 — 모바일 드로어도 같은 이름을 Feather 로 그리므로 두 플랫폼의
- * 메뉴가 같은 뜻의 아이콘을 쓴다(AI 허브 항목은 shared 카탈로그가 이름을 준다).
- */
-const NAV_ICONS: Record<string, LucideIcon> = {
-  zap: Zap,
-  'bar-chart-2': BarChart2,
-  'book-open': BookOpen,
-  cpu: Cpu,
-  layers: Layers,
-  'file-text': FileText,
-  compass: Compass,
-  'shopping-bag': Store,
-  'trending-up': TrendingUp,
-  'link-2': Link2,
-  archive: Archive,
-  clock: Clock,
-  award: Award,
-  settings: SettingsIcon,
-  shield: Shield,
-  'help-circle': HelpCircle,
-  target: Target,
-  menu: Menu,
-  hand: Hand,
-}
-
-function NavIcon({ name, className }: { name: string; className?: string }) {
-  const Icon = NAV_ICONS[name]
-  if (!Icon) return null
-  return <Icon className={className ?? 'w-4 h-4'} aria-hidden="true" />
-}
-
-type NavLink = { kind: 'link'; path: string; label: string; icon: string }
-/** `children` is `NavItem[]`, so a submenu can hold a submenu. `path` makes the group's own
- *  header a link — AI 학습 groups three features AND is a page. */
-type NavGroup = { kind: 'group'; label: string; icon: string; path?: string; children: NavItem[] }
-type NavItem = NavLink | NavGroup
-
-// ── Quick Tips — extensible: just add items to TIPS array ──
-const TIPS = [
-  { icon: 'hand', text: 'Tap card to flip, swipe or click buttons to rate' },
-  { icon: 'bar-chart-2', text: 'Dashboard shows your study stats & streaks' },
-  { icon: 'zap', text: 'Quick Study starts a session instantly' },
-  { icon: 'target', text: 'Set daily goals in Settings to stay motivated' },
-]
-
-function QuickTip() {
-  const [idx, setIdx] = useState(0)
-  const tip = TIPS[idx]
-  return (
-    <button
-      onClick={() => setIdx((i) => (i + 1) % TIPS.length)}
-      className="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-xs text-muted-foreground hover:bg-accent transition cursor-pointer border-none bg-transparent text-left"
-    >
-      <NavIcon name={tip.icon} className="w-4 h-4 shrink-0" />
-      <span className="flex-1">{tip.text}</span>
-      <span className="text-[10px] opacity-60">{idx + 1}/{TIPS.length}</span>
-    </button>
-  )
-}
+import { SidebarContent, BottomTabs, MenuSheet } from './AppNav'
 
 export function Layout() {
-  // 'ai-generate' is declared alongside 'common' so the submenu's registry-derived labels
-  // wait for their bundle instead of painting raw keys on first render.
-  const { t } = useTranslation(['common', 'ai-generate'])
-  const { role } = useAuthStore()
+  const { t } = useTranslation('common')
   // The one subscriber to the AI hub bus. Layout wraps every authenticated page, so this is
   // the only place it can be mounted once.
   useAiHubEventBridge()
-
-  const navItems: NavItem[] = [
-    { kind: 'link', path: '/quick-study', label: t('nav.quickStudy'), icon: 'zap' },
-    { kind: 'link', path: '/dashboard', label: t('nav.dashboard'), icon: 'bar-chart-2' },
-    { kind: 'group', label: t('nav.study'), icon: 'book-open', children: [
-      // Derived, not listed: registering a fourth AI feature must add a menu item without
-      // an edit here. The section header itself opens the hub.
-      { kind: 'group', label: t('nav.aiHub'), icon: 'cpu', path: '/ai', children: aiHubEntries().map((entry) => ({
-        kind: 'link' as const,
-        path: entry.webPath,
-        label: t(entry.titleKey, { ns: 'ai-generate' }),
-        icon: entry.icon,
-      })) },
-      // `/templates` was labelled "카드" while its own page is titled "카드 템플릿", and there is
-      // no card list anywhere — cards live inside a deck. Sitting next to 덱 it read as
-      // "덱 = 묶음, 카드 = 낱장", so the name is corrected and the two are one section.
-      { kind: 'group', label: t('nav.deckAndCards'), icon: 'layers', children: [
-        { kind: 'link', path: '/decks', label: t('nav.decks'), icon: 'book-open' },
-        { kind: 'link', path: '/templates', label: t('nav.cardTemplates'), icon: 'file-text' },
-      ]},
-      // Finding and selling decks is not studying. Grouping them says so without hiding them.
-      { kind: 'group', label: t('nav.explore'), icon: 'compass', children: [
-        { kind: 'link', path: '/marketplace', label: t('nav.marketplace'), icon: 'shopping-bag' },
-        { kind: 'link', path: '/publisher', label: t('nav.publisher'), icon: 'trending-up' },
-        // `/my-shares` has existed and been routable on web all along with nothing linking to
-        // it — the drawer had the row, the web nav never did.
-        { kind: 'link', path: '/my-shares', label: t('nav.myShares'), icon: 'link-2' },
-      ]},
-      // 업적 was a top-level link while 기록 sat in here, so "how much have I done" was split
-      // across two menus. Same question, one place.
-      { kind: 'group', label: t('nav.myRecords'), icon: 'archive', children: [
-        { kind: 'link', path: '/history', label: t('nav.studyHistory'), icon: 'clock' },
-        { kind: 'link', path: '/achievements', label: t('nav.achievements'), icon: 'award' },
-      ]},
-    ]},
-    { kind: 'link', path: '/settings', label: t('nav.settings'), icon: 'settings' },
-    ...(role === 'admin' ? [{ kind: 'link' as const, path: '/admin', label: t('nav.admin'), icon: 'shield' }] : []),
-  ]
-  const location = useLocation()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [openDesktopGroup, setOpenDesktopGroup] = useState<string | null>(null)
-  const [openMobileGroups, setOpenMobileGroups] = useState<Set<string>>(new Set())
-  /**
-   * Which inline SECTIONS are open, by label.
-   *
-   * They used to render expanded, all four at once, so opening 학습 dropped a fifteen-row wall
-   * on the screen and the learner scanned it rather than chose from it. A section is a promise
-   * that its contents are related; showing every promise at once keeps none of them.
-   *
-   * `null` means "nothing has been touched yet" and the section holding the current route is the
-   * one open — arriving from /quiz should show 퀴즈 highlighted in context, not a closed list the
-   * learner has to guess their way back into.
-   */
-  const [openSections, setOpenSections] = useState<Set<string> | null>(null)
-  const desktopNavRef = useRef<HTMLElement>(null)
-
-  // Match on a segment boundary rather than on characters: '/ai' is the hub and '/ai-generate'
-  // is a sibling route, so a bare startsWith would light up both.
-  const isActive = (path: string) => {
-    if (path === '/dashboard') return location.pathname === '/dashboard'
-    return location.pathname === path || location.pathname.startsWith(`${path}/`)
-  }
-
-  const isGroupActive = (group: NavGroup): boolean =>
-    (group.path !== undefined && isActive(group.path)) ||
-    group.children.some(child => (child.kind === 'link' ? isActive(child.path) : isGroupActive(child)))
-
-  const isSectionOpen = (group: NavGroup): boolean =>
-    openSections === null ? isGroupActive(group) : openSections.has(group.label)
-
-  const toggleSection = (group: NavGroup) => {
-    setOpenSections((current) => {
-      // First touch: start from what is on screen, so the section the learner can see open does
-      // not jump shut because they clicked a different one.
-      const next = new Set(current ?? (isGroupActive(group) ? [group.label] : []))
-      if (next.has(group.label)) next.delete(group.label)
-      else next.add(group.label)
-      return next
-    })
-  }
-
-  // 클릭 외부 감지로 데스크톱 드롭다운 닫기
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (desktopNavRef.current && !desktopNavRef.current.contains(e.target as Node)) {
-        setOpenDesktopGroup(null)
-      }
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
-
-  const toggleDesktopGroup = (label: string) => {
-    setOpenDesktopGroup(prev => prev === label ? null : label)
-  }
-
-  const toggleMobileGroup = (label: string) => {
-    setOpenMobileGroups(prev => {
-      const next = new Set(prev)
-      if (next.has(label)) {
-        next.delete(label)
-      } else {
-        next.add(label)
-      }
-      return next
-    })
-  }
-
-  const activeClass = 'bg-brand/10 text-brand font-medium'
-  const inactiveClass = 'text-muted-foreground hover:bg-accent'
-  // Colour is applied per state, not baked in: two text-* utilities on one element resolve by
-  // stylesheet order, so an appended active colour would not reliably win.
-  const sectionClass = 'text-xs font-semibold tracking-wide'
-  const sectionIdleClass = 'text-content-tertiary'
-
-  // A group inside a group renders INLINE as a labelled section, not as a second flyout:
-  // a flyout hanging off a dropdown is hard to keep open with a mouse, needs its own
-  // open/close state, and hides items that fit on screen as they are.
-  const renderDesktopSubItem = (item: NavItem): ReactElement => {
-    if (item.kind === 'link') {
-      return (
-        <Link
-          key={item.path}
-          to={item.path}
-          onClick={() => setOpenDesktopGroup(null)}
-          className={`block px-4 py-2 text-sm whitespace-nowrap no-underline transition ${
-            isActive(item.path) ? activeClass : inactiveClass
-          }`}
-        >
-          <NavIcon name={item.icon} className="w-4 h-4 mr-2 shrink-0" />
-          {item.label}
-        </Link>
-      )
-    }
-
-    const open = isSectionOpen(item)
-    // The LABEL is the group's own page when it has one (AI 학습 opens the hub); the CHEVRON
-    // toggles. Two targets in one row rather than one that does both, because a header that
-    // navigates AND expands does neither predictably.
-    const header = <><NavIcon name={item.icon} className="w-4 h-4 mr-2 shrink-0" />{item.label}</>
-    return (
-      <div key={item.label} className="mt-1 pt-1 border-t border-border first:mt-0 first:pt-0 first:border-t-0">
-        <div className="flex items-center">
-          {item.path ? (
-            <Link
-              to={item.path}
-              onClick={() => setOpenDesktopGroup(null)}
-              className={`flex-1 px-4 py-1.5 whitespace-nowrap no-underline transition ${sectionClass} ${
-                isActive(item.path) ? 'text-brand' : `${sectionIdleClass} hover:text-foreground`
-              }`}
-            >
-              {header}
-            </Link>
-          ) : (
-            <button
-              type="button"
-              onClick={() => toggleSection(item)}
-              className={`flex-1 text-left px-4 py-1.5 whitespace-nowrap cursor-pointer transition ${sectionClass} ${sectionIdleClass} hover:text-foreground`}
-            >
-              {header}
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={() => toggleSection(item)}
-            aria-expanded={open}
-            aria-label={item.label}
-            data-testid={`nav-section-toggle-${item.label}`}
-            className={`px-2 py-1.5 cursor-pointer text-xs transition ${sectionIdleClass} hover:text-foreground`}
-          >
-            {open ? '\u2227' : '\u2228'}
-          </button>
-        </div>
-        {open && <div className="pl-3">{item.children.map(renderDesktopSubItem)}</div>}
-      </div>
-    )
-  }
-
-  const renderMobileSubItem = (item: NavItem): ReactElement => {
-    if (item.kind === 'link') {
-      return (
-        <Link
-          key={item.path}
-          to={item.path}
-          onClick={() => setMobileMenuOpen(false)}
-          className={`block px-3 py-2 rounded-lg text-sm no-underline transition ${
-            isActive(item.path) ? activeClass : inactiveClass
-          }`}
-        >
-          <NavIcon name={item.icon} className="w-4 h-4 mr-2 shrink-0" />
-          {item.label}
-        </Link>
-      )
-    }
-
-    const open = isSectionOpen(item)
-    // The LABEL is the group's own page when it has one (AI 학습 opens the hub); the CHEVRON
-    // toggles. Two targets in one row rather than one that does both, because a header that
-    // navigates AND expands does neither predictably.
-    const header = <><NavIcon name={item.icon} className="w-4 h-4 mr-2 shrink-0" />{item.label}</>
-    return (
-      <div key={item.label} className="mt-1 pt-2 border-t border-border first:mt-0 first:pt-0 first:border-t-0">
-        <div className="flex items-center">
-          {item.path ? (
-            <Link
-              to={item.path}
-              onClick={() => setMobileMenuOpen(false)}
-              className={`flex-1 px-3 py-1.5 whitespace-nowrap no-underline transition ${sectionClass} ${
-                isActive(item.path) ? 'text-brand' : `${sectionIdleClass} hover:text-foreground`
-              }`}
-            >
-              {header}
-            </Link>
-          ) : (
-            <button
-              type="button"
-              onClick={() => toggleSection(item)}
-              className={`flex-1 text-left px-3 py-1.5 whitespace-nowrap cursor-pointer transition ${sectionClass} ${sectionIdleClass} hover:text-foreground`}
-            >
-              {header}
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={() => toggleSection(item)}
-            aria-expanded={open}
-            aria-label={item.label}
-            data-testid={`nav-section-toggle-${item.label}`}
-            className={`px-2 py-1.5 cursor-pointer text-xs transition ${sectionIdleClass} hover:text-foreground`}
-          >
-            {open ? '\u2227' : '\u2228'}
-          </button>
-        </div>
-        {open && <div className="pl-3">{item.children.map(renderMobileSubItem)}</div>}
-      </div>
-    )
-  }
+  const [menuOpen, setMenuOpen] = useState(false)
+  const closeMenu = useCallback(() => setMenuOpen(false), [])
 
   return (
     <div className="min-h-screen bg-background">
@@ -324,165 +20,78 @@ export function Layout() {
       <a href="#main-content" className="skip-link no-underline">
         {t('skipToContent', 'Skip to content')}
       </a>
-      {/* Header */}
-      <header className="bg-card border-b border-border sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link to="/dashboard" className="shrink-0 no-underline flex items-center gap-2">
-            <img src="/favicon.png" alt="" className="w-9 h-9 sm:w-10 sm:h-10 object-contain" />
-            <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-8 sm:h-11 object-contain dark:brightness-0 dark:invert" />
+
+      {/* Desktop: the whole menu, always visible. */}
+      <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-60 flex-col bg-card border-r border-border" data-testid="sidebar">
+        <Link to="/dashboard" className="flex items-center gap-2 h-16 px-5 shrink-0 no-underline">
+          <img src="/favicon.png" alt="" className="w-9 h-9 object-contain" />
+          <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-9 object-contain dark:brightness-0 dark:invert" />
+        </Link>
+        <div className="flex-1 min-h-0">
+          <SidebarContent />
+        </div>
+      </aside>
+
+      {/* Phone / tablet: a slim bar on top, tabs at the bottom, the full menu in a sheet. */}
+      <header className="lg:hidden bg-card border-b border-border sticky top-0 z-40">
+        <div className="px-2 h-14 flex items-center justify-between">
+          <Link to="/dashboard" className="flex items-center gap-2 px-2 no-underline">
+            <img src="/favicon.png" alt="" className="w-8 h-8 object-contain" />
+            <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-8 object-contain dark:brightness-0 dark:invert" />
           </Link>
-
-          {/* Desktop nav */}
-          <nav ref={desktopNavRef} className="hidden md:flex items-center gap-1">
-            {navItems.map((item) => {
-              if (item.kind === 'link') {
-                return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className={`px-3 py-2 rounded-lg text-sm no-underline transition ${
-                      isActive(item.path) ? activeClass : inactiveClass
-                    }`}
-                  >
-                    <NavIcon name={item.icon} className="w-4 h-4 mr-1 shrink-0" />
-                    {item.label}
-                  </Link>
-                )
-              }
-
-              // kind === 'group'
-              const isOpen = openDesktopGroup === item.label
-              return (
-                <div key={item.label} className="relative">
-                  <button
-                    onClick={() => toggleDesktopGroup(item.label)}
-                    className={`px-3 py-2 rounded-lg text-sm transition flex items-center gap-1 cursor-pointer border-none bg-transparent ${
-                      isGroupActive(item) ? activeClass : inactiveClass
-                    }`}
-                  >
-                    <NavIcon name={item.icon} className="w-4 h-4 mr-1 shrink-0" />
-                    {item.label}
-                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-                  </button>
-                  {/* 140px fitted the old one-word labels. The nested section indents its
-                      children and its longest entry is a phrase ("Deck & card generation"),
-                      which wrapped onto three lines; with `whitespace-nowrap` on the rows the
-                      panel sizes to its content instead. */}
-                  {isOpen && (
-                    <div className="absolute top-full left-0 mt-1 bg-card border border-border rounded-lg shadow-lg py-1 min-w-[180px] max-w-[16rem] z-50">
-                      {item.children.map(renderDesktopSubItem)}
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </nav>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Link to="/guide" className="hidden md:inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm no-underline transition text-muted-foreground hover:bg-accent">
-              <BookOpen className="w-4 h-4" />
-              {t('nav.guide')}
-            </Link>
-
-            {/* Mobile hamburger */}
-            <button
-              aria-label={t('menu')}
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-muted-foreground hover:bg-accent rounded-lg cursor-pointer"
+          <div className="flex items-center">
+            <Link
+              to="/guide"
+              aria-label={t('nav.guide')}
+              className="w-11 h-11 flex items-center justify-center rounded-lg text-muted-foreground hover:bg-accent no-underline"
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              <BookOpen className="w-5 h-5" aria-hidden="true" />
+            </Link>
+            <button
+              type="button"
+              aria-label={t('menu')}
+              aria-expanded={menuOpen}
+              aria-haspopup="dialog"
+              onClick={() => setMenuOpen(true)}
+              className="w-11 h-11 flex items-center justify-center rounded-lg text-muted-foreground hover:bg-accent bg-transparent border-none cursor-pointer"
+              data-testid="header-menu"
+            >
+              <Menu className="w-5 h-5" aria-hidden="true" />
             </button>
           </div>
         </div>
-
-        {/* Mobile menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-border bg-card">
-            <nav className="max-w-6xl mx-auto px-4 py-2 flex flex-col">
-              {navItems.map((item) => {
-                if (item.kind === 'link') {
-                  return (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`px-3 py-3 rounded-lg text-sm no-underline transition ${
-                        isActive(item.path) ? activeClass : inactiveClass
-                      }`}
-                    >
-                      <NavIcon name={item.icon} className="w-4 h-4 mr-2 shrink-0" />
-                      {item.label}
-                    </Link>
-                  )
-                }
-
-                // kind === 'group'
-                const isOpen = openMobileGroups.has(item.label)
-                return (
-                  <div key={item.label}>
-                    <button
-                      onClick={() => toggleMobileGroup(item.label)}
-                      className={`w-full px-3 py-3 rounded-lg text-sm transition flex items-center justify-between cursor-pointer border-none bg-transparent text-left ${
-                        isGroupActive(item) ? activeClass : inactiveClass
-                      }`}
-                    >
-                      <span>
-                        <NavIcon name={item.icon} className="w-4 h-4 mr-2 shrink-0" />
-                        {item.label}
-                      </span>
-                      <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-                    </button>
-                    {isOpen && (
-                      <div className="pl-6">
-                        {item.children.map(renderMobileSubItem)}
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-              <div className="border-t border-border mt-2 pt-3 px-3 space-y-2">
-                <Link
-                  to="/guide"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-brand no-underline transition"
-                >
-                  <BookOpen className="w-4 h-4" />
-                  {t('nav.guide')}
-                </Link>
-                <QuickTip />
-              </div>
-            </nav>
-          </div>
-        )}
       </header>
+      <MenuSheet open={menuOpen} onClose={closeMenu} />
 
-      {/* Main Content */}
-      <main id="main-content" tabIndex={-1} className="max-w-6xl mx-auto px-4 py-4 sm:py-6 outline-none">
-        <Outlet />
-      </main>
+      <div className="lg:pl-60">
+        {/* Main Content */}
+        <main id="main-content" tabIndex={-1} className="max-w-6xl mx-auto px-4 py-4 sm:py-6 outline-none">
+          <Outlet />
+        </main>
 
-      {/* Footer */}
-      <footer className="border-t border-border bg-background pb-20 sm:pb-0">
-        <div className="max-w-6xl mx-auto px-4 py-10 sm:py-12">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
-            <div className="flex items-center gap-2">
-              <img src="/favicon.png" alt="" className="w-7 h-7" />
-              <span className="font-bold text-foreground">ReeeeecallStudy</span>
+        {/* Footer — padded on phones so the tab bar never covers it. */}
+        <footer className="border-t border-border bg-background pb-24 lg:pb-0">
+          <div className="max-w-6xl mx-auto px-4 py-10 sm:py-12">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
+              <div className="flex items-center gap-2">
+                <img src="/favicon.png" alt="" className="w-7 h-7" />
+                <span className="font-bold text-foreground">ReeeeecallStudy</span>
+              </div>
+              <AppDownload />
             </div>
-            <AppDownload />
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-border">
+              <p className="text-sm text-muted-foreground">
+                {t('footer.copyright', '© 2026 ReeeeecallStudy. All rights reserved.')}
+              </p>
+              <a href="mailto:admin@reeeeecallstudy.xyz" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
+                admin@reeeeecallstudy.xyz
+              </a>
+            </div>
           </div>
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-border">
-            <p className="text-sm text-content-tertiary">
-              {t('footer.copyright', '© 2026 ReeeeecallStudy. All rights reserved.')}
-            </p>
-          </div>
-          <div className="mt-4 text-center sm:text-right">
-            <a href="mailto:admin@reeeeecallstudy.xyz" className="text-sm text-content-tertiary hover:text-muted-foreground transition no-underline">
-              admin@reeeeecallstudy.xyz
-            </a>
-          </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
+
+      <BottomTabs onOpenMenu={() => setMenuOpen(true)} menuOpen={menuOpen} />
     </div>
   )
 }

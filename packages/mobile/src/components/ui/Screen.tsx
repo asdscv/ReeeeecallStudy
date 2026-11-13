@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTheme } from '../../theme'
 import { testProps } from '../../utils/testProps'
+import { useTabBarVisible } from './tab-bar-context'
 
 interface ScreenProps {
   children: React.ReactNode
@@ -32,6 +33,7 @@ export function Screen({
   testID,
 }: ScreenProps) {
   const theme = useTheme()
+  const tabBar = useTabBarVisible()
   const bg = { backgroundColor: theme.colors.background }
   const pad = padding ? { paddingHorizontal: theme.spacing.xl } : {}
 
@@ -65,7 +67,12 @@ export function Screen({
   }
 
   return (
-    <Wrapper style={[styles.flex, bg, style]} {...testProps(testID, true)}>
+    <Wrapper
+      style={[styles.flex, bg, style]}
+      // With the tab bar below, the bar pads for the home indicator — padding here too doubled it.
+      {...(safeArea && tabBar ? { edges: ['top', 'left', 'right'] as const } : {})}
+      {...testProps(testID, true)}
+    >
       {content}
     </Wrapper>
   )

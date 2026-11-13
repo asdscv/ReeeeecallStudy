@@ -159,7 +159,7 @@ export function QuizResultPage() {
         <button
           type="button"
           onClick={() => void retake()}
-          className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover"
+          className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-brand-foreground rounded-lg cursor-pointer transition-colors hover:bg-brand-hover"
         >
           {t('result.retake')}
         </button>

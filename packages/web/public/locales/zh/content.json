@@ -22,5 +22,25 @@
     "listTitle": "学习洞察 | ReeeCall",
     "listDescription": "发现基于科学的学习策略和间隔重复技巧。",
     "breadcrumbInsights": "学习洞察"
+  },
+  "appCta": {
+    "answer": {
+      "title": "只读一遍，很快就会忘",
+      "description": "把这篇指南做成闪卡吧。间隔重复会在你快要忘记之前把卡片送回来——iPhone、Android 和网页版均可免费使用。"
+    },
+    "wrap_up": {
+      "title": "把读到的内容真正记住",
+      "description": "把刚读到的内容做成闪卡，每天复习几分钟。每张卡片都会在你快要忘记时再次出现。"
+    },
+    "web": "在网页版免费开始",
+    "deck": {
+      "button": "立即用这个牌组学习",
+      "meta_one": "免费官方牌组 · {{count, number}} 张",
+      "meta_other": "免费官方牌组 · {{count, number}} 张"
+    },
+    "hub": {
+      "meta": "免费单词表 · 例句 · 7种语言的牌组",
+      "button": "查看单词表"
+    }
   }
 }

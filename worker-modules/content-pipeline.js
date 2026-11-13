@@ -1,8 +1,10 @@
+import { contentCanonicalUrl } from '../packages/shared/lib/content-canonical.ts'
 // Content generation pipeline orchestrator
 
 import { LOCALES, DEFAULT_LOCALE, PIPELINE_DEFAULTS } from './config.js'
 import { createLogger, info, warn, error } from './logger.js'
 import { generateTopics } from './topic-generator.js'
+import { planKeywordTopic, planDeckTopic } from './keyword-planner.js'
 import { selectTopic } from './topic-registry.js'
 import { buildPrompt } from './prompt-builder.js'
 import { callAI, generateImage } from './ai-client.js'
@@ -40,29 +42,53 @@ export async function runContentPipeline(env, cron) {
       primaryTitles: [],
     }
 
-    // 2. Generate topics via AI (replaces static topic selection)
-    let topics
+    // 2. Today's topic: a real query Google already shows us for but nobody clicks
+    //    (Search Console); else a page for an obvious query one of our official decks answers;
+    //    AI-generated topics only when both are exhausted or fail.
+    const topics = []
     try {
-      topics = await generateTopics(env, recentContent, PIPELINE_DEFAULTS.topicGenerationCount)
-      info('AI topics generated', { count: topics.length })
+      const planned = await planKeywordTopic(env, db)
+      if (planned) {
+        topics.push(planned)
+        info('Keyword topic planned', { query: planned.targetQuery, locale: planned.queryLocale, format: planned.format, deck: planned.deckFamily })
+      }
     } catch (err) {
-      warn('Topic generation failed, using static fallback', { error: err.message })
-      const recentTags = recentContent.flatMap(c => c.tags || [])
-      const usedSubtopicIds = [...new Set(recentTags)]
-      topics = []
-      for (let i = 0; i < topicCount; i++) {
-        topics.push(selectTopic([...usedSubtopicIds, ...topics.map(t => t.id)]))
+      warn('Keyword planner failed, falling back to deck guides', { error: err.message })
+    }
+    if (topics.length === 0) {
+      try {
+        const deckTopic = await planDeckTopic(db)
+        if (deckTopic) {
+          topics.push(deckTopic)
+          info('Deck guide planned', { query: deckTopic.targetQuery, deck: deckTopic.deckFamily })
+        }
+      } catch (err) {
+        warn('Deck guide planner failed, falling back to AI topics', { error: err.message })
       }
     }
 
     let topicsAttempted = 0
+    let topicsPublished = 0
+    let aiTopicsLoaded = false
 
-    // Iterate over pre-generated topics
-    for (const topic of topics) {
+    for (let i = 0; ; i++) {
       const allMet = LOCALES.every(l => successCount[l] >= topicCount)
-      if (allMet) break
+      // A topic that published in any language is the day's topic; a failed edition must not
+      // pull in a whole AI-invented topic on top of it.
+      if (allMet || topicsPublished >= topicCount) break
+
+      if (i >= topics.length) {
+        if (aiTopicsLoaded) break
+        aiTopicsLoaded = true
+        topics.push(...await loadAiTopics(env, recentContent, topicCount))
+        if (i >= topics.length) break
+      }
+      const topic = topics[i]
 
       topicsAttempted++
+      // Deck guides teach the deck's own words — never AI-picked words the deck lacks.
+      const deckWordsFor = topic.deckFamily ? await loadDeckWords(db, topic.deckFamily) : () => null
+      const successesBefore = LOCALES.reduce((n, l) => n + successCount[l], 0)
 
       try {
         info('Topic selected', { index: topicsAttempted, category: topic.category, subtopic: topic.id || topic.titleHint })
@@ -87,7 +113,7 @@ export async function runContentPipeline(env, cron) {
         let sharedSlug = null
         try {
           const primaryArticle = await generateForLocale(
-            env, db, topic, DEFAULT_LOCALE, recentContent, null, thumbnailUrl, runState,
+            env, db, topic, DEFAULT_LOCALE, recentContent, null, thumbnailUrl, runState, deckWordsFor(DEFAULT_LOCALE),
           )
           if (primaryArticle) {
             sharedSlug = primaryArticle.slug
@@ -107,7 +133,7 @@ export async function runContentPipeline(env, cron) {
         const otherLocales = LOCALES.filter(l => l !== DEFAULT_LOCALE)
         const results = await Promise.allSettled(
           otherLocales.map(locale =>
-            generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl, runState),
+            generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl, runState, deckWordsFor(locale)),
           ),
         )
 
@@ -126,6 +152,7 @@ export async function runContentPipeline(env, cron) {
       } catch (err) {
         error('Topic failed', { index: topicsAttempted, error: err.message })
       }
+      if (LOCALES.reduce((n, l) => n + successCount[l], 0) > successesBefore) topicsPublished++
     }
 
     info('Pipeline completed', { topicsAttempted, successCount, target: topicCount })
@@ -165,15 +192,51 @@ export async function runContentPipeline(env, cron) {
   }
 }
 
+// Each edition gets the deck its readers are shown: the words with meanings in its own language.
+// Same-family decks share their English words, so an edition with no deck in its language (English;
+// conversation decks exist only in Korean) gets those words without meanings.
+async function loadDeckWords(db, deckFamily) {
+  const byLocale = {}
+  await Promise.all(LOCALES.map(async (locale) => {
+    try {
+      const words = await db.getOfficialDeckWords(deckFamily, locale)
+      if (words.length > 0) byLocale[locale] = words
+    } catch (err) {
+      warn('Deck words unavailable', { deck: deckFamily, locale, error: err.message })
+    }
+  }))
+  info('Deck words loaded', { deck: deckFamily, locales: Object.keys(byLocale) })
+  const source = byLocale.ko || Object.values(byLocale)[0]
+  const withoutMeanings = source ? source.map((w) => ({ ...w, meaning: '' })) : null
+  return (locale) => byLocale[locale] || withoutMeanings
+}
+
+async function loadAiTopics(env, recentContent, topicCount) {
+  try {
+    const topics = await generateTopics(env, recentContent, PIPELINE_DEFAULTS.topicGenerationCount)
+    info('AI topics generated', { count: topics.length })
+    return topics
+  } catch (err) {
+    warn('Topic generation failed, using static fallback', { error: err.message })
+    const usedSubtopicIds = [...new Set(recentContent.flatMap(c => c.tags || []))]
+    const topics = []
+    for (let i = 0; i < topicCount; i++) {
+      topics.push(selectTopic([...usedSubtopicIds, ...topics.map(t => t.id)]))
+    }
+    return topics
+  }
+}
+
 function buildImagePrompt(topic) {
   return `A modern, clean editorial illustration for a blog article about "${topic.titleHint}" in the context of ${topic.category}. Abstract, minimal style with soft gradients and geometric shapes. No text, no letters, no words. Professional, educational tone. Vibrant but not overwhelming colors.`
 }
 
-async function generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl, runState) {
+async function generateForLocale(env, db, topic, locale, recentContent, sharedSlug, thumbnailUrl, runState, deckWords = null) {
   info('Generating content', { locale, topic: topic.id || topic.titleHint })
 
   const prompt = buildPrompt(topic, locale, {
     previousTitles: runState.primaryTitles || [],
+    deckWords,
   })
   let article = null
 
@@ -200,22 +263,26 @@ async function generateForLocale(env, db, topic, locale, recentContent, sharedSl
     throw new Error(`Failed to generate valid content after ${PIPELINE_DEFAULTS.maxValidationRetries} attempts`)
   }
 
+  // The primary edition owns the slug; a translation that re-ran dedup on its own title could
+  // land on a different slug and lose its hreflang pair. Only a real 409 moves it (below).
+  const ownsSlug = !(sharedSlug && locale !== DEFAULT_LOCALE)
+
   // Same-run dedup check
-  const sameRunCheck = checkSameRunDuplicate(
+  const sameRunCheck = ownsSlug && checkSameRunDuplicate(
     { slug: article.slug, title: article.title, tags: article.tags, locale },
     runState,
   )
-  if (sameRunCheck.isDuplicate) {
+  if (sameRunCheck && sameRunCheck.isDuplicate) {
     info('Same-run duplicate detected, adding date suffix', { reason: sameRunCheck.reason })
     article.slug = appendDateSuffix(article.slug)
   }
 
   // DB-level dedup check
-  const dupCheck = checkDuplicate(
+  const dupCheck = ownsSlug && checkDuplicate(
     { slug: article.slug, title: article.title, tags: article.tags, locale },
     recentContent,
   )
-  if (dupCheck.isDuplicate) {
+  if (dupCheck && dupCheck.isDuplicate) {
     info('Duplicate detected, adding date suffix', { reason: dupCheck.reason })
     article.slug = appendDateSuffix(article.slug)
   }
@@ -234,12 +301,25 @@ async function generateForLocale(env, db, topic, locale, recentContent, sharedSl
     reading_time_minutes: article.reading_time_minutes || 5,
     thumbnail_url: thumbnailUrl || null,
     og_image_url: thumbnailUrl || null,
-    canonical_url: `${SITE_URL}/insight/${article.slug}`,
+    canonical_url: contentCanonicalUrl(SITE_URL, article.slug, locale),
     author_name: 'ReeeeecallStudy',
     is_published: true,
     published_at: new Date().toISOString(),
+    ...(topic.targetQuery ? { target_query: topic.targetQuery } : {}),
+    ...(topic.deckFamily ? { deck_family: topic.deckFamily } : {}),
   }
 
-  const inserted = await db.insertContent(record)
+  // Dedup only sees the latest 100 rows; an older (or pruned, unpublished) row can still own
+  // this slug+locale, and the unique index turns that into a lost article.
+  let inserted
+  try {
+    inserted = await db.insertContent(record)
+  } catch (err) {
+    if (!/insert failed: 409/.test(err.message)) throw err
+    record.slug = appendDateSuffix(record.slug)
+    record.canonical_url = contentCanonicalUrl(SITE_URL, record.slug, locale)
+    info('Slug taken by an older row, retrying with date suffix', { slug: record.slug, locale })
+    inserted = await db.insertContent(record)
+  }
   return inserted
 }

@@ -250,7 +250,7 @@ export function ImportModal({ open, onClose, deckId, templateId, template, onCom
             <p className="text-muted-foreground mb-2">{t('dragFile')}</p>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
+              className="px-4 py-2 bg-brand text-brand-foreground rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
             >
               {t('selectFile')}
             </button>

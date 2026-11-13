@@ -146,7 +146,7 @@ export function LearningGoalsPage() {
           <button
             type="button"
             onClick={openCreate}
-            className="px-3 py-1.5 text-sm font-medium bg-brand text-white rounded-lg cursor-pointer transition-colors hover:bg-brand-hover"
+            className="px-3 py-1.5 text-sm font-medium bg-brand text-brand-foreground rounded-lg cursor-pointer transition-colors hover:bg-brand-hover"
           >
             {t('goals.create')}
           </button>

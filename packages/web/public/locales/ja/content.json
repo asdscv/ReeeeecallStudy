@@ -22,5 +22,25 @@
     "listTitle": "学習インサイト | ReeeCall",
     "listDescription": "科学に基づいた学習戦略と間隔反復のヒントを発見しましょう。",
     "breadcrumbInsights": "学習インサイト"
+  },
+  "appCta": {
+    "answer": {
+      "title": "一度読んだだけでは、すぐに薄れます",
+      "description": "このガイドをフラッシュカードにしておきましょう。間隔反復が、忘れる直前にカードを出してくれます。iPhone・Android・Webで無料。"
+    },
+    "wrap_up": {
+      "title": "読んだ内容を自分のものに",
+      "description": "今読んだ内容をフラッシュカードにして、1日数分だけ復習しましょう。忘れる直前にカードが戻ってきます。"
+    },
+    "web": "Webで無料で始める",
+    "deck": {
+      "button": "このデッキですぐ学習",
+      "meta_one": "無料の公式デッキ · {{count, number}}枚",
+      "meta_other": "無料の公式デッキ · {{count, number}}枚"
+    },
+    "hub": {
+      "meta": "無料の単語リスト · 例文 · 7言語のデッキ",
+      "button": "単語リストを見る"
+    }
   }
 }

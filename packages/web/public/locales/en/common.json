@@ -2,6 +2,7 @@
   "nav": {
     "quickStudy": "Quick Study",
     "dashboard": "Dashboard",
+    "brainTraining": "Brain Training",
     "study": "Study",
     "decks": "Decks",
     "cards": "Cards",
@@ -23,7 +24,16 @@
     "analytics": "Analytics",
     "publisher": "Publisher Stats",
     "wallet": "Wallet",
-    "quiz": "Quiz"
+    "quiz": "Quiz",
+    "aiHubHome": "AI Learning home",
+    "tabsLabel": "Main tabs",
+    "short": {
+      "home": "Home",
+      "study": "Study",
+      "decks": "Decks",
+      "brain": "Brain",
+      "more": "Menu"
+    }
   },
   "guideHelp": "Help",
   "actions": {

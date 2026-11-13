@@ -4,6 +4,7 @@ import { SEO, toOgLocale } from '../lib/seo-config'
 
 interface SEOOptions {
   title: string
+  lang?: string
   description: string
   ogImage?: string
   ogImageWidth?: number
@@ -59,6 +60,7 @@ function removeLink(rel: string, hreflang?: string) {
 export function useSEO(options: SEOOptions) {
   const {
     title,
+    lang,
     description,
     ogImage,
     ogImageWidth,
@@ -83,7 +85,7 @@ export function useSEO(options: SEOOptions) {
 
     // HTML lang
     const prevLang = document.documentElement.lang
-    const currentLang = i18next.language || SEO.DEFAULT_LOCALE
+    const currentLang = lang || i18next.language || SEO.DEFAULT_LOCALE
     document.documentElement.lang = currentLang
 
     // Description
@@ -100,6 +102,8 @@ export function useSEO(options: SEOOptions) {
       .map(toOgLocale)
     setMeta('property', 'og:locale', ogLocale)
     // Add all alternate locale meta tags
+    const prevAltMetaEls = Array.from(document.querySelectorAll('meta[property="og:locale:alternate"]'))
+    for (const el of prevAltMetaEls) el.remove()
     const altMetaEls: HTMLMetaElement[] = []
     for (const alt of altLocales) {
       const el = document.createElement('meta')
@@ -130,9 +134,10 @@ export function useSEO(options: SEOOptions) {
     }
 
     // Robots noindex
-    if (noIndex) {
-      setMeta('name', 'robots', 'noindex, follow')
-    }
+    const prevRobots = document.querySelector('meta[name="robots"]')?.getAttribute('content')
+    setMeta('name', 'robots', noIndex
+      ? 'noindex, follow'
+      : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1')
 
     // Keywords
     if (keywords && keywords.length > 0) {
@@ -198,6 +203,7 @@ export function useSEO(options: SEOOptions) {
       removeMeta('property', 'og:site_name')
       removeMeta('property', 'og:locale')
       for (const el of altMetaEls) el.remove()
+      for (const el of prevAltMetaEls) document.head.appendChild(el)
       removeMeta('property', 'og:url')
 
       // OG image cleanup
@@ -217,9 +223,8 @@ export function useSEO(options: SEOOptions) {
       }
 
       // Robots cleanup
-      if (noIndex) {
-        removeMeta('name', 'robots')
-      }
+      if (prevRobots != null) setMeta('name', 'robots', prevRobots)
+      else removeMeta('name', 'robots')
 
       // Keywords cleanup
       if (keywords && keywords.length > 0) {
@@ -248,5 +253,5 @@ export function useSEO(options: SEOOptions) {
       // JSON-LD cleanup
       for (const s of scripts) s.remove()
     }
-  }, [title, description, ogImage, ogImageWidth, ogImageHeight, ogType, canonicalUrl, jsonLd, hreflangAlternates, publishedTime, modifiedTime, articleSection, keywords, articleTags, articleAuthor, noIndex])
+  }, [title, lang, description, ogImage, ogImageWidth, ogImageHeight, ogType, canonicalUrl, jsonLd, hreflangAlternates, publishedTime, modifiedTime, articleSection, keywords, articleTags, articleAuthor, noIndex])
 }

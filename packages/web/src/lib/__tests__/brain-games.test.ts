@@ -1,0 +1,505 @@
+/**
+ * Brain games: every round is generated at the player's level, the level has no ceiling (Quick Eye
+ * aside, whose ladder ends at one frame), and the adaptive rules follow the research the feature
+ * cites. These tests walk every game across levels and screen widths and check each round is
+ * well-formed and solvable, then pin the staircase targets, the Corsi stop rule, Quick Eye's
+ * exposure rules and variant ladder, the session plan and the course schedule.
+ */
+import { describe, it, expect } from 'vitest'
+import {
+  BRAIN_GAMES,
+  DEFAULT_CONTEXT,
+  GROUP_RULES,
+  QUICK_EYE_LADDER_MS,
+  advanceBarMs,
+  brainGame,
+  courseStatus,
+  createRng,
+  emptyProgress,
+  exposureMsFor,
+  maxColsFor,
+  parseProgress,
+  planTodaysSession,
+  quickEyeAdvance,
+  quickEyeThreshold,
+  recordRound,
+  recordSession,
+  restartLevel,
+  serializeProgress,
+  stepLevel,
+  targetAccuracy,
+  buildDemo,
+  emptyHistory,
+  gameHistory,
+  parseHistory,
+  recordHistory,
+  serializeHistory,
+  roundStars,
+  streakTier,
+  todaysPlanSeed,
+  HISTORY_PER_GAME,
+  weekProgress,
+  weekStart,
+  type BrainGameId,
+  type ChoiceView,
+  type CreateContext,
+  type QuickEyeView,
+} from '@reeeeecall/shared/lib/brain-games'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Any = any
+
+function settle(def: Any, s: Any): Any {
+  for (let i = 0; i < 500 && def.pendingMs(s) !== null && !def.acceptsInput(s); i++) s = def.advance(s)
+  return s
+}
+
+/** Plays the trial perfectly using the game's own state. */
+function solve(id: BrainGameId, def: Any, s0: Any): Any {
+  let s = settle(def, s0)
+  switch (id) {
+    case 'quickEye': {
+      // fixation → stimulus, the platform reports an exact exposure, mask → answer.
+      s = def.advance(s0)
+      s = def.exposed(s, s.exposureMs, 1000 / 60)
+      s = settle(def, s)
+      s = def.tap(s, s.correctCenter)
+      if (s.targetDir !== null) s = def.tap(s, s.targetDir)
+      return s
+    }
+    case 'memoryGrid':
+      for (const t of s.targets) s = def.tap(s, t)
+      return s
+    case 'sequence': {
+      const order = s.reverse ? [...s.seq].reverse() : s.seq
+      for (const t of order) s = def.tap(s, t)
+      return s
+    }
+    case 'pairs': {
+      const faces = [...new Set(s.cards as string[])]
+      for (const f of faces) {
+        const idx = s.cards.map((c: string, i: number) => (c === f ? i : -1)).filter((i: number) => i >= 0)
+        s = def.tap(s, idx[0])
+        s = def.tap(s, idx[1])
+      }
+      return s
+    }
+    case 'schulte': {
+      const total = s.n * s.n
+      for (let k = 0; k < total; k++) {
+        const want = s.order === 'asc' ? k + 1 : total - k
+        s = def.tap(s, s.values.indexOf(want))
+      }
+      return s
+    }
+    case 'oddOneOut':
+      return def.tap(s, s.oddIndex)
+    default:
+      return def.tap(s, s.correctIndex)
+  }
+}
+
+const LEVELS = [0, 1, 2, 3, 4, 6, 8, 10, 12, 14, 16, 20, 30, 60, 120]
+const CONTEXTS: CreateContext[] = [
+  DEFAULT_CONTEXT,
+  { ...DEFAULT_CONTEXT, maxCols: maxColsFor(358), ringSlots: [8, 16, 16] },
+  { ...DEFAULT_CONTEXT, maxCols: 3, centerOnly: true, livesLeft: 1 },
+]
+
+describe('every game, every level, every screen', () => {
+  for (const { id, def } of BRAIN_GAMES) {
+    it(`${id}: well-formed and solvable`, () => {
+      for (const ctx of CONTEXTS) {
+        for (const level of LEVELS) {
+          for (let seed = 1; seed <= 20; seed++) {
+            const variant = 1 + (seed % 16)
+            const c = { ...ctx, variant }
+            const s0 = def.create(id === 'quickEye' ? Math.min(level, 12) : Math.max(1, level), createRng(seed * 7919 + level), c)
+            const view = def.view(s0)
+            if (view.kind === 'grid') {
+              expect(view.cells.length).toBe(view.cols * view.rows)
+              expect(view.cols, `${id} must not exceed the width cap`).toBeLessThanOrEqual(Math.max(3, Math.min(7, c.maxCols)))
+            } else if (view.kind === 'choice') {
+              const texts = view.options.map((o) => o.text ?? o.textKey)
+              expect(new Set(texts).size, `${id} L${level} duplicate options ${texts}`).toBe(texts.length)
+              expect(view.options.length).toBeGreaterThanOrEqual(2)
+            }
+            const won = solve(id, def, s0)
+            expect(def.outcome(won)?.correct, `${id} L${level} seed ${seed} v${variant} not won`).toBe(true)
+          }
+        }
+      }
+    })
+  }
+})
+
+describe('Quick Eye', () => {
+  const def = brainGame('quickEye').def as Any
+  const frame = 1000 / 60
+
+  it('exposure ladder runs 500ms down to one 60Hz frame, floored per platform', () => {
+    expect(QUICK_EYE_LADDER_MS[0]).toBe(500)
+    expect(QUICK_EYE_LADDER_MS[QUICK_EYE_LADDER_MS.length - 1]).toBe(17)
+    expect(exposureMsFor(-3)).toBe(500)
+    expect(exposureMsFor(99)).toBe(17)
+    const s = def.create(12, createRng(1), { ...DEFAULT_CONTEXT, minExposureMs: 33 })
+    expect(s.exposureMs).toBe(33)
+  })
+
+  it('voids a trial whose short exposure was off by even one frame, tolerates one frame on long ones', () => {
+    const short = def.advance(def.create(10, createRng(2), DEFAULT_CONTEXT)) // 50ms = 3 frames
+    expect(def.outcome(def.exposed(short, short.exposureMs + frame, frame))?.void).toBe(true)
+    expect(def.exposed(short, short.exposureMs, frame).phase).toBe('mask')
+    const long = def.advance(def.create(0, createRng(3), DEFAULT_CONTEXT)) // 500ms = 30 frames
+    expect(def.exposed(long, long.exposureMs + frame, frame).phase).toBe('mask')
+    expect(def.outcome(def.exposed(long, long.exposureMs + 3 * frame, frame))?.void).toBe(true)
+  })
+
+  it('needs both answers from variant 2, the centre alone on variant 1 and in centre-only mode', () => {
+    const v2 = def.advance(def.create(0, createRng(4), { ...DEFAULT_CONTEXT, variant: 2 }))
+    let s = settle(def, def.exposed(v2, v2.exposureMs, frame))
+    s = def.tap(s, s.correctCenter)
+    expect(s.phase).toBe('answerLocation')
+    s = def.tap(s, (s.targetDir + 1) % 8)
+    expect(def.outcome(s)).toMatchObject({ correct: false, accuracy: 0.5 })
+    const only = def.create(0, createRng(5), { ...DEFAULT_CONTEXT, variant: 9, centerOnly: true })
+    expect(only.target).toBeNull()
+    expect(only.distractors).toHaveLength(0)
+  })
+
+  it('never puts a distractor on the target, and caps distractors by the field', () => {
+    for (let seed = 1; seed < 200; seed++) {
+      const phone = def.create(5, createRng(seed), { ...DEFAULT_CONTEXT, variant: 9, ringSlots: [8, 16, 16] })
+      expect(phone.distractors.length).toBe(39)
+      expect(phone.distractors.some((d: Any) => d.ring === phone.target.ring && d.slot === phone.target.slot)).toBe(false)
+      const view = def.view(phone) as QuickEyeView
+      expect(view.ringSlots).toEqual([8, 16, 16])
+    }
+  })
+
+  it('estimates a threshold only from enough reversals, and opens the next variant on the criterion', () => {
+    expect(quickEyeThreshold([100, 100, 100], [true, false, true])).toBeNull()
+    const ms = Array.from({ length: 24 }, (_, i) => (i % 5 === 4 ? 133 : 83))
+    const ok = Array.from({ length: 24 }, (_, i) => i % 5 !== 4)
+    const t = quickEyeThreshold(ms, ok)
+    expect(t).not.toBeNull()
+    expect(quickEyeAdvance(2, ms, ok).advance).toBe(t! <= advanceBarMs(2))
+    expect(quickEyeAdvance(16, ms, ok).advance).toBe(false)
+    expect(advanceBarMs(1)).toBe(50)
+    expect(advanceBarMs(7)).toBe(200)
+    expect(advanceBarMs(12)).toBe(250)
+  })
+
+  it('advancing eases the exposure back three steps and clears the window', () => {
+    let p = emptyProgress()
+    p = { ...p, quickEye: { ...p.quickEye, variant: 2 } }
+    for (let i = 0; i < 40; i++) {
+      const ok = i % 5 !== 4
+      // Misses happen at the harder (shorter) exposures, as on a real staircase.
+      p = recordRound(p, 'quickEye', { level: 7, correct: ok, points: 10, shownMs: ok ? 83 : 67 }, '2026-11-12')
+      if (p.quickEye.variant === 3) break
+    }
+    expect(p.quickEye.variant).toBe(3)
+    expect(p.games.quickEye?.level).toBe(4)
+    expect(p.quickEye.recentMs).toEqual([])
+  })
+})
+
+describe('staircase', () => {
+  it('targets 85% for speed games and 80% for Quick Eye; speed never moves the level', () => {
+    expect(targetAccuracy('speed')).toBeCloseTo(0.85, 2)
+    expect(targetAccuracy('quickEye')).toBeCloseTo(0.8, 2)
+  })
+
+  function simulate(group: 'speed' | 'quickEye', threshold: number, seed: number) {
+    const rng = createRng(seed)
+    const r = GROUP_RULES[group]
+    let level = r.min
+    let wins = 0
+    const N = 6000
+    for (let i = 0; i < N; i++) {
+      const p = 1 / (1 + Math.exp((level - threshold) / 1.2))
+      const correct = rng.chance(p)
+      wins += correct ? 1 : 0
+      level = stepLevel(group, level, correct, correct ? 1 : 0, i % 20)
+    }
+    return wins / N
+  }
+
+  it('settles near its target accuracy', () => {
+    expect(Math.abs(simulate('speed', 15, 1) - 0.85)).toBeLessThan(0.04)
+    expect(Math.abs(simulate('quickEye', 8, 2) - 0.8)).toBeLessThan(0.05)
+  })
+
+  it('uncertainty scales both steps by k (the ratio — the target — unchanged); never below the floor', () => {
+    expect(stepLevel('speed', 5, true, 1, 2)).toBeCloseTo(5.3)
+    expect(stepLevel('speed', 5, true, 1)).toBeCloseTo(5.15)
+    expect(stepLevel('speed', 5, false, 0, 2)).toBeCloseTo(3.3)
+    expect(stepLevel('speed', 1.2, false, 0)).toBe(1)
+    expect(stepLevel('quickEye', 11.9, true, 1)).toBe(12)
+    let level = 1
+    for (let i = 0; i < 2000; i++) level = stepLevel('speed', level, true, 1)
+    expect(level).toBeGreaterThan(250)
+  })
+
+  it('span games follow Corsi: up one length per success, a miss does not move the level', () => {
+    expect(stepLevel('span', 4, true, 1, 0)).toBe(5)
+    expect(stepLevel('span', 4, false, 0, 0)).toBe(4)
+    expect(restartLevel('span', 9, 9)).toBe(7)
+    expect(restartLevel('speed', 6.4, 6.4)).toBeCloseTo(5.9)
+    expect(restartLevel('quickEye', 0.5, 0.5)).toBe(0)
+  })
+})
+
+describe('Today\'s Training plan', () => {
+  it('opens with Quick Eye, then a speed game, then rotates; variety games every other session', () => {
+    const roles = (id: BrainGameId) => BRAIN_GAMES.find((g) => g.id === id)!.role
+    for (let seed = 1; seed < 60; seed++) {
+      let p = emptyProgress()
+      p = { ...p, sessions: { ...p.sessions, total: seed % 2 } }
+      const plan = planTodaysSession(p, createRng(seed))
+      expect(plan.map((s) => s.gameId)[0]).toBe('quickEye')
+      expect(roles(plan[1].gameId)).toBe('speed')
+      expect(['span', 'reasoning']).toContain(roles(plan[2].gameId))
+      if (seed % 2 === 0) expect(roles(plan[3].gameId)).toBe('variety')
+      else expect(['span', 'reasoning']).toContain(roles(plan[3].gameId))
+      expect(new Set(plan.map((s) => s.gameId)).size).toBe(4)
+      expect(plan.reduce((a, s) => a + s.minutes, 0)).toBe(22)
+    }
+  })
+
+  it('counts sessions by week, Monday to Sunday', () => {
+    expect(weekStart('2026-11-12')).toBe('2026-11-09')
+    expect(weekStart('2026-11-09')).toBe('2026-11-09')
+    expect(weekStart('2026-11-15')).toBe('2026-11-09')
+    let p = emptyProgress()
+    for (const day of ['2026-11-06', '2026-11-09', '2026-11-11']) p = recordSession(p, 22, day, null)
+    expect(weekProgress(p, '2026-11-12')).toEqual({ done: 2, goal: 3 })
+  })
+
+  it('runs a 10-session core course, then refreshers at 11 and 35 months', () => {
+    let p = emptyProgress()
+    // Mon/Wed/Fri from Monday 2026-01-05: the 10th session is Monday 2026-02-02.
+    const days = ['2026-01-05', '2026-01-07', '2026-01-09', '2026-01-12', '2026-01-14', '2026-01-16', '2026-01-19', '2026-01-21', '2026-01-23', '2026-02-02']
+    for (const day of days) p = recordSession(p, 22, day, null)
+    expect(p.sessions.coreDoneOn).toBe('2026-02-02')
+    expect(courseStatus(p, '2026-06-01')).toMatchObject({ phase: 'maintenance', nextBoosterOn: '2027-01-02' })
+    expect(courseStatus(p, '2027-01-04')).toMatchObject({ phase: 'booster', booster: { index: 1, done: 0, total: 4 } })
+    for (const day of ['2027-01-04', '2027-01-06', '2027-01-08', '2027-01-11']) p = recordSession(p, 22, day, 1)
+    expect(courseStatus(p, '2027-01-20')).toMatchObject({ phase: 'maintenance', nextBoosterOn: '2029-01-02' })
+    expect(courseStatus(p, '2029-01-03')).toMatchObject({ phase: 'booster', booster: { index: 2 } })
+  })
+
+  it('a session past three in a week is welcome but moves the course no further (EVIDENCE §3)', () => {
+    let p = emptyProgress()
+    for (let i = 0; i < 10; i++) p = recordSession(p, 22, '2026-01-15', null)
+    expect(p.sessions.total).toBe(10)
+    expect(p.sessions.course).toBe(3)
+    expect(p.sessions.coreDoneOn).toBeNull()
+    expect(courseStatus(p, '2026-01-15')).toMatchObject({ phase: 'core', coreDone: 3 })
+  })
+})
+
+describe('choice answers', () => {
+  it('math: the marked option is the real answer, all options non-negative', () => {
+    const { def } = brainGame('math')
+    for (const level of LEVELS) {
+      for (let seed = 1; seed <= 60; seed++) {
+        const s = def.create(Math.max(1, level), createRng(seed + level * 1000), DEFAULT_CONTEXT) as Any
+        const view = def.view(s) as ChoiceView
+        const expr = view.stimulus.text!.replace(' = ?', '')
+        const values = view.options.map((o) => Number(o.text))
+        values.forEach((v) => expect(v).toBeGreaterThanOrEqual(0))
+        if (!expr.includes('?')) {
+          const answer = Function(`return ${expr.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-')}`)()
+          expect(values[s.correctIndex]).toBe(answer)
+        }
+      }
+    }
+  })
+
+  it('stroop: the answer is the ink (or the word, when asked)', () => {
+    const { def } = brainGame('stroop')
+    for (const level of LEVELS) {
+      for (let seed = 1; seed <= 60; seed++) {
+        const s = def.create(Math.max(1, level), createRng(seed + level * 31), DEFAULT_CONTEXT) as Any
+        const view = def.view(s) as ChoiceView
+        const answer = view.options[s.correctIndex].textKey
+        const want = s.prompt.key === 'play.pickInk' ? `colors.${view.stimulus.color}` : view.stimulus.textKey
+        expect(answer).toBe(want)
+      }
+    }
+  })
+})
+
+describe('per-game life rules', () => {
+  it('Number Hunt spends a life per wrong tap, and stops at the lives left', () => {
+    const def = brainGame('schulte').def as Any
+    let s = def.create(3, createRng(9), { ...DEFAULT_CONTEXT, livesLeft: 2 })
+    const wrong = s.values.findIndex((v: number) => v !== 1)
+    s = def.tap(s, wrong)
+    expect(def.outcome(s)).toBeNull()
+    s = def.tap(s, wrong)
+    expect(def.outcome(s)).toMatchObject({ correct: false, livesSpent: 2 })
+  })
+
+  it('Match Pairs does not count turning over unseen cards as mistakes', () => {
+    const def = brainGame('pairs').def as Any
+    let s = def.create(24, createRng(11), DEFAULT_CONTEXT) // the preview has tapered away by here
+    s = settle(def, s)
+    const a = 0
+    const b = s.cards.findIndex((c: string, i: number) => i !== a && c !== s.cards[a])
+    s = def.tap(def.tap(s, a), b)
+    expect(s.misses).toBe(0)
+  })
+})
+
+describe('migration and rotation', () => {
+  it('converts v1 span levels to the new length scale', () => {
+    const v1 = JSON.stringify({ v: 1, games: { memoryGrid: { level: 6, bestLevel: 9, rounds: 4, wins: 3 }, sequence: { level: 6, bestLevel: 6, rounds: 2, wins: 1 }, math: { level: 6, bestLevel: 6, rounds: 2, wins: 1 } }, totalRounds: 8, totalPoints: 0, lastDay: null, dayStreak: 0, todayRounds: 0 })
+    const p = parseProgress(v1)
+    expect(p.games.memoryGrid).toMatchObject({ level: 4, bestLevel: 5 }) // 3 + ⌊5·0.6⌋ = 6 cells → length 6 − 2
+    expect(p.games.sequence).toMatchObject({ level: 3 }) // 3 + ⌊5·0.45⌋ = 5 tiles → 3
+    expect(p.games.math).toMatchObject({ level: 6 }) // other games keep their scale
+    // A v2 record is read as written.
+    const v2 = parseProgress(serializeProgress({ ...emptyProgress(), games: { memoryGrid: { level: 6, bestLevel: 6, rounds: 1, wins: 1 } } }))
+    expect(v2.games.memoryGrid?.level).toBe(6)
+  })
+
+  it('rotates by the games recent sessions used, not by trial counts', () => {
+    let p = emptyProgress()
+    p = recordSession(p, 22, '2026-11-10', null, ['quickEye', 'oddOneOut', 'memoryGrid', 'pairs'])
+    for (let seed = 1; seed < 30; seed++) {
+      const plan = planTodaysSession(p, createRng(seed))
+      expect(plan[1].gameId).toBe('schulte')
+      expect(plan[2].gameId).not.toBe('memoryGrid')
+    }
+  })
+})
+
+describe('progress', () => {
+  it('records rounds, keeps the best level, and counts day streaks', () => {
+    let p = emptyProgress()
+    p = recordRound(p, 'math', { level: 3.3, correct: true, points: 30 }, '2026-11-10')
+    p = recordRound(p, 'math', { level: 2.5, correct: false, points: 0 }, '2026-11-10')
+    expect(p.games.math).toEqual({ level: 2.5, bestLevel: 3.3, rounds: 2, wins: 1 })
+    expect(p.todayRounds).toBe(2)
+    p = recordRound(p, 'stroop', { level: 1.3, correct: true, points: 10 }, '2026-11-11')
+    expect(p.dayStreak).toBe(2)
+  })
+
+  it('round-trips, tolerates garbage, and stays small enough for SecureStore', () => {
+    let p = emptyProgress()
+    for (const g of BRAIN_GAMES) p = recordRound(p, g.id, { level: g.id === 'quickEye' ? 9 : 123.45, correct: true, points: 99999, shownMs: 133 }, '2026-11-12')
+    for (let i = 0; i < 30; i++) p = recordRound(p, 'quickEye', { level: 6.25, correct: i % 3 !== 0, points: 10, shownMs: i % 3 ? 267 : 333 }, '2026-11-12')
+    for (let i = 0; i < 20; i++) p = recordSession(p, 23, `2026-11-${String(10 + (i % 18)).padStart(2, '0')}`, null)
+    p = { ...p, bestRuns: Object.fromEntries(BRAIN_GAMES.map((g) => [g.id, 123456])), practiced: BRAIN_GAMES.map((g) => g.id) }
+    const raw = serializeProgress(p)
+    expect(parseProgress(raw)).toEqual(p)
+    expect(raw.length).toBeLessThan(1800)
+    expect(parseProgress('not json')).toEqual(emptyProgress())
+    expect(parseProgress('{"v":2}')).toEqual(emptyProgress())
+    expect(parseProgress('{"v":1,"games":{},"quickEye":{"variant":99,"recentMs":[1,2],"recentOk":"1"}}').quickEye).toMatchObject({ variant: 16, recentMs: [], recentOk: '' })
+    // A corrupted level is clamped, never handed to a game as 1e308 (which hung Quick Math).
+    const huge = parseProgress('{"v":1,"games":{"math":{"level":1e308},"quickEye":{"level":99}},"sessions":{}}')
+    expect(huge.games.math?.level).toBe(500)
+    expect(huge.games.quickEye?.level).toBe(12)
+    expect(brainGame('math').def.create(1e308, createRng(1), DEFAULT_CONTEXT)).toBeTruthy()
+  })
+})
+
+/** Plays a trial with nothing but the game's own `solution()` — what the how-to-play demo does. */
+function playBySolution(def: Any, s: Any): Any {
+  for (let guard = 0; guard < 2000 && !def.outcome(s); guard++) {
+    const view = def.view(s)
+    if (view.kind === 'quickEye' && view.phase === 'stimulus') {
+      s = def.exposed(s, view.exposureMs, 1000 / 60)
+      continue
+    }
+    if (def.pendingMs(s) !== null && !def.acceptsInput(s)) {
+      s = def.advance(s)
+      continue
+    }
+    const taps = def.solution(s)
+    if (!taps || taps.length === 0) throw new Error('no solution while input is expected')
+    s = def.tap(s, taps[0])
+  }
+  return s
+}
+
+describe('solution() — the demo and these tests play every game from the engine alone', () => {
+  for (const { id, def } of BRAIN_GAMES) {
+    it(`${id}: following solution() always wins`, () => {
+      for (const ctx of CONTEXTS) {
+        for (const level of LEVELS) {
+          for (let seed = 1; seed <= 12; seed++) {
+            const c = { ...ctx, variant: 1 + (seed % 16) }
+            const s0 = def.create(id === 'quickEye' ? Math.min(level, 12) : Math.max(1, level), createRng(seed * 104729 + level), c)
+            const won = playBySolution(def, s0)
+            expect(def.outcome(won)?.correct, `${id} L${level} seed ${seed}`).toBe(true)
+            expect(def.solution(won), 'nothing is asked once the trial is over').toBeNull()
+          }
+        }
+      }
+    })
+  }
+
+  it('every game has a demo that asks something, taps, and ends on a right answer', () => {
+    for (const { id, def } of BRAIN_GAMES) {
+      const frames = buildDemo(id)
+      expect(frames.length, id).toBeGreaterThan(2)
+      expect(frames.some((f) => f.tap !== undefined), `${id} demo taps`).toBe(true)
+      const last = frames[frames.length - 1].view
+      if (last.kind === 'choice') expect(last.picked).toBe(last.correctIndex)
+      if (last.kind === 'quickEye') {
+        expect(last.pickedCenter).toBe(last.correctCenter)
+        expect(last.pickedDirection).toBe(last.correctDirection)
+      }
+      if (last.kind === 'grid') expect(last.cells.some((c) => c.tone === 'wrong'), `${id} demo makes no mistake`).toBe(false)
+      expect(frames.every((f) => f.holdMs > 0 && f.holdMs <= 1600)).toBe(true)
+      // Quick Eye's demo shows the flash (variant 2: centre and star) — or the centre alone for a
+      // player on the centre-only setting.
+      if (id === 'quickEye') {
+        expect(frames.some((f) => f.flash)).toBe(true)
+        const centre = buildDemo('quickEye', { centerOnly: true })
+        expect(centre.every((f) => f.view.kind !== 'quickEye' || f.view.target === null)).toBe(true)
+      }
+      void def
+    }
+  })
+})
+
+describe('round history, stars and streaks', () => {
+  it('keeps the last rounds per game, round-trips, and stays small for SecureStore', () => {
+    let h = emptyHistory()
+    for (const { id } of BRAIN_GAMES) {
+      for (let i = 0; i < 20; i++) h = recordHistory(h, id, { day: '2026-11-12', level: 12.34 + i, accuracy: 0.876 })
+    }
+    for (const { id } of BRAIN_GAMES) expect(gameHistory(h, id)).toHaveLength(HISTORY_PER_GAME)
+    const raw = serializeHistory(h)
+    expect(raw.length).toBeLessThan(1800)
+    const back = parseHistory(raw)
+    expect(gameHistory(back, 'memoryGrid').at(-1)).toEqual({ day: '2026-11-12', level: 31.3, accuracy: 0.88 })
+    expect(parseHistory('{"rounds":{"memoryGrid":[[1,2],"x",[1,2,3]],"nope":[[1,1,1]]}}').rounds).toEqual({ memoryGrid: [[1, 2, 3]] })
+    expect(parseHistory('garbage')).toEqual(emptyHistory())
+    // A day far out of range would throw in the date conversion on every trend: it is dropped.
+    expect(parseHistory('{"rounds":{"math":[[9e15,10,50],[1000,10,50]]}}').rounds).toEqual({ math: [[1000, 10, 50]] })
+  })
+
+  it('stars by accuracy (none for very short rounds), streak tiers at 3, 6 and 10', () => {
+    expect(roundStars(4, 4)).toBe(0)
+    expect(roundStars(10, 9)).toBe(3)
+    expect(roundStars(10, 8)).toBe(2)
+    expect(roundStars(10, 5)).toBe(1)
+    expect([2, 3, 6, 10].map(streakTier)).toEqual([0, 1, 2, 3])
+  })
+
+  it("today's line-up is the same all day, and changes once a session is done", () => {
+    const p = emptyProgress()
+    const a = planTodaysSession(p, createRng(todaysPlanSeed(p, '2026-11-12'))).map((s) => s.gameId)
+    const b = planTodaysSession(p, createRng(todaysPlanSeed(p, '2026-11-12'))).map((s) => s.gameId)
+    expect(a).toEqual(b)
+    const after = recordSession(p, 22, '2026-11-12', null, a)
+    expect(todaysPlanSeed(after, '2026-11-12')).not.toBe(todaysPlanSeed(p, '2026-11-12'))
+  })
+})

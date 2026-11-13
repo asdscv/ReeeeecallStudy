@@ -23,6 +23,10 @@ const KEYS = {
   // don't lose their saved theme.
   theme: 'reeeeecall-user-theme',
   haptics: 'app-haptics-enabled',
+  // Suffixed with the user id — SecureStore keys allow [A-Za-z0-9._-], which a UUID fits.
+  brainProgress: 'brain-progress',
+  brainHistory: 'brain-history',
+  brainMeta: 'brain-meta',
 } as const
 
 function read(key: string): string | null {
@@ -66,5 +70,44 @@ export const localPrefs = {
   },
   setHapticsEnabled(enabled: boolean): void {
     write(KEYS.haptics, enabled ? 'true' : 'false')
+  },
+
+  /**
+   * Brain-training progress (levels, streak), per user. A few hundred bytes of JSON — well
+   * under SecureStore's ~2KB value limit (see `parseProgress` in shared/lib/brain-games).
+   */
+  getBrainProgress(userId: string): string | null {
+    return read(`${KEYS.brainProgress}.${userId}`)
+  },
+  setBrainProgress(userId: string, raw: string): void {
+    write(`${KEYS.brainProgress}.${userId}`, raw)
+  },
+
+  /**
+   * Recent brain rounds per game (the trend lines), per user — kept apart from progress so each
+   * stays under the ~2KB value limit (eight entries of three integers per game, see history.ts).
+   */
+  getBrainHistory(userId: string): string | null {
+    return read(`${KEYS.brainHistory}.${userId}`)
+  },
+  setBrainHistory(userId: string, raw: string): void {
+    write(`${KEYS.brainHistory}.${userId}`, raw)
+  },
+
+  /**
+   * Brain-game meta (skill estimates, tiers, rules seen, achievements), per user — a third value,
+   * because progress is already near SecureStore's ~2KB per value (see meta.ts; ~400B worst case).
+   */
+  getBrainMeta(userId: string): string | null {
+    return read(`${KEYS.brainMeta}.${userId}`)
+  },
+  setBrainMeta(userId: string, raw: string): void {
+    write(`${KEYS.brainMeta}.${userId}`, raw)
+  },
+  /** The account was deleted: its brain record leaves this device too. */
+  clearBrain(userId: string): void {
+    for (const k of [KEYS.brainProgress, KEYS.brainHistory, KEYS.brainMeta]) {
+      SecureStore.deleteItemAsync(`${k}.${userId}`).catch(() => {})
+    }
   },
 }

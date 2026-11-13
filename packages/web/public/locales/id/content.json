@@ -22,5 +22,25 @@
     "listTitle": "Wawasan Pembelajaran | ReeeeecallStudy",
     "listDescription": "Temukan strategi pembelajaran berbasis sains dan kiat pengulangan berjarak.",
     "breadcrumbInsights": "Wawasan Pembelajaran"
+  },
+  "appCta": {
+    "answer": {
+      "title": "Sekali baca, cepat terlupa",
+      "description": "Ubah panduan ini menjadi kartu kilat. Pengulangan berjarak menampilkan setiap kartu lagi tepat sebelum kamu lupa — gratis di iPhone, Android, dan web."
+    },
+    "wrap_up": {
+      "title": "Biar benar-benar ingat",
+      "description": "Masukkan yang baru kamu baca ke kartu kilat dan ulangi beberapa menit sehari. Setiap kartu kembali tepat sebelum kamu lupa."
+    },
+    "web": "Mulai gratis di web",
+    "deck": {
+      "button": "Belajar dengan dek ini sekarang",
+      "meta_one": "Dek resmi gratis · {{count, number}} kartu",
+      "meta_other": "Dek resmi gratis · {{count, number}} kartu"
+    },
+    "hub": {
+      "meta": "Daftar kata gratis · contoh kalimat · dek dalam 7 bahasa",
+      "button": "Lihat daftar kata"
+    }
   }
 }

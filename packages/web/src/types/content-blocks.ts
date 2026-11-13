@@ -1,6 +1,10 @@
 // Content block type definitions for the block-based content system
 // AI generates content as an array of these blocks
 
+import type { AppCtaBlock } from '@reeeeecall/shared/lib/content-drop-off'
+
+export type { AppCtaBlock }
+
 export type ContentBlock =
   | HeroBlock
   | ParagraphBlock
@@ -13,6 +17,7 @@ export type ContentBlock =
   | ImageBlock
   | DividerBlock
   | CtaBlock
+  | AppCtaBlock
 
 export interface HeroBlock {
   type: 'hero'
@@ -145,4 +150,6 @@ export interface ContentDetail {
   published_at: string
   created_at: string
   updated_at: string
+  /** Official deck family the page leads to, e.g. 'toeic:800' (see official-deck-family.ts). */
+  deck_family?: string | null
 }

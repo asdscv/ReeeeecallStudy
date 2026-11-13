@@ -175,7 +175,7 @@ export function PricingSection() {
                 onClick={() => navigate(SIGNUP_ROUTE)}
                 className={`mt-auto inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition cursor-pointer ${
                   tier.featured
-                    ? 'bg-brand text-white hover:brightness-110 shadow-sm shadow-blue-600/25'
+                    ? 'bg-brand text-brand-foreground hover:brightness-110 shadow-sm shadow-blue-600/25'
                     : 'bg-accent text-foreground hover:bg-accent/70'
                 }`}
                 whileHover={prefersReduced ? undefined : { scale: 1.03 }}

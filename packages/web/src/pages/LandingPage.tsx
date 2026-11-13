@@ -42,12 +42,12 @@ function Divider() {
 }
 
 export function LandingPage() {
-  const { t } = useTranslation('landing')
+  const { t, i18n } = useTranslation('landing')
   const { fetchContents } = useContentStore()
 
   useEffect(() => {
     fetchContents(true)
-  }, [fetchContents])
+  }, [fetchContents, i18n.language])
 
   const howToSteps = [
     { name: t('howItWorks.step1.title'), text: t('howItWorks.step1.desc') },
@@ -77,10 +77,11 @@ export function LandingPage() {
         description={t('seo.description')}
         ogImage={SEO.DEFAULT_OG_IMAGE}
         ogType="website"
-        canonicalUrl={SEO.SITE_URL}
+        canonicalUrl={`${SEO.SITE_URL}/landing${i18n.language !== 'en' ? `?lang=${i18n.language}` : ''}`}
+        noIndex={!(SEO.INDEXABLE_LOCALES as readonly string[]).includes(i18n.language)}
         jsonLd={landingSchemas}
         keywords={['spaced repetition', 'flashcards', 'SRS', 'study app', 'learning platform', 'memorization', 'active recall']}
-        hreflangAlternates={buildStaticHreflangAlternates('/')}
+        hreflangAlternates={buildStaticHreflangAlternates('/landing')}
       />
       <ScrollProgress />
       <LandingNav />

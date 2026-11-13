@@ -124,7 +124,8 @@ export function MarketplaceDetailPage() {
         { p_listing_id: listingId },
       )
       const previewTyped = previewRpc as unknown as PublicListingPreview | null
-      const previewFields = previewTyped?.sample_fields ?? []
+      // The public word-list page shows up to 50 official cards; this panel keeps its 10.
+      const previewFields = (previewTyped?.sample_fields ?? []).slice(0, 10)
       setPreviewSampleFields(previewFields)
 
       if (previewFields.length === 0) {
@@ -319,7 +320,7 @@ export function MarketplaceDetailPage() {
           <button
             onClick={handleAcquire}
             disabled={acquiring || hasAcquired || wouldExceed}
-            className="px-6 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="px-6 py-2.5 bg-brand text-brand-foreground rounded-lg text-sm font-medium hover:bg-brand-hover transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {hasAcquired
               ? t('marketplace:detail.alreadyAcquired', { defaultValue: 'Already in your collection' })

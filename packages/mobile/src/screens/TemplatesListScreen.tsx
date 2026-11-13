@@ -229,7 +229,8 @@ const styles = StyleSheet.create({
   fieldChip: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 12 },
   fieldDot: { width: 6, height: 6, borderRadius: 3 },
   actionsRow: { flexDirection: 'row', gap: 12, paddingTop: 10, borderTopWidth: 1 },
-  iconBtn: { padding: 4 },
+  // 48: Android's touch minimum (44 is Apple's); these sat at ~31-41 on every row.
+  iconBtn: { padding: 4, minWidth: 48, minHeight: 48, alignItems: 'center', justifyContent: 'center' },
   emptyCard: { borderRadius: 12, borderWidth: 1, padding: 32, alignItems: 'center', gap: 12 },
   emptyEmoji: { fontSize: 40 },
 })

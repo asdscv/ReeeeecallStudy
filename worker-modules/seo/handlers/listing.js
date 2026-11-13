@@ -16,6 +16,10 @@ import {
 import { buildHtmlDocument, buildMetaTags, buildSeoResponse, renderJsonLd } from '../html-builder.js'
 import { renderSampleCardsHtml, buildSampleCardLearningResources } from '../card-preview.js'
 import { isUiLocale } from '../../locale-policy.js'
+import {
+  wordListPageLanguage, wordListHeading, wordListDescription, wordListIntro,
+  wordListColumns, wordListCta, wordListHreflang, wordRows, wordListIndexLink,
+} from '../../../packages/shared/lib/listing-seo.ts'
 
 export async function handleListingBotRequest(listingId, url, env) {
   const restUrl = getSupabaseRestUrl(env)
@@ -38,6 +42,9 @@ export async function handleListingBotRequest(listingId, url, env) {
   if (!res.ok) return null
   const listing = await res.json()
   if (!listing || !listing.title) return null
+
+  const pageLang = wordListPageLanguage(listing)
+  if (pageLang) return renderWordListPage(listing, listingId, pageLang)
 
   const rawLang = url.searchParams.get('lang')
   const lang = isUiLocale(rawLang) ? rawLang : 'en'
@@ -106,4 +113,65 @@ ${sampleCardsHtml}
     cacheSeconds: 3600,
     robots: ROBOTS_INDEX,
   })
+}
+
+// Official decks: a word-list page in the deck's own language — the shape of the pages that win
+// «toeic 800 words»-type searches. One URL per deck (no ?lang variants); hreflang links the same
+// exam level across native languages.
+function renderWordListPage(listing, listingId, lang) {
+  const heading = wordListHeading(listing, lang)
+  const title = `${heading} | ${BRAND_NAME}`
+  const description = wordListDescription(listing, lang)
+  const canonicalUrl = `${SITE_URL}/d/${listingId}`
+  const rows = wordRows(listing)
+  const [termCol, meaningCol, exampleCol] = wordListColumns(lang, listing.category)
+  const studyUrl = `${SITE_URL}/auth/login?redirect=${encodeURIComponent(`/marketplace/${listingId}`)}`
+
+  const datasetJsonLd = { ...buildDatasetJsonLd(listing, listingId, lang), name: heading, description }
+  const sampleResources = buildSampleCardLearningResources(listing.sample_fields, listingId, lang)
+  if (sampleResources.length > 0) datasetJsonLd.hasPart = sampleResources
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: BRAND_NAME, url: SITE_URL },
+    { name: wordListIndexLink(lang).label, url: `${SITE_URL}${wordListIndexLink(lang).path}` },
+    { name: heading, url: canonicalUrl },
+  ])
+
+  const metaTags = buildMetaTags({
+    title,
+    description,
+    ogType: 'website',
+    ogUrl: canonicalUrl,
+    ogImage: DEFAULT_OG_IMAGE,
+    locale: lang,
+    canonical: canonicalUrl,
+    keywords: heading,
+  })
+  const hreflangTags = wordListHreflang(listing, SITE_URL)
+    .map((h) => `<link rel="alternate" hreflang="${escapeHtml(h.lang)}" href="${escapeHtml(h.href)}">`)
+    .join('\n')
+  const head = `${metaTags}
+${hreflangTags}
+${renderJsonLd([datasetJsonLd, breadcrumbJsonLd, buildOrganizationJsonLd()])}`
+
+  const tableRows = rows.map((r) => `<tr><td lang="en"><strong>${escapeHtml(r.term)}</strong></td><td>${escapeHtml(r.meaning)}</td><td>${r.example ? `<span lang="en">${escapeHtml(r.example)}</span>` : ''}${r.exampleNote ? `<br><small>${escapeHtml(r.exampleNote)}</small>` : ''}</td></tr>`).join('\n')
+
+  const index = wordListIndexLink(lang)
+  const body = `<nav aria-label="breadcrumb"><ol><li><a href="${SITE_URL}">${BRAND_NAME}</a></li><li><a href="${SITE_URL}${index.path}">${escapeHtml(index.label)}</a></li><li>${escapeHtml(heading)}</li></ol></nav>
+<main>
+<h1>${escapeHtml(heading)}</h1>
+<p>${escapeHtml(wordListIntro(listing, lang))}</p>
+<table>
+<thead><tr><th>${escapeHtml(termCol)}</th><th>${escapeHtml(meaningCol)}</th><th>${escapeHtml(exampleCol)}</th></tr></thead>
+<tbody>
+${tableRows}
+</tbody>
+</table>
+<p><a href="${escapeHtml(studyUrl)}">${escapeHtml(wordListCta(listing, lang))}</a></p>
+</main>
+<footer>
+<p><a href="${SITE_URL}/landing">← ${BRAND_NAME}</a></p>
+</footer>`
+
+  const html = buildHtmlDocument({ lang, head, body, robots: ROBOTS_INDEX })
+  return buildSeoResponse(html, { lang, cacheSeconds: 3600, robots: ROBOTS_INDEX })
 }

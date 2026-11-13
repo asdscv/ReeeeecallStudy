@@ -39,7 +39,7 @@ export function ModeBreakdownCards({ breakdown, timeByMode }: ModeBreakdownCards
                   {/* Only SRS reschedules. A learner looking at 500 crammed cards has no other
                       way to know that none of it moved their review dates or their plan. */}
                   {!modeFeedsSrsSchedule(item.mode) && (
-                    <span className="px-1.5 py-0.5 text-[10px] rounded-full bg-accent text-content-tertiary">
+                    <span className="px-1.5 py-0.5 text-xs rounded-full bg-accent text-content-tertiary">
                       {t('charts.noSrsEffect')}
                     </span>
                   )}
@@ -52,7 +52,7 @@ export function ModeBreakdownCards({ breakdown, timeByMode }: ModeBreakdownCards
               </div>
               <div className="text-right shrink-0">
                 <div className="text-lg font-bold text-foreground">{item.avgPerformance}%</div>
-                <div className="text-[10px] text-content-tertiary">{t('charts.performance')}</div>
+                <div className="text-xs text-content-tertiary">{t('charts.performance')}</div>
               </div>
             </div>
           )

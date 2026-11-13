@@ -2,6 +2,7 @@
   "nav": {
     "quickStudy": "Belajar Cepat",
     "dashboard": "Dasbor",
+    "brainTraining": "Latihan Otak",
     "study": "Belajar",
     "decks": "Dek",
     "cards": "Kartu",
@@ -23,7 +24,16 @@
     "analytics": "Analytics",
     "publisher": "Statistik Penerbit",
     "wallet": "Dompet",
-    "quiz": "Kuis"
+    "quiz": "Kuis",
+    "aiHubHome": "Beranda AI",
+    "tabsLabel": "Tab utama",
+    "short": {
+      "home": "Beranda",
+      "study": "Belajar",
+      "decks": "Dek",
+      "brain": "Otak",
+      "more": "Menu"
+    }
   },
   "actions": {
     "save": "Simpan",

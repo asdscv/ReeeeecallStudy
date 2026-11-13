@@ -198,12 +198,12 @@ export function QuickStudyPage() {
                   </div>
                   <div className="flex flex-wrap gap-1 sm:gap-2">
                     {(deckStats?.new_cards ?? 0) > 0 && (
-                      <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-brand/15 text-brand">
+                      <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-xs sm:text-xs font-medium bg-brand/15 text-brand">
                         {t('quickStudy.newCards', { count: deckStats!.new_cards })}
                       </span>
                     )}
                     {(deckStats?.review_cards ?? 0) > 0 && (
-                      <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-orange-100 text-orange-700">
+                      <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-xs sm:text-xs font-medium bg-orange-100 text-orange-700">
                         {t('quickStudy.reviewCards', { count: deckStats!.review_cards })}
                       </span>
                     )}

@@ -71,7 +71,7 @@ export function AIHubPage() {
                 <div className="flex items-center gap-2">
                   <h2 className="text-sm font-medium text-foreground">{t(entry.titleKey)}</h2>
                   {isAiBadgeEligible(entry) && (
-                    <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-brand/10 text-brand">
+                    <span className="shrink-0 px-1.5 py-0.5 rounded text-xs font-semibold bg-brand/10 text-brand">
                       {t('hub.badge.ai')}
                     </span>
                   )}

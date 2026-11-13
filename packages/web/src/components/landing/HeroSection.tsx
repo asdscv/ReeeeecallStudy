@@ -98,7 +98,7 @@ export function HeroSection() {
         >
           <motion.button
             onClick={goLogin}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 bg-brand text-white text-base font-semibold rounded-xl hover:brightness-110 transition shadow-lg shadow-blue-600/25 cursor-pointer"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 bg-brand text-brand-foreground text-base font-semibold rounded-xl hover:brightness-110 transition shadow-lg shadow-blue-600/25 cursor-pointer"
             whileHover={prefersReduced ? undefined : { scale: 1.04, boxShadow: '0 20px 40px rgba(37,99,235,0.3)' }}
             whileTap={prefersReduced ? undefined : { scale: 0.98 }}
           >

@@ -50,7 +50,7 @@ export function AdminStudyPage() {
               onClick={() => setDays(p)}
               className={`px-3 py-1 text-xs rounded-full border transition cursor-pointer ${
                 days === p
-                  ? 'bg-brand text-white border-brand'
+                  ? 'bg-brand text-brand-foreground border-brand'
                   : 'bg-card text-muted-foreground border-border hover:border-border'
               }`}
             >

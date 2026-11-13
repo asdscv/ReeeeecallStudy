@@ -6,8 +6,8 @@ import { scrollUp } from './scroll'
 const DRAWER_TEST_IDS: Record<string, string> = {
   'Quick Study': 'drawer-quick-study',
   Dashboard: 'drawer-dashboard',
-  Study: 'drawer-study-group',
-  // Nested under the Study group. The AI entries are GENERATED from the AI-hub catalog
+  'Brain Training': 'drawer-brain',
+  // The AI entries are GENERATED from the AI-hub catalog
   // (`drawer-ai-${entry.id}` in MainDrawer), so their ids move when the catalog does —
   // which is why `drawer-learning-plan` and `drawer-quiz` stopped resolving.
   'AI Hub': 'drawer-ai-hub',
@@ -18,6 +18,7 @@ const DRAWER_TEST_IDS: Record<string, string> = {
   Cards: 'drawer-cards',
   Marketplace: 'drawer-marketplace',
   History: 'drawer-history',
+  Achievements: 'drawer-achievements',
   Settings: 'drawer-settings',
   Guide: 'drawer-guide',
 }
@@ -131,80 +132,23 @@ export async function openDrawer() {
 
 /**
  * Navigate to a screen via the drawer menu using testIDs (language-independent).
- */
-/**
- * Which collapsible section holds each drawer item.
  *
- * AI 학습's header is a LINK to the hub, so its chevron carries the `-toggle` suffix; the other
- * three have no page of their own and their whole row toggles.
+ * Every drawer section is open now — the collapsible 학습 group and its four folding sections are
+ * gone (two taps from the dashboard to anything) — so there is nothing to expand first. On Android
+ * UiAutomator2 only sees on-screen nodes, so an item low in the drawer is scrolled into view.
  */
-const DRAWER_SECTION_OF: Record<string, string> = {
-  'AI Hub': 'drawer-ai-hub-toggle',
-  'Quiz': 'drawer-ai-hub-toggle',
-  'Learning Plan': 'drawer-ai-hub-toggle',
-  'AI Generate': 'drawer-ai-hub-toggle',
-  'Decks': 'drawer-decks-section',
-  'Cards': 'drawer-decks-section',
-  'Marketplace': 'drawer-explore-section',
-  'History': 'drawer-records-section',
-  'Achievements': 'drawer-records-section',
-}
-
 export async function navigateToDrawerItem(itemName: string) {
-  const studyGroupItems = ['AI Hub', 'Quiz', 'Learning Plan', 'AI Generate',
-                           'Decks', 'Cards', 'Marketplace', 'History', 'Achievements']
-  const needsStudyGroup = studyGroupItems.includes(itemName)
-
   const opened = await openDrawer()
   if (!opened) {
     console.log(`[nav] Failed to open drawer for ${itemName}`)
     return false
   }
 
-  // If the item is inside the Study group, expand it first.
-  //
-  // POLLED, not slept. The group starts collapsed on every mount and the expansion is an
-  // animation plus a re-render, so a fixed 1500ms wait is a coin flip on a loaded simulator
-  // — and when it lost, the failure surfaced as "the item is missing", which reads like the
-  // feature is broken rather than the drawer being shut. Three taps, each polled for two
-  // seconds, and a report when it truly did not open.
-  if (needsStudyGroup) {
-    const testID = DRAWER_TEST_IDS[itemName]
-    const visible = async () =>
-      !testID || await $(`~${testID}`).isDisplayed().catch(() => false)
-
-    // LOOK FIRST. The group header is a TOGGLE and `appium:noReset` keeps the drawer's
-    // state between runs, so tapping unconditionally closes a group that was already open
-    // — and an odd number of retries then leaves it closed, which surfaces as "the item
-    // does not exist" and reads like the feature is missing.
-    let expanded = await visible()
-    for (let attempt = 0; attempt < 3 && !expanded; attempt++) {
-      await tapDrawerTestID('drawer-study-group')
-      // Polled, not slept: expansion is an animation plus a re-render, so a fixed wait is
-      // a coin flip on a loaded simulator.
-      for (let waited = 0; waited < 2500 && !expanded; waited += 250) {
-        await browser.pause(250)
-        expanded = await visible()
-      }
-    }
-    // Then the SECTION. The four sections inside 학습 used to render expanded together — a
-    // fifteen-row wall the moment the group opened — and they collapse now, one at a time. So a
-    // group that is open is no longer enough; the item's own section has to be opened too, and
-    // opening one closes another, which is why this looks first and taps once.
-    if (!expanded) {
-      const section = DRAWER_SECTION_OF[itemName]
-      if (section) {
-        await tapDrawerTestID(section)
-        for (let waited = 0; waited < 2500 && !expanded; waited += 250) {
-          await browser.pause(250)
-          expanded = await visible()
-        }
-      }
-    }
-
-    if (!expanded) {
-      console.log(`[nav] WARNING: study group never revealed ${itemName} (${testID})`)
-    }
+  const id = DRAWER_TEST_IDS[itemName]
+  if (id && !driver.isIOS) {
+    await $(`android=new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().resourceId("${id}"))`)
+      .isDisplayed()
+      .catch(() => false)
   }
 
   // Tap the item by testID

@@ -5,6 +5,7 @@ import {
   StyleSheet,
   type ViewStyle,
   type TextStyle,
+  Platform,
 } from 'react-native'
 import { useTheme, type Theme } from '../../theme'
 import { testProps } from '../../utils/testProps'
@@ -108,6 +109,9 @@ function getStyles(theme: Theme, variant: ButtonVariant, size: ButtonSize, isDis
       gap: sp.sm,
       paddingVertical: s.py,
       paddingHorizontal: s.px,
+      // Touch-target floor: Apple's 44pt, Android's 48dp. `sm` was ~36 tall and sat on screen
+      // headers where older players aim with a thumb.
+      minHeight: size === 'sm' ? Platform.select({ android: 48, default: 44 }) : 48,
       borderRadius: br.lg,
       backgroundColor: isDisabled ? colors.buttonDisabled : bgMap[variant],
       borderWidth: variant === 'outline' ? 1.5 : 0,

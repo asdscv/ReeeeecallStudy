@@ -111,7 +111,7 @@ export function TemplatesPage() {
           </button>
           <button
             onClick={handleNew}
-            className="px-3 sm:px-4 py-2 bg-brand text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
+            className="px-3 sm:px-4 py-2 bg-brand text-brand-foreground rounded-lg text-xs sm:text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
           >
             {t('createNew')}
           </button>
@@ -130,7 +130,7 @@ export function TemplatesPage() {
           <p className="text-muted-foreground mb-4 text-sm sm:text-base">{t('empty')}</p>
           <button
             onClick={handleNew}
-            className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
+            className="px-4 py-2 bg-brand text-brand-foreground rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
           >
             {t('createFirst')}
           </button>
@@ -214,7 +214,7 @@ function TemplateCard({
         </div>
 
         {/* Layout preview */}
-        <div className="flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-0.5 text-[10px] sm:text-xs text-content-tertiary mb-3">
+        <div className="flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-0.5 text-xs sm:text-xs text-content-tertiary mb-3">
           <span>{t('frontFields', { count: template.front_layout.length })}</span>
           <span>{t('backFields', { count: template.back_layout.length })}</span>
           <span>{t('created', { date: formatLocalDate(template.created_at, dateLocale) })}</span>

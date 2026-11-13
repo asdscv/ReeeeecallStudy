@@ -2,6 +2,7 @@
   "nav": {
     "quickStudy": "빠른 학습",
     "dashboard": "대시보드",
+    "brainTraining": "두뇌 트레이닝",
     "study": "학습",
     "decks": "덱",
     "cards": "카드",
@@ -23,7 +24,16 @@
     "analytics": "분석",
     "publisher": "퍼블리셔 통계",
     "wallet": "충전금",
-    "quiz": "퀴즈"
+    "quiz": "퀴즈",
+    "aiHubHome": "AI 학습 홈",
+    "tabsLabel": "주요 탭",
+    "short": {
+      "home": "홈",
+      "study": "학습",
+      "decks": "덱",
+      "brain": "두뇌",
+      "more": "메뉴"
+    }
   },
   "guideHelp": "도움말",
   "actions": {

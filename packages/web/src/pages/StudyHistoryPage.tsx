@@ -347,7 +347,7 @@ export function StudyHistoryPage() {
                 onClick={() => setDeckScope('all')}
                 className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition cursor-pointer whitespace-nowrap ${
                   deckScope === 'all'
-                    ? 'bg-brand text-white'
+                    ? 'bg-brand text-brand-foreground'
                     : 'bg-card text-muted-foreground border border-border hover:bg-muted'
                 }`}
               >
@@ -359,7 +359,7 @@ export function StudyHistoryPage() {
                   onClick={() => setDeckScope(d.id)}
                   className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition cursor-pointer whitespace-nowrap ${
                     deckScope === d.id
-                      ? 'bg-brand text-white'
+                      ? 'bg-brand text-brand-foreground'
                       : 'bg-card text-muted-foreground border border-border hover:bg-muted'
                   }`}
                 >
@@ -479,7 +479,7 @@ export function StudyHistoryPage() {
                         onClick={() => setCurrentPage(page)}
                         className={`w-10 h-10 text-sm rounded cursor-pointer ${
                           currentPage === page
-                            ? 'bg-brand text-white'
+                            ? 'bg-brand text-brand-foreground'
                             : 'hover:bg-accent text-foreground'
                         }`}
                       >
@@ -537,7 +537,7 @@ function DeckProgressCard({ progress: p }: { progress: DeckProgress }) {
       </div>
 
       {/* Status breakdown */}
-      <div className="flex items-center gap-2 mt-2 text-[11px]">
+      <div className="flex items-center gap-2 mt-2 text-xs">
         {p.newCards > 0 && (
           <span className="text-brand">{t('deckProgress.notStudied', { count: p.newCards })}</span>
         )}
@@ -629,7 +629,7 @@ function SessionCard({
                       />
                     ))}
                   </div>
-                  <span className="text-[10px] text-content-tertiary shrink-0 hidden sm:inline">
+                  <span className="text-xs text-content-tertiary shrink-0 hidden sm:inline">
                     {ratingEntries.map(([r, c]) => `${getRatingLabel(r)} ${c}`).join(' / ')}
                   </span>
                 </div>

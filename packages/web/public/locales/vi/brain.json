@@ -1,0 +1,464 @@
+{
+  "title": "Luyện trí não",
+  "subtitle": "Trò chơi tập trung và ghi nhớ cho thói quen hoạt động trí não đều đặn",
+  "disclaimer": "Tính năng này không phải là thiết bị y tế và không nhằm mục đích chẩn đoán, điều trị, chữa khỏi hoặc phòng ngừa bất kỳ bệnh lý nào.",
+  "worry": "Nếu bạn lo lắng về trí nhớ của mình, hãy trao đổi với bác sĩ hoặc cơ sở y tế tại địa phương thay vì chơi thêm.",
+  "training": {
+    "title": "Bài luyện hôm nay",
+    "desc": "Nhanh mắt và 3 trò chơi · khoảng {{minutes}} phút",
+    "start": "Bắt đầu bài luyện hôm nay",
+    "week": "Tuần này {{done}}/{{goal}}",
+    "weekDone": "Đã đạt mục tiêu tuần",
+    "course": "Khóa cơ bản {{done}}/{{total}}",
+    "booster": "Ôn lại {{done}}/{{total}}",
+    "boosterNext": "Lần ôn lại tiếp theo: {{date}}",
+    "minutes": "Tổng cộng {{value}} phút",
+    "dose": "Kế hoạch là khoảng 3 buổi mỗi tuần, mỗi buổi 20 phút. Chơi nhiều hơn cũng được, nhưng không được thêm gì.",
+    "slot": "Trò chơi {{index}}/{{total}}",
+    "next": "Trò chơi tiếp theo",
+    "continue": "Tiếp tục",
+    "doneTitle": "Đã xong bài luyện hôm nay",
+    "doneBody": "Làm tốt lắm. Nghỉ một hai ngày rồi mới luyện tiếp cũng không sao.",
+    "quitTitle": "Đã dừng bài luyện",
+    "quitBody": "Kết quả đến giờ đã được lưu. Vì chưa làm hết nên buổi này không được tính là đã hoàn thành.",
+    "backHome": "Quay lại Luyện trí não",
+    "kicker": "3 lần mỗi tuần",
+    "lineup": "Bài hôm nay",
+    "minutesShort": "{{value}} phút",
+    "stopBody": "Kết quả đến giờ đã được lưu, nhưng buổi tập chưa xong sẽ không được tính là hoàn thành."
+  },
+  "home": {
+    "freePlay": "Luyện tự do",
+    "freePlayHint": "Chọn một trò chơi để luyện. Lượt chơi kết thúc khi bạn dùng hết cơ hội.",
+    "level": "Cấp {{level}}",
+    "best": "Cao nhất cấp {{level}}",
+    "new": "Mới",
+    "quickEyeLevel": "Màn {{stage}} · tốc độ {{speed}}",
+    "record": "Cao nhất {{value}} điểm",
+    "settings": "Cài đặt",
+    "research": "Cơ sở nghiên cứu",
+    "howItWorks": "Mỗi câu đố đều được tạo mới. Đúng thì câu sau khó hơn một chút, sai thì dễ hơn. Cấp độ chỉ cho thấy kỹ năng của bạn ở trò chơi đó — không phải thước đo trí nhớ hay sức khỏe não bộ."
+  },
+  "settings": {
+    "title": "Cài đặt Luyện trí não",
+    "timing": "Thời gian thoải mái",
+    "timingHelp": "Tăng thời gian cho các trò chơi có giới hạn giờ, hoặc bỏ hẳn giới hạn. Ở các chế độ dài hơn, hết giờ sẽ không bị mất cơ hội.",
+    "timing_1": "Tiêu chuẩn",
+    "timing_1_5": "1,5×",
+    "timing_2": "2×",
+    "timing_0": "Không giới hạn",
+    "centerOnly": "Nhanh mắt: chỉ ở giữa",
+    "centerOnlyHelp": "Bật lên nếu khó nhìn thấy ngôi sao ở rìa. Bạn chỉ cần trả lời hình ở giữa.",
+    "flash": "Nhanh mắt hiện hình ảnh trong thời gian rất ngắn. Nếu bạn nhạy cảm với ánh sáng nhấp nháy, hãy chơi vừa sức.",
+    "close": "Đóng",
+    "sound": "Hiệu ứng âm thanh",
+    "soundHelp": "Phát tiếng ngắn khi trả lời đúng hoặc sai.",
+    "haptics": "Rung",
+    "hapticsHelp": "Rung ngắn khi trả lời đúng hoặc sai. Giống cài đặt rung của cả ứng dụng."
+  },
+  "skills": {
+    "memory": "Trí nhớ",
+    "attention": "Chú ý",
+    "speed": "Tốc độ",
+    "reasoning": "Suy luận"
+  },
+  "games": {
+    "quickEye": {
+      "name": "Nhanh mắt",
+      "desc": "Nhìn thoáng qua một hình ở giữa và một ngôi sao ở rìa, rồi cho biết đó là gì và ở đâu."
+    },
+    "memoryGrid": {
+      "name": "Ô sáng",
+      "desc": "Luyện nhớ vị trí: ghi nhớ các ô vừa sáng rồi chạm vào chúng."
+    },
+    "sequence": {
+      "name": "Nhớ thứ tự",
+      "desc": "Luyện nhớ thứ tự: chạm các ô theo đúng thứ tự chúng nhấp nháy."
+    },
+    "pairs": {
+      "name": "Lật hình",
+      "desc": "Lật hai thẻ mỗi lần để tìm cặp hình giống nhau."
+    },
+    "schulte": {
+      "name": "Tìm số",
+      "desc": "Tìm và chạm các số nằm rải rác theo thứ tự."
+    },
+    "oddOneOut": {
+      "name": "Tìm điểm khác",
+      "desc": "Tất cả giống nhau trừ một. Hãy tìm nó."
+    },
+    "stroop": {
+      "name": "Màu và chữ",
+      "desc": "Chọn màu của chữ, không phải chữ bạn đọc được."
+    },
+    "math": {
+      "name": "Tính nhanh",
+      "desc": "Tính ra rồi chọn đáp án."
+    },
+    "series": {
+      "name": "Quy luật số",
+      "desc": "Tìm quy luật và chọn số tiếp theo."
+    }
+  },
+  "play": {
+    "memorize": "Ghi nhớ các ô sáng",
+    "tapLit": "Chạm các ô vừa sáng · còn {{left}}",
+    "watch": "Xem thứ tự",
+    "watchReverse": "Xem kỹ — bạn sẽ chạm ngược lại",
+    "repeat": "Chạm đúng thứ tự · {{done}}/{{total}}",
+    "repeatReverse": "Chạm theo thứ tự NGƯỢC · {{done}}/{{total}}",
+    "memorizePairs": "Ghi nhớ các hình",
+    "findPairs": "Tìm các cặp · lượt sai còn lại: {{lives}}",
+    "tapAscending": "Chạm từ 1 đến {{max}} · tiếp theo: {{next}}",
+    "tapDescending": "Chạm từ {{max}} về 1 · tiếp theo: {{next}}",
+    "findOdd": "Chạm vào cái khác biệt",
+    "pickInk": "Chọn MÀU của chữ",
+    "pickWord": "Chọn NGHĨA của chữ",
+    "solve": "Chọn đáp án",
+    "nextNumber": "Số tiếp theo là gì?",
+    "correct": "Chính xác",
+    "wrong": "Chưa đúng",
+    "timeUp": "Hết giờ",
+    "timeUpForgiven": "Hết giờ · không mất cơ hội",
+    "void": "Màn hình bị giật — mình hiện lại nhé",
+    "points": "+{{value}}",
+    "levelUp": "Lên cấp · Cấp {{level}}",
+    "lives": "Còn {{value}} cơ hội",
+    "livesSpan": "Cơ hội ở độ dài này: {{value}}",
+    "practice": "Luyện thử {{done}}/{{total}}",
+    "practiceHint": "Đây là luyện thử — không mất cơ hội, không tính điểm.",
+    "practiceDone": "Xong phần luyện thử — bắt đầu nào",
+    "trial": "{{done}}/{{total}}",
+    "score": "Điểm",
+    "streak": "Chuỗi",
+    "pause": "Tạm dừng",
+    "paused": "Đang tạm dừng",
+    "resume": "Tiếp tục",
+    "stop": "Kết thúc",
+    "stopConfirm": "Dừng ở đây nhé? Kết quả đến giờ sẽ được lưu.",
+    "go": "Bắt đầu!",
+    "back": "Quay lại",
+    "streakCount": "{{value}} câu liên tiếp",
+    "streakBanner": "Đúng {{value}} câu liên tiếp!",
+    "levelUpBanner": "Lên cấp! Lv. {{level}}",
+    "fasterBanner": "Nhanh hơn rồi!",
+    "roundOver": "Hết vòng",
+    "roundCleared": "Qua vòng!",
+    "stopTitle": "Dừng ở đây?",
+    "stopBody": "Mọi kết quả đến giờ đã được lưu.",
+    "keepPlaying": "Chơi tiếp",
+    "stopNow": "Dừng"
+  },
+  "quickEye": {
+    "watch": "Nhìn vào giữa",
+    "what": "Ở giữa có gì?",
+    "where": "Ngôi sao ở hướng nào?",
+    "sameOrDifferent": "Hai hình ở giữa có giống nhau không?",
+    "same": "Giống",
+    "different": "Khác",
+    "circle": "Hình tròn",
+    "square": "Hình vuông",
+    "stage": "Màn {{stage}}",
+    "dir": {
+      "0": "Trên",
+      "1": "Trên bên phải",
+      "2": "Phải",
+      "3": "Dưới bên phải",
+      "4": "Dưới",
+      "5": "Dưới bên trái",
+      "6": "Trái",
+      "7": "Trên bên trái"
+    },
+    "speedLevel": "Mức tốc độ {{level}}"
+  },
+  "summary": {
+    "livesOut": "Kết thúc lượt",
+    "cleared": "Hoàn thành lượt",
+    "stopped": "Điểm dừng hợp lý",
+    "trials": "Số câu",
+    "accuracy": "Tỉ lệ đúng",
+    "points": "Điểm",
+    "bestStreak": "Chuỗi dài nhất",
+    "levelChange": "Cấp {{from}} → {{to}}",
+    "improved": "Thành tích của bạn ở trò chơi này đã tốt hơn",
+    "newBest": "Điểm cao nhất của bạn",
+    "again": "Chơi lại",
+    "home": "Tất cả trò chơi",
+    "stars": "{{value}} sao",
+    "time": "Thời gian",
+    "trend": "Cấp độ các vòng gần đây",
+    "otherGames": "Trò khác",
+    "minutes": "Phút",
+    "voided": "Màn hình liên tục bị giật nên vòng chơi đã dừng"
+  },
+  "colors": {
+    "red": "ĐỎ",
+    "blue": "XANH DƯƠNG",
+    "green": "XANH LÁ",
+    "yellow": "VÀNG",
+    "purple": "TÍM",
+    "orange": "CAM"
+  },
+  "intro": {
+    "howTo": "Cách chơi",
+    "replay": "Xem lại",
+    "start": "Bắt đầu",
+    "practiceNote": "4 câu đầu là luyện tập: không mất lượt và không tính điểm.",
+    "level": "Cấp",
+    "speed": "Tốc độ",
+    "stage": "Màn",
+    "rounds": "Đã chơi",
+    "best": "Điểm cao nhất",
+    "welcomeBack": "Chào mừng trở lại. Vài câu đầu sẽ tìm lại mức phù hợp.",
+    "firstPlacement": "Vài câu đầu sẽ tìm mức bắt đầu phù hợp."
+  },
+  "mechanics": {
+    "quickEye": {
+      "periphery": {
+        "title": "Tìm cả ngôi sao",
+        "body": "Một ngôi sao cũng hiện ra ở bên ngoài. Chọn hình ở giữa, rồi chọn phía có ngôi sao."
+      },
+      "distractors": {
+        "title": "Ngôi sao giữa các tam giác",
+        "body": "Các hình tam giác cũng hiện ra. Chọn phía có ngôi sao duy nhất."
+      },
+      "similar": {
+        "title": "Hình gần giống",
+        "body": "Góc hình vuông tròn dần, gần giống hình tròn hơn."
+      },
+      "sameDiff": {
+        "title": "Giống hay khác?",
+        "body": "Hai hình hiện ra ở giữa. Chọn xem chúng giống hay khác nhau."
+      }
+    },
+    "oddOneOut": {
+      "rotation": {
+        "title": "Hình bị xoay",
+        "body": "Tất cả là cùng một hình. Chạm vào hình quay khác hướng. Đôi khi cả bảng đều nghiêng."
+      },
+      "lookalike": {
+        "title": "Hình na ná",
+        "body": "Hình khác biệt ngày càng giống các hình còn lại."
+      },
+      "nearTwin": {
+        "title": "Gần như sinh đôi",
+        "body": "Chỉ khác một chi tiết nhỏ, như nụ cười hay kim đồng hồ."
+      },
+      "glyphs": {
+        "title": "Chữ dễ nhầm",
+        "body": "Những chữ trông giống nhau, như b và d hoặc 6 và 9."
+      }
+    },
+    "board": {
+      "biggerGrid": {
+        "title": "Bảng lớn hơn",
+        "body": "Giờ có nhiều ô hơn."
+      },
+      "moreNumbers": {
+        "title": "Thêm số",
+        "body": "Giờ có nhiều số hơn, thời gian cũng tăng theo."
+      },
+      "moreCards": {
+        "title": "Thêm thẻ",
+        "body": "Nhiều cặp hơn, thời gian và số lần được sai cũng tăng theo."
+      },
+      "moreChoices": {
+        "title": "Thêm lựa chọn",
+        "body": "Có thêm một màu để chọn."
+      }
+    },
+    "schulte": {
+      "descending": {
+        "title": "Đếm ngược",
+        "body": "Chạm từ số lớn nhất xuống đến 1."
+      },
+      "reshuffle": {
+        "title": "Số đổi chỗ",
+        "body": "Mỗi lần chạm, các số đổi chỗ. Bù lại, bảng nhỏ hơn một cỡ."
+      }
+    },
+    "memoryGrid": {
+      "fastShow": {
+        "title": "Hiện ngắn hơn",
+        "body": "Bảng đã lớn nhất. Từ giờ các ô sáng trong thời gian ngắn hơn."
+      }
+    },
+    "sequence": {
+      "reverse": {
+        "title": "Chạm ngược",
+        "body": "Chạm theo thứ tự ngược, bắt đầu từ ô sáng cuối cùng."
+      }
+    },
+    "series": {
+      "descending": {
+        "title": "Số giảm dần",
+        "body": "Các số cũng có thể giảm đều mỗi bước."
+      },
+      "geometric": {
+        "title": "Nhân lên",
+        "body": "Xuất hiện quy luật: mỗi số bằng số trước nhân với cùng một số."
+      },
+      "alternating": {
+        "title": "Lên rồi xuống",
+        "body": "Xuất hiện quy luật cộng rồi trừ xen kẽ."
+      },
+      "growing": {
+        "title": "Khoảng cách tăng dần",
+        "body": "Xuất hiện quy luật: số cộng thêm lớn dần mỗi lần."
+      },
+      "fibonacci": {
+        "title": "Hai số trước",
+        "body": "Xuất hiện quy luật: mỗi số bằng tổng hai số trước."
+      },
+      "squares": {
+        "title": "Bình phương",
+        "body": "Xuất hiện quy luật dựa trên số nhân với chính nó."
+      },
+      "interleaved": {
+        "title": "Hai dãy đan xen",
+        "body": "Hai quy luật thay phiên nhau. Hãy đọc cách một số."
+      },
+      "doublePlus": {
+        "title": "Gấp đôi rồi cộng",
+        "body": "Xuất hiện quy luật: số trước nhân đôi rồi cộng thêm cùng một số."
+      }
+    },
+    "pairs": {
+      "oneFamily": {
+        "title": "Cùng một chủ đề",
+        "body": "Giờ mọi hình đều thuộc một chủ đề, như con vật hay trái cây."
+      },
+      "noPreview": {
+        "title": "Không xem trước",
+        "body": "Không cho xem thẻ lúc đầu nữa. Hãy nhớ khi lật."
+      }
+    },
+    "stroop": {
+      "word": {
+        "title": "Đổi quy tắc",
+        "body": "Khi được hỏi chữ NÓI gì, hãy chọn màu mà chữ đó gọi tên, không phải màu mực."
+      }
+    },
+    "math": {
+      "sub": {
+        "title": "Có phép trừ",
+        "body": "Giờ có cả bài trừ."
+      },
+      "mul": {
+        "title": "Có phép nhân",
+        "body": "Giờ có cả bài nhân."
+      },
+      "div": {
+        "title": "Có phép chia",
+        "body": "Có cả bài chia. Kết quả luôn chia hết."
+      },
+      "twoStep": {
+        "title": "Hai bước",
+        "body": "Có bài phải tính hai bước. Nếu có + và × thì nhân trước; nếu có ? thì chọn số điền vào."
+      }
+    }
+  },
+  "rule": {
+    "label": "Quy tắc mới",
+    "gotIt": "Đã hiểu",
+    "unscored": "Câu này không tính điểm và không mất lượt.",
+    "change": "Điều mới"
+  },
+  "placement": {
+    "label": "Đang tìm mức bắt đầu",
+    "hint": "Vài câu để tìm mức phù hợp. Không mất lượt nào."
+  },
+  "tiers": {
+    "none": "Chưa có hạng",
+    "t1": "Đồng",
+    "t2": "Bạc",
+    "t3": "Vàng",
+    "t4": "Bạch kim",
+    "t5": "Kim cương",
+    "t6": "Bậc thầy",
+    "label": "Hạng",
+    "next": "Đến hạng tiếp theo",
+    "up": "Đạt hạng {{tier}}!",
+    "upBody": "Bạn đã đạt hạng {{tier}} ở {{game}}.",
+    "max": "Hạng cao nhất"
+  },
+  "achievements": {
+    "title": "Thành tích",
+    "earned": "Thành tích",
+    "locked": "Chưa đạt",
+    "firstClear": {
+      "title": "Hoàn thành vòng đầu",
+      "body": "Chơi hết một vòng."
+    },
+    "cleanRound": {
+      "title": "Hoàn thành không mất lượt",
+      "body": "Kết thúc một vòng mà không mất lượt nào."
+    },
+    "streak10": {
+      "title": "10 câu liên tiếp",
+      "body": "Trả lời đúng 10 câu liên tiếp."
+    },
+    "streak20": {
+      "title": "20 câu liên tiếp",
+      "body": "Trả lời đúng 20 câu liên tiếp."
+    },
+    "flawlessHunt": {
+      "title": "Không chạm sai",
+      "body": "Hoàn thành Tìm số 5×5 trở lên mà không chạm sai lần nào."
+    },
+    "span7": {
+      "title": "Nhớ được bảy",
+      "body": "Nhớ được 7 ô ở Nhớ thứ tự hoặc Ô sáng."
+    },
+    "quickEyeStage5": {
+      "title": "Nhanh mắt màn 5",
+      "body": "Lên đến màn 5 của Nhanh mắt."
+    },
+    "quickEyeStage10": {
+      "title": "Nhanh mắt màn 10",
+      "body": "Lên đến màn 10 của Nhanh mắt."
+    },
+    "allGames": {
+      "title": "Mọi trò chơi",
+      "body": "Đã thử cả 9 trò chơi."
+    },
+    "firstSession": {
+      "title": "Buổi đầu tiên",
+      "body": "Hoàn thành Bài luyện hôm nay lần đầu."
+    },
+    "weekGoal": {
+      "title": "3 lần tuần này",
+      "body": "Làm Bài luyện hôm nay 3 lần trong một tuần."
+    },
+    "coreCourse": {
+      "title": "Xong khóa cơ bản",
+      "body": "Hoàn thành khóa cơ bản 10 buổi."
+    },
+    "comeback": {
+      "title": "Trở lại",
+      "body": "Quay lại sau hơn 2 tuần và hoàn thành một buổi."
+    },
+    "goldTier": {
+      "title": "Vàng đầu tiên",
+      "body": "Đạt hạng Vàng ở một trò chơi."
+    },
+    "masterTier": {
+      "title": "Bậc thầy đầu tiên",
+      "body": "Đạt hạng Bậc thầy ở một trò chơi."
+    }
+  },
+  "breakdown": {
+    "title": "Chi tiết điểm",
+    "base": "Điểm cơ bản",
+    "speed": "Tốc độ",
+    "combo": "Liên tiếp",
+    "clear": "Thưởng hoàn thành",
+    "clean": "Thưởng không mất lượt",
+    "total": "Tổng"
+  },
+  "relax": {
+    "suggest": "Mấy vòng gần đây kết thúc sớm. Bật thêm thời gian nhé?",
+    "turnOn": "Bật thời gian ×1,5",
+    "on": "Đã bật thêm thời gian"
+  }
+}

@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { PIPELINE_DEFAULTS, LOCALES } from '../config.js'
 
 describe('PIPELINE_DEFAULTS', () => {
-  it('topicsPerRun is 5', () => {
-    expect(PIPELINE_DEFAULTS.topicsPerRun).toBe(5)
+  it('topicsPerRun is 1 — one article a day', () => {
+    expect(PIPELINE_DEFAULTS.topicsPerRun).toBe(1)
   })
 
   it('topicGenerationCount is 8', () => {
@@ -15,7 +15,7 @@ describe('PIPELINE_DEFAULTS', () => {
   })
 
   it('retains other defaults unchanged', () => {
-    expect(PIPELINE_DEFAULTS.maxBlocks).toBe(13)
+    expect(PIPELINE_DEFAULTS.maxBlocks).toBe(22)
     expect(PIPELINE_DEFAULTS.minBlocks).toBe(7)
     expect(PIPELINE_DEFAULTS.maxRetries).toBe(3)
     expect(PIPELINE_DEFAULTS.recentContentLimit).toBe(100)
@@ -24,7 +24,7 @@ describe('PIPELINE_DEFAULTS', () => {
 })
 
 describe('LOCALES (generation set — see locale-policy.js)', () => {
-  it('generates only en + ko under the current locale policy', () => {
-    expect(LOCALES).toEqual(['en', 'ko'])
+  it('generates en, ko, ja and vi under the current locale policy', () => {
+    expect(LOCALES).toEqual(['en', 'ko', 'ja', 'vi'])
   })
 })

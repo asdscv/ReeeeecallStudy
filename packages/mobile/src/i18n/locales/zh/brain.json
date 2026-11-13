@@ -1,0 +1,464 @@
+{
+  "title": "大脑训练",
+  "subtitle": "用专注与记忆小游戏，养成规律的动脑习惯",
+  "disclaimer": "本功能不是医疗器械，不用于诊断、治疗、治愈或预防任何疾病。",
+  "worry": "如果担心自己的记忆力，与其多玩游戏，不如咨询医生或当地的医疗卫生服务机构。",
+  "training": {
+    "title": "今日训练",
+    "desc": "快眼和3个游戏 · 约{{minutes}}分钟",
+    "start": "开始今日训练",
+    "week": "本周 {{done}}/{{goal}}次",
+    "weekDone": "已达成本周目标",
+    "course": "基础课程 {{done}}/{{total}}",
+    "booster": "复习课程 {{done}}/{{total}}",
+    "boosterNext": "下次复习课程: {{date}}",
+    "minutes": "累计 {{value}} 分钟",
+    "dose": "计划是每周约3次、每次20分钟左右。多玩也没关系，但不会有额外奖励。",
+    "slot": "游戏 {{index}}/{{total}}",
+    "next": "下一个游戏",
+    "continue": "继续",
+    "doneTitle": "今日训练完成",
+    "doneBody": "辛苦了。休息一两天再进行下一次也没关系。",
+    "quitTitle": "训练已停止",
+    "quitBody": "目前的记录已保存。因为没有完成，不计入已完成的训练。",
+    "backHome": "返回大脑训练",
+    "kicker": "每周 3 次",
+    "lineup": "今日安排",
+    "minutesShort": "{{value}} 分钟",
+    "stopBody": "到目前为止的记录已保存，但没有完成的训练不算作完成一次。"
+  },
+  "home": {
+    "freePlay": "自由练习",
+    "freePlayHint": "选一个游戏来练习。机会用完，本轮结束。",
+    "level": "Lv. {{level}}",
+    "best": "最高 Lv. {{level}}",
+    "new": "新",
+    "quickEyeLevel": "第{{stage}}阶段 · 速度 {{speed}}",
+    "record": "最高 {{value}} 分",
+    "settings": "设置",
+    "research": "研究依据",
+    "howItWorks": "每道题都是新生成的。答对了下一题会稍难一点，答错了就会变简单。等级只代表你在这个游戏中的水平，并不衡量记忆力或大脑健康。"
+  },
+  "settings": {
+    "title": "大脑训练设置",
+    "timing": "宽松计时",
+    "timingHelp": "可以延长限时游戏的时间，或者取消限时。在延长的模式下，超时不会扣除机会。",
+    "timing_1": "标准",
+    "timing_1_5": "1.5倍",
+    "timing_2": "2倍",
+    "timing_0": "不限时",
+    "centerOnly": "快眼: 只答中间",
+    "centerOnlyHelp": "如果边缘的星星不容易看清，可以打开此项。只需回答中间的图案。",
+    "flash": "快眼中的图案只会极短暂地出现。如果你对闪光敏感，请不要勉强。",
+    "close": "关闭",
+    "sound": "音效",
+    "soundHelp": "答对或答错时会有短促的提示音。",
+    "haptics": "振动",
+    "hapticsHelp": "答对或答错时短暂振动。与整个应用的振动设置相同。"
+  },
+  "skills": {
+    "memory": "记忆",
+    "attention": "注意",
+    "speed": "速度",
+    "reasoning": "推理"
+  },
+  "games": {
+    "quickEye": {
+      "name": "快眼",
+      "desc": "中间的图案和边缘的星星只出现一瞬间，看完后说出是什么、在哪里。"
+    },
+    "memoryGrid": {
+      "name": "瞬间记忆",
+      "desc": "空间记忆练习：记住亮过的格子，然后点出来。"
+    },
+    "sequence": {
+      "name": "顺序记忆",
+      "desc": "顺序记忆练习：按方块闪烁的顺序点击。"
+    },
+    "pairs": {
+      "name": "翻牌配对",
+      "desc": "每次翻两张牌，找出相同的图案。"
+    },
+    "schulte": {
+      "name": "数字寻找",
+      "desc": "按顺序找到并点击散落的数字。"
+    },
+    "oddOneOut": {
+      "name": "找不同",
+      "desc": "全都一样，只有一个不同。找出来吧。"
+    },
+    "stroop": {
+      "name": "颜色文字",
+      "desc": "选择文字的颜色，而不是读到的字。"
+    },
+    "math": {
+      "name": "快速计算",
+      "desc": "算一算，选出答案。"
+    },
+    "series": {
+      "name": "数字规律",
+      "desc": "找出规律，选出下一个数。"
+    }
+  },
+  "play": {
+    "memorize": "记住亮起的格子",
+    "tapLit": "点击刚才亮过的格子 · 还剩{{left}}个",
+    "watch": "注意看顺序",
+    "watchReverse": "注意看 — 要倒着点",
+    "repeat": "按相同顺序点击 · {{done}}/{{total}}",
+    "repeatReverse": "按相反顺序点击 · {{done}}/{{total}}",
+    "memorizePairs": "记住图案位置",
+    "findPairs": "找出配对 · 剩余失误 {{lives}}",
+    "tapAscending": "从1到{{max}}按顺序点 · 下一个: {{next}}",
+    "tapDescending": "从{{max}}到1倒着点 · 下一个: {{next}}",
+    "findOdd": "点出不同的那个",
+    "pickInk": "选择文字的「颜色」",
+    "pickWord": "选择文字的「意思」",
+    "solve": "选出答案",
+    "nextNumber": "下一个数是？",
+    "correct": "正确",
+    "wrong": "差一点",
+    "timeUp": "时间到",
+    "timeUpForgiven": "时间到 · 不扣机会",
+    "void": "画面卡了一下，再显示一次",
+    "points": "+{{value}}",
+    "levelUp": "升级 · Lv. {{level}}",
+    "lives": "剩余机会 {{value}}",
+    "livesSpan": "此长度剩余机会 {{value}}",
+    "practice": "练习 {{done}}/{{total}}",
+    "practiceHint": "这是练习，不扣机会，也不计分。",
+    "practiceDone": "练习结束，正式开始",
+    "trial": "{{done}}/{{total}}",
+    "score": "得分",
+    "streak": "连对",
+    "pause": "暂停",
+    "paused": "已暂停",
+    "resume": "继续",
+    "stop": "结束",
+    "stopConfirm": "要在这里结束吗？目前的记录会保存。",
+    "go": "开始！",
+    "back": "返回",
+    "streakCount": "连对{{value}}题",
+    "streakBanner": "连续答对{{value}}题！",
+    "levelUpBanner": "升级！Lv. {{level}}",
+    "fasterBanner": "更快了！",
+    "roundOver": "本轮结束",
+    "roundCleared": "本轮通关！",
+    "stopTitle": "要在这里停下吗？",
+    "stopBody": "到目前为止的记录都已保存。",
+    "keepPlaying": "继续玩",
+    "stopNow": "停止"
+  },
+  "quickEye": {
+    "watch": "看中间",
+    "what": "中间是什么？",
+    "where": "星星在哪个方向？",
+    "sameOrDifferent": "中间的两个图案一样吗？",
+    "same": "一样",
+    "different": "不一样",
+    "circle": "圆形",
+    "square": "方形",
+    "stage": "第{{stage}}阶段",
+    "dir": {
+      "0": "上",
+      "1": "右上",
+      "2": "右",
+      "3": "右下",
+      "4": "下",
+      "5": "左下",
+      "6": "左",
+      "7": "左上"
+    },
+    "speedLevel": "速度等级 {{level}}"
+  },
+  "summary": {
+    "livesOut": "本轮结束",
+    "cleared": "本轮通过",
+    "stopped": "先到这里吧",
+    "trials": "题数",
+    "accuracy": "正确率",
+    "points": "得分",
+    "bestStreak": "最高连对",
+    "levelChange": "Lv. {{from}} → {{to}}",
+    "improved": "你在这个游戏中的成绩提高了",
+    "newBest": "个人最高分",
+    "again": "再玩一次",
+    "home": "全部游戏",
+    "stars": "{{value}} 颗星",
+    "time": "用时",
+    "trend": "最近几轮的等级",
+    "otherGames": "其他游戏",
+    "minutes": "分钟",
+    "voided": "画面多次卡顿，本轮已停止"
+  },
+  "colors": {
+    "red": "红",
+    "blue": "蓝",
+    "green": "绿",
+    "yellow": "黄",
+    "purple": "紫",
+    "orange": "橙"
+  },
+  "intro": {
+    "howTo": "玩法",
+    "replay": "再看一遍",
+    "start": "开始",
+    "practiceNote": "前 4 题是练习，不扣机会，也不计分。",
+    "level": "等级",
+    "speed": "速度",
+    "stage": "阶段",
+    "rounds": "已玩",
+    "best": "最高分",
+    "welcomeBack": "欢迎回来。前几道题会重新找到合适的等级。",
+    "firstPlacement": "前几道题会找到合适的起始等级。"
+  },
+  "mechanics": {
+    "quickEye": {
+      "periphery": {
+        "title": "还要找星星",
+        "body": "中央图形出现的同时，外围也会闪现一颗星星。先选中央的图形，再选星星所在的方向。"
+      },
+      "distractors": {
+        "title": "三角形中的星星",
+        "body": "三角形也会一起出现。选出那颗星星所在的方向。"
+      },
+      "similar": {
+        "title": "相似的形状",
+        "body": "方形的角会越来越圆，越来越像圆形。"
+      },
+      "sameDiff": {
+        "title": "相同还是不同？",
+        "body": "中央会出现两个图形。选出它们是否相同。"
+      }
+    },
+    "oddOneOut": {
+      "rotation": {
+        "title": "转向的那一个",
+        "body": "所有图都一样。点出朝向不同的那一个。有时整个棋盘都是倾斜的。"
+      },
+      "lookalike": {
+        "title": "相似的图",
+        "body": "不同的那一个会和其他图越来越像。"
+      },
+      "nearTwin": {
+        "title": "几乎一样",
+        "body": "只有很小的细节不同，比如表情或时钟指针。"
+      },
+      "glyphs": {
+        "title": "容易混淆的字",
+        "body": "会出现相似的字，比如 b 和 d、6 和 9。"
+      }
+    },
+    "board": {
+      "biggerGrid": {
+        "title": "棋盘变大了",
+        "body": "格子变多了。"
+      },
+      "moreNumbers": {
+        "title": "数字变多了",
+        "body": "数字变多了，时间也相应增加。"
+      },
+      "moreCards": {
+        "title": "卡片变多了",
+        "body": "配对变多了，时间和失误余量也一起增加。"
+      },
+      "moreChoices": {
+        "title": "选项变多了",
+        "body": "可选的颜色多了一种。"
+      }
+    },
+    "schulte": {
+      "descending": {
+        "title": "倒着数",
+        "body": "从最大的数一直点到 1。"
+      },
+      "reshuffle": {
+        "title": "数字会换位置",
+        "body": "每点一次，数字的位置都会改变。作为补偿，棋盘小一号。"
+      }
+    },
+    "memoryGrid": {
+      "fastShow": {
+        "title": "显示时间变短",
+        "body": "棋盘已经最大。之后格子亮起的时间会变短。"
+      }
+    },
+    "sequence": {
+      "reverse": {
+        "title": "倒着点",
+        "body": "按看到的相反顺序，从最后亮起的格子开始点。"
+      }
+    },
+    "series": {
+      "descending": {
+        "title": "递减的数",
+        "body": "数字也可能每次减少同样的量。"
+      },
+      "geometric": {
+        "title": "成倍增长",
+        "body": "会出现每个数都是前一个数乘以同一个数的规律。"
+      },
+      "alternating": {
+        "title": "一上一下",
+        "body": "会出现加和减交替进行的规律。"
+      },
+      "growing": {
+        "title": "间隔变大",
+        "body": "会出现每次所加的数越来越大的规律。"
+      },
+      "fibonacci": {
+        "title": "前两个数",
+        "body": "会出现前两个数相加得到下一个数的规律。"
+      },
+      "squares": {
+        "title": "自乘",
+        "body": "会出现以数字乘以自身为基础的规律。"
+      },
+      "interleaved": {
+        "title": "两列交错",
+        "body": "两条规律轮流出现。试着隔一个读。"
+      },
+      "doublePlus": {
+        "title": "翻倍再加",
+        "body": "会出现前一个数乘以 2 再加同一个数的规律。"
+      }
+    },
+    "pairs": {
+      "oneFamily": {
+        "title": "同类图案",
+        "body": "之后的图案都来自同一类，比如动物或水果。"
+      },
+      "noPreview": {
+        "title": "不再预览",
+        "body": "开始时不再展示卡片。边翻边记。"
+      }
+    },
+    "stroop": {
+      "word": {
+        "title": "规则变了",
+        "body": "如果要求选「意思」，请选文字所说的颜色，而不是字的颜色。"
+      }
+    },
+    "math": {
+      "sub": {
+        "title": "出现减法",
+        "body": "之后也会出现减法题。"
+      },
+      "mul": {
+        "title": "出现乘法",
+        "body": "之后也会出现乘法题。"
+      },
+      "div": {
+        "title": "出现除法",
+        "body": "也会出现除法题，答案总是整数。"
+      },
+      "twoStep": {
+        "title": "两步计算",
+        "body": "会出现需要计算两步的题。+ 和 × 同时出现时先算 ×；有 ? 时选出应填的数。"
+      }
+    }
+  },
+  "rule": {
+    "label": "新规则",
+    "gotIt": "知道了",
+    "unscored": "这一题不计分，也不扣机会。",
+    "change": "新变化"
+  },
+  "placement": {
+    "label": "正在寻找起始等级",
+    "hint": "用几道题找到合适的等级，不会扣机会。"
+  },
+  "tiers": {
+    "none": "暂无段位",
+    "t1": "青铜",
+    "t2": "白银",
+    "t3": "黄金",
+    "t4": "铂金",
+    "t5": "钻石",
+    "t6": "大师",
+    "label": "段位",
+    "next": "距下一段位",
+    "up": "达成{{tier}}！",
+    "upBody": "你在{{game}}中达到了{{tier}}。",
+    "max": "最高段位"
+  },
+  "achievements": {
+    "title": "成就",
+    "earned": "达成成就",
+    "locked": "尚未达成",
+    "firstClear": {
+      "title": "首次完成",
+      "body": "完整玩完了一轮。"
+    },
+    "cleanRound": {
+      "title": "无失误完成",
+      "body": "一个机会都没丢就完成了一轮。"
+    },
+    "streak10": {
+      "title": "连对 10 题",
+      "body": "连续答对 10 题。"
+    },
+    "streak20": {
+      "title": "连对 20 题",
+      "body": "连续答对 20 题。"
+    },
+    "flawlessHunt": {
+      "title": "零误点",
+      "body": "完成了 5×5 或更大的数字寻找，一次都没点错。"
+    },
+    "span7": {
+      "title": "记住七个",
+      "body": "在顺序记忆或瞬间记忆中记住了 7 个。"
+    },
+    "quickEyeStage5": {
+      "title": "快眼第 5 阶段",
+      "body": "升到了快眼第 5 阶段。"
+    },
+    "quickEyeStage10": {
+      "title": "快眼第 10 阶段",
+      "body": "升到了快眼第 10 阶段。"
+    },
+    "allGames": {
+      "title": "全部游戏",
+      "body": "9 个游戏都玩过了。"
+    },
+    "firstSession": {
+      "title": "第一次训练",
+      "body": "第一次完成了今日训练。"
+    },
+    "weekGoal": {
+      "title": "本周 3 次",
+      "body": "一周内完成了 3 次今日训练。"
+    },
+    "coreCourse": {
+      "title": "基础课程完成",
+      "body": "完成了 10 次基础课程。"
+    },
+    "comeback": {
+      "title": "重新开始",
+      "body": "休息超过 2 周后回来完成了一次训练。"
+    },
+    "goldTier": {
+      "title": "首个黄金",
+      "body": "在一个游戏中达到了黄金。"
+    },
+    "masterTier": {
+      "title": "首个大师",
+      "body": "在一个游戏中达到了大师。"
+    }
+  },
+  "breakdown": {
+    "title": "得分明细",
+    "base": "基础分",
+    "speed": "速度",
+    "combo": "连对",
+    "clear": "完成奖励",
+    "clean": "无失误奖励",
+    "total": "合计"
+  },
+  "relax": {
+    "suggest": "最近几轮都很快结束了。要打开时间宽限吗？",
+    "turnOn": "打开 1.5 倍时间",
+    "on": "已打开时间宽限"
+  }
+}

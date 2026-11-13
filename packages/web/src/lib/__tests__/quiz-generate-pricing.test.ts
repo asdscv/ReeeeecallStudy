@@ -29,15 +29,16 @@ describe('what generating costs', () => {
       .toEqual({ key: 'pricing.genAllFree', params: { free: 3 } })
   })
 
-  it('splits the sentence when the allowance runs out mid-batch', () => {
+  it('splits the sentence when the allowance runs out mid-batch, without a dollar figure', () => {
     // The boundary case, and the one a single "무료" or a single price would both misreport.
+    // No `amount`: the line says free/paid COUNTS, never what the paid share costs.
     expect(generateCostLine(quote({ count: 8, free_items: 5, paid_items: 3, price_micro: 450_000 })))
-      .toEqual({ key: 'pricing.genPartlyFree', params: { free: 5, paid: 3, amount: '$0.45' } })
+      .toEqual({ key: 'pricing.genPartlyFree', params: { free: 5, paid: 3 } })
   })
 
-  it('names the amount when nothing is free', () => {
+  it('says how many are paid, never the amount, when nothing is free', () => {
     expect(generateCostLine(quote({ count: 4, free_items: 0, paid_items: 4, price_micro: 400_000 })))
-      .toEqual({ key: 'pricing.genAllPaid', params: { paid: 4, amount: '$0.40' } })
+      .toEqual({ key: 'pricing.genAllPaid', params: { paid: 4 } })
   })
 
   it('says nothing at all without a quote', () => {

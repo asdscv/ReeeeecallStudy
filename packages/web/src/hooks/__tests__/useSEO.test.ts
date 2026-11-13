@@ -353,11 +353,31 @@ describe('useSEO', () => {
     expect(meta?.getAttribute('content')).toBe('noindex, follow')
   })
 
-  it('should not set robots meta when noIndex is not provided', () => {
+  it('explicitly restores indexability on an indexable page', () => {
     renderHook(() => useSEO({ title: 'T', description: 'd' }))
-    // Should not add a robots meta (default from index.html handles it)
     const meta = document.querySelector('meta[name="robots"]')
-    expect(meta).toBeNull()
+    expect(meta?.getAttribute('content')).toContain('index, follow')
+  })
+
+  it('restores existing robots instructions after leaving a noindex page', () => {
+    const initial = document.createElement('meta')
+    initial.name = 'robots'
+    initial.content = 'index, follow'
+    document.head.appendChild(initial)
+    const { rerender, unmount } = renderHook(({ noIndex }) => useSEO({ title: 'T', description: 'd', noIndex }), {
+      initialProps: { noIndex: true },
+    })
+    expect(initial.content).toBe('noindex, follow')
+    rerender({ noIndex: false })
+    expect(initial.content.startsWith('index, follow')).toBe(true)
+    unmount()
+    expect(initial.content).toBe('index, follow')
+  })
+
+  it('marks fallback content with the article language instead of the requested UI language', () => {
+    renderHook(() => useSEO({ title: 'Korean article', description: 'd', lang: 'ko' }))
+    expect(document.documentElement.lang).toBe('ko')
+    expect(document.querySelector('meta[property="og:locale"]')?.getAttribute('content')).toBe('ko_KR')
   })
 
   it('should cleanup robots meta on unmount when noIndex was set', () => {

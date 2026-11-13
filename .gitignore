@@ -94,3 +94,8 @@ STUDY_DATA/*.tmp
 # "english_260226.csv 10-08-21-813.csv" would slip into real deck content on
 # `git add STUDY_DATA`. Real deck files never contain a space.
 STUDY_DATA/* *
+
+# UI/UX audit (scripts/uiux-audit) — local secrets and outputs
+scripts/uiux-audit/local.env
+scripts/uiux-audit/vendor/
+scripts/uiux-audit/out/

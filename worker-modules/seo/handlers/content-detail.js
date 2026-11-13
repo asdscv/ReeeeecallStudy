@@ -1,7 +1,8 @@
+import { contentCanonicalUrl } from '../../../packages/shared/lib/content-canonical.ts'
 // Content detail page bot handler — extracted from worker.js handleContentDetailBot
 import {
   SITE_URL, BRAND_NAME, DEFAULT_OG_IMAGE,
-  LIST_TITLES, ROBOTS_INDEX, ROBOTS_NOINDEX,
+  LIST_TITLES, ROBOTS_INDEX, ROBOTS_NOINDEX, pageChrome,
 } from '../constants.js'
 import {
   escapeHtml, buildHreflangTags,
@@ -15,6 +16,13 @@ import {
   buildOrganizationJsonLd,
 } from '../json-ld.js'
 import { renderBlocksToHtml } from '../content-renderer.js'
+import { withDropOffCtas } from '../../../packages/shared/lib/content-drop-off.ts'
+import { parseDeckFamily, deckListingFilter } from '../../../packages/shared/lib/official-deck-family.ts'
+import { wordListHeading } from '../../../packages/shared/lib/listing-seo.ts'
+import {
+  VOCAB_INDEX_PATH, VOCAB_EN_INDEX, VOCAB_LANGUAGE_INDEX,
+  isDeckLanguage, vocabHubForFamily, vocabHubPath, vocabHubShortTitle, vocabLanguageIndexPath,
+} from '../../../packages/shared/lib/vocab-hubs.ts'
 import { buildHtmlDocument, buildMetaTags, buildSeoResponse, renderJsonLd } from '../html-builder.js'
 import { INDEXABLE_LOCALES, isIndexable, isUiLocale, DEFAULT_LOCALE } from '../../locale-policy.js'
 
@@ -34,7 +42,7 @@ export async function handleContentDetailBot(slug, url, env) {
   try {
     const hdr = { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
     const localesRes = await fetch(
-      `${restUrl}/contents?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&select=locale`,
+      `${restUrl}/contents?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&select=locale&order=locale.asc`,
       { headers: hdr },
     )
     if (localesRes.ok) present = ((await localesRes.json()) || []).map((r) => r.locale)
@@ -84,9 +92,11 @@ export async function handleContentDetailBot(slug, url, env) {
   const ogImage = article.og_image_url || article.thumbnail_url || DEFAULT_OG_IMAGE
   const tags = article.tags || []
   const articleSection = tags[0] || 'Education'
-  const bodyHtml = renderBlocksToHtml(blocks)
+  const deckLink = await resolveDeckLink(article, restUrl, anonKey)
+  const bodyHtml = renderBlocksToHtml(withDropOffCtas(blocks, slug, article.deck_family), { deckLink })
+    + `\n${wordListsLink(article.locale)}`
 
-  const canonicalUrl = localizedUrl(`/insight/${slug}`, article.locale)
+  const canonicalUrl = contentCanonicalUrl(SITE_URL, slug, article.locale, article.canonical_url)
 
   // Build JSON-LD schemas
   const articleJsonLd = buildArticleJsonLd(article, slug)
@@ -125,7 +135,7 @@ ${feedLinks}
 ${hreflangTags}
 ${jsonLdScripts}`
 
-  const body = `<nav aria-label="breadcrumb"><ol><li><a href="${SITE_URL}">${BRAND_NAME}</a></li><li><a href="${SITE_URL}/insight">${LIST_TITLES[article.locale]?.split(' — ')[0] || 'Learning Insights'}</a></li><li>${escapeHtml(article.title)}</li></ol></nav>
+  const body = `<nav aria-label="breadcrumb"><ol><li><a href="${SITE_URL}">${BRAND_NAME}</a></li><li><a href="${localizedUrl('/insight', article.locale)}">${LIST_TITLES[article.locale]?.split(' — ')[0] || 'Learning Insights'}</a></li><li>${escapeHtml(article.title)}</li></ol></nav>
 <article data-speakable>
 <header>
 <h1>${escapeHtml(article.title)}</h1>
@@ -142,17 +152,17 @@ ${bodyHtml}
 </section>
 </article>
 ${relatedArticles.length > 0 ? `<aside>
-<h2>${article.locale === 'ko' ? '관련 글' : 'Related Articles'}</h2>
+<h2>${pageChrome(article.locale).related}</h2>
 <ul>
 ${relatedArticles.map((r) => {
   const rDate = r.published_at ? new Date(r.published_at).toISOString().split('T')[0] : ''
-  return `<li><a href="${SITE_URL}/insight/${escapeHtml(r.slug)}">${escapeHtml(r.title)}</a>${r.subtitle ? ` — ${escapeHtml(r.subtitle)}` : ''}${rDate ? ` <time datetime="${r.published_at}">(${rDate})</time>` : ''}</li>`
+  return `<li><a href="${localizedUrl(`/insight/${escapeHtml(r.slug)}`, article.locale)}">${escapeHtml(r.title)}</a>${r.subtitle ? ` — ${escapeHtml(r.subtitle)}` : ''}${rDate ? ` <time datetime="${r.published_at}">(${rDate})</time>` : ''}</li>`
 }).join('\n')}
 </ul>
 </aside>` : ''}
 <footer>
-<p><a href="${SITE_URL}/insight">← ${article.locale === 'ko' ? '더 많은 학습 인사이트' : 'More Learning Insights'}</a></p>
-<p><a href="${SITE_URL}/landing">${article.locale === 'ko' ? `${BRAND_NAME}에서 학습 시작하기` : `Start Learning with ${BRAND_NAME}`}</a></p>
+<p><a href="${localizedUrl('/insight', article.locale)}">← ${pageChrome(article.locale).moreInsights}</a></p>
+<p><a href="${localizedUrl('/landing', article.locale)}">${pageChrome(article.locale).startLearning}</a></p>
 </footer>`
 
   const html = buildHtmlDocument({ lang: article.locale, head, body, robots })
@@ -162,4 +172,34 @@ ${relatedArticles.map((r) => {
     cacheSeconds: 3600,
     robots,
   })
+}
+
+// The deck a deck-guide article leads to, as a crawlable link: the deck page in the article's
+// language, or the English hub for the English edition (there is no English deck).
+async function resolveDeckLink(article, restUrl, anonKey) {
+  const family = parseDeckFamily(article.deck_family)
+  if (!family) return null
+  const filter = isDeckLanguage(article.locale) ? deckListingFilter(family, article.locale) : null
+  if (filter) {
+    try {
+      const tags = encodeURIComponent(`{${filter.tags.join(',')}}`)
+      const res = await fetch(
+        `${restUrl}/marketplace_listings?select=id,title,category,card_count,tags,owner_is_official,native_language`
+          + `&is_active=eq.true&owner_is_official=eq.true&category=eq.${filter.category}&tags=cs.${tags}&limit=1`,
+        { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } },
+      )
+      const [deck] = res.ok ? await res.json() : []
+      if (deck) return { href: `${SITE_URL}/d/${deck.id}`, label: wordListHeading({ ...deck, sample_fields: [] }, article.locale) }
+    } catch { /* fall through to the hub */ }
+  }
+  const hub = vocabHubForFamily(article.deck_family)
+  return hub ? { href: `${SITE_URL}${vocabHubPath(hub)}`, label: vocabHubShortTitle(hub) } : null
+}
+
+// Every article links to the word lists in its language — a crawl path into all deck pages.
+function wordListsLink(locale) {
+  if (isDeckLanguage(locale)) {
+    return `<p><a href="${SITE_URL}${vocabLanguageIndexPath(locale)}">${escapeHtml(VOCAB_LANGUAGE_INDEX[locale].backToIndex)}</a></p>`
+  }
+  return `<p><a href="${SITE_URL}${VOCAB_INDEX_PATH}">${escapeHtml(VOCAB_EN_INDEX.heading)}</a></p>`
 }

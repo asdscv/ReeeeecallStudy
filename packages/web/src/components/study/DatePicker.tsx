@@ -117,7 +117,7 @@ export function DatePicker({ selectedDate, onSelectDate, datesWithCards }: DateP
               onClick={() => handleDateClick(day)}
               className={`
                 aspect-square flex items-center justify-center text-sm rounded-lg transition-colors cursor-pointer
-                ${isSelected ? 'bg-brand text-white font-bold' : ''}
+                ${isSelected ? 'bg-brand text-brand-foreground font-bold' : ''}
                 ${!isSelected && hasCards ? 'bg-accent text-foreground font-semibold hover:bg-accent' : ''}
                 ${!isSelected && !hasCards ? 'text-content-tertiary hover:bg-muted' : ''}
                 ${isToday && !isSelected ? 'ring-2 ring-brand' : ''}

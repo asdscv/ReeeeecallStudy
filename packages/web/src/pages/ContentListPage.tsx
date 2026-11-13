@@ -32,6 +32,7 @@ export function ContentListPage() {
         description={t('seo.listDescription')}
         ogImage={SEO.DEFAULT_OG_IMAGE}
         ogType="website"
+        noIndex={!(SEO.INDEXABLE_LOCALES as readonly string[]).includes(i18n.language)}
         canonicalUrl={`${SEO.SITE_URL}/insight${i18n.language !== 'en' ? `?lang=${i18n.language}` : ''}`}
         jsonLd={[buildCollectionPageJsonLd(), buildOrganizationJsonLd()]}
         keywords={['spaced repetition', 'learning strategies', 'study tips', 'flashcards', 'active recall', 'memory techniques']}

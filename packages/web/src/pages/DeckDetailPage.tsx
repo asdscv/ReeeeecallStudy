@@ -400,7 +400,7 @@ export function DeckDetailPage() {
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-4">
           <button
             onClick={() => navigate(`/decks/${deckId}/study/setup`)}
-            className="px-3 sm:px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
+            className="px-3 sm:px-4 py-2 bg-brand text-brand-foreground rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
           >
             {t('decks:detail.startStudy')}
           </button>
@@ -511,6 +511,7 @@ export function DeckDetailPage() {
             />
             <select
               value={statusFilter}
+              aria-label={t('decks:detail.columns.status')}
               onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); setSelectedIds(new Set()) }}
               className="px-3 py-2.5 rounded-lg border border-border text-sm text-foreground outline-none"
             >
@@ -522,6 +523,7 @@ export function DeckDetailPage() {
             </select>
             <select
               value={cardsPerPage}
+              aria-label={t('decks:detail.perPage', { count: cardsPerPage })}
               onChange={(e) => {
                 setCardsPerPage(Number(e.target.value))
                 setCurrentPage(1)
@@ -564,7 +566,7 @@ export function DeckDetailPage() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
                 <button
                   onClick={() => { setEditingCard(null); setShowCardForm(true) }}
-                  className="px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
+                  className="px-4 py-2 bg-brand text-brand-foreground rounded-lg text-sm font-medium hover:bg-brand-hover transition cursor-pointer"
                 >
                   {t('decks:detail.addFirstCard')}
                 </button>
@@ -593,9 +595,11 @@ export function DeckDetailPage() {
                   <thead>
                     <tr className="border-b border-border bg-muted">
                       <th className="px-4 py-3 w-10">
+                        <span className="sr-only">{t('common:selectAllPage')}</span>
                         <input
                           ref={selectAllRef}
                           type="checkbox"
+                          aria-label={t('common:selectAllPage')}
                           checked={selectAllState === 'all'}
                           onChange={toggleSelectAll}
                           className="cursor-pointer"
@@ -618,7 +622,7 @@ export function DeckDetailPage() {
                       <th className="text-left text-xs font-medium text-muted-foreground uppercase px-4 py-3 w-28">
                         {t('decks:detail.columns.addedDate')}
                       </th>
-                      <th className="px-4 py-3 w-20" />
+                      <th className="px-4 py-3 w-20"><span className="sr-only">{t('common:actions.edit')}</span></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -630,6 +634,7 @@ export function DeckDetailPage() {
                         <td className="px-4 py-3">
                           <input
                             type="checkbox"
+                            aria-label={String(card.field_values[displayFields[0]?.key ?? ''] || `#${startIdx + i + 1}`)}
                             checked={selectedIds.has(card.id)}
                             onChange={() => toggleSelect(card.id)}
                             className="cursor-pointer"
@@ -687,6 +692,7 @@ export function DeckDetailPage() {
                   <input
                     ref={selectAllMobileRef}
                     type="checkbox"
+                    aria-label={t('common:selectAllPage')}
                     checked={selectAllState === 'all'}
                     onChange={toggleSelectAll}
                     className="cursor-pointer"
@@ -701,6 +707,7 @@ export function DeckDetailPage() {
                     <div className="flex items-start gap-2">
                       <input
                         type="checkbox"
+                        aria-label={String(card.field_values[displayFields[0]?.key ?? ''] || `#${startIdx + i + 1}`)}
                         checked={selectedIds.has(card.id)}
                         onChange={() => toggleSelect(card.id)}
                         className="cursor-pointer mt-1 shrink-0"
@@ -727,12 +734,14 @@ export function DeckDetailPage() {
                       <div className="flex items-center gap-1 shrink-0">
                         <button
                           onClick={() => handleEditCard(card)}
+                          aria-label={t('common:edit')}
                           className="p-3 text-content-tertiary hover:text-brand rounded-md hover:bg-brand/10 transition cursor-pointer"
                         >
                           <Pencil className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => setDeletingCard(card)}
+                          aria-label={t('common:delete')}
                           className="p-3 text-content-tertiary hover:text-destructive rounded-md hover:bg-destructive/10 transition cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -753,6 +762,7 @@ export function DeckDetailPage() {
                     <button
                       onClick={() => setCurrentPage(Math.max(1, safePage - 1))}
                       disabled={safePage <= 1}
+                      aria-label={t('common:actions.back')}
                       className="w-10 h-10 flex items-center justify-center rounded hover:bg-accent disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                     >
                       <ChevronLeft className="w-4 h-4" />
@@ -774,7 +784,7 @@ export function DeckDetailPage() {
                           onClick={() => setCurrentPage(page)}
                           className={`w-10 h-10 text-sm rounded cursor-pointer ${
                             safePage === page
-                              ? 'bg-brand text-white'
+                              ? 'bg-brand text-brand-foreground'
                               : 'hover:bg-accent text-foreground'
                           }`}
                         >
@@ -785,6 +795,7 @@ export function DeckDetailPage() {
                     <button
                       onClick={() => setCurrentPage(Math.min(totalPages, safePage + 1))}
                       disabled={safePage >= totalPages}
+                      aria-label={t('common:actions.next')}
                       className="w-10 h-10 flex items-center justify-center rounded hover:bg-accent disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed"
                     >
                       <ChevronRight className="w-4 h-4" />

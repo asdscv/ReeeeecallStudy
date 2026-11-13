@@ -1,3 +1,5 @@
+import { parseDeckFamily, deckListingFilter } from '../packages/shared/lib/official-deck-family.ts'
+
 // 3-layer prompt builder for AI content generation
 
 const SYSTEM_PROMPT = `You are an expert educational content writer for ReeeeecallStudy, a smart flashcard learning platform that uses spaced repetition (SRS).
@@ -57,14 +59,14 @@ Each block has "type" and "props":
 
 ## Rules
 
-- Generate 9 to 13 blocks total (aim high — thin articles do not rank)
+- Generate 10 to 15 blocks total
 - First block MUST be "hero", last block MUST be "cta"
 - Do NOT use "image", "blockquote", or "statistics" block types
 - **bold** and *italic* markdown is ONLY allowed inside "paragraph" blocks. All other block types must use plain text without any markdown formatting.
 - Mix different block types for visual variety
 - Use at least 3 different block types (besides hero and cta)
-- DEPTH REQUIREMENT (critical for ranking): the article MUST total at least 900 words of substantive body text. Every "paragraph" block must be 60-120 words of real explanation — never a single thin sentence. Every "numbered_list" / "feature_cards" item description must be a complete, specific sentence of 20+ words. Shallow, padded, or one-line content fails.
-- Include practical, actionable advice with CONCRETE specifics: a worked example, a step-by-step mini-scenario, a sample, or a do/don't comparison the reader can apply immediately. Generic advice that could apply to any topic is not acceptable.
+- DEPTH REQUIREMENT: the article MUST total at least 900 words of substantive body text. Every "paragraph" block must be 60-120 words of real explanation — never a single thin sentence. Every "numbered_list" / "feature_cards" item description must be a complete, specific sentence of 20+ words. Shallow, padded, or one-line content fails.
+- Include practical, actionable advice with CONCRETE specifics: a fully worked example with the input or question, the answer, and the reasoning, plus a step-by-step mini-scenario or do/don't comparison the reader can apply immediately. Clearly label illustrative practice as an example; never imply it is an official exam question. Generic advice that could apply to any topic is not acceptable.
 
 ## Content Reliability
 
@@ -75,9 +77,9 @@ Each block has "type" and "props":
 - Use general, qualitative descriptions instead of specific numbers (e.g., "research suggests significant improvement" instead of "studies show 85% improvement")
 - The CTA should naturally tie the article topic to ReeeeecallStudy's flashcard/SRS features
 
-## GEO Optimization (Generative Engine Optimization — CRITICAL for 2026 AI visibility)
+## Clear Answers and Reliable Explanations
 
-These techniques are proven by research (Princeton/Georgia Tech, KDD 2024) to increase AI citation rates by 40%+:
+Help readers understand and apply the topic. These writing choices do not guarantee search rankings or AI citations:
 
 1. **Question-first H2 headings**: Frame at least 2 section headings as questions that users might ask AI assistants (e.g., "Why Does Spaced Repetition Work?" instead of "How Spaced Repetition Works"). The first paragraph under each question heading MUST directly answer the question in under 40 words.
 
@@ -89,7 +91,7 @@ These techniques are proven by research (Princeton/Georgia Tech, KDD 2024) to in
 
 5. **Entity-centric writing**: Consistently name key concepts (e.g., always say "spaced repetition" not "this technique," always say "active recall" not "this method"). AI engines build knowledge graphs from consistent entity mentions.
 
-6. **Fluency optimization**: Write in clear, direct sentences. Avoid jargon without explanation. Each paragraph should convey ONE key idea. This improves AI extraction accuracy by 15-30%.
+6. **Fluency optimization**: Write in clear, direct sentences. Avoid jargon without explanation. Each paragraph should convey ONE key idea. Explain the topic accurately without claiming a measured improvement.
 
 ## SEO Guidelines
 
@@ -121,18 +123,92 @@ const LOCALE_INSTRUCTIONS = {
   es: 'Write the entire article in Spanish (Español). The slug must remain in English lowercase kebab-case. All other fields (title, subtitle, meta_title, meta_description, tags, and all content_blocks text) must be in Spanish. For SEO: use Spanish keywords that Spanish-speaking users would search on Google. meta_title and meta_description must be in Spanish.',
 }
 
+const FORMAT_INSTRUCTIONS = {
+  guide: 'Format: a step-by-step guide. Lead with the direct answer, then numbered steps the reader can follow today.',
+  comparison: 'Format: a comparison. Put the options the searcher is weighing side by side (methods, exams, levels, schedules), say which fits which kind of learner, and end with a clear recommendation. Never name or compare other apps, websites or companies — compare methods and approaches only.',
+  explainer: 'Format: an explainer. Define the thing plainly in the first two sentences, then explain how it works and how a learner applies it.',
+}
+
+// The page exists to answer one query Google already shows us for, so the query must be
+// unmistakable on the page — and the page must not drift into a generic study article.
+function searchQuerySection(topic, locale, deckWords) {
+  if (!topic.targetQuery) return ''
+  const q = topic.targetQuery
+  const placement = topic.queryLocale === locale
+    ? `- Use the exact phrase "${q}" verbatim in the hero title, in meta_title (near the start), in the first paragraph, and in at least one H2.`
+    : `- The query is in another language. Write this edition for someone with the same need searching in this article's language: use the phrase a native speaker would actually type into Google, in the hero title, meta_title, first paragraph and one H2.\n- Never copy words or script from the original query into this edition (exam names like JLPT or TOEIC are fine).`
+  return `\n\n## Search Query This Page Must Answer
+
+Real people typed this exact query into Google: "${q}". Google already shows our site for it, but none of our pages answers it, so nobody clicks. This article is that page.
+
+${placement}
+- The first paragraph must answer the query directly, in under 40 words.
+- Stay on this query from start to finish. Do not widen it into a general article about studying.
+
+${FORMAT_INSTRUCTIONS[topic.format] || FORMAT_INSTRUCTIONS.guide}${deckWordsSection(deckWords)}${deckSection(topic, locale, deckWords)}`
+}
+
+// The page's call to action opens our free official deck for this exam level, so the article
+// should teach the vocabulary itself and make the deck the obvious next step.
+// Only where this edition's readers are actually shown a deck: there is no English-native deck,
+// and conversation decks exist only for Korean readers.
+// Real cards from the deck the page leads to — the article's examples must be words the reader
+// will actually find in that deck. An edition gets meanings only from its own language's deck.
+const DECK_WORDS_IN_PROMPT = 15
+
+function deckWordsSection(deckWords) {
+  if (!Array.isArray(deckWords) || deckWords.length === 0) return ''
+  const n = Math.min(DECK_WORDS_IN_PROMPT, deckWords.length)
+  const picked = Array.from({ length: n }, (_, i) => deckWords[Math.floor((i * deckWords.length) / n)])
+  const lines = picked.map((w) => {
+    const parts = [w.term]
+    if (w.meaning) parts.push(w.meaning)
+    if (w.example) parts.push(w.example)
+    return `- ${parts.join(' — ')}`
+  })
+  return `
+
+## Words From The Deck
+
+These are real cards from the deck this page leads to. Use exactly these words as the article's example words — do not add or substitute others. Explain each in the article's language; you may shorten the example sentences.
+${lines.join('\n')}`
+}
+
+function deckSection(topic, locale, deckWords) {
+  const family = parseDeckFamily(topic.deckFamily)
+  if (!family || !deckListingFilter(family, locale)) return ''
+  const hasWords = Array.isArray(deckWords) && deckWords.length > 0
+  return `
+
+## The Deck This Page Leads To
+
+Below the article, readers get our free official flashcard deck for this level (${topic.deckFamily}). Teach the vocabulary itself: what this level demands, ${hasWords ? 'the words listed under «Words From The Deck»' : '10-15 representative words or expressions'} with meanings and a short example sentence each, and a daily review plan. Mention the free deck once, where a reader would want the full list. Do not state how many cards it has.`
+}
+
+const NATIVE_TERMS = 'Write study terms in the article\'s language — spaced repetition, active recall, flashcard, forgetting curve (e.g. 간격 반복, 間隔反復, lặp lại ngắt quãng). Keep English only for the English words being taught, example sentences, and exam names.'
+
 export function buildPrompt(topic, locale, options = {}) {
-  const { previousTitles = [] } = options
+  const { previousTitles = [], deckWords = null } = options
+
+  // Another language's edition of a search-query topic must not carry the original query's
+  // words — that is how "JLPT N2 문법 Mastery" ended up as an English title.
+  const translated = topic.targetQuery && topic.queryLocale && topic.queryLocale !== locale
+  const subtopic = translated
+    ? `the same need as the search query "${topic.targetQuery}", expressed the way a native speaker of this article's language would search for it`
+    : topic.titleHint
+  const keywords = translated
+    ? 'the natural search phrase in this article\'s language (not the original query text)'
+    : topic.keywords.join(', ')
 
   const topicContext = `## Topic Assignment
 
 Category: ${topic.category}
-Subtopic: ${topic.titleHint}
-Keywords to incorporate: ${topic.keywords.join(', ')}
+Subtopic: ${subtopic}
+Keywords to incorporate: ${keywords}
 Target audience: ${topic.audience}
 Suggested tags: ${topic.tags.join(', ')}
 
-Write a unique, insightful article about "${topic.titleHint}" within the "${topic.category}" domain. Focus on practical value for ${topic.audience}. Naturally mention how spaced repetition and flashcard-based tools can help with this topic where appropriate.`
+Write a unique, insightful article about ${translated ? 'that need' : `"${topic.titleHint}"`} within the "${topic.category}" domain. Focus on practical value for ${topic.audience}. Naturally mention how spaced repetition and flashcard-based tools can help with this topic where appropriate.`
 
   let titleAvoidance = ''
   if (previousTitles.length > 0) {
@@ -147,8 +223,10 @@ Write a unique, insightful article about "${topic.titleHint}" within the "${topi
     throw new Error(`prompt-builder: no LOCALE_INSTRUCTIONS for locale "${locale}" — add one before generating it`)
   }
 
+  // Rehearsal: the Korean and Japanese editions kept "spaced repetition" in English mid-sentence.
+  const terms = locale === 'en' ? '' : `\n\n${NATIVE_TERMS}`
   return {
     system: SYSTEM_PROMPT,
-    user: `${topicContext}${titleAvoidance}\n\n## Language\n\n${localeInstruction}`,
+    user: `${topicContext}${searchQuerySection(topic, locale, deckWords)}${titleAvoidance}\n\n## Language\n\n${localeInstruction}${terms}`,
   }
 }

@@ -1,3 +1,4 @@
+import { contentCanonicalUrl } from '../../packages/shared/lib/content-canonical.ts'
 import {
   SITE_URL,
   BRAND_NAME,
@@ -6,7 +7,7 @@ import {
   OG_IMAGE_HEIGHT,
   INDEXABLE_LOCALES,
 } from './constants.js'
-import { buildPublisherJsonLd } from './helpers.js'
+import { buildPublisherJsonLd, localizedUrl } from './helpers.js'
 
 export function buildOrganizationJsonLd() {
   return {
@@ -35,11 +36,6 @@ export function buildWebSiteJsonLd() {
     name: BRAND_NAME,
     url: SITE_URL,
     inLanguage: INDEXABLE_LOCALES,
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: `${SITE_URL}/insight?q={search_term_string}`,
-      'query-input': 'required name=search_term_string',
-    },
   }
 }
 
@@ -48,9 +44,7 @@ export function buildArticleJsonLd(article, slug) {
   const description = article.meta_description || article.subtitle || ''
   const ogImage = article.og_image_url || article.thumbnail_url || DEFAULT_OG_IMAGE
   const tags = article.tags || []
-  const wordCount = Math.round((article.reading_time_minutes || 5) * 250)
   const locale = article.locale || 'en'
-  const langSuffix = locale !== 'en' ? `?lang=${locale}` : ''
 
   return {
     '@context': 'https://schema.org',
@@ -60,12 +54,11 @@ export function buildArticleJsonLd(article, slug) {
     image: { '@type': 'ImageObject', url: ogImage, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT },
     datePublished: article.published_at,
     dateModified: article.updated_at,
-    wordCount,
     keywords: tags.join(', '),
     author: { '@type': 'Organization', name: article.author_name || BRAND_NAME, url: SITE_URL },
     publisher: buildPublisherJsonLd(),
     inLanguage: locale,
-    mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/insight/${slug}${langSuffix}` },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': contentCanonicalUrl(SITE_URL, slug, locale, article.canonical_url) },
   }
 }
 
@@ -88,7 +81,6 @@ export function buildLearningResourceJsonLd(article, slug) {
   const ogImage = article.og_image_url || article.thumbnail_url || DEFAULT_OG_IMAGE
   const tags = article.tags || []
   const locale = article.locale || 'en'
-  const langSuffix = locale !== 'en' ? `?lang=${locale}` : ''
 
   return {
     '@context': 'https://schema.org',
@@ -106,7 +98,7 @@ export function buildLearningResourceJsonLd(article, slug) {
     isAccessibleForFree: true,
     author: { '@type': 'Organization', name: article.author_name || BRAND_NAME, url: SITE_URL },
     publisher: buildPublisherJsonLd(),
-    mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/insight/${slug}${langSuffix}` },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': contentCanonicalUrl(SITE_URL, slug, locale, article.canonical_url) },
     speakable: {
       '@type': 'SpeakableSpecification',
       cssSelector: ['article h1', 'article h2', 'article p', 'article li', 'article blockquote'],
@@ -120,12 +112,12 @@ export function buildCollectionPageJsonLd(title, desc, lang, count) {
     '@type': 'CollectionPage',
     name: title,
     description: desc,
-    url: `${SITE_URL}/insight`,
+    url: localizedUrl('/insight', lang),
     image: { '@type': 'ImageObject', url: DEFAULT_OG_IMAGE, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT },
     inLanguage: lang,
     numberOfItems: count,
     publisher: buildPublisherJsonLd(),
-    mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/insight` },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': localizedUrl('/insight', lang) },
   }
 }
 
@@ -136,7 +128,7 @@ export function buildItemListJsonLd(articles) {
     itemListElement: articles.slice(0, 30).map((a, i) => ({
       '@type': 'ListItem',
       position: i + 1,
-      url: `${SITE_URL}/insight/${a.slug}`,
+      url: localizedUrl(`/insight/${a.slug}`, a.locale),
       name: a.title,
     })),
   }
@@ -155,12 +147,6 @@ export function buildWebAppJsonLd(desc, lang) {
     inLanguage: lang,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     publisher: buildPublisherJsonLd(),
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      reviewCount: '150',
-      bestRating: '5',
-    },
   }
 }
 

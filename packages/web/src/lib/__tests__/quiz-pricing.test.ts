@@ -8,8 +8,12 @@
  *
  * What was missing was the TELLING. The grade button reads "이 답안 채점" with no price — a
  * deliberate choice, a button is a decision and not a price tag — but nothing else said anything
- * either, so the learner tapped it not knowing whether it was free. Measured on production
- * beforehand: a short answer is $0.01 and an essay $0.04, charged again on every retake.
+ * either, so the learner tapped it not knowing whether it was free.
+ *
+ * The line says WHETHER it charges, not HOW MUCH. Neither this app nor the products a learner
+ * already knows (ChatGPT, Claude) put a dollar figure next to an individual action — the balance
+ * itself is the place for a number, on the wallet screen, not repeated and re-stated on every
+ * button that spends it.
  */
 import { describe, it, expect } from 'vitest'
 import { gradeCostLine, retakeNoteKey } from '@reeeeecall/shared/lib/quiz-pricing'
@@ -20,14 +24,10 @@ const quote = (over: Partial<Parameters<typeof gradeCostLine>[0] & object> = {})
 })
 
 describe('what grading costs', () => {
-  it('names the amount in the wallet\'s own unit', () => {
-    // Measured: grade_short is 2 units × 50,000 micro. The balance elsewhere reads "$499.60",
-    // so a grade denominated any other way would be a second currency on the same screen.
-    expect(gradeCostLine(quote())).toEqual({
-      key: 'pricing.gradeCost', params: { amount: '$0.01' },
-    })
-    // grade_essay is 8 units — four times the price, and it has to say so.
-    expect(gradeCostLine(quote({ price_micro: 40_000 }))!.params.amount).toBe('$0.04')
+  it('says that it charges, never how much', () => {
+    // No `amount` param, regardless of the actual price — the string itself carries no figure.
+    expect(gradeCostLine(quote())).toEqual({ key: 'pricing.gradeCost', params: {} })
+    expect(gradeCostLine(quote({ price_micro: 40_000 }))).toEqual({ key: 'pricing.gradeCost', params: {} })
   })
 
   it('says nothing when the quote carries no price, rather than saying free', () => {

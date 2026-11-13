@@ -67,7 +67,7 @@ export function ProofSection() {
     <section id="proof" className="py-16 sm:py-20 md:py-28 px-4">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-10 sm:mb-14">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-[11px] font-medium text-muted-foreground">
+          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs font-medium text-muted-foreground">
             <span className="relative flex h-1.5 w-1.5">
               {!prefersReduced && (
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand/70" />
@@ -140,7 +140,7 @@ export function ProofSection() {
                       i < minor.length - 1 ? 'border-r md:border-r-0 md:border-b border-border/60' : ''
                     }`}
                   >
-                    <span className="flex items-start md:items-center gap-1.5 text-[11px] sm:text-[13px] font-medium leading-tight text-muted-foreground">
+                    <span className="flex items-start md:items-center gap-1.5 text-xs sm:text-[13px] font-medium leading-tight text-muted-foreground">
                       <m.icon className="w-3.5 h-3.5 shrink-0 mt-px md:mt-0" />
                       {m.label}
                     </span>
@@ -156,7 +156,7 @@ export function ProofSection() {
           </motion.div>
         </div>
 
-        <p className="mt-5 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground/80">
+        <p className="mt-5 flex items-center justify-center gap-1.5 text-xs text-muted-foreground/80">
           <RefreshCw className="w-3 h-3" />
           {t('proof.footnote')}
         </p>

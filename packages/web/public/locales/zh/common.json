@@ -2,6 +2,7 @@
   "nav": {
     "quickStudy": "快速学习",
     "dashboard": "仪表盘",
+    "brainTraining": "大脑训练",
     "study": "学习",
     "decks": "牌组",
     "cards": "卡片",
@@ -23,7 +24,16 @@
     "analytics": "Analytics",
     "publisher": "发布者统计",
     "wallet": "钱包",
-    "quiz": "测验"
+    "quiz": "测验",
+    "aiHubHome": "AI 学习首页",
+    "tabsLabel": "主要标签",
+    "short": {
+      "home": "首页",
+      "study": "学习",
+      "decks": "牌组",
+      "brain": "脑训",
+      "more": "菜单"
+    }
   },
   "actions": {
     "save": "保存",

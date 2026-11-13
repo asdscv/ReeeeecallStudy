@@ -1,43 +1,28 @@
 # ReeeeecallStudy
-# https://llmstxt.org/
 
-> ReeeeecallStudy is a free smart flashcard learning platform that uses scientifically proven spaced repetition (SRS) to help students memorize any subject faster and retain knowledge longer. Available in 8 languages with 5 study modes.
+> ReeeeecallStudy is a flashcard learning platform with spaced repetition (SRS), six study modes, AI-assisted learning, deck sharing, and progress statistics. You can start with a free plan; paid plans increase card storage limits.
 
-## What is ReeeeecallStudy?
+## Product
 
-ReeeeecallStudy is a web-based educational platform at https://reeeeecallstudy.xyz that applies spaced repetition science to flashcard-based learning. It uses a modified SM-2 algorithm to schedule reviews at optimal intervals, leveraging the spacing effect and testing effect from cognitive psychology. The platform is completely free with no premium tier.
+- Six study modes: SRS, sequential review, random, sequential, by date, and cramming.
+- SRS recall ratings: Again, Hard, Good, and Easy. Review timing adapts to each card's learning history.
+- AI card generation creates templates, decks, and cards from a topic. AI quizzes and grading are separate features.
+- AI features have a daily free allowance. Usage beyond that allowance uses prepaid balance; the charge is shown before confirmation.
+- Deck sharing supports Copy, Subscribe, and Snapshot. Public deck previews can be read without an account.
+- The free plan has a card storage limit. Paid plans increase it. Current prices, limits, and available plans appear on the landing page; they can change.
+- The interface supports English, Korean, Simplified Chinese, Japanese, Spanish, Vietnamese, Thai, and Indonesian.
+- New Learning Insights articles are published in English and Korean. Some older articles remain available in other languages.
 
-## What study modes does ReeeeecallStudy offer?
+## Public Links
 
-ReeeeecallStudy provides five study modes: SRS (spaced repetition with optimized scheduling), Cramming (rapid sequential review for exam prep), Quiz (AI-generated multiple choice), Matching (drag-and-drop card pairing), and Writing (type-the-answer with fuzzy matching). Each mode targets different aspects of learning based on desirable difficulties research.
-
-## How does spaced repetition work in ReeeeecallStudy?
-
-ReeeeecallStudy implements the spacing effect — a well-established finding in cognitive psychology that information is better retained when review sessions are spaced over increasing intervals. After each review, users rate their recall (Again/Hard/Good/Easy/Perfect), and the algorithm adjusts the next review interval accordingly, typically following patterns like 1→3→7→14→30 days.
-
-## Is ReeeeecallStudy free?
-
-Yes, ReeeeecallStudy is completely free. All features — including all 5 study modes, unlimited deck creation, marketplace sharing, real-time analytics, and AI-generated educational content — are available to every user at no cost. There is no premium tier, subscription, or paywall.
-
-## What languages does ReeeeecallStudy support?
-
-ReeeeecallStudy supports 8 languages: English, Korean (한국어), Chinese Simplified (简体中文), Japanese (日本語), Spanish (Español), Vietnamese (Tiếng Việt), Thai (ภาษาไทย), and Indonesian (Bahasa Indonesia). Both the UI and all Learning Insights articles are fully available in all supported languages.
-
-## Key Links
-
-- [Homepage](https://reeeeecallstudy.xyz/landing): Main landing page with features overview
-- [Learning Insights](https://reeeeecallstudy.xyz/insight): Daily science-backed articles about learning strategies
-- [Full LLM Context](https://reeeeecallstudy.xyz/llms-full.txt): Comprehensive technical details for AI systems
-- [RSS Feed](https://reeeeecallstudy.xyz/feed.xml): Subscribe to latest learning articles
-- [Atom Feed](https://reeeeecallstudy.xyz/feed.atom): Atom format feed
-- [JSON Feed](https://reeeeecallstudy.xyz/feed.json): JSON format feed
-- [Sitemap](https://reeeeecallstudy.xyz/sitemap.xml): All indexed pages
-
-## Learning Insights Topics
-
-The blog publishes daily articles covering: spaced repetition science (Ebbinghaus's forgetting curve, Leitner system), active recall and testing effect, memory techniques (mnemonics, method of loci, chunking), study habit optimization (Pomodoro, interleaving), language learning strategies, exam preparation, and cognitive psychology fundamentals.
+- [English homepage](https://reeeeecallstudy.xyz/landing): Features and current plans
+- [Korean homepage](https://reeeeecallstudy.xyz/landing?lang=ko): Korean features and current plans
+- [Learning Insights](https://reeeeecallstudy.xyz/insight): Articles about learning and exam preparation
+- [Korean Learning Insights](https://reeeeecallstudy.xyz/insight?lang=ko): Korean articles
+- [Full product context](https://reeeeecallstudy.xyz/llms-full.txt)
+- [RSS feed](https://reeeeecallstudy.xyz/feed.xml)
+- [Sitemap index](https://reeeeecallstudy.xyz/sitemap.xml)
 
 ## Contact
 
-- Email: admin@reeeeecallstudy.xyz
-- Twitter/X: [@reeeeecallstudy](https://x.com/reeeeecallstudy)
+- Support: admin@reeeeecallstudy.xyz

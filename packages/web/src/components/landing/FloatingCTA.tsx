@@ -21,7 +21,7 @@ export function FloatingCTA() {
       {visible && (
         <motion.button
           onClick={() => navigate('/auth/login')}
-          className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 inline-flex items-center gap-2 px-5 py-3 bg-brand text-white text-sm font-semibold rounded-full shadow-lg shadow-blue-600/25 hover:brightness-110 transition cursor-pointer"
+          className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 inline-flex items-center gap-2 px-5 py-3 bg-brand text-brand-foreground text-sm font-semibold rounded-full shadow-lg shadow-blue-600/25 hover:brightness-110 transition cursor-pointer"
           initial={prefersReduced ? { opacity: 1 } : { opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={prefersReduced ? { opacity: 0 } : { opacity: 0, scale: 0.9, y: 20 }}

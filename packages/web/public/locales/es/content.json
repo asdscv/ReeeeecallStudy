@@ -22,5 +22,25 @@
     "listTitle": "Artículos de aprendizaje | ReeeCall",
     "listDescription": "Descubre estrategias de aprendizaje respaldadas por la ciencia y consejos de repetición espaciada.",
     "breadcrumbInsights": "Artículos de aprendizaje"
+  },
+  "appCta": {
+    "answer": {
+      "title": "Lo que lees una vez, se olvida pronto",
+      "description": "Convierte esta guía en tarjetas de estudio. La repetición espaciada te devuelve cada tarjeta justo antes de que la olvides: gratis en iPhone, Android y la web."
+    },
+    "wrap_up": {
+      "title": "Que se te quede de verdad",
+      "description": "Pasa lo que acabas de leer a tarjetas de estudio y repásalas unos minutos al día. Cada tarjeta vuelve justo antes de que la olvides."
+    },
+    "web": "Empieza gratis en la web",
+    "deck": {
+      "button": "Estudia este mazo ahora",
+      "meta_one": "Mazo oficial gratis · {{count, number}} tarjeta",
+      "meta_other": "Mazo oficial gratis · {{count, number}} tarjetas"
+    },
+    "hub": {
+      "meta": "Lista de palabras gratis · frases de ejemplo · mazos en 7 idiomas",
+      "button": "Ver la lista"
+    }
   }
 }

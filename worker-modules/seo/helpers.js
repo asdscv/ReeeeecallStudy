@@ -16,9 +16,11 @@ export function escapeHtml(str) {
 }
 
 export function buildHreflangTags(basePath, queryParam, locales = INDEXABLE_LOCALES) {
+  if (locales.length === 0) return ''
+  const defaultLocale = locales.includes('en') ? 'en' : locales[0]
   return locales.map(
-    (l) => `<link rel="alternate" hreflang="${l}" href="${SITE_URL}${basePath}${queryParam ? `?lang=${l}` : ''}">`
-  ).join('\n') + `\n<link rel="alternate" hreflang="x-default" href="${SITE_URL}${basePath}">`
+    (l) => `<link rel="alternate" hreflang="${l}" href="${queryParam ? localizedUrl(basePath, l) : `${SITE_URL}${basePath}`}">`
+  ).join('\n') + `\n<link rel="alternate" hreflang="x-default" href="${queryParam ? localizedUrl(basePath, defaultLocale) : `${SITE_URL}${basePath}`}">`
 }
 
 export function buildOgLocaleAlternates(lang) {

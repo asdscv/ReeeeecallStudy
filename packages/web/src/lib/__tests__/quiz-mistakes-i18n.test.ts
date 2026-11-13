@@ -122,11 +122,14 @@ describe.each(Object.keys(PLATFORMS) as (keyof typeof PLATFORMS)[])('%s', (platf
       }
     })
 
-    it('tells the learner what grading and retaking cost', () => {
+    it('tells the learner WHETHER grading and generation charge, never how much', () => {
       const tf = tr()
       // The billing is simple on purpose; the TELLING has to reach every language, or a Thai
-      // learner taps 채점 not knowing whether it is free.
-      expect(tf('pricing.gradeCost', { amount: '$0.10' })).toContain('$0.10')
+      // learner taps 채점 not knowing it charges at all. No dollar figure, in any language —
+      // that number belongs on the wallet screen, not repeated on every button that spends it.
+      const gradeCost = tf('pricing.gradeCost')
+      expect(gradeCost).not.toBe('pricing.gradeCost')
+      expect(gradeCost).not.toMatch(/[$₩¥₫฿]|\d/)
       for (const key of ['pricing.retakeMcq', 'pricing.retakeWritten'] as const) {
         expect(tf(key)).not.toBe(key)
         // Not a character-count floor. This was `> 5` and zh failed it on "免费批改" — four
@@ -134,14 +137,15 @@ describe.each(Object.keys(PLATFORMS) as (keyof typeof PLATFORMS)[])('%s', (platf
         // translated text is a Latin-alphabet assumption.
         expect(tf(key).trim()).not.toBe('')
       }
-      // The generation lines carry three interpolations between them, and `free`/`paid`/`amount`
-      // all have to land — a learner reading "무료 {{free}}문항" learns nothing.
+      // The generation lines carry `free`/`paid` counts — never `amount` — and both have to land.
       expect(tf('pricing.genAllFree', { free: 5 })).not.toBe('pricing.genAllFree')
-      expect(tf('pricing.genAllPaid', { paid: 4, amount: '$0.40' })).toContain('$0.40')
-      const partly = tf('pricing.genPartlyFree', { free: 5, paid: 3, amount: '$0.45' })
-      expect(partly).toContain('$0.45')
+      const allPaid = tf('pricing.genAllPaid', { paid: 4 })
+      expect(allPaid).toContain('4')
+      expect(allPaid).not.toMatch(/[$₩¥₫฿]/)
+      const partly = tf('pricing.genPartlyFree', { free: 5, paid: 3 })
       expect(partly).toContain('5')
       expect(partly).toContain('3')
+      expect(partly).not.toMatch(/[$₩¥₫฿]/)
       const left = tf('pricing.genFreeLeft', { left: 2, limit: 5 })
       expect(left).toContain('2')
       expect(left).toContain('5')

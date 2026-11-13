@@ -17,11 +17,13 @@ describe('buildHreflangTags', () => {
     )
   })
 
-  it('defaults to the indexable locales (en, ko) when none are passed', () => {
+  it('defaults to the indexable locales (en, ko, ja, vi) when none are passed', () => {
     const out = buildHreflangTags('/insight', true)
     expect(out).toContain('hreflang="en"')
     expect(out).toContain('hreflang="ko"')
-    expect(out).not.toContain('hreflang="ja"')
+    expect(out).toContain('hreflang="ja"')
+    expect(out).toContain('hreflang="vi"')
+    expect(out).not.toContain('hreflang="zh"')
   })
 
   it('appends ?lang= per locale when queryParam is true', () => {

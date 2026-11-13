@@ -49,7 +49,7 @@ export function WalletSummary() {
           title={PAYMENTS_ACTIVE ? undefined : t('balance.topUpSoon')}
           className={`mt-3 px-4 py-2 text-sm rounded-lg cursor-pointer font-medium transition ${
             PAYMENTS_ACTIVE
-              ? 'bg-brand text-white hover:bg-brand-hover'
+              ? 'bg-brand text-brand-foreground hover:bg-brand-hover'
               : 'bg-accent text-muted-foreground hover:bg-accent/70'
           }`}
         >

@@ -2,6 +2,7 @@
   "nav": {
     "quickStudy": "เรียนด่วน",
     "dashboard": "แดชบอร์ด",
+    "brainTraining": "ฝึกสมอง",
     "study": "เรียน",
     "decks": "สำรับ",
     "cards": "การ์ด",
@@ -23,7 +24,16 @@
     "analytics": "Analytics",
     "publisher": "สถิติผู้เผยแพร่",
     "wallet": "กระเป๋าเงิน",
-    "quiz": "แบบทดสอบ"
+    "quiz": "แบบทดสอบ",
+    "aiHubHome": "หน้าหลัก AI",
+    "tabsLabel": "แท็บหลัก",
+    "short": {
+      "home": "หน้าแรก",
+      "study": "เรียน",
+      "decks": "สำรับ",
+      "brain": "สมอง",
+      "more": "เมนู"
+    }
   },
   "actions": {
     "save": "บันทึก",

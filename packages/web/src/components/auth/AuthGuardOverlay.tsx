@@ -20,10 +20,10 @@ const FIRST_FLIP_DELAY = 750  // Show front briefly, then flip
 const FLIP_INTERVAL = 3000
 const RATING_BUTTONS = ['Again', 'Hard', 'Good', 'Easy']
 const RATING_COLORS = [
-  'bg-destructive text-white shadow-red-500/40',
+  'bg-destructive text-destructive-foreground shadow-red-500/40',
   'bg-orange-500 text-white shadow-orange-500/40',
   'bg-emerald-500 text-white shadow-emerald-500/40',
-  'bg-brand text-white shadow-blue-500/40',
+  'bg-brand text-brand-foreground shadow-blue-500/40',
 ]
 
 function MockBrowserPreview({ prefersReduced }: { prefersReduced: boolean | null }) {
@@ -124,7 +124,7 @@ function MockBrowserPreview({ prefersReduced }: { prefersReduced: boolean | null
             {/* Front */}
             <div className="absolute inset-0 [backface-visibility:hidden] bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 rounded-2xl flex flex-col items-center justify-center p-6 shadow-xl shadow-blue-600/25 border border-white/10">
               <div className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.2)_0%,transparent_50%)]" />
-              <div className="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-card/10 text-[10px] text-white/50 font-medium">
+              <div className="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-card/10 text-xs text-white/50 font-medium">
                 Q
               </div>
               <p className="text-3xl sm:text-4xl font-bold text-white relative">
@@ -137,7 +137,7 @@ function MockBrowserPreview({ prefersReduced }: { prefersReduced: boolean | null
             {/* Back */}
             <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] bg-gradient-to-br from-emerald-400 via-cyan-500 to-blue-600 rounded-2xl flex flex-col items-center justify-center p-4 sm:p-6 shadow-xl shadow-cyan-600/25 border border-white/10">
               <div className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.2)_0%,transparent_50%)]" />
-              <div className="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-card/10 text-[10px] text-white/50 font-medium">
+              <div className="absolute top-3 right-3 px-2 py-0.5 rounded-md bg-card/10 text-xs text-white/50 font-medium">
                 A
               </div>
               <p className="text-3xl sm:text-4xl font-bold text-white relative">
@@ -173,7 +173,7 @@ function MockBrowserPreview({ prefersReduced }: { prefersReduced: boolean | null
 
         {/* Progress bar */}
         <div className="mt-5 w-full max-w-[280px] sm:max-w-sm">
-          <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1.5">
+          <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
             <span>{t('preview.mockCards', '12/30 cards')}</span>
             <span className="text-brand/70/70">40%</span>
           </div>

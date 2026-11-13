@@ -360,7 +360,7 @@ export function StudyCard({
               {frontRender.mode !== 'custom' && displaySide === 'front' && (
                 <>
                   <div className="absolute top-0 left-0 right-0 h-1 bg-brand rounded-t-2xl z-10" />
-                  <div className="absolute top-2 right-3 text-[10px] font-semibold text-brand/70 tracking-wider uppercase z-10">
+                  <div className="absolute top-2 right-3 text-xs font-semibold text-brand/70 tracking-wider uppercase z-10">
                     {t('card.front')}
                   </div>
                 </>
@@ -368,7 +368,7 @@ export function StudyCard({
               {backRender.mode !== 'custom' && displaySide === 'back' && (
                 <>
                   <div className="absolute top-0 left-0 right-0 h-1 bg-teal-500 rounded-t-2xl z-10" />
-                  <div className="absolute top-2 left-3 text-[10px] font-semibold text-teal-400 tracking-wider uppercase z-10">
+                  <div className="absolute top-2 left-3 text-xs font-semibold text-teal-400 tracking-wider uppercase z-10">
                     {t('card.back')}
                   </div>
                 </>

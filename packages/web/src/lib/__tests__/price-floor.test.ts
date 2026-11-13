@@ -63,8 +63,16 @@ const PRICE: Record<keyof typeof MEASURED, number> = {
   // $0.40 an answer was 1,233x — the top of the ladder by four times, on the type learners get
   // the most out of. Essay GENERATION is expensive; essay GRADING is not, because the rubric is
   // already stored with the question and the model only returns a level per criterion.
-  gradeShort: 10_000,     // 2 units x 5,000
-  gradeEssay: 20_000,     // 4 units
+  //
+  // 283 halved both again: #616/#617 moved grading itself onto Jev, whose real cost is ~$0.00007
+  // (short) / ~$0.00011 (essay) — far under this file's floor already. This ladder still prices
+  // against gemini-2.5-flash, though, because that is the LLM FALLBACK grader (`ai-quiz-jev.ts`
+  // falls back to it when Jev is down or unconfigured), and that path has to clear the floor on
+  // its own, not on Jev's cost. gradeEssay at 10,000 sits at 11.25x the fallback's cost — the
+  // exact multiple this file's own comment derives before flooring it to 10 — so it cannot go
+  // any lower without risking the fallback selling under cost.
+  gradeShort: 5_000,      // 1 unit x 5,000
+  gradeEssay: 10_000,     // 2 units
   // 261 이 셋을 사다리 안으로 데려왔습니다. 230 이 값을 열 배로 올린 뒤 원가를 다시 잰 적이
   // 없어서 해설 644배 · 힌트 858배 · 진단 588배로 떠 있었습니다(나머지 사다리는 29~143배).
   remediation: 30_000,       // $0.50 → $0.03,  원가의 39배

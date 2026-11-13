@@ -23,6 +23,8 @@ import { QuickStudyPage } from './pages/QuickStudyPage'
 import { LearningTodayPage } from './pages/learning/LearningTodayPage'
 import { QuizHomePage } from './pages/quiz/QuizHomePage'
 import { QuizSetupPage } from './pages/quiz/QuizSetupPage'
+import { BrainHomePage } from './pages/brain/BrainHomePage'
+import { BrainResearchPage } from './pages/brain/BrainResearchPage'
 import { LearningGoalsPage } from './pages/learning/LearningGoalsPage'
 import { StudyHistoryPage } from './pages/StudyHistoryPage'
 import { SessionDetailPage } from './pages/SessionDetailPage'
@@ -35,6 +37,7 @@ import { ContentListPage } from './pages/ContentListPage'
 import { ContentDetailPage } from './pages/ContentDetailPage'
 import { LandingPage } from './pages/LandingPage'
 import { PublicListingPage } from './pages/PublicListingPage'
+import { VocabularyPage } from './pages/VocabularyPage'
 import { TossCheckoutPage } from './pages/checkout/TossCheckoutPage'
 import { TossReturnPage } from './pages/checkout/TossReturnPage'
 import { usePageTracking } from './hooks/usePageTracking'
@@ -64,6 +67,12 @@ const QuizSetDetailPage = lazy(() =>
 )
 const QuizResultPage = lazy(() =>
   import('./pages/quiz/QuizResultPage').then(m => ({ default: m.QuizResultPage }))
+)
+const BrainPlayPage = lazy(() =>
+  import('./pages/brain/BrainPlayPage').then((m) => ({ default: m.BrainPlayPage }))
+)
+const BrainTrainingPage = lazy(() =>
+  import('./pages/brain/BrainTrainingPage').then((m) => ({ default: m.BrainTrainingPage }))
 )
 const StudySessionPage = lazy(() =>
   import('./pages/StudySessionPage').then(m => ({ default: m.StudySessionPage }))
@@ -260,6 +269,8 @@ function App() {
             <Route path="/insight" element={<ContentListPage />} />
             <Route path="/insight/:slug" element={<ContentDetailPage />} />
             <Route path="/d/:listingId" element={<PublicListingPage />} />
+            <Route path="/vocabulary" element={<VocabularyPage />} />
+            <Route path="/vocabulary/:slug" element={<VocabularyPage />} />
             <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
             {/* Guide — public, no auth required (with Layout for nav) */}
@@ -300,6 +311,29 @@ function App() {
               }
             />
 
+            {/* Brain-training rounds and Today's Training — outside Layout for the same reason as a
+                quiz: full screen, nothing competing with the board. */}
+            <Route
+              path="/brain/play/:mode"
+              element={
+                <ProtectedRoute>
+                  <StudyErrorBoundary>
+                    <BrainPlayPage />
+                  </StudyErrorBoundary>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/brain/training"
+              element={
+                <ProtectedRoute>
+                  <StudyErrorBoundary>
+                    <BrainTrainingPage />
+                  </StudyErrorBoundary>
+                </ProtectedRoute>
+              }
+            />
+
             {/* Study session (outside Layout for fullscreen focus) */}
             <Route
               path="/decks/:deckId/study"
@@ -322,6 +356,8 @@ function App() {
             >
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/quick-study" element={<QuickStudyPage />} />
+              <Route path="/brain" element={<BrainHomePage />} />
+              <Route path="/brain/research" element={<BrainResearchPage />} />
               {/* List -> detail. `/learning` is the plans; a plan opens at `/learning/:goalId`.
                   The old `/learning/insights` is gone: its only entry point was a small "진단"
                   link in the plan header, which is why nobody found it, and what it showed

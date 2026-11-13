@@ -1,7 +1,7 @@
 // Content list page bot handler — extracted from worker.js handleContentListBot
 import {
   SITE_URL, BRAND_NAME, DEFAULT_OG_IMAGE,
-  LIST_TITLES, LIST_DESCS, ROBOTS_INDEX, ROBOTS_NOINDEX,
+  LIST_TITLES, LIST_DESCS, ROBOTS_INDEX, ROBOTS_NOINDEX, pageChrome,
 } from '../constants.js'
 import {
   escapeHtml, buildHreflangTags,
@@ -61,7 +61,7 @@ export async function handleContentListBot(url, env) {
   const articlesHtml = articles.map((a) => {
     const dateStr = a.published_at ? new Date(a.published_at).toISOString().split('T')[0] : ''
     return `<article>
-<h2><a href="${SITE_URL}/insight/${escapeHtml(a.slug)}">${escapeHtml(a.title)}</a></h2>
+<h2><a href="${localizedUrl(`/insight/${escapeHtml(a.slug)}`, lang)}">${escapeHtml(a.title)}</a></h2>
 ${a.subtitle ? `<p>${escapeHtml(a.subtitle)}</p>` : ''}
 <div>
 ${dateStr ? `<time datetime="${escapeHtml(a.published_at)}">${dateStr}</time>` : ''}
@@ -87,7 +87,7 @@ ${articlesHtml}
 </section>
 </main>
 <footer>
-<p><a href="${SITE_URL}/landing">Start Learning with ${BRAND_NAME}</a></p>
+<p><a href="${localizedUrl('/landing', lang)}">${pageChrome(lang).startLearning}</a></p>
 </footer>`
 
   const html = buildHtmlDocument({ lang, head, body, robots })

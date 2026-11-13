@@ -87,7 +87,9 @@ export function serializeNavState(state: unknown, now: number): string {
  * Route names that must NOT be restored because their content depends on
  * volatile in-memory state (zustand stores) that is lost across cold starts.
  */
-export const VOLATILE_ROUTE_NAMES: readonly string[] = ['StudySession']
+// Brain rounds too: restoring one after a cold start would flash a Quick Eye stimulus while the
+// app is still appearing and silently throw away the session it replaced.
+export const VOLATILE_ROUTE_NAMES: readonly string[] = ['StudySession', 'BrainPlay', 'BrainTraining']
 
 interface NavStateLike {
   index?: number

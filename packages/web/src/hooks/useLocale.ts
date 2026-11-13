@@ -7,6 +7,12 @@ export function useLocale() {
 
   const changeLanguage = useCallback(
     async (lng: string) => {
+      // Public language URLs must reflect the content people and bots receive.
+      if (/^\/(?:landing(?:\/|$)|insight(?:\/|$)|d\/)/.test(window.location.pathname) || window.location.pathname === '/') {
+        const url = new URL(window.location.href)
+        url.searchParams.set('lang', lng)
+        window.history.replaceState(window.history.state, '', url)
+      }
       await i18n.changeLanguage(lng)
       localStorage.setItem('reeeeecall-lang', lng)
       document.documentElement.lang = lng

@@ -3,9 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { ScrollReveal } from './ScrollReveal'
 import { LanguageSelector } from '../common/LanguageSelector'
 import { AppDownload } from '../common/AppDownload'
+import { VOCAB_INDEX_PATH, isDeckLanguage, vocabLanguageIndexPath } from '@reeeeecall/shared/lib/vocab-hubs'
 
 export function FooterSection() {
-  const { t } = useTranslation('landing')
+  const { t, i18n } = useTranslation('landing')
+  const lang = i18n.language.slice(0, 2)
+  const vocabularyPath = isDeckLanguage(lang) ? vocabLanguageIndexPath(lang) : VOCAB_INDEX_PATH
 
   return (
     <footer className="border-t border-border bg-background pb-20 sm:pb-0">
@@ -64,6 +67,11 @@ export function FooterSection() {
                 <li>
                   <Link to="/insight" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
                     {t('footer.blog', 'Insights')}
+                  </Link>
+                </li>
+                <li>
+                  <Link to={vocabularyPath} className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
+                    {t('footer.vocabulary', 'Vocabulary lists')}
                   </Link>
                 </li>
                 <li>
