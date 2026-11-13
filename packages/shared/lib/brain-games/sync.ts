@@ -17,10 +17,15 @@ import { BRAIN_GAMES } from './catalog'
  * each game keeps the side with more trials. Never a reset to level 1.
  */
 
-/** The `v` this client writes and fully understands. A cloud copy with a higher `v` is read-only here. */
-export const BRAIN_PROGRESS_FORMAT = 1
-export const BRAIN_HISTORY_FORMAT = 1
-export const BRAIN_META_FORMAT = 1
+/**
+ * The `v` this client writes and fully understands. A cloud copy with a higher `v` is read-only here.
+ * 2: the hard-content change moved the board games' levels to a new scale (scale.ts). A v1 copy is
+ * converted once on reading; an app that only knows v1 stops syncing ('outdated') rather than push
+ * old-scale levels over it, and migration 288 refuses any write with a lower `v` than stored.
+ */
+export const BRAIN_PROGRESS_FORMAT = 2
+export const BRAIN_HISTORY_FORMAT = 2
+export const BRAIN_META_FORMAT = 2
 /** Mirrors the CHECKs in migration 288 (octet_length of the jsonb text). */
 export const BRAIN_SAVE_MAX_BYTES = 16_384
 
@@ -188,12 +193,18 @@ function gameWinner(a: GameProgress | undefined, b: GameProgress | undefined): S
 /**
  * Quick Eye's variant ladder and its game record travel together (opening a variant eases the level
  * back, so the pair must not be split). Higher variant first — picking by trials alone could drop a
- * player from variant 6 back to 5 — then more trials.
+ * player from variant 6 back to 5 — then more trials. Variants 1 and 2 rank together: 2 is where
+ * every record starts (an empty one too) and 1 only where a slow first placement sends a player,
+ * so a fresh device's untouched variant 2 must not undo that placement — the side that played decides.
  */
 function quickEyeSide(local: BrainProgress, remote: BrainProgress): Side {
-  if (local.quickEye.variant !== remote.quickEye.variant) return local.quickEye.variant > remote.quickEye.variant ? 'local' : 'remote'
+  const rank = (v: number) => Math.max(2, v)
+  const [lv, rv] = [rank(local.quickEye.variant), rank(remote.quickEye.variant)]
+  if (lv !== rv) return lv > rv ? 'local' : 'remote'
   const a = local.games.quickEye
   const b = remote.games.quickEye
+  // Neither has played: the same answer on both devices, never "keep mine" on each.
+  if (!a && !b && local.quickEye.variant !== remote.quickEye.variant) return local.quickEye.variant > remote.quickEye.variant ? 'local' : 'remote'
   if (a && b && a.rounds === b.rounds && a.level === b.level) return tieSide({ a, q: local.quickEye }, { a: b, q: remote.quickEye })
   return gameWinner(a, b)
 }
@@ -281,7 +292,7 @@ export function mergeProgress(local: BrainProgress, remote: BrainProgress, sides
 
   return {
     ...local,
-    v: 1,
+    v: 2,
     games,
     totalRounds: Math.max(local.totalRounds, remote.totalRounds),
     totalPoints: Math.max(local.totalPoints, remote.totalPoints),
@@ -326,7 +337,7 @@ export function mergeHistory(local: BrainHistory, remote: BrainHistory): BrainHi
     merged.sort((x, y) => x[0] - y[0] || (key(x) < key(y) ? -1 : key(x) > key(y) ? 1 : 0))
     rounds[id] = merged.slice(-HISTORY_PER_GAME)
   }
-  return { v: 1, rounds }
+  return { v: 2, rounds }
 }
 
 // ── meta ────────────────────────────────────────────────────────────────────
@@ -381,7 +392,7 @@ export function mergeMeta(local: BrainMeta, remote: BrainMeta, sides: GameSides 
   }
   return {
     ...local,
-    v: 1,
+    v: 2,
     sk,
     tier: maxPerGame(local.tier, remote.tier),
     seen: orMask(local.seen, remote.seen),

@@ -72,13 +72,16 @@ export function useTodaysTraining() {
         levels: { ...s.totals.levels, [gameId]: { start: prior?.start ?? stats.levelStart, end: stats.levelEnd } },
       }
       const activeMs = s.activeMs + stats.activeMs
-      const slotActiveMs = s.slotActiveMs + stats.activeMs
+      // Setup (practice, placement, rule-card trials — a first day's) is not the game's play time:
+      // it does not eat the slot. The session's minutes still count it.
+      const slotActiveMs = s.slotActiveMs + Math.max(0, stats.activeMs - stats.setupMs)
       if (stats.endedBy === 'stop') return { ...s, totals, activeMs, slotActiveMs, phase: 'quit' }
       const now = Date.now()
       const slot = s.slots[s.slotIndex]
       const rounds = s.roundsInSlot + 1
       const left = slot.minutes * 60_000 - slotActiveMs
-      if (rounds < slot.maxRounds && left > 60_000) {
+      // Another round only when it ended early (chances out) with a real stretch of the slot left.
+      if (stats.endedBy !== 'time' && rounds < slot.maxRounds && left > 45_000) {
         return { ...s, totals, activeMs, slotActiveMs, roundsInSlot: rounds, roundKey: s.roundKey + 1 }
       }
       if (s.slotIndex + 1 < s.slots.length) return { ...s, totals, activeMs, slotActiveMs, phase: 'between' }
@@ -132,6 +135,8 @@ export function useTodaysTraining() {
     roundKey: state.roundKey,
     totals: state.totals,
     plannedMinutes: plannedMinutes(state.slots),
+    /** Play time left in this game's slot — the round in play gets it as its time budget. */
+    slotBudgetMs: slot ? Math.max(15_000, slot.minutes * 60_000 - state.slotActiveMs) : undefined,
     startedAt: state.startedAt,
     /** Minutes actually played so far. */
     activeMinutes: state.activeMs / 60_000,

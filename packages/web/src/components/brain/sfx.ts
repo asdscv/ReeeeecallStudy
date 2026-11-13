@@ -7,6 +7,12 @@ import type { BrainFx } from '@reeeeecall/shared/hooks/useBrainFx'
  * Soft by design: sine and triangle voices, short envelopes, a wrong answer that thuds rather
  * than buzzes. The context is created on the first tap (browsers refuse audio before a gesture)
  * and nothing plays while the setting is off or the tab is hidden.
+ *
+ * Quick Eye's measured frames are silent: while the round is `quiet` (fixation, stimulus, mask)
+ * every request is dropped except the ready cue (`fixationTick`) as the fixation starts — it is
+ * the same on every trial, so it alerts without telling anything about the flash. Whatever is still
+ * ringing when it turns quiet (a stage-up chord tapped away at once) is faded out then, so no tail
+ * reaches the flash 500ms later.
  */
 
 // C major pentatonic, C4 to E6 — any two notes sound fine together, so overlapping taps never
@@ -20,6 +26,42 @@ class Sfx {
   private ctx: AudioContext | null = null
   private master: GainNode | null = null
   enabled = true
+  private hushed = false
+  /** Voices started and not yet ended, so a quiet stretch can cut their tails. */
+  private voices = new Set<{ src: AudioScheduledSourceNode; env: GainNode }>()
+
+  /** Quick Eye's display is being measured (set by the round): only the ready cue may sound. */
+  get quiet() {
+    return this.hushed
+  }
+  set quiet(on: boolean) {
+    if (on && !this.hushed) this.hush()
+    this.hushed = on
+  }
+
+  /** Fades out (30ms) every voice still sounding or still scheduled. */
+  private hush() {
+    const ctx = this.ctx
+    if (!ctx) return
+    const now = ctx.currentTime
+    for (const v of this.voices) {
+      try {
+        v.env.gain.cancelScheduledValues?.(now)
+        v.env.gain.setValueAtTime(Math.max(0.0001, v.env.gain.value), now)
+        v.env.gain.exponentialRampToValueAtTime(0.0001, now + 0.03)
+        v.src.stop(now + 0.04)
+      } catch {
+        // Already stopped: nothing left to cut.
+      }
+    }
+    this.voices.clear()
+  }
+
+  private track(src: AudioScheduledSourceNode, env: GainNode) {
+    const v = { src, env }
+    this.voices.add(v)
+    src.onended = () => this.voices.delete(v)
+  }
 
   /** Call from a user gesture: unlocks audio on browsers that need one. */
   unlock() {
@@ -64,6 +106,7 @@ class Sfx {
     osc.connect(env).connect(this.master)
     osc.start(t0)
     osc.stop(t0 + dur + 0.02)
+    this.track(osc, env)
   }
 
   /**
@@ -76,6 +119,8 @@ class Sfx {
   }
 
   private lastVerdict = 0
+  /** When Odd One Out's «없음» tone last played: its 'correct' (the same moment) adds no chime. */
+  private lastNone = -Infinity
 
   /** Filtered noise: a card flip or a whoosh. */
   private noise({ at = 0, dur = 0.06, gain = 0.05, freq = 3000, q = 0.8, sweepTo }: { at?: number; dur?: number; gain?: number; freq?: number; q?: number; sweepTo?: number } = {}) {
@@ -100,10 +145,37 @@ class Sfx {
     src.connect(filter).connect(env).connect(this.master)
     src.start(t0)
     src.stop(t0 + dur + 0.02)
+    this.track(src, env)
   }
 
   tap() {
     this.tone(1400, { dur: 0.05, gain: 0.07, wave: 'triangle', glideTo: 900 })
+  }
+
+  /** Quick Eye's ready cue, 500ms before the flash: one soft low tick. */
+  fixationTick() {
+    this.tone(220, { dur: 0.05, gain: 0.05, wave: 'triangle' })
+  }
+
+  /** Quick Eye's flash got one step shorter: E5 → G5. */
+  rungUp() {
+    if (this.quiet) return
+    this.tone(note(7), { dur: 0.07, gain: 0.1, wave: 'triangle' })
+    this.tone(note(8), { at: 0.06, dur: 0.1, gain: 0.1, wave: 'triangle' })
+  }
+
+  /** Quick Eye: the star was right next to the pick — a gentle E4 → D4, not the miss's thud. */
+  nearMiss() {
+    if (this.quiet) return
+    this.tone(note(2), { dur: 0.07, gain: 0.12, wave: 'triangle' })
+    this.tone(note(1), { at: 0.06, dur: 0.1, gain: 0.12, wave: 'triangle' })
+  }
+
+  /** Quick Eye reached a stage: C5-E5-G5, and a C6 on top when the field changes colour (a new stage group). */
+  stageUp(newGroup = false) {
+    if (this.quiet) return
+    ;[5, 7, 8].forEach((n, i) => this.bell(note(n), i * 0.12, 0.32, 0.11))
+    if (newGroup) this.bell(note(10), 0.36, 0.5, 0.09)
   }
 
   countdown(n: number) {
@@ -115,18 +187,38 @@ class Sfx {
   }
 
   play(fx: BrainFx) {
+    if (this.quiet && fx.kind !== 'fixation') return
     // The tap that finishes a trial plays only its verdict, not a hit and then the verdict.
     const now = performance.now()
-    if (fx.kind === 'correct' || fx.kind === 'wrong') this.lastVerdict = now
+    if (fx.kind === 'correct' || fx.kind === 'wrong' || fx.kind === 'nearMiss' || fx.kind === 'noneCorrect') this.lastVerdict = now
     if (fx.kind === 'hit') {
       setTimeout(() => {
-        if (performance.now() - this.lastVerdict > 40) this.bell(note(4 + Math.min(fx.step, 8)), 0, 0.22, 0.12)
+        if (performance.now() - this.lastVerdict <= 40) return
+        // The run climbs a pentatonic step per hit. Number Hunt's second series (the boxed numbers)
+        // answers in a rounder, lower voice, so the two series are told apart by ear too.
+        if (fx.alt) {
+          const f = note(1 + Math.min(fx.step, 8))
+          this.tone(f, { dur: 0.2, gain: 0.13, attack: 0.008 })
+          this.tone(f / 2, { dur: 0.16, gain: 0.04 })
+        } else this.bell(note(4 + Math.min(fx.step, 8)), 0, 0.22, 0.12)
       }, 0)
       return
     }
     switch (fx.kind) {
       case 'reveal':
         this.noise({ dur: 0.35, gain: 0.04, freq: 600, sweepTo: 2400, q: 1.2 })
+        break
+      case 'wave': {
+        // Flash Grid's waves: the reveal's whoosh, a little higher each wave.
+        const lift = 1 + 0.25 * Math.max(0, fx.index)
+        this.noise({ dur: 0.3, gain: 0.04, freq: 600 * lift, sweepTo: 2000 * lift, q: 1.2 })
+        break
+      }
+      case 'noneCorrect':
+        // «없음» was right: an open fifth (C5 + G5) that rings out — calm, unlike the climbing chime.
+        this.lastNone = now
+        this.bell(note(5), 0, 0.55, 0.11)
+        this.bell(note(8), 0.0, 0.55, 0.08)
         break
       case 'flash':
         // A Simon tone per tile: the same cell always sings the same note.
@@ -143,6 +235,7 @@ class Sfx {
         this.tone(196, { dur: 0.2, gain: 0.16, wave: 'triangle', glideTo: 140 })
         break
       case 'correct': {
+        if (now - this.lastNone < 40) break
         // The chime climbs with the run (a semitone-ish pentatonic step per answer, capped).
         const base = 5 + Math.min(fx.streak - 1, 5)
         this.bell(note(base), 0, 0.3, 0.13)
@@ -167,6 +260,16 @@ class Sfx {
         ;[3, 5, 7].forEach((n, i) => this.bell(note(n), 0.35 + i * 0.1, 0.25, 0.12))
         ;[5, 7, 10].forEach((n) => this.bell(note(n), 0.7, 1.1, 0.08))
         break
+      case 'fixation':
+        this.fixationTick()
+        break
+      case 'nearMiss':
+        this.nearMiss()
+        break
+      case 'stageUp':
+        this.stageUp()
+        break
+      // Quick Eye's flash is never sounded.
       case 'stimulus':
       case 'void':
         break

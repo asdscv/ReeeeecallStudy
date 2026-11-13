@@ -1,5 +1,5 @@
 import { Aperture, LayoutGrid, Repeat, Copy, Hash, Eye, Droplet, PlusCircle, TrendingUp, type LucideIcon } from 'lucide-react'
-import { INK_COLORS } from '@reeeeecall/shared/lib/brain-games'
+import { INK_COLORS, maxRowsFor, type CellInk } from '@reeeeecall/shared/lib/brain-games'
 import type { BrainStorage } from '@reeeeecall/shared/stores/brain-store'
 import type { PlatformContext } from '@reeeeecall/shared/hooks/useBrainRound'
 
@@ -18,6 +18,29 @@ export const BRAIN_ICONS: Record<string, LucideIcon> = {
 
 /** Ink colours for the colour-word game (shared with the app). */
 export const INK = INK_COLORS
+
+/**
+ * A grid label's ink on the dark canvas (Odd One Out's colour noise, Number Hunt's second series):
+ * told apart by brightness and hue, never red against green. Even on the light end of a game
+ * canvas each is ≥ 4:1 (labels are ≥ 28px bold, where 3:1 is the bar); colour is never the only cue
+ * that matters — the second series is also boxed.
+ */
+export const CELL_INK: Record<CellInk, string> = {
+  neutral: '#F8FAFC',
+  amber: '#FBBF24',
+  cyan: '#67E8F9',
+}
+
+/**
+ * The height a grid board may take in a round: the window less the round's header, score row,
+ * bars, prompt and verdict line (≈330px), never below 360. BrainBoard sizes its cells from it.
+ */
+export function boardHeight(): number {
+  return Math.max(360, (typeof window === 'undefined' ? 768 : window.innerHeight) - 330)
+}
+
+/** The row above a grid (badge, chip, waves, budget) with its margin: kept out of the cells' height. */
+export const BOARD_STRIP_H = 44
 
 export function brainStorageFor(userId: string): BrainStorage {
   const key = `reeeeecall-brain:${userId}`
@@ -94,12 +117,16 @@ export function cardBackground(theme: { cardFrom: string; cardTo: string }): str
  * The web's platform context. Quick Eye starts at 33ms (two 60Hz frames) — a browser's frame
  * timing is not trustworthy enough at one frame without hardware checks — and keeps the inner ring
  * to the 8 radial positions on small screens, where 16 stimuli would overlap the centre box.
+ *
+ * `maxRows`: the tallest grid that keeps 56px cells in the board's height, less the strip a tall
+ * board carries above it (Flash Grid's «N칸» and waves) — so a portrait 5×7 board is only offered
+ * where it fits without scrolling.
  */
-export function webPlatform(_boardWidth: number, maxCols: number): PlatformContext {
+export function webPlatform(_boardWidth: number, maxCols: number, maxRows = maxRowsFor(boardHeight() - BOARD_STRIP_H)): PlatformContext & { maxRows: number } {
   // Decided by the screen, as the app does (its screenShortSide) — not by the board, which is
   // capped at 560px and would always read as "small".
   const small = Math.min(window.innerWidth, window.innerHeight) < 600
-  return { maxCols, minExposureMs: 33, ringSlots: small ? [8, 16, 16] : [16, 16, 16] }
+  return { maxCols, maxRows, minExposureMs: 33, ringSlots: small ? [8, 16, 16] : [16, 16, 16] }
 }
 
 /**

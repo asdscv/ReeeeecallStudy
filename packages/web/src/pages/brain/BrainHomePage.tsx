@@ -6,6 +6,7 @@ import { formatCount } from '@reeeeecall/shared/lib/format-number'
 import {
   BRAIN_GAMES,
   GAME_THEMES,
+  SESSION_MINUTES,
   TRAINING_THEME,
   courseStatus,
   createRng,
@@ -13,8 +14,9 @@ import {
   gameHistory,
   gameProgress,
   localDayKey,
-  planTodaysSession,
+  planToday,
   plannedMinutes,
+  quickEyeStage,
   researchContent,
   todaysPlanSeed,
   weekProgress,
@@ -40,11 +42,12 @@ export function BrainHomePage() {
   const progress = useBrainStore((s) => s.progress)
   const history = useBrainStore((s) => s.history)
   const meta = useBrainStore((s) => s.meta)
+  const setSettings = useBrainStore((s) => s.setSettings)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const today = localDayKey()
   const week = weekProgress(progress, today)
   const course = courseStatus(progress, today)
-  const plan = planTodaysSession(progress, createRng(todaysPlanSeed(progress, today)))
+  const { focus, slots: plan } = planToday(progress, createRng(todaysPlanSeed(progress, today)))
   const minutes = plannedMinutes(plan)
   const research = researchContent(i18n.language)
 
@@ -87,7 +90,8 @@ export function BrainHomePage() {
           <div className="min-w-0">
             <p className="text-sm font-semibold uppercase tracking-wider text-white/75">{t('training.kicker')}</p>
             <h2 className="mt-1 text-3xl font-extrabold tracking-tight">{t('training.title')}</h2>
-            <p className="mt-1 text-base text-white/85">{t('training.desc', { minutes })}</p>
+            <p className="mt-1 text-base text-white/85">{t('training.desc', { minutes, count: plan.length })}</p>
+            <p className="mt-1 text-sm font-semibold text-white/75" data-testid="brain-training-focus">{t(`training.focus.${focus}`)}</p>
           </div>
           <WeekRing done={week.done} goal={week.goal} size={88} label={t('training.week', { done: week.done, goal: week.goal })} />
         </div>
@@ -107,9 +111,33 @@ export function BrainHomePage() {
           })}
         </ul>
 
+        {/* Session length: a quick 5 minutes or the full 20 — remembered on this device. */}
+        <div className="relative mt-5 flex flex-wrap items-center gap-3">
+          <span id="brain-session-length" className="text-sm font-semibold text-white/85">{t('training.length')}</span>
+          <div className="flex rounded-2xl bg-white/15 p-1" role="radiogroup" aria-labelledby="brain-session-length">
+            {SESSION_MINUTES.map((m) => {
+              const on = progress.settings.sessionMinutes === m
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  onClick={() => setSettings({ sessionMinutes: m })}
+                  className={`min-h-11 min-w-20 px-4 rounded-xl text-base font-bold border-none cursor-pointer transition-colors ${on ? 'bg-white shadow' : 'bg-transparent text-white hover:bg-white/10'}`}
+                  style={on ? { color: TRAINING_THEME.cardTo } : undefined}
+                  data-testid={`brain-session-${m}`}
+                >
+                  {t('training.minutesShort', { value: m })}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
         <Link
           to="/brain/training"
-          className="relative mt-6 flex items-center justify-center gap-2 min-h-14 rounded-2xl bg-white text-lg font-extrabold no-underline shadow-[0_10px_30px_rgba(0,0,0,0.25)] hover:scale-[1.01] active:scale-[0.99] transition-transform"
+          className="relative mt-5 flex items-center justify-center gap-2 min-h-14 rounded-2xl bg-white text-lg font-extrabold no-underline shadow-[0_10px_30px_rgba(0,0,0,0.25)] hover:scale-[1.01] active:scale-[0.99] transition-transform"
           style={{ color: TRAINING_THEME.cardTo }}
           data-testid="brain-training-start"
         >
@@ -154,7 +182,7 @@ export function BrainHomePage() {
             const best = progress.bestRuns[game.id]
             const trend = gameHistory(history, game.id).map((h) => h.level)
             const levelLabel = qe
-              ? t('home.quickEyeLevel', { stage: progress.quickEye.variant, speed: quickEyeSpeedLevel(p.level) })
+              ? t('home.quickEyeLevel', { stage: quickEyeStage(progress.quickEye.variant, progress.settings.centerOnly), speed: quickEyeSpeedLevel(p.level) })
               : t('home.level', { level: displayLevel(p.level).toFixed(1) })
             return (
               <li key={game.id}>

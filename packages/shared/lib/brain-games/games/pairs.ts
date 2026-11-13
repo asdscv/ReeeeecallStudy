@@ -1,156 +1,311 @@
-import type { BrainGameDef, CellView } from '../types'
+import type { BrainGameDef, CellView, CreateContext, GridView } from '../types'
 
 /**
- * Flip two cards at a time and find matching pictures — the classic matching game.
+ * Flip cards and find matching pictures — the classic matching game (GAMES_DIFFICULTY_PLAN §3.8).
  *
- * Board sizes are fixed to ones that fill a rectangle (no empty slots). Past the largest board
- * the preview shrinks to nothing, the pictures come from one look-alike family, and the miss
- * budget tightens — so the level keeps meaning something.
+ * The level is a fixed table, looked up with floor(level): the board size, the family the pictures
+ * come from (mixed, one distinct family, or one look-alike family), whether a preview is shown and
+ * how many mistakes the board allows. From L14 matches are sets of three. Every integer level
+ * changes one of these, so a level means the same puzzle on every screen that can hold it.
  *
- * Turning over a card nobody has seen yet is exploring the board, not a mistake: a mismatch only
- * counts against the budget when it goes against what the player had already seen. A board is one trial —
- * finishing it within the budget is right, running out is one life.
+ * Turning over a card nobody has seen yet is exploring the board, not a mistake (EVIDENCE #39): a
+ * mismatch only counts against the budget when it goes against what had been seen — this card was
+ * already seen, or a card that belongs with the open ones had been seen and was passed over. The
+ * preview is a hint only: it never marks a card as seen. A board is one trial — finishing it within
+ * the budget and the clock is right; one mistake past the budget, or the clock, fails it.
  */
+export type PairsFamilyClass = 'mixed' | 'distinct' | 'lookalike'
+
 export interface PairsState {
   level: number
+  /** Cards in one match: 2, or 3 on triples boards. */
+  size: 2 | 3
   cols: number
   rows: number
   cards: string[]
+  family: PairsFamilyClass
+  /** The family the faces came from ('mixed' when several). The next board avoids repeating it. */
+  familyName: string
   matched: boolean[]
-  /** Cards that have been face up at least once (after the preview). */
+  /** Cards that have been face up at least once in play (the preview does not count). */
   seen: boolean[]
   open: number[]
   phase: 'preview' | 'play' | 'mismatch' | 'done'
   previewMs: number
+  /** Mistakes made against what had been seen (informed misses). */
   misses: number
-  maxMisses: number
+  /** Mistakes the board allows; the next one fails it. */
+  budget: number
+  /** The mismatch on the board cost nothing (cards never seen): «새 카드 — 괜찮아요». */
+  freeMiss: boolean
   timedOut: boolean
 }
 
-const BOARDS: readonly { pairs: number; cols: number; rows: number }[] = [
-  { pairs: 3, cols: 3, rows: 2 },
-  { pairs: 4, cols: 4, rows: 2 },
-  { pairs: 6, cols: 4, rows: 3 },
-  { pairs: 8, cols: 4, rows: 4 },
-  { pairs: 10, cols: 4, rows: 5 },
-  { pairs: 12, cols: 4, rows: 6 },
+/** One row of the level table (§3.8). `cols × rows` is the board on a four-column screen or wider. */
+export interface PairsRung {
+  size: 2 | 3
+  sets: number
+  cols: number
+  rows: number
+  family: PairsFamilyClass
+  preview: boolean
+  budget: number
+}
+
+/** The level table, L1 first. The plan's own rows; nothing past L18 (5 columns) or L16 (fewer). */
+export const PAIRS_LADDER: readonly PairsRung[] = [
+  { size: 2, sets: 3, cols: 3, rows: 2, family: 'mixed', preview: true, budget: 2 },
+  { size: 2, sets: 4, cols: 4, rows: 2, family: 'mixed', preview: true, budget: 2 },
+  { size: 2, sets: 4, cols: 4, rows: 2, family: 'mixed', preview: false, budget: 2 },
+  { size: 2, sets: 6, cols: 4, rows: 3, family: 'mixed', preview: false, budget: 3 },
+  { size: 2, sets: 6, cols: 4, rows: 3, family: 'distinct', preview: false, budget: 3 },
+  { size: 2, sets: 8, cols: 4, rows: 4, family: 'mixed', preview: false, budget: 3 },
+  { size: 2, sets: 8, cols: 4, rows: 4, family: 'distinct', preview: false, budget: 3 },
+  { size: 2, sets: 8, cols: 4, rows: 4, family: 'lookalike', preview: false, budget: 3 },
+  { size: 2, sets: 10, cols: 4, rows: 5, family: 'distinct', preview: false, budget: 4 },
+  { size: 2, sets: 10, cols: 4, rows: 5, family: 'lookalike', preview: false, budget: 4 },
+  { size: 2, sets: 12, cols: 4, rows: 6, family: 'distinct', preview: false, budget: 4 },
+  { size: 2, sets: 12, cols: 4, rows: 6, family: 'lookalike', preview: false, budget: 4 },
+  { size: 2, sets: 12, cols: 4, rows: 6, family: 'lookalike', preview: false, budget: 3 },
+  { size: 3, sets: 6, cols: 3, rows: 6, family: 'distinct', preview: false, budget: 4 },
+  { size: 3, sets: 8, cols: 4, rows: 6, family: 'distinct', preview: false, budget: 4 },
+  { size: 3, sets: 8, cols: 4, rows: 6, family: 'lookalike', preview: false, budget: 4 },
+  { size: 3, sets: 10, cols: 5, rows: 6, family: 'distinct', preview: false, budget: 4 },
+  { size: 3, sets: 10, cols: 5, rows: 6, family: 'lookalike', preview: false, budget: 4 },
 ]
 
-const FAMILIES: readonly string[][] = [
-  ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔'],
-  ['🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🫐'],
-  ['⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏉', '🎱', '🏓', '🏸', '🥊', '⛳', '🎯', '🎳', '🛹', '🥌'],
-  ['🚗', '🚕', '🚙', '🚌', '🚎', '🏎', '🚓', '🚑', '🚒', '🚐', '🛻', '🚚', '🚛', '🚜', '🏍', '🚲'],
-  ['🌸', '🌼', '🌻', '🌺', '🌷', '🌹', '🥀', '💐', '🌿', '🍀', '🍁', '🍂', '🌵', '🌴', '🌲', '🌳'],
-  ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🙂', '😉', '😊', '😇', '😍', '😋', '😎', '🤓', '🥳'],
-]
+/** The L1-2 preview: a 2-second look, a hint only. */
+export const PAIRS_PREVIEW_MS = 2000
+/** A mismatched pair (or set) stays up this long, unless the next tap turns it back sooner. */
+export const PAIRS_MISMATCH_MS = 650
+
+/**
+ * Picture families: single code points, Unicode 11 or earlier (no 🫐 or 🛻, which older phones draw as
+ * boxes), no faces. Distinct families are told apart at a glance; look-alike ones are not.
+ */
+export const PAIRS_FAMILIES = {
+  animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔'],
+  fruit: ['🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍈', '🥑'],
+  sports: ['⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🎱', '🏓', '🏸', '🥊', '⛳', '🎯', '🎳', '🛹', '🥌', '🏆'],
+  vehicles: ['🚗', '🚕', '🚙', '🚌', '🚎', '🚓', '🚑', '🚒', '🚐', '🚚', '🚛', '🚜', '🚘', '🚖', '🚔', '🚍'],
+  plants: ['🌸', '🌼', '🌻', '🌺', '🌷', '🌹', '🥀', '💐', '🌿', '🍀', '🍁', '🍂', '🌵', '🌴', '🌲', '🌳'],
+} as const satisfies Record<string, readonly string[]>
+
+export type PairsFamilyName = keyof typeof PAIRS_FAMILIES
+
+export const PAIRS_FAMILY_CLASS: Record<PairsFamilyName, Exclude<PairsFamilyClass, 'mixed'>> = {
+  animals: 'distinct',
+  fruit: 'distinct',
+  sports: 'distinct',
+  vehicles: 'lookalike',
+  plants: 'lookalike',
+}
+
+const NAMES = Object.keys(PAIRS_FAMILIES) as PairsFamilyName[]
+const OF_CLASS = (c: Exclude<PairsFamilyClass, 'mixed'>) => NAMES.filter((n) => PAIRS_FAMILY_CLASS[n] === c)
+
+function columns(ctx: CreateContext): number {
+  return Math.max(3, Math.min(7, Math.floor(ctx.maxCols)))
+}
+
+/** The last level whose board this screen holds: L18 (10 triples, 5 wide) needs five columns. */
+export function pairsMaxLevel(ctx: CreateContext): number {
+  return columns(ctx) >= 5 ? 18 : 16
+}
+
+/**
+ * Where a board's cards go on this screen. The table's shape, or turned on its side when that is
+ * what fits (a wide, short desktop takes 4×6 as 6×4); taller than the screen only when nothing else
+ * fits the columns. Three columns take the nearest board three wide, never with fewer cards (4×4 →
+ * 3×6, 4×5 → 3×8): the level means slightly more there, a rare screen.
+ */
+function layout(cols: number, rows: number, size: 2 | 3, ctx: CreateContext): { cols: number; rows: number } {
+  const maxC = columns(ctx)
+  const maxR = Math.max(3, Math.min(7, Math.floor(ctx.maxRows)))
+  const shapes = [
+    [cols, rows],
+    [rows, cols],
+  ].filter(([c]) => c <= maxC)
+  if (shapes.length) {
+    const [c, r] = shapes.find(([, rr]) => rr <= maxR) ?? shapes.reduce((a, b) => (b[1] < a[1] ? b : a))
+    return { cols: c, rows: r }
+  }
+  let r = Math.ceil((cols * rows) / 3)
+  while ((3 * r) % size !== 0) r++
+  return { cols: 3, rows: r }
+}
+
+/**
+ * The board a level builds on this screen. A blocked rule swaps in that level's other content:
+ * no-preview keeps the 2-second preview; triples become pairs with as many cards (6 sets → 9 pairs),
+ * which also keeps the clock (6000 + 9000·6 = 6000 + 6000·9).
+ */
+export function pairsBoard(level: number, ctx: CreateContext): PairsRung {
+  const lv = Math.max(1, Math.min(pairsMaxLevel(ctx), Math.floor(Number.isFinite(level) ? level : 1)))
+  const rung = PAIRS_LADDER[lv - 1]
+  const blocked = (tag: string) => ctx.blockRules.includes(tag)
+  const size: 2 | 3 = rung.size === 3 && blocked('pairs.triples') ? 2 : rung.size
+  const { cols, rows } = layout(rung.cols, rung.rows, size, ctx)
+  return {
+    size,
+    sets: (cols * rows) / size,
+    cols,
+    rows,
+    family: rung.family,
+    preview: rung.preview || blocked('pairs.noPreview'),
+    budget: rung.budget,
+  }
+}
+
+/** The board's clock: 6000 + 6000 per pair, or 6000 + 9000 per set of three. */
+export function pairsLimitMs(size: 2 | 3, sets: number): number {
+  return 6000 + (size === 3 ? 9000 : 6000) * sets
+}
+
+/** A board still taking taps: in play, or during a mismatch that has not used up the budget. */
+function live(s: PairsState): boolean {
+  return s.phase === 'play' || (s.phase === 'mismatch' && s.misses <= s.budget)
+}
+
+/** Turns card `i` face up in play and settles what that means. */
+function flip(s: PairsState, i: number): PairsState {
+  if (s.matched[i] || s.open.includes(i)) return s
+  const open = [...s.open, i]
+  if (open.length === 1) return { ...s, open }
+  const face = s.cards[open[0]]
+  const seen = s.seen.slice()
+  for (const j of open) seen[j] = true
+  if (s.cards[i] === face) {
+    if (open.length < s.size) return { ...s, open, seen }
+    const matched = s.matched.slice()
+    for (const j of open) matched[j] = true
+    return { ...s, matched, seen, open: [], phase: matched.every(Boolean) ? 'done' : 'play' }
+  }
+  // A mistake is a choice made against what had been seen: this card was already known, or a card
+  // that belongs with the open ones had been seen and was passed over. On a triples board this is
+  // the same rule for the second and the third card: a third card never seen is free.
+  const passedOver = s.cards.some((c, j) => c === face && !open.includes(j) && !s.matched[j] && s.seen[j])
+  const informed = s.seen[i] || passedOver
+  return { ...s, open, seen, misses: s.misses + (informed ? 1 : 0), freeMiss: !informed, phase: 'mismatch' }
+}
 
 export const pairs: BrainGameDef<PairsState> = {
   id: 'pairs',
   create(level, rng, ctx) {
-    const fits = BOARDS.filter((b) => b.cols <= Math.max(3, ctx.maxCols))
-    const board = fits[Math.min(fits.length - 1, Math.floor((level - 1) / 3))]
-    // Low levels mix families (easy to tell apart); high levels draw from a single one.
-    const pool =
-      level >= 10 ? rng.pick(FAMILIES) : rng.shuffle(FAMILIES.flat())
-    const faces = rng.sample(pool, board.pairs)
-    const cards = rng.shuffle([...faces, ...faces])
-    // The preview tapers away over levels 18-24 instead of vanishing at once.
-    const fade = Math.max(0, Math.min(1, (24 - level) / 6))
-    const tapered = Math.round(Math.max(0, 1500 + board.pairs * 250 - level * 90) * (level < 18 ? 1 : fade))
-    // Under half a second a preview is a flicker, not a look: none at all is fairer.
-    const previewMs = tapered < 500 ? 0 : tapered
+    const board = pairsBoard(level, ctx)
+    let familyName = 'mixed'
+    let pool: readonly string[]
+    if (board.family === 'mixed') {
+      pool = OF_CLASS('distinct').flatMap((n) => PAIRS_FAMILIES[n])
+    } else {
+      // Never the same family as the board before, while the class has another.
+      const last = ctx.recent[ctx.recent.length - 1]?.carry
+      const names = OF_CLASS(board.family)
+      const fresh = names.filter((n) => n !== last)
+      const name = rng.pick(fresh.length ? fresh : names)
+      familyName = name
+      pool = PAIRS_FAMILIES[name]
+    }
+    const faces = rng.sample(pool, board.sets)
+    const cards = rng.shuffle(faces.flatMap((f) => Array.from({ length: board.size }, () => f)))
+    const previewMs = board.preview ? PAIRS_PREVIEW_MS : 0
     return {
       level,
+      size: board.size,
       cols: board.cols,
       rows: board.rows,
       cards,
+      family: board.family,
+      familyName,
       matched: cards.map(() => false),
-      seen: cards.map(() => previewMs > 0),
+      seen: cards.map(() => false),
       open: [],
       phase: previewMs > 0 ? 'preview' : 'play',
       previewMs,
       misses: 0,
-      maxMisses: Math.round(board.pairs * Math.max(0.8, 2.2 - level * 0.06)) + 2,
+      budget: board.budget,
+      freeMiss: false,
       timedOut: false,
     }
   },
   pendingMs(s) {
     if (s.phase === 'preview') return s.previewMs
-    if (s.phase === 'mismatch') return 650
+    if (s.phase === 'mismatch') return PAIRS_MISMATCH_MS
     return null
   },
   advance(s) {
     if (s.phase === 'preview') return { ...s, phase: 'play' }
     if (s.phase === 'mismatch') {
-      if (s.misses > s.maxMisses) return { ...s, open: [], phase: 'done' }
-      return { ...s, open: [], phase: 'play' }
+      if (s.misses > s.budget) return { ...s, open: [], freeMiss: false, phase: 'done' }
+      return { ...s, open: [], freeMiss: false, phase: 'play' }
     }
     return s
   },
-  acceptsInput: (s) => s.phase === 'play' || s.phase === 'mismatch',
+  acceptsInput: live,
   tap(s, i) {
-    if (s.phase !== 'play' || s.matched[i] || s.open.includes(i)) return s
-    const open = [...s.open, i]
-    if (open.length < 2) return { ...s, open }
-    const [a, b] = open
-    // A mistake is a choice made against what the player had seen: the second card was already
-    // known (and is not the partner), or the first card's partner had been seen and was passed over.
-    const partnerKnown = s.cards.some((c, j) => j !== a && c === s.cards[a] && s.seen[j] && !s.matched[j])
-    const informed = s.seen[b] || partnerKnown
-    const seen = s.seen.slice()
-    seen[a] = seen[b] = true
-    if (s.cards[a] === s.cards[b]) {
-      const matched = s.matched.slice()
-      matched[a] = matched[b] = true
-      return { ...s, matched, seen, open: [], phase: matched.every(Boolean) ? 'done' : 'play' }
+    if (s.phase === 'mismatch') {
+      // The next tap does not wait out the mismatch: the open cards turn back at once and the tapped
+      // card opens. The mismatch was counted when it happened, never again here.
+      if (!live(s) || s.matched[i]) return s
+      return flip({ ...s, open: [], freeMiss: false, phase: 'play' }, i)
     }
-    return { ...s, open, seen, misses: s.misses + (informed ? 1 : 0), phase: 'mismatch' }
+    if (s.phase !== 'play') return s
+    return flip(s, i)
   },
-  timeout: (s) => (s.phase === 'done' ? s : { ...s, timedOut: true, open: [], phase: 'done' }),
+  timeout: (s) => (s.phase === 'done' ? s : { ...s, timedOut: true, open: [], freeMiss: false, phase: 'done' }),
   outcome(s) {
     if (s.phase !== 'done') return null
     const found = s.matched.filter(Boolean).length
-    return { correct: found === s.cards.length && !s.timedOut, accuracy: found / s.cards.length }
+    return { correct: found === s.cards.length && !s.timedOut, accuracy: found / s.cards.length, informedMisses: s.misses }
   },
-  timeLimitMs: (s) => {
-    const pairsCount = s.cards.length / 2
-    return Math.round(Math.max(4000 + pairsCount * 2500, (6000 + pairsCount * 6000) * Math.pow(0.97, Math.max(0, s.level - 24))))
-  },
-  maxLevel: () => 50,
+  timeLimitMs: (s) => pairsLimitMs(s.size, s.cards.length / s.size),
+  maxLevel: pairsMaxLevel,
   view(s) {
     const cells: CellView[] = s.cards.map((face, i) => {
       if (s.matched[i]) return { label: face, tone: 'matched' }
+      // A board that ends unfinished shows every card face up, calmly — no red.
       if (s.phase === 'preview' || s.phase === 'done' || s.open.includes(i)) {
         return { label: face, tone: s.phase === 'mismatch' && s.open.includes(i) ? 'wrong' : 'faceUp' }
       }
       return { tone: 'faceDown' }
     })
-    return {
+    const left = Math.max(0, s.budget - s.misses)
+    const view: GridView = {
       kind: 'grid',
       cols: s.cols,
       rows: s.rows,
       cells,
-      locked: s.phase !== 'play',
+      locked: !live(s),
       prompt:
         s.phase === 'preview'
           ? { key: 'play.memorizePairs' }
-          : { key: 'play.findPairs', params: { lives: Math.max(0, s.maxMisses - s.misses + 1) } },
+          : { key: s.size === 3 ? 'play.findTriples' : 'play.findPairs', params: { lives: left } },
+      // Dots and «실수 N번까지» — never hearts: the budget is the board's, not the round's chances.
+      budget: { left, total: s.budget },
     }
+    if (s.phase === 'preview') view.showBar = { ms: s.previewMs }
+    if (s.family === 'lookalike') view.badge = { key: 'play.lookalikeBadge' }
+    if (s.size === 3 && s.phase !== 'preview') view.progress = { kind: 'set', open: s.open.length, size: 3 }
+    if (s.phase === 'mismatch' && s.freeMiss) view.chip = { key: 'play.newCardFree' }
+    return view
   },
-  signature: (s) => `pr:${s.cards.join('')}`,
+  signature: (s) => `pr${s.size}:${s.cards.join('')}`,
   mechanics(s) {
-    const pairCount = s.cards.length / 2
-    const tags = [4, 6, 8, 10, 12].filter((n) => pairCount >= n).map((n) => `pairs.board${n}`)
-    if (s.level >= 10) tags.push('pairs.oneFamily')
+    const tags = [4, 6, 8, 10, 12].filter((n) => s.cards.length >= 2 * n).map((n) => `pairs.board${n}`)
+    if (s.family !== 'mixed') tags.push('pairs.oneFamily')
+    if (s.family === 'lookalike') tags.push('pairs.lookalike')
     if (s.previewMs === 0) tags.push('pairs.noPreview')
+    if (s.size === 3) tags.push('pairs.triples')
     return tags
   },
+  trialInfo: (s) => ({ kind: `${s.size}x${s.cards.length / s.size}`, carry: s.familyName }),
   solution(s) {
-    if (s.phase !== 'play') return null
-    const partner = (i: number) => s.cards.findIndex((c, j) => j !== i && c === s.cards[i] && !s.matched[j])
-    if (s.open.length === 1) return [partner(s.open[0])]
+    if (!live(s)) return null
+    // During a mismatch the next tap turns the open cards back first, so nothing counts as open.
+    const open = s.phase === 'mismatch' ? [] : s.open
+    const rest = (face: string, not: readonly number[]) => s.cards.flatMap((c, j) => (c === face && !s.matched[j] && !not.includes(j) ? [j] : []))
+    if (open.length) return rest(s.cards[open[0]], open)
     const first = s.matched.findIndex((m) => !m)
-    return first < 0 ? null : [first, partner(first)]
+    return first < 0 ? null : [first, ...rest(s.cards[first], [first])]
   },
 }

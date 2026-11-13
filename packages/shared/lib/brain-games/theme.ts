@@ -70,6 +70,26 @@ export const INK_COLORS: Record<BrainColor, string> = {
   orange: '#EA580C',
 }
 
+/**
+ * The inks a colour-blind player can take for each other. INK_COLORS simulated for protanopia and
+ * deuteranopia (Viénot, Brettel & Mollon 1999, and Machado, Oliveira & Fernandes 2009 at full
+ * severity, both in linear sRGB), then CIEDE2000 between the simulated colours: a pair is confusable
+ * below 20. The table does not hinge on that line — every pair listed is under 11 in some
+ * simulation, every other pair over 49 in all of them. brain-stroop-ladder.test.ts recomputes it.
+ *
+ * Colour Word's coloured labels and frame lure never put one of these next to the stimulus ink.
+ * Tritanopia (about 1 in 10,000) is not covered: it would add blue–green and leave green with one
+ * safe colour. The full colour-blind-safe palette stays open (EVIDENCE §5).
+ */
+export const INK_CONFUSABLE: Record<BrainColor, readonly BrainColor[]> = {
+  red: ['green', 'yellow', 'orange'],
+  blue: ['purple'],
+  green: ['red', 'yellow', 'orange'],
+  yellow: ['red', 'green', 'orange'],
+  purple: ['blue'],
+  orange: ['red', 'green', 'yellow'],
+}
+
 /** Streak tiers for the combo badge: 3, 6 and 10 in a row. */
 export function streakTier(streak: number): 0 | 1 | 2 | 3 {
   if (streak >= 10) return 3

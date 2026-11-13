@@ -10,20 +10,29 @@ import { FX } from './brain-ui'
 
 const noop = () => {}
 const BOARD_MAX_H = 240
+/** The demo board's height (BOARD_MAX_H) holds four rows of its small cells comfortably. */
+const DEMO_MAX_ROWS = 4
 const GLIDE = Easing.bezier(0.3, 0.7, 0.2, 1)
 
 /**
  * How to play, shown rather than told: the real engine plays an easy round on the real board, and
  * a fingertip makes each tap. It loops until the player starts; under reduce motion it holds each
  * frame longer and the fingertip jumps instead of gliding.
+ *
+ * Quick Eye demonstrates the player's own stage (`variant`; a new player's is the first one with
+ * the star, the task the round really opens with).
  */
-export function DemoPlayer({ gameId, width, centerOnly = false }: { gameId: BrainGameId; width: number; centerOnly?: boolean }) {
+export function DemoPlayer({ gameId, width, centerOnly = false, variant }: { gameId: BrainGameId; width: number; centerOnly?: boolean; variant?: number }) {
   const { t } = useTranslation('brain')
   const reduced = useReducedMotion()
   const theme = GAME_THEMES[gameId]
   const boardWidth = Math.max(200, Math.min(width - 32, 300))
-  // A player on Quick Eye's "centre only" setting sees the centre-only task demonstrated.
-  const frames = useMemo(() => buildDemo(gameId, { maxCols: Math.min(4, maxColsFor(boardWidth)), centerOnly }), [gameId, boardWidth, centerOnly])
+  // A player on Quick Eye's "centre only" setting sees the centre-only task demonstrated. At most
+  // 4×4: an easy board, the same on every screen.
+  const frames = useMemo(
+    () => buildDemo(gameId, { maxCols: Math.min(4, maxColsFor(boardWidth)), maxRows: DEMO_MAX_ROWS, centerOnly, ...(variant !== undefined ? { variant } : {}) }),
+    [gameId, boardWidth, centerOnly, variant],
+  )
   const [i, setI] = useState(0)
   const [run, setRun] = useState(0)
   // The frames differ in height (Quick Eye's answers replace its box, a choice's options appear):

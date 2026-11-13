@@ -20,7 +20,16 @@ export {
   quickEyeAdvance,
   quickEyeMaxLevel,
   quickEyeMsAt,
+  QUICK_EYE_BARS_MS,
+  QUICK_EYE_HOLD_NEED,
+  QUICK_EYE_HOLD_WINDOW,
+  QE_PLACES,
+  quickEyeBarLevel,
+  quickEyeHold,
+  quickEyePlace,
 } from './games/quick-eye'
+export * from './games/quick-eye-art'
+export * from './quick-eye-journey'
 export { researchContent, type ResearchContent, type ResearchSection } from './research-content'
 export { quickEyeGeometry, quickEyeBox, slotPosition, QUICK_EYE_BOX_RADIUS } from './games/quick-eye-geometry'
 export * from './theme'
@@ -31,5 +40,6 @@ export * from './mechanics'
 export * from './tiers'
 export * from './skill'
 export * from './placement'
+export * from './scale'
 export * from './achievements'
 export * from './sync'

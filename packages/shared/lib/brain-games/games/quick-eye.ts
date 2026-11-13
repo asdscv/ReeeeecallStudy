@@ -1,5 +1,5 @@
 import type { Rng } from '../rng'
-import type { BrainGameDef, FieldSlot, QuickEyeView } from '../types'
+import type { BrainGameDef, FieldSlot, QePlaceId, QuickEyeView } from '../types'
 
 /**
  * Quick Eye — speed of processing with divided attention.
@@ -89,6 +89,26 @@ export function shapePair(similarity: number): [string, string] {
 
 export const FIELD_RINGS = 3
 
+/**
+ * The stage groups, each with its own field tint and reveal colour (quick-eye-art.ts): one new
+ * thing per group — the centre alone, the widening field, distractors, closer centre shapes, the
+ * same/different task. Ids only; never shown as names (the header says "Stage N").
+ */
+export const QE_PLACES: readonly { id: QePlaceId; from: number; to: number }[] = [
+  { id: 'dock', from: 1, to: 1 },
+  { id: 'shore', from: 2, to: 4 },
+  { id: 'pines', from: 5, to: 9 },
+  { id: 'tea', from: 10, to: 14 },
+  { id: 'lake', from: 15, to: 16 },
+]
+
+/** The stage group a variant belongs to. Centre-only play shows the centre task alone through stage 9. */
+export function quickEyePlace(variant: number, centerOnly = false): QePlaceId {
+  const v = Math.max(1, Math.min(QUICK_EYE_MAX_VARIANT, Math.round(variant)))
+  if (centerOnly && v <= 9) return 'dock'
+  return (QE_PLACES.find((p) => v >= p.from && v <= p.to) ?? QE_PLACES[0]).id
+}
+
 /** The slot on a ring of `slots` slots that lies on radial direction `dir` (0-7, clockwise from 12). */
 export function radialSlot(slots: number, dir: number): number {
   return (dir * slots) / 8
@@ -114,6 +134,8 @@ export interface QuickEyeState {
   pickedCenter: number | null
   pickedDirection: number | null
   void: boolean
+  /** Created on the centre-only setting (picks the stage group's tint; the field is empty anyway). */
+  centerOnly: boolean
 }
 
 function buildField(
@@ -173,6 +195,7 @@ export const quickEye: BrainGameDef<QuickEyeState> = {
       pickedCenter: null,
       pickedDirection: null,
       void: false,
+      centerOnly: ctx.centerOnly,
     }
   },
   pendingMs(s) {
@@ -225,9 +248,14 @@ export const quickEye: BrainGameDef<QuickEyeState> = {
   view(s) {
     const asking = s.phase === 'answerLocation' ? 'answerLocation' : 'answerCenter'
     const done = s.phase === 'done'
+    // Off by one direction (around the circle): the reveal says "right next to it". Display only —
+    // the outcome still needs the exact direction.
+    const off = done && s.targetDir !== null && s.pickedDirection !== null ? Math.abs(s.pickedDirection - s.targetDir) % 8 : null
     return {
       kind: 'quickEye',
       phase: s.phase,
+      variant: s.variant,
+      place: quickEyePlace(s.variant, s.centerOnly),
       prompt:
         s.phase === 'fixation' || s.phase === 'stimulus' || s.phase === 'mask'
           ? { key: 'quickEye.watch' }
@@ -247,6 +275,8 @@ export const quickEye: BrainGameDef<QuickEyeState> = {
             correctCenter: s.correctCenter,
             pickedDirection: s.pickedDirection ?? undefined,
             correctDirection: s.targetDir ?? undefined,
+            nearMiss: off !== null && Math.min(off, 8 - off) === 1,
+            void: s.void,
           }
         : s.phase === 'answerLocation'
           ? { pickedCenter: s.pickedCenter ?? undefined }
@@ -254,7 +284,9 @@ export const quickEye: BrainGameDef<QuickEyeState> = {
     }
   },
   mechanics(s) {
-    const tags: string[] = []
+    // Every trial is drawn on the redesigned field: met once (silently in practice), it tells a
+    // returning player the screen changed and recalibrates their start (useBrainRound).
+    const tags: string[] = ['quickEye.clearView']
     if (s.target) tags.push('quickEye.periphery')
     if (s.distractors.length > 0) tags.push('quickEye.distractors')
     if (s.center.length === 2) tags.push('quickEye.sameDiff')
@@ -274,30 +306,55 @@ export const quickEye: BrainGameDef<QuickEyeState> = {
  * Quick Eye's progression between trials, kept in progress: the exposures actually shown and
  * whether each was answered right, for the last 24 valid trials.
  *
- * The threshold is the geometric mean of the shown exposure at the staircase's reversal points
- * (Levitt 1971), and needs at least six of them — fewer and there is no estimate, so no move.
- * When the player holds ≥75% at a threshold under the variant's bar, the next variant opens and
- * the exposure eases back three steps, the way the original training raised difficulty only once
- * a criterion was met (Ball 2002). The bars rise with the variant because divided- and
- * selective-attention thresholds in older adults run roughly 100-350ms; a single 100ms bar would
- * have stranded most 60+ players at the first distractor stage.
+ * A variant is passed on either of two criteria (Ball 2002: difficulty rose only once a criterion
+ * was met; the exposure then eases back three steps):
+ *   - the staircase threshold — the geometric mean of the shown exposure at its reversal points
+ *     (Levitt 1971), needing at least six of them — under the variant's bar with ≥75% of the last
+ *     16 right;
+ *   - enough evidence without reversals: the last 16 valid trials all shown at or under the bar
+ *     with at least 14 right. A player at the platform's shortest flash makes no reversals (the
+ *     staircase has nowhere further to go), and used to be stranded there however well they did.
+ * The bars rise with the variant because divided- and selective-attention thresholds in older
+ * adults run roughly 100-350ms against a mid-grey field and a luminance-matched mask; they live in
+ * one table so they can be tuned to the players' medians after release. [product decision]
  */
 export const QUICK_EYE_WINDOW = 24
 const MIN_REVERSALS = 6
+/** The evidence criterion: this many of the last `QUICK_EYE_HOLD_WINDOW` trials right, all at or under the bar. */
+export const QUICK_EYE_HOLD_NEED = 14
+export const QUICK_EYE_HOLD_WINDOW = 16
+
+/** Bars per variant range, ms: V1 (the slow-start path and centre-only) 100, V2 167, V3-4 200, V5-9 250, V10+ 300. */
+export const QUICK_EYE_BARS_MS: readonly { upTo: number; ms: number }[] = [
+  { upTo: 1, ms: 100 },
+  { upTo: 2, ms: 167 },
+  { upTo: 4, ms: 200 },
+  { upTo: 9, ms: 250 },
+  { upTo: Infinity, ms: 300 },
+]
 
 export function advanceBarMs(variant: number): number {
-  if (variant <= 1) return 50
-  if (variant <= 4) return 100
-  if (variant <= 9) return 200
-  return 250
+  return (QUICK_EYE_BARS_MS.find((b) => variant <= b.upTo) ?? QUICK_EYE_BARS_MS[QUICK_EYE_BARS_MS.length - 1]).ms
 }
+
+/** The easiest ladder step at or under the variant's bar (V1 7, V2-4 5, V5-9 4, V10+ 3). */
+export function quickEyeBarLevel(variant: number): number {
+  const bar = advanceBarMs(variant)
+  return QUICK_EYE_LADDER_MS.findIndex((ms) => ms <= bar)
+}
+
+/** Shown exposures within this of the bar count as under it (a measured 167.4 for a 167 bar). */
+const BAR_SLACK_MS = 1
 
 export function quickEyeThreshold(shownMs: readonly number[], ok: readonly boolean[]): number | null {
   const reversals: number[] = []
   for (let i = 1; i < ok.length; i++) if (ok[i] !== ok[i - 1]) reversals.push(shownMs[i])
   if (reversals.length < MIN_REVERSALS) return null
-  const logMean = reversals.reduce((a, ms) => a + Math.log(Math.max(1, ms)), 0) / reversals.length
-  return Math.round(Math.exp(logMean))
+  return geomean(reversals)
+}
+
+function geomean(ms: readonly number[]): number {
+  return Math.round(Math.exp(ms.reduce((a, x) => a + Math.log(Math.max(1, x)), 0) / ms.length))
 }
 
 export function quickEyeAdvance(
@@ -307,8 +364,31 @@ export function quickEyeAdvance(
 ): { advance: boolean; thresholdMs: number | null } {
   const ms = shownMs.slice(-QUICK_EYE_WINDOW)
   const rs = ok.slice(-QUICK_EYE_WINDOW)
+  const bar = advanceBarMs(variant)
+  if (rs.length >= QUICK_EYE_HOLD_WINDOW && variant < QUICK_EYE_MAX_VARIANT) {
+    const lastMs = ms.slice(-QUICK_EYE_HOLD_WINDOW)
+    const right = rs.slice(-QUICK_EYE_HOLD_WINDOW).filter(Boolean).length
+    if (lastMs.every((x) => x <= bar + BAR_SLACK_MS) && right >= QUICK_EYE_HOLD_NEED) return { advance: true, thresholdMs: geomean(lastMs) }
+  }
   const thresholdMs = quickEyeThreshold(ms, rs)
   if (thresholdMs === null || rs.length < 16) return { advance: false, thresholdMs }
   const accuracy = rs.slice(-16).filter(Boolean).length / 16
-  return { advance: variant < QUICK_EYE_MAX_VARIANT && accuracy >= 0.75 && thresholdMs <= advanceBarMs(variant), thresholdMs }
+  return { advance: variant < QUICK_EYE_MAX_VARIANT && accuracy >= 0.75 && thresholdMs <= bar, thresholdMs }
+}
+
+/**
+ * Progress toward the evidence criterion, for "hold top speed n/14": the trials at the end of the
+ * window shown at or under the bar, in a row (`run`, at most 16), and how many of them were right
+ * (`filled`). Once `filled` reaches 14 the criterion is met within two more trials at that speed.
+ */
+export function quickEyeHold(recentMs: readonly number[], recentOk: readonly boolean[] | string, variant: number): { filled: number; run: number } {
+  const ok = typeof recentOk === 'string' ? recentOk.split('').map((c) => c === '1') : recentOk
+  const bar = advanceBarMs(variant)
+  let run = 0
+  let filled = 0
+  for (let i = recentMs.length - 1; i >= 0 && run < QUICK_EYE_HOLD_WINDOW && recentMs[i] <= bar + BAR_SLACK_MS; i--) {
+    run++
+    if (ok[i]) filled++
+  }
+  return { filled, run }
 }
