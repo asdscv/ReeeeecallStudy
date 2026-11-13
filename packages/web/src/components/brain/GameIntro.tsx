@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 're
 import { useTranslation } from 'react-i18next'
 import { X, Play, Trophy, Gauge, Sparkles } from 'lucide-react'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
-import { GAME_THEMES, brainGame, dayNumber, displayLevel, gameProgress, localDayKey, quickEyeStage, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
+import { GAME_THEMES, GROUP_RULES, brainGame, dayNumber, displayLevel, gameProgress, localDayKey, quickEyeStage, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
 import { BRAIN_ICONS, cardBackground, focusIfKeyboard } from './brain-ui'
 import { DemoPlayer } from './DemoPlayer'
@@ -158,7 +158,7 @@ export function GameIntro({
 
         {(firstTime || placementNext || welcomeBack) && (
           <div className="mt-4 space-y-1.5 text-center text-base text-white/80" data-testid="brain-intro-notes">
-            {firstTime && <p>{t('intro.practiceNote')}</p>}
+            {firstTime && <p>{t(GROUP_RULES[brainGame(gameId).group].lives === 0 ? 'intro.practiceNoteNoLives' : 'intro.practiceNote')}</p>}
             {placementNext && <p>{t('intro.firstPlacement')}</p>}
             {welcomeBack && <p>{t('intro.welcomeBack')}</p>}
           </div>

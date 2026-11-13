@@ -183,7 +183,8 @@
     "newBestReverse": "¡{{count}} al revés!",
     "newBestReverse_one": "¡{{count}} al revés!",
     "newBestReverse_other": "¡{{count}} al revés!",
-    "lookalikeBadge": "Parecidos"
+    "lookalikeBadge": "Parecidos",
+    "practiceHintNoLives": "Es práctica: no cuenta para los puntos."
   },
   "quickEye": {
     "watch": "Mira el centro",
@@ -276,7 +277,8 @@
     "rounds": "Partidas",
     "best": "Mejor puntuación",
     "welcomeBack": "Bienvenido de nuevo. Las primeras preguntas volverán a encontrar tu nivel.",
-    "firstPlacement": "Las primeras preguntas buscan el nivel inicial adecuado."
+    "firstPlacement": "Las primeras preguntas buscan el nivel inicial adecuado.",
+    "practiceNoteNoLives": "Las primeras son de práctica y no cuentan para los puntos."
   },
   "mechanics": {
     "quickEye": {
@@ -560,11 +562,13 @@
     "label": "Regla nueva",
     "gotIt": "Entendido",
     "unscored": "Esta no cuenta para los puntos ni las oportunidades.",
-    "change": "Novedad"
+    "change": "Novedad",
+    "unscoredNoLives": "Esta no cuenta para los puntos."
   },
   "placement": {
     "label": "Buscando tu nivel inicial",
-    "hint": "Unas pocas preguntas para encontrar el nivel adecuado. No se gastan oportunidades."
+    "hint": "Unas pocas preguntas para encontrar el nivel adecuado. No se gastan oportunidades.",
+    "hintNoLives": "Unas pocas preguntas para encontrar tu nivel."
   },
   "tiers": {
     "none": "Sin rango",

@@ -183,7 +183,8 @@
     "newBestReverse": "거꾸로 {{count}}개!",
     "newBestReverse_one": "거꾸로 {{count}}개!",
     "newBestReverse_other": "거꾸로 {{count}}개!",
-    "lookalikeBadge": "비슷한 그림"
+    "lookalikeBadge": "비슷한 그림",
+    "practiceHintNoLives": "연습이에요. 점수에 들어가지 않아요."
   },
   "quickEye": {
     "watch": "가운데를 보세요",
@@ -276,7 +277,8 @@
     "rounds": "플레이",
     "best": "최고 점수",
     "welcomeBack": "다시 오셨네요. 처음 몇 문제로 알맞은 레벨을 다시 맞출게요.",
-    "firstPlacement": "처음 몇 문제는 알맞은 시작 레벨을 찾는 문제예요."
+    "firstPlacement": "처음 몇 문제는 알맞은 시작 레벨을 찾는 문제예요.",
+    "practiceNoteNoLives": "처음 몇 문제는 연습이에요. 점수에 들어가지 않아요."
   },
   "mechanics": {
     "quickEye": {
@@ -560,11 +562,13 @@
     "label": "새 규칙",
     "gotIt": "알겠어요",
     "unscored": "이번 문제는 점수와 기회에 들어가지 않아요.",
-    "change": "달라진 점"
+    "change": "달라진 점",
+    "unscoredNoLives": "이번 문제는 점수에 들어가지 않아요."
   },
   "placement": {
     "label": "시작 레벨 찾는 중",
-    "hint": "몇 문제로 알맞은 레벨을 찾고 있어요. 기회는 줄지 않아요."
+    "hint": "몇 문제로 알맞은 레벨을 찾고 있어요. 기회는 줄지 않아요.",
+    "hintNoLives": "몇 문제로 알맞은 레벨을 찾고 있어요."
   },
   "tiers": {
     "none": "등급 전",

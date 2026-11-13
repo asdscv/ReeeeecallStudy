@@ -183,7 +183,8 @@
     "newBestReverse": "倒序{{count}}个！",
     "newBestReverse_one": "倒序{{count}}个！",
     "newBestReverse_other": "倒序{{count}}个！",
-    "lookalikeBadge": "相似的图"
+    "lookalikeBadge": "相似的图",
+    "practiceHintNoLives": "这是练习，不计分。"
   },
   "quickEye": {
     "watch": "看中间",
@@ -276,7 +277,8 @@
     "rounds": "已玩",
     "best": "最高分",
     "welcomeBack": "欢迎回来。前几道题会重新找到合适的等级。",
-    "firstPlacement": "前几道题会找到合适的起始等级。"
+    "firstPlacement": "前几道题会找到合适的起始等级。",
+    "practiceNoteNoLives": "前几题是练习，不计分。"
   },
   "mechanics": {
     "quickEye": {
@@ -560,11 +562,13 @@
     "label": "新规则",
     "gotIt": "知道了",
     "unscored": "这一题不计分，也不扣机会。",
-    "change": "新变化"
+    "change": "新变化",
+    "unscoredNoLives": "这道题不计分。"
   },
   "placement": {
     "label": "正在寻找起始等级",
-    "hint": "用几道题找到合适的等级，不会扣机会。"
+    "hint": "用几道题找到合适的等级，不会扣机会。",
+    "hintNoLives": "用几道题找到合适的级别。"
   },
   "tiers": {
     "none": "暂无段位",

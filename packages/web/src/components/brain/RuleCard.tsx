@@ -8,7 +8,7 @@ import type { GameTheme } from '@reeeeecall/shared/lib/brain-games'
  * its clock stopped until "got it", and is played unscored — so nobody meets a new rule cold
  * inside a timed trial. White card on the game's dark canvas; the board stays faintly visible.
  */
-export function RuleCard({ copy, theme, onAck }: { copy: string; theme: GameTheme; onAck: () => void }) {
+export function RuleCard({ copy, theme, onAck, noLives = false }: { copy: string; theme: GameTheme; onAck: () => void; noLives?: boolean }) {
   const { t } = useTranslation('brain')
   const button = useRef<HTMLButtonElement>(null)
   const ack = useRef(onAck)
@@ -44,7 +44,8 @@ export function RuleCard({ copy, theme, onAck }: { copy: string; theme: GameThem
         <p id="brain-rule-body" className="mt-2 text-lg leading-relaxed text-slate-700">{t(`mechanics.${copy}.body`)}</p>
         <p className="mt-4 flex items-start gap-1.5 text-sm text-slate-500">
           <Info className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
-          {t('rule.unscored')}
+          {/* A game without chances (Quick Eye) must not say the trial spares one. */}
+          {t(noLives ? 'rule.unscoredNoLives' : 'rule.unscored')}
         </p>
         <button
           ref={button}

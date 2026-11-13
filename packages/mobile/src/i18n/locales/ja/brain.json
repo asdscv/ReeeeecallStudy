@@ -183,7 +183,8 @@
     "newBestReverse": "逆順で{{count}}個！",
     "newBestReverse_one": "逆順で{{count}}個！",
     "newBestReverse_other": "逆順で{{count}}個！",
-    "lookalikeBadge": "似た絵"
+    "lookalikeBadge": "似た絵",
+    "practiceHintNoLives": "練習です。点数には入りません。"
   },
   "quickEye": {
     "watch": "中央を見て",
@@ -276,7 +277,8 @@
     "rounds": "プレイ回数",
     "best": "最高スコア",
     "welcomeBack": "おかえりなさい。最初の何問かで、合うレベルをもう一度探します。",
-    "firstPlacement": "最初の何問かで、合うスタートレベルを探します。"
+    "firstPlacement": "最初の何問かで、合うスタートレベルを探します。",
+    "practiceNoteNoLives": "最初の数問は練習です。点数には入りません。"
   },
   "mechanics": {
     "quickEye": {
@@ -560,11 +562,13 @@
     "label": "新しいルール",
     "gotIt": "わかりました",
     "unscored": "この問題は点数とチャンスに入りません。",
-    "change": "変わった点"
+    "change": "変わった点",
+    "unscoredNoLives": "この問題は点数に入りません。"
   },
   "placement": {
     "label": "スタートレベルを探しています",
-    "hint": "何問かで合うレベルを探しています。チャンスは減りません。"
+    "hint": "何問かで合うレベルを探しています。チャンスは減りません。",
+    "hintNoLives": "何問かで、ちょうどいいレベルを探しています。"
   },
   "tiers": {
     "none": "ランクなし",

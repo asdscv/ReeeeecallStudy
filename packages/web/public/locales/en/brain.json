@@ -183,7 +183,8 @@
     "newBestReverse": "{{count}} in reverse!",
     "newBestReverse_one": "{{count}} in reverse!",
     "newBestReverse_other": "{{count}} in reverse!",
-    "lookalikeBadge": "Look-alikes"
+    "lookalikeBadge": "Look-alikes",
+    "practiceHintNoLives": "Practice — it doesn't count toward points."
   },
   "quickEye": {
     "watch": "Look at the centre",
@@ -276,7 +277,8 @@
     "rounds": "Played",
     "best": "Best score",
     "welcomeBack": "Welcome back. The first few questions will find your level again.",
-    "firstPlacement": "The first few questions find the right starting level."
+    "firstPlacement": "The first few questions find the right starting level.",
+    "practiceNoteNoLives": "The first few are practice and don't count toward points."
   },
   "mechanics": {
     "quickEye": {
@@ -560,11 +562,13 @@
     "label": "New rule",
     "gotIt": "Got it",
     "unscored": "This one doesn't count toward points or chances.",
-    "change": "What's new"
+    "change": "What's new",
+    "unscoredNoLives": "This one doesn't count toward points."
   },
   "placement": {
     "label": "Finding your start",
-    "hint": "A few questions to find the right level. No chances are used."
+    "hint": "A few questions to find the right level. No chances are used.",
+    "hintNoLives": "A few questions to find the right level."
   },
   "tiers": {
     "none": "No tier yet",

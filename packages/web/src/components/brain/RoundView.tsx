@@ -338,7 +338,9 @@ function Round({ gameId, onOver, caption, width, theme, timeBudgetMs }: { gameId
   const legBar = r.maxLives === 0 && r.roundCap !== null && (r.trialKind === 'counted' || r.legMarks.length > 0)
   const capProgress = r.roundCap !== null && r.maxLives > 0 && !r.practice && !r.placing ? r.trialInRound / r.roundCap : null
   // Under the score row: what kind of trial this is, when it is not a counted one.
-  const hint = r.trialKind === 'practice' ? t('play.practiceHint') : r.trialKind === 'intro' ? t('rule.unscored') : r.placing ? t('placement.hint') : null
+  // A game without chances (Quick Eye) gets the same lines without «chances».
+  const noLives = r.maxLives === 0
+  const hint = r.trialKind === 'practice' ? t(noLives ? 'play.practiceHintNoLives' : 'play.practiceHint') : r.trialKind === 'intro' ? t(noLives ? 'rule.unscoredNoLives' : 'rule.unscored') : r.placing ? t(noLives ? 'placement.hintNoLives' : 'placement.hint') : null
 
   return (
     <>
@@ -518,14 +520,6 @@ function Round({ gameId, onOver, caption, width, theme, timeBudgetMs }: { gameId
             onSkip={r.skipReveal}
             paused={r.paused || r.intro !== null || r.stageUp !== null}
           />
-          {/* Level-up and streak news, over the top of the board — the prompt and the verdict line stay readable. */}
-          {shownBanner && (
-            <div key={`banner-${shownBanner.id}`} className="pointer-events-none absolute inset-x-0 top-3 z-10 flex justify-center" role="status">
-              <span className="bfx-pop px-5 py-2.5 rounded-full text-lg font-extrabold text-slate-900 shadow-[0_10px_30px_rgba(0,0,0,0.35)]" style={{ background: `linear-gradient(90deg, #FDE68A, ${theme.accent})` }} data-testid="brain-banner">
-                {shownBanner.text}
-              </span>
-            </div>
-          )}
           {/* The verdict, big and brief, over the board. */}
           {burst && (
             <div key={`burst-${burst.id}`} className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
@@ -539,7 +533,13 @@ function Round({ gameId, onOver, caption, width, theme, timeBudgetMs }: { gameId
           )}
         </div>
         <div className="min-h-11 flex items-center justify-center" aria-live="polite">
-          {r.result && (
+          {/* Level-up and streak news take the verdict line for a moment (as on mobile): over the board
+              they hid the problem itself — a sum's digits — right when its answer was shown. */}
+          {shownBanner ? (
+            <span key={`banner-${shownBanner.id}`} className="bfx-pop px-5 py-2 rounded-full text-lg font-extrabold text-slate-900 shadow-[0_10px_30px_rgba(0,0,0,0.35)]" style={{ background: `linear-gradient(90deg, #FDE68A, ${theme.accent})` }} role="status" data-testid="brain-banner">
+              {shownBanner.text}
+            </span>
+          ) : r.result && (
             // Quick Eye's miss is a calm chip («that one was quick», amber-edged when right next to it).
             <p
               key={r.trialId}
@@ -557,7 +557,7 @@ function Round({ gameId, onOver, caption, width, theme, timeBudgetMs }: { gameId
       {r.stageUp && !r.over && <StageUpInterstitial key={r.stageUp.id} up={r.stageUp} theme={theme} width={width} ringSlots={platform.ringSlots} centerOnly={centerOnly} onAck={r.ackStageUp} />}
 
       {/* A rule met for the first time: the trial waits, clock stopped, until the player has read it. */}
-      {r.intro && !r.over && !r.stageUp && <RuleCard key={r.intro.tag} copy={r.intro.copy} theme={theme} onAck={r.ackIntro} />}
+      {r.intro && !r.over && !r.stageUp && <RuleCard key={r.intro.tag} copy={r.intro.copy} theme={theme} onAck={r.ackIntro} noLives={r.maxLives === 0} />}
 
       {r.paused && !sheetWanted && (
         <Overlay testId="brain-paused">

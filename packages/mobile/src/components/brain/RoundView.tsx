@@ -384,11 +384,11 @@ function Round({
     r.trialKind === 'practice'
       ? qe && r.practiceDone > 0
         ? t('quickEye.slowerStart')
-        : t('play.practiceHint')
+        : t(r.maxLives === 0 ? 'play.practiceHintNoLives' : 'play.practiceHint')
       : r.trialKind === 'intro'
-        ? t('rule.unscored')
+        ? t(r.maxLives === 0 ? 'rule.unscoredNoLives' : 'rule.unscored')
         : r.placing
-          ? t('placement.hint')
+          ? t(r.maxLives === 0 ? 'placement.hintNoLives' : 'placement.hint')
           : r.speed && !r.speed.atTop
             ? t('quickEye.gauge', { count: r.speed.toNext })
             : null
@@ -602,7 +602,7 @@ function Round({
         />
       ) : null}
 
-      {r.intro && !ending ? <RuleCard key={r.intro.tag} copy={r.intro.copy} theme={theme} onAck={r.ackIntro} /> : null}
+      {r.intro && !ending ? <RuleCard key={r.intro.tag} copy={r.intro.copy} theme={theme} onAck={r.ackIntro} noLives={r.maxLives === 0} /> : null}
 
       {/* Over the rule card when one follows: the stage first, then what its new rule means. */}
       {r.stageUp && !ending ? (
@@ -905,7 +905,7 @@ function BoardNotice({ title, body, theme }: { title: string; body: string; them
  * clock stopped until "Got it". The trial after it is unscored (the card says so). The pause
  * button is off meanwhile, and Android's back button waits for the card.
  */
-function RuleCard({ copy, theme, onAck }: { copy: string; theme: GameTheme; onAck: () => void }) {
+function RuleCard({ copy, theme, onAck, noLives = false }: { copy: string; theme: GameTheme; onAck: () => void; noLives?: boolean }) {
   const { t } = useTranslation('brain')
   const pop = useMotion('pop', copy)
   const title = useRef<React.ComponentRef<typeof Text>>(null)
@@ -933,7 +933,8 @@ function RuleCard({ copy, theme, onAck }: { copy: string; theme: GameTheme; onAc
             {t(`mechanics.${copy}.body`)}
           </Text>
           <Text style={styles.ruleNote} maxFontSizeMultiplier={1.4}>
-            {t('rule.unscored')}
+            {/* A game without chances (Quick Eye) must not say the trial spares one. */}
+            {t(noLives ? 'rule.unscoredNoLives' : 'rule.unscored')}
           </Text>
           <Pressable
             onPress={() => {

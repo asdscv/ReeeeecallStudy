@@ -4,7 +4,7 @@ import Animated from 'react-native-reanimated'
 import { Feather } from '@expo/vector-icons'
 import { useTranslation } from 'react-i18next'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
-import { GAME_THEMES, displayLevel, gameProgress, quickEyeStage, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
+import { GAME_THEMES, GROUP_RULES, brainGame, displayLevel, gameProgress, quickEyeStage, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
 import { CanvasButton, GameCanvas, GradientFill, StatTile } from './GameCanvas'
 import { DemoPlayer } from './DemoPlayer'
@@ -142,7 +142,7 @@ export function GameIntro({
             {/* No "turn your phone sideways" line for Quick Eye, unlike the web: the app is portrait-only. */}
             {firstTime || placementNote || welcomeBack ? (
               <View style={styles.notes}>
-                {firstTime ? <Note icon="edit-3" text={t('intro.practiceNote')} /> : null}
+                {firstTime ? <Note icon="edit-3" text={t(GROUP_RULES[brainGame(gameId).group].lives === 0 ? 'intro.practiceNoteNoLives' : 'intro.practiceNote')} /> : null}
                 {placementNote ? <Note icon="compass" text={t('intro.firstPlacement')} testID="brain-intro-placement" /> : null}
                 {welcomeBack ? <Note icon="sunrise" text={t('intro.welcomeBack')} testID="brain-intro-welcome-back" /> : null}
               </View>

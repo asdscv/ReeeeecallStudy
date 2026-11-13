@@ -183,7 +183,8 @@
     "newBestReverse": "Ngược {{count}} ô!",
     "newBestReverse_one": "Ngược {{count}} ô!",
     "newBestReverse_other": "Ngược {{count}} ô!",
-    "lookalikeBadge": "Hình na ná"
+    "lookalikeBadge": "Hình na ná",
+    "practiceHintNoLives": "Đây là phần luyện tập, không tính điểm."
   },
   "quickEye": {
     "watch": "Nhìn vào giữa",
@@ -276,7 +277,8 @@
     "rounds": "Đã chơi",
     "best": "Điểm cao nhất",
     "welcomeBack": "Chào mừng trở lại. Vài câu đầu sẽ tìm lại mức phù hợp.",
-    "firstPlacement": "Vài câu đầu sẽ tìm mức bắt đầu phù hợp."
+    "firstPlacement": "Vài câu đầu sẽ tìm mức bắt đầu phù hợp.",
+    "practiceNoteNoLives": "Vài câu đầu là luyện tập, không tính điểm."
   },
   "mechanics": {
     "quickEye": {
@@ -560,11 +562,13 @@
     "label": "Quy tắc mới",
     "gotIt": "Đã hiểu",
     "unscored": "Câu này không tính điểm và không mất lượt.",
-    "change": "Điều mới"
+    "change": "Điều mới",
+    "unscoredNoLives": "Câu này không tính điểm."
   },
   "placement": {
     "label": "Đang tìm mức bắt đầu",
-    "hint": "Vài câu để tìm mức phù hợp. Không mất lượt nào."
+    "hint": "Vài câu để tìm mức phù hợp. Không mất lượt nào.",
+    "hintNoLives": "Vài câu để tìm mức độ phù hợp."
   },
   "tiers": {
     "none": "Chưa có hạng",

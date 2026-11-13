@@ -183,7 +183,8 @@
     "newBestReverse": "{{count}} terbalik!",
     "newBestReverse_one": "{{count}} terbalik!",
     "newBestReverse_other": "{{count}} terbalik!",
-    "lookalikeBadge": "Gambar mirip"
+    "lookalikeBadge": "Gambar mirip",
+    "practiceHintNoLives": "Ini latihan, tidak dihitung ke poin."
   },
   "quickEye": {
     "watch": "Lihat ke tengah",
@@ -276,7 +277,8 @@
     "rounds": "Dimainkan",
     "best": "Skor terbaik",
     "welcomeBack": "Selamat datang kembali. Beberapa soal pertama akan menemukan levelmu lagi.",
-    "firstPlacement": "Beberapa soal pertama mencari level awal yang pas."
+    "firstPlacement": "Beberapa soal pertama mencari level awal yang pas.",
+    "practiceNoteNoLives": "Beberapa soal pertama adalah latihan dan tidak dihitung ke poin."
   },
   "mechanics": {
     "quickEye": {
@@ -560,11 +562,13 @@
     "label": "Aturan baru",
     "gotIt": "Mengerti",
     "unscored": "Soal ini tidak dihitung untuk skor maupun kesempatan.",
-    "change": "Yang baru"
+    "change": "Yang baru",
+    "unscoredNoLives": "Soal ini tidak dihitung ke poin."
   },
   "placement": {
     "label": "Mencari level awalmu",
-    "hint": "Beberapa soal untuk menemukan level yang pas. Kesempatan tidak berkurang."
+    "hint": "Beberapa soal untuk menemukan level yang pas. Kesempatan tidak berkurang.",
+    "hintNoLives": "Beberapa soal untuk menemukan level yang pas."
   },
   "tiers": {
     "none": "Belum ada peringkat",
