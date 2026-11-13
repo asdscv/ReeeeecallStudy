@@ -5,7 +5,7 @@
   "worry": "如果担心自己的记忆力，与其多玩游戏，不如咨询医生或当地的医疗卫生服务机构。",
   "training": {
     "title": "今日训练",
-    "desc": "快眼和3个游戏 · 约{{minutes}}分钟",
+    "desc": "{{count}}个游戏 · 约{{minutes}}分钟",
     "start": "开始今日训练",
     "week": "本周 {{done}}/{{goal}}次",
     "weekDone": "已达成本周目标",
@@ -13,7 +13,7 @@
     "booster": "复习课程 {{done}}/{{total}}",
     "boosterNext": "下次复习课程: {{date}}",
     "minutes": "累计 {{value}} 分钟",
-    "dose": "计划是每周约3次、每次20分钟左右。多玩也没关系，但不会有额外奖励。",
+    "dose": "计划是每周约3次，每次可选5分钟或20分钟。多玩也没关系，但不会有额外奖励。",
     "slot": "游戏 {{index}}/{{total}}",
     "next": "下一个游戏",
     "continue": "继续",
@@ -25,7 +25,17 @@
     "kicker": "每周 3 次",
     "lineup": "今日安排",
     "minutesShort": "{{value}} 分钟",
-    "stopBody": "到目前为止的记录已保存，但没有完成的训练不算作完成一次。"
+    "stopBody": "到目前为止的记录已保存，但没有完成的训练不算作完成一次。",
+    "length": "训练时长",
+    "minutesSeconds": "{{m}}分{{s}}秒",
+    "focus": {
+      "mixed": "今天样样都练",
+      "speed": "今天以速度为主",
+      "memory": "今天以记忆为主",
+      "thinking": "今天以思考为主"
+    },
+    "desc_other": "{{count}}个游戏 · 约{{minutes}}分钟",
+    "desc_one": "{{count}}个游戏 · 约{{minutes}}分钟"
   },
   "home": {
     "freePlay": "自由练习",
@@ -65,7 +75,7 @@
   "games": {
     "quickEye": {
       "name": "快眼",
-      "desc": "中间的图案和边缘的星星只出现一瞬间，看完后说出是什么、在哪里。"
+      "desc": "盯住中间的形状，一眼看出周围闪现的星星在哪个方向。"
     },
     "memoryGrid": {
       "name": "瞬间记忆",
@@ -118,7 +128,7 @@
     "nextNumber": "下一个数是？",
     "correct": "正确",
     "wrong": "差一点",
-    "timeUp": "时间到",
+    "timeUp": "时间到！",
     "timeUpForgiven": "时间到 · 不扣机会",
     "void": "画面卡了一下，再显示一次",
     "points": "+{{value}}",
@@ -147,7 +157,33 @@
     "stopTitle": "要在这里停下吗？",
     "stopBody": "到目前为止的记录都已保存。",
     "keepPlaying": "继续玩",
-    "stopNow": "停止"
+    "stopNow": "停止",
+    "missingTerm": "空格里应填哪个数？",
+    "noneOdd": "没有",
+    "findOddOrNone": "点出不同的那个 · 没有就点「没有」",
+    "noneWas": "没有不同的",
+    "tapRange": "从{{from}}到{{to}}按顺序点 · 下一个: {{next}}",
+    "tapSkip": "按每次大{{step}}的顺序点",
+    "nextHint": "下一个: {{next}}",
+    "tapAlternate": "白 ↔ 黄 交替",
+    "tapAlternateOpposite": "白色往上，黄色往下",
+    "cueInk": "颜色",
+    "cueWord": "意思",
+    "inkWas": "字的颜色：{{color}}",
+    "findTriples": "找出 3 张相同的图",
+    "newCardFree": "新卡片 — 没关系",
+    "budget": "还能失误 {{left}} 次",
+    "cells": "{{count}}格",
+    "cells_one": "{{count}}格",
+    "cells_other": "{{count}}格",
+    "newBestCells": "{{count}}格！",
+    "newBestCells_one": "{{count}}格！",
+    "newBestCells_other": "{{count}}格！",
+    "reverseBadge": "倒序",
+    "newBestReverse": "倒序{{count}}个！",
+    "newBestReverse_one": "倒序{{count}}个！",
+    "newBestReverse_other": "倒序{{count}}个！",
+    "lookalikeBadge": "相似的图"
   },
   "quickEye": {
     "watch": "看中间",
@@ -169,7 +205,37 @@
       "6": "左",
       "7": "左上"
     },
-    "speedLevel": "速度等级 {{level}}"
+    "speedLevel": "速度等级 {{level}}",
+    "knob": {
+      "wider": "这次看得更宽一些",
+      "ring2": "扩大到中间一圈",
+      "ring3": "扩大到最外圈",
+      "crowd": "在三角形中找星星",
+      "moreCrowd": "三角形变多了",
+      "similar": "中间的形状更像了",
+      "sameDiff": "一样还是不一样？"
+    },
+    "stageUp": {
+      "title": "新阶段",
+      "stage": "第{{stage}}阶段",
+      "ease": "新阶段开始时会稍微慢一点",
+      "continue": "继续"
+    },
+    "gauge": "再答对{{count}}题就快一档",
+    "speedUp": "快了一档",
+    "topSpeed": "最高速度",
+    "hold": "保持最高速度 {{n}}/14",
+    "wasHere": "就在这里",
+    "nearMiss": "好可惜，就在旁边",
+    "missFast": "这次太快了",
+    "slowerStart": "稍微快一点了",
+    "legEnd": "本段结束",
+    "nextGoal": "下一个目标：稳定在速度等级{{level}}左右",
+    "landscapeHint": "把手机横过来，或用平板，看得更宽",
+    "revealA11y": "答案：{{center}}，星星在{{dir}}",
+    "warmup": "准备出发",
+    "gauge_other": "再答对{{count}}题就快一档",
+    "gauge_one": "再答对{{count}}题就快一档"
   },
   "summary": {
     "livesOut": "本轮结束",
@@ -229,12 +295,16 @@
       "sameDiff": {
         "title": "相同还是不同？",
         "body": "中央会出现两个图形。选出它们是否相同。"
+      },
+      "clearView": {
+        "title": "画面更清晰了",
+        "body": "遮挡图案换了，所以前几题会稍慢一点开始。"
       }
     },
     "oddOneOut": {
       "rotation": {
         "title": "转向的那一个",
-        "body": "所有图都一样。点出朝向不同的那一个。有时整个棋盘都是倾斜的。"
+        "body": "所有图都一样。点出朝向不同的那一个。"
       },
       "lookalike": {
         "title": "相似的图",
@@ -247,6 +317,22 @@
       "glyphs": {
         "title": "容易混淆的字",
         "body": "会出现相似的字，比如 b 和 d、6 和 9。"
+      },
+      "colorNoise": {
+        "title": "不用管颜色",
+        "body": "每个格子的颜色都不同。不用管颜色，点出形状不同的那一个。"
+      },
+      "mirror": {
+        "title": "翻转的那一个",
+        "body": "所有字都转了方向，这没关系 — 找出像镜子一样翻过来的那一个。"
+      },
+      "absent": {
+        "title": "可能没有",
+        "body": "有的棋盘里没有不同的那一个。看完全部，没有就点「没有」。"
+      },
+      "glyphTwin": {
+        "title": "非常相似的字",
+        "body": "会出现只有一笔略有不同的字。"
       }
     },
     "board": {
@@ -260,7 +346,7 @@
       },
       "moreCards": {
         "title": "卡片变多了",
-        "body": "配对变多了，时间和失误余量也一起增加。"
+        "body": "配对变多了，时间也一起增加。"
       },
       "moreChoices": {
         "title": "选项变多了",
@@ -275,18 +361,42 @@
       "reshuffle": {
         "title": "数字会换位置",
         "body": "每点一次，数字的位置都会改变。作为补偿，棋盘小一号。"
+      },
+      "twoDigit": {
+        "title": "两位数",
+        "body": "数字变成两位数。从最小的数开始按顺序点。"
+      },
+      "skipCount": {
+        "title": "跳着数",
+        "body": "数字每次大 2 或大 3。下一个数要自己数。"
+      },
+      "alternate": {
+        "title": "交替点击",
+        "body": "白色数字和黄色方框数字交替：白 1 → 黄 1 → 白 2 → 黄 2 …"
+      },
+      "alternateOpposite": {
+        "title": "方向相反",
+        "body": "白色数字从 1 往上，黄色数字从大往下：白 1 → 黄 8 → 白 2 → 黄 7 …"
+      },
+      "unmarked": {
+        "title": "没有标记",
+        "body": "找到的数字不会变淡。记住你点到哪里了。"
       }
     },
     "memoryGrid": {
       "fastShow": {
         "title": "显示时间变短",
-        "body": "棋盘已经最大。之后格子亮起的时间会变短。"
+        "body": "分批亮起的格子亮的时间更短。"
+      },
+      "waves": {
+        "title": "分批显示",
+        "body": "格子分两三次亮起。全部看完后再全部点出来。"
       }
     },
     "sequence": {
       "reverse": {
         "title": "倒着点",
-        "body": "按看到的相反顺序，从最后亮起的格子开始点。"
+        "body": "按看到的相反顺序，从最后亮起的格子开始点。从现在起一直都是倒着点。"
       }
     },
     "series": {
@@ -312,15 +422,63 @@
       },
       "squares": {
         "title": "自乘",
-        "body": "会出现以数字乘以自身为基础的规律。"
+        "body": "会出现以数字乘以自身为基础的规律，有时会再加或减一点。"
       },
       "interleaved": {
         "title": "两列交错",
         "body": "两条规律轮流出现。试着隔一个读。"
       },
       "doublePlus": {
-        "title": "翻倍再加",
-        "body": "会出现前一个数乘以 2 再加同一个数的规律。"
+        "title": "乘了再加",
+        "body": "会出现前一个数乘以几倍，再加上或减去同一个数的规律。"
+      },
+      "halving": {
+        "title": "减半",
+        "body": "会出现每次减半或每次乘 3 的规律。"
+      },
+      "altOps": {
+        "title": "两种运算交替",
+        "body": "两种不同的运算轮流进行。"
+      },
+      "mixedLines": {
+        "title": "加的列和乘的列",
+        "body": "隔一个读：一列在加或减，另一列在乘。"
+      },
+      "growFactor": {
+        "title": "乘数变大",
+        "body": "会出现乘数每次大 1 的规律。"
+      },
+      "tribonacci": {
+        "title": "前三个数",
+        "body": "前三个数相加得到下一个数。"
+      },
+      "threeLines": {
+        "title": "三列交错",
+        "body": "三条规律轮流出现。试着隔两个读。"
+      },
+      "diffGrowing": {
+        "title": "间隔的间隔",
+        "body": "间隔增大的幅度也越来越大。"
+      },
+      "opCycle": {
+        "title": "三种运算循环",
+        "body": "三种运算按顺序反复进行。"
+      },
+      "diffLines": {
+        "title": "间隔分两列",
+        "body": "把间隔隔一个读，各自都有规律。"
+      },
+      "diffFib": {
+        "title": "间隔之和",
+        "body": "每个间隔等于前两个间隔相加。"
+      },
+      "cubes": {
+        "title": "立方",
+        "body": "会出现以同一个数连乘三次为基础的规律，有时会再加或减一点。"
+      },
+      "missingTerm": {
+        "title": "找出空格",
+        "body": "现在 ? 也会出现在一行的中间。选出空格应填的数。"
       }
     },
     "pairs": {
@@ -331,12 +489,36 @@
       "noPreview": {
         "title": "不再预览",
         "body": "开始时不再展示卡片。边翻边记。"
+      },
+      "lookalike": {
+        "title": "相似的图",
+        "body": "会出现形状相似的图案。"
+      },
+      "triples": {
+        "title": "三张配对",
+        "body": "找出 3 张相同的图。第二张不同就会马上盖回去。"
       }
     },
     "stroop": {
       "word": {
         "title": "规则变了",
-        "body": "如果要求选「意思」，请选文字所说的颜色，而不是字的颜色。"
+        "body": "提示「意思」时选文字所说的颜色，提示「颜色」时选字的颜色。"
+      },
+      "shuffle": {
+        "title": "选项会换位置",
+        "body": "现在每题的选项位置都会改变。"
+      },
+      "labelInk": {
+        "title": "别被选项颜色骗了",
+        "body": "选项也涂上了颜色。请按选项上写的颜色名称来选，而不是选项的颜色。"
+      },
+      "switchOften": {
+        "title": "规则经常变",
+        "body": "每次都要看卡片上方的提示（颜色 / 意思）。"
+      },
+      "frame": {
+        "title": "不用管边框",
+        "body": "卡片边框的颜色不是答案。"
       }
     },
     "math": {
@@ -353,8 +535,24 @@
         "body": "也会出现除法题，答案总是整数。"
       },
       "twoStep": {
-        "title": "两步计算",
-        "body": "会出现需要计算两步的题。+ 和 × 同时出现时先算 ×；有 ? 时选出应填的数。"
+        "title": "先乘除",
+        "body": "+、− 和 ×、÷ 同时出现时，先算 ×、÷。例：6 + 4 × 7 = 6 + 28"
+      },
+      "missing": {
+        "title": "填空",
+        "body": "选出式子中 ? 处应填的数。"
+      },
+      "threeDigit": {
+        "title": "三位数",
+        "body": "会出现三位数的计算。"
+      },
+      "parens": {
+        "title": "先算括号",
+        "body": "有括号时，先算括号里面的。"
+      },
+      "bigMul": {
+        "title": "两位数 × 两位数",
+        "body": "会出现两位数相乘的题。"
       }
     }
   },

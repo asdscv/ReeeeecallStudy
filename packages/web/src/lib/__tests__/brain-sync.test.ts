@@ -23,7 +23,9 @@ import {
   recordRun,
   recordSession,
   markPracticed,
+  migrateLevelV1,
   sameDoc,
+  serializeProgress,
   stableJson,
   updateSettings,
   weekProgress,
@@ -90,6 +92,25 @@ describe('mergeProgress', () => {
     const more = { ...older, quickEye: { ...older.quickEye, variant: 6 } }
     expect(mergeProgress(newer, more).quickEye.recentMs).toEqual([50])
     expect(gameProgress(mergeProgress(newer, more), 'quickEye').rounds).toBe(40)
+  })
+
+  it('Quick Eye: variants 1 and 2 rank together — a slow start placed at 1 is not undone by an untouched or behind variant 2', () => {
+    const placed = { ...play(emptyProgress(), 'quickEye', 9, 0), quickEye: { variant: 1, recentMs: [100], recentOk: '1', thresholdMs: null } }
+    // A fresh device (every record starts at variant 2) and the copy pushed mid-placement (fewer trials).
+    const fresh = emptyProgress()
+    const midPlacement = play(emptyProgress(), 'quickEye', 6, 0)
+    for (const other of [fresh, midPlacement]) {
+      expect(mergeProgress(placed, other).quickEye.variant).toBe(1)
+      expect(mergeProgress(other, placed).quickEye.variant).toBe(1)
+    }
+    // Played on past it at variant 2 elsewhere (more trials): that side wins; and 3 still beats 1.
+    const passed = { ...play(emptyProgress(), 'quickEye', 30, 2), quickEye: { variant: 2, recentMs: [], recentOk: '', thresholdMs: null } }
+    expect(mergeProgress(placed, passed).quickEye.variant).toBe(2)
+    const v3 = { ...play(emptyProgress(), 'quickEye', 2, 2), quickEye: { variant: 3, recentMs: [], recentOk: '', thresholdMs: null } }
+    expect(mergeProgress(placed, v3).quickEye.variant).toBe(3)
+    // Neither played: the same answer from both sides.
+    const centreOnly = { ...emptyProgress(), quickEye: { ...emptyProgress().quickEye, variant: 1 } }
+    expect(mergeProgress(centreOnly, fresh).quickEye.variant).toBe(mergeProgress(fresh, centreOnly).quickEye.variant)
   })
 
   it('bests are maxed, practice is a union, settings stay this device’s, the course is honest', () => {
@@ -231,9 +252,11 @@ describe('reconcile and formats', () => {
     expect(r.push).toBe(false)
     expect(r.encoded.progress.placement).toEqual({ schulte: 4 })
     expect(r.encoded.meta.streakShield).toBe(2)
-    expect(isNewerFormat({ progress: { v: 2 }, history: { v: 1 }, meta: { v: 1 } })).toBe(true)
-    expect(isNewerFormat({ progress: { v: 1 }, history: { v: 1 }, meta: { v: 2 } })).toBe(true)
-    expect(isNewerFormat({ progress: { v: 1 }, history: null, meta: undefined })).toBe(false)
+    expect(isNewerFormat({ progress: { v: 3 }, history: { v: 2 }, meta: { v: 2 } })).toBe(true)
+    expect(isNewerFormat({ progress: { v: 2 }, history: { v: 2 }, meta: { v: 3 } })).toBe(true)
+    expect(isNewerFormat({ progress: { v: 2 }, history: null, meta: undefined })).toBe(false)
+    // This app writes v2: a v1 copy (an app from before the hard-content change) is older, not newer.
+    expect(isNewerFormat({ progress: { v: 1 }, history: { v: 1 }, meta: { v: 1 } })).toBe(false)
   })
 
   it('measures size the way Postgres prints jsonb, and a worst-case record is far under 16KB', () => {
@@ -449,7 +472,7 @@ describe('brain store cloud sync', () => {
   it('a round (here a first-time placement) open when the cloud copy lands never overwrites the account: the account wins at its end', async () => {
     const server = fakeServer()
     server.db.set('u1', {
-      progress: { ...play(emptyProgress(), 'stroop', 60, 18), v: 1 },
+      progress: play(emptyProgress(), 'stroop', 60, 18),
       history: emptyHistory(),
       meta: { ...emptyMeta(), sk: { stroop: { mu: 18.5, sd: 1, n: 60, day: 700 } } },
       rev: 3,
@@ -497,7 +520,7 @@ describe('brain store cloud sync', () => {
 
   it('an answer that arrives after the account switched is dropped, not merged into the new account', async () => {
     const server = fakeServer()
-    server.db.set('u1', { progress: { ...play(emptyProgress(), 'stroop', 9, 7), v: 1 }, history: emptyHistory(), meta: emptyMeta(), rev: 5 })
+    server.db.set('u1', { progress: play(emptyProgress(), 'stroop', 9, 7), history: emptyHistory(), meta: emptyMeta(), rev: 5 })
     const G = await device(server, 'u1')
     const real = server.connect(G.session).cloud
     let release: () => void = () => {}
@@ -507,7 +530,7 @@ describe('brain store cloud sync', () => {
     G.store.getState().hydrate(G.storageFor('u1'))
     await idle()
     // Another u1 device saves meanwhile, so u1's push comes back as a conflict carrying u1's record.
-    server.db.set('u1', { ...server.db.get('u1')!, progress: { ...play(emptyProgress(), 'math', 20, 9), v: 1 }, rev: 6 })
+    server.db.set('u1', { ...server.db.get('u1')!, progress: play(emptyProgress(), 'math', 20, 9), rev: 6 })
     G.store.getState().record('series', { level: 4, correct: true, points: 1 })
     void G.flush()
     await idle()
@@ -523,7 +546,7 @@ describe('brain store cloud sync', () => {
 
   it('drops a cloud answer for a different account than the one on screen', async () => {
     const server = fakeServer()
-    server.db.set('u2', { progress: { ...play(emptyProgress(), 'stroop', 9, 7), v: 1 }, history: emptyHistory(), meta: emptyMeta(), rev: 4 })
+    server.db.set('u2', { progress: play(emptyProgress(), 'stroop', 9, 7), history: emptyHistory(), meta: emptyMeta(), rev: 4 })
     const E = await device(server, 'u2') // the session already belongs to u2 …
     E.store.getState().hydrate(E.storageFor('u1')) // … while the screen still shows u1
     await idle()
@@ -558,7 +581,7 @@ describe('brain store cloud sync', () => {
 
   it('a newer-format cloud copy (an updated app on another device) is never merged or overwritten', async () => {
     const server = fakeServer()
-    const newer = { progress: { v: 2, games: {}, something: 'new' }, history: { v: 1, rounds: {} }, meta: { v: 1 }, rev: 7 }
+    const newer = { progress: { v: 3, games: {}, something: 'new' }, history: { v: 2, rounds: {} }, meta: { v: 2 }, rev: 7 }
     server.db.set('u1', clone(newer))
     const A = await device(server)
     A.store.getState().hydrate(A.storageFor('u1'))
@@ -576,8 +599,8 @@ describe('brain store cloud sync', () => {
     const A = await device(server)
     A.store.getState().hydrate(A.storageFor('u1'))
     await idle()
-    // Between this device's read and its write, a newer app writes meta v2: the conflict shows it.
-    server.db.set('u1', { progress: { v: 1 }, history: { v: 1, rounds: {} }, meta: { v: 2 }, rev: 1 })
+    // Between this device's read and its write, a newer app writes meta v3: the conflict shows it.
+    server.db.set('u1', { progress: { v: 2 }, history: { v: 2, rounds: {} }, meta: { v: 3 }, rev: 1 })
     A.store.getState().record('stroop', { level: 3, correct: true, points: 1 })
     await A.flush()
     expect(A.store.getState().cloudStatus).toBe('outdated')
@@ -585,7 +608,7 @@ describe('brain store cloud sync', () => {
     A.store.getState().record('stroop', { level: 3.1, correct: true, points: 1 })
     await vi.advanceTimersByTimeAsync(10_000)
     expect(server.state.pushes).toBe(pushes)
-    expect((server.db.get('u1')!.meta as { v: number }).v).toBe(2)
+    expect((server.db.get('u1')!.meta as { v: number }).v).toBe(3)
 
     // The server's own refusal (client_outdated) stops it the same way.
     const other = fakeServer()
@@ -600,6 +623,41 @@ describe('brain store cloud sync', () => {
     B.store.getState().record('stroop', { level: 3.1, correct: true, points: 1 })
     await vi.advanceTimersByTimeAsync(10_000)
     expect(other.state.pushes).toBe(sent)
+  })
+
+  it('a v1 save (an app from before the hard-content change) is converted once and goes up as v2; an older write is then refused', async () => {
+    const server = fakeServer()
+    // The same old-app record on this device and in the cloud: Quick Math on the v1 scale.
+    const v1Progress = { ...JSON.parse(serializeProgress(play(emptyProgress(), 'math', 20, 9))), v: 1 }
+    const v1History = { v: 1, rounds: { math: [[1000, 109, 90]] } }
+    const v1Meta = { ...emptyMeta(), v: 1, sk: { math: { mu: 10.5, sd: 1, n: 20, day: 1000 } } }
+    server.db.set('u1', { progress: clone(v1Progress), history: clone(v1History), meta: clone(v1Meta), rev: 2 })
+    const A = await device(server)
+    A.disk.set('p.u1', JSON.stringify(v1Progress))
+    A.disk.set('h.u1', JSON.stringify(v1History))
+    A.disk.set('m.u1', JSON.stringify(v1Meta))
+    A.store.getState().hydrate(A.storageFor('u1'))
+    await idle()
+    const once = migrateLevelV1('math', 10.9)
+    expect(level(A.store.getState().progress, 'math')).toBeCloseTo(once)
+    expect(A.store.getState().meta.sk.math).toEqual({ mu: migrateLevelV1('math', 10.5), sd: 9, n: 0, day: 1000 })
+    expect(A.store.getState().cloudStatus).toBe('synced')
+    const row = server.db.get('u1')!
+    expect([ver(row.progress), ver(row.history), ver(row.meta)]).toEqual([2, 2, 2])
+    // Converted exactly once: the cloud holds the same v2 levels as the device.
+    expect(level(row.progress as BrainProgress, 'math')).toBeCloseTo(once)
+    expect((row.meta as BrainMeta).sk.math?.mu).toBeCloseTo(migrateLevelV1('math', 10.5))
+    expect((row.history as { rounds: { math: number[][] } }).rounds.math).toEqual([[1000, Math.round(migrateLevelV1('math', 10.9) * 10), 90]])
+    // A second device reading it takes it as written.
+    const B = await device(server)
+    B.store.getState().hydrate(B.storageFor('u1'))
+    await idle()
+    expect(level(B.store.getState().progress, 'math')).toBeCloseTo(once)
+    expect(server.db.get('u1')!.rev).toBe(row.rev)
+    // An old app pushing its v1 copy now is refused (migration 288: a lower `v` than stored).
+    const old = await server.connect({ uid: 'u1' }).cloud.push({ userId: 'u1', baseRev: row.rev, progress: clone(v1Progress), history: clone(v1History), meta: clone(v1Meta) })
+    expect(old).toMatchObject({ ok: true, status: 'client_outdated' })
+    expect(server.db.get('u1')!.rev).toBe(row.rev)
   })
 
   it('not deployed yet, or nobody signed in: quiet, device-only, the game plays on', async () => {

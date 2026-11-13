@@ -14,13 +14,20 @@ import { QUICK_EYE_VARIANTS } from './games/quick-eye'
 export const TIER_COUNT = 6
 
 export const TIERS: Record<BrainGameId, readonly [number, number, number, number, number, number]> = {
-  oddOneOut: [4, 10, 15, 22, 30, 42],
-  schulte: [5, 9, 12, 22, 30, 35],
-  stroop: [3, 8, 11, 17, 24, 28],
-  math: [3, 6, 10, 18, 28, 36],
-  series: [4, 8, 12, 16, 22, 32],
-  pairs: [4, 10, 16, 20, 26, 38],
+  // look-alikes · glyphs · colour noise · mirror · «없음» · deep clock
+  oddOneOut: [3, 7, 10, 13, 17, 26],
+  // 4×4 · 5×5 · alternation · reshuffle · unmarked · deep clock
+  schulte: [3, 6, 10, 14, 16, 21],
+  // 3 options · 6 options · cued switch · frame · clock · clock
+  stroop: [3, 7, 10, 14, 20, 27],
+  // sub facts · div facts · two carries · × before + · borrow across zero · two-step missing
+  math: [3, 6, 10, 13, 18, 23],
+  // descending · growing step · Fibonacci · mixed lines · three lines · squares/cubes
+  series: [3, 6, 9, 12, 15, 20],
+  // no preview · 8 pairs · look-alike · 12 pairs · L13 · triples 8
+  pairs: [3, 6, 8, 11, 13, 15],
   memoryGrid: [3, 4, 6, 7, 9, 12],
+  // forward 4 · forward 5 · reverse 6 · reverse 7 · reverse 8 · reverse 10
   sequence: [2, 3, 4, 5, 6, 8],
   quickEye: [1, 3, 5, 9, 12, 15.64],
 }

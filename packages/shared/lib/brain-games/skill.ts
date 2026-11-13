@@ -44,15 +44,27 @@ export function legacySd(group: GameGroup): number {
   return SKILL[group].floor * Math.min(2, SKILL[group].kMax)
 }
 
-export function stepMultiplier(group: GameGroup, sd: number): number {
+/** How much both steps are scaled: 1 once settled, up to `kMax` (the group's, or a game's own — catalog `steps`) while unsure. */
+export function stepMultiplier(group: GameGroup, sd: number, kMax: number = SKILL[group].kMax): number {
   const p = SKILL[group]
-  return Math.max(1, Math.min(p.kMax, sd / p.floor))
+  return Math.max(1, Math.min(kMax, sd / p.floor))
 }
 
 /** After a judged trial: a little surer every trial, a lot surer at a reversal. */
 export function shrinkSd(group: GameGroup, sd: number, reversal: boolean): number {
   const p = SKILL[group]
   return Math.max(p.floor, sd * (reversal ? 0.7 : 0.92))
+}
+
+/**
+ * The uncertainty after a counted trial. A speed-group run of 4 or more right answers in a row says
+ * the level is still too low, so it re-opens a little (×1.1, never past sd0) and the steps grow
+ * with it; everything else shrinks it. Only upward runs: holding on downward runs too pushed a
+ * slow player down to L1.3-1.6 in simulation.
+ */
+export function nextSd(group: GameGroup, sd: number, reversal: boolean, upRun: number): number {
+  if (group === 'speed' && upRun >= 4) return Math.min(SKILL[group].sd0, sd * 1.1)
+  return shrinkSd(group, sd, reversal)
 }
 
 /** Uncertainty after `days` away. */

@@ -123,6 +123,7 @@ function Training() {
         gameId={gameId}
         caption={`${t('training.title')} · ${t('training.slot', { index: s.slotIndex + 1, total: s.slots.length })}`}
         onOver={onOver}
+        timeBudgetMs={s.slotBudgetMs}
         confirmEmpty
         stopBody={t('training.stopBody')}
       />
@@ -179,7 +180,7 @@ function Lineup({ slots, minutes, onStart, onClose }: { slots: PlanSlot[]; minut
                 {t('training.title')}
               </Text>
               <Text style={styles.lead} maxFontSizeMultiplier={1.5}>
-                {t('training.desc', { minutes })}
+                {t('training.desc', { minutes, count: slots.length })}
               </Text>
             </View>
             <WeekRing done={week.done} goal={week.goal} label={t('training.week', { done: week.done, goal: week.goal })} color={TRAINING_THEME.accent} />
@@ -205,8 +206,10 @@ function LineupRow({ index, slot }: { index: number; slot: PlanSlot }) {
   const { t } = useTranslation('brain')
   const rise = useMotion('rise', slot.gameId, index * 70)
   const theme = GAME_THEMES[slot.gameId]
+  const duration =
+    slot.minutes % 1 ? t('training.minutesSeconds', { m: Math.floor(slot.minutes), s: Math.round((slot.minutes % 1) * 60) }) : t('training.minutesShort', { value: slot.minutes })
   return (
-    <Animated.View style={[styles.row, rise]} accessible accessibilityLabel={`${index + 1}. ${t(`games.${slot.gameId}.name`)}, ${t('training.minutesShort', { value: slot.minutes })}`}>
+    <Animated.View style={[styles.row, rise]} accessible accessibilityLabel={`${index + 1}. ${t(`games.${slot.gameId}.name`)}, ${duration}`}>
       <Text style={styles.rowIndex} maxFontSizeMultiplier={1.3}>
         {index + 1}
       </Text>
@@ -225,7 +228,7 @@ function LineupRow({ index, slot }: { index: number; slot: PlanSlot }) {
       <View style={styles.rowTime}>
         <Feather name="clock" size={15} color="rgba(255,255,255,0.75)" />
         <Text style={styles.rowTimeText} maxFontSizeMultiplier={1.3}>
-          {t('training.minutesShort', { value: slot.minutes })}
+          {duration}
         </Text>
       </View>
     </Animated.View>

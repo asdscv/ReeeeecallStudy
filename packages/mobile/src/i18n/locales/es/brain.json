@@ -5,7 +5,7 @@
   "worry": "Si te preocupa tu memoria, en lugar de jugar más, habla con un médico o con un servicio de salud de tu zona.",
   "training": {
     "title": "Entrenamiento de hoy",
-    "desc": "Ojo rápido y 3 juegos · unos {{minutes}} min",
+    "desc": "{{count}} juegos · unos {{minutes}} min",
     "start": "Empezar el entrenamiento de hoy",
     "week": "Esta semana {{done}}/{{goal}}",
     "weekDone": "Objetivo semanal cumplido",
@@ -13,7 +13,7 @@
     "booster": "Repaso {{done}}/{{total}}",
     "boosterNext": "Próximo repaso: {{date}}",
     "minutes": "{{value}} min en total",
-    "dose": "El plan son unas tres sesiones de 20 minutos por semana. Puedes jugar más, pero no suma nada extra.",
+    "dose": "El plan son unas tres sesiones por semana: elige 5 o 20 minutos cada vez. Puedes jugar más, pero no suma nada extra.",
     "slot": "Juego {{index}}/{{total}}",
     "next": "Siguiente juego",
     "continue": "Continuar",
@@ -25,7 +25,17 @@
     "kicker": "3 veces por semana",
     "lineup": "Juegos de hoy",
     "minutesShort": "{{value}} min",
-    "stopBody": "Lo hecho queda guardado, pero una sesión sin terminar no cuenta como completada."
+    "stopBody": "Lo hecho queda guardado, pero una sesión sin terminar no cuenta como completada.",
+    "length": "Duración",
+    "minutesSeconds": "{{m}} min {{s}} s",
+    "focus": {
+      "mixed": "Hoy, un poco de todo",
+      "speed": "Hoy, velocidad",
+      "memory": "Hoy, memoria",
+      "thinking": "Hoy, razonamiento"
+    },
+    "desc_one": "{{count}} juego · unos {{minutes}} min",
+    "desc_other": "{{count}} juegos · unos {{minutes}} min"
   },
   "home": {
     "freePlay": "Práctica libre",
@@ -65,7 +75,7 @@
   "games": {
     "quickEye": {
       "name": "Ojo rápido",
-      "desc": "Ve durante un instante una imagen en el centro y una estrella en el borde, y di qué era y dónde estaba."
+      "desc": "Mira la figura del centro y capta de un vistazo hacia dónde apareció la estrella."
     },
     "memoryGrid": {
       "name": "Cuadrícula flash",
@@ -118,7 +128,7 @@
     "nextNumber": "¿Qué número sigue?",
     "correct": "Correcto",
     "wrong": "Casi",
-    "timeUp": "Se acabó el tiempo",
+    "timeUp": "¡Tiempo!",
     "timeUpForgiven": "Se acabó el tiempo · no pierdes oportunidad",
     "void": "La pantalla se trabó; te lo mostramos otra vez",
     "points": "+{{value}}",
@@ -147,7 +157,33 @@
     "stopTitle": "¿Parar aquí?",
     "stopBody": "Todo lo hecho hasta ahora queda guardado.",
     "keepPlaying": "Seguir jugando",
-    "stopNow": "Parar"
+    "stopNow": "Parar",
+    "missingTerm": "¿Qué número completa el hueco?",
+    "noneOdd": "No hay",
+    "findOddOrNone": "Toca el que es diferente, o «No hay»",
+    "noneWas": "No había ninguno",
+    "tapRange": "Toca del {{from}} al {{to}} en orden · siguiente: {{next}}",
+    "tapSkip": "Cuenta de {{step}} en {{step}}",
+    "nextHint": "Siguiente: {{next}}",
+    "tapAlternate": "Blanco ↔ amarillo por turnos",
+    "tapAlternateOpposite": "Blancos suben, amarillos bajan",
+    "cueInk": "Color",
+    "cueWord": "Palabra",
+    "inkWas": "Tinta: {{color}}",
+    "findTriples": "Encuentra 3 iguales",
+    "newCardFree": "Carta nueva: no pasa nada",
+    "budget": "Fallos que quedan: {{left}}",
+    "cells": "{{count}} casillas",
+    "cells_one": "{{count}} casilla",
+    "cells_other": "{{count}} casillas",
+    "newBestCells": "¡{{count}} casillas!",
+    "newBestCells_one": "¡{{count}} casilla!",
+    "newBestCells_other": "¡{{count}} casillas!",
+    "reverseBadge": "Al revés",
+    "newBestReverse": "¡{{count}} al revés!",
+    "newBestReverse_one": "¡{{count}} al revés!",
+    "newBestReverse_other": "¡{{count}} al revés!",
+    "lookalikeBadge": "Parecidos"
   },
   "quickEye": {
     "watch": "Mira el centro",
@@ -169,7 +205,37 @@
       "6": "Izquierda",
       "7": "Arriba a la izquierda"
     },
-    "speedLevel": "Nivel de velocidad {{level}}"
+    "speedLevel": "Nivel de velocidad {{level}}",
+    "knob": {
+      "wider": "Ahora mira más amplio",
+      "ring2": "Hasta el anillo del medio",
+      "ring3": "Hasta el anillo exterior",
+      "crowd": "Busca la estrella entre triángulos",
+      "moreCrowd": "Más triángulos",
+      "similar": "Las figuras del centro se parecen más",
+      "sameDiff": "¿Iguales o diferentes?"
+    },
+    "stageUp": {
+      "title": "Nueva etapa",
+      "stage": "Etapa {{stage}}",
+      "ease": "Una etapa nueva empieza un poco más despacio",
+      "continue": "Continuar"
+    },
+    "gauge": "{{count}} aciertos más y irá más rápido",
+    "speedUp": "Un paso más rápido",
+    "topSpeed": "Velocidad máxima",
+    "hold": "Mantén la velocidad máxima {{n}}/14",
+    "wasHere": "Estaba aquí",
+    "nearMiss": "Casi, justo al lado",
+    "missFast": "Esa fue rápida",
+    "slowerStart": "Un poco más rápido",
+    "legEnd": "Fin del tramo",
+    "nextGoal": "Siguiente: mantente cerca del nivel de velocidad {{level}}",
+    "landscapeHint": "Gira el teléfono o usa una tableta para verlo más amplio",
+    "revealA11y": "Respuesta: {{center}}, estrella: {{dir}}",
+    "warmup": "Preparándonos",
+    "gauge_one": "{{count}} acierto más y irá más rápido",
+    "gauge_other": "{{count}} aciertos más y irá más rápido"
   },
   "summary": {
     "livesOut": "Ronda terminada",
@@ -229,12 +295,16 @@
       "sameDiff": {
         "title": "¿Iguales o distintas?",
         "body": "Aparecen dos figuras en el centro. Di si son iguales o distintas."
+      },
+      "clearView": {
+        "title": "Una pantalla más nítida",
+        "body": "La cubierta cambió, así que las primeras empiezan un poco más despacio."
       }
     },
     "oddOneOut": {
       "rotation": {
         "title": "La que está girada",
-        "body": "Todas son el mismo dibujo. Toca la que está girada en otra dirección. A veces todo el tablero está inclinado."
+        "body": "Todas son el mismo dibujo. Toca la que está girada en otra dirección."
       },
       "lookalike": {
         "title": "Parecidas",
@@ -247,6 +317,22 @@
       "glyphs": {
         "title": "Letras engañosas",
         "body": "Letras que se parecen, como b y d o 6 y 9."
+      },
+      "colorNoise": {
+        "title": "Ignora los colores",
+        "body": "Los colores cambian. Toca la que tiene otra forma."
+      },
+      "mirror": {
+        "title": "La reflejada",
+        "body": "Todas están giradas, y eso no importa. Busca la que está volteada como en un espejo."
+      },
+      "absent": {
+        "title": "Puede que no haya",
+        "body": "En algunos tableros no hay ninguna diferente. Revísalo todo y, si no hay, toca «No hay»."
+      },
+      "glyphTwin": {
+        "title": "Caracteres casi idénticos",
+        "body": "Caracteres en los que solo cambia un poco un trazo."
       }
     },
     "board": {
@@ -260,7 +346,7 @@
       },
       "moreCards": {
         "title": "Más cartas",
-        "body": "Ahora hay más parejas, con más tiempo y margen de error."
+        "body": "Ahora hay más parejas, y también más tiempo."
       },
       "moreChoices": {
         "title": "Más opciones",
@@ -275,18 +361,42 @@
       "reshuffle": {
         "title": "Modo mezcla",
         "body": "Los números cambian de sitio con cada toque. A cambio, el tablero es un tamaño menor."
+      },
+      "twoDigit": {
+        "title": "Números de dos cifras",
+        "body": "Ahora los números tienen dos cifras. Toca del más pequeño al más grande."
+      },
+      "skipCount": {
+        "title": "Contar a saltos",
+        "body": "Los números suben de 2 en 2 o de 3 en 3. Cuenta tú el siguiente."
+      },
+      "alternate": {
+        "title": "Por turnos",
+        "body": "Números blancos y amarillos con recuadro, por turnos: blanco 1 → amarillo 1 → blanco 2 → amarillo 2 …"
+      },
+      "alternateOpposite": {
+        "title": "En sentidos opuestos",
+        "body": "Los blancos suben desde el 1 y los amarillos bajan desde el mayor: blanco 1 → amarillo 8 → blanco 2 → amarillo 7 …"
+      },
+      "unmarked": {
+        "title": "Sin marcas",
+        "body": "Los números encontrados no se atenúan. Recuerda por dónde vas."
       }
     },
     "memoryGrid": {
       "fastShow": {
         "title": "Se ve menos tiempo",
-        "body": "El tablero ya tiene su tamaño máximo. Ahora las casillas se iluminan menos tiempo."
+        "body": "Las partes se iluminan menos tiempo."
+      },
+      "waves": {
+        "title": "En partes",
+        "body": "Las casillas se iluminan en 2 o 3 partes. Al final, tócalas todas."
       }
     },
     "sequence": {
       "reverse": {
         "title": "Al revés",
-        "body": "Toca las casillas en orden inverso, empezando por la última que se iluminó."
+        "body": "Toca las casillas en orden inverso, empezando por la última que se iluminó. A partir de ahora, siempre al revés."
       }
     },
     "series": {
@@ -312,15 +422,63 @@
       },
       "squares": {
         "title": "Cuadrados",
-        "body": "Aparece una regla basada en números multiplicados por sí mismos."
+        "body": "Aparece una regla basada en números multiplicados por sí mismos, a veces con un poco más o un poco menos."
       },
       "interleaved": {
         "title": "Dos en una",
         "body": "Dos reglas se turnan. Lee un número sí y otro no."
       },
       "doublePlus": {
-        "title": "Doble y suma",
-        "body": "Aparece una regla que duplica el número anterior y suma lo mismo."
+        "title": "Multiplica y suma",
+        "body": "Aparece una regla que multiplica el número anterior y luego suma o resta siempre lo mismo."
+      },
+      "halving": {
+        "title": "A la mitad",
+        "body": "Aparecen reglas que reducen a la mitad, o que triplican."
+      },
+      "altOps": {
+        "title": "Dos pasos por turnos",
+        "body": "Dos operaciones distintas se turnan."
+      },
+      "mixedLines": {
+        "title": "Una línea suma, otra multiplica",
+        "body": "Lee un número sí y otro no: una línea suma o resta, y la otra multiplica."
+      },
+      "growFactor": {
+        "title": "Un multiplicador que crece",
+        "body": "El número por el que se multiplica crece de uno en uno."
+      },
+      "tribonacci": {
+        "title": "Los tres anteriores",
+        "body": "Suma los tres anteriores para obtener el siguiente."
+      },
+      "threeLines": {
+        "title": "Tres líneas mezcladas",
+        "body": "Tres reglas se turnan. Lee un número de cada tres."
+      },
+      "diffGrowing": {
+        "title": "Saltos que crecen cada vez más",
+        "body": "Lo que crece el salto también va creciendo."
+      },
+      "opCycle": {
+        "title": "Tres pasos en ciclo",
+        "body": "Tres operaciones se repiten en el mismo orden."
+      },
+      "diffLines": {
+        "title": "Saltos en dos líneas",
+        "body": "Lee los saltos uno sí y otro no: cada línea tiene su regla."
+      },
+      "diffFib": {
+        "title": "Saltos de los dos anteriores",
+        "body": "Cada salto es la suma de los dos saltos anteriores."
+      },
+      "cubes": {
+        "title": "Cubos",
+        "body": "Aparece una regla basada en un número multiplicado por sí mismo y otra vez por sí mismo, a veces con un poco más o un poco menos."
+      },
+      "missingTerm": {
+        "title": "Encuentra el hueco",
+        "body": "Ahora el ? puede estar dentro de la fila. Elige el número que lo completa."
       }
     },
     "pairs": {
@@ -331,12 +489,36 @@
       "noPreview": {
         "title": "Sin vistazo",
         "body": "Ya no se muestran las cartas al principio. Recuérdalas mientras las giras."
+      },
+      "lookalike": {
+        "title": "Dibujos parecidos",
+        "body": "Aparecen juntos dibujos que se parecen."
+      },
+      "triples": {
+        "title": "Busca tres",
+        "body": "Encuentra 3 iguales. Si la segunda carta no coincide, se vuelven a tapar."
       }
     },
     "stroop": {
       "word": {
         "title": "Cambio de regla",
-        "body": "Cuando te pidan lo que DICE, elige el color que nombra la palabra, no el de la tinta."
+        "body": "Con la señal «Palabra», elige el color que nombra la palabra; con «Color», elige el de la tinta."
+      },
+      "shuffle": {
+        "title": "Los botones se mueven",
+        "body": "Ahora los botones cambian de sitio en cada pregunta."
+      },
+      "labelInk": {
+        "title": "No te fíes del color de los botones",
+        "body": "Los botones también tienen color. Elige por el nombre del color escrito, no por el color del botón."
+      },
+      "switchOften": {
+        "title": "La regla cambia más a menudo",
+        "body": "Mira cada vez la señal sobre la tarjeta (Color / Palabra)."
+      },
+      "frame": {
+        "title": "Ignora el marco",
+        "body": "El color del marco nunca es la respuesta."
       }
     },
     "math": {
@@ -353,8 +535,24 @@
         "body": "También hay divisiones. El resultado siempre es exacto."
       },
       "twoStep": {
-        "title": "Dos pasos",
-        "body": "Ahora hay problemas de dos pasos. Con + y × juntos, haz primero la ×; si hay un ?, elige el número que falta."
+        "title": "Primero multiplica y divide",
+        "body": "Si hay + o − junto a × o ÷, haz primero × y ÷: 6 + 4 × 7 = 6 + 28"
+      },
+      "missing": {
+        "title": "Completa el hueco",
+        "body": "Elige el número que va donde está el ?."
+      },
+      "threeDigit": {
+        "title": "Números de tres cifras",
+        "body": "Ahora entran cuentas con números de tres cifras."
+      },
+      "parens": {
+        "title": "Primero los paréntesis",
+        "body": "Si hay paréntesis, resuelve primero lo que está dentro."
+      },
+      "bigMul": {
+        "title": "Dos cifras × dos cifras",
+        "body": "Ahora se multiplican dos números de dos cifras."
       }
     }
   },

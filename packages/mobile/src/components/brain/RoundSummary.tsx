@@ -4,7 +4,7 @@ import Animated from 'react-native-reanimated'
 import { Feather } from '@expo/vector-icons'
 import { useTranslation } from 'react-i18next'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
-import { GAME_THEMES, TIER_COUNT, displayLevel, gameHistory, gameProgress, roundStars, type BrainGameId, type GameTheme } from '@reeeeecall/shared/lib/brain-games'
+import { GAME_THEMES, TIER_COUNT, displayLevel, gameHistory, gameProgress, quickEyeBarLevel, roundStars, type BrainGameId, type GameTheme } from '@reeeeecall/shared/lib/brain-games'
 import type { RoundStats, ScoreParts } from '@reeeeecall/shared/hooks/useBrainRound'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
 import { CanvasButton, Confetti, GameCanvas, StatTile, useCountUp } from './GameCanvas'
@@ -22,6 +22,10 @@ const PARTS: (keyof ScoreParts)[] = ['base', 'speed', 'combo', 'clear', 'clean']
  * counting up, then ONE celebration — a new tier first, else achievements, else a personal best —
  * the level it moved to and the game's tier, where the points came from, and the recent trend.
  * The level and the tier are this game's record only, never a measure of memory (the copy says so).
+ *
+ * Quick Eye: "end of leg", no accuracy stars (its staircase holds every player near 80% right, so
+ * they would say nothing), its speed level start → end, a stage reached, and the next goal — the
+ * speed level its stage asks for, never a flash time.
  */
 export function RoundSummary({ gameId, stats, onAgain, onHome }: { gameId: BrainGameId; stats: RoundStats; onAgain: () => void; onHome: () => void }) {
   const { t } = useTranslation('brain')
@@ -32,15 +36,19 @@ export function RoundSummary({ gameId, stats, onAgain, onHome }: { gameId: Brain
   const best = progress.bestRuns[gameId]
   const trend = gameHistory(history, gameId)
   const accuracy = stats.trials > 0 ? Math.round((stats.correct / stats.trials) * 100) : 0
-  const stars = roundStars(stats.trials, stats.correct)
+  const qe = gameId === 'quickEye'
+  const stars = qe ? 0 : roundStars(stats.trials, stats.correct)
   const score = useCountUp(stats.points)
-  const title = stats.cleared
-    ? t('summary.cleared')
-    : stats.endedBy === 'stop'
+  const title =
+    stats.endedBy === 'stop'
       ? t('summary.stopped')
       : stats.endedBy === 'void'
         ? t('summary.voided')
-        : t('summary.livesOut')
+        : qe
+          ? t('quickEye.legEnd')
+          : stats.cleared
+            ? t('summary.cleared')
+            : t('summary.livesOut')
   const seconds = Math.round(stats.activeMs / 1000)
   const titleIn = useMotion('rise', title)
   const gameName = t(`games.${gameId}.name`)
@@ -121,7 +129,16 @@ export function RoundSummary({ gameId, stats, onAgain, onHome }: { gameId: Brain
 
         {stats.suggestRelax ? <RelaxCard theme={theme} /> : null}
 
-        {showLevel || played ? <ProgressCard gameId={gameId} stats={stats} showLevel={showLevel} standing={played ? standing : null} theme={theme} /> : null}
+        {showLevel || played ? (
+          <ProgressCard
+            gameId={gameId}
+            stats={stats}
+            showLevel={showLevel}
+            standing={played ? standing : null}
+            theme={theme}
+            nextGoal={qe ? t('quickEye.nextGoal', { level: quickEyeBarLevel(progress.quickEye.variant) }) : null}
+          />
+        ) : null}
 
         <View style={styles.grid}>
           <View style={styles.gridRow}>
@@ -221,7 +238,8 @@ function TierUp({ tier, game }: { tier: number; game: string }) {
 
 /**
  * Where the round left the game: the level it moved to (Quick Eye: its speed level, higher is
- * better — never a flash time), then the game's tier with the bar toward the next.
+ * better — never a flash time; a stage reached; what to aim for next), then the game's tier with
+ * the bar toward the next.
  */
 function ProgressCard({
   gameId,
@@ -229,12 +247,14 @@ function ProgressCard({
   showLevel,
   standing,
   theme,
+  nextGoal,
 }: {
   gameId: BrainGameId
   stats: RoundStats
   showLevel: boolean
   standing: TierStanding | null
   theme: GameTheme
+  nextGoal: string | null
 }) {
   const { t } = useTranslation('brain')
   const qe = gameId === 'quickEye'
@@ -258,6 +278,19 @@ function ProgressCard({
           {up ? (
             <Text style={styles.improved} maxFontSizeMultiplier={1.4}>
               {t('summary.improved')}
+            </Text>
+          ) : null}
+          {qe && stats.stageReached !== null ? (
+            <View style={styles.stageLine} testID="brain-summary-stage">
+              <Feather name="flag" size={16} color={FX.gold} />
+              <Text style={styles.stageText} maxFontSizeMultiplier={1.4}>
+                {`${t('quickEye.stageUp.title')} · ${t('quickEye.stageUp.stage', { stage: stats.stageReached })}`}
+              </Text>
+            </View>
+          ) : null}
+          {nextGoal ? (
+            <Text style={styles.nextGoal} maxFontSizeMultiplier={1.4} testID="brain-summary-goal">
+              {nextGoal}
             </Text>
           ) : null}
         </View>
@@ -400,6 +433,9 @@ const styles = StyleSheet.create({
   levelValue: { color: '#FFFFFF', fontSize: 18, fontWeight: '700', fontVariant: ['tabular-nums'] },
   arrow: { color: 'rgba(255,255,255,0.5)' },
   improved: { color: FX.goodText, fontSize: 14, fontWeight: '600' },
+  stageLine: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  stageText: { color: FX.gold, fontSize: 15, fontWeight: '700', flexShrink: 1 },
+  nextGoal: { color: 'rgba(255,255,255,0.78)', fontSize: 14, lineHeight: 20 },
   divider: { height: 1, backgroundColor: FX.glassBorder, marginVertical: 2 },
   tierBlock: { gap: 10 },
   tierHead: { flexDirection: 'row', alignItems: 'center', gap: 10 },

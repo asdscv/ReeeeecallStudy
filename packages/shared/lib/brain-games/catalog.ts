@@ -27,6 +27,11 @@ export interface BrainGameEntry {
    */
   role: 'core' | 'speed' | 'span' | 'reasoning' | 'variety'
   icon: string
+  /**
+   * Staircase step scaling (useBrainRound judgeTrial): both steps are multiplied by `scale` (so the
+   * 85% target is unchanged), and while unsure by up to `kMax` instead of the group's own.
+   */
+  steps?: { scale: number; kMax: number }
   // The registry is heterogeneous by design; each game's state type stays private to it.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   def: BrainGameDef<any>
@@ -39,7 +44,7 @@ export const BRAIN_GAMES: readonly BrainGameEntry[] = [
   { id: 'memoryGrid', skill: 'memory', group: 'span', role: 'span', icon: 'grid', def: memoryGrid },
   { id: 'sequence', skill: 'memory', group: 'span', role: 'span', icon: 'repeat', def: sequence },
   { id: 'series', skill: 'reasoning', group: 'speed', role: 'reasoning', icon: 'trending-up', def: series },
-  { id: 'pairs', skill: 'memory', group: 'speed', role: 'variety', icon: 'copy', def: pairs },
+  { id: 'pairs', skill: 'memory', group: 'speed', role: 'variety', icon: 'copy', steps: { scale: 2, kMax: 1.5 }, def: pairs },
   { id: 'stroop', skill: 'attention', group: 'speed', role: 'variety', icon: 'droplet', def: stroop },
   { id: 'math', skill: 'speed', group: 'speed', role: 'variety', icon: 'plus-circle', def: math },
 ]

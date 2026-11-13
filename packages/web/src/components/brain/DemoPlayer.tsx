@@ -7,18 +7,25 @@ import { BrainBoard } from './BrainBoard'
 
 const noop = () => {}
 
+/** The demo board's height (maxHeight below) holds four rows of its small cells comfortably. */
+const DEMO_MAX_ROWS = 4
+
 /**
  * How to play, shown rather than told: the real engine plays an easy round on the real board, and
  * a pointer makes each tap. It loops until the player starts; under reduced motion it holds each
  * frame longer and the pointer jumps instead of gliding.
  */
-export function DemoPlayer({ gameId, width, centerOnly = false }: { gameId: BrainGameId; width: number; centerOnly?: boolean }) {
+export function DemoPlayer({ gameId, width, centerOnly = false, variant }: { gameId: BrainGameId; width: number; centerOnly?: boolean; /** Quick Eye: the player's stage, so the demo shows the task they will play. */ variant?: number }) {
   const { t } = useTranslation('brain')
   const reduced = useReducedMotion()
   const theme = GAME_THEMES[gameId]
   // Inside the demo card's padding (16px each side) and border.
   const boardWidth = Math.min(width - 34, 300)
-  const frames = useMemo(() => buildDemo(gameId, { maxCols: Math.min(4, maxColsFor(boardWidth)), centerOnly }), [gameId, boardWidth, centerOnly])
+  const frames = useMemo(
+    // At most 4×4 (the demo box is 300×260): an easy board, the same on every screen.
+    () => buildDemo(gameId, { maxCols: Math.min(4, maxColsFor(boardWidth)), maxRows: DEMO_MAX_ROWS, centerOnly, ...(variant !== undefined ? { variant } : {}) }),
+    [gameId, boardWidth, centerOnly, variant],
+  )
   const [i, setI] = useState(0)
   const [run, setRun] = useState(0)
   const box = useRef<HTMLDivElement>(null)

@@ -45,7 +45,7 @@ export function hasAchievement(meta: BrainMeta, id: AchievementId): boolean {
 /** What one finished round can earn. `meta` is AFTER this round's tier update. */
 export interface RoundFacts {
   gameId: BrainGameId
-  endedBy: 'lives' | 'cap' | 'stop' | 'void' | null
+  endedBy: 'lives' | 'cap' | 'stop' | 'void' | 'time' | null
   /** The round's own verdict: reached its end with at least half the counted trials right. */
   cleared: boolean
   /** Counted trials (practice, rule-intro and placement trials excluded), and how many were right. */
