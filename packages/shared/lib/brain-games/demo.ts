@@ -41,7 +41,8 @@ export function buildDemo(gameId: BrainGameId, ctx: Partial<CreateContext> = {})
   const def = brainGame(gameId).def
   const setup = DEMO_SETUP[gameId]
   const context: CreateContext = { ...DEFAULT_CONTEXT, maxCols: 4, ...ctx }
-  let s = def.create(setup.level, createRng(setup.seed), context)
+  // Demonstrate the full first rule; the one-item foundation is played before this in practice.
+  let s = def.create(Math.max(1.01, setup.level), createRng(setup.seed), context)
   const frames: DemoFrame[] = []
   for (let guard = 0; guard < 200; guard++) {
     if (def.outcome(s)) {

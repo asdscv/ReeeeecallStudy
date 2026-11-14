@@ -225,6 +225,8 @@ const SHAPES: Record<number, readonly (readonly [number, number])[]> = {
   9: [[3, 3]],
   12: [[3, 4], [4, 3]],
   15: [[3, 5], [5, 3]],
+  18: [[3, 6], [6, 3]],
+  20: [[4, 5], [5, 4]],
 }
 
 /**
@@ -236,7 +238,7 @@ export function setMatchBoard(n: number, ctx: Pick<CreateContext, 'maxCols' | 'm
   const maxCols = Math.max(3, Math.min(7, ctx.maxCols))
   const tall = Math.max(3, Math.min(7, ctx.maxRows ?? 7))
   const maxRows = noneButton && tall < 7 ? tall - 1 : tall
-  const sizes = [15, 12, 9, 6, 4].filter((s) => s <= n)
+  const sizes = [20, 18, 15, 12, 9, 6, 4].filter((s) => s <= n)
   for (const size of sizes) {
     const shapes = maxCols >= maxRows ? [...SHAPES[size]].reverse() : SHAPES[size]
     const fit = shapes.find(([c, r]) => c <= maxCols && r <= maxRows)

@@ -259,7 +259,12 @@
     "mazeKey_other": "Llave {{count}}",
     "memorizeNumbers": "Recuerda las posiciones · del 1 al {{max}}",
     "memoryBadge": "Memoriza boca abajo",
-    "makeSquare": "Elevar al cuadrado el último número"
+    "makeSquare": "Elevar al cuadrado el último número",
+    "difficulty": {
+      "foundation": "Inicio fácil · sin límite de tiempo",
+      "extreme": "Dificultad extrema"
+    },
+    "extremeSequence": "Una casilla puede iluminarse de nuevo. Recuerda cada destello como un paso de la secuencia."
   },
   "summary": {
     "livesOut": "Ronda terminada",

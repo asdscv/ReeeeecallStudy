@@ -1,16 +1,6 @@
 import type { BrainGameDef, BrainGameId, BrainSkill, GameGroup, RetiredGameId } from './types'
-import { memoryGrid } from './games/memory-grid'
-import { sequence } from './games/sequence'
-import { pairs } from './games/pairs'
-import { schulte } from './games/schulte'
-import { oddOneOut } from './games/odd-one-out'
-import { stroop } from './games/stroop'
-import { math } from './games/math'
-import { series } from './games/series'
-import { setMatch } from './games/set-match'
-import { CODE_BREAK_ROUND_CAP, codeBreak } from './games/code-break'
-import { makeNumber } from './games/make-number'
-import { mazeRun } from './games/maze-run'
+import { DIFFICULTY_GAMES } from './difficulty-range'
+import { CODE_BREAK_ROUND_CAP } from './games/code-break'
 
 /**
  * Adding a game = write its state machine in `games/` and add one entry here. Names and
@@ -46,24 +36,24 @@ export interface BrainGameEntry {
 }
 
 export const BRAIN_GAMES: readonly BrainGameEntry[] = [
-  { id: 'oddOneOut', skill: 'speed', group: 'speed', role: 'speed', icon: 'eye', def: oddOneOut },
-  { id: 'schulte', skill: 'speed', group: 'speed', role: 'speed', icon: 'hash', def: schulte },
-  { id: 'memoryGrid', skill: 'memory', group: 'span', role: 'span', icon: 'grid', def: memoryGrid },
-  { id: 'sequence', skill: 'memory', group: 'span', role: 'span', icon: 'repeat', def: sequence },
-  { id: 'series', skill: 'reasoning', group: 'speed', role: 'reasoning', icon: 'trending-up', def: series },
-  { id: 'pairs', skill: 'memory', group: 'speed', role: 'variety', icon: 'copy', steps: { scale: 2, kMax: 1.5 }, def: pairs },
-  { id: 'stroop', skill: 'attention', group: 'speed', role: 'variety', icon: 'droplet', def: stroop },
-  { id: 'math', skill: 'speed', group: 'speed', role: 'variety', icon: 'plus-circle', def: math },
+  { id: 'oddOneOut', skill: 'speed', group: 'speed', role: 'speed', icon: 'eye', def: DIFFICULTY_GAMES.oddOneOut },
+  { id: 'schulte', skill: 'speed', group: 'speed', role: 'speed', icon: 'hash', def: DIFFICULTY_GAMES.schulte },
+  { id: 'memoryGrid', skill: 'memory', group: 'span', role: 'span', icon: 'grid', def: DIFFICULTY_GAMES.memoryGrid },
+  { id: 'sequence', skill: 'memory', group: 'span', role: 'span', icon: 'repeat', def: DIFFICULTY_GAMES.sequence },
+  { id: 'series', skill: 'reasoning', group: 'speed', role: 'reasoning', icon: 'trending-up', def: DIFFICULTY_GAMES.series },
+  { id: 'pairs', skill: 'memory', group: 'speed', role: 'variety', icon: 'copy', steps: { scale: 2, kMax: 1.5 }, def: DIFFICULTY_GAMES.pairs },
+  { id: 'stroop', skill: 'attention', group: 'speed', role: 'variety', icon: 'droplet', def: DIFFICULTY_GAMES.stroop },
+  { id: 'math', skill: 'speed', group: 'speed', role: 'variety', icon: 'plus-circle', def: DIFFICULTY_GAMES.math },
   // The thinking games (owner 2026-11-13). All on the 85% staircase: each level is a harder board
   // (more cards, digits, tiles or cells, or less time), so the speed group's rule fits; none is a
   // span task. Skills (the hub label and the day's focus) spread the twelve games three a skill: Set
   // Match is card-by-card comparison (주의), Make the Number arithmetic reasoning (추리). A Code Break
   // trial is a whole puzzle (a minute or more): Match Pairs' doubled steps, so a round moves in fewer
   // trials (target unchanged), and a round is five codes, not twenty (`roundCap`).
-  { id: 'setMatch', skill: 'attention', group: 'speed', role: 'reasoning', icon: 'layers', def: setMatch },
-  { id: 'codeBreak', skill: 'reasoning', group: 'speed', role: 'reasoning', icon: 'lock', steps: { scale: 2, kMax: 1.5 }, roundCap: CODE_BREAK_ROUND_CAP, def: codeBreak },
-  { id: 'makeNumber', skill: 'reasoning', group: 'speed', role: 'reasoning', icon: 'target', def: makeNumber },
-  { id: 'mazeRun', skill: 'attention', group: 'speed', role: 'variety', icon: 'compass', def: mazeRun },
+  { id: 'setMatch', skill: 'attention', group: 'speed', role: 'reasoning', icon: 'layers', def: DIFFICULTY_GAMES.setMatch },
+  { id: 'codeBreak', skill: 'reasoning', group: 'speed', role: 'reasoning', icon: 'lock', steps: { scale: 2, kMax: 1.5 }, roundCap: CODE_BREAK_ROUND_CAP, def: DIFFICULTY_GAMES.codeBreak },
+  { id: 'makeNumber', skill: 'reasoning', group: 'speed', role: 'reasoning', icon: 'target', def: DIFFICULTY_GAMES.makeNumber },
+  { id: 'mazeRun', skill: 'attention', group: 'speed', role: 'variety', icon: 'compass', def: DIFFICULTY_GAMES.mazeRun },
 ]
 
 export function brainGame(id: BrainGameId): BrainGameEntry {

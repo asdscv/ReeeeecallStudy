@@ -364,7 +364,7 @@ export const codeBreak: BrainGameDef<CodeBreakState> = {
     }
     return view
   },
-  signature: (s) => `cb:${s.pool[0]}-${s.pool[s.pool.length - 1]}:${s.repeats ? 'r' : ''}${s.secret.join('')}`,
+  signature: (s) => `cb:${s.secret.join('')}`,
   solution(s) {
     if (over(s)) return null
     const plan = s.plan
