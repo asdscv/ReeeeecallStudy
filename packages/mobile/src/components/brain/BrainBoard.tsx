@@ -20,7 +20,7 @@ import { testProps } from '../../utils/testProps'
 import { SetMatchBoard, CodeBreakBoard, MakeNumberBoard, MazeBoard } from './ThinkingBoards'
 import { BOARD_STRIP_H, CANVAS_INK, CELL_INK, FX, type FeatherName } from './brain-ui'
 import { GradientFill } from './GameCanvas'
-import { useDrain, useMotion, type Motion } from './motion'
+import { BrainInstantMotion, useDrain, useMotion, type Motion } from './motion'
 
 /**
  * Draws whatever trial the engine hands over — a grid or a pick-one choice — on the game's dark
@@ -51,6 +51,10 @@ export interface BoardProps {
 }
 
 export function BrainBoard(props: BoardProps) {
+  return <BrainInstantMotion.Provider value={props.view.difficulty === 'extreme'}><BoardContent {...props} /></BrainInstantMotion.Provider>
+}
+
+function BoardContent(props: BoardProps) {
   const { view } = props
   if (view.kind === 'grid') return <GridBoard {...props} view={view} />
   if (view.kind === 'choice') return <ChoiceBoard {...props} view={view} />

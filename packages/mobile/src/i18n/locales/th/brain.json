@@ -259,7 +259,12 @@
     "mazeKey_other": "กุญแจหมายเลข {{count}}",
     "memorizeNumbers": "จำตำแหน่งเลข 1 ถึง {{max}}",
     "memoryBadge": "จำไพ่คว่ำ",
-    "makeSquare": "ยกกำลังสองตัวเลขล่าสุด"
+    "makeSquare": "ยกกำลังสองตัวเลขล่าสุด",
+    "difficulty": {
+      "foundation": "เริ่มแบบง่าย · ไม่จำกัดเวลา",
+      "extreme": "ระดับยากสุดขีด"
+    },
+    "extremeSequence": "ช่องเดิมอาจสว่างซ้ำ จดจำการสว่างแต่ละครั้งเป็นหนึ่งขั้นในลำดับ"
   },
   "summary": {
     "livesOut": "จบรอบ",

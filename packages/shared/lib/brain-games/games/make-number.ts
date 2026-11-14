@@ -951,7 +951,7 @@ export interface MakeNumberState {
   /** The ladder band this trial deals (see makeNumberPlan). */
   band: number
   kind: MakeNumberKind
-  /** Ways to make the target, as the generator counted them. */
+  /** Ways the core generator counted; 0 when a procedural extreme extension was not enumerated. */
   ways: number
   /** The rules open on this trial — ctx.recent's carry. */
   carry: string

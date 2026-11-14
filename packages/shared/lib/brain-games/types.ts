@@ -356,7 +356,7 @@ export interface MazeView {
   answer?: { path: number[]; walls: number[] }
 }
 
-export type RoundView = GridView | ChoiceView | SetMatchView | CodeBreakView | MakeNumberView | MazeView
+export type RoundView = (GridView | ChoiceView | SetMatchView | CodeBreakView | MakeNumberView | MazeView) & { difficulty?: 'foundation' | 'extreme' }
 
 export interface RoundOutcome {
   correct: boolean

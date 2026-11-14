@@ -1,5 +1,8 @@
 import type { GameGroup } from './types'
 
+/** Extra challenge levels beyond each game's original content ladder. */
+export const EXTREME_LEVELS = 20
+
 /**
  * The adaptive rules — how the level moves, how many misses a round absorbs, when it ends.
  *

@@ -259,7 +259,12 @@
     "mazeKey_other": "Kunci {{count}}",
     "memorizeNumbers": "Ingat posisi angka · 1 sampai {{max}}",
     "memoryBadge": "Ingatan kartu tertutup",
-    "makeSquare": "Kuadratkan angka terakhir"
+    "makeSquare": "Kuadratkan angka terakhir",
+    "difficulty": {
+      "foundation": "Awal yang mudah · tanpa batas waktu",
+      "extreme": "Kesulitan ekstrem"
+    },
+    "extremeSequence": "Kotak yang sama dapat menyala lagi. Ingat setiap nyala sebagai satu langkah dalam urutan."
   },
   "summary": {
     "livesOut": "Ronde selesai",

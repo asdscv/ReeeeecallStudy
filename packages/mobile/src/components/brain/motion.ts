@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { createContext, useContext, useEffect } from 'react'
 import {
   Easing,
   cancelAnimation,
@@ -10,6 +10,10 @@ import {
   withSequence,
   withTiming,
 } from 'react-native-reanimated'
+
+/** Short extreme exposures start fully visible; decorative entrances would hide the task. */
+export const BrainInstantMotion = createContext(false)
+
 
 /**
  * The web's game motions (index.css `bfx-*`), on Reanimated so they run on the UI thread:
@@ -32,7 +36,8 @@ const OUT = Easing.out(Easing.cubic)
 
 /** Plays `motion` whenever `trigger` changes (and on mount). */
 export function useMotion(motion: Motion, trigger: unknown, delayMs = 0) {
-  const reduced = useReducedMotion()
+  const systemReduced = useReducedMotion()
+  const reduced = useContext(BrainInstantMotion) || systemReduced
   const scale = useSharedValue(1)
   const tx = useSharedValue(0)
   const ty = useSharedValue(0)

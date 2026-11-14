@@ -363,11 +363,11 @@ function introduce(s: State, now: number): State {
   }
   const rule = tags.find((t) => mechanicInfo(t)?.kind === 'rule' && !seen(t))
   if (rule) {
-    if (s.gameId === 'makeNumber') {
-      // A returning player's stored level can already be beyond a newly released operator.
-      // Teach it on its first, small band, without moving the stored skill estimate.
-      const fresh = createTrial(s.gameId, mechanicInfo(rule)!.from, randomSeed(), buildCtx(s, { kind: 'intro', blockRules: gateRules(s, 'intro') }), s.recentSigs)
-      next = { ...next, round: fresh.round, recent: [...s.recent.slice(0, -1), fresh.recent], recentSigs: [...s.recentSigs.slice(0, -1), fresh.sig] }
+    if (s.gameId === 'makeNumber' || def.view(s.round).difficulty === 'extreme') {
+      // A high saved level must still introduce an unseen rule on its own first, small band.
+      const fresh = createTrial(s.gameId, mechanicInfo(rule)!.from, randomSeed(), buildCtx(s, { kind: 'placement', blockRules: gateRules(s, 'intro') }), s.recentSigs)
+      const firstBoards = def.mechanics(fresh.round).filter((tag) => mechanicInfo(tag)?.kind === 'board' && !seen(tag))
+      next = { ...next, seenAdded: [...s.seenAdded, ...firstBoards], toast: null, round: fresh.round, recent: [...s.recent.slice(0, -1), fresh.recent], recentSigs: [...s.recentSigs.slice(0, -1), fresh.sig] }
     }
     next = {
       ...next,
@@ -568,7 +568,10 @@ function judgeTrial(state: State, round: State['round'], now: number, timedOut: 
   // Span fast entry: a pass jumps two lengths (never past the next rule); the first miss is a probe —
   // one length back, no chance spent — and ordinary Corsi takes over.
   const fastEntry = state.group === 'span' && state.fastEntry
-  const levelAfter = fastEntry
+  const gentleSpan = state.group === 'span' && state.level < 2
+  const levelAfter = gentleSpan
+    ? outcome.correct ? 1 + Math.min(3, Math.round((state.level - 1) * 3) + 1) / 3 : state.level
+    : fastEntry
     ? outcome.correct
       ? Math.min(cap, fastJump(state.gameId, state.level))
       : Math.max(rules.min, state.level - 1)
@@ -807,7 +810,7 @@ function init({ gameId, platform }: { gameId: BrainGameId; platform: PlatformCon
       const og = progress.games[other]
       const oe = meta.sk[other]
       const passed = oe && oe.n > 0 ? oe.mu : og && og.rounds > 0 ? og.bestLevel - 1 : null
-      const floor = gameId === 'sequence' ? 2 : rules.min
+      const floor = rules.min
       const otherLength = passed === null ? null : brainGame(other).def.spanLength?.(Math.round(passed), buildCtx(base)) ?? Math.round(passed) + 2
       seedLevel = otherLength === null ? floor : Math.max(floor, otherLength - 2 - 2)
     } else if (gameId === 'pairs') {

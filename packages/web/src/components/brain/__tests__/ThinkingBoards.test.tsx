@@ -47,7 +47,7 @@ describe('maze drag', () => {
     vi.stubGlobal('PointerEvent', Pointer)
     try {
       const id: BrainGameId = 'mazeRun', def = brainGame(id).def
-      let state = def.create(1, createRng(6), DEFAULT_CONTEXT)
+      let state = def.create(1.01, createRng(6), DEFAULT_CONTEXT)
       function Player() {
         const [s, setS] = useState(state)
         useEffect(() => { state = s }, [s])
