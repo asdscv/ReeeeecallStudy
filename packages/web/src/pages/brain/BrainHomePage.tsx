@@ -16,6 +16,7 @@ import {
   localDayKey,
   planToday,
   plannedMinutes,
+  randomSeed,
   todaysPlanSeed,
   weekProgress,
 } from '@reeeeecall/shared/lib/brain-games'
@@ -42,6 +43,8 @@ export function BrainHomePage() {
   const meta = useBrainStore((s) => s.meta)
   const setSettings = useBrainStore((s) => s.setSettings)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  // Keep the cards steady while browsing; draw a new order on the next visit.
+  const [games] = useState(() => createRng(randomSeed()).shuffle(BRAIN_GAMES))
   const today = localDayKey()
   const week = weekProgress(progress, today)
   const course = courseStatus(progress, today)
@@ -165,7 +168,7 @@ export function BrainHomePage() {
           <p className="text-base text-muted-foreground mt-0.5">{t('home.freePlayHint')}</p>
         </div>
         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {BRAIN_GAMES.map((game) => {
+          {games.map((game) => {
             const Icon = BRAIN_ICONS[game.icon]
             const theme = GAME_THEMES[game.id]
             const p = gameProgress(progress, game.id)
