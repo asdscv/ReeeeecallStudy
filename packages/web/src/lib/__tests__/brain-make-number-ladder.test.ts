@@ -119,3 +119,16 @@ describe('Make the Number: mathematical difficulty', () => {
     }
   })
 })
+
+it('reusing solver results preserves seeded puzzles, tile identities and witnesses', () => {
+  for (const level of [11, 12, 14, 15, 16, 21]) {
+    const first = makeNumber.create(level, createRng(1234567 + level), DEFAULT_CONTEXT)
+    for (let n = 0; n < 5; n++) makeNumber.create(level, createRng(7654321 + n), DEFAULT_CONTEXT)
+    const again = makeNumber.create(level, createRng(1234567 + level), DEFAULT_CONTEXT)
+    expect(again).toEqual(first)
+    let played = again
+    for (const tap of makeNumber.solution(played)!) played = makeNumber.tap(played, tap)
+    expect(makeNumber.outcome(played)?.correct).toBe(true)
+    expect(first.witness).toEqual(again.witness)
+  }
+})

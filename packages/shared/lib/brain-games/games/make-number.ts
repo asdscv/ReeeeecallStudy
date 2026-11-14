@@ -498,7 +498,22 @@ interface TreeStat {
   clean: boolean
 }
 
+// Repeated draws use the same exact solver result. Bound memory on phones; cached data never
+// consumes randomness, so a seed produces the same puzzle before and after a cache hit.
+const statsCache = new Map<string, Map<number, TreeStat>>()
+const witnessCache = new Map<string, MakeTree[]>()
+const solverKey = (tiles: readonly number[], allow: { times: boolean; divide: boolean; square?: boolean; flatOnly?: boolean }) =>
+  `${tiles.join(',')}:${+allow.times}${+allow.divide}${+!!allow.square}${+!!allow.flatOnly}`
+function cacheResult<T>(cache: Map<string, T>, key: string, value: T): T {
+  if (cache.size >= 128) cache.delete(cache.keys().next().value!)
+  cache.set(key, value)
+  return value
+}
+
 function treeStats(tiles: readonly number[], allow: { times: boolean; divide: boolean; square?: boolean; flatOnly?: boolean }, maxTarget: number): Map<number, TreeStat> {
+  const key = `${solverKey(tiles, allow)}:${maxTarget}`
+  const cached = statsCache.get(key)
+  if (cached) return cached
   const out = new Map<number, TreeStat>()
   eachTree(tiles, allow, (t) => {
     if (t.d !== 1 || t.n < 1 || t.n > maxTarget) return
@@ -515,21 +530,25 @@ function treeStats(tiles: readonly number[], allow: { times: boolean; divide: bo
     if (t.int) s.int = true
     if (t.clean) s.clean = true
   })
-  return out
+  return cacheResult(statsCache, key, out)
 }
 
 /** The witness: among the trees making `target` that pass `ok`, the fewest brackets (ties at random). */
-function bestTree(tiles: readonly number[], target: number, allow: { times: boolean; divide: boolean; square?: boolean; flatOnly?: boolean }, ok: (t: MakeTree) => boolean, rng: Rng): MakeTree | null {
+function bestTree(tiles: readonly number[], target: number, allow: { times: boolean; divide: boolean; square?: boolean; flatOnly?: boolean }, cleanOnly: boolean, rng: Rng): MakeTree | null {
+  const key = `${solverKey(tiles, allow)}:${target}:${+cleanOnly}`
+  const cached = witnessCache.get(key)
+  if (cached) return cached.length ? rng.pick(cached) : null
   let best: MakeTree[] = []
   let fewest = Infinity
   eachTree(tiles, allow, (t) => {
-    if (t.d !== 1 || t.n !== target || !ok(t)) return
+    if (t.d !== 1 || t.n !== target || (cleanOnly && !t.clean)) return
     const k = brackets(treeTokens(t))
     if (k < fewest) {
       fewest = k
       best = [t]
-    } else if (k === fewest) best.push(t)
+    } else if (k === fewest && best.length < 8) best.push(t)
   })
+  cacheResult(witnessCache, key, best)
   return best.length ? rng.pick(best) : null
 }
 
@@ -566,27 +585,79 @@ const FRACTION_TABLE =
   '489990478d9089cc90178d91388b91258992278992999b9258ac92288c9338cc9336bc94259a9447dd95259a9557dd96' +
   '588a9699bc9718cc979acc9889cd98588d99388c99'
 
-/** Exhaustively verified with optional once-per-tile squares as well as + − × ÷. */
+/** Offline exhaustive solutions: no runtime search, including for ² variants. */
+function readSolvedTable(table: string): Puzzle[] {
+  return table.split('|').map((entry) => {
+    const [digits, target, ways, expr] = entry.split(':')
+    const tiles = [...digits].map((n) => parseInt(n, 14))
+    const witness = [...expr].map((c) => {
+      const tile = 'ABCD'.indexOf(c)
+      return tile >= 0 ? num(tiles[tile], tile) : op(c as MakeOp)
+    })
+    return { tiles, target: Number(target), ways: parseInt(ways, 36), witness }
+  })
+}
+
 const SQUARE_FRACTION_TABLE =
-  '112654112645112896112880112a75113a75114645114a75115645115810115a12115a80115c10116932116a12116c14' +
-  '116c10116c39116c33117a98117c14123488134874137a7513ab45145882145878145a42146a96147890148954148a82' +
-  '148b86148c98148c94156721156715156964156a62156a48156c62156c58159a92159a8815ac4215bc9915bc45166c27' +
-  '166c45167a84167b99167b63167c86167c82167c57168b96168b99168c38168c34169a8016bc6916cd7516cd92178936' +
-  '178928178a35178c98179a3517ac4217bc21188a40189a15189a96189c57189c3918aa4018ad5218bc2218cc2418cd26' +
-  '19ab5519ab4519ac6619bc6619cd641aac601abc661abc361abc251abd651abd551acc601acd781acd651acd521acd40' +
-  '1bcd781bcd66222690222627222a35224699224693224681224663224c45226d75229c51233662233692233682233680' +
-  '233c92244699244693244681244663244c45246c97246c95248c49248c47248c93266899268c81269b93269c49269c47' +
-  '26cc4926cc4728cc5128cc7528cc572acc45333656333652333c32334662334698334694334686334682334890334c82' +
-  '336a74336a68336a56336c76336c68336c74336c62336d56337c8033ac68344870344858344882345886345898346b58' +
-  '347886348c7834bc98356b9635ac87366992366c80366c64367b66368a85368a97368d94368d4636cc3738ad1638bc86' +
-  '38bd333aac553acd683bcd80444c45445874445a78445a88446893446a81446c75446c69446c98446c94446c65447878' +
-  '448970448946448994448b90448b86448c93448c98448c94448c58448d90448d38448d82455a38455a88455a72456a62' +
-  '457894458c54459a58459a53459c4645ab63466851466d99468a55468a57468a51468a85469937469935469b9346ab81' +
-  '46bd7846bd66477870477842478994478c90478c78488c99488c93489990489954489c66489c7448aa8548bc7448bc38' +
-  '48bc9448cc7548cd5848cd4648cd9849ac4549bc874aac454abc87556a5855ac6655ac76569c9856ab9856ab6356ab73' +
-  '56bc8256cd38577c2857ac78588a72589a62589b45589c935abc865acc545ccc15667c69668950668970668a87668c99' +
-  '66ac6566ac5566cd9467895867ab66689984689b87689b7068ac8568ac5368ac4369ac836aac656acd44777c2178bd91' +
-  '889c7888cc5488cc6989ac9389ad6589ad1689bc938abc4899cc649acd42abcc54'
+  '1126:54:8:D²×(B+A÷C)|1126:45:8:D²×(B+A÷C²)|1128:96:8:D²×(B+A÷C)|1128:80:8:D²×(B+A÷C²)|112a:75:8:D²×(B−A÷C²)|11' +
+  '3a:75:8:D²÷(B+A÷C)|1146:45:8:D²×(B+A÷C)|114a:75:8:D²×(B−A÷C)|1156:45:8:D²÷(B−A÷C)|1158:10:8:D÷(B−A÷C)|115a:12:' +
+  '8:D×(B+A÷C)|115a:80:8:D²×(B−A÷C)|115c:10:8:D÷(B+A÷C)|1169:32:8:C²×(B−A÷D)|116a:12:8:D÷(B−A÷C)|116c:14:8:D×(B+A' +
+  '÷C)|116c:10:8:D×(B−A÷C)|116c:39:8:C²×(B+A÷D)|116c:33:8:C²×(B−A÷D)|117a:98:8:D²÷(B+A÷C²)|117c:14:8:D÷(B−A÷C)|12' +
+  '34:88:2:D²×(A+C²÷B)|1348:74:2:D×(B²+A÷C)|137a:75:2:D²÷(C÷B−A)|13ab:45:4:C÷(D÷B²−A)|1458:82:2:B²×(C+A÷D)|1458:7' +
+  '8:2:B²×(C−A÷D)|145a:42:4:D×(B+A÷C)|146a:96:2:C²÷(A−D÷B²)|1478:90:2:D×(C²÷B−A)|1489:54:4:D²÷(A+B÷C)|148a:82:2:C' +
+  '×(D+A÷B)|148b:86:2:C×(D−A÷B)|148c:98:2:C×(D+A÷B)|148c:94:2:C×(D−A÷B)|1567:21:4:C÷(A−B÷D)|1567:15:4:C÷(D÷B−A)|1' +
+  '569:64:2:C²×(B²÷D−A)|156a:62:4:D×(C+A÷B)|156a:48:2:C²÷(A−B²÷D²)|156c:62:4:D×(B+A÷C)|156c:58:2:D×(B−A÷C)|159a:9' +
+  '2:2:D×(C+A÷B)|159a:88:2:D×(C−A÷B)|15ac:42:2:D×(A+B²÷C)|15bc:99:2:D²÷(A+B÷C)|15bc:45:2:D²÷(A+C÷B)|166c:27:8:C²÷' +
+  '(A+D÷B²)|166c:45:4:C²×(A+B²÷D²)|167a:84:2:B²÷(D÷C−A)|167b:99:2:B²÷(A−C÷D)|167b:63:2:B²÷(D÷C−A)|167c:86:4:D×(C+' +
+  'A÷B)|167c:82:2:D×(C−A÷B)|167c:57:2:B²×(A+C÷D)|168b:96:2:B²÷(D÷C−A)|168b:99:2:D²÷(A+C÷B²)|168c:38:4:B×(A+C²÷D)|' +
+  '168c:34:2:B²×(A−C÷D²)|169a:80:4:D²÷(A+C÷B²)|16bc:69:2:B²×(A+C÷D)|16cd:75:2:B²×(A+D÷C)|16cd:92:2:C²×(A−D÷B²)|17' +
+  '89:36:4:C÷(A−B÷D)|1789:28:4:C÷(D÷B−A)|178a:35:2:B÷(A−C÷D)|178c:98:2:B²÷(D÷C−A)|179a:35:2:D÷(C÷B−A)|17ac:42:2:B' +
+  '÷(A−C÷D)|17bc:21:2:D÷(C÷B−A)|188a:40:4:C÷(A−B÷D)|189a:15:2:C²÷(B²÷D−A)|189a:96:2:C²÷(A−D÷B²)|189c:57:2:C×(A+B²' +
+  '÷D)|189c:39:2:C×(B²÷D−A)|18aa:40:4:D÷(C÷B−A)|18ad:52:2:D÷(C÷B−A)|18bc:22:2:C÷(D÷B−A)|18cc:24:4:D÷(C÷B−A)|18cd:' +
+  '26:2:D÷(C÷B−A)|19ab:55:4:C÷(A−B÷D)|19ab:45:4:C÷(D÷B−A)|19ac:66:2:B×(C²÷D−A)|19bc:66:2:D÷(A−B÷C)|19cd:64:2:C²×(' +
+  'D÷B−A)|1aac:60:4:C÷(A−B÷D)|1abc:66:4:C÷(A−B÷D)|1abc:36:2:C÷(A−B²÷D²)|1abc:25:2:C÷(D²÷B²−A)|1abd:65:2:B÷(A−C÷D)' +
+  '|1abd:55:2:B÷(D÷C−A)|1acc:60:4:D÷(C÷B−A)|1acd:78:2:D÷(A−B÷C)|1acd:65:2:D÷(C÷B−A)|1acd:52:4:C÷(A−B÷D)|1acd:40:2' +
+  ':C÷(D÷B−A)|1bcd:78:4:C÷(A−B÷D)|1bcd:66:4:C÷(D÷B−A)|2226:90:6:D²×(B+A÷C²)|2226:27:6:D×(C²+A÷B²)|222a:35:6:D×(C²' +
+  '−A÷B²)|2246:99:2:D×(C²+A÷B²)|2246:93:2:D×(C²−A÷B²)|2246:81:2:D²×(A+B²÷C²)|2246:63:2:D²×(A−B²÷C²)|224c:45:2:D×(' +
+  'B²−A²÷C²)|226d:75:2:C×(D−A÷B²)|229c:51:2:D×(A+C÷B²)|2336:62:2:D×(C²+A²÷B)|2336:92:2:D²×(B−A²÷C²)|2336:82:2:C²×' +
+  '(B²+A²÷D²)|2336:80:2:C²×(B²−A²÷D²)|233c:92:2:D×(C²−A²÷B)|2446:99:2:D×(C²+A÷B)|2446:93:2:D×(C²−A÷B)|2446:81:2:D' +
+  '²×(A+B÷C²)|2446:63:2:D²×(A−B÷C²)|244c:45:4:D×(B−A²÷C²)|246c:97:1:C×(B²+A÷D)|246c:95:1:C×(B²−A÷D)|248c:49:2:B×(' +
+  'D+A÷C)|248c:47:2:B×(D−A÷C)|248c:93:1:D×(C−A²÷B²)|2668:99:2:C²×(A+B÷D)|268c:81:1:D²÷(A−C÷B²)|269b:93:2:B×(D+C÷A' +
+  ')|269c:49:1:A²×(D+C÷B²)|269c:47:1:A²×(D−C÷B²)|26cc:49:2:A²×(C+B²÷D²)|26cc:47:2:A²×(C−B²÷D²)|28cc:51:2:C×(A+D²÷' +
+  'B²)|28cc:75:2:C×(A²+D²÷B²)|28cc:57:2:A²×(C+D²÷B²)|2acc:45:2:D²÷(A+C÷B)|3336:56:6:D×(C²+A÷B²)|3336:52:6:D×(C²−A' +
+  '÷B²)|333c:32:6:D×(B−A÷C²)|3346:62:2:D×(B²+C÷A)|3346:98:2:D×(C²+A÷B²)|3346:94:2:D×(C²−A÷B²)|3346:86:2:D×(B²+C²÷' +
+  'A)|3346:82:2:B²×(A²+C÷D²)|3348:90:2:D×(B²+A²÷C)|334c:82:2:B²×(A²+C²÷D²)|336a:74:2:C×(B²+D÷A)|336a:68:2:C²×(A−D' +
+  '÷B²)|336a:56:2:B²×(A²−D²÷C²)|336c:76:2:D×(C+A÷B²)|336c:68:2:D×(C−A÷B²)|336c:74:2:C×(D+A÷B²)|336c:62:2:C×(B²+D÷' +
+  'A²)|336d:56:2:C²×(A−D÷B²)|337c:80:4:D×(C−A÷B²)|33ac:68:2:D×(B²−C÷A)|3448:70:4:C²×(B+A÷D)|3448:58:2:C²×(B−A÷D)|' +
+  '3448:82:2:C²×(B+A²÷D)|3458:86:1:B²×(C+A÷D)|3458:98:2:B²×(A+C²÷D)|346b:58:1:C×(D−B÷A)|3478:86:1:D×(A²+C÷B)|348c' +
+  ':78:2:C×(D−A²÷B)|34bc:98:1:A²×(C−B²÷D²)|356b:96:1:C²×(D−B²÷A)|35ac:87:1:B×(A+D²÷C)|3669:92:2:C²×(A−B²÷D²)|366c' +
+  ':80:2:D×(C+B÷A²)|366c:64:2:D×(C−B÷A²)|367b:66:1:D²÷(A−C÷B)|368a:85:1:D×(C+A÷B)|368a:97:1:A²×(C+D²÷B²)|368d:94:' +
+  '1:B×(D+C÷A)|368d:46:1:B×(C²−D²÷A)|36cc:37:2:A×(D+C÷B²)|38ad:16:1:D²÷(A²+C²÷B²)|38bc:86:1:B×(C−A÷D)|38bd:33:1:C' +
+  '²÷(B−D÷A)|3aac:55:2:A×(B+C²÷D)|3acd:68:1:C×(B−D÷A)|3bcd:80:1:C×(B−D÷A)|444c:45:6:D×(B−A÷C²)|4458:74:2:B²×(A+C÷' +
+  'D)|445a:78:2:C×(B²−A÷D)|445a:88:2:C×(B²+A²÷D)|4468:93:4:C×(B²−A÷D)|446a:81:4:C×(B²−D÷A)|446c:75:4:D×(C+A÷B²)|4' +
+  '46c:69:2:D×(C−A÷B²)|446c:98:2:C×(B²+A÷D)|446c:94:2:C×(B²−A÷D)|446c:65:2:A×(B²+C²÷D²)|4478:78:2:B²×(A+C÷D)|4489' +
+  ':70:2:C×(D−A÷B²)|4489:46:2:B²×(A−D÷C)|4489:94:2:B²×(A²−D²÷C)|448b:90:2:C×(D+A÷B²)|448b:86:4:C×(D−A÷B²)|448c:93' +
+  ':2:D×(C−A÷B²)|448c:98:2:C×(D+A÷B²)|448c:94:2:C×(D−A÷B²)|448c:58:2:A×(B²−D÷C)|448d:90:2:B²×(A+D÷C)|448d:38:2:B²' +
+  '×(A−D÷C)|448d:82:2:B²×(D²÷C−A²)|455a:38:2:D×(A−B÷C²)|455a:88:2:A²×(C+B÷D)|455a:72:2:A²×(C−B÷D)|456a:62:1:B×(A²' +
+  '−C²÷D)|4578:94:1:A²×(B+C÷D)|458c:54:2:D×(B−A÷C)|459a:58:2:D×(A+C÷B)|459a:53:1:B×(C+A²÷D)|459c:46:1:C×(B+A²÷D²)' +
+  '|45ab:63:1:B×(D+A²÷C)|4668:51:4:B×(A+C²÷D)|466d:99:2:C²×(B−D÷A)|468a:55:2:D×(B−A÷C)|468a:57:2:B×(D−A÷C)|468a:5' +
+  '1:1:B×(D²÷C−A)|468a:85:1:D×(A+B²÷C)|4699:37:2:A×(D+C÷B²)|4699:35:2:A×(D−C÷B²)|469b:93:1:C×(D−A÷B)|46ab:81:1:B×' +
+  '(D+C÷A)|46bd:78:1:D²÷(A−C÷B)|46bd:66:1:C²÷(A−D÷B)|4778:70:2:D×(C+B÷A)|4778:42:4:D×(C−B÷A)|4789:94:1:A²×(B−D÷C)' +
+  '|478c:90:2:D×(B+A÷C)|478c:78:2:D×(B−A÷C)|488c:99:2:D×(B+A²÷C²)|488c:93:2:D×(B−A²÷C²)|4899:90:4:B×(D+C÷A)|4899:' +
+  '54:2:B×(D−C÷A)|489c:66:2:B×(C²÷A−D)|489c:74:1:B×(A²−C²÷D)|48aa:85:4:C×(D²÷B−A)|48bc:74:1:B×(D−C÷A)|48bc:38:1:A' +
+  '×(C−D÷B)|48bc:94:1:B×(C+D÷A²)|48cc:75:2:C×(A+D²÷B²)|48cd:58:1:A×(D+C÷B)|48cd:46:1:A×(D−C÷B)|48cd:98:1:B×(D−C÷A' +
+  '²)|49ac:45:1:C²÷(A−D²÷B²)|49bc:87:1:B×(C−A²÷D)|4aac:45:2:D×(B−C²÷A²)|4abc:87:1:D×(B−C÷A)|556a:58:2:D×(C−A÷B²)|' +
+  '55ac:66:2:D×(B+A÷C)|55ac:76:2:C²×(D²÷B²−A)|569c:98:1:D×(C−A÷B)|56ab:98:1:C×(D−B÷A)|56ab:63:1:B×(D−A÷C)|56ab:73' +
+  ':1:A×(D+B²÷C)|56bc:82:2:D×(A+C÷B)|56cd:38:1:C×(D²÷B−A²)|577c:28:2:D²÷(A+B÷C²)|57ac:78:1:D×(B−A÷C)|588a:72:2:A×' +
+  '(B+C²÷D)|589a:62:1:D×(B−C÷A)|589b:45:1:C²÷(B²÷A−D)|589c:93:1:C×(A+B²÷D)|5abc:86:1:B×(C−D÷A)|5acc:54:2:A×(D−C÷B' +
+  ')|5ccc:15:6:D²÷(C−B÷A)|667c:69:2:B²×(A−C²÷D)|6689:50:2:C×(A+D÷B²)|6689:70:2:D×(A+C²÷B²)|668a:87:2:A×(D+B²÷C)|6' +
+  '68c:99:2:A×(D+B²÷C)|66ac:65:2:C×(B+A÷D)|66ac:55:2:C×(B−A÷D)|66cd:94:2:C×(B²−D²÷A)|6789:58:1:C×(B+D÷A²)|67ab:66' +
+  ':1:D²÷(C−B²÷A)|6899:84:2:B×(D+C÷A)|689b:87:1:C×(D−B÷A)|689b:70:1:B×(D−C²÷A²)|68ac:85:1:C×(B+A÷D)|68ac:53:1:A×(' +
+  'B+C÷D)|68ac:43:1:A×(B−C÷D)|69ac:83:1:B×(D−C²÷A²)|6aac:65:2:A×(C+B÷D)|6acd:44:1:C×(B²÷A−D)|777c:21:6:D²÷(B−A÷C²' +
+  ')|78bd:91:1:D²÷(C−B²÷A)|889c:78:2:C×(B+A÷D)|88cc:54:4:D²÷(A−B²÷C)|88cc:69:4:C×(A−D²÷B²)|89ac:93:1:D×(B−C÷A)|89' +
+  'ad:65:1:D²÷(B−A²÷C)|89ad:16:1:D²÷(B+C²÷A²)|89bc:93:1:B×(C−A÷D)|8abc:48:1:B²÷(C²÷D−A)|99cc:64:4:D²÷(A−B²÷C)|9ac' +
+  'd:42:1:A×(D−B²÷C)|abcc:54:2:D²÷(B−A²÷C)'
+const SQUARE_FRACTION_PUZZLES = readSolvedTable(SQUARE_FRACTION_TABLE)
 
 export interface FractionPuzzle {
   tiles: number[]
@@ -596,9 +667,10 @@ export interface FractionPuzzle {
 const fractionPuzzles: Partial<Record<'plain' | 'square', FractionPuzzle[]>> = {}
 
 export function makeNumberFractionPuzzles(square = false): readonly FractionPuzzle[] {
-  const key = square ? 'square' : 'plain'
+  if (square) return SQUARE_FRACTION_PUZZLES
+  const key = 'plain'
   if (!fractionPuzzles[key]) {
-    const table = square ? SQUARE_FRACTION_TABLE : FRACTION_TABLE
+    const table = FRACTION_TABLE
     const out: FractionPuzzle[] = []
     for (let i = 0; i + 6 <= table.length; i += 6) {
       const s = table.slice(i, i + 6)
@@ -708,7 +780,7 @@ function anyOrderPuzzle(p: MakeNumberBand, rng: Rng): Puzzle | null {
   const allow = { times: true, divide: true, square: p.square, flatOnly: true }
   const ops: MakeOp[] = ['+', '−', '×', '÷']
   for (let attempt = 0; attempt < 200; attempt++) {
-    const tiles = draw(p, rng)
+    const tiles = draw(p, rng).sort((a, b) => a - b)
     const stats = treeStats(tiles, allow, p.maxTarget)
     const total = sum(tiles)
     let valid = [...stats].filter(([t, s]) => s.flatClean && t !== total).map(([t, s]) => [t, { ways: s.flatWays }] as [number, { ways: number }])
@@ -719,7 +791,7 @@ function anyOrderPuzzle(p: MakeNumberBand, rng: Rng): Puzzle | null {
         valid = valid.filter(([t]) => t !== pick[0])
         continue
       }
-      const w = bestTree(tiles, pick[0], allow, (t) => t.clean, rng)!
+      const w = bestTree(tiles, pick[0], allow, true, rng)!
       return { tiles: order.map((i) => tiles[i]), target: pick[0], witness: shownWitness(w, order), ways: pick[1].ways }
     }
   }
@@ -731,12 +803,12 @@ function bracketPuzzle(p: MakeNumberBand, rng: Rng): Puzzle | null {
   if (p.target24 && p.square) return square24Puzzle(p, rng)
   const allow = { times: true, divide: true, square: p.square }
   for (let attempt = 0; attempt < 400; attempt++) {
-    const tiles = draw(p, rng)
+    const tiles = draw(p, rng).sort((a, b) => a - b)
     const stats = treeStats(tiles, allow, p.maxTarget)
     const valid = [...stats].filter(([t, s]) => s.flatWays === 0 && s.clean && (!p.target24 || t === 24))
     const pick = chooseTarget(valid, p.hard, rng)
     if (!pick) continue
-    const w = bestTree(tiles, pick[0], allow, (t) => t.clean, rng)!
+    const w = bestTree(tiles, pick[0], allow, true, rng)!
     const order = rng.shuffle(tiles.map((_, i) => i))
     return { tiles: order.map((i) => tiles[i]), target: pick[0], witness: shownWitness(w, order), ways: pick[1].ways }
   }
@@ -746,40 +818,80 @@ function bracketPuzzle(p: MakeNumberBand, rng: Rng): Puzzle | null {
 /** Solved offline over all 1..13 tile sets, with optional squares: 24 needs brackets.
  * Store each set plus its exact solution count so live generation never searches rejected sets. */
 const SQUARE_24_TABLE =
-  '1117:1c,1118:o,111b:1c,111c:9c,111d:1c,1122:o,1123:1s,1124:18,1127:7k,1128:70,1129:1c,1133:6w,1136:4' +
-  'o,1137:4k,1139:3g,113a:k,113b:g,113c:3o,1144:1k,1145:3g,114b:g,114c:1c,1156:3g,1158:c,115a:8,115b:38' +
-  ',115c:30,115d:8,1166:1c,1168:o,1169:4,117a:4,117c:30,117d:38,1188:g,118c:c,118d:w,1222:8o,125b:22,12' +
-  '77:i,1299:o,12bd:1q,133a:w,135d:1e,137b:16,138a:g,1399:2k,139a:s,13ad:q,13bd:g,1459:k,145b:1s,146a:1' +
-  '2,146c:3c,147b:a,14ac:22,14bb:g,14bd:8,1559:8,155c:18,1569:18,156b:a,158d:2,159c:g,159d:4,15ad:g,166' +
-  '8:s,1678:8,1679:i,167d:a,1688:w,168d:q,169c:12,169d:u,16aa:4,16ab:4,16ad:a,16bc:q,16bd:2,16cd:o,177c' +
-  ':c,178b:c,178d:4,179a:8,179b:c,179d:g,17ac:s,17ad:6,17bc:8,188a:o,188c:w,18aa:2,18bd:i,18cd:a,19ac:a' +
-  ',19ad:g,19bb:8,19bc:u,19bd:8,19cc:g,1aac:8,1abc:k,1abd:2,1acd:m,1bcd:10,2388:19,23ab:c,244d:w,25bd:n' +
-  ',266b:g,266d:i,267b:j,2777:1u,2799:g,27bb:8,27cd:g,2889:q,288b:8,28bd:e,29ab:c,29cd:g,2aad:c,2abd:9,' +
-  '2bcc:14,2ccd:14,333d:u,3368:2i,339d:i,33aa:8,33ac:i,33dd:8,3577:4,35bc:m,366b:m,367b:a,36bd:v,377b:1' +
-  ',377c:8,378a:8,3799:a,37bd:4,388a:2,38ab:c,399a:b,399d:8,39aa:4,39ac:9,39dd:4,3abd:s,3acc:q,3bbd:8,3' +
-  'ccd:g,3cdd:4,444d:6,4456:22,448d:f,449a:u,44bb:a,4566:2a,457d:d,4599:4,459b:b,45bb:9,45bd:f,466b:2,4' +
-  '66d:12,468b:3,46ab:k,46cd:j,477c:5,488b:s,48ab:l,48ad:6,499d:8,49ad:q,4bbc:5,4bcc:2,4ccd:2,559b:g,56' +
-  '68:q,5679:a,567b:l,5688:u,568b:g,568c:j,5699:w,569b:z,569d:4,56bb:4,56bd:h,5779:4,578b:9,579c:r,57bc' +
-  ':r,588c:c,58bd:c,58cc:2,59bd:c,59cc:g,5aad:2,5bdd:c,6678:s,6679:12,667a:a,6688:s,668b:o,668d:2,669a:' +
-  'u,669b:q,66ab:e,677a:5,6789:k,679b:5,679c:a,68bc:9,69ac:x,69bd:8,69dd:2,6acd:r,777c:2i,778b:5,778d:a' +
-  ',779c:2,77ab:e,77ac:3,788b:e,788d:k,789a:6,789b:2,789c:t,789d:f,78aa:7,78cc:c,78dd:a,799a:8,79bc:h,7' +
-  '9bd:4,79cd:7,7aac:8,7abc:b,7abd:c,7acc:e,7bbc:4,7bcc:o,7ccc:o,7ddd:c,88aa:a,89ab:a,8aab:3,8aad:2,8ab' +
-  'd:4,8acd:9,8bcc:2,8bcd:j,8ccc:f,999c:30,9abb:2,9abd:d,9acc:e,9bbd:8,9bcd:a,9ccd:2,abcc:s'
-const SQUARE_24_PUZZLES = SQUARE_24_TABLE.split(',').map((entry) => {
-  const [tiles, ways] = entry.split(':')
-  return { tiles: [...tiles].map((x) => parseInt(x, 14)), ways: parseInt(ways, 36) }
-})
+  '1117:24:1c:(D²−C)÷(A+B)|1118:24:o:D×(C+A+B)|111b:24:1c:(A+B)×(C+D)|111c:24:9c:(A+B)×C×D|111d:24:1c:(A+B)×(D−C)' +
+  '|1122:24:o:D²×(C²+A+B)|1123:24:1s:(A+B)×C²×D|1124:24:18:D×(C²+A+B)|1127:24:7k:(D²−A×B)÷C|1128:24:70:D×(C+A×B)|' +
+  '1129:24:1c:(A+C)×(D−B)|1133:24:6w:C×(D²−A×B)|1136:24:4o:C×(D+A+B)|1137:24:4k:C×(D+A×B)|1139:24:3g:C×(D−A×B)|11' +
+  '3a:24:k:C×(D−A−B)|113b:24:g:(C−A)×(B+D)|113c:24:3o:D×(C−A×B)|1144:24:1k:D×(C+A+B)|1145:24:3g:C×(D+A×B)|114b:24' +
+  ':g:(D²−B)÷(A+C)|114c:24:1c:C×D÷(A+B)|1156:24:3g:D×(C−A×B)|1158:24:c:D×(C−A−B)|115a:24:8:D²÷(C−A)−B|115b:24:38:' +
+  '(D²−A×B)÷C|115c:24:30:D²÷(C+A×B)|115d:24:8:(A+B)×(C²−D)|1166:24:1c:D×(C−A−B)|1168:24:o:C×D÷(A+B)|1169:24:4:C+D' +
+  '×(A+B)|117a:24:4:D+C×(A+B)|117c:24:30:D²÷(C−A×B)|117d:24:38:(D²−A×B)÷C|1188:24:g:D+C×(A+B)|118c:24:c:D²÷(C−A−B' +
+  ')|118d:24:w:(D²−B)÷(C−A)|1222:24:8o:(A+B)×C×D²|125b:24:22:(A+D²−B)÷C|1277:24:i:(C×D−A)÷B|1299:24:o:(D²−C)÷(A+B' +
+  ')|12bd:24:1q:D+C×(B−A)|133a:24:w:C×(A+D−B)|135d:24:1e:A×B×(D−C)|137b:24:16:(D²−A×C²)÷B|138a:24:g:C×(D−A)÷B|139' +
+  '9:24:2k:(C−A)×D÷B|139a:24:s:B×(A+D)−C|13ad:24:q:A+(D²−C²)÷B|13bd:24:g:(D²−C²)÷(B−A)|1459:24:k:D+C×(B−A)|145b:2' +
+  '4:1s:A×B×(D−C)|146a:24:12:D×(B−A)−C|146c:24:3c:C×D÷(B−A)|147b:24:a:C×(A+B)−D|14ac:24:22:C×D÷(A+B)|14bb:24:g:(D' +
+  '²−A)÷(B²−C)|14bd:24:8:(D²−A)÷(C−B)|1559:24:8:(A+B)×(D−C)|155c:24:18:D×(A+B÷C)|1569:24:18:C×(D−A×B)|156b:24:a:B' +
+  '×(A+C)−D|158d:24:2:B×(D−C)−A|159c:24:g:C×(B−A)−D|159d:24:4:(A+B)×(D−C)|15ad:24:g:(D−A)×C÷B|1668:24:s:B×C²÷(A+D' +
+  ')|1678:24:8:(C²−A)÷(D−B)|1679:24:i:(C−A)×B²÷D|167d:24:a:(B+D²)÷C−A|1688:24:w:D×(A+C−B)|168d:24:q:B×(D−A−C)|169' +
+  'c:24:12:D×(C−A−B)|169d:24:u:A×B×(D−C)|16aa:24:4:D²÷(C−B)−A|16ab:24:4:B²−(D²−A)÷C|16ad:24:a:B×(A+D−C)|16bc:24:q' +
+  ':(A+C)×D÷B|16bd:24:2:(A+C×D)÷B|16cd:24:o:(D−A)×C÷B|177c:24:c:D×(A+B÷C)|178b:24:c:C×(D−A−B)|178d:24:4:A+(D²−C)÷' +
+  'B|179a:24:8:(C−A)×(D−B)|179b:24:c:(A+D)×(C−B)|179d:24:g:(B−A)×(D−C)|17ac:24:s:D×(C−A−B)|17ad:24:6:B+(A+D²)÷C|1' +
+  '7bc:24:8:(C²−A)÷(D−B)|188a:24:o:C×(A+D−B)|188c:24:w:C×(D−A−B)|18aa:24:2:(C²+D²)÷B−A|18bd:24:i:B×(A+D−C)|18cd:2' +
+  '4:a:C²÷(A+D−B)|19ac:24:a:D×(A+C−B)|19ad:24:g:D+(C²−A)÷B|19bb:24:8:(A+C)×(D−B)|19bc:24:u:D×(C−A×B)|19bd:24:8:(D' +
+  '−A)×(C−B)|19cc:24:g:D×(C−A−B)|1aac:24:8:D×(A+B÷C)|1abc:24:k:D×(A+C−B)|1abd:24:2:D+C²÷(A+B)|1acd:24:m:C×(D−A−B)' +
+  '|1bcd:24:10:C×(D−A×B)|2388:24:19:D×(C−A−B)|23ab:24:c:A×(D+C−B²)|244d:24:w:A×(D−B÷C)|25bd:24:n:B²−D÷(A+C)|266b:' +
+  '24:g:A×(D+B÷C)|266d:24:i:A×(D−B÷C)|267b:24:j:A×(D+C−B)|2777:24:1u:(D²−B÷C)÷A|2799:24:g:(B²−C÷D)÷A|27bb:24:8:(B' +
+  '²−C÷D)÷A|27cd:24:g:C+A×(D−B)|2889:24:q:C×(A+D−B)|288b:24:8:A×(D+B÷C)|28bd:24:e:A²×(B+C−D)|29ab:24:c:A×(D+C−B)|' +
+  '29cd:24:g:C÷A×(D−B)|2aad:24:c:A×(D−B÷C)|2abd:24:9:A×(B+D−C)|2bcc:24:14:A×C×(D−B)|2ccd:24:14:A×B×(D−C)|333d:24:' +
+  'u:(A+B)×(D−C²)|3368:24:2i:D×(A×B−C)|339d:24:i:(A+B)×(D−C)|33aa:24:8:A×(B²−C÷D)|33ac:24:i:D×(A+B²−C)|33dd:24:8:' +
+  'A×(B²−C÷D)|3577:24:4:(A²−C)×(B+D)|35bc:24:m:D÷A×(C−B)|366b:24:m:(C+B×D)÷A|367b:24:a:B²−A×(D−C)|36bd:24:v:A×(B+' +
+  'D−C)|377b:24:1:(D²−B×C)÷A|377c:24:8:D×(A−B÷C)|378a:24:8:C²−D×(B−A)|3799:24:a:(D+B×C)÷A|37bd:24:4:(D²−C²)÷(A²−B' +
+  ')|388a:24:2:(B×D−C)÷A|38ab:24:c:A×B×(D−C)|399a:24:b:A×(B+C−D)|399d:24:8:(B−A)×(D−C)|39aa:24:4:A×(B−C÷D)|39ac:2' +
+  '4:9:D×(A+B−C)|39dd:24:4:A×(B−C÷D)|3abd:24:s:A×(B+C−D)|3acc:24:q:D²÷(B−C÷A)|3bbd:24:8:(D²−C²)÷(B−A²)|3ccd:24:g:' +
+  'C×(A+B−D)|3cdd:24:4:B×(A−C÷D)|444d:24:6:(A+B)×(C²−D)|4456:24:22:D×(C−A÷B)|448d:24:f:C×(A×B−D)|449a:24:u:B+D²÷(' +
+  'C−A)|44bb:24:a:A×(C+D−B²)|4566:24:2a:A×C×(D−B)|457d:24:d:(B+C×D)÷A|4599:24:4:A×(B+C÷D)|459b:24:b:B×(A²−C)−D|45' +
+  'bb:24:9:B×(C−A)−D|45bd:24:f:D+C×(B−A)|466b:24:2:B×(A²−D)−C|466d:24:12:B×(D−C²÷A)|468b:24:3:B²−A×(D−C)|46ab:24:' +
+  'k:A×B×(D−C)|46cd:24:j:A×B×(D−C)|477c:24:5:A×(C²−B)−D²|488b:24:s:(C+B×D)÷A|48ab:24:l:B×(A+C−D)|48ad:24:6:A+C²÷(' +
+  'D−B)|499d:24:8:(C²−B)÷(A²−D)|49ad:24:q:A×(B+C−D)|4bbc:24:5:D²÷(B+C−A²)|4bcc:24:2:C×(B−D²÷A²)|4ccd:24:2:B×(A²−D' +
+  ')−C|559b:24:g:(C−A)×(D−B)|5668:24:q:C+B×(D−A)|5679:24:a:B+D×(C−A)|567b:24:l:B+(A+D²)÷C|5688:24:u:D×(A+B−C)|568' +
+  'b:24:g:B×C²÷(A+D)|568c:24:j:B×D÷(C−A)|5699:24:w:D+A×(C−B)|569b:24:z:C×(A+D)÷B|569d:24:4:(D−A)×(C−B)|56bb:24:4:' +
+  'B×(A−C÷D)|56bd:24:h:D+C×(B−A)|5779:24:4:(A+B)×(D−C)|578b:24:9:(B+D²−C)÷A|579c:24:r:D×(A+C)÷B|57bc:24:r:(C+D²)÷' +
+  'A−B|588c:24:c:D²÷(A+B÷C)|58bd:24:c:B×(A+C−D)|58cc:24:2:C×(B−A)−D|59bd:24:c:(C−A)×(D−B)|59cc:24:g:D×(A+B−C)|5aa' +
+  'd:24:2:(B×D−C)÷A|5bdd:24:c:(B²−C÷D)÷A|6678:24:s:A×(B²−D)÷C|6679:24:12:B×(A+C−D)|667a:24:a:B+A×(D−C)|6688:24:s:' +
+  'B×D÷(C−A)|668b:24:o:B+A×(D−C)|668d:24:2:A×(D−C)−B|669a:24:u:D×(C−A)−B|669b:24:q:B×(A+C−D)|66ab:24:e:A×C²÷(B²−D' +
+  ')|677a:24:5:A×(B+C−D)|6789:24:k:A×C÷(D−B)|679b:24:5:A×(C²−B×D)|679c:24:a:A×(B+C−D)|68bc:24:9:A×D÷(C−B)|69ac:24' +
+  ':x:B×(C−A)−D|69bd:24:8:A+B×(D−C)|69dd:24:2:A×(D²÷C−B)|6acd:24:r:A×C÷(D−B)|777c:24:2i:D×(A+B)÷C|778b:24:5:C×(A+' +
+  'B−D)|778d:24:a:(A+D²−C)÷B|779c:24:2:D×(C−B²÷A)|77ab:24:e:A+(B²+D²)÷C|77ac:24:3:D×(C²−A²−B²)|788b:24:e:B×(D−A)−' +
+  'C|788d:24:k:C×(B+D)÷A|789a:24:6:B×C÷(D−A)|789b:24:2:B+(D²−C)÷A|789c:24:t:D×(A+C)÷B|789d:24:f:B×(A+C−D)|78aa:24' +
+  ':7:D+A×(C−B)|78cc:24:c:D+C×(B−A)|78dd:24:a:D+(B²+C)÷A|799a:24:8:(C²−B)÷(D−A)|79bc:24:h:D×(A+C)÷B|79bd:24:4:(D²' +
+  '−C²)÷(B−A)|79cd:24:7:C×(D²−A)÷B²|7aac:24:8:C+A×(D−B)|7abc:24:b:D²÷(A+B−C)|7abd:24:c:B+A×(D−C)|7acc:24:e:C×(B−A' +
+  ')−D|7bbc:24:4:D²÷(A−B÷C)|7bcc:24:o:D²÷(A+B−C)|7ccc:24:o:A×(B+C)−D²|7ddd:24:c:(D²−B÷C)÷A|88aa:24:a:(D²+C²−A)÷B|' +
+  '89ab:24:a:C+(D²−B)÷A|8aab:24:3:(C²+A²+B²)÷D|8aad:24:2:A×(D−C²÷B)|8abd:24:4:(D²−C²)÷(B−A)|8acd:24:9:B×C÷(D−A)|8' +
+  'bcc:24:2:C×(B−A)−D|8bcd:24:j:(D²+B+C)÷A|8ccc:24:f:D²÷(B−A)−C|999c:24:30:D×(A+B)÷C|9abb:24:2:C+(A+D²)÷B|9abd:24' +
+  ':d:D+C×(B−A)|9acc:24:e:D+C×(B−A)|9bbd:24:8:(D²−C²)÷(B−A)|9bcd:24:a:C×(A+D)÷B|9ccd:24:2:C²÷(D−A)−B|abcc:24:s:D+' +
+  'C×(B−A)'
+const SQUARE_24_PUZZLES = readSolvedTable(SQUARE_24_TABLE)
+
+/** The stored witness uses canonical tile positions; randomise the visible positions each time. */
+function shuffledPuzzle(puzzle: Puzzle, rng: Rng): Puzzle {
+  const order = rng.shuffle(puzzle.tiles.map((_, i) => i))
+  return {
+    ...puzzle,
+    tiles: order.map((i) => puzzle.tiles[i]),
+    witness: puzzle.witness.map((t) => t.kind === 'num' ? num(t.value, order.indexOf(t.tile)) : t),
+  }
+}
 
 function square24Puzzle(p: MakeNumberBand, rng: Rng): Puzzle {
   const candidates = SQUARE_24_PUZZLES.map((f, i) => [i, f] as [number, typeof f])
-  const f = chooseTarget(candidates, p.hard, rng)![1]
-  const w = bestTree(f.tiles, 24, { times: true, divide: true, square: true }, (t) => t.clean, rng)!
-  const order = rng.shuffle(f.tiles.map((_, i) => i))
-  return { tiles: order.map((i) => f.tiles[i]), target: 24, witness: shownWitness(w, order), ways: f.ways }
+  return shuffledPuzzle(chooseTarget(candidates, p.hard, rng)![1], rng)
 }
 
 /** A non-whole value on every way: from the table, numbers to 9 or to 13 as the band says. */
 function fractionPuzzle(p: MakeNumberBand, rng: Rng): Puzzle {
+  if (p.square) {
+    const pool = SQUARE_FRACTION_PUZZLES.filter((f) => Math.max(...f.tiles) <= p.maxTile && f.tiles.every((x) => x >= p.minTile))
+    return shuffledPuzzle(rng.pick(pool), rng)
+  }
   const allow = { times: true, divide: true, square: p.square }
   const pool = makeNumberFractionPuzzles(p.square).filter((f) => Math.max(...f.tiles) <= p.maxTile && f.tiles.every((x) => x >= p.minTile))
   const f = rng.pick(pool)
@@ -787,7 +899,7 @@ function fractionPuzzle(p: MakeNumberBand, rng: Rng): Puzzle {
   eachTree(f.tiles, allow, (t) => {
     if (t.d === 1 && t.n === f.target) ways++
   })
-  const w = bestTree(f.tiles, f.target, allow, () => true, rng)!
+  const w = bestTree(f.tiles, f.target, allow, false, rng)!
   const order = rng.shuffle(f.tiles.map((_, i) => i))
   return { tiles: order.map((i) => f.tiles[i]), target: f.target, witness: shownWitness(w, order), ways }
 }
