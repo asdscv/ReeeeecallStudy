@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions } from 'react-native'
 import { Feather } from '@expo/vector-icons'
-import { useNavigation } from '@react-navigation/native'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
 import { formatCount } from '@reeeeecall/shared/lib/format-number'
@@ -20,6 +20,7 @@ import {
   localDayKey,
   planToday,
   plannedMinutes,
+  randomSeed,
   todaysPlanSeed,
   weekProgress,
   type AchievementId,
@@ -57,6 +58,11 @@ export function BrainHomeScreen() {
   const meta = useBrainStore((s) => s.meta)
   const setSettings = useBrainStore((s) => s.setSettings)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [games, setGames] = useState(() => createRng(randomSeed()).shuffle(BRAIN_GAMES))
+  // Stack screens stay mounted: shuffle again when returning from a game or another tab.
+  useFocusEffect(useCallback(() => {
+    setGames(createRng(randomSeed()).shuffle(BRAIN_GAMES))
+  }, []))
 
   const today = localDayKey()
   const week = weekProgress(progress, today)
@@ -202,7 +208,7 @@ export function BrainHomeScreen() {
         </View>
 
         <View style={styles.cards}>
-          {BRAIN_GAMES.map((game) => (
+          {games.map((game) => (
             <GameCard
               key={game.id}
               game={game}
