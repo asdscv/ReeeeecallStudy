@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createRng, DEFAULT_CONTEXT, type MakeNumberView } from '@reeeeecall/shared/lib/brain-games'
-import { evaluate, MAKE_NUMBER_MAX_LEVEL, makeNumber } from '@reeeeecall/shared/lib/brain-games/games/make-number'
+import { eachTree, evaluate, MAKE_NUMBER_MAX_LEVEL, makeNumber, makeNumberFractionPuzzles } from '@reeeeecall/shared/lib/brain-games/games/make-number'
 
 describe('Make the Number: editing and recovery', () => {
   it('an unfinished or wrong expression can be undone, cleared and solved at every level', () => {
@@ -54,4 +54,81 @@ describe('Make the Number: editing and recovery', () => {
     }
     expect(fractions).toBe(80)
   })
+})
+
+describe('Make the Number: square operator', () => {
+  it('squares a number once, before multiplication and division; it never consumes a second tile', () => {
+    const n = (value: number, tile: number) => ({ kind: 'num' as const, value, tile })
+    const o = (op: '²' | '+' | '×' | '(' | ')') => ({ kind: 'op' as const, op })
+    expect(evaluate([n(2, 0), o('+'), n(3, 1), o('²'), o('×'), n(2, 2)])).toEqual({ n: 20, d: 1 })
+    expect(evaluate([n(3, 0), o('²'), o('²')])).toBeNull()
+    expect(evaluate([o('('), n(3, 0), o(')'), o('²')])).toBeNull()
+    for (let seed = 1; seed <= 30; seed++) {
+      let s = makeNumber.create(7, createRng(seed), DEFAULT_CONTEXT)
+      expect(s.tiles).toHaveLength(2)
+      expect(s.witness.some((t) => t.kind === 'op' && t.op === '²')).toBe(true)
+      const square = (makeNumber.view(s) as MakeNumberView).ops.find((x) => x.op === '²')!
+      s = makeNumber.tap(s, square.index)
+      expect(s.expr.filter((t) => t.kind === 'num')).toHaveLength(1)
+      expect(makeNumber.tap(s, square.index)).toBe(s)
+      expect((makeNumber.view(s) as MakeNumberView).ops.find((x) => x.op === '²')!.disabled).toBe(true)
+      s = makeNumber.tap(s, (makeNumber.view(s) as MakeNumberView).undo.index)
+      expect(s.expr).toEqual([n(s.tiles[0], 0)])
+      for (const tap of makeNumber.solution(s)!) s = makeNumber.tap(s, tap)
+      expect(makeNumber.outcome(s)?.correct).toBe(true)
+    }
+  })
+
+  it('never offers or requires an unseen blocked square rule', () => {
+    for (let level = 7; level <= 21; level++) {
+      const s = makeNumber.create(level, createRng(level), { ...DEFAULT_CONTEXT, blockRules: ['makeNumber.square'] })
+      expect(s.ops).not.toContain('²')
+      expect(s.witness.some((t) => t.kind === 'op' && t.op === '²')).toBe(false)
+    }
+  })
+})
+
+
+describe('Make the Number: mathematical difficulty', () => {
+  it('square introduction targets cannot be solved with the old four operators alone', () => {
+    const ops = ['+', '−', '×', '÷'] as const
+    for (let level = 7; level <= 9; level++) for (let seed = 1; seed <= 15; seed++) {
+      const s = makeNumber.create(level, createRng(seed), DEFAULT_CONTEXT)
+      for (let choice = 0; choice < 4 ** (s.tiles.length - 1); choice++) {
+        let code = choice
+        const expr: typeof s.expr = []
+        s.tiles.forEach((value, tile) => {
+          if (tile > 0) { expr.push({ kind: 'op', op: ops[code % 4] }); code = Math.floor(code / 4) }
+          expr.push({ kind: 'num', value, tile })
+        })
+        expect(evaluate(expr)).not.toEqual({ n: s.target, d: 1 })
+      }
+    }
+  })
+
+  it('every advanced puzzle still requires an intermediate fraction even when squares are available', () => {
+    const puzzles = makeNumberFractionPuzzles(true)
+    expect(puzzles.length).toBeGreaterThan(200)
+    for (const p of puzzles) {
+      let ways = 0, whole = false
+      eachTree(p.tiles, { times: true, divide: true, square: true }, (t) => {
+        if (t.d === 1 && t.n === p.target) { ways++; if (t.int) whole = true }
+      })
+      expect(ways).toBeGreaterThan(0)
+      expect(whole, `${p.tiles} = ${p.target}`).toBe(false)
+    }
+  })
+})
+
+it('reusing solver results preserves seeded puzzles, tile identities and witnesses', () => {
+  for (const level of [11, 12, 14, 15, 16, 21]) {
+    const first = makeNumber.create(level, createRng(1234567 + level), DEFAULT_CONTEXT)
+    for (let n = 0; n < 5; n++) makeNumber.create(level, createRng(7654321 + n), DEFAULT_CONTEXT)
+    const again = makeNumber.create(level, createRng(1234567 + level), DEFAULT_CONTEXT)
+    expect(again).toEqual(first)
+    let played = again
+    for (const tap of makeNumber.solution(played)!) played = makeNumber.tap(played, tap)
+    expect(makeNumber.outcome(played)?.correct).toBe(true)
+    expect(first.witness).toEqual(again.witness)
+  }
 })

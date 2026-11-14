@@ -258,7 +258,8 @@
     "mazeKey_one": "第{{count}}把钥匙",
     "mazeKey_other": "第{{count}}把钥匙",
     "memorizeNumbers": "记住数字位置 · 1到{{max}}",
-    "memoryBadge": "翻牌记忆"
+    "memoryBadge": "翻牌记忆",
+    "makeSquare": "将最后一个数平方"
   },
   "summary": {
     "livesOut": "本轮结束",
@@ -642,6 +643,10 @@
       "fraction": {
         "title": "中途可以有分数",
         "body": "中间结果可以是分数，最后等于目标数即可。"
+      },
+      "square": {
+        "title": "也可以使用平方",
+        "body": "在数字后按²，将这个数乘以自身：3² = 9。每个数字只能平方一次。先算平方，再算×和÷，最后算+和−。每种新运算先使用较少的数字，再逐渐增加。"
       }
     },
     "mazeRun": {

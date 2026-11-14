@@ -93,7 +93,7 @@ export function CodeBreakBoard({ view, onTap, width, height, demo, registerTarge
 export function MakeNumberBoard({ view, onTap, width, height, demo, registerTarget }: Props<MakeNumberView>) {
   const { t } = useTranslation('brain')
   const expression = view.expression.map((x) => x.kind === 'num' ? x.value : x.op).join(' ')
-  const signs = view.expression.filter((x) => x.kind === 'op')
+  const signs = view.expression.filter((x) => x.kind === 'op' && x.op !== '²')
   return <Frame width={width} height={height} demo={demo}>
     <Text style={[styles.hint, { fontSize: demo ? 18 : 30, fontWeight: '700' }]}>{t('play.makeTarget', { target: view.target })}</Text>
     <Text style={[styles.hint, { fontSize: demo ? 12 : 16 }]}>{t(view.order === 'fixed' ? 'play.makeFixed' : 'play.makeAny')} · {t('play.makeTries', { count: view.tries.left })}</Text>
@@ -104,7 +104,7 @@ export function MakeNumberBoard({ view, onTap, width, height, demo, registerTarg
       </View>)}
     </View>
     <Text style={[styles.expression, { fontSize: demo ? 18 : 28, minHeight: demo ? 30 : 60 }]} accessibilityLabel={t('play.makeExpression')} accessibilityLiveRegion="polite">{expression || '…'}{view.preview !== undefined ? ` = ${view.preview}` : ''}</Text>
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>{view.ops.map((o) => <Tap key={o.op} {...o} disabled={o.disabled || view.locked} onTap={onTap} demo={demo} registerTarget={registerTarget} style={{ width: (width - (Math.min(4, view.ops.length) - 1) * 8) / Math.min(4, view.ops.length) }}>{o.op}</Tap>)}</View>
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>{view.ops.map((o) => <Tap key={o.op} {...o} label={o.op === '²' ? t('play.makeSquare') : o.op} disabled={o.disabled || view.locked} onTap={onTap} demo={demo} registerTarget={registerTarget} style={{ width: (width - (Math.min(4, view.ops.length) - 1) * 8) / Math.min(4, view.ops.length) }}>{o.op}</Tap>)}</View>
     <View style={styles.row}>
       <Tap {...view.undo} onTap={onTap} demo={demo} registerTarget={registerTarget} style={styles.flex}>{t('play.undo')}</Tap>
       <Tap {...view.clear} onTap={onTap} demo={demo} registerTarget={registerTarget} style={styles.flex}>{t('play.clear')}</Tap>

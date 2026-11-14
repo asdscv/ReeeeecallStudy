@@ -115,9 +115,9 @@ describe('every game, every level, every screen', () => {
           }
         }
       }
-    // Thousands of deduction puzzles also run their candidate search; the default 5s is too
+    // Thousands of deduction/arithmetic puzzles also search candidates and square variants; 5s is too
     // short when the full suite shares a CPU with the native bundle check.
-    }, id === 'codeBreak' ? 20_000 : 5_000)
+    }, id === 'codeBreak' || id === 'makeNumber' ? 20_000 : 5_000)
   }
 })
 
