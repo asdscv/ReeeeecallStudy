@@ -85,7 +85,7 @@ export function CodeBreakBoard({ view, onTap, width, demo }: Props<CodeBreakView
 export function MakeNumberBoard({ view, onTap, width, demo }: Props<MakeNumberView>) {
   const { t } = useTranslation('brain')
   const expression = view.expression.map((x) => x.kind === 'num' ? x.value : x.op).join(' ')
-  const signs = view.expression.filter((x) => x.kind === 'op')
+  const signs = view.expression.filter((x) => x.kind === 'op' && x.op !== '²')
   return <div style={{ width }} className="space-y-3" data-testid="brain-make-number">
     <p className="text-center text-white font-bold" style={{ fontSize: demo ? 18 : 30 }}>{t('play.makeTarget', { target: view.target })}</p>
     <p className="text-center text-white/85" style={{ fontSize: demo ? 12 : 16 }}>{t(view.order === 'fixed' ? 'play.makeFixed' : 'play.makeAny')} · {t('play.makeTries', { count: view.tries.left })}</p>
@@ -98,7 +98,7 @@ export function MakeNumberBoard({ view, onTap, width, demo }: Props<MakeNumberVi
     <div className="rounded-xl bg-black/20 p-3 text-center text-white font-bold break-words" style={{ minHeight: demo ? 30 : 60, fontSize: demo ? 18 : 28 }} aria-live="polite" aria-label={t('play.makeExpression')}>
       {expression || '…'}{view.preview !== undefined && ` = ${view.preview}`}
     </div>
-    <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(4, view.ops.length)}, 1fr)` }}>{view.ops.map((o) => <Tap key={o.op} {...o} onTap={onTap} demo={demo} disabled={o.disabled || view.locked}>{o.op}</Tap>)}</div>
+    <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(4, view.ops.length)}, 1fr)` }}>{view.ops.map((o) => <Tap key={o.op} {...o} label={o.op === '²' ? t('play.makeSquare') : o.op} onTap={onTap} demo={demo} disabled={o.disabled || view.locked}>{o.op}</Tap>)}</div>
     <div className="grid grid-cols-3 gap-2">
       <Tap {...view.undo} onTap={onTap} demo={demo}>{t('play.undo')}</Tap>
       <Tap {...view.clear} onTap={onTap} demo={demo}>{t('play.clear')}</Tap>

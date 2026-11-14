@@ -258,7 +258,8 @@
     "mazeKey_one": "Llave {{count}}",
     "mazeKey_other": "Llave {{count}}",
     "memorizeNumbers": "Recuerda las posiciones · del 1 al {{max}}",
-    "memoryBadge": "Memoriza boca abajo"
+    "memoryBadge": "Memoriza boca abajo",
+    "makeSquare": "Elevar al cuadrado el último número"
   },
   "summary": {
     "livesOut": "Ronda terminada",
@@ -642,6 +643,10 @@
       "fraction": {
         "title": "Fracciones en el camino",
         "body": "Los resultados intermedios pueden ser fracciones. El final debe ser el objetivo."
+      },
+      "square": {
+        "title": "También puedes usar cuadrados",
+        "body": "Pulsa ² tras un número para multiplicarlo por sí mismo: 3² = 9. Cada ficha se puede elevar al cuadrado una sola vez. Calcula primero los cuadrados, luego × y ÷, y después + y −. Cada operación nueva empieza con menos números y después se añaden más."
       }
     },
     "mazeRun": {

@@ -266,7 +266,7 @@ describe('mechanics (new rules and board changes)', () => {
     // (owner 2026-11-13) and its emoji near-twins (§2.10).
     expect(MECHANICS.filter((m) => m.retired).map((m) => m.tag)).toEqual([
       'quickEye.periphery', 'quickEye.distractors', 'quickEye.similar', 'quickEye.sameDiff',
-      'oddOneOut.rotation', 'oddOneOut.nearTwin', 'quickEye.clearView',
+      'oddOneOut.rotation', 'oddOneOut.nearTwin', 'quickEye.clearView', 'makeNumber.tiles5',
     ])
     // Every mechanic of a game no longer in the catalogue is retired.
     for (const m of MECHANICS) if (!BRAIN_GAMES.some((g) => g.id === m.game)) expect(m.retired, m.tag).toBe(true)
@@ -347,8 +347,8 @@ describe('mechanics (new rules and board changes)', () => {
       ['codeBreak.five', 'board', 19, 'codeBreak.five'],
       ['makeNumber.target24', 'board', 16, 'makeNumber.target24'],
       ['makeNumber.tiles4', 'board', 2, 'board.moreNumbers'],
-      ['makeNumber.multiply', 'rule', 4, 'makeNumber.multiply'],
-      ['makeNumber.divide', 'rule', 7, 'makeNumber.divide'],
+      ['makeNumber.multiply', 'rule', 3, 'makeNumber.multiply'],
+      ['makeNumber.divide', 'rule', 5, 'makeNumber.divide'],
       ['makeNumber.brackets', 'rule', 13, 'makeNumber.brackets'],
       ['makeNumber.tiles5', 'board', 3, 'board.moreNumbers'],
       ['makeNumber.fraction', 'rule', 17, 'makeNumber.fraction'],
@@ -366,7 +366,7 @@ describe('mechanics (new rules and board changes)', () => {
     block.forEach(([tag, kind, from, copy], i) => {
       const m = mechanicInfo(tag)
       expect(m, tag).toMatchObject({ bit: first + i, kind, from, copy })
-      expect(m?.retired, tag).toBeUndefined()
+      expect(m?.retired, tag).toBe(tag === 'makeNumber.tiles5' ? true : undefined)
     })
   })
 

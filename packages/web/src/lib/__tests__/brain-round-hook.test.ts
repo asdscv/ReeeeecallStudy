@@ -6,7 +6,7 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
-import { dayNumber, emptyHistory, emptyMeta, emptyProgress, hasBit, mechanicInfo, parseMeta, parseProgress, brainGame, DEFAULT_CONTEXT, MECHANICS, type BrainMeta, type BrainProgress, type CreateContext, type RoundView } from '@reeeeecall/shared/lib/brain-games'
+import { dayNumber, emptyHistory, emptyMeta, emptyProgress, hasBit, setBit, mechanicInfo, parseMeta, parseProgress, brainGame, DEFAULT_CONTEXT, MECHANICS, type BrainMeta, type BrainProgress, type CreateContext, type RoundView } from '@reeeeecall/shared/lib/brain-games'
 import { useBrainRound, type PlatformContext, type RoundStats } from '@reeeeecall/shared/hooks/useBrainRound'
 import { useTodaysTraining } from '@reeeeecall/shared/hooks/useTodaysTraining'
 import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
@@ -116,6 +116,55 @@ describe('active time', () => {
 })
 
 describe('placement and rule cards in a round', () => {
+  it('Make the Number introduces multiplication and division during first placement, on two tiles with spaced unscored cards', () => {
+    seed()
+    const { result } = renderHook(() => useBrainRound('makeNumber', PLATFORM))
+    const cards: { tag: string; placements: number }[] = []
+    let placements = 0
+    let lastResult: unknown = null
+    for (let guard = 0; guard < 3000 && cards.length < 2; guard++) {
+      const r = result.current
+      if (r.intro) {
+        expect(r.placing).toBe(true)
+        expect(r.trialKind).toBe('intro')
+        expect(r.view.kind === 'makeNumber' && r.view.tiles.length).toBe(2)
+        cards.push({ tag: r.intro.tag, placements })
+        act(() => r.ackIntro())
+        continue
+      }
+      if (r.result && r.result !== lastResult) {
+        lastResult = r.result
+        if (r.result.kind === 'placement') placements++
+        if (r.result.kind === 'intro') expect(r.result.livesLost).toBe(0)
+      }
+      if (r.solution?.length && !r.result) act(() => r.tap(r.solution![0]))
+      else advance(100)
+    }
+    expect(cards.map((c) => c.tag)).toEqual(['makeNumber.multiply', 'makeNumber.divide'])
+    expect(cards[0].placements).toBeGreaterThanOrEqual(1)
+    expect(cards[1].placements - cards[0].placements).toBeGreaterThanOrEqual(3)
+    expect(placements).toBeLessThan(10)
+    expect(result.current.lives).toBe(3)
+  })
+
+  it('a returning high-level player learns the new square rule on two tiles without lowering their stored level', () => {
+    const meta = emptyMeta()
+    meta.seen = MECHANICS.filter((m) => m.game === 'makeNumber' && m.tag !== 'makeNumber.square')
+      .reduce((mask, m) => setBit(mask, mechanicInfo(m.tag)!.bit), meta.seen)
+    meta.sk.makeNumber = { mu: 15, sd: 1, n: 10, day: TODAY }
+    seed((p) => ({ ...p, practiced: [...p.practiced, 'makeNumber'], games: { ...p.games, makeNumber: { level: 15, bestLevel: 15, rounds: 10, wins: 8 } } }), meta)
+    const { result } = renderHook(() => useBrainRound('makeNumber', PLATFORM))
+    expect(result.current.intro?.tag).toBe('makeNumber.square')
+    expect(result.current.view.kind === 'makeNumber' && result.current.view.tiles.length).toBe(2)
+    act(() => result.current.ackIntro())
+    for (let guard = 0; guard < 20 && !result.current.result; guard++) {
+      const r = result.current
+      act(() => r.tap(r.solution![0]))
+    }
+    expect(result.current.result).toMatchObject({ correct: true, kind: 'intro', livesLost: 0 })
+    expect(result.current.result!.levelAfter).toBeGreaterThan(14)
+  })
+
   it("a game never played starts by finding the level: no chances spent, then the staircase takes over higher than 1", () => {
     seed()
     const { result } = renderHook(() => useBrainRound('oddOneOut', PLATFORM))

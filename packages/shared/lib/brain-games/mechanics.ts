@@ -166,10 +166,10 @@ export const MECHANICS: readonly MechanicInfo[] = [
   // (unreleased): L1 already has three numbers.
   { tag: 'makeNumber.target24', game: 'makeNumber', kind: 'board', from: 16, copy: 'makeNumber.target24' },
   { tag: 'makeNumber.tiles4', game: 'makeNumber', kind: 'board', from: 2, copy: 'board.moreNumbers' },
-  { tag: 'makeNumber.multiply', game: 'makeNumber', kind: 'rule', from: 4, copy: 'makeNumber.multiply' },
-  { tag: 'makeNumber.divide', game: 'makeNumber', kind: 'rule', from: 7, copy: 'makeNumber.divide' },
+  { tag: 'makeNumber.multiply', game: 'makeNumber', kind: 'rule', from: 3, copy: 'makeNumber.multiply' },
+  { tag: 'makeNumber.divide', game: 'makeNumber', kind: 'rule', from: 5, copy: 'makeNumber.divide' },
   { tag: 'makeNumber.brackets', game: 'makeNumber', kind: 'rule', from: 13, copy: 'makeNumber.brackets' },
-  { tag: 'makeNumber.tiles5', game: 'makeNumber', kind: 'board', from: 3, copy: 'board.moreNumbers' },
+  { tag: 'makeNumber.tiles5', game: 'makeNumber', kind: 'board', from: 3, copy: 'board.moreNumbers', retired: true },
   { tag: 'makeNumber.fraction', game: 'makeNumber', kind: 'rule', from: 17, copy: 'makeNumber.fraction' },
   // Maze Run (games/maze-run.ts) — open mazes 4×4 → 8×8; winding (L6, its own notice below);
   // keys in order (L11, a rule, from 4×4 again); hidden walls (L16, a rule, from 4×4 again); keys
@@ -197,6 +197,7 @@ export const MECHANICS: readonly MechanicInfo[] = [
   // Number Hunt's memory boards (L19-26, games/schulte.ts SCHULTE_MEMORY): the numbers show, the cards
   // turn face down, tap 1 → N from memory — from 2×2 again.
   { tag: 'schulte.memory', game: 'schulte', kind: 'rule', from: 19, copy: 'schulte.memory' },
+  { tag: 'makeNumber.square', game: 'makeNumber', kind: 'rule', from: 7, copy: 'makeNumber.square' },
 ]
 
 const BY_TAG = new Map(MECHANICS.map((m, i) => [m.tag, { ...m, bit: i }]))

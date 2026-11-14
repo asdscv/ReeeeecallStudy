@@ -303,10 +303,13 @@ function seenTag(s: Pick<State, 'seenMask' | 'seenAdded'>, tag: string): boolean
 /**
  * The rules a new trial must not use (§2.4). Match Pairs' probe boards gate like counted trials, so
  * the first one can open with the no-preview card (it still counts as probe board 1).
+ * Make the Number also introduces operators during placement: each card's trial stays unscored,
+ * with the same two-card budget and three completed placement/counting trials between cards.
  */
-function gateRules(s: Pick<State, 'gameId' | 'seenMask' | 'seenAdded' | 'cardsShown' | 'cardAt' | 'counted' | 'probe'>, kind: TrialKind): readonly string[] {
-  const asKind: TrialKind = s.probe && kind === 'placement' ? 'counted' : kind
-  return blockedRules(s.gameId, (tag) => seenTag(s, tag), asKind, { shown: s.cardsShown, countedSinceLast: s.cardAt === null ? null : s.counted - s.cardAt })
+function gateRules(s: Pick<State, 'gameId' | 'seenMask' | 'seenAdded' | 'cardsShown' | 'cardAt' | 'counted' | 'probe' | 'placementTrials'>, kind: TrialKind): readonly string[] {
+  const asKind: TrialKind = (s.probe || s.gameId === 'makeNumber') && kind === 'placement' ? 'counted' : kind
+  const completed = s.counted + (s.gameId === 'makeNumber' ? s.placementTrials : 0)
+  return blockedRules(s.gameId, (tag) => seenTag(s, tag), asKind, { shown: s.cardsShown, countedSinceLast: s.cardAt === null ? null : completed - s.cardAt })
 }
 
 /** Setup (practice, placement, a rule card's trial) as opposed to play — kept out of a Today's Training slot. */
@@ -360,6 +363,12 @@ function introduce(s: State, now: number): State {
   }
   const rule = tags.find((t) => mechanicInfo(t)?.kind === 'rule' && !seen(t))
   if (rule) {
+    if (s.gameId === 'makeNumber') {
+      // A returning player's stored level can already be beyond a newly released operator.
+      // Teach it on its first, small band, without moving the stored skill estimate.
+      const fresh = createTrial(s.gameId, mechanicInfo(rule)!.from, randomSeed(), buildCtx(s, { kind: 'intro', blockRules: gateRules(s, 'intro') }), s.recentSigs)
+      next = { ...next, round: fresh.round, recent: [...s.recent.slice(0, -1), fresh.recent], recentSigs: [...s.recentSigs.slice(0, -1), fresh.sig] }
+    }
     next = {
       ...next,
       intro: { tag: rule },
@@ -369,7 +378,7 @@ function introduce(s: State, now: number): State {
       pausedAt: now,
       // The round's card budget (§2.4).
       cardsShown: s.cardsShown + 1,
-      cardAt: s.counted,
+      cardAt: s.counted + (s.gameId === 'makeNumber' ? s.placementTrials : 0),
     }
   }
   return next
@@ -826,7 +835,7 @@ function init({ gameId, platform }: { gameId: BrainGameId; platform: PlatformCon
         hotAfter: plan.hotAfter,
       })
       // Nothing known: the first placement trial is never above practice level + 2.
-      if (seed === null) placeStart = 3
+      if (seed === null || (gameId === 'makeNumber' && !est && !legacy)) placeStart = gameId === 'makeNumber' ? 2 : 3
       sd = SKILL[group].sd0
       level = practiceLeft > 0 ? rules.min : placeLevel({ place, placeStart })
     }
@@ -843,7 +852,7 @@ function init({ gameId, platform }: { gameId: BrainGameId; platform: PlatformCon
   level = Math.min(cap, Math.max(rules.min, level))
   const trialKind: TrialKind = practiceLeft > 0 ? 'practice' : place || probe ? 'placement' : 'counted'
   const trialSeed = randomSeed()
-  const blockRules = gateRules({ gameId, seenMask: meta.seen, seenAdded: [], cardsShown: 0, cardAt: null, counted: 0, probe }, trialKind)
+  const blockRules = gateRules({ gameId, seenMask: meta.seen, seenAdded: [], cardsShown: 0, cardAt: null, counted: 0, placementTrials: 0, probe }, trialKind)
   const ctx = buildCtx(base, { kind: trialKind, blockRules })
   const { round, sig, recent } = createTrial(gameId, level, trialSeed, ctx, [])
   const now = Date.now()
