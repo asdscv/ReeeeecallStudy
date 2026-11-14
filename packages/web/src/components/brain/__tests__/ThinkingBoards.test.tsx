@@ -5,10 +5,10 @@ import { brainGame, createRng, DEFAULT_CONTEXT, GAME_THEMES, type BrainGameId, t
 import { mazeDragCells } from '@reeeeecall/shared/lib/brain-games/maze-drag'
 import { BrainBoard } from '../BrainBoard'
 
-for (const id of ['setMatch', 'codeBreak', 'makeNumber', 'mazeRun'] as const) {
-  it(`${id}: the real board's buttons finish a generated puzzle`, () => {
+for (const [id, level] of [['setMatch', 1], ['codeBreak', 1], ['makeNumber', 1], ['makeNumber', 7], ['makeNumber', 14], ['mazeRun', 1]] as const) {
+  it(`${id} L${level}: the real board's buttons finish a generated puzzle`, () => {
     const def = brainGame(id).def
-    let state = def.create(1, createRng(6), DEFAULT_CONTEXT)
+    let state = def.create(level, createRng(6), DEFAULT_CONTEXT)
     function Player() {
       const [s, setS] = useState(state)
       useEffect(() => { state = s }, [s])

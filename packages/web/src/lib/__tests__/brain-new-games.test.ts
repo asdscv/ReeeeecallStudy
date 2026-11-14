@@ -228,7 +228,7 @@ describe('mechanics: a new kind of content is a rule card and starts small again
       'setMatch.color', 'setMatch.fill', 'setMatch.none',
       'codeBreak.repeats',
       'makeNumber.multiply', 'makeNumber.divide', 'makeNumber.brackets', 'makeNumber.fraction',
-      'mazeRun.keys', 'mazeRun.hidden', 'makeNumber.anyOrder',
+      'mazeRun.keys', 'mazeRun.hidden', 'makeNumber.anyOrder', 'makeNumber.square',
     ])
     for (const m of rules) {
       const before = items[m.game](m.from - 1)
@@ -497,6 +497,7 @@ describe('Make the Number (숫자 만들기)', () => {
         if (row.target24) expect(s.target, at).toBe(24)
         expect(v.ops.map((x) => x.op).includes('×'), at).toBe(row.times)
         expect(v.ops.map((x) => x.op).includes('÷'), at).toBe(row.divide)
+        expect(v.ops.map((x) => x.op).includes('²'), at).toBe(row.square)
         expect(v.ops.map((x) => x.op).includes('('), at).toBe(row.brackets)
         if (row.need === '×') expect(s.witness.some((t) => t.kind === 'op' && t.op === '×'), at).toBe(true)
         if (row.need === '÷') expect(s.witness.some((t) => t.kind === 'op' && t.op === '÷'), at).toBe(true)
@@ -516,12 +517,13 @@ describe('Make the Number (숫자 만들기)', () => {
     expect(v0.tiles.every((x) => x.disabled)).toBe(true)
     expect(v0.ops.every((x) => !x.disabled)).toBe(true)
     expect(v0.submit.disabled).toBe(true)
-    const plusIndex = v0.ops.find((x) => x.op === '+')!.index
+    const wrongOp = s.target === s.tiles.reduce((a, b) => a + b, 0) ? '−' : '+'
+    const plusIndex = v0.ops.find((x) => x.op === wrongOp)!.index
     for (let i = 1; i < s.tiles.length; i++) s = makeNumber.tap(s, plusIndex)
     const ready = makeNumber.view(s) as MakeNumberView
     expect(ready.submit.disabled).toBe(false)
     expect(ready.preview).toBeDefined()
-    // The plain sum is excluded by the generator, so this is a real wrong answer.
+    // Choose the other sign on the two-number starter, so this is a real wrong answer.
     expect(Number(ready.preview)).not.toBe(s.target)
     const once = makeNumber.tap(s, ready.submit.index)
     const v2 = makeNumber.view(once) as MakeNumberView
@@ -536,7 +538,7 @@ describe('Make the Number (숫자 만들기)', () => {
   })
 
   it('a new operator starts small again (2-3 tiles) with a card; a blocked one is swapped out of the band', () => {
-    expect([3, 4, 6, 7, 9, 10, 12, 13].map((b) => MAKE_NUMBER_LADDER[b - 1].tiles)).toEqual([5, 3, 5, 3, 4, 3, 4, 3])
+    expect([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13].map((b) => MAKE_NUMBER_LADDER[b - 1].tiles)).toEqual([2, 4, 2, 3, 2, 4, 2, 3, 4, 3, 4, 3])
     for (let seed = 1; seed <= 20; seed++) {
       const s = make(makeNumber, 14.5, seed, { ...PHONE, blockRules: ['makeNumber.brackets'] }) as MakeNumberState
       expect(s.ops).not.toContain('(')

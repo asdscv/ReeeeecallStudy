@@ -258,7 +258,8 @@
     "mazeKey_one": "Kunci {{count}}",
     "mazeKey_other": "Kunci {{count}}",
     "memorizeNumbers": "Ingat posisi angka · 1 sampai {{max}}",
-    "memoryBadge": "Ingatan kartu tertutup"
+    "memoryBadge": "Ingatan kartu tertutup",
+    "makeSquare": "Kuadratkan angka terakhir"
   },
   "summary": {
     "livesOut": "Ronde selesai",
@@ -642,6 +643,10 @@
       "fraction": {
         "title": "Pecahan di tengah langkah",
         "body": "Hasil antara boleh berupa pecahan. Hasil akhir harus sesuai target."
+      },
+      "square": {
+        "title": "Gunakan kuadrat juga",
+        "body": "Ketuk ² setelah angka untuk mengalikannya dengan dirinya sendiri: 3² = 9. Setiap ubin angka hanya dapat dikuadratkan sekali. Hitung kuadrat dahulu, lalu × dan ÷, kemudian + dan −. Operasi baru dimulai dengan lebih sedikit angka, lalu jumlahnya bertambah."
       }
     },
     "mazeRun": {

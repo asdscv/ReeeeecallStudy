@@ -258,7 +258,8 @@
     "mazeKey_one": "Chìa số {{count}}",
     "mazeKey_other": "Chìa số {{count}}",
     "memorizeNumbers": "Nhớ vị trí các số · 1 đến {{max}}",
-    "memoryBadge": "Nhớ thẻ úp"
+    "memoryBadge": "Nhớ thẻ úp",
+    "makeSquare": "Bình phương số cuối"
   },
   "summary": {
     "livesOut": "Kết thúc lượt",
@@ -642,6 +643,10 @@
       "fraction": {
         "title": "Phân số ở bước giữa",
         "body": "Kết quả giữa có thể là phân số. Chỉ cần đáp án cuối bằng số đích."
+      },
+      "square": {
+        "title": "Dùng cả bình phương",
+        "body": "Nhấn ² sau một số để nhân số đó với chính nó: 3² = 9. Mỗi ô số chỉ được bình phương một lần. Tính bình phương trước, rồi × và ÷, cuối cùng + và −. Phép tính mới bắt đầu với ít số rồi tăng dần."
       }
     },
     "mazeRun": {

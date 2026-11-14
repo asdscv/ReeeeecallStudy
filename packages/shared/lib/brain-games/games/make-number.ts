@@ -3,21 +3,16 @@ import type { Rng } from '../rng'
 
 /**
  * Make the Number (숫자 만들기) — make the target from the number tiles, each used exactly once,
- * with + − × ÷ (later brackets), like the 24 game. Owner 2026-11-13: «숫자 만들기 가능한가?», and for
+ * with + − × ÷ ² (later brackets), like the 24 game. Owner 2026-11-13: «숫자 만들기 가능한가?», and for
  * every new game «새로운 게임은 처음부터 내 피드백 수준으로 만들어라».
  *
- * The ladder — each new idea starts small again (three numbers) with a rule card, then more numbers
- * or fewer ways to make it, then less time:
- *   L1-3   + −, numbers in a FIXED order: choose the sign between them   3 / 4 / 5 numbers
- *   L4-6   + − × (rule) in fixed order: × before + −                       3 / 4 / 5 numbers
- *   L7-9   + − × ÷ (rule) in fixed order                                   3 / 4 / 5 numbers
- *   L10-12 any order (rule): pick the order too                            3 / 4 / 4 numbers (to 13)
- *   L13-15 brackets (rule): no way without them                            3 / 4 / 4 numbers
- *   L16    24 from four numbers up to 13, brackets needed (the classic 24 game)
- *   L17-21 a fraction on the way (rule): every way passes a non-whole value — 8 ÷ (3 − 8 ÷ 3) = 24 —
- *          the clock tightening from 120 s to 45 s, three tries then two
+ * The ladder: start with two +/− tiles, increase the count, then restart at two tiles
+ * for ×, ÷ and ². Each new operator is required by the puzzle, not just an extra button.
+ * L1-2 +/− (2, 4 tiles), L3-4 × (2, 3), L5-6 ÷ (2, 4), L7-9 ² (2, 3, 4),
+ * L10-12 any order (3, 4, 4), L13-15 brackets (3, 4, 4), L16 make 24,
+ * L17-21 fractions on the way. Squaring is once per number tile, before ×/÷.
  * In fixed order the numbers place themselves: the player taps the sign between them and the next
- * number follows (`view.order`). The running value is shown as a help up to L4.
+ * number follows (`view.order`). The running value is shown as a help on the first band of each new operator.
  *
  * Every puzzle is solved before it is shown: the generator enumerates every expression in exact
  * rational arithmetic (fixed order: every choice of signs; any order: every expression tree, so
@@ -36,8 +31,8 @@ import type { Rng } from '../rng'
  * above its own start opens on its first, smallest band (ctx.recent's carry says which rules were open).
  */
 
-export type MakeNumberKind = 'plus' | 'times' | 'divide' | 'anyOrder' | 'brackets' | 'make24' | 'fraction'
-export type MakeNumberRule = 'multiply' | 'divide' | 'anyOrder' | 'brackets' | 'fraction'
+export type MakeNumberKind = 'plus' | 'times' | 'divide' | 'square' | 'anyOrder' | 'brackets' | 'make24' | 'fraction'
+export type MakeNumberRule = 'multiply' | 'divide' | 'square' | 'anyOrder' | 'brackets' | 'fraction'
 
 export interface MakeNumberBand {
   kind: MakeNumberKind
@@ -47,9 +42,10 @@ export interface MakeNumberBand {
   /** × available (its rule), ÷ available, brackets available. */
   times: boolean
   divide: boolean
+  square: boolean
   brackets: boolean
   /** What every way to make the target must use: the band's new idea. */
-  need: '×' | '÷' | '()' | null
+  need: '×' | '÷' | '²' | '()' | null
   /** Every way to make the target passes a non-whole value (needs ÷ and brackets). */
   fraction: boolean
   minTile: number
@@ -65,14 +61,15 @@ export interface MakeNumberBand {
   hard: number
 }
 
-const KIND: Record<MakeNumberKind, Pick<MakeNumberBand, 'order' | 'times' | 'divide' | 'brackets' | 'need' | 'fraction' | 'target24'>> = {
-  plus: { order: 'fixed', times: false, divide: false, brackets: false, need: null, fraction: false, target24: false },
-  times: { order: 'fixed', times: true, divide: false, brackets: false, need: '×', fraction: false, target24: false },
-  divide: { order: 'fixed', times: true, divide: true, brackets: false, need: '÷', fraction: false, target24: false },
-  anyOrder: { order: 'any', times: true, divide: true, brackets: false, need: null, fraction: false, target24: false },
-  brackets: { order: 'any', times: true, divide: true, brackets: true, need: '()', fraction: false, target24: false },
-  make24: { order: 'any', times: true, divide: true, brackets: true, need: '()', fraction: false, target24: true },
-  fraction: { order: 'any', times: true, divide: true, brackets: true, need: null, fraction: true, target24: false },
+const KIND: Record<MakeNumberKind, Pick<MakeNumberBand, 'order' | 'times' | 'divide' | 'square' | 'brackets' | 'need' | 'fraction' | 'target24'>> = {
+  plus: { order: 'fixed', times: false, divide: false, square: false, brackets: false, need: null, fraction: false, target24: false },
+  times: { order: 'fixed', times: true, divide: false, square: false, brackets: false, need: '×', fraction: false, target24: false },
+  divide: { order: 'fixed', times: true, divide: true, square: false, brackets: false, need: '÷', fraction: false, target24: false },
+  square: { order: 'fixed', times: true, divide: true, square: true, brackets: false, need: '²', fraction: false, target24: false },
+  anyOrder: { order: 'any', times: true, divide: true, square: true, brackets: false, need: null, fraction: false, target24: false },
+  brackets: { order: 'any', times: true, divide: true, square: true, brackets: true, need: '()', fraction: false, target24: false },
+  make24: { order: 'any', times: true, divide: true, square: true, brackets: true, need: '()', fraction: false, target24: true },
+  fraction: { order: 'any', times: true, divide: true, square: true, brackets: true, need: null, fraction: true, target24: false },
 }
 
 const row = (kind: MakeNumberKind, tiles: number, minTile: number, maxTile: number, maxTarget: number, preview: boolean, tries: number, parMs: number, hard: number): MakeNumberBand => ({
@@ -90,15 +87,15 @@ const row = (kind: MakeNumberKind, tiles: number, minTile: number, maxTile: numb
 
 /** Band b is MAKE_NUMBER_LADDER[b − 1]. */
 export const MAKE_NUMBER_LADDER: readonly MakeNumberBand[] = [
-  row('plus', 3, 1, 9, 30, true, 3, 45_000, 0),
-  row('plus', 4, 1, 9, 40, true, 3, 60_000, 0.5),
-  row('plus', 5, 1, 9, 45, true, 3, 70_000, 1),
-  row('times', 3, 2, 9, 99, true, 3, 55_000, 0),
-  row('times', 4, 2, 9, 99, false, 3, 65_000, 0.5),
-  row('times', 5, 2, 9, 99, false, 3, 80_000, 1),
-  row('divide', 3, 2, 9, 99, false, 2, 60_000, 0),
-  row('divide', 4, 2, 9, 99, false, 2, 75_000, 0.5),
-  row('divide', 4, 2, 9, 99, false, 2, 65_000, 1),
+  row('plus', 2, 1, 9, 20, true, 3, 30_000, 0),
+  row('plus', 4, 1, 9, 40, true, 3, 45_000, 0.5),
+  row('times', 2, 2, 9, 81, true, 3, 45_000, 0),
+  row('times', 3, 2, 9, 99, false, 3, 50_000, 0.5),
+  row('divide', 2, 2, 12, 99, true, 3, 45_000, 0),
+  row('divide', 4, 2, 9, 99, false, 2, 65_000, 0.5),
+  row('square', 2, 2, 9, 99, true, 3, 55_000, 0),
+  row('square', 3, 2, 9, 99, false, 2, 65_000, 0.5),
+  row('square', 4, 2, 9, 99, false, 2, 75_000, 1),
   row('anyOrder', 3, 2, 9, 99, false, 2, 60_000, 0),
   row('anyOrder', 4, 2, 9, 99, false, 2, 85_000, 0.5),
   row('anyOrder', 4, 2, 13, 99, false, 2, 85_000, 1),
@@ -118,24 +115,26 @@ export const MAKE_NUMBER_MAX_LEVEL = MAKE_NUMBER_LADDER.length
 export const MAKE_NUMBER_RULE_TAG: Readonly<Record<MakeNumberRule, string>> = {
   multiply: 'makeNumber.multiply',
   divide: 'makeNumber.divide',
+  square: 'makeNumber.square',
   anyOrder: 'makeNumber.anyOrder',
   brackets: 'makeNumber.brackets',
   fraction: 'makeNumber.fraction',
 }
 
 /** Where each rule's first band is (mechanics.ts `from`). */
-export const MAKE_NUMBER_RULE_START: Readonly<Record<MakeNumberRule, number>> = { multiply: 4, divide: 7, anyOrder: 10, brackets: 13, fraction: 17 }
+export const MAKE_NUMBER_RULE_START: Readonly<Record<MakeNumberRule, number>> = { multiply: 3, divide: 5, square: 7, anyOrder: 10, brackets: 13, fraction: 17 }
 
-const RULES: readonly MakeNumberRule[] = ['multiply', 'divide', 'anyOrder', 'brackets', 'fraction']
-const LETTER: Readonly<Record<MakeNumberRule, string>> = { multiply: 'x', divide: 'd', anyOrder: 'o', brackets: 'b', fraction: 'f' }
+const RULES: readonly MakeNumberRule[] = ['multiply', 'divide', 'square', 'anyOrder', 'brackets', 'fraction']
+const LETTER: Readonly<Record<MakeNumberRule, string>> = { multiply: 'x', divide: 'd', square: 's', anyOrder: 'o', brackets: 'b', fraction: 'f' }
 const NEEDS: Readonly<Record<MakeNumberKind, readonly MakeNumberRule[]>> = {
   plus: [],
   times: ['multiply'],
   divide: ['multiply', 'divide'],
-  anyOrder: ['multiply', 'divide', 'anyOrder'],
-  brackets: ['multiply', 'divide', 'anyOrder', 'brackets'],
-  make24: ['multiply', 'divide', 'anyOrder', 'brackets'],
-  fraction: ['multiply', 'divide', 'anyOrder', 'brackets', 'fraction'],
+  square: ['multiply', 'divide', 'square'],
+  anyOrder: ['multiply', 'divide', 'square', 'anyOrder'],
+  brackets: ['multiply', 'divide', 'square', 'anyOrder', 'brackets'],
+  make24: ['multiply', 'divide', 'square', 'anyOrder', 'brackets'],
+  fraction: ['multiply', 'divide', 'square', 'anyOrder', 'brackets', 'fraction'],
 }
 
 /** A stretched band (a rule blocked): the clock shortens this much a level past the band, to this floor. */
@@ -164,7 +163,7 @@ export function makeNumberLimitMs(level: number, parMs: number): number {
 function stretched(e: number, lv: number, open: string): MakeNumberPlan {
   const r = MAKE_NUMBER_LADDER[e - 1]
   const g = lv - e
-    const plus = r.kind === 'plus'
+  const plus = r.kind === 'plus'
   const tiles = plus && g >= 3 ? Math.min(6, r.tiles + 1) : r.tiles
   const maxTile = plus ? Math.min(30, r.maxTile + Math.round(2 * g)) : Math.min(13, r.maxTile + Math.round(g))
   const parMs = Math.round(r.parMs * (plus ? MAKE_NUMBER_STRETCH_RATE : MAKE_NUMBER_STRETCH_RATE_OPS) ** g)
@@ -195,7 +194,7 @@ export function makeNumberPlan(level: number, ctx: Partial<Pick<CreateContext, '
   const fits = (band: number) => NEEDS[MAKE_NUMBER_LADDER[band - 1].kind].every(isOpen)
   const recent = ctx.recent ?? []
   const trial = ctx.trialKind ?? 'counted'
-  if ((trial === 'counted' || trial === 'intro') && recent.length > 0) {
+  if ((trial === 'counted' || trial === 'intro' || trial === 'placement') && recent.length > 0) {
     const met = (r: MakeNumberRule) => recent.some((t) => t.carry === undefined || t.carry.includes(LETTER[r]))
     const arriving = RULES.find((r) => isOpen(r) && !met(r) && b > MAKE_NUMBER_RULE_START[r] && fits(MAKE_NUMBER_RULE_START[r]))
     if (arriving) {
@@ -269,6 +268,10 @@ export function evaluate(tokens: readonly MakeToken[]): Frac | null {
     if (!t) return null
     if (t.kind === 'num') {
       i++
+      if (isOp(peek(), '²')) {
+        i++
+        return frac(t.value * t.value)
+      }
       return frac(t.value)
     }
     if (t.op === '(') {
@@ -385,7 +388,7 @@ export interface MakeTree {
 
 /** Does `child` need brackets as the left / right operand of `parent`? */
 function wraps(parent: MakeOp, child: MakeOp | null, right: boolean): boolean {
-  if (child === null) return false
+  if (child === null || child === '²') return false
   const sum = child === '+' || child === '−'
   switch (parent) {
     case '+':
@@ -440,7 +443,7 @@ const leaf = (value: number, tile: number): MakeTree => ({ n: value, d: 1, op: n
  * allowed, both ways round for − and ÷, until one value is left. `flatOnly` skips anything that
  * needs brackets (a bracketed part can never become bracket-free). Four tiles: 3888 trees.
  */
-export function eachTree(tiles: readonly number[], allow: { times: boolean; divide: boolean; flatOnly?: boolean }, visit: (t: MakeTree) => void): void {
+export function eachTree(tiles: readonly number[], allow: { times: boolean; divide: boolean; square?: boolean; flatOnly?: boolean }, visit: (t: MakeTree) => void): void {
   const walk = (items: MakeTree[]) => {
     if (items.length === 1) {
       visit(items[0])
@@ -466,11 +469,18 @@ export function eachTree(tiles: readonly number[], allow: { times: boolean; divi
       }
     }
   }
-  walk(tiles.map((v, i) => leaf(v, i)))
+  const variants = (at: number, items: MakeTree[]) => {
+    if (at === tiles.length) return walk(items)
+    const t = leaf(tiles[at], at)
+    variants(at + 1, [...items, t])
+    if (allow.square) variants(at + 1, [...items, { ...t, n: t.n * t.n, op: '²', l: t }])
+  }
+  variants(0, [])
 }
 
 /** A tree written out with as few brackets as it needs; leaves carry `tileAt[leaf.tile]` as their tile. */
 export function treeTokens(t: MakeTree, tileAt: (tile: number) => number = (x) => x): MakeToken[] {
+  if (t.op === '²' && t.l) return [...treeTokens(t.l, tileAt), op('²')]
   if (t.op === null || !t.l || !t.r) return [num(t.n, tileAt(t.tile))]
   const l = treeTokens(t.l, tileAt)
   const r = treeTokens(t.r, tileAt)
@@ -488,7 +498,7 @@ interface TreeStat {
   clean: boolean
 }
 
-function treeStats(tiles: readonly number[], allow: { times: boolean; divide: boolean; flatOnly?: boolean }, maxTarget: number): Map<number, TreeStat> {
+function treeStats(tiles: readonly number[], allow: { times: boolean; divide: boolean; square?: boolean; flatOnly?: boolean }, maxTarget: number): Map<number, TreeStat> {
   const out = new Map<number, TreeStat>()
   eachTree(tiles, allow, (t) => {
     if (t.d !== 1 || t.n < 1 || t.n > maxTarget) return
@@ -509,7 +519,7 @@ function treeStats(tiles: readonly number[], allow: { times: boolean; divide: bo
 }
 
 /** The witness: among the trees making `target` that pass `ok`, the fewest brackets (ties at random). */
-function bestTree(tiles: readonly number[], target: number, allow: { times: boolean; divide: boolean; flatOnly?: boolean }, ok: (t: MakeTree) => boolean, rng: Rng): MakeTree | null {
+function bestTree(tiles: readonly number[], target: number, allow: { times: boolean; divide: boolean; square?: boolean; flatOnly?: boolean }, ok: (t: MakeTree) => boolean, rng: Rng): MakeTree | null {
   let best: MakeTree[] = []
   let fewest = Infinity
   eachTree(tiles, allow, (t) => {
@@ -556,23 +566,47 @@ const FRACTION_TABLE =
   '489990478d9089cc90178d91388b91258992278992999b9258ac92288c9338cc9336bc94259a9447dd95259a9557dd96' +
   '588a9699bc9718cc979acc9889cd98588d99388c99'
 
+/** Exhaustively verified with optional once-per-tile squares as well as + − × ÷. */
+const SQUARE_FRACTION_TABLE =
+  '112654112645112896112880112a75113a75114645114a75115645115810115a12115a80115c10116932116a12116c14' +
+  '116c10116c39116c33117a98117c14123488134874137a7513ab45145882145878145a42146a96147890148954148a82' +
+  '148b86148c98148c94156721156715156964156a62156a48156c62156c58159a92159a8815ac4215bc9915bc45166c27' +
+  '166c45167a84167b99167b63167c86167c82167c57168b96168b99168c38168c34169a8016bc6916cd7516cd92178936' +
+  '178928178a35178c98179a3517ac4217bc21188a40189a15189a96189c57189c3918aa4018ad5218bc2218cc2418cd26' +
+  '19ab5519ab4519ac6619bc6619cd641aac601abc661abc361abc251abd651abd551acc601acd781acd651acd521acd40' +
+  '1bcd781bcd66222690222627222a35224699224693224681224663224c45226d75229c51233662233692233682233680' +
+  '233c92244699244693244681244663244c45246c97246c95248c49248c47248c93266899268c81269b93269c49269c47' +
+  '26cc4926cc4728cc5128cc7528cc572acc45333656333652333c32334662334698334694334686334682334890334c82' +
+  '336a74336a68336a56336c76336c68336c74336c62336d56337c8033ac68344870344858344882345886345898346b58' +
+  '347886348c7834bc98356b9635ac87366992366c80366c64367b66368a85368a97368d94368d4636cc3738ad1638bc86' +
+  '38bd333aac553acd683bcd80444c45445874445a78445a88446893446a81446c75446c69446c98446c94446c65447878' +
+  '448970448946448994448b90448b86448c93448c98448c94448c58448d90448d38448d82455a38455a88455a72456a62' +
+  '457894458c54459a58459a53459c4645ab63466851466d99468a55468a57468a51468a85469937469935469b9346ab81' +
+  '46bd7846bd66477870477842478994478c90478c78488c99488c93489990489954489c66489c7448aa8548bc7448bc38' +
+  '48bc9448cc7548cd5848cd4648cd9849ac4549bc874aac454abc87556a5855ac6655ac76569c9856ab9856ab6356ab73' +
+  '56bc8256cd38577c2857ac78588a72589a62589b45589c935abc865acc545ccc15667c69668950668970668a87668c99' +
+  '66ac6566ac5566cd9467895867ab66689984689b87689b7068ac8568ac5368ac4369ac836aac656acd44777c2178bd91' +
+  '889c7888cc5488cc6989ac9389ad6589ad1689bc938abc4899cc649acd42abcc54'
+
 export interface FractionPuzzle {
   tiles: number[]
   target: number
 }
 
-let fractionPuzzles: FractionPuzzle[] | null = null
+const fractionPuzzles: Partial<Record<'plain' | 'square', FractionPuzzle[]>> = {}
 
-export function makeNumberFractionPuzzles(): readonly FractionPuzzle[] {
-  if (!fractionPuzzles) {
+export function makeNumberFractionPuzzles(square = false): readonly FractionPuzzle[] {
+  const key = square ? 'square' : 'plain'
+  if (!fractionPuzzles[key]) {
+    const table = square ? SQUARE_FRACTION_TABLE : FRACTION_TABLE
     const out: FractionPuzzle[] = []
-    for (let i = 0; i + 6 <= FRACTION_TABLE.length; i += 6) {
-      const s = FRACTION_TABLE.slice(i, i + 6)
+    for (let i = 0; i + 6 <= table.length; i += 6) {
+      const s = table.slice(i, i + 6)
       out.push({ tiles: [0, 1, 2, 3].map((k) => parseInt(s[k], 14)), target: Number(s.slice(4)) })
     }
-    fractionPuzzles = out
+    fractionPuzzles[key] = out
   }
-  return fractionPuzzles
+  return fractionPuzzles[key]!
 }
 
 // ── puzzles ─────────────────────────────────────────────────────────────────
@@ -604,36 +638,43 @@ function fixedPuzzle(p: MakeNumberBand, rng: Rng): Puzzle | null {
   const ops: MakeOp[] = ['+', '−', ...(p.times ? (['×'] as const) : []), ...(p.divide ? (['÷'] as const) : [])]
   for (let attempt = 0; attempt < 400; attempt++) {
     const tiles = draw(p, rng)
-    const by = new Map<number, { ways: number; clean: MakeOp[][]; bad: boolean }>()
-    for (const signs of signChoices(tiles.length - 1, ops)) {
-      const v = fixedValue(tiles, signs)
-      if (!v || v.d !== 1 || v.n < 1 || v.n > p.maxTarget) continue
-      let s = by.get(v.n)
-      if (!s) {
-        s = { ways: 0, clean: [], bad: false }
-        by.set(v.n, s)
+    const by = new Map<number, { ways: number; clean: { signs: MakeOp[]; mask: number }[]; bad: boolean }>()
+    for (let mask = 0; mask < (p.square ? 2 ** tiles.length : 1); mask++) {
+      for (const signs of signChoices(tiles.length - 1, ops)) {
+        const v = fixedValue(tiles.map((v, i) => mask & (1 << i) ? v * v : v), signs)
+        if (!v || v.d !== 1 || v.n < 1 || v.n > p.maxTarget) continue
+        let s = by.get(v.n)
+        if (!s) {
+          s = { ways: 0, clean: [], bad: false }
+          by.set(v.n, s)
+        }
+        s.ways++
+        // Every way must use the band's new idea: a − (the plain sum is no puzzle), a ×, a ÷.
+        if (p.kind === 'plus' && tiles.length > 2 && !signs.includes('−')) s.bad = true
+        if (p.need === '×' && !signs.includes('×')) s.bad = true
+        if (p.need === '÷' && !signs.includes('÷')) s.bad = true
+        if (p.need === '²' && mask === 0) s.bad = true
+        if (v.clean) s.clean.push({ signs, mask })
       }
-      s.ways++
-      // Every way must use the band's new idea: a − (the plain sum is no puzzle), a ×, a ÷.
-      if (p.kind === 'plus' && !signs.includes('−')) s.bad = true
-      if (p.need === '×' && !signs.includes('×')) s.bad = true
-      if (p.need === '÷' && !signs.includes('÷')) s.bad = true
-      if (v.clean) s.clean.push(signs)
     }
     const valid = [...by].filter(([, s]) => !s.bad && s.clean.length > 0)
     // The hardest bands ask for the one way there is.
     const pick = chooseTarget(p.hard >= 1 ? valid.filter(([, s]) => s.ways === 1) : valid, p.hard, rng)
     if (!pick) continue
-    const signs = rng.pick(pick[1].clean)
-    const witness: MakeToken[] = [num(tiles[0], 0)]
-    signs.forEach((o, i) => witness.push(op(o), num(tiles[i + 1], i + 1)))
+    const { signs, mask } = rng.pick(pick[1].clean)
+    const witness: MakeToken[] = []
+    tiles.forEach((v, i) => {
+      if (i > 0) witness.push(op(signs[i - 1]))
+      witness.push(num(v, i))
+      if (mask & (1 << i)) witness.push(op('²'))
+    })
     return { tiles, target: pick[0], witness, ways: pick[1].ways }
   }
   return null
 }
 
 /** A shown order the target cannot be made in as it stands (any-order bands: the order is part of the puzzle). */
-function unhelpfulOrder(tiles: readonly number[], target: number, ops: readonly MakeOp[], rng: Rng): number[] | null {
+function unhelpfulOrder(tiles: readonly number[], target: number, ops: readonly MakeOp[], rng: Rng, square = false): number[] | null {
   const perms: number[][] = []
   const permute = (prefix: number[], left: number[]) => {
     if (left.length === 0) perms.push(prefix)
@@ -643,11 +684,13 @@ function unhelpfulOrder(tiles: readonly number[], target: number, ops: readonly 
   for (const order of rng.shuffle(perms)) {
     const shown = order.map((i) => tiles[i])
     let makes = false
-    for (const signs of signChoices(shown.length - 1, ops)) {
-      const v = fixedValue(shown, signs)
-      if (v && v.d === 1 && v.n === target) {
-        makes = true
-        break
+    for (let mask = 0; mask < (square ? 2 ** shown.length : 1) && !makes; mask++) {
+      for (const signs of signChoices(shown.length - 1, ops)) {
+        const v = fixedValue(shown.map((v, i) => mask & (1 << i) ? v * v : v), signs)
+        if (v && v.d === 1 && v.n === target) {
+          makes = true
+          break
+        }
       }
     }
     if (!makes) return order
@@ -662,7 +705,7 @@ function shownWitness(t: MakeTree, order: readonly number[]): MakeToken[] {
 
 /** Any order, no brackets. */
 function anyOrderPuzzle(p: MakeNumberBand, rng: Rng): Puzzle | null {
-  const allow = { times: true, divide: true, flatOnly: true }
+  const allow = { times: true, divide: true, square: p.square, flatOnly: true }
   const ops: MakeOp[] = ['+', '−', '×', '÷']
   for (let attempt = 0; attempt < 200; attempt++) {
     const tiles = draw(p, rng)
@@ -671,7 +714,7 @@ function anyOrderPuzzle(p: MakeNumberBand, rng: Rng): Puzzle | null {
     let valid = [...stats].filter(([t, s]) => s.flatClean && t !== total).map(([t, s]) => [t, { ways: s.flatWays }] as [number, { ways: number }])
     for (let k = 0; k < 4 && valid.length > 0; k++) {
       const pick = chooseTarget(valid, p.hard, rng)!
-      const order = unhelpfulOrder(tiles, pick[0], ops, rng)
+      const order = unhelpfulOrder(tiles, pick[0], ops, rng, p.square)
       if (!order) {
         valid = valid.filter(([t]) => t !== pick[0])
         continue
@@ -685,7 +728,8 @@ function anyOrderPuzzle(p: MakeNumberBand, rng: Rng): Puzzle | null {
 
 /** Any order with brackets, and no way without them (24 every time on the 24 band). */
 function bracketPuzzle(p: MakeNumberBand, rng: Rng): Puzzle | null {
-  const allow = { times: true, divide: true }
+  if (p.target24 && p.square) return square24Puzzle(p, rng)
+  const allow = { times: true, divide: true, square: p.square }
   for (let attempt = 0; attempt < 400; attempt++) {
     const tiles = draw(p, rng)
     const stats = treeStats(tiles, allow, p.maxTarget)
@@ -699,10 +743,45 @@ function bracketPuzzle(p: MakeNumberBand, rng: Rng): Puzzle | null {
   return null
 }
 
+/** Solved offline over all 1..13 tile sets, with optional squares: 24 needs brackets.
+ * Store each set plus its exact solution count so live generation never searches rejected sets. */
+const SQUARE_24_TABLE =
+  '1117:1c,1118:o,111b:1c,111c:9c,111d:1c,1122:o,1123:1s,1124:18,1127:7k,1128:70,1129:1c,1133:6w,1136:4' +
+  'o,1137:4k,1139:3g,113a:k,113b:g,113c:3o,1144:1k,1145:3g,114b:g,114c:1c,1156:3g,1158:c,115a:8,115b:38' +
+  ',115c:30,115d:8,1166:1c,1168:o,1169:4,117a:4,117c:30,117d:38,1188:g,118c:c,118d:w,1222:8o,125b:22,12' +
+  '77:i,1299:o,12bd:1q,133a:w,135d:1e,137b:16,138a:g,1399:2k,139a:s,13ad:q,13bd:g,1459:k,145b:1s,146a:1' +
+  '2,146c:3c,147b:a,14ac:22,14bb:g,14bd:8,1559:8,155c:18,1569:18,156b:a,158d:2,159c:g,159d:4,15ad:g,166' +
+  '8:s,1678:8,1679:i,167d:a,1688:w,168d:q,169c:12,169d:u,16aa:4,16ab:4,16ad:a,16bc:q,16bd:2,16cd:o,177c' +
+  ':c,178b:c,178d:4,179a:8,179b:c,179d:g,17ac:s,17ad:6,17bc:8,188a:o,188c:w,18aa:2,18bd:i,18cd:a,19ac:a' +
+  ',19ad:g,19bb:8,19bc:u,19bd:8,19cc:g,1aac:8,1abc:k,1abd:2,1acd:m,1bcd:10,2388:19,23ab:c,244d:w,25bd:n' +
+  ',266b:g,266d:i,267b:j,2777:1u,2799:g,27bb:8,27cd:g,2889:q,288b:8,28bd:e,29ab:c,29cd:g,2aad:c,2abd:9,' +
+  '2bcc:14,2ccd:14,333d:u,3368:2i,339d:i,33aa:8,33ac:i,33dd:8,3577:4,35bc:m,366b:m,367b:a,36bd:v,377b:1' +
+  ',377c:8,378a:8,3799:a,37bd:4,388a:2,38ab:c,399a:b,399d:8,39aa:4,39ac:9,39dd:4,3abd:s,3acc:q,3bbd:8,3' +
+  'ccd:g,3cdd:4,444d:6,4456:22,448d:f,449a:u,44bb:a,4566:2a,457d:d,4599:4,459b:b,45bb:9,45bd:f,466b:2,4' +
+  '66d:12,468b:3,46ab:k,46cd:j,477c:5,488b:s,48ab:l,48ad:6,499d:8,49ad:q,4bbc:5,4bcc:2,4ccd:2,559b:g,56' +
+  '68:q,5679:a,567b:l,5688:u,568b:g,568c:j,5699:w,569b:z,569d:4,56bb:4,56bd:h,5779:4,578b:9,579c:r,57bc' +
+  ':r,588c:c,58bd:c,58cc:2,59bd:c,59cc:g,5aad:2,5bdd:c,6678:s,6679:12,667a:a,6688:s,668b:o,668d:2,669a:' +
+  'u,669b:q,66ab:e,677a:5,6789:k,679b:5,679c:a,68bc:9,69ac:x,69bd:8,69dd:2,6acd:r,777c:2i,778b:5,778d:a' +
+  ',779c:2,77ab:e,77ac:3,788b:e,788d:k,789a:6,789b:2,789c:t,789d:f,78aa:7,78cc:c,78dd:a,799a:8,79bc:h,7' +
+  '9bd:4,79cd:7,7aac:8,7abc:b,7abd:c,7acc:e,7bbc:4,7bcc:o,7ccc:o,7ddd:c,88aa:a,89ab:a,8aab:3,8aad:2,8ab' +
+  'd:4,8acd:9,8bcc:2,8bcd:j,8ccc:f,999c:30,9abb:2,9abd:d,9acc:e,9bbd:8,9bcd:a,9ccd:2,abcc:s'
+const SQUARE_24_PUZZLES = SQUARE_24_TABLE.split(',').map((entry) => {
+  const [tiles, ways] = entry.split(':')
+  return { tiles: [...tiles].map((x) => parseInt(x, 14)), ways: parseInt(ways, 36) }
+})
+
+function square24Puzzle(p: MakeNumberBand, rng: Rng): Puzzle {
+  const candidates = SQUARE_24_PUZZLES.map((f, i) => [i, f] as [number, typeof f])
+  const f = chooseTarget(candidates, p.hard, rng)![1]
+  const w = bestTree(f.tiles, 24, { times: true, divide: true, square: true }, (t) => t.clean, rng)!
+  const order = rng.shuffle(f.tiles.map((_, i) => i))
+  return { tiles: order.map((i) => f.tiles[i]), target: 24, witness: shownWitness(w, order), ways: f.ways }
+}
+
 /** A non-whole value on every way: from the table, numbers to 9 or to 13 as the band says. */
 function fractionPuzzle(p: MakeNumberBand, rng: Rng): Puzzle {
-  const allow = { times: true, divide: true }
-  const pool = makeNumberFractionPuzzles().filter((f) => Math.max(...f.tiles) <= p.maxTile && f.tiles.every((x) => x >= p.minTile))
+  const allow = { times: true, divide: true, square: p.square }
+  const pool = makeNumberFractionPuzzles(p.square).filter((f) => Math.max(...f.tiles) <= p.maxTile && f.tiles.every((x) => x >= p.minTile))
   const f = rng.pick(pool)
   let ways = 0
   eachTree(f.tiles, allow, (t) => {
@@ -732,7 +811,7 @@ function makePuzzle(p: MakeNumberPlan, rng: Rng): Puzzle {
 
 const expectsOperand = (expr: readonly MakeToken[]) => {
   const last = expr[expr.length - 1]
-  return !last || (last.kind === 'op' && last.op !== ')')
+  return !last || (last.kind === 'op' && last.op !== ')' && last.op !== '²')
 }
 const openBrackets = (expr: readonly MakeToken[]) => expr.reduce((n, t) => n + (t.kind === 'op' ? (t.op === '(' ? 1 : t.op === ')' ? -1 : 0) : 0), 0)
 const usedTiles = (expr: readonly MakeToken[]) => new Set(expr.flatMap((t) => (t.kind === 'num' ? [t.tile] : [])))
@@ -777,6 +856,7 @@ const idx = {
 
 function opEnabled(s: MakeNumberState, o: MakeOp): boolean {
   const want = expectsOperand(s.expr)
+  if (o === '²') return s.expr.at(-1)?.kind === 'num'
   if (s.order === 'fixed') return !want && usedTiles(s.expr).size < s.tiles.length
   if (o === '(') return want && usedTiles(s.expr).size < s.tiles.length
   if (o === ')') return !want && openBrackets(s.expr) > 0
@@ -794,12 +874,12 @@ export const makeNumber: BrainGameDef<MakeNumberState> = {
   create(level, rng, ctx) {
     const p = makeNumberPlan(level, ctx)
     const puzzle = makePuzzle(p, rng)
-    const ops: MakeOp[] = ['+', '−', ...(p.times ? (['×'] as const) : []), ...(p.divide ? (['÷'] as const) : []), ...(p.brackets ? (['(', ')'] as const) : [])]
+    const ops: MakeOp[] = ['+', '−', ...(p.times ? (['×'] as const) : []), ...(p.divide ? (['÷'] as const) : []), ...(p.square ? (['²'] as const) : []), ...(p.brackets ? (['(', ')'] as const) : [])]
     const tags: string[] = []
     if (puzzle.tiles.length >= 4) tags.push('makeNumber.tiles4')
-    if (puzzle.tiles.length >= 5) tags.push('makeNumber.tiles5')
     if (p.times) tags.push('makeNumber.multiply')
     if (p.divide) tags.push('makeNumber.divide')
+    if (p.square) tags.push('makeNumber.square')
     if (p.order === 'any') tags.push('makeNumber.anyOrder')
     if (p.brackets) tags.push('makeNumber.brackets')
     if (p.target24) tags.push('makeNumber.target24')
@@ -842,12 +922,12 @@ export const makeNumber: BrainGameDef<MakeNumberState> = {
     if (i >= idx.op(s, 0) && i < idx.op(s, s.ops.length)) {
       const o = s.ops[i - idx.op(s, 0)]
       if (!opEnabled(s, o)) return s
-      if (!fixed) return edit([...s.expr, op(o)])
+      if (!fixed || o === '²') return edit([...s.expr, op(o)])
       const next = usedTiles(s.expr).size
       return edit([...s.expr, op(o), num(s.tiles[next], next)])
     }
     const base = start(s)
-    if (i === idx.undo(s)) return s.expr.length > base.length ? edit(s.expr.slice(0, fixed ? -2 : -1)) : s
+    if (i === idx.undo(s)) return s.expr.length > base.length ? edit(s.expr.slice(0, fixed && s.expr.at(-1)?.kind === 'num' ? -2 : -1)) : s
     if (i === idx.clear(s)) return s.expr.length > base.length ? edit(base) : s
     if (i === idx.submit(s)) {
       if (!complete(s)) return s

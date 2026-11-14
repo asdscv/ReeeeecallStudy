@@ -248,7 +248,7 @@ export interface CodeBreakView {
   solved?: boolean
 }
 
-export type MakeOp = '+' | '−' | '×' | '÷' | '(' | ')'
+export type MakeOp = '+' | '−' | '×' | '÷' | '²' | '(' | ')'
 
 export type MakeToken = { kind: 'num'; value: number; tile: number } | { kind: 'op'; op: MakeOp }
 

@@ -258,7 +258,8 @@
     "mazeKey_one": "Key {{count}}",
     "mazeKey_other": "Key {{count}}",
     "memorizeNumbers": "Remember the positions · 1 to {{max}}",
-    "memoryBadge": "Face-down memory"
+    "memoryBadge": "Face-down memory",
+    "makeSquare": "Square the last number"
   },
   "summary": {
     "livesOut": "Round over",
@@ -642,6 +643,10 @@
       "fraction": {
         "title": "Fractions on the way",
         "body": "Intermediate results can be fractions. Only the final answer must match the target."
+      },
+      "square": {
+        "title": "Squaring a number",
+        "body": "Tap ² after a number to multiply it by itself: 3² = 9. Each tile can be squared once. Square first, then × and ÷, then + and −. A new operator starts with fewer numbers, then more are added."
       }
     },
     "mazeRun": {
