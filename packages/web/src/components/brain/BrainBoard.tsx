@@ -30,6 +30,13 @@ export interface BoardProps {
 }
 
 export function BrainBoard(props: BoardProps) {
+  // Very short exposures must show the stimulus immediately, for its full allotted duration.
+  return props.view.difficulty === 'extreme'
+    ? <div className="contents" data-brain-extreme><BoardContent {...props} /></div>
+    : <BoardContent {...props} />
+}
+
+function BoardContent(props: BoardProps) {
   const { view } = props
   if (view.kind === 'grid') return <Grid {...props} view={view} />
   if (view.kind === 'choice') return <Choice {...props} view={view} />

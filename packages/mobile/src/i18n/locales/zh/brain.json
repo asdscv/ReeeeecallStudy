@@ -259,7 +259,12 @@
     "mazeKey_other": "第{{count}}把钥匙",
     "memorizeNumbers": "记住数字位置 · 1到{{max}}",
     "memoryBadge": "翻牌记忆",
-    "makeSquare": "将最后一个数平方"
+    "makeSquare": "将最后一个数平方",
+    "difficulty": {
+      "foundation": "轻松起步 · 无时间限制",
+      "extreme": "极限难度"
+    },
+    "extremeSequence": "同一个格子可能再次亮起。每次亮起都要作为顺序中的一步记住。"
   },
   "summary": {
     "livesOut": "本轮结束",

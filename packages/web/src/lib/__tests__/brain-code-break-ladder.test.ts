@@ -452,3 +452,9 @@ describe('a round is short: five codes, each a different one', () => {
     expect(new Set(secrets).size).toBe(5)
   })
 })
+
+it('the same secret stays a repeat when the available digit pool changes', () => {
+  const def = brainGame('codeBreak').def
+  const s = def.create(5, createRng(19), DEFAULT_CONTEXT)
+  expect(def.signature({ ...s, pool: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] })).toBe(def.signature(s))
+})

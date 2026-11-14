@@ -519,6 +519,14 @@ function playDays(id: PersonaId, seed: number, rounds: number, stopAfter?: numbe
           continue
         }
         const v = cur.view
+        if (v.kind === 'setMatch' && v.difficulty === 'foundation' && !v.locked) {
+          // The three-card starter has one valid set and no clock; the old timed-search model
+          // would otherwise wait forever for a timer that deliberately does not exist.
+          act(() => vi.advanceTimersByTime(800))
+          for (const tap of result.current.solution ?? []) act(() => result.current.tap(tap))
+          log.push({ kind: cur.trialKind, level: cur.level, p: 1, correct: result.current.result?.correct ?? false })
+          continue
+        }
         if (v.kind !== 'setMatch' || v.locked || !cur.timer) {
           act(() => vi.advanceTimersByTime(50))
           continue

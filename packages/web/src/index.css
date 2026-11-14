@@ -299,6 +299,9 @@ aside {
 .bfx-drift { animation: bfx-drift 18s ease-in-out infinite; }
 .bfx-glow { animation: bfx-glow 1.6s ease-out infinite; }
 
+/* Extreme trials use short, deliberate exposures; decorative entrances must not consume them. */
+[data-brain-extreme] * { animation: none !important; transition: none !important; }
+
 /* Respect OS "reduce motion" — neutralize decorative animation/transition while
    keeping opacity changes perceivable. (WCAG 2.3.3 / Apple-Google baseline) */
 @media (prefers-reduced-motion: reduce) {

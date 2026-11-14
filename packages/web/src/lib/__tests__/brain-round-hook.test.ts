@@ -44,9 +44,9 @@ describe('memorise phases and pause', () => {
     const { result } = renderHook(() => useBrainRound('memoryGrid', PLATFORM))
     const view = result.current.view
     expect(view.kind === 'grid' && view.locked).toBe(true)
-    // Level 1: 3 cells for 1540ms (its memorise bar says how long). Pause 450ms before the end, wait a minute, resume.
+    // Foundation: one cell for 3500ms (its memorise bar says how long). Pause 450ms before the end, wait a minute, resume.
     const showMs = view.kind === 'grid' ? (view.showBar?.ms ?? 0) : 0
-    expect(showMs).toBe(1540)
+    expect(showMs).toBe(3500)
     advance(showMs - 450)
     act(() => result.current.pause())
     advance(60_000)
@@ -60,7 +60,7 @@ describe('memorise phases and pause', () => {
 
 describe('rounds always end', () => {
   it('relaxed timing: a timeout never costs a chance (EVIDENCE §4.3), and the round still ends — at its cap, not as cleared', () => {
-    seed((p) => ({ ...p, settings: { ...p.settings, timing: 2 } }))
+    seed((p) => ({ ...p, settings: { ...p.settings, timing: 2 }, games: { ...p.games, memoryGrid: { level: 2, bestLevel: 2, rounds: 1, wins: 0 } } }))
     const { result } = renderHook(() => useBrainRound('memoryGrid', PLATFORM))
     for (let i = 0; i < 80 && !result.current.over; i++) advance(10_000)
     expect(result.current.over).toBe(true)
@@ -163,6 +163,23 @@ describe('placement and rule cards in a round', () => {
     }
     expect(result.current.result).toMatchObject({ correct: true, kind: 'intro', livesLost: 0 })
     expect(result.current.result!.levelAfter).toBeGreaterThan(14)
+  })
+
+  it('an extreme saved level introduces an unseen Code Break or Number Hunt memory rule on its first small board', () => {
+    for (const [id, rule, level, cells] of [['codeBreak', 'codeBreak.repeats', 40, 3], ['schulte', 'schulte.memory', 45, 4]] as const) {
+      const meta = emptyMeta()
+      meta.seen = MECHANICS.filter((m) => m.game === id && m.tag !== rule)
+        .reduce((mask, m) => setBit(mask, mechanicInfo(m.tag)!.bit), meta.seen)
+      meta.sk[id] = { mu: level, sd: 1, n: 20, day: TODAY }
+      seed((p) => ({ ...p, practiced: [...p.practiced, id], games: { ...p.games, [id]: { level, bestLevel: level, rounds: 20, wins: 18 } } }), meta)
+      const { result, unmount } = renderHook(() => useBrainRound(id, PLATFORM))
+      expect(result.current.intro?.tag).toBe(rule)
+      expect(result.current.view.difficulty).not.toBe('extreme')
+      const view = result.current.view
+      expect(view.kind === 'codeBreak' ? view.length : view.kind === 'grid' ? view.cells.length : 0).toBe(cells)
+      expect(result.current.level).toBeGreaterThan(level - 1)
+      unmount()
+    }
   })
 
   it("a game never played starts by finding the level: no chances spent, then the staircase takes over higher than 1", () => {
@@ -458,10 +475,10 @@ describe('the board games\' new round logic (GAMES_DIFFICULTY_PLAN §2.3-2.9)', 
     expect(result.current.level).toBeGreaterThanOrEqual(12.5)
   })
 
-  it('span fast entry: a first round jumps two lengths a pass (never past the reverse rule), and its first miss costs no chance', () => {
+  it('span fast entry walks the gentle items first, then jumps two lengths without skipping the reverse rule, and its first miss is free', () => {
     seed()
     const { result } = renderHook(() => useBrainRound('sequence', PLATFORM))
-    expect(result.current.level).toBe(2)
+    expect(result.current.level).toBe(1)
     const levels: number[] = []
     let missed = false
     for (let guard = 0; guard < 8000 && !missed && !result.current.over; guard++) {
@@ -484,7 +501,7 @@ describe('the board games\' new round logic (GAMES_DIFFICULTY_PLAN §2.3-2.9)', 
         act(() => r.tap(taps[0]))
       } else advance(100)
     }
-    expect(levels).toEqual([2, 4, 6])
+    expect(levels.map((level) => Number(level.toFixed(2)))).toEqual([1, 1.3, 1.6, 2, 4, 6])
     expect(result.current.result).toMatchObject({ correct: false, livesLost: 0, levelAfter: 5 })
     expect(result.current.lives).toBe(2)
   })

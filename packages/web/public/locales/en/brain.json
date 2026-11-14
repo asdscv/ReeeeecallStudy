@@ -259,7 +259,12 @@
     "mazeKey_other": "Key {{count}}",
     "memorizeNumbers": "Remember the positions · 1 to {{max}}",
     "memoryBadge": "Face-down memory",
-    "makeSquare": "Square the last number"
+    "makeSquare": "Square the last number",
+    "difficulty": {
+      "foundation": "Gentle start · no time limit",
+      "extreme": "Extreme level"
+    },
+    "extremeSequence": "A cell can light up again. Remember every flash as a separate step."
   },
   "summary": {
     "livesOut": "Round over",

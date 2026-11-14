@@ -259,7 +259,12 @@
     "mazeKey_other": "{{count}}番の鍵",
     "memorizeNumbers": "数字の位置を覚えてください · 1〜{{max}}",
     "memoryBadge": "裏返して記憶",
-    "makeSquare": "最後の数を二乗"
+    "makeSquare": "最後の数を二乗",
+    "difficulty": {
+      "foundation": "やさしいスタート・時間制限なし",
+      "extreme": "極限の難易度"
+    },
+    "extremeSequence": "同じマスが再び光ることがあります。光るたびに順番の一つとして覚えてください。"
   },
   "summary": {
     "livesOut": "ラウンド終了",

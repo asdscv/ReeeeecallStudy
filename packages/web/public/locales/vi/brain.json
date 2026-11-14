@@ -259,7 +259,12 @@
     "mazeKey_other": "Chìa số {{count}}",
     "memorizeNumbers": "Nhớ vị trí các số · 1 đến {{max}}",
     "memoryBadge": "Nhớ thẻ úp",
-    "makeSquare": "Bình phương số cuối"
+    "makeSquare": "Bình phương số cuối",
+    "difficulty": {
+      "foundation": "Khởi đầu nhẹ nhàng · không giới hạn thời gian",
+      "extreme": "Độ khó cực cao"
+    },
+    "extremeSequence": "Một ô có thể sáng lại. Hãy nhớ mỗi lần sáng là một bước riêng trong chuỗi."
   },
   "summary": {
     "livesOut": "Kết thúc lượt",

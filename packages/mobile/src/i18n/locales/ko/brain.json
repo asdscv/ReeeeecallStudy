@@ -259,7 +259,12 @@
     "mazeKey_other": "{{count}}번 열쇠",
     "memorizeNumbers": "숫자 자리를 기억하세요 · 1부터 {{max}}까지",
     "memoryBadge": "뒤집어 기억하기",
-    "makeSquare": "마지막 수를 제곱"
+    "makeSquare": "마지막 수를 제곱",
+    "difficulty": {
+      "foundation": "천천히 시작 · 시간 제한 없음",
+      "extreme": "극한 난이도"
+    },
+    "extremeSequence": "같은 칸이 다시 켜질 수 있어요. 켜진 횟수마다 순서에 넣어 기억하세요."
   },
   "summary": {
     "livesOut": "라운드 끝",
