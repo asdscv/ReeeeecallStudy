@@ -153,6 +153,6 @@ queue manager, 두 store 연결부, phase 테스트를 revert한다. schema/data
 - shared/web `study-queue.ts` byte-identical (`cmp`) and `git diff --check` passed
 - web production build passed in 3.38s
 - independent review: APPROVED; due boundary, promotion order, future-only completion, snapshot, stats, store result 전달에 blocker/high/medium 없음
-- PR: https://github.com/asdscv/ReeeeecallStudy/pull/334
+- PR: https://github.com/asdscv/Reklue/pull/334
 - Remote CI: initial Supabase startup이 upstream 502로 실패했으나 같은 commit의 failed job rerun에서 통과; 최종 7 checks 모두 green
 - 완료 문서 위치: `DOCS/DONE/STUDY-HARDENING/PHASE-3-SRS-TIMESTAMP-DUE-QUEUE.md`

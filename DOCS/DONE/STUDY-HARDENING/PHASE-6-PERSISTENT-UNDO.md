@@ -29,7 +29,7 @@
 
 - 설계 commit: `f18083a docs(study): design phase 6 persistent undo`
 - 구현 commit: `6dddf2d feat(study): make undo persistent — server first, then the UI`
-- PR: https://github.com/asdscv/ReeeeecallStudy/pull/340 (merge `44a0253`)
+- PR: https://github.com/asdscv/Reklue/pull/340 (merge `44a0253`)
 - 원격 CI: 7 checks 전부 SUCCESS(재시도 없이 1회 통과)
 - 로컬 검증: store 9 tests, study-store 회귀 44 tests, integration 43 tests(신규 9 포함),
   web `tsc -b` / `vite build` / mobile `tsc` green, fresh `supabase db reset` 2회,

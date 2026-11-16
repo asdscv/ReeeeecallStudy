@@ -6,7 +6,7 @@
 
 - 설계 commit: `262726f docs(study): design phase 7 shared single source`
 - 구현 commit: `7a4fc74 refactor(study): one implementation of the study engine, not two`
-- PR: https://github.com/asdscv/ReeeeecallStudy/pull/343 (merge `43bf6ad`)
+- PR: https://github.com/asdscv/Reklue/pull/343 (merge `43bf6ad`)
 - 검증: web 전수 vitest 128 files / 2180 tests, 학습 store suite 7종 44 tests,
   web `tsc -b` / `vite build` / mobile `tsc` 무오류, Architecture Guard 통과 +
   사본 재생성 시 exit 1 확인, 신규 lint 오류 0
