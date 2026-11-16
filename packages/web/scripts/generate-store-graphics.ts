@@ -1,0 +1,46 @@
+import { readFile, mkdir, writeFile } from 'node:fs/promises'
+import { resolve } from 'node:path'
+import sharp from 'sharp'
+
+const captions: Record<string, string> = {
+  en: 'Flashcards & Brain Games',
+  ko: '카드 공부와 두뇌 게임',
+  ja: '暗記カードと脳トレ',
+  zh: '闪卡学习与脑力游戏',
+  vi: 'Thẻ học & trò chơi trí não',
+  th: 'แฟลชการ์ดและเกมฝึกสมอง',
+  id: 'Flashcard & permainan otak',
+  es: 'Tarjetas de estudio y juegos mentales',
+}
+
+const xml = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;')
+
+async function main() {
+  const publicDir = resolve(import.meta.dirname, '..', 'public')
+  const outDir = resolve(publicDir, '..', '..', 'mobile', 'store-assets', 'feature-graphics')
+  const symbol = (await readFile(resolve(publicDir, 'favicon.png'))).toString('base64')
+  const wordmark = (await readFile(resolve(publicDir, 'logo-text.svg'), 'utf8'))
+    .replace('<svg ', '<svg x="352" y="159" width="536" height="149" ')
+  await mkdir(outDir, { recursive: true })
+  for (const [locale, caption] of Object.entries(captions)) {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1024" height="500" viewBox="0 0 1024 500">
+<title>Reklue — ${xml(caption)}</title>
+<defs><linearGradient id="canvas" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset="1" stop-color="#eaf5ff"/></linearGradient></defs>
+<rect width="1024" height="500" fill="url(#canvas)"/>
+<circle cx="960" cy="20" r="190" fill="#dbeafe" opacity="0.5"/>
+<circle cx="20" cy="490" r="160" fill="#ccfbf1" opacity="0.4"/>
+<image x="104" y="120" width="216" height="216" xlink:href="data:image/png;base64,${symbol}"/>
+${wordmark}
+<text x="512" y="378" text-anchor="middle" font-family="Arial,Apple SD Gothic Neo,Hiragino Sans GB,Thonburi,sans-serif" font-size="38" font-weight="500" fill="#334155">${xml(caption)}</text>
+<text x="512" y="439" text-anchor="middle" font-family="Arial,sans-serif" font-size="25" letter-spacing="1" fill="#2563eb">reklue.com</text>
+</svg>`
+    await writeFile(resolve(outDir, `${locale}.svg`), svg)
+    await sharp(Buffer.from(svg)).png().toFile(resolve(outDir, `${locale}.png`))
+  }
+  console.log(`Generated ${Object.keys(captions).length} Reklue feature graphics (1024×500).`)
+}
+
+main().catch((error: unknown) => {
+  console.error(error)
+  process.exitCode = 1
+})
