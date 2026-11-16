@@ -37,7 +37,7 @@ These are compatibility/history references, not product display names. Do not re
 ## Outstanding console checks
 
 - Search keyword automation still reads the former Search Console property until the user confirms restricted access for the existing keyword service account on the new property. A briefly added grant was immediately revoked; only the owner remains on the new property.
-- Google OAuth consent branding is separate from the deployment project above. Supabase Google login is enabled and uses a client from project number `212581278702`; that project does not appear in the signed-in `asdscv@gmail.com` project list. The owner has been asked to reauthenticate the other existing Google account in Chrome to locate the actual OAuth project. No OAuth credentials, callbacks, providers or permissions were changed.
+- Use the owner’s `asdscv@gmail.com` Google account for this app. Cloud Console access with that account was verified. The earlier request to sign in with a different existing Google account was an unsupported ownership assumption and has been withdrawn. Supabase Google login is enabled; the real app login uses client `212581278702-r7560o2uu0b9gubgnrlncmiini7bf6i6.apps.googleusercontent.com` and returns through the existing Supabase callback to `https://reklue.com/auth/callback`. The OAuth consent-brand configuration still needs to be located and verified in the owner’s account; a project-picker search miss does not establish a different owner. No OAuth credentials, callbacks, providers or permissions were changed.
 - Chrome computer control recovered. Registrar verification and Play privacy-policy checks above are complete; store approvals are external pending states.
 
 ## Verification
