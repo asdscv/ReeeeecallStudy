@@ -25,8 +25,8 @@ import {
   pickStarters,
   taughtLanguages,
   normalizeLang,
-} from '@reeeeecall/shared/lib/starter-decks'
-import type { MarketplaceListing } from '@reeeeecall/shared/types/database'
+} from '@reklue/shared/lib/starter-decks'
+import type { MarketplaceListing } from '@reklue/shared/types/database'
 
 const from = vi.fn()
 const rpc = vi.fn()
@@ -36,14 +36,14 @@ const client = {
   rpc: (...a: unknown[]) => rpc(...a),
   auth: { getUser: () => getUser() },
 }
-vi.mock('@reeeeecall/shared/lib/supabase', () => ({
+vi.mock('@reklue/shared/lib/supabase', () => ({
   supabase: client,
   getSupabase: () => client,
   initSupabase: vi.fn(),
 }))
 
 const { fetchStarterDecks, ensureStarterSubscriptions } =
-  await import('@reeeeecall/shared/stores/starter-decks')
+  await import('@reklue/shared/stores/starter-decks')
 
 function listing(over: Partial<MarketplaceListing> & { id: string }): MarketplaceListing {
   return {

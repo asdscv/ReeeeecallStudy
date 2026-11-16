@@ -13,14 +13,14 @@
  * thing, and exists because a client count and a server cap once lived in separate packages
  * with no relationship expressed, both individually correct, while the feature was broken.
  */
-import { CARD_MAX_CHARS } from '@reeeeecall/shared/lib/card-content-limits'
+import { CARD_MAX_CHARS } from '@reklue/shared/lib/card-content-limits'
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
   MAX_ANSWER_CHARS, MIN_ANSWER_CHARS, answerLength,
-} from '@reeeeecall/shared/lib/quiz-answer-limits'
+} from '@reklue/shared/lib/quiz-answer-limits'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const serverFile = join(here, '../../../../../supabase/functions/_shared/ai-quiz.ts')

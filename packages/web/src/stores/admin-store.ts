@@ -1,5 +1,5 @@
 // Re-export from shared — single source of truth
-export { useAdminStore } from '@reeeeecall/shared/stores/admin-store'
+export { useAdminStore } from '@reklue/shared/stores/admin-store'
 export type {
   AdminBillingOverview,
   AdminSubscriptionRow,
@@ -13,4 +13,4 @@ export type {
   GrowthLevers,
   RefundResult,
   RefundEligibility,
-} from '@reeeeecall/shared/stores/admin-store'
+} from '@reklue/shared/stores/admin-store'

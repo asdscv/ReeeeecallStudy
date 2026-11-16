@@ -11,8 +11,8 @@ import {
   attemptTypedAnswer,
   latestAttemptForCard,
   KNOWN_SCORE_THRESHOLD,
-} from '@reeeeecall/shared/lib/learning-attempt-selection'
-import type { AttemptRow } from '@reeeeecall/shared/stores/learning-store'
+} from '@reklue/shared/lib/learning-attempt-selection'
+import type { AttemptRow } from '@reklue/shared/stores/learning-store'
 
 function attempt(over: Partial<AttemptRow> & { id: string }): AttemptRow {
   return {

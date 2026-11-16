@@ -16,7 +16,7 @@ const ALLOWED_COLORS = [
 
 const HIGHLIGHT_VARIANTS = ['blue', 'green', 'amber']
 
-const BRAND_SUFFIX = ' | ReeeeecallStudy'
+const BRAND_SUFFIX = ' | Reklue'
 
 // Truncate to `max` chars without splitting a latin word.
 // For CJK (no spaces in head), falls back to a hard cut since CJK has no word boundaries.

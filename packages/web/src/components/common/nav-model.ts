@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { aiHubEntries } from '@reeeeecall/shared/lib/ai/hub/catalog'
+import { aiHubEntries } from '@reklue/shared/lib/ai/hub/catalog'
 import { useAuthStore } from '../../stores/auth-store'
 
 /** The navigation's destinations, shared by the sidebar and the phone menu sheet (AppNav.tsx). */

@@ -1,4 +1,4 @@
-# ARCHITECTURE STANDARD — ReeeeecallStudy (이전됨)
+# ARCHITECTURE STANDARD — Reklue (이전됨)
 
 > **이 문서는 2026-08-16 에 번호 붙은 표준 트리로 확장·이전되었다.**
 > 새 진입점: **[`DOCS/STANDARD/README.md`](README.md)** · 제1원칙: [`01_ARCHITECTURE/modular_composition.md`](01_ARCHITECTURE/modular_composition.md)

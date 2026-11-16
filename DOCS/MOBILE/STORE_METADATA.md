@@ -3,20 +3,9 @@
 > **이 문서가 스토어 등록정보의 원본이다.** 콘솔에 직접 쓰기 전에 여기를 먼저 고치고,
 > 고친 내용을 App Store 8개 로케일 / Google Play 10개 로케일에 그대로 옮긴다.
 >
-> 마지막 반영: **2026-08-28** — 검색 유입이 0이라 리스팅 전체를 다시 썼다.
-> 그날의 실측(iTunes Search API, KR 상위 200): `플래시카드`·`단어암기`·`암기`·`단어장`·
-> `flashcard`·`리콜스터디`·`recall study` 전부 **미노출**, `간격반복`만 158위.
-> 원인은 색인 필드 낭비였다 — 애플이 검색에 쓰는 건 **이름(30) + 부제(30) + 키워드(100)**
-> 뿐인데 **부제가 8개 로케일 전부 `null`** 이었고, **이름은 8개 로케일 전부 `ReeeeecallStudy`**
-> 였다. 설명문은 애플이 색인하지 않는다(Play 는 한다).
->
-> 그때 함께 잡은 거짓 셋:
-> ① Play `ja-JP` 짧은 설명에 한글이 섞여 있었다 — `記憶력을最大化` → `記憶力を最大化`.
-> ② Play 전 로케일 긴 설명이 "Google Gemini, OpenAI, xAI/Grok, Anthropic 지원"이라고
->    적고 있었다. 지금은 서버 키 단일 구성이고 앱에 API 키 입력 UI 자체가 없다. 삭제했다.
-> ③ App Store 설명이 Play 보다 한 세대 뒤처져 "5가지 학습 모드"에 인앱결제 고지가 없었다.
->
-> 숫자를 여기에 박을 때는 출처 파일을 함께 적어라. 출처 없는 숫자가 다시 거짓이 된다.
+> **2026-11-16 리브랜딩 초안:** 브랜드를 **Reklue / 리클루**로 통일했다. 아래 내용은 스토어 반영용 원본이며 외부 콘솔에 적용됐다는 뜻은 아니다.
+> 기본 도메인은 `reklue.com`으로 전환하고, 앱 ID `com.reeeeecall.study`, EAS 프로젝트와 구매 상품 ID는 유지한다.
+> 기기 홈 화면 이름은 새 네이티브 빌드 설치 후 바뀐다.
 
 ## 글자수 한도 (초과하면 API 가 400 을 준다)
 
@@ -31,16 +20,7 @@
 | Google Play 짧은 설명 | 80 | ✅ |
 | Google Play 긴 설명 | 4000 | ✅ 전문 검색 |
 
-**키워드 규칙**: 애플은 이름·부제·키워드의 단어를 자동으로 조합한다. 그래서 세 필드에
-같은 단어를 반복하면 그 글자수는 그냥 버려진다. 아래 목록은 이름·부제에 이미 있는 단어를
-전부 뺀 상태다. 붙여쓴 질의(`recallstudy`)는 조합으로 생기지 않으므로 **토큰을 따로 넣어야
-한다** — ko/ja 처럼 이름이 라틴 문자가 아닌 로케일에서는 `reeeeecallstudy` 도 함께 넣어
-기존 브랜드 검색을 잃지 않게 한다.
-
-Play 도 마찬가지다. 제목의 `Recall Study` 는 `recall` + `study` **두 토큰**으로 쪼개지므로
-붙여쓴 `recallstudy` 질의는 걸리지 않는다. 그래서 긴 설명 끝에 로케일마다 한 줄
-(`(Also written as Recall Study or recallstudy.)` 같은 문장)을 두어 그 토큰을 심어 둔다.
-이 줄을 지우면 Play 10개 로케일에서 `recallstudy` 검색이 통째로 죽는다.
+**브랜드 표기**: 영어와 글로벌 브랜드는 `Reklue`, 한국어 발음 표기는 `리클루`다. 이름·부제·설명은 새 브랜드로 통일하고, 스토어 키워드도 `reklue`로 통일한다.
 
 **이름/부제와 겹치는 키워드는 버려진 글자수다.** 2026-08-28 첫 작성 때 zh(`复习`,`考试`)·
 vi(`ghi nhớ`)·id(`belajar`,`kartu`)·es(`repaso`)가 이름/부제에 이미 있는 말을 키워드에서
@@ -68,17 +48,17 @@ CJK 부분일치(`考试복습`)까지 봐야 한다.
 
 | 필드 | 값 | 길이 |
 |---|---|---|
-| App Store 이름 | `ReeeeecallStudy: Flashcards` | 27/30 |
+| App Store 이름 | `Reklue: Study & Brain Games` | 27/30 |
 | App Store 부제 | `AI Cards & Spaced Repetition` | 28/30 |
 | App Store 키워드 | `recallstudy,recall,study,memorize,vocabulary,quiz,exam,revision,srs,language,school,cram` | 88/100 |
-| Play 앱 이름 | `ReeeeecallStudy: AI Flashcards` | 30/30 |
-| Play 짧은 설명 | Recall Study: AI flashcards + spaced repetition (SRS) to memorize anything fast. | 80/80 |
+| Play 앱 이름 | `Reklue: Study & Brain Games` | 27/30 |
+| Play 짧은 설명 | Reklue: AI flashcards + spaced repetition (SRS) to memorize anything fast. | 74/80 |
 | 프로모션 텍스트 | New: turn a photo of your notes into a full flashcard deck with AI, and let spaced repetition schedule every review for you. 10 free AI cards every day. | 152/170 |
 
-<details><summary>긴 설명 (2173/4000) — App Store · Play 공통</summary>
+<details><summary>긴 설명 (2093/4000) — App Store · Play 공통</summary>
 
 ```
-ReeeeecallStudy (Recall Study) — the smartest way to memorize anything.
+Reklue — the smartest way to memorize anything.
 
 Make flashcards and let science do the rest. Our SRS (Spaced Repetition System) algorithm schedules every review for the moment you are about to forget, so you remember more with less effort. Great for vocabulary and language learning, exam prep, medical and law school, certifications, and anything else you need to keep in your head.
 
@@ -107,9 +87,8 @@ PRICING
 • AI credit packs ($0.99 / $4.99 / $9.99) — for AI use beyond the daily free allowance.
 • AI runs on our servers. There is no API key to buy or configure, and the app never asks you for one.
 
-Start studying smarter today. Download ReeeeecallStudy for free.
+Start studying smarter today. Download Reklue for free.
 
-(Also written as Recall Study or recallstudy.)
 ```
 
 </details>
@@ -118,17 +97,17 @@ Start studying smarter today. Download ReeeeecallStudy for free.
 
 | 필드 | 값 | 길이 |
 |---|---|---|
-| App Store 이름 | `리콜스터디: AI 암기카드 단어장` | 18/30 |
+| App Store 이름 | `리클루 Reklue: 암기카드·두뇌 게임` | 22/30 |
 | App Store 부제 | `플래시카드 영단어 암기앱 간격반복` | 18/30 |
-| App Store 키워드 | `recallstudy,reeeeecallstudy,recall,study,단어암기,암기법,단어외우기,반복학습,복습,퀴즈,공부앱,자격증,토익,수능,공무원,오답노트` | 89/100 |
-| Play 앱 이름 | `리콜스터디: AI 암기카드 단어장` | 18/30 |
-| Play 짧은 설명 | Recall Study - AI 암기카드와 과학적 간격반복(SRS)으로 영단어·시험공부를 가장 빠르게. | 57/80 |
+| App Store 키워드 | `reklue,recall,study,단어암기,암기법,단어외우기,반복학습,복습,퀴즈,공부앱,자격증,토익,수능,공무원,오답노트` | 68/100 |
+| Play 앱 이름 | `리클루 Reklue: 암기카드·두뇌 게임` | 22/30 |
+| Play 짧은 설명 | Reklue - AI 암기카드와 과학적 간격반복(SRS)으로 영단어·시험공부를 가장 빠르게. | 51/80 |
 | 프로모션 텍스트 | 새 기능: 필기 사진 한 장이면 AI가 암기카드 한 덱을 만들어 줍니다. 복습 시점은 간격 반복이 알아서 잡습니다. 매일 AI 카드 10장 무료. | 81/170 |
 
-<details><summary>긴 설명 (1185/4000) — App Store · Play 공통</summary>
+<details><summary>긴 설명 (1111/4000) — App Store · Play 공통</summary>
 
 ```
-리콜스터디(ReeeeecallStudy / Recall Study) — 무엇이든 가장 똑똑하게 외우는 법.
+리클루(Reklue) — 무엇이든 가장 똑똑하게 외우는 법.
 
 카드만 만들면 나머지는 과학이 합니다. SRS(간격 반복) 알고리즘이 잊기 직전의 순간에 복습을 배치해, 더 적은 노력으로 더 오래 기억하게 합니다. 영단어와 어학, 시험공부, 수능·공무원·자격증, 전공 암기까지 외워야 하는 모든 것에 맞습니다.
 
@@ -157,9 +136,8 @@ Start studying smarter today. Download ReeeeecallStudy for free.
 • AI 크레딧 팩($0.99 / $4.99 / $9.99) — 매일 주어지는 무료분을 넘겨 쓸 때.
 • AI는 저희 서버에서 돌아갑니다. 따로 살 API 키도, 넣을 API 키도 없습니다.
 
-오늘부터 더 똑똑하게 공부하세요. 리콜스터디는 무료로 시작합니다.
+오늘부터 더 똑똑하게 공부하세요. 리클루는 무료로 시작합니다.
 
-(리콜스터디는 Recall Study · recallstudy 로도 표기합니다.)
 ```
 
 </details>
@@ -168,17 +146,17 @@ Start studying smarter today. Download ReeeeecallStudy for free.
 
 | 필드 | 값 | 길이 |
 |---|---|---|
-| App Store 이름 | `リコールスタディ: AI暗記カード単語帳` | 20/30 |
+| App Store 이름 | `Reklue: 暗記カード・脳トレ` | 17/30 |
 | App Store 부제 | `フラッシュカード・間隔反復・英単語` | 17/30 |
-| App Store 키워드 | `recallstudy,reeeeecallstudy,recall,study,暗記アプリ,勉強,テスト対策,復習,クイズ,語彙,資格,受験,記憶術,SRS,問題集,語学` | 86/100 |
-| Play 앱 이름 | `リコールスタディ: AI暗記カード単語帳` | 20/30 |
-| Play 짧은 설명 | Recall Study - AIカード生成と科学的なSRS（間隔反復）で記憶力を最大化。 | 45/80 |
+| App Store 키워드 | `reklue,recall,study,暗記アプリ,勉強,テスト対策,復習,クイズ,語彙,資格,受験,記憶術,SRS,問題集,語学` | 65/100 |
+| Play 앱 이름 | `Reklue: 暗記カード・脳トレ` | 17/30 |
+| Play 짧은 설명 | Reklue - AIカード生成と科学的なSRS（間隔反復）で記憶力を最大化。 | 39/80 |
 | 프로모션 텍스트 | 新機能：ノートの写真から、AIが暗記カードのデッキを丸ごと作成。復習のタイミングは間隔反復におまかせ。毎日AIカード10枚が無料です。 | 67/170 |
 
-<details><summary>긴 설명 (1080/4000) — App Store · Play 공통</summary>
+<details><summary>긴 설명 (998/4000) — App Store · Play 공통</summary>
 
 ```
-リコールスタディ（ReeeeecallStudy / Recall Study）— あらゆるものを暗記する、最もスマートな方法。
+Reklue— あらゆるものを暗記する、最もスマートな方法。
 
 カードを作れば、あとは科学の仕事です。SRS（間隔反復）アルゴリズムが「忘れる直前」に復習を配置するので、少ない労力で長く覚えていられます。英単語や語学、テスト対策、資格試験、専門科目の暗記まで。
 
@@ -207,9 +185,8 @@ Start studying smarter today. Download ReeeeecallStudy for free.
 • AIクレジットパック（$0.99 / $4.99 / $9.99）— 毎日の無料分を超えて使うとき。
 • AIは当社のサーバーで動きます。APIキーを買う必要も、入力する必要もありません。
 
-今日から、もっとスマートな学習を。リコールスタディは無料で始められます。
+今日から、もっとスマートな学習を。Reklueは無料で始められます。
 
-（リコールスタディは Recall Study／recallstudy とも表記します。）
 ```
 
 </details>
@@ -218,17 +195,17 @@ Start studying smarter today. Download ReeeeecallStudy for free.
 
 | 필드 | 값 | 길이 |
 |---|---|---|
-| App Store 이름 | `Recall Study 闪卡背单词` | 18/30 |
+| App Store 이름 | `Reklue: 闪卡学习与脑力游戏` | 17/30 |
 | App Store 부제 | `AI记忆卡·间隔重复·考试复习` | 15/30 |
-| App Store 키워드 | `recallstudy,reeeeecallstudy,抽认卡,单词卡,测验,词汇,学习,SRS,笔记,英语,记忆法,记单词,刷题,速记,默写,外语,自学,考研,记忆训练` | 85/100 |
-| Play 앱 이름 | `Recall Study: 闪卡背单词` | 19/30 |
+| App Store 키워드 | `reklue,抽认卡,单词卡,测验,词汇,学习,SRS,笔记,英语,记忆法,记单词,刷题,速记,默写,外语,自学,考研,记忆训练` | 64/100 |
+| Play 앱 이름 | `Reklue: 闪卡学习与脑力游戏` | 17/30 |
 | Play 짧은 설명 | 用 AI 闪卡与科学的间隔重复（SRS），把任何知识牢牢记住。 | 31/80 |
 | 프로모션 텍스트 | 新功能：拍一张笔记照片，AI 就能生成一整副闪卡；复习时机交给间隔重复算法。每天 10 张 AI 卡片免费。 | 54/170 |
 
-<details><summary>긴 설명 (905/4000) — App Store · Play 공통</summary>
+<details><summary>긴 설명 (844/4000) — App Store · Play 공통</summary>
 
 ```
-Recall Study（ReeeeecallStudy）—— 记住任何东西的最聪明方式。
+Reklue—— 记住任何东西的最聪明方式。
 
 做好卡片，剩下的交给科学。SRS（间隔重复）算法会把复习安排在你即将遗忘的那一刻，让你用更少的力气记得更久。适合背单词与语言学习、考试复习、资格证书，以及任何你需要长期记住的内容。
 
@@ -257,9 +234,8 @@ Recall Study（ReeeeecallStudy）—— 记住任何东西的最聪明方式。
 • AI 积分包（$0.99 / $4.99 / $9.99）—— 超出每日免费额度时使用。
 • AI 在我们的服务器上运行，无需购买或填写任何 API 密钥。
 
-今天就开始更聪明地学习。Recall Study 免费下载。
+今天就开始更聪明地学习。Reklue 免费下载。
 
-（Recall Study 也写作 recallstudy。）
 ```
 
 </details>
@@ -268,17 +244,17 @@ Recall Study（ReeeeecallStudy）—— 记住任何东西的最聪明方式。
 
 | 필드 | 값 | 길이 |
 |---|---|---|
-| App Store 이름 | `Recall Study: Thẻ ghi nhớ AI` | 28/30 |
+| App Store 이름 | `Reklue: Thẻ học & Trò trí não` | 29/30 |
 | App Store 부제 | `Lặp lại ngắt quãng & từ vựng` | 28/30 |
-| App Store 키워드 | `recallstudy,reeeeecallstudy,ôn tập,trắc nghiệm,thẻ học,SRS,ngôn ngữ,thi cử,tiếng anh,flashcard` | 94/100 |
-| Play 앱 이름 | `Recall Study: Thẻ ghi nhớ AI` | 28/30 |
+| App Store 키워드 | `reklue,ôn tập,trắc nghiệm,thẻ học,SRS,ngôn ngữ,thi cử,tiếng anh,flashcard` | 73/100 |
+| Play 앱 이름 | `Reklue: Thẻ học & Trò trí não` | 29/30 |
 | Play 짧은 설명 | Ghi nhớ nhanh hơn với thẻ ghi nhớ AI và hệ thống lặp lại ngắt quãng (SRS). | 74/80 |
 | 프로모션 텍스트 | Mới: biến ảnh chụp ghi chép thành cả một bộ thẻ ghi nhớ bằng AI, và để lặp lại ngắt quãng sắp lịch ôn cho bạn. 10 thẻ AI miễn phí mỗi ngày. | 139/170 |
 
-<details><summary>긴 설명 (1990/4000) — App Store · Play 공통</summary>
+<details><summary>긴 설명 (1910/4000) — App Store · Play 공통</summary>
 
 ```
-Recall Study (ReeeeecallStudy) — cách thông minh nhất để ghi nhớ mọi thứ.
+Reklue — cách thông minh nhất để ghi nhớ mọi thứ.
 
 Bạn chỉ cần tạo thẻ, phần còn lại để khoa học lo. Thuật toán SRS (lặp lại ngắt quãng) sắp lịch ôn đúng vào lúc bạn sắp quên, nên bạn nhớ lâu hơn với ít công sức hơn. Phù hợp cho từ vựng và học ngoại ngữ, ôn thi, chứng chỉ và mọi kiến thức bạn cần giữ trong đầu.
 
@@ -307,9 +283,8 @@ GIÁ
 • Gói tín dụng AI ($0,99 / $4,99 / $9,99) — cho phần dùng AI vượt hạn mức miễn phí hằng ngày.
 • AI chạy trên máy chủ của chúng tôi. Không cần mua hay nhập bất kỳ khóa API nào.
 
-Bắt đầu học thông minh hơn ngay hôm nay. Tải Recall Study miễn phí.
+Bắt đầu học thông minh hơn ngay hôm nay. Tải Reklue miễn phí.
 
-(Còn được viết là Recall Study hoặc recallstudy.)
 ```
 
 </details>
@@ -318,17 +293,17 @@ Bắt đầu học thông minh hơn ngay hôm nay. Tải Recall Study miễn ph�
 
 | 필드 | 값 | 길이 |
 |---|---|---|
-| App Store 이름 | `Recall Study: แฟลชการ์ด AI` | 26/30 |
+| App Store 이름 | `Reklue: การ์ด & เกมฝึกสมอง` | 26/30 |
 | App Store 부제 | `ทบทวนเว้นระยะ ท่องศัพท์ SRS` | 27/30 |
-| App Store 키워드 | `recallstudy,reeeeecallstudy,ท่องจำ,แบบทดสอบ,คำศัพท์,ภาษา,สอบ,เรียน,บัตรคำ,ความจำ,อ่านหนังสือ` | 92/100 |
-| Play 앱 이름 | `Recall Study: แฟลชการ์ด AI` | 26/30 |
+| App Store 키워드 | `reklue,ท่องจำ,แบบทดสอบ,คำศัพท์,ภาษา,สอบ,เรียน,บัตรคำ,ความจำ,อ่านหนังสือ` | 71/100 |
+| Play 앱 이름 | `Reklue: การ์ด & เกมฝึกสมอง` | 26/30 |
 | Play 짧은 설명 | จำได้เร็วขึ้นด้วยแฟลชการ์ด AI และการทบทวนเว้นระยะ (SRS) ที่พิสูจน์แล้ว | 70/80 |
 | 프로모션 텍스트 | ใหม่: เปลี่ยนรูปสมุดจดให้เป็นชุดแฟลชการ์ดทั้งชุดด้วย AI และให้ระบบทบทวนเว้นระยะจัดตารางให้คุณ ฟรีวันละ 10 การ์ด AI | 114/170 |
 
-<details><summary>긴 설명 (1834/4000) — App Store · Play 공통</summary>
+<details><summary>긴 설명 (1754/4000) — App Store · Play 공통</summary>
 
 ```
-Recall Study (ReeeeecallStudy) — วิธีที่ฉลาดที่สุดในการจดจำทุกสิ่ง
+Reklue — วิธีที่ฉลาดที่สุดในการจดจำทุกสิ่ง
 
 แค่สร้างการ์ด ที่เหลือปล่อยให้วิทยาศาสตร์จัดการ อัลกอริทึม SRS (การทบทวนแบบเว้นระยะ) จะจัดตารางทบทวนในจังหวะที่คุณกำลังจะลืมพอดี คุณจึงจำได้มากขึ้นโดยใช้แรงน้อยลง เหมาะกับการท่องศัพท์และเรียนภาษา เตรียมสอบ สอบใบประกอบวิชาชีพ และทุกอย่างที่คุณต้องจำ
 
@@ -357,9 +332,8 @@ Recall Study (ReeeeecallStudy) — วิธีที่ฉลาดที่ส
 • แพ็กเครดิต AI ($0.99 / $4.99 / $9.99) — สำหรับการใช้ AI เกินโควตาฟรีรายวัน
 • AI ทำงานบนเซิร์ฟเวอร์ของเรา ไม่ต้องซื้อหรือกรอก API key ใด ๆ
 
-เริ่มเรียนให้ฉลาดขึ้นตั้งแต่วันนี้ ดาวน์โหลด Recall Study ฟรี
+เริ่มเรียนให้ฉลาดขึ้นตั้งแต่วันนี้ ดาวน์โหลด Reklue ฟรี
 
-(เขียนได้อีกแบบว่า Recall Study หรือ recallstudy)
 ```
 
 </details>
@@ -368,17 +342,17 @@ Recall Study (ReeeeecallStudy) — วิธีที่ฉลาดที่ส
 
 | 필드 | 값 | 길이 |
 |---|---|---|
-| App Store 이름 | `Recall Study: Kartu Belajar AI` | 30/30 |
+| App Store 이름 | `Reklue: Kartu & Game Otak` | 25/30 |
 | App Store 부제 | `Pengulangan Berjarak, Kosakata` | 30/30 |
-| App Store 키워드 | `recallstudy,reeeeecallstudy,hafalan,menghafal,kuis,ujian,bahasa,flashcard,SRS,ingatan,inggris,tes` | 97/100 |
-| Play 앱 이름 | `Recall Study: Kartu Belajar AI` | 30/30 |
+| App Store 키워드 | `reklue,hafalan,menghafal,kuis,ujian,bahasa,flashcard,SRS,ingatan,inggris,tes` | 76/100 |
+| Play 앱 이름 | `Reklue: Kartu & Game Otak` | 25/30 |
 | Play 짧은 설명 | Hafal lebih cepat dengan flashcard AI dan sistem pengulangan berjarak (SRS). | 76/80 |
 | 프로모션 텍스트 | Baru: ubah foto catatan Anda menjadi satu dek flashcard penuh dengan AI, dan biarkan pengulangan berjarak menjadwalkan ulasannya. 10 kartu AI gratis tiap hari. | 159/170 |
 
-<details><summary>긴 설명 (2134/4000) — App Store · Play 공통</summary>
+<details><summary>긴 설명 (2050/4000) — App Store · Play 공통</summary>
 
 ```
-Recall Study (ReeeeecallStudy) — cara paling cerdas untuk menghafal apa pun.
+Reklue — cara paling cerdas untuk menghafal apa pun.
 
 Anda cukup membuat kartu, sisanya biar sains yang bekerja. Algoritme SRS (pengulangan berjarak) menjadwalkan ulasan tepat saat Anda hampir lupa, sehingga Anda ingat lebih lama dengan usaha lebih kecil. Cocok untuk kosakata dan belajar bahasa, persiapan ujian, sertifikasi, dan apa pun yang perlu Anda ingat.
 
@@ -407,9 +381,8 @@ HARGA
 • Paket kredit AI ($0,99 / $4,99 / $9,99) — untuk pemakaian AI di luar jatah gratis harian.
 • AI berjalan di server kami. Tidak ada API key yang perlu dibeli atau dimasukkan.
 
-Mulai belajar lebih cerdas hari ini. Unduh Recall Study gratis.
+Mulai belajar lebih cerdas hari ini. Unduh Reklue gratis.
 
-(Juga ditulis sebagai Recall Study atau recallstudy.)
 ```
 
 </details>
@@ -418,17 +391,17 @@ Mulai belajar lebih cerdas hari ini. Unduh Recall Study gratis.
 
 | 필드 | 값 | 길이 |
 |---|---|---|
-| App Store 이름 | `Recall Study: Tarjetas con IA` | 29/30 |
+| App Store 이름 | `Reklue: Tarjetas y juegos` | 25/30 |
 | App Store 부제 | `Repetición espaciada y repaso` | 29/30 |
-| App Store 키워드 | `recallstudy,reeeeecallstudy,memorizar,vocabulario,examen,estudio,quiz,idiomas,fichas,SRS,oposiciones` | 100/100 |
-| Play 앱 이름 | `Recall Study: Tarjetas con IA` | 29/30 |
+| App Store 키워드 | `reklue,memorizar,vocabulario,examen,estudio,quiz,idiomas,fichas,SRS,oposiciones` | 79/100 |
+| Play 앱 이름 | `Reklue: Tarjetas y juegos` | 25/30 |
 | Play 짧은 설명 | Memoriza más rápido con tarjetas de IA y repetición espaciada (SRS) científica. | 79/80 |
 | 프로모션 텍스트 | Nuevo: convierte una foto de tus apuntes en un mazo completo con IA y deja que la repetición espaciada programe cada repaso. 10 tarjetas de IA gratis al día. | 157/170 |
 
-<details><summary>긴 설명 (2301/4000) — App Store · Play 공통</summary>
+<details><summary>긴 설명 (2220/4000) — App Store · Play 공통</summary>
 
 ```
-Recall Study (ReeeeecallStudy): la forma más inteligente de memorizar cualquier cosa.
+Reklue: la forma más inteligente de memorizar cualquier cosa.
 
 Tú creas las tarjetas y la ciencia hace el resto. Nuestro algoritmo SRS (repetición espaciada) programa cada repaso justo en el momento en que estás a punto de olvidar, así recuerdas más con menos esfuerzo. Ideal para vocabulario e idiomas, preparación de exámenes, oposiciones, certificaciones y todo lo que necesites retener.
 
@@ -457,9 +430,8 @@ PRECIOS
 • Packs de créditos de IA (0,99 $ / 4,99 $ / 9,99 $): para el uso de IA que supere la cuota gratuita diaria.
 • La IA se ejecuta en nuestros servidores. No hay ninguna clave de API que comprar ni que introducir.
 
-Empieza hoy a estudiar de forma más inteligente. Descarga Recall Study gratis.
+Empieza hoy a estudiar de forma más inteligente. Descarga Reklue gratis.
 
-(También escrito como Recall Study o recallstudy.)
 ```
 
 </details>
@@ -490,8 +462,8 @@ Empieza hoy a estudiar de forma más inteligente. Descarga Recall Study gratis.
 
 | 항목 | 값 |
 |---|---|
-| 개인정보처리방침 | https://reeeeecallstudy.asdscv.workers.dev/privacy-policy.html |
-| 서비스 이용약관 | https://reeeeecallstudy.asdscv.workers.dev/terms-of-service.html |
+| 개인정보처리방침 | https://reklue.com/privacy-policy.html |
+| 서비스 이용약관 | https://reklue.com/terms-of-service.html |
 | 지원 | mailto:luke@rictax.kr |
 
 ## 스크린샷 / 이미지 — 2026-08-28 전량 교체

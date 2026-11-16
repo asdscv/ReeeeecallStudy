@@ -113,7 +113,7 @@ describe('buildSampleCardLearningResources', () => {
     const result = buildSampleCardLearningResources(wordSamples, 'abc-123', 'en')
     expect(result).toHaveLength(2)
     expect(result[0]['@type']).toBe('LearningResource')
-    expect(result[0]['@id']).toBe('https://reeeeecallstudy.xyz/d/abc-123#card-1')
+    expect(result[0]['@id']).toBe('https://reklue.com/d/abc-123#card-1')
     expect(result[0].name).toBe('ontology')
     expect(result[0].teaches).toContain('存在論')
     expect(result[0].teaches).toContain('Ontology investigates')

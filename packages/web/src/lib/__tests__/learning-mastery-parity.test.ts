@@ -12,7 +12,7 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { LEGACY_MATURE_INTERVAL_DAYS } from '@reeeeecall/shared/learning'
+import { LEGACY_MATURE_INTERVAL_DAYS } from '@reklue/shared/learning'
 
 const REPO_ROOT = join(__dirname, '../../../../..')
 const MIGRATION = 'supabase/migrations/183_one_mastery_definition.sql'

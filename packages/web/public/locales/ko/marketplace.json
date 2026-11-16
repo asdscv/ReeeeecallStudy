@@ -74,9 +74,9 @@
     "submitted": "신고가 접수되었습니다. 감사합니다!"
   },
   "preview": {
-    "title": "\"{{title}}\" - 플래시카드 덱 | ReeeeecallStudy",
-    "description": "{{title}} — 플래시카드 {{cardCount}}장. ReeeeecallStudy에서 미리보기하고 학습하세요.",
-    "defaultDescription": "ReeeeecallStudy의 플래시카드 덱",
+    "title": "\"{{title}}\" - 플래시카드 덱 | Reklue",
+    "description": "{{title}} — 플래시카드 {{cardCount}}장. Reklue에서 미리보기하고 학습하세요.",
+    "defaultDescription": "Reklue의 플래시카드 덱",
     "sampleCards": "샘플 카드",
     "viewInMarket": "마켓플레이스에서 보기",
     "cardCount": "{{count, number}}장",

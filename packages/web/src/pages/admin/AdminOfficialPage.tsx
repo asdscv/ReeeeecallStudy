@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../../lib/supabase'
-import { useOfficialStore } from '@reeeeecall/shared/stores/official-store'
+import { useOfficialStore } from '@reklue/shared/stores/official-store'
 import { confirm } from '../../stores/confirm-store'
 import { OfficialBadge } from '../../components/common/OfficialBadge'
 import { AdminErrorState } from '../../components/admin/AdminErrorState'

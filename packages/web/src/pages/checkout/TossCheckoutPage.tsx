@@ -46,7 +46,7 @@ export function TossCheckoutPage() {
         if (it.status !== 'pending') return setError('already_processed')
 
         // Product title for orderName (best-effort; Toss needs 1–100 chars).
-        let orderName = 'ReeeeecallStudy'
+        let orderName = 'Reklue'
         try {
           const { data: prods } = await supabase.rpc('get_billing_products')
           const p = ((prods ?? []) as Array<{ id: string; title: string }>).find((x) => x.id === it.product_id)

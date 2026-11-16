@@ -11,7 +11,7 @@
  * one sentence covered all three, and the only one it sounded like was the bad one.
  */
 import { describe, it, expect } from 'vitest'
-import { caughtUp, SOON_MINUTES } from '@reeeeecall/shared/lib/caught-up'
+import { caughtUp, SOON_MINUTES } from '@reklue/shared/lib/caught-up'
 
 const NOW = '2026-08-11T15:00:00.000Z'
 const plus = (minutes: number) =>

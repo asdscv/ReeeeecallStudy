@@ -3,7 +3,7 @@ import {
   availableDomainIds, projectWorkload, daysForDailyBudget,
   parseCadence, parseNewCardsPerDay, studyDaysBetween, perStudyDayMultiplier,
   DEFAULT_NEW_CARDS_PER_DAY,
-} from '@reeeeecall/shared/learning'
+} from '@reklue/shared/learning'
 import { useTranslation } from 'react-i18next'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/dialog'
 import type { LearningGoalWithDecks, GoalDeckLink } from '../../stores/learning-store'

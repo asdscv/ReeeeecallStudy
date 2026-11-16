@@ -20,7 +20,7 @@ import {
   taughtLanguage,
   storedTitleLanguage,
   localizedOfficialTitle,
-} from '@reeeeecall/shared/lib/deck-audience'
+} from '@reklue/shared/lib/deck-audience'
 
 const REVERSE_KO = ['official', 'category:beginner', 'lang:ko-en', 'source:ko', 'target:en', 'learning_language:en', 'level:batch-2']
 const FORWARD_KO = ['official', 'category:beginner', 'lang:en-ko', 'source:en', 'target:ko', 'level:batch-2']

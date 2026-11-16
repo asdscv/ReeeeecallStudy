@@ -15,7 +15,7 @@ import { describe, expect, it } from 'vitest'
 import {
   resolveCardAnswerFaces as sharedResolve,
   cardReferenceAnswer as sharedReference,
-} from '@reeeeecall/shared/lib/card-answer'
+} from '@reklue/shared/lib/card-answer'
 import {
   resolveCardAnswerFaces as edgeResolve,
   cardReferenceAnswer as edgeReference,

@@ -8,9 +8,9 @@
  * sums, prime gaps) and the top band 30–31 are held to the same checks.
  */
 import { describe, it, expect, vi } from 'vitest'
-import { DEFAULT_CONTEXT, createRng, type ChoiceView, type CreateContext, type RecentTrial } from '@reeeeecall/shared/lib/brain-games'
-import { MECHANICS } from '@reeeeecall/shared/lib/brain-games'
-import { SERIES_BANDS, SERIES_MAX_LEVEL, series, seriesLimitMs, seriesPar } from '@reeeeecall/shared/lib/brain-games/games/series'
+import { DEFAULT_CONTEXT, createRng, type ChoiceView, type CreateContext, type RecentTrial } from '@reklue/shared/lib/brain-games'
+import { MECHANICS } from '@reklue/shared/lib/brain-games'
+import { SERIES_BANDS, SERIES_MAX_LEVEL, series, seriesLimitMs, seriesPar } from '@reklue/shared/lib/brain-games/games/series'
 import {
   GAP_ANYWHERE,
   PRIMES,
@@ -23,7 +23,7 @@ import {
   seriesExplainedBy,
   seriesReadings,
   type SeriesFamilyId,
-} from '@reeeeecall/shared/lib/brain-games/games/series-rules'
+} from '@reklue/shared/lib/brain-games/games/series-rules'
 
 // Thousands of sampled trials per test: a second or three here, several times that on a CI runner,
 // where the 5s default would time out.

@@ -29,7 +29,7 @@ vi.mock('react-i18next', () => ({
 }))
 
 import { LearningPlanWidget } from '../LearningPlanWidget'
-import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
+import { goalKnowledgeSummary } from '@reklue/shared/lib/goal-knowledge-summary'
 
 const goal = (over: Record<string, unknown> = {}) => ({
   id: 'goal-1', domain_id: 'language', title: 'JLPT N2', target_date: null,

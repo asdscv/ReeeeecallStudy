@@ -11,7 +11,7 @@
  * being active must not break it (the day is not over), but yesterday's gap must.
  */
 import { describe, it, expect } from 'vitest'
-import { planWeek, type PlanDay } from '@reeeeecall/shared/learning/application/plan-week'
+import { planWeek, type PlanDay } from '@reklue/shared/learning/application/plan-week'
 
 /** Seven days ending 2026-08-11 (a Tuesday), so weekday assertions are checkable by hand. */
 const DATES = [

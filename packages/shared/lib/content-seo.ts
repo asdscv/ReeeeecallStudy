@@ -187,10 +187,7 @@ export function buildOrganizationJsonLd() {
       width: SEO.OG_IMAGE_WIDTH,
       height: SEO.OG_IMAGE_HEIGHT,
     },
-    sameAs: [
-      `https://twitter.com/${SEO.TWITTER_HANDLE.replace('@', '')}`,
-      `https://x.com/${SEO.TWITTER_HANDLE.replace('@', '')}`,
-    ],
+    sameAs: [], // Add profiles once the Reklue accounts are registered.
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer service',

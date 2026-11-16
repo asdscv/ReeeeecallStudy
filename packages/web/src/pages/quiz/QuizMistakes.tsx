@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { useQuizStore, groupMistakesByDeck } from '@reeeeecall/shared/stores/quiz-store'
+import { useQuizStore, groupMistakesByDeck } from '@reklue/shared/stores/quiz-store'
 
 /**
  * 오답 노트 — what you got wrong, and the one thing to do about it.

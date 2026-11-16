@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { BRAIN_GAMES, DEFAULT_CONTEXT, EXTREME_LEVELS, brainGame, createRng, type RoundView } from '@reeeeecall/shared/lib/brain-games'
-import type { MemoryGridState } from '@reeeeecall/shared/lib/brain-games/games/memory-grid'
-import type { SequenceState } from '@reeeeecall/shared/lib/brain-games/games/sequence'
-import type { SchulteState } from '@reeeeecall/shared/lib/brain-games/games/schulte'
-import type { MakeNumberState } from '@reeeeecall/shared/lib/brain-games/games/make-number'
-import { evaluate } from '@reeeeecall/shared/lib/brain-games/games/make-number'
+import { BRAIN_GAMES, DEFAULT_CONTEXT, EXTREME_LEVELS, brainGame, createRng, type RoundView } from '@reklue/shared/lib/brain-games'
+import type { MemoryGridState } from '@reklue/shared/lib/brain-games/games/memory-grid'
+import type { SequenceState } from '@reklue/shared/lib/brain-games/games/sequence'
+import type { SchulteState } from '@reklue/shared/lib/brain-games/games/schulte'
+import type { MakeNumberState } from '@reklue/shared/lib/brain-games/games/make-number'
+import { evaluate } from '@reklue/shared/lib/brain-games/games/make-number'
 
 const screens = [{ maxCols: 3, maxRows: 4 }, { maxCols: 5, maxRows: 7 }, { maxCols: 7, maxRows: 7 }]
 

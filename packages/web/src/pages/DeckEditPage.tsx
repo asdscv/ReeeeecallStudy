@@ -24,7 +24,7 @@ import { TimePeriodTabs } from '../components/common/TimePeriodTabs'
 import { DailyStudyChart } from '../components/dashboard/DailyStudyChart'
 import { StudyHeatmap } from '../components/dashboard/StudyHeatmap'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
-import { fetchAllRows } from '@reeeeecall/shared/lib/fetch-all-rows'
+import { fetchAllRows } from '@reklue/shared/lib/fetch-all-rows'
 
 const STATUS_COLORS: Record<string, string> = {
   new: '#3b82f6',

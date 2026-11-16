@@ -32,9 +32,9 @@ import {
   type BrainGameId,
   type BrainMeta,
   type BrainProgress,
-} from '@reeeeecall/shared/lib/brain-games'
-import type { BrainCloud, CloudFetch, CloudPush } from '@reeeeecall/shared/stores/brain-cloud'
-import type { BrainStorage } from '@reeeeecall/shared/stores/brain-store'
+} from '@reklue/shared/lib/brain-games'
+import type { BrainCloud, CloudFetch, CloudPush } from '@reklue/shared/stores/brain-cloud'
+import type { BrainStorage } from '@reklue/shared/stores/brain-store'
 
 const D = (n: number) => `2026-11-${String(n).padStart(2, '0')}`
 /**
@@ -327,7 +327,7 @@ function fakeServer() {
 /** A device = a fresh copy of the store module (its own module state) + its own disk. */
 async function device(server: ReturnType<typeof fakeServer>, uid: string | null = 'u1') {
   vi.resetModules()
-  const mod = await import('@reeeeecall/shared/stores/brain-store')
+  const mod = await import('@reklue/shared/stores/brain-store')
   const session = { uid }
   const { cloud, emit } = server.connect(session)
   mod.configureBrainCloud(cloud)

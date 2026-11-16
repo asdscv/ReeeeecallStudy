@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import { TIMING_MODES, type TimingMode } from '@reeeeecall/shared/lib/brain-games'
-import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
+import { TIMING_MODES, type TimingMode } from '@reklue/shared/lib/brain-games'
+import { useBrainStore } from '@reklue/shared/stores/brain-store'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
 
 /**

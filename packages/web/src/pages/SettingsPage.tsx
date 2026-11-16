@@ -19,8 +19,8 @@ import { PaymentHistory } from '../components/settings/PaymentHistory'
 import { PlanSelector } from '../components/billing/PlanSelector'
 import { isUnlimitedCardLimit } from '../lib/card-limit'
 import { CardUsagePanel } from '../components/billing/CardUsagePanel'
-import { registerCardUsageDetailInterest, releaseCardUsageDetailInterest } from '@reeeeecall/shared/stores/deck-store'
-import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
+import { registerCardUsageDetailInterest, releaseCardUsageDetailInterest } from '@reklue/shared/stores/deck-store'
+import { aiHubBus } from '@reklue/shared/lib/ai/hub/events'
 import {
   loadSettings,
   saveSettings,
@@ -636,11 +636,11 @@ export function SettingsPage() {
 
         {/* ── Legal (compact inline, very bottom) ── */}
         <div className="flex items-center justify-center gap-3 py-2 text-sm text-content-tertiary">
-          <a href="https://reeeeecallstudy.xyz/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground transition no-underline text-content-tertiary">
+          <a href="https://reklue.com/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground transition no-underline text-content-tertiary">
             {t('legal.privacy')}
           </a>
           <span>·</span>
-          <a href="https://reeeeecallstudy.xyz/terms-of-service.html" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground transition no-underline text-content-tertiary">
+          <a href="https://reklue.com/terms-of-service.html" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground transition no-underline text-content-tertiary">
             {t('legal.terms')}
           </a>
         </div>

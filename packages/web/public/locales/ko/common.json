@@ -128,7 +128,7 @@
     "stepOf": "{{total}}단계 중 {{current}}단계",
     "restartOnboarding": "튜토리얼 다시 시작",
     "welcome": {
-      "title": "Reeeeecall에 오신 것을 환영합니다!",
+      "title": "리클루에 오신 것을 환영합니다!",
       "description": "플래시카드로 가장 스마트하게 공부하는 방법. 덱을 만들고, 카드를 추가하고, 간격 반복 알고리즘으로 학습을 최적화하세요.",
       "action": "시작하기"
     },
@@ -386,7 +386,7 @@
   },
   "skipToContent": "본문 바로가기",
   "footer": {
-    "copyright": "© 2026 ReeeeecallStudy. All rights reserved."
+    "copyright": "© 2026 Reklue. All rights reserved."
   },
   "cancel": "취소",
   "loading": "로딩 중...",

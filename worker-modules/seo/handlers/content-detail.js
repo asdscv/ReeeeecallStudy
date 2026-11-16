@@ -1,3 +1,4 @@
+import { withCurrentBrand } from '../../../packages/shared/lib/brand.ts'
 import { brainGuideFromTags } from '../../../packages/shared/lib/brain-content.ts'
 import { contentCanonicalUrl } from '../../../packages/shared/lib/content-canonical.ts'
 // Content detail page bot handler — extracted from worker.js handleContentDetailBot
@@ -55,7 +56,7 @@ export async function handleContentDetailBot(slug, url, env) {
         `${restUrl}/contents?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&locale=eq.${chosen}&limit=1`,
         { headers: hdr },
       )
-      if (artRes.ok) article = (await artRes.json())?.[0]
+      if (artRes.ok) article = withCurrentBrand((await artRes.json())?.[0])
     }
   } catch (err) {
     console.error('Content detail fetch error:', err)
@@ -78,7 +79,7 @@ export async function handleContentDetailBot(slug, url, env) {
       `${restUrl}/contents?is_published=eq.true&locale=eq.${article.locale}&slug=neq.${encodeURIComponent(slug)}&select=slug,title,subtitle,tags,reading_time_minutes,published_at&order=published_at.desc&limit=20`,
       { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } },
     )
-    const allRelated = (await relatedRes.json()) || []
+    const allRelated = withCurrentBrand((await relatedRes.json()) || [])
     const articleTags = new Set(article.tags || [])
     // Score by tag overlap, pick top 5
     relatedArticles = allRelated

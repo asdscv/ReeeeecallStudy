@@ -4,7 +4,7 @@
  * `contents.meta_title` and `contents.meta_description` rows in Supabase.
  *
  * Pre-fix code used a naive `.slice()` and cut mid-word (e.g.
- * "TOEFL Skimming Techniques for Academic Pas | ReeeeecallStudy").
+ * "TOEFL Skimming Techniques for Academic Pas | Reklue").
  * `truncateAtWordBoundary()` in worker-modules/content-schema.js now
  * snaps to the last space (when within 75% of budget). This script
  * walks every published row, recomputes the canonical meta values
@@ -23,13 +23,14 @@
  */
 
 import { truncateAtWordBoundary } from '../worker-modules/content-schema.js'
+import { withCurrentBrand } from '../packages/shared/lib/brand.ts'
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://ixdapelfikaneexnskfm.supabase.co'
 const ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY
 const APPLY = process.env.APPLY === '1'
 
-const BRAND_SUFFIX = ' | ReeeeecallStudy'
+const BRAND_SUFFIX = ' | Reklue'
 const META_TITLE_MAX = 60
 const META_DESC_MAX = 155
 const META_DESC_BUDGET = 152 // = 155 - '...'.length
@@ -50,7 +51,7 @@ if (APPLY && !SERVICE_KEY) {
 // re-added it), we append it before measuring.
 function canonicalMetaTitle(stored) {
   if (typeof stored !== 'string') return stored
-  let mt = stored
+  let mt = withCurrentBrand(stored)
   if (!mt.endsWith(BRAND_SUFFIX)) mt = mt + BRAND_SUFFIX
   if (mt.length > META_TITLE_MAX) {
     mt = truncateAtWordBoundary(mt, META_TITLE_MAX - BRAND_SUFFIX.length) + BRAND_SUFFIX

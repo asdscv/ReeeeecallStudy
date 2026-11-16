@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   wordListPageLanguage, wordListHeading, wordListDescription, wordListCta, wordListHreflang, wordRows, wordListColumns,
   type ListingSeoInput,
-} from '@reeeeecall/shared/lib/listing-seo'
+} from '@reklue/shared/lib/listing-seo'
 
 const word = (front: string, back: string) => ({ field_values: { kind: 'word', front, back, example_front: `Use ${front}.`, example_back: `${back} 예문` } })
 

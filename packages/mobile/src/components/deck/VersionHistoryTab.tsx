@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native'
-import { useVersionStore } from '@reeeeecall/shared/stores/version-store'
+import { useVersionStore } from '@reklue/shared/stores/version-store'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../../theme'
 import { Button, Badge } from '../ui'

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { supabase } from '../../lib/supabase'
 import { useAuthStore } from '../../stores/auth-store'
-import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
+import { useBrainStore } from '@reklue/shared/stores/brain-store'
 import { forgetBrainOnDevice } from '../brain/brain-ui'
 import { isAnalyticsOptedOut, setAnalyticsOptOut } from '../../lib/analytics-consent'
 

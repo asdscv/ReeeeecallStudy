@@ -138,6 +138,6 @@ Tie-safe loading만으로는 충분하지 않았다. 사용자가 duplicate-posi
 - targeted ESLint, `git diff --check`, shared/web helper byte parity passed
 - web production build passed in 3.27s
 - independent review: APPROVED; tie boundary, cyclic wrap, partial-tie early exit에 blocker/high/medium 없음
-- PR: https://github.com/asdscv/ReeeeecallStudy/pull/335
+- PR: https://github.com/asdscv/Reklue/pull/335
 - Remote CI: final implementation head에서 7 checks 모두 green
 - 완료 문서 위치: `DOCS/DONE/STUDY-HARDENING/PHASE-4-SEQUENTIAL-CURSOR-SAFETY.md`

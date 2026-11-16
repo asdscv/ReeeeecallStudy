@@ -1,9 +1,9 @@
 import { View, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { StatCard } from '../charts/StatCard'
-import { formatDuration } from '@reeeeecall/shared/lib/study-history'
+import { formatDuration } from '@reklue/shared/lib/study-history'
 import { palette } from '../../theme'
-import type { OverviewStats } from '@reeeeecall/shared/lib/study-history-stats'
+import type { OverviewStats } from '@reklue/shared/lib/study-history-stats'
 
 interface OverviewStatsRowProps {
   stats: OverviewStats

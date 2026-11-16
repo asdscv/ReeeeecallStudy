@@ -15,7 +15,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 const { mockCallServerAI, mockGetAiWallet } = vi.hoisted(() => ({
   mockCallServerAI: vi.fn(), mockGetAiWallet: vi.fn(),
 }))
-vi.mock('@reeeeecall/shared/lib/ai/server-client', () => ({
+vi.mock('@reklue/shared/lib/ai/server-client', () => ({
   callServerAI: mockCallServerAI, getAiWallet: mockGetAiWallet,
 }))
 
@@ -36,10 +36,10 @@ const { mockFrom, mockRpc, mockGetUser, mockSupabase } = vi.hoisted(() => {
 })
 
 vi.mock('../../lib/supabase', () => ({ supabase: mockSupabase }))
-vi.mock('@reeeeecall/shared/lib/supabase', () => ({ supabase: mockSupabase }))
+vi.mock('@reklue/shared/lib/supabase', () => ({ supabase: mockSupabase }))
 
 import { useLearningStore, type LearningGoalWithDecks } from '../learning-store'
-import { DEFAULT_NEW_CARDS_PER_DAY } from '@reeeeecall/shared/learning/application/cadence'
+import { DEFAULT_NEW_CARDS_PER_DAY } from '@reklue/shared/learning/application/cadence'
 
 /** A thenable PostgREST-builder stub: every filter returns itself, awaiting resolves. */
 function q(result: unknown) {

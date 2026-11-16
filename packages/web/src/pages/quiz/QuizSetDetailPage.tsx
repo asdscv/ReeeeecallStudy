@@ -4,11 +4,11 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   useQuizStore, isDailyCheckTitle,
   type QuizSetRow, type QuizSetHistoryRun,
-} from '@reeeeecall/shared/stores/quiz-store'
+} from '@reklue/shared/stores/quiz-store'
 import {
   dateLine, tallyFromCounts, tallyLine, isRunUnfinished,
-} from '@reeeeecall/shared/lib/quiz-outcome'
-import { retakeNoteKey } from '@reeeeecall/shared/lib/quiz-pricing'
+} from '@reklue/shared/lib/quiz-outcome'
+import { retakeNoteKey } from '@reklue/shared/lib/quiz-pricing'
 import { Button } from '../../components/ui/button'
 import { Trash2 } from 'lucide-react'
 

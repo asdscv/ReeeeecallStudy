@@ -74,9 +74,9 @@
     "submitted": "Report submitted. Thank you!"
   },
   "preview": {
-    "title": "\"{{title}}\" - Flashcard Deck | ReeeeecallStudy",
-    "description": "{{title}} — {{cardCount}} flashcards. Preview and study this deck on ReeeeecallStudy.",
-    "defaultDescription": "Flashcard deck on ReeeeecallStudy",
+    "title": "\"{{title}}\" - Flashcard Deck | Reklue",
+    "description": "{{title}} — {{cardCount}} flashcards. Preview and study this deck on Reklue.",
+    "defaultDescription": "Flashcard deck on Reklue",
     "sampleCards": "Sample Cards",
     "viewInMarket": "View in Marketplace",
     "cardCount": "{{count, number}} cards",

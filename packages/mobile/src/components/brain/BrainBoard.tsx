@@ -14,8 +14,8 @@ import {
   type GridView,
   type PromptView,
   type RoundView,
-} from '@reeeeecall/shared/lib/brain-games'
-import { formatCount, formatDecimal } from '@reeeeecall/shared/lib/format-number'
+} from '@reklue/shared/lib/brain-games'
+import { formatCount, formatDecimal } from '@reklue/shared/lib/format-number'
 import { testProps } from '../../utils/testProps'
 import { SetMatchBoard, CodeBreakBoard, MakeNumberBoard, MazeBoard } from './ThinkingBoards'
 import { BOARD_STRIP_H, CANVAS_INK, CELL_INK, FX, type FeatherName } from './brain-ui'

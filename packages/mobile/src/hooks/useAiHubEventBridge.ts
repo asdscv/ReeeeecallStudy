@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { aiHubAnalyticsEvent, aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
+import { aiHubAnalyticsEvent, aiHubBus } from '@reklue/shared/lib/ai/hub/events'
 import { getMobileSupabase } from '../adapters'
 
 // analytics_events.page_path is a URL on web. The app has no URL, and a funnel that cannot tell

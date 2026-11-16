@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useReducedMotion } from 'motion/react'
-import type { GameTheme } from '@reeeeecall/shared/lib/brain-games'
+import type { GameTheme } from '@reklue/shared/lib/brain-games'
 import { canvasBackground } from './brain-ui'
 import { sfx } from './sfx'
 

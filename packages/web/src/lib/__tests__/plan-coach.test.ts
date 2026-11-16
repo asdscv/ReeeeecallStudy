@@ -10,7 +10,7 @@
  * that teaches the learner it does not understand their week.
  */
 import { describe, it, expect } from 'vitest'
-import { planCoach, type PlanDigest } from '@reeeeecall/shared/learning/application/plan-coach'
+import { planCoach, type PlanDigest } from '@reklue/shared/learning/application/plan-coach'
 
 const week = (over: Partial<PlanDigest> = {}): PlanDigest => ({
   days: 7,

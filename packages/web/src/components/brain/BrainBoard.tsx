@@ -2,7 +2,7 @@ import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState, type C
 import { useTranslation } from 'react-i18next'
 import { useReducedMotion } from 'motion/react'
 import { BookOpen, Check, Copy, Droplet, Undo2, X, type LucideIcon } from 'lucide-react'
-import { CANVAS_TONES, type CellTone, type CellView, type ChoiceView, type GameTheme, type GridView, type RoundView } from '@reeeeecall/shared/lib/brain-games'
+import { CANVAS_TONES, type CellTone, type CellView, type ChoiceView, type GameTheme, type GridView, type RoundView } from '@reklue/shared/lib/brain-games'
 import { SetMatchBoard, CodeBreakBoard, MakeNumberBoard, MazeBoard } from './ThinkingBoards'
 import { BOARD_STRIP_H, CELL_INK, INK, boardHeight } from './brain-ui'
 

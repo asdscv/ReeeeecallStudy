@@ -27,7 +27,7 @@
 
     /* Monorepo paths */
     "paths": {
-      "@reeeeecall/shared/*": ["../shared/*"]
+      "@reklue/shared/*": ["../shared/*"]
     }
   },
   "include": ["src", "../shared"]

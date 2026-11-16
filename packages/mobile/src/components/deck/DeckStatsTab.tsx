@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../../theme'
 import { StatCard } from '../charts/StatCard'
 import { ProgressBar } from '../charts/ProgressBar'
-import { calculateDeckStats } from '@reeeeecall/shared/lib/stats'
-import type { Card } from '@reeeeecall/shared/types/database'
+import { calculateDeckStats } from '@reklue/shared/lib/stats'
+import type { Card } from '@reklue/shared/types/database'
 
 interface DeckStatsTabProps {
   cards: Card[]

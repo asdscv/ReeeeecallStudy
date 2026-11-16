@@ -1,4 +1,4 @@
-import { BRAIN_CONTENT_GUIDES, brainGuidePath } from '@reeeeecall/shared/lib/brain-content'
+import { BRAIN_CONTENT_GUIDES, brainGuidePath } from '@reklue/shared/lib/brain-content'
 
 const KEY = 'reeeeecall-brain-auth-return'
 const allowed = new Set(['/brain/training', ...BRAIN_CONTENT_GUIDES.map((g) => brainGuidePath(g.id))])

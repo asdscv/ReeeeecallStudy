@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { withDropOffCtas } from '@reeeeecall/shared/lib/content-drop-off'
-import { playStoreUrlWithReferrer, PLAY_STORE_URL } from '@reeeeecall/shared/lib/app-store-links'
+import { withDropOffCtas } from '@reklue/shared/lib/content-drop-off'
+import { playStoreUrlWithReferrer, PLAY_STORE_URL } from '@reklue/shared/lib/app-store-links'
 
 const b = (type: string) => ({ type })
 const types = (blocks: Array<{ type: string }>) => blocks.map((x) => x.type)

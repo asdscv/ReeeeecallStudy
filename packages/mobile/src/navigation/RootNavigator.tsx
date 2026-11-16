@@ -7,7 +7,7 @@ import { useAuthState } from '../hooks/useAuthState'
 import { LoadingScreen } from '../components/auth/LoadingScreen'
 import { AuthGuardScreen } from '../components/auth/AuthGuardScreen'
 import { SessionKickedScreen } from '../components/auth/SessionKickedScreen'
-import { useSubscriptionStore } from '@reeeeecall/shared/stores/subscription-store'
+import { useSubscriptionStore } from '@reklue/shared/stores/subscription-store'
 import { useAppUpdateStore } from '../services/app-update'
 import { ForceUpdateScreen } from '../components/update/ForceUpdateScreen'
 import { OptionalUpdateModal } from '../components/update/OptionalUpdateModal'
@@ -129,7 +129,7 @@ export function RootNavigator() {
   const handleLogout = useCallback(async () => {
     prefetch.reset()
     await clearNavState()
-    const { getSupabase } = await import('@reeeeecall/shared/lib/supabase')
+    const { getSupabase } = await import('@reklue/shared/lib/supabase')
     const auth = getSupabase().auth
     // A global sign-out asks the server to revoke the session, and that call can fail — an
     // expired refresh token, no network, or a user row that no longer exists. This is the

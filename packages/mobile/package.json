@@ -1,5 +1,5 @@
 {
-  "name": "@reeeeecall/mobile",
+  "name": "@reklue/mobile",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
     "@react-navigation/drawer": "^7.9.4",
     "@react-navigation/native": "^7.1.33",
     "@react-navigation/native-stack": "^7.14.5",
-    "@reeeeecall/shared": "workspace:*",
+    "@reklue/shared": "workspace:*",
     "@supabase/supabase-js": "^2.95.3",
     "expo": "~55.0.6",
     "expo-apple-authentication": "^55.0.8",

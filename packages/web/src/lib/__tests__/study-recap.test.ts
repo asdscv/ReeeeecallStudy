@@ -7,7 +7,7 @@
  * decides which attempts are even in them.
  */
 import { describe, it, expect } from 'vitest'
-import { studyRecap, scoreBand } from '@reeeeecall/shared/lib/study-recap'
+import { studyRecap, scoreBand } from '@reklue/shared/lib/study-recap'
 
 const at = (iso: string, score: number | null, ms = 1000) =>
   ({ created_at: iso, normalized_score: score, duration_ms: ms })

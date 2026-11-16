@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
+import { formatUsdMicro } from '@reklue/shared/lib/ai/server-client'
 import { useAdminStore } from '../../stores/admin-store'
 import type {
   AdminSubscriptionRow, AdminPaymentRow, BillingPlatform, RefundResult,

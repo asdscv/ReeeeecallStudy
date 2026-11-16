@@ -25,7 +25,7 @@ const mockSupabase = vi.hoisted(() => ({
 }))
 
 vi.mock('../../lib/supabase', () => ({ supabase: mockSupabase }))
-vi.mock('@reeeeecall/shared/lib/supabase', () => ({
+vi.mock('@reklue/shared/lib/supabase', () => ({
   supabase: mockSupabase, getSupabase: () => mockSupabase, initSupabase: vi.fn(),
 }))
 

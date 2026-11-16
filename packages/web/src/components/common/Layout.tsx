@@ -25,7 +25,7 @@ export function Layout() {
       <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-60 flex-col bg-card border-r border-border" data-testid="sidebar">
         <Link to="/dashboard" className="flex items-center gap-2 h-16 px-5 shrink-0 no-underline">
           <img src="/favicon.png" alt="" className="w-9 h-9 object-contain" />
-          <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-9 object-contain dark:brightness-0 dark:invert" />
+          <img src="/logo-text.png" alt="Reklue" className="h-9 object-contain dark:brightness-0 dark:invert" />
         </Link>
         <div className="flex-1 min-h-0">
           <SidebarContent />
@@ -37,7 +37,7 @@ export function Layout() {
         <div className="px-2 h-14 flex items-center justify-between">
           <Link to="/dashboard" className="flex items-center gap-2 px-2 no-underline">
             <img src="/favicon.png" alt="" className="w-8 h-8 object-contain" />
-            <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-8 object-contain dark:brightness-0 dark:invert" />
+            <img src="/logo-text.png" alt="Reklue" className="h-8 object-contain dark:brightness-0 dark:invert" />
           </Link>
           <div className="flex items-center">
             <Link
@@ -75,16 +75,16 @@ export function Layout() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
               <div className="flex items-center gap-2">
                 <img src="/favicon.png" alt="" className="w-7 h-7" />
-                <span className="font-bold text-foreground">ReeeeecallStudy</span>
+                <span className="font-bold text-foreground">Reklue</span>
               </div>
               <AppDownload />
             </div>
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-border">
               <p className="text-sm text-muted-foreground">
-                {t('footer.copyright', '© 2026 ReeeeecallStudy. All rights reserved.')}
+                {t('footer.copyright', '© 2026 Reklue. All rights reserved.')}
               </p>
-              <a href="mailto:admin@reeeeecallstudy.xyz" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
-                admin@reeeeecallstudy.xyz
+              <a href="mailto:admin@reklue.com" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
+                admin@reklue.com
               </a>
             </div>
           </div>

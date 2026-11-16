@@ -128,7 +128,7 @@ export class RNDevice implements IDeviceAdapter {
     return Application.getIosIdForVendorAsync() ?? Application.androidId ?? 'unknown'
   }
   getUserAgent() {
-    return `ReeeeecallStudy/${Application.nativeApplicationVersion} (${Platform.OS})`
+    return `Reklue/${Application.nativeApplicationVersion} (${Platform.OS})`
   }
   getDeviceType() {
     return Device.deviceType === Device.DeviceType.TABLET ? 'tablet' : 'mobile'

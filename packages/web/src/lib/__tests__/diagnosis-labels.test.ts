@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url'
 import {
   WEAK_THEMES, DIAGNOSIS_ACTIONS,
   MCQ_FLAW_LABELS, SHORT_GAP_LABELS, ESSAY_ASPECT_LABELS, topLabels,
-} from '@reeeeecall/shared/lib/weak-themes'
+} from '@reklue/shared/lib/weak-themes'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../../../..')
 const LOCALES = ['en', 'ko', 'ja', 'zh', 'vi', 'th', 'id', 'es'] as const

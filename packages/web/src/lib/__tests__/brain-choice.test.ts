@@ -4,9 +4,9 @@
  * phase and late reveal, and the band mix for banded games (Quick Math, Number Pattern).
  */
 import { describe, it, expect, vi } from 'vitest'
-import { DEFAULT_CONTEXT, createRng, type ChoiceView, type CreateContext, type RecentTrial } from '@reeeeecall/shared/lib/brain-games'
-import { choiceGame, nearMissOptions, type ChoiceState } from '@reeeeecall/shared/lib/brain-games/games/choice'
-import { pickBand } from '@reeeeecall/shared/lib/brain-games/games/bands'
+import { DEFAULT_CONTEXT, createRng, type ChoiceView, type CreateContext, type RecentTrial } from '@reklue/shared/lib/brain-games'
+import { choiceGame, nearMissOptions, type ChoiceState } from '@reklue/shared/lib/brain-games/games/choice'
+import { pickBand } from '@reklue/shared/lib/brain-games/games/bands'
 
 // Thousands of sampled trials per test: a second or three here, several times that on a CI runner,
 // where the 5s default would time out.

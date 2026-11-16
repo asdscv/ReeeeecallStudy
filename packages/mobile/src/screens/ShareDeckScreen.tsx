@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next'
 import { Screen, Button, ScreenHeader } from '../components/ui'
 import { useDecks } from '../hooks/useDecks'
 import { useTheme, palette } from '../theme'
-import { statusColors } from '@reeeeecall/shared/design-tokens/colors'
+import { statusColors } from '@reklue/shared/design-tokens/colors'
 import { getMobileSupabase } from '../adapters'
 import type { DecksStackParamList } from '../navigation/types'
 
@@ -138,7 +138,7 @@ export function ShareDeckScreen() {
       return
     }
 
-    const link = `https://reeeeecallstudy.xyz/invite/${inviteCode}`
+    const link = `https://reklue.com/invite/${inviteCode}`
     setInviteLink(link)
     setCreating(false)
     await fetchShares()

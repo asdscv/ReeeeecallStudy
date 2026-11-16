@@ -2,20 +2,20 @@ import { useState, useEffect, useRef } from 'react'
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
-import { toIntlLocale } from '@reeeeecall/shared/lib/locale-utils'
+import { toIntlLocale } from '@reklue/shared/lib/locale-utils'
 import { Screen, Badge, ScreenHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
-import { ratingColors } from '@reeeeecall/shared/design-tokens/colors'
+import { ratingColors } from '@reklue/shared/design-tokens/colors'
 import { getMobileSupabase } from '../adapters'
 import {
   formatDuration,
   getStudyModeLabel,
   getStudyModeEmoji,
   getSessionPerformance,
-} from '@reeeeecall/shared/lib/study-history'
-import type { StudySession, StudyLog, Card } from '@reeeeecall/shared/types/database'
+} from '@reklue/shared/lib/study-history'
+import type { StudySession, StudyLog, Card } from '@reklue/shared/types/database'
 import type { HomeStackParamList } from '../navigation/types'
-import { fetchAllRows, fetchRowsByIds } from '@reeeeecall/shared/lib/fetch-all-rows'
+import { fetchAllRows, fetchRowsByIds } from '@reklue/shared/lib/fetch-all-rows'
 
 type Route = RouteProp<HomeStackParamList, 'SessionDetail'>
 type LogWithCard = StudyLog & { card?: Card }

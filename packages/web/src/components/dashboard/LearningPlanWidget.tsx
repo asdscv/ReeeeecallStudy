@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { useLearningStore } from '../../stores/learning-store'
-import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
+import { goalKnowledgeSummary } from '@reklue/shared/lib/goal-knowledge-summary'
 
 /**
  * The learning plan, in one line, on the dashboard.

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { parseDeckFamily, deckListingFilter, formatDeckFamily } from '@reeeeecall/shared/lib/official-deck-family'
-import { withDropOffCtas } from '@reeeeecall/shared/lib/content-drop-off'
+import { parseDeckFamily, deckListingFilter, formatDeckFamily } from '@reklue/shared/lib/official-deck-family'
+import { withDropOffCtas } from '@reklue/shared/lib/content-drop-off'
 
 describe('official deck family', () => {
   it('round-trips real families and rejects unknown ones', () => {

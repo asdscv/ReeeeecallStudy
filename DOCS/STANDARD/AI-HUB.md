@@ -152,10 +152,10 @@ point:
 
 ```bash
 # gates
-pnpm --filter @reeeeecall/web exec tsc -b --noEmit
-pnpm --filter @reeeeecall/web typecheck:e2e
-pnpm --filter @reeeeecall/web lint
-pnpm --filter @reeeeecall/web test
+pnpm --filter @reklue/web exec tsc -b --noEmit
+pnpm --filter @reklue/web typecheck:e2e
+pnpm --filter @reklue/web lint
+pnpm --filter @reklue/web test
 cd packages/mobile && npx tsx src/i18n/i18n.test.ts
 
 # web screenshots (light + dark, every surface the menu gathers)

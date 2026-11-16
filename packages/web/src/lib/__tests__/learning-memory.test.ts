@@ -23,7 +23,7 @@ import {
   reviewValue,
   scheduleAnchoredElapsedDays,
   stabilityFromInterval,
-} from '@reeeeecall/shared/learning'
+} from '@reklue/shared/learning'
 
 const NOW = '2026-07-31T00:00:00.000Z'
 

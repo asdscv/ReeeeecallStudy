@@ -11,12 +11,12 @@ import {
   MIN_BATCH_SIZE,
   MAX_BATCH_SIZE,
   isBatchSizeConfigurable,
-} from '@reeeeecall/shared/lib/study-session-utils'
+} from '@reklue/shared/lib/study-session-utils'
 import { CrammingSetupPanel } from '../components/study/CrammingSetupPanel'
-import type { CrammingFilter } from '@reeeeecall/shared/lib/cramming-queue'
+import type { CrammingFilter } from '@reklue/shared/lib/cramming-queue'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import type { Deck, StudyMode } from '../types/database'
-import { fetchAllRows } from '@reeeeecall/shared/lib/fetch-all-rows'
+import { fetchAllRows } from '@reklue/shared/lib/fetch-all-rows'
 
 export function StudySetupPage() {
   const { t } = useTranslation('study')

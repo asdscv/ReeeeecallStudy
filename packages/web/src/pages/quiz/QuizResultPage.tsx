@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useQuizStore, type QuizRunItem } from '@reeeeecall/shared/stores/quiz-store'
+import { useQuizStore, type QuizRunItem } from '@reklue/shared/stores/quiz-store'
 import { QuizFeedback } from './QuizFeedback'
-import { tallyQuiz, tallyLine } from '@reeeeecall/shared/lib/quiz-outcome'
+import { tallyQuiz, tallyLine } from '@reklue/shared/lib/quiz-outcome'
 import { QuizVerdictBadge } from './QuizVerdictBadge'
-import { retakeNoteKey } from '@reeeeecall/shared/lib/quiz-pricing'
+import { retakeNoteKey } from '@reklue/shared/lib/quiz-pricing'
 
 /**
  * What the sitting came to, and the one control that matters: the learner can overrule any

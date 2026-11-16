@@ -96,7 +96,7 @@
     "finish": "完了",
     "stepOf": "{{current}} / {{total}}",
     "welcome": {
-      "title": "Reeeeecall へようこそ！",
+      "title": "Reklue へようこそ！",
       "description": "暗記カードで学ぶ、最もスマートな方法。デッキを作ってカードを追加すれば、間隔反復が学習を最適化します。",
       "action": "はじめる"
     },

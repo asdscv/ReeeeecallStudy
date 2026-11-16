@@ -4,7 +4,7 @@ import { describe, it, expect } from 'vitest'
 // agrees today is how the prompts copy silently drifted.
 import {
   validateTemplateResponse, validateDeckResponse, validateCardsResponse,
-} from '@reeeeecall/shared/lib/ai/validators'
+} from '@reklue/shared/lib/ai/validators'
 
 describe('validateTemplateResponse', () => {
   it('validates a correct template', () => {

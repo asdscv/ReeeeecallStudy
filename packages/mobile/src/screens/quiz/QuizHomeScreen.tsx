@@ -3,15 +3,15 @@ import { View, Text, StyleSheet, FlatList, Pressable, Alert } from 'react-native
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
-import { AI_HUB_QUIZ } from '@reeeeecall/shared/lib/ai/hub/catalog'
+import { AI_HUB_QUIZ } from '@reklue/shared/lib/ai/hub/catalog'
 import { AiCreditNotice } from '../../components/ai/AiCreditNotice'
-import { useQuizStore, isDailyCheckTitle, type QuizSetRow } from '@reeeeecall/shared/stores/quiz-store'
+import { useQuizStore, isDailyCheckTitle, type QuizSetRow } from '@reklue/shared/stores/quiz-store'
 import { Screen, Button, EmptyState, ListSkeleton, ScreenHeader } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
 import type { QuizStackParamList } from '../../navigation/types'
 import { QuizMistakes } from './QuizMistakes'
-import { dateLine } from '@reeeeecall/shared/lib/quiz-outcome'
+import { dateLine } from '@reklue/shared/lib/quiz-outcome'
 
 type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizHome'>
 

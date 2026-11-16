@@ -6,9 +6,9 @@
     "title1": "超越记忆极限的",
     "title2": "学习方式",
     "description": "通过科学验证的间隔重复（SRS）最大化您的学习效率。",
-    "subDescription": "使用 ReeeeecallStudy，记得更快，记得更久。",
+    "subDescription": "使用 Reklue，记得更快，记得更久。",
     "subtitle1": "通过科学验证的间隔重复（SRS）最大化您的学习效率。",
-    "subtitle2": "使用 ReeeeecallStudy，记得更快，记得更久。",
+    "subtitle2": "使用 Reklue，记得更快，记得更久。",
     "startFree": "免费开始",
     "learnMore": "了解更多",
     "cta": {
@@ -80,7 +80,7 @@
     "subtitle": "高效学习所需的所有工具集于一处"
   },
   "why": {
-    "title": "为什么选择 ReeeeecallStudy？",
+    "title": "为什么选择 Reklue？",
     "subtitle": "融合间隔重复与现代界面的新一代闪卡工具",
     "points": [
       "科学验证的 SRS 学习算法",
@@ -94,7 +94,7 @@
     ]
   },
   "benefitsSection": {
-    "title": "为什么选择 ReeeeecallStudy？",
+    "title": "为什么选择 Reklue？",
     "subtitle": "融合间隔重复与现代界面的新一代闪卡工具",
     "cta": "立即开始"
   },
@@ -167,7 +167,7 @@
     "aiGenerate": "AI 生成卡片"
   },
   "footer": {
-    "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",
+    "copyright": "© 2026 Reklue. All rights reserved.",
     "tagline": "基于间隔重复的智能闪卡学习平台",
     "product": "产品",
     "resources": "资源",
@@ -188,11 +188,11 @@
   "faq": {
     "title": "常见问题",
     "q1": "什么是间隔重复（SRS）？",
-    "a1": "间隔重复是一种经科学验证的学习方法，通过在最佳间隔安排复习来最大化长期记忆保持。ReeeeecallStudy 使用先进的 SRS 算法自动确定您应该何时复习每张闪卡。",
-    "q2": "ReeeeecallStudy 是免费的吗？",
+    "a1": "间隔重复是一种经科学验证的学习方法，通过在最佳间隔安排复习来最大化长期记忆保持。Reklue 使用先进的 SRS 算法自动确定您应该何时复习每张闪卡。",
+    "q2": "Reklue 是免费的吗？",
     "a2": "可以，免费即可开始。注册后即可无限制使用 SRS、六种学习模式、统计和卡组共享。\n\n免费方案对可保存的卡片数量有上限，升级付费方案可提高上限（具体数字见上方的价格方案）。AI 生成卡片和 AI 测验每天都有免费额度，超出部分从充值余额扣除——并且在你确认前一定会先显示扣费金额。",
     "q3": "有哪些学习模式？",
-    "a3": "ReeeeecallStudy 支持 6 种学习模式：SRS（间隔重复）安排最佳复习时间、顺序复习进行系统性复习、随机打乱练习、顺序逐张学习、按日期整理、突击复习集中重复直到掌握。",
+    "a3": "Reklue 支持 6 种学习模式：SRS（间隔重复）安排最佳复习时间、顺序复习进行系统性复习、随机打乱练习、顺序逐张学习、按日期整理、突击复习集中重复直到掌握。",
     "q4": "我可以分享我的闪卡牌组吗？",
     "a4": "可以！您可以通过 3 种模式分享牌组：复制（为他人复制一份）、订阅（同步更新）和快照（冻结版本）。在社区市场中浏览和发现其他用户的牌组。"
   },
@@ -214,7 +214,7 @@
   "science": {
     "badge": "循证学习法",
     "title": "基于认知科学的学习",
-    "subtitle": "ReeeeecallStudy的每项功能都建立在记忆、学习和神经科学领域数十年同行评审研究的基础上。",
+    "subtitle": "Reklue的每项功能都建立在记忆、学习和神经科学领域数十年同行评审研究的基础上。",
     "chart": {
       "title": "随时间变化的记忆保持率",
       "subtitle": "临时抱佛脚 vs. 间隔重复",
@@ -283,12 +283,12 @@
     }
   },
   "seo": {
-    "title": "ReeeeecallStudy — 基于间隔重复的智能闪卡学习",
+    "title": "Reklue — 闪卡学习与脑力游戏",
     "description": "基于科学验证的间隔重复（SRS）算法的智能闪卡学习平台。记得更快，记得更久。"
   },
   "proof": {
     "eyebrow": "真实数据",
-    "title": "用数字看 ReeeeecallStudy",
+    "title": "用数字看 Reklue",
     "subtitle": "这是此刻服务里真实存在的数量。",
     "cards": {
       "label": "已创建卡片",

@@ -5,7 +5,7 @@ import {
   formatUsdMicro,
   getAiUsageHistory,
   type WalletUsageRow,
-} from '@reeeeecall/shared/lib/ai/server-client'
+} from '@reklue/shared/lib/ai/server-client'
 import { toIntlLocale } from '../../lib/locale-utils'
 
 const PAGE = 30

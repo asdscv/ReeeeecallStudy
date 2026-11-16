@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { formatCount } from '@reeeeecall/shared/lib/format-number'
+import { formatCount } from '@reklue/shared/lib/format-number'
 
 interface StatsSummaryCardsProps {
   totalCards: number

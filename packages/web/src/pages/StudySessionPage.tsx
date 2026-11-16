@@ -2,7 +2,7 @@ import { useEffect, useCallback, useState, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { X, Undo2, Keyboard, Lock } from 'lucide-react'
-import { useStudyStore, type PlanSelection } from '@reeeeecall/shared/stores/study-store'
+import { useStudyStore, type PlanSelection } from '@reklue/shared/stores/study-store'
 import { useLearningStore } from '../stores/learning-store'
 import { useAuthStore } from '../stores/auth-store'
 import { useAchievementStore } from '../stores/achievement-store'
@@ -24,7 +24,7 @@ import { getSessionSummaryType } from '../lib/study-summary-type'
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts'
 import { stopSpeaking, getCardAudioUrl, getTTSFieldsForLayout, speak, type TTSOptions } from '../lib/tts'
 import { loadSettings, shouldShowButtons, getDirectionsForMode, type StudyInputSettings, type SwipeDirectionMap } from '../lib/study-input-settings'
-import type { CrammingFilter } from '@reeeeecall/shared/lib/cramming-queue'
+import type { CrammingFilter } from '@reklue/shared/lib/cramming-queue'
 import type { StudyMode, Profile } from '../types/database'
 
 export function StudySessionPage() {
@@ -486,7 +486,7 @@ export function StudySessionPage() {
       <div className="bg-card border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-2.5 sm:py-3.5 flex items-center justify-center gap-2.5">
           <img src="/favicon.png" alt="" className="w-8 h-8 sm:w-12 sm:h-12 object-contain" />
-          <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-7 sm:h-10 object-contain dark:brightness-0 dark:invert" />
+          <img src="/logo-text.png" alt="Reklue" className="h-7 sm:h-10 object-contain dark:brightness-0 dark:invert" />
         </div>
       </div>
 

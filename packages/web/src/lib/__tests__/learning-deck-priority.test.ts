@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest'
 import {
   DECK_PRIORITY_LEVELS, DEFAULT_DECK_PRIORITY,
   importanceForPriority, priorityForImportance,
-} from '@reeeeecall/shared/lib/learning-deck-priority'
+} from '@reklue/shared/lib/learning-deck-priority'
 
 describe('importanceForPriority', () => {
   it('never reaches 0 or 1', () => {

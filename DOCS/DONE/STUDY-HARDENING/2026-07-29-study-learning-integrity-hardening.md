@@ -288,7 +288,7 @@ web/mobile 동시 shared client가 develop에 있으므로 contract를 적용한
 - web local files는 삭제하거나 import compatibility re-export만 남긴다:
   - `srs`, `study-queue`, `cramming-queue`, `study-session-utils`, `srs-access`
   - `stores/study-store`
-- 웹 product code는 `@reeeeecall/shared/...`를 직접 import한다.
+- 웹 product code는 `@reklue/shared/...`를 직접 import한다.
 - 웹 Vitest는 shared implementation을 mock/test하며 mobile typecheck도 같은 source를 소비한다.
 - parity guard는 local 파일에 구현 코드가 다시 생기면 실패한다.
 

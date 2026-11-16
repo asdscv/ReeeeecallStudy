@@ -8,11 +8,11 @@ describe('SEO config', () => {
   })
 
   it('should export BRAND_NAME', () => {
-    expect(SEO.BRAND_NAME).toBe('ReeeeecallStudy')
+    expect(SEO.BRAND_NAME).toBe('Reklue')
   })
 
-  it('should export TWITTER_HANDLE starting with @', () => {
-    expect(SEO.TWITTER_HANDLE).toMatch(/^@/)
+  it('should not advertise an unregistered social handle', () => {
+    expect(SEO.TWITTER_HANDLE).toBe('')
   })
 
   it('should export DEFAULT_OG_IMAGE as absolute URL', () => {

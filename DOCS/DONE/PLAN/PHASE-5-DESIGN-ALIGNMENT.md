@@ -3,7 +3,7 @@
 > **Version**: 1.0
 > **Created**: 2026-02-15
 > **Status**: 계획 완료, 구현 대기
-> **기반**: `ReeeCall Study UI_UX Design/` 디자인 프로토타입 vs 현재 구현 비교
+> **기반**: `Reklue Study UI_UX Design/` 디자인 프로토타입 vs 현재 구현 비교
 
 ---
 

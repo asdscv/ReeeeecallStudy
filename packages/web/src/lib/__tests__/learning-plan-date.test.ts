@@ -11,7 +11,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import {
   localPlanDate, utcOffsetLabel, resolveTimezoneLabel, currentPlanContext,
-} from '@reeeeecall/shared/lib/learning-plan-date'
+} from '@reklue/shared/lib/learning-plan-date'
 
 afterEach(() => { vi.unstubAllGlobals() })
 

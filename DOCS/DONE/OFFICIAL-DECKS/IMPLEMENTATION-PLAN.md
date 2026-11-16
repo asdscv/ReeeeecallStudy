@@ -194,10 +194,10 @@ Marketplace listing is created with `is_active = true` immediately. Discoverabil
 -- System user seed
 INSERT INTO auth.users (id, ...) VALUES ('00000000-0000-0000-0000-000000000001', ...);
 INSERT INTO profiles (id, display_name, role, is_official) VALUES (
-  '00000000-0000-0000-0000-000000000001', 'ReeeeecallStudy Official', 'user', true
+  '00000000-0000-0000-0000-000000000001', 'Reklue Official', 'user', true
 );
 INSERT INTO official_account_settings (user_id, display_badge, organization_name, featured_priority, max_listings)
-  VALUES ('00000000-0000-0000-0000-000000000001', 'official', 'ReeeeecallStudy', 100, 1000);
+  VALUES ('00000000-0000-0000-0000-000000000001', 'official', 'Reklue', 100, 1000);
 
 -- Two universal card templates (fixed UUIDs)
 INSERT INTO card_templates (id, user_id, name, fields, ...) VALUES
@@ -383,7 +383,7 @@ Hook into existing `ci.yml` jobs so the main CI still runs unchanged for unrelat
 ## 8. Success Criteria (Definition of Done)
 
 - All migrations apply cleanly from `001` through `082` on a fresh DB.
-- `pnpm --filter @reeeeecall/official-decks test` passes (unit + integration + e2e).
+- `pnpm --filter @reklue/official-decks test` passes (unit + integration + e2e).
 - `official-decks plan` emits **exactly 327** deck plans across the 51 input CSVs.
 - `official-decks apply` succeeds in dry-run and live modes against local Supabase.
 - Re-running `apply` immediately after a successful run reports `0 changes` (all rows `noop`).

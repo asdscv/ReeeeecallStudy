@@ -16,7 +16,7 @@
  * button that spends it.
  */
 import { describe, it, expect } from 'vitest'
-import { gradeCostLine, retakeNoteKey } from '@reeeeecall/shared/lib/quiz-pricing'
+import { gradeCostLine, retakeNoteKey } from '@reklue/shared/lib/quiz-pricing'
 
 const quote = (over: Partial<Parameters<typeof gradeCostLine>[0] & object> = {}) => ({
   price_micro: 10_000, free_units: 0, trial_units: 0,

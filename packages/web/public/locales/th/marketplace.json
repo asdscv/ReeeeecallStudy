@@ -58,9 +58,9 @@
     }
   },
   "preview": {
-    "title": "\"{{title}}\" - สำรับแฟลชการ์ด | ReeeeecallStudy",
-    "description": "{{title}} — {{cardCount}} แฟลชการ์ด ดูตัวอย่างและเรียนสำรับนี้บน ReeeeecallStudy",
-    "defaultDescription": "สำรับแฟลชการ์ดบน ReeeeecallStudy",
+    "title": "\"{{title}}\" - สำรับแฟลชการ์ด | Reklue",
+    "description": "{{title}} — {{cardCount}} แฟลชการ์ด ดูตัวอย่างและเรียนสำรับนี้บน Reklue",
+    "defaultDescription": "สำรับแฟลชการ์ดบน Reklue",
     "sampleCards": "ตัวอย่างการ์ด",
     "viewInMarket": "ดูในตลาด",
     "cardCount": "{{count, number}} การ์ด",

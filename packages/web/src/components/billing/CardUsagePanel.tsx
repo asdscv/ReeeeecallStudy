@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Archive, Layers, Users, ShieldCheck, Infinity as InfinityIcon } from 'lucide-react'
-import { formatCount } from '@reeeeecall/shared/lib/ai/server-client'
-import type { CardUsageDetail } from '@reeeeecall/shared/stores/deck-store'
+import { formatCount } from '@reklue/shared/lib/ai/server-client'
+import type { CardUsageDetail } from '@reklue/shared/stores/deck-store'
 import { isUnlimitedCardLimit } from '../../lib/card-limit'
 
 /**

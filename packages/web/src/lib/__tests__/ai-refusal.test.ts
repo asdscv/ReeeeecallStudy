@@ -19,7 +19,7 @@ import { describe, it, expect } from 'vitest'
 import {
   refusalFrom, refusalMessageKey, refusalFallbackKey, isWalletRefusal,
   PAID_ACTIONS, type PaidActionId,
-} from '@reeeeecall/shared/lib/ai/refusal'
+} from '@reklue/shared/lib/ai/refusal'
 
 /** Every code the edge function can answer a paid request with, from its own branches. */
 const SERVER_CODES = [

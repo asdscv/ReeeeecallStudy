@@ -10,7 +10,7 @@
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "paths": {
-      "@reeeeecall/shared/*": ["../shared/*"]
+      "@reklue/shared/*": ["../shared/*"]
     }
   },
   "exclude": ["__tests__/e2e", "wdio.*.ts"]

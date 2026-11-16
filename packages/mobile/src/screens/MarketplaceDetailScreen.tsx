@@ -3,17 +3,17 @@ import { View, Text, FlatList, Alert, StyleSheet, TouchableOpacity, TextInput, M
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import { Screen, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { OfficialBadge } from '../components/ui/OfficialBadge'
-import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
-import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
-import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
-import { useReviewsStore } from '@reeeeecall/shared/stores/reviews-store'
+import { useMarketplaceStore } from '@reklue/shared/stores/marketplace-store'
+import { useDeckStore } from '@reklue/shared/stores/deck-store'
+import { useCardLimit } from '@reklue/shared/hooks/useCardLimit'
+import { useReviewsStore } from '@reklue/shared/stores/reviews-store'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
 import { getMobileSupabase } from '../adapters'
 import { toast } from '../stores/toast-store'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import type { MarketplaceStackParamList } from '../navigation/types'
-import type { MarketplaceReview, ReviewSortBy } from '@reeeeecall/shared/types/database'
+import type { MarketplaceReview, ReviewSortBy } from '@reklue/shared/types/database'
 
 // DeckDetailScreen 과 같은 방식으로 타입을 준다 — getParent() 로 스택을 건너뛰려면
 // 네비게이터 타입이 있어야 navigate 시그니처가 살아난다.

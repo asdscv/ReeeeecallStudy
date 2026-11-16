@@ -146,7 +146,7 @@ web/mobile typecheck, targeted lint, 학습 회귀 tests, production build.
 - web `tsc -b --noEmit`, mobile `tsc --noEmit`, targeted ESLint, production build 통과
 - 프로덕션 배포·migration 실행 없음
 - 구현 commit: `697aa0c chore(study): close direct study write paths`
-- PR: https://github.com/asdscv/ReeeeecallStudy/pull/339
+- PR: https://github.com/asdscv/Reklue/pull/339
 - 원격 CI: 7 checks 전부 SUCCESS(재시도 없이 1회 통과)
 
 ### 기존 test 갱신

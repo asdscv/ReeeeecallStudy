@@ -1,10 +1,10 @@
 // Local storage based data management
 const STORAGE_KEYS = {
-  USER: 'reeecall_user',
-  DECKS: 'reeecall_decks',
-  CARDS: 'reeecall_cards',
-  TEMPLATES: 'reeecall_templates',
-  SESSIONS: 'reeecall_sessions',
+  USER: 'reklue_user',
+  DECKS: 'reklue_decks',
+  CARDS: 'reklue_cards',
+  TEMPLATES: 'reklue_templates',
+  SESSIONS: 'reklue_sessions',
 };
 
 // User management

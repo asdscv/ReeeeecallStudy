@@ -1,6 +1,6 @@
 import { Platform } from 'react-native'
 import * as Haptics from 'expo-haptics'
-import type { BrainFx } from '@reeeeecall/shared/hooks/useBrainFx'
+import type { BrainFx } from '@reklue/shared/hooks/useBrainFx'
 import { areHapticsEnabled } from '../../utils/haptics'
 
 /**

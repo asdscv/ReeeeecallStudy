@@ -12,9 +12,9 @@ import { describe, expect, it } from 'vitest'
 import {
   splitDecksBySrsSource, attachProgressToCards, isDueAt,
   type PlannerDeckMeta,
-} from '@reeeeecall/shared/lib/learning-card-sources'
-import type { UserCardProgress } from '@reeeeecall/shared/lib/srs-access'
-import type { Card } from '@reeeeecall/shared/types/database'
+} from '@reklue/shared/lib/learning-card-sources'
+import type { UserCardProgress } from '@reklue/shared/lib/srs-access'
+import type { Card } from '@reklue/shared/types/database'
 
 const ME = 'user-me'
 const OTHER = 'user-publisher'

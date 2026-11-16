@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native'
 import { useTheme } from '../../theme'
-import type { TimePeriod } from '@reeeeecall/shared/lib/time-period'
+import type { TimePeriod } from '@reklue/shared/lib/time-period'
 
 const CHIPS: { value: TimePeriod; label: string }[] = [
   { value: '1d', label: '1D' },

@@ -35,7 +35,7 @@ importers:
       '@react-navigation/native-stack':
         specifier: ^7.14.5
         version: 7.14.5(@react-navigation/native@7.1.33(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0))(react-native-safe-area-context@5.7.0(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0))(react-native-screens@4.24.0(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0))(react-native@0.83.2(@babel/core@7.29.0)(@types/react@19.2.14)(react@19.2.0))(react@19.2.0)
-      '@reeeeecall/shared':
+      '@reklue/shared':
         specifier: workspace:*
         version: link:../shared
       '@supabase/supabase-js':
@@ -227,7 +227,7 @@ importers:
       '@radix-ui/react-slot':
         specifier: ^1.2.4
         version: 1.2.4(@types/react@19.2.14)(react@19.2.0)
-      '@reeeeecall/shared':
+      '@reklue/shared':
         specifier: workspace:*
         version: link:../shared
       '@supabase/supabase-js':

@@ -5,7 +5,7 @@ import { Layers, Store, Globe, Repeat, RefreshCw } from 'lucide-react'
 import { useCountUp } from '../../hooks/useCountUp'
 import { supabase } from '../../lib/supabase'
 import { SUPPORTED_LOCALES } from '../../lib/locale-utils'
-import { STUDY_MODES } from '@reeeeecall/shared/lib/study-validation'
+import { STUDY_MODES } from '@reklue/shared/lib/study-validation'
 
 /**
  * 랜딩의 수치 섹션.

@@ -34,7 +34,7 @@ import {
   type SetAttribute,
   type SetCard,
   type SetMatchView,
-} from '@reeeeecall/shared/lib/brain-games'
+} from '@reklue/shared/lib/brain-games'
 import {
   SET_MATCH_LADDER,
   SET_MATCH_MAX_LEVEL,
@@ -48,9 +48,9 @@ import {
   setMatchPlan,
   setsOn,
   type SetMatchState,
-} from '@reeeeecall/shared/lib/brain-games/games/set-match'
-import { useBrainRound, type PlatformContext } from '@reeeeecall/shared/hooks/useBrainRound'
-import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
+} from '@reklue/shared/lib/brain-games/games/set-match'
+import { useBrainRound, type PlatformContext } from '@reklue/shared/hooks/useBrainRound'
+import { useBrainStore } from '@reklue/shared/stores/brain-store'
 
 const DESKTOP: CreateContext = DEFAULT_CONTEXT
 const PHONE: CreateContext = { ...DEFAULT_CONTEXT, maxCols: maxColsFor(358), maxRows: 7 }

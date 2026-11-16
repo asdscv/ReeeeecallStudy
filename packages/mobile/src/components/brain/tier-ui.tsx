@@ -15,7 +15,7 @@ import {
   type BrainGameId,
   type BrainMeta,
   type BrainProgress,
-} from '@reeeeecall/shared/lib/brain-games'
+} from '@reklue/shared/lib/brain-games'
 import { useMotion } from './motion'
 import { FX, type FeatherName } from './brain-ui'
 

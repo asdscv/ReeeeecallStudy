@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { createRng, DEFAULT_CONTEXT, type MakeNumberView } from '@reeeeecall/shared/lib/brain-games'
-import { eachTree, evaluate, MAKE_NUMBER_MAX_LEVEL, makeNumber, makeNumberFractionPuzzles } from '@reeeeecall/shared/lib/brain-games/games/make-number'
+import { createRng, DEFAULT_CONTEXT, type MakeNumberView } from '@reklue/shared/lib/brain-games'
+import { eachTree, evaluate, MAKE_NUMBER_MAX_LEVEL, makeNumber, makeNumberFractionPuzzles } from '@reklue/shared/lib/brain-games/games/make-number'
 
 describe('Make the Number: editing and recovery', () => {
   it('an unfinished or wrong expression can be undone, cleared and solved at every level', () => {

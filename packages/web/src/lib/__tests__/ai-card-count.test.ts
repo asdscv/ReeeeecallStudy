@@ -14,7 +14,7 @@
  * legitimately owns (its own input range) is still enforced.
  */
 import { describe, it, expect } from 'vitest'
-import { defaultCardCount, MAX_CARD_COUNT } from '@reeeeecall/shared/lib/ai/card-count'
+import { defaultCardCount, MAX_CARD_COUNT } from '@reklue/shared/lib/ai/card-count'
 
 describe('defaultCardCount', () => {
   it('THE REGRESSION: a quota raised above 10 is not capped at 10', () => {

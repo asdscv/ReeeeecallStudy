@@ -2,9 +2,9 @@ import { View, Text, SectionList, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../theme'
 import { ListCard, Badge } from '../ui'
-import { groupCardsByDate } from '@reeeeecall/shared/lib/stats'
-import { formatDateKeyShort } from '@reeeeecall/shared/lib/date-utils'
-import type { Card } from '@reeeeecall/shared/types/database'
+import { groupCardsByDate } from '@reklue/shared/lib/stats'
+import { formatDateKeyShort } from '@reklue/shared/lib/date-utils'
+import type { Card } from '@reklue/shared/types/database'
 
 interface UploadDateTabProps {
   cards: Card[]

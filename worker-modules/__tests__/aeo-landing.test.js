@@ -12,7 +12,7 @@ describe('AEO public content', () => {
   })
 
   it.each(UI_LOCALES)('uses the visible landing FAQ and metadata for %s', async (lang) => {
-    const response = await handleLandingBotRequest(new URL(`https://reeeeecallstudy.xyz/landing?lang=${lang}`))
+    const response = await handleLandingBotRequest(new URL(`https://reklue.com/landing?lang=${lang}`))
     const html = await response.text()
     const copy = LANDING_COPY[lang]
     expect(html).toContain(`<title>${escapeHtml(copy.seo.title)}</title>`)

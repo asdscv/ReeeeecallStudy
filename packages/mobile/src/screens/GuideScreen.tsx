@@ -6,7 +6,7 @@ import { Screen, TextInput, ScreenHeader } from '../components/ui'
 
 import { useTheme } from '../theme'
 
-const BASE_URL = 'https://reeeeecallstudy.xyz'
+const BASE_URL = 'https://reklue.com'
 
 // ── Types ──────────────────────────────────────────────────────────
 interface GuideItem {

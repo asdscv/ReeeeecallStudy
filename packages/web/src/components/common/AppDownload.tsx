@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { APP_STORE_URL, PLAY_STORE_URL } from '@reeeeecall/shared/lib/app-store-links'
+import { APP_STORE_URL, PLAY_STORE_URL } from '@reklue/shared/lib/app-store-links'
 
 function AppleIcon({ className }: { className?: string }) {
   return (

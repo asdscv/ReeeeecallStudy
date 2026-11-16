@@ -123,7 +123,7 @@ class PrefetchService {
 // Singleton + 태스크 등록
 // 새 프리로드 대상 추가 시 여기에 .register() 한 줄 추가.
 // ─────────────────────────────────────────────────────────────────────────
-import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
+import { useDeckStore } from '@reklue/shared/stores/deck-store'
 import { useThemeStore } from '../stores/theme-store'
 import { getMobileSupabase } from '../adapters'
 

@@ -128,7 +128,7 @@
     "stepOf": "ステップ {{current}} / {{total}}",
     "restartOnboarding": "チュートリアルをやり直す",
     "welcome": {
-      "title": "Reeeeecall へようこそ！",
+      "title": "Reklue へようこそ！",
       "description": "暗記カードで学ぶ、最もスマートな方法。デッキを作ってカードを追加すれば、間隔反復アルゴリズムが学習を最適化します。",
       "action": "はじめる"
     },
@@ -386,7 +386,7 @@
   },
   "skipToContent": "本文へスキップ",
   "footer": {
-    "copyright": "© 2026 ReeeeecallStudy. All rights reserved."
+    "copyright": "© 2026 Reklue. All rights reserved."
   },
   "cancel": "キャンセル",
   "loading": "読み込み中...",

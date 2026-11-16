@@ -43,7 +43,7 @@ import {
   weekStart,
   type ChoiceView,
   type CreateContext,
-} from '@reeeeecall/shared/lib/brain-games'
+} from '@reklue/shared/lib/brain-games'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Any = any

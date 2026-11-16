@@ -1,4 +1,4 @@
-import type { IDeviceAdapter } from '@reeeeecall/shared/adapters/device'
+import type { IDeviceAdapter } from '@reklue/shared/adapters/device'
 import { Platform } from 'react-native'
 import * as SecureStore from 'expo-secure-store'
 
@@ -48,7 +48,7 @@ export class RNDevice implements IDeviceAdapter {
   }
 
   getUserAgent(): string {
-    return `ReeeeecallStudy/${Platform.OS}`
+    return `Reklue/${Platform.OS}`
   }
 
   getPlatform(): 'ios' | 'android' {

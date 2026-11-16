@@ -43,7 +43,7 @@
 
 ```
 packages/web ─┐                         supabase/functions ── (packages 참조 불가)
-              ├─→ @reeeeecall/shared ──→ types
+              ├─→ @reklue/shared ──→ types
 packages/mobile┘        │                worker-modules ───── (workspace 밖)
                         ├─ stores  (유스케이스 · supabase 접근은 여기까지)
                         ├─ lib     (순수 도메인 · supabase 금지 — 현재 stats.ts/storage.ts 2건 위반, §3 형제 import 구멍)

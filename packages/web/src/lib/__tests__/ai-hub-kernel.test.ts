@@ -12,8 +12,8 @@
  * you write on purpose and fails the first time telemetry is added to a real screen.
  */
 import { describe, expect, it, vi } from 'vitest'
-import { Registry, RegistryError } from '@reeeeecall/shared/lib/kernel/registry'
-import { EventBus } from '@reeeeecall/shared/lib/kernel/event-bus'
+import { Registry, RegistryError } from '@reklue/shared/lib/kernel/registry'
+import { EventBus } from '@reklue/shared/lib/kernel/event-bus'
 
 interface Thing {
   readonly id: string

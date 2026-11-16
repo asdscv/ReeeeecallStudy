@@ -41,7 +41,7 @@ export function Settings() {
 
   function loadSettings() {
     // Load from localStorage
-    const saved = localStorage.getItem('reeecall-settings');
+    const saved = localStorage.getItem('reklue-settings');
     if (saved) {
       const settings = JSON.parse(saved);
       setDailyNewCards(settings.dailyNewCards || 20);
@@ -66,7 +66,7 @@ export function Settings() {
       dailyNewCards,
       swipe: swipeSettings,
     };
-    localStorage.setItem('reeecall-settings', JSON.stringify(settings));
+    localStorage.setItem('reklue-settings', JSON.stringify(settings));
     toast.success('설정이 저장되었습니다!');
   }
 

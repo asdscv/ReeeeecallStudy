@@ -3,7 +3,7 @@ import { parseDeckFamily, deckListingFilter } from '../packages/shared/lib/offic
 
 // 3-layer prompt builder for AI content generation
 
-const SYSTEM_PROMPT = `You are an expert educational content writer for ReeeeecallStudy, a learning platform with spaced repetition (SRS) flashcards and recreational brain games.
+const SYSTEM_PROMPT = `You are an expert educational content writer for Reklue, a learning platform with spaced repetition (SRS) flashcards and recreational brain games.
 
 You write engaging, practical articles about learning, studying, and exam preparation. Your content is informative and actionable.
 
@@ -76,7 +76,7 @@ Each block has "type" and "props":
 - NEVER present made-up study results as facts
 - Only mention well-known, widely accepted concepts (e.g., "spaced repetition improves long-term retention")
 - Use general, qualitative descriptions instead of specific numbers (e.g., "research suggests significant improvement" instead of "studies show 85% improvement")
-- The CTA should tie the topic to the matching ReeeeecallStudy feature: flashcards for study assignments, the actual game for brain-game assignments.
+- The CTA should tie the topic to the matching Reklue feature: flashcards for study assignments, the actual game for brain-game assignments.
 
 ## Clear Answers and Reliable Explanations
 
@@ -96,7 +96,7 @@ Help readers understand and apply the topic. These writing choices do not guaran
 
 ## SEO Guidelines
 
-- meta_title: 30-45 characters (a brand suffix " | ReeeeecallStudy" is appended automatically, do NOT include it). Place the primary keyword near the beginning.
+- meta_title: 30-45 characters (a brand suffix " | Reklue" is appended automatically, do NOT include it). Place the primary keyword near the beginning.
 - meta_description: 70-155 characters. Include primary keyword in the first 70 chars. Write a compelling summary that encourages clicks. Frame as a direct answer to a question when possible.
 - tags: Use 3-5 tags relevant to the topic. Use lowercase, single-word or hyphenated tags.
 - slug: 3-6 words, lowercase kebab-case, always in English, include primary keyword.

@@ -9,7 +9,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   groupMistakesByDeck, mistakeResponseText, type QuizMistake,
-} from '@reeeeecall/shared/stores/quiz-store'
+} from '@reklue/shared/stores/quiz-store'
 
 const miss = (over: Partial<QuizMistake> & { attempt_id: string }): QuizMistake => ({
   card_id: 'card-1', deck_id: 'deck-1', deck_name: '영단어', question_type: 'mcq',

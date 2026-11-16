@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { generateCostLine, freeLeftLine } from '@reeeeecall/shared/lib/quiz-pricing'
+import { generateCostLine, freeLeftLine } from '@reklue/shared/lib/quiz-pricing'
 
 /**
  * The free allowance is only an allowance if the learner can see it.

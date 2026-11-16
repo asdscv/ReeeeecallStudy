@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../theme'
-import { formatCount, formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
+import { formatCount, formatUsdMicro } from '@reklue/shared/lib/ai/server-client'
 import { getMyPaymentHistory, type PaymentHistoryRow } from '../../services/billing'
 
 // Rows per fetch. Small on mobile: Settings is one long ScrollView, so the first screen

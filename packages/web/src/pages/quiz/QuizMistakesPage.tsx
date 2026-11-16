@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { useQuizStore, mistakeResponseText, groupMistakesByDeck } from '@reeeeecall/shared/stores/quiz-store'
-import { dateLine } from '@reeeeecall/shared/lib/quiz-outcome'
+import { useQuizStore, mistakeResponseText, groupMistakesByDeck } from '@reklue/shared/stores/quiz-store'
+import { dateLine } from '@reklue/shared/lib/quiz-outcome'
 
 /**
  * 오답 노트, on its own page, one deck at a time.

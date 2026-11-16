@@ -28,7 +28,7 @@ import { opsGate } from '../_shared/ops-gate.ts'
 const ENV = (k: string) => Deno.env.get(k)
 
 const ALLOWED_ORIGINS = (ENV('ALLOWED_ORIGINS') ??
-  'https://reeeeecallstudy.xyz,http://localhost:5173')
+  'https://reklue.com,http://localhost:5173')
   .split(',').map((s) => s.trim()).filter(Boolean)
 
 function corsHeadersFor(origin: string | null): Record<string, string> {

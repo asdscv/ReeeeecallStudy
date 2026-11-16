@@ -65,7 +65,7 @@ export type HomeStackParamList = {
   Dashboard: undefined
   StudyHistory: undefined
   SessionDetail: {
-    session: import('@reeeeecall/shared/types/database').StudySession
+    session: import('@reklue/shared/types/database').StudySession
     deckName: string
     deckIcon: string
   }

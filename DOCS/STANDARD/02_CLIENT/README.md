@@ -26,7 +26,7 @@
 | 영속화는 미들웨어가 아니라 명시적으로: 모바일 `local-prefs.ts`, 웹 `localStorage` 래퍼 | 없음 |
 
 **웹 스토어의 3가지 형태와 그 의미**
-- **re-export shim (11개)** — `export { X } from '@reeeeecall/shared/stores/...'`. 이것이 기본값이다.
+- **re-export shim (11개)** — `export { X } from '@reklue/shared/stores/...'`. 이것이 기본값이다.
 - **웹 전용 (5개)** — `achievement`/`billing`/`confirm`/`onboarding`/`report`. shared 에 대응이 없으니 정상.
 - **shared 와 별개 구현 (3개)** — `content`/`marketplace`/`subscription`. **부채다**(D5). 웹은 로컬을, 모바일은 shared 를 읽어서 이미 갈라졌다 — 예: 웹 `subscription-store` 는 shared 가 받은 `getDeviceId()` 버그 수정을 못 받았다.
 
@@ -117,7 +117,7 @@ deckCache.invalidate('stats')
 ## 8. 함정
 
 - **웹에 supabase 클라이언트가 2개 산다.** `packages/web/src/lib/supabase.ts` 가 자체 `createClient` 를 export 하면서 `initSupabase()` 도 부르고, `adapters/index.ts` 도 `initSupabase()` 를 부른다. `initSupabase` 는 호출할 때마다 새 클라이언트로 **교체**한다 → 웹 UI 41파일과 shared 스토어 18개가 서로 다른 GoTrue 인스턴스를 쓸 수 있다. (부채 D6)
-- **테스트에서 supabase mock 경로를 잘못 고르면 mock 이 안 먹는다.** 웹 로컬 모듈을 mock 해도 shared 스토어는 shared 모듈을 import 한다. 현재 `vi.mock('@reeeeecall/shared/lib/supabase')` 23건 / 웹 로컬 경로 mock 19건(`'../../lib/supabase'` 17 · `'../../../lib/supabase'` 1 · `'../lib/supabase'` 1)이 공존한다.
+- **테스트에서 supabase mock 경로를 잘못 고르면 mock 이 안 먹는다.** 웹 로컬 모듈을 mock 해도 shared 스토어는 shared 모듈을 import 한다. 현재 `vi.mock('@reklue/shared/lib/supabase')` 23건 / 웹 로컬 경로 mock 19건(`'../../lib/supabase'` 17 · `'../../../lib/supabase'` 1 · `'../lib/supabase'` 1)이 공존한다.
 - **모바일은 `useAuthStore.initialize()` 를 부르지 않는다**(호출은 웹 `App.tsx:166` 한 곳). 모바일 인증은 `useAuthState.ts` 가 따로 관리하므로 shared auth-store 의 `user` 는 모바일에서 영원히 null 이다 — 모바일 화면에서 `useAuthStore(s => s.user?.id)` 를 읽으면 그 분기는 절대 실행되지 않는다(`LearningGoalsScreen.tsx:65,91` 가 그 상태).
 - **`createCards` 진입 시 `set({ error: null })`**(`card-store.ts:207`)은 이전 실패의 잔여 error 가 이번 호출의 결과로 오인되지 않게 한다 — 이 초기화가 없어 성공한 재시도가 캐시 무효화를 건너뛰고 새 덱 카드 수가 0에 고정된 사고가 있었다. (현재 무효화 게이트는 `if (!get().error)` 가 아니라 `if (totalInserted > 0)`(`:263`)로 바뀌어 부분 성공도 반영한다.)
 - **`packages/shared` 소스 디렉터리의 컴파일 `.js`/`.d.ts` 트윈(현재 29개)** — 커밋 금지이고, 소스 스캔 테스트는 `.js` 를 제외해야 한다.

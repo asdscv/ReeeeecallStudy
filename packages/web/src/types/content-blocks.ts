@@ -1,7 +1,7 @@
 // Content block type definitions for the block-based content system
 // AI generates content as an array of these blocks
 
-import type { AppCtaBlock } from '@reeeeecall/shared/lib/content-drop-off'
+import type { AppCtaBlock } from '@reklue/shared/lib/content-drop-off'
 
 export type { AppCtaBlock }
 

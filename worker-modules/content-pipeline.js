@@ -165,7 +165,7 @@ export async function runContentPipeline(env, cron) {
     // ?lang= URL only for translations that exist — no phantom variants.
     const publishedKeys = [...runState.slugs]
     if (publishedKeys.length > 0) {
-      const SITE_URL = 'https://reeeeecallstudy.xyz'
+      const SITE_URL = 'https://reklue.com'
       const seenSlug = new Set()
       const newUrls = []
       for (const key of publishedKeys) {
@@ -301,7 +301,7 @@ export async function generateForLocale(env, db, topic, locale, recentContent, s
   }
 
   // Build DB record
-  const SITE_URL = 'https://reeeeecallstudy.xyz'
+  const SITE_URL = 'https://reklue.com'
   const record = {
     title: article.title,
     subtitle: article.subtitle || null,
@@ -315,7 +315,7 @@ export async function generateForLocale(env, db, topic, locale, recentContent, s
     thumbnail_url: thumbnailUrl || null,
     og_image_url: thumbnailUrl || null,
     canonical_url: contentCanonicalUrl(SITE_URL, article.slug, locale),
-    author_name: 'ReeeeecallStudy',
+    author_name: 'Reklue',
     is_published: true,
     published_at: new Date().toISOString(),
     ...(topic.targetQuery ? { target_query: topic.targetQuery } : {}),

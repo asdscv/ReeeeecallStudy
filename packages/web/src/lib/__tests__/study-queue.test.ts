@@ -4,8 +4,8 @@ vi.mock('i18next', () => ({
   default: { t: (key: string, opts?: Record<string, unknown>) => opts?.count !== undefined ? `${key}:${opts.count}` : key },
 }))
 
-import { SrsQueueManager } from '@reeeeecall/shared/lib/study-queue'
-import type { SrsCardData } from '@reeeeecall/shared/lib/srs'
+import { SrsQueueManager } from '@reklue/shared/lib/study-queue'
+import type { SrsCardData } from '@reklue/shared/lib/srs'
 
 // ─── Helpers ────────────────────────────────────────────────
 

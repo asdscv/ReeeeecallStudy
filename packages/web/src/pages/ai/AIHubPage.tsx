@@ -2,11 +2,11 @@ import { useEffect, useRef } from 'react'
 import { Target, HelpCircle, Cpu } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { aiHubEntries } from '@reeeeecall/shared/lib/ai/hub/catalog'
-import { isAiBadgeEligible } from '@reeeeecall/shared/lib/ai/hub/types'
-import { AI_HUB_GENERATE } from '@reeeeecall/shared/lib/ai/hub/catalog'
+import { aiHubEntries } from '@reklue/shared/lib/ai/hub/catalog'
+import { isAiBadgeEligible } from '@reklue/shared/lib/ai/hub/types'
+import { AI_HUB_GENERATE } from '@reklue/shared/lib/ai/hub/catalog'
 import { AiCreditNotice } from '../../components/ai/AiCreditNotice'
-import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
+import { aiHubBus } from '@reklue/shared/lib/ai/hub/events'
 
 /**
  * The AI 학습 landing: every registered AI feature, and what the user has left to spend.

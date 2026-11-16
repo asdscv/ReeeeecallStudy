@@ -7,4 +7,4 @@
 export type {
   GenerateMode, GeneratedTemplateField, GeneratedLayoutItem, GeneratedTemplate,
   GeneratedDeck, GeneratedCard, GenerateStep,
-} from '@reeeeecall/shared/lib/ai/types'
+} from '@reklue/shared/lib/ai/types'

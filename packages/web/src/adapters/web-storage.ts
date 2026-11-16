@@ -1,4 +1,4 @@
-import type { IStorage, ISessionStorage } from '@reeeeecall/shared/adapters/storage'
+import type { IStorage, ISessionStorage } from '@reklue/shared/adapters/storage'
 
 export class WebStorage implements IStorage {
   getItem(key: string): string | null {
