@@ -4,7 +4,7 @@
 
 - Public brand: Reklue / 리클루. Repository: `asdscv/Reklue`. Workspace packages: `@reklue/*`.
 - Canonical site: `https://reklue.com`. Cloudflare Worker: `reklue`; both `reklue.com/*` and `www.reklue.com/*` are routed to it.
-- Registrar nameservers: `martin.ns.cloudflare.com`, `samara.ns.cloudflare.com`.
+- Registrar nameservers: `martin.ns.cloudflare.com`, `samara.ns.cloudflare.com`. Registrant contact verification completed in HostingKR; the domain detail page now reports normal status without the unverified-contact label.
 - Former domain: `reeeeecallstudy.xyz`, automatic renewal OFF; existing registration remains active until February 2027 for redirects. Paths and queries are preserved.
 - Support: `admin@reklue.com`, Cloudflare Email Routing enabled to the existing verified owner mailbox.
 - Supabase project display name: Reklue. Auth Site URL: `https://reklue.com`; allowed callback: `https://reklue.com/auth/callback`.
@@ -20,7 +20,9 @@
 - Source graphics: `packages/mobile/store-assets/feature-graphics/`; regenerate with `pnpm --filter @reklue/web exec tsx scripts/generate-store-graphics.ts`.
 - All **114** existing store screenshots were downloaded at original size and checked with OCR. The old official publisher name appeared only in the 19 marketplace frames (10 Play locales, 8 iPhone locales and 1 iPad set). Those obsolete frames were removed from the editable listings, preserving the first **5** images and their order in every set. Apple live 1.0.5 screenshot IDs were checked to be separate and left untouched. No image editing or additional UI automation was required.
 - Production OTA update **73e6a0e4-6024-43fb-90ba-57331927af95** (runtime 1.0.6, iOS and Android) includes the final dark-mode wordmark fix. Main merge: `7d40fbbc3b822a2a06e203ee847e9b2681056e19`.
-- Apple review draft is prepared, but adding version 1.0.6 for review is blocked by the new required `socialMedia` age-rating answer. Existing `userGeneratedContent` is true. The owner has been asked to confirm the social-media classification because it can change the eligible age rating. No age-rating answer was guessed or changed.
+- Apple 1.0.6 was submitted successfully after the owner authorized the social-media age-rating answer. Only `socialMedia=true` and `socialMediaAgeRestricted=false` changed in the declaration; all other existing age answers were verified unchanged. Submission `606b32d3-397f-4266-8637-4bd9c7affb5c`, submitted at `2026-11-16T10:27:33Z`, was read back with one version item and **WAITING_FOR_REVIEW** on both submission and version.
+- Play privacy-policy URL changed to `https://reklue.com/privacy-policy` and included in the existing release review. Publishing Overview confirms 1.0.6 and the localized rebrand are in review; automatic pre-review checks also cover the privacy-policy change.
+- Apple bundle registration display name is now **Reklue**; bundle identifier `com.reeeeecall.study` is unchanged. Google Cloud deployment project display name is now **Reklue**; project ID `reeeeecallstudy` and number `203245252470` are unchanged.
 
 ## Preserved technical identities
 
@@ -35,7 +37,8 @@ These are compatibility/history references, not product display names. Do not re
 ## Outstanding console checks
 
 - Search keyword automation still reads the former Search Console property until the user confirms restricted access for the existing keyword service account on the new property. A briefly added grant was immediately revoked; only the owner remains on the new property.
-- Registrar contact verification, Google OAuth consent branding, and the Play privacy-policy setting need final console verification. Computer Use was returning `cgWindowNotFound` for both Chrome and Finder; no security warnings or authentication protections were bypassed.
+- Google OAuth consent branding is separate from the deployment project above. Supabase Google login is enabled and uses a client from project number `212581278702`; that project does not appear in the signed-in `asdscv@gmail.com` project list. The owner has been asked to reauthenticate the other existing Google account in Chrome to locate the actual OAuth project. No OAuth credentials, callbacks, providers or permissions were changed.
+- Chrome computer control recovered. Registrar verification and Play privacy-policy checks above are complete; store approvals are external pending states.
 
 ## Verification
 
