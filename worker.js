@@ -41,7 +41,8 @@ export default {
     const ua = request.headers.get('user-agent') || ''
 
     // Keep old shares, article URLs and login return paths working during the move.
-    if ([LEGACY_SITE_HOST, `www.${LEGACY_SITE_HOST}`, 'www.reklue.com'].includes(url.hostname)) {
+    if ([LEGACY_SITE_HOST, `www.${LEGACY_SITE_HOST}`, 'www.reklue.com'].includes(url.hostname)
+      || (url.hostname === new URL(SITE_URL).hostname && url.protocol === 'http:')) {
       const target = new URL(SITE_URL)
       target.pathname = url.pathname
       target.search = url.search
