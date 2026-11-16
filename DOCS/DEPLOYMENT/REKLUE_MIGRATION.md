@@ -34,11 +34,11 @@ These are compatibility/history references, not product display names. Do not re
 - Applied SQL migration history and Google service-account/project IDs.
 - Former-domain redirect rules and their regression fixtures.
 
-## Outstanding console checks
+## Automation status and final login verification
 
 - Search keyword automation still reads the former Search Console property until the user confirms restricted access for the existing keyword service account on the new property. A briefly added grant was immediately revoked; only the owner remains on the new property.
-- Use the owner’s `asdscv@gmail.com` Google account for this app. Cloud Console access with that account was verified. The earlier request to sign in with a different existing Google account was an unsupported ownership assumption and has been withdrawn. Supabase Google login is enabled; the real app login uses client `212581278702-r7560o2uu0b9gubgnrlncmiini7bf6i6.apps.googleusercontent.com` and returns through the existing Supabase callback to `https://reklue.com/auth/callback`. The OAuth consent-brand configuration still needs to be located and verified in the owner’s account; a project-picker search miss does not establish a different owner. No OAuth credentials, callbacks, providers or permissions were changed.
-- Chrome computer control recovered. Registrar verification and Play privacy-policy checks above are complete; store approvals are external pending states.
+- Google login verified end to end with the owner’s `asdscv@gmail.com`: the actual Reklue login button opened Google account selection, selecting the existing authorized account returned successfully to `https://reklue.com/dashboard`, and the page title was Reklue. Google account selection displays the existing Supabase authentication hostname rather than the former product name. The public client remains `212581278702-r7560o2uu0b9gubgnrlncmiini7bf6i6.apps.googleusercontent.com`; credentials, callbacks, providers and permissions were unchanged. The earlier request to authenticate another Google account was incorrect and withdrawn; no further owner sign-in is required for this verification. Customizing Google’s generic authentication-host display would be a separate branding change, not a remaining legacy-name replacement.
+- Registrar verification and Play privacy-policy checks above are complete. Apple 1.0.6 was reread as WAITING_FOR_REVIEW. Public Apple lookup still returns 1.0.5 under the former name; public Google Play also still shows the former name until its submitted changes are approved. Submission is not proof of public store availability.
 
 ## Verification
 
