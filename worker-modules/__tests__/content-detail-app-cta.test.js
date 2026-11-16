@@ -8,13 +8,13 @@ const h = (text) => ({ type: 'heading', props: { level: 2, text } })
 
 const ARTICLE = {
   slug: 'toeic-part-5', locale: 'en',
-  title: 'TOEIC Part 5', meta_title: 'TOEIC Part 5', meta_description: 'd',
+  title: 'TOEIC Part 5', meta_title: 'TOEIC Part 5 | ReeeeecallStudy', meta_description: 'd',
   content_blocks: [
     { type: 'hero', props: { title: 'TOEIC Part 5' } }, p('Intro.'),
     h('What is Part 5?'), p('The answer.'), p('More.'),
     h('Common traps'), p('Traps.'),
     h('Bottom line'), p('Wrap.'),
-    { type: 'cta', props: { title: 'Start', description: 'd', buttonText: 'Go', buttonUrl: '/auth/login' } },
+    { type: 'cta', props: { title: 'Start with ReeeeecallStudy', description: 'd', buttonText: 'Go', buttonUrl: '/auth/login' } },
   ],
   tags: ['toeic'], reading_time_minutes: 5, author_name: 'ReeeeecallStudy',
   published_at: '2026-11-01T00:00:00Z', updated_at: '2026-11-01T00:00:00Z',
@@ -36,5 +36,9 @@ describe('crawler HTML carries the same drop-off app links as the page', () => {
     expect(html).toContain('utm_campaign%3Dtoeic-part-5%26utm_content%3Danswer')
     expect(html).toContain('utm_content%3Dwrap_up')
     expect(html.indexOf('The answer.')).toBeLessThan(html.indexOf('<aside><a'))
+    expect(html).toContain('TOEIC Part 5 | Reklue')
+    expect(html).toContain('Start with Reklue')
+    expect(html).not.toContain('ReeeeecallStudy')
+    expect(html).toContain('https://reeeeecallstudy.xyz')
   })
 })

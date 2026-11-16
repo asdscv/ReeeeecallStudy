@@ -128,7 +128,7 @@
     "stepOf": "Paso {{current}} de {{total}}",
     "restartOnboarding": "Reiniciar el tutorial",
     "welcome": {
-      "title": "¡Bienvenido a Reeeeecall!",
+      "title": "¡Bienvenido a Reklue!",
       "description": "La forma más inteligente de estudiar con tarjetas. Crea mazos, añade tarjetas y deja que el algoritmo de repetición espaciada optimice tu aprendizaje.",
       "action": "Empezar"
     },
@@ -386,7 +386,7 @@
   },
   "skipToContent": "Saltar al contenido",
   "footer": {
-    "copyright": "© 2026 ReeeeecallStudy. Todos los derechos reservados."
+    "copyright": "© 2026 Reklue. Todos los derechos reservados."
   },
   "cancel": "Cancelar",
   "loading": "Cargando...",

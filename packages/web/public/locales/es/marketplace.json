@@ -58,9 +58,9 @@
     }
   },
   "preview": {
-    "title": "\"{{title}}\" - Mazo de tarjetas | ReeeeecallStudy",
-    "description": "{{title}} — {{cardCount}} tarjetas. Vista previa y estudia este mazo en ReeeeecallStudy.",
-    "defaultDescription": "Mazo de tarjetas en ReeeeecallStudy",
+    "title": "\"{{title}}\" - Mazo de tarjetas | Reklue",
+    "description": "{{title}} — {{cardCount}} tarjetas. Vista previa y estudia este mazo en Reklue.",
+    "defaultDescription": "Mazo de tarjetas en Reklue",
     "sampleCards": "Tarjetas de muestra",
     "viewInMarket": "Ver en el mercado",
     "cardCount": "{{count, number}} tarjetas",

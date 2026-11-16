@@ -48,7 +48,7 @@ describe('오늘의 확인 on device', () => {
     await browser.pause(6000)
     await shoot('learning-goals')
 
-    // A deep-link launch leaves "Open in ReeeeecallStudy?" on screen. It belongs to
+    // A deep-link launch leaves "Open in Reklue?" on screen. It belongs to
     // SpringBoard, not the app, so an element selector never finds it — only the alert API
     // reaches it. It swallowed every tap and looked exactly like a missing element.
     for (let i = 0; i < 3; i++) {

@@ -95,7 +95,7 @@ const article = (locale) => ({
     { type: 'hero', props: { title: 'TOEIC 800' } }, p('Intro.'),
     h('A'), p('The answer.'), p('More.'), h('B'), p('Traps.'), h('C'), p('Wrap.'),
   ],
-  tags: ['toeic'], reading_time_minutes: 5, author_name: 'ReeeeecallStudy',
+  tags: ['toeic'], reading_time_minutes: 5, author_name: 'Reklue',
   published_at: '2026-11-01T00:00:00Z', updated_at: '2026-11-01T00:00:00Z',
 })
 

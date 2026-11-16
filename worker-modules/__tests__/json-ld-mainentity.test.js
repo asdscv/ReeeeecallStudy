@@ -7,7 +7,7 @@ const SLUG = 'toefl-skimming-techniques-academic-passages'
 function makeArticle(locale = 'en') {
   return {
     title: 'Skim Smarter for TOEFL Academic Passages',
-    meta_title: 'TOEFL Skimming Techniques | ReeeeecallStudy',
+    meta_title: 'TOEFL Skimming Techniques | Reklue',
     meta_description: 'Practical skimming methods.',
     subtitle: 'Subtitle',
     thumbnail_url: 'https://example.com/img.jpg',
@@ -16,7 +16,7 @@ function makeArticle(locale = 'en') {
     locale,
     published_at: '2026-05-18T06:04:04.836+00:00',
     updated_at: '2026-05-18T06:04:05.015655+00:00',
-    author_name: 'ReeeeecallStudy',
+    author_name: 'Reklue',
   }
 }
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ReeeeecallStudy brain games: local verification, or an explicitly requested OTA.
+# Reklue brain games: local verification, or an explicitly requested OTA.
 # Web: merging the feature PR into develop triggers the existing Cloudflare deployment.
 # Mobile: merging develop into main triggers deploy-mobile.yml; ota reruns that release.
 set -euo pipefail

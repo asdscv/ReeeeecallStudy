@@ -1,6 +1,6 @@
-# ReeeeecallStudy — Product Context
+# Reklue — Product Context
 
-> ReeeeecallStudy is a flashcard learning platform for students, language learners, and professionals. It is available on the web, iOS, and Android. Users can start with a free plan; paid plans raise card storage limits.
+> Reklue is a flashcard learning platform for students, language learners, and professionals. It is available on the web, iOS, and Android. Users can start with a free plan; paid plans raise card storage limits.
 
 ## Learning
 

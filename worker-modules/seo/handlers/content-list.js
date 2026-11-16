@@ -1,3 +1,4 @@
+import { withCurrentBrand } from '../../../packages/shared/lib/brand.ts'
 // Content list page bot handler — extracted from worker.js handleContentListBot
 import {
   SITE_URL, BRAND_NAME, DEFAULT_OG_IMAGE,
@@ -32,7 +33,7 @@ export async function handleContentListBot(url, env) {
     { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } },
   )
 
-  const articles = (await res.json()) || []
+  const articles = withCurrentBrand((await res.json()) || [])
   const listTitle = LIST_TITLES[lang] || LIST_TITLES.en
   const listDesc = LIST_DESCS[lang] || LIST_DESCS.en
   const canonicalUrl = localizedUrl('/insight', lang)

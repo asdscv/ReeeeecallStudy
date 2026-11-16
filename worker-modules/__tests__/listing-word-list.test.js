@@ -8,7 +8,7 @@ const card = (i) => ({ field_values: { kind: 'word', front: `word${i}`, back: `�
 function official(over = {}) {
   return {
     id: 'deck-ko', title: 'TOEIC 800 어휘 (영어 → 한국어)', description: '공식 덱', category: 'toeic', card_count: 1500,
-    tags: ['official', 'category:toeic', 'source:en', 'target:ko', 'level:800'], owner_name: 'ReeeeecallStudy Official',
+    tags: ['official', 'category:toeic', 'source:en', 'target:ko', 'level:800'], owner_name: 'Reklue Official',
     owner_is_official: true, native_language: 'ko', created_at: '2026-05-01T00:00:00Z',
     siblings: [{ id: 'deck-ja', native_language: 'ja' }, { id: 'deck-vi', native_language: 'vi' }],
     sample_fields: Array.from({ length: 50 }, (_, i) => card(i)),
@@ -29,7 +29,7 @@ describe('official deck page = word list in the deck language', () => {
     const html = await res.text()
 
     expect(html).toMatch(/<html lang="ko"/)
-    expect(html).toContain('<title>토익 800점 단어 1,500개 — 뜻·예문 (영어 → 한국어) | ReeeeecallStudy</title>')
+    expect(html).toContain('<title>토익 800점 단어 1,500개 — 뜻·예문 (영어 → 한국어) | Reklue</title>')
     expect(html).toContain('<h1>토익 800점 단어 1,500개 — 뜻·예문 (영어 → 한국어)</h1>')
     expect(html).toContain('<link rel="canonical" href="https://reeeeecallstudy.xyz/d/deck-ko">')
     expect(html).toContain('hreflang="ko" href="https://reeeeecallstudy.xyz/d/deck-ko"')

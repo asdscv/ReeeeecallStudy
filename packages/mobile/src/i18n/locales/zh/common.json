@@ -96,7 +96,7 @@
     "finish": "完成",
     "stepOf": "{{current}} / {{total}}",
     "welcome": {
-      "title": "欢迎使用 Reeeeecall！",
+      "title": "欢迎使用 Reklue！",
       "description": "用记忆卡片学习的最聪明方式。创建卡片集、添加卡片，间隔重复会帮你优化学习。",
       "action": "开始使用"
     },

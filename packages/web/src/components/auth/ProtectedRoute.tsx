@@ -17,7 +17,7 @@ function LoadingScreen() {
           <div className="absolute inset-0 w-20 h-20 rounded-full bg-blue-500/20 blur-xl scale-150" />
           <img src="/favicon.png" alt="" className="w-20 h-20 relative z-10 animate-pulse" style={{ animationDuration: '4s' }} />
         </div>
-        <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-7 brightness-0 invert opacity-80" />
+        <img src="/logo-text.png" alt="Reklue" className="h-7 brightness-0 invert opacity-80" />
         <p className="text-sm text-slate-400/80 tracking-wide">{t('tagline')}</p>
 
         {/* Loading dots */}

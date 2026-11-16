@@ -486,7 +486,7 @@ export function StudySessionPage() {
       <div className="bg-card border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-2.5 sm:py-3.5 flex items-center justify-center gap-2.5">
           <img src="/favicon.png" alt="" className="w-8 h-8 sm:w-12 sm:h-12 object-contain" />
-          <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-7 sm:h-10 object-contain dark:brightness-0 dark:invert" />
+          <img src="/logo-text.png" alt="Reklue" className="h-7 sm:h-10 object-contain dark:brightness-0 dark:invert" />
         </div>
       </div>
 

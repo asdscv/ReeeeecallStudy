@@ -1,3 +1,4 @@
+import { BRAND_NAME } from '../../packages/shared/lib/brand.ts'
 // Keep in sync with packages/web/src/lib/seo-config.ts
 // (web INDEXABLE_LOCALES / SUPPORTED_LOCALES mirror these two policy views).
 //
@@ -16,7 +17,7 @@ import landing_id from '../../packages/web/public/locales/id/landing.json'
 import landing_es from '../../packages/web/public/locales/es/landing.json'
 
 export const SITE_URL = 'https://reeeeecallstudy.xyz'
-export const BRAND_NAME = 'ReeeeecallStudy'
+export { BRAND_NAME }
 export const TWITTER_HANDLE = '@reeeeecallstudy'
 export const CONTACT_EMAIL = 'admin@reeeeecallstudy.xyz'
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`
@@ -75,14 +76,14 @@ export function pageChrome(lang) {
 }
 
 export const LIST_TITLES = {
-  en: 'Learning Insights — Science-Backed Study Strategies | ReeeeecallStudy',
-  ko: '학습 인사이트 — 과학적 학습 전략 | ReeeeecallStudy',
-  zh: '学习洞察 — 科学学习策略 | ReeeeecallStudy',
-  ja: '学習インサイト — 科学的学習戦略 | ReeeeecallStudy',
-  vi: 'Kiến thức Học tập — Chiến lược Học tập Khoa học | ReeeeecallStudy',
-  th: 'ข้อมูลเชิงลึกด้านการเรียนรู้ — กลยุทธ์การเรียนรู้ทางวิทยาศาสตร์ | ReeeeecallStudy',
-  id: 'Wawasan Belajar — Strategi Belajar Berbasis Sains | ReeeeecallStudy',
-  es: 'Perspectivas de Aprendizaje — Estrategias de Estudio Científicas | ReeeeecallStudy',
+  en: 'Learning Insights — Science-Backed Study Strategies | Reklue',
+  ko: '학습 인사이트 — 과학적 학습 전략 | Reklue',
+  zh: '学习洞察 — 科学学习策略 | Reklue',
+  ja: '学習インサイト — 科学的学習戦略 | Reklue',
+  vi: 'Kiến thức Học tập — Chiến lược Học tập Khoa học | Reklue',
+  th: 'ข้อมูลเชิงลึกด้านการเรียนรู้ — กลยุทธ์การเรียนรู้ทางวิทยาศาสตร์ | Reklue',
+  id: 'Wawasan Belajar — Strategi Belajar Berbasis Sains | Reklue',
+  es: 'Perspectivas de Aprendizaje — Estrategias de Estudio Científicas | Reklue',
 }
 
 export const LIST_DESCS = {

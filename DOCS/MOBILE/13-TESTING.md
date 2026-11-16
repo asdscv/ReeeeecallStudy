@@ -147,7 +147,7 @@ export const config = {
     'appium:automationName': 'XCUITest',
     'appium:deviceName': process.env.IOS_DEVICE_NAME ?? 'iPhone 16',
     'appium:platformVersion': process.env.IOS_PLATFORM_VERSION ?? '18.0',
-    'appium:app': './ios/build/ReeeeecallStudy.app',
+    'appium:app': './ios/build/Reklue.app',
     'appium:noReset': false,
   }],
   port: 4723,

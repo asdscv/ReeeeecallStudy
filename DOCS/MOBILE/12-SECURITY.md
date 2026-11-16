@@ -112,7 +112,7 @@ async function authenticateWithBiometrics(): Promise<boolean> {
   if (!hasHardware) return true // Skip if no biometric hardware
 
   const result = await LocalAuthentication.authenticateAsync({
-    promptMessage: 'Unlock ReeeeecallStudy',
+    promptMessage: 'Unlock Reklue',
     fallbackLabel: 'Use passcode',
   })
   return result.success

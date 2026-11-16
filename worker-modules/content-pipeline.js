@@ -315,7 +315,7 @@ export async function generateForLocale(env, db, topic, locale, recentContent, s
     thumbnail_url: thumbnailUrl || null,
     og_image_url: thumbnailUrl || null,
     canonical_url: contentCanonicalUrl(SITE_URL, article.slug, locale),
-    author_name: 'ReeeeecallStudy',
+    author_name: 'Reklue',
     is_published: true,
     published_at: new Date().toISOString(),
     ...(topic.targetQuery ? { target_query: topic.targetQuery } : {}),

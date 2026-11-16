@@ -10,7 +10,7 @@ function article(locale, slug = 'foo') {
     meta_title: `M-${locale}`, meta_description: `D-${locale}`,
     content_blocks: [{ type: 'paragraph', props: { text: 'Body text.' } }],
     tags: ['study'], reading_time_minutes: 5,
-    author_name: 'ReeeeecallStudy',
+    author_name: 'Reklue',
     published_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-02T00:00:00Z',
   }
 }
@@ -80,7 +80,7 @@ describe('an indexed Japanese article speaks Japanese around the article too', (
     expect(res.headers.get('X-Robots-Tag')).toContain('index, follow')
     const html = await res.text()
     expect(html).toContain('その他の学習インサイト')
-    expect(html).toContain('ReeeeecallStudyで学習を始める')
+    expect(html).toContain('Reklueで学習を始める')
     expect(html).not.toContain('More Learning Insights')
   })
 })

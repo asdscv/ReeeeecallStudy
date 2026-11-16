@@ -48,7 +48,7 @@ beforeEach(() => {
 describe('Logo link', () => {
   it('should have logo wrapped in a link to /', () => {
     renderLogin()
-    const link = screen.getByRole('link', { name: /ReeeeecallStudy/i })
+    const link = screen.getByRole('link', { name: /Reklue/i })
     expect(link).toHaveAttribute('href', '/')
   })
 })

@@ -32,11 +32,11 @@ const mockArticle: ContentDetail = {
   content_blocks: [],
   reading_time_minutes: 5,
   tags: ['learning', 'srs'],
-  meta_title: 'Test Article | ReeeeecallStudy',
+  meta_title: 'Test Article | Reklue',
   meta_description: 'Test description',
   og_image_url: 'https://example.com/og.jpg',
   canonical_url: 'https://reeeeecallstudy.xyz/insight/test-article',
-  author_name: 'ReeeeecallStudy',
+  author_name: 'Reklue',
   is_published: true,
   published_at: '2025-01-01T00:00:00Z',
   created_at: '2025-01-01T00:00:00Z',
@@ -394,7 +394,7 @@ describe('buildHowToJsonLd', () => {
     const steps = [
       { name: 'Create a Deck', text: 'Create a deck to organize cards.' },
     ]
-    const result = buildHowToJsonLd('How to Use ReeeeecallStudy', steps)
+    const result = buildHowToJsonLd('How to Use Reklue', steps)
     expect(result['@context']).toBe('https://schema.org')
     expect(result['@type']).toBe('HowTo')
   })
@@ -405,8 +405,8 @@ describe('buildHowToJsonLd', () => {
       { name: 'Study', text: 'SRS presents review cards.' },
       { name: 'Track Progress', text: 'Check learning stats.' },
     ]
-    const result = buildHowToJsonLd('How to Use ReeeeecallStudy', steps)
-    expect(result.name).toBe('How to Use ReeeeecallStudy')
+    const result = buildHowToJsonLd('How to Use Reklue', steps)
+    expect(result.name).toBe('How to Use Reklue')
     expect(result.step).toHaveLength(3)
     expect(result.step[0]['@type']).toBe('HowToStep')
     expect(result.step[0].name).toBe('Create a Deck')

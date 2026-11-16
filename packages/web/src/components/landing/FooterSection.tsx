@@ -19,7 +19,7 @@ export function FooterSection() {
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 mb-3">
                 <img src="/favicon.png" alt="" className="w-8 h-8" />
-                <span className="font-bold text-foreground text-lg">ReeeeecallStudy</span>
+                <span className="font-bold text-foreground text-lg">Reklue</span>
               </div>
               <p className="text-sm text-muted-foreground mb-4 max-w-xs">
                 {t('footer.tagline', 'Smart flashcard learning platform with spaced repetition')}
@@ -115,7 +115,7 @@ export function FooterSection() {
           {/* Bottom bar */}
           <div className="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-sm text-content-tertiary">
-              {t('footer.copyright', '© 2026 ReeeeecallStudy. All rights reserved.')}
+              {t('footer.copyright', '© 2026 Reklue. All rights reserved.')}
             </p>
             <a
               href="mailto:admin@reeeeecallstudy.xyz"

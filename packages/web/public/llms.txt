@@ -1,6 +1,6 @@
-# ReeeeecallStudy
+# Reklue
 
-> ReeeeecallStudy is a flashcard learning platform with spaced repetition (SRS), six study modes, AI-assisted learning, deck sharing, and progress statistics. You can start with a free plan; paid plans increase card storage limits.
+> Reklue is a flashcard learning platform with spaced repetition (SRS), six study modes, AI-assisted learning, deck sharing, and progress statistics. You can start with a free plan; paid plans increase card storage limits.
 
 ## Product
 

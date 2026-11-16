@@ -6,9 +6,9 @@
     "title1": "Aprendizaje Que Trasciende",
     "title2": "Los Límites de la Memoria",
     "description": "Maximiza tu eficiencia de aprendizaje con la repetición espaciada (SRS) científicamente comprobada.",
-    "subDescription": "Con ReeeeecallStudy, puedes recordar más rápido y por más tiempo.",
+    "subDescription": "Con Reklue, puedes recordar más rápido y por más tiempo.",
     "subtitle1": "Maximiza tu eficiencia de aprendizaje con la repetición espaciada (SRS) científicamente comprobada.",
-    "subtitle2": "Con ReeeeecallStudy, puedes recordar más rápido y por más tiempo.",
+    "subtitle2": "Con Reklue, puedes recordar más rápido y por más tiempo.",
     "startFree": "Comenzar Gratis",
     "learnMore": "Más Información",
     "cta": {
@@ -80,7 +80,7 @@
     "subtitle": "Todas las herramientas para un aprendizaje eficiente en un solo lugar"
   },
   "why": {
-    "title": "¿Por qué ReeeeecallStudy?",
+    "title": "¿Por qué Reklue?",
     "subtitle": "Herramienta de tarjetas de estudio de nueva generación que combina la repetición espaciada con una interfaz moderna",
     "points": [
       "Algoritmo de aprendizaje SRS científicamente verificado",
@@ -94,7 +94,7 @@
     ]
   },
   "benefitsSection": {
-    "title": "¿Por qué ReeeeecallStudy?",
+    "title": "¿Por qué Reklue?",
     "subtitle": "Herramienta de tarjetas de estudio de nueva generación que combina la repetición espaciada con una interfaz moderna",
     "cta": "Comenzar Ahora"
   },
@@ -167,7 +167,7 @@
     "aiGenerate": "Tarjetas con IA"
   },
   "footer": {
-    "copyright": "© 2026 ReeeeecallStudy. Todos los derechos reservados.",
+    "copyright": "© 2026 Reklue. Todos los derechos reservados.",
     "tagline": "Plataforma inteligente de aprendizaje con tarjetas y repetición espaciada",
     "product": "Producto",
     "resources": "Recursos",
@@ -188,11 +188,11 @@
   "faq": {
     "title": "Preguntas Frecuentes",
     "q1": "¿Qué es la repetición espaciada (SRS)?",
-    "a1": "La repetición espaciada es un método de aprendizaje científicamente comprobado que programa los repasos en intervalos óptimos para maximizar la retención de la memoria a largo plazo. ReeeeecallStudy utiliza un algoritmo SRS avanzado para determinar automáticamente cuándo debes repasar cada tarjeta de estudio.",
-    "q2": "¿ReeeeecallStudy es gratis?",
+    "a1": "La repetición espaciada es un método de aprendizaje científicamente comprobado que programa los repasos en intervalos óptimos para maximizar la retención de la memoria a largo plazo. Reklue utiliza un algoritmo SRS avanzado para determinar automáticamente cuándo debes repasar cada tarjeta de estudio.",
+    "q2": "¿Reklue es gratis?",
     "a2": "Sí, puedes empezar gratis. Al registrarte tienes SRS, los seis modos de estudio, estadísticas y compartir mazos sin límite.\n\nEl plan gratuito sí limita cuántas tarjetas puedes guardar, y un plan de pago amplía ese límite (las cifras exactas aparecen en la sección de precios). La generación de tarjetas con IA y los cuestionarios con IA incluyen un cupo gratis diario; a partir de ahí se descuentan de tu saldo, y el cargo siempre se muestra antes de confirmar.",
     "q3": "¿Qué modos de estudio están disponibles?",
-    "a3": "ReeeeecallStudy admite 6 modos de estudio: SRS para programar repasos óptimos, repaso secuencial para revisar de forma sistemática, aleatorio para practicar mezclado, secuencial en orden, por fecha para organizar por tiempo y repaso intensivo hasta dominarlo.",
+    "a3": "Reklue admite 6 modos de estudio: SRS para programar repasos óptimos, repaso secuencial para revisar de forma sistemática, aleatorio para practicar mezclado, secuencial en orden, por fecha para organizar por tiempo y repaso intensivo hasta dominarlo.",
     "q4": "¿Puedo compartir mis mazos de tarjetas de estudio?",
     "a4": "¡Sí! Puedes compartir mazos en 3 modos: Copiar (duplicar para otros), Suscribir (sincronizar actualizaciones) e Instantánea (versión congelada). Explora y descubre los mazos de otros usuarios en el mercado comunitario."
   },
@@ -214,7 +214,7 @@
   "science": {
     "badge": "Aprendizaje Basado en Evidencia",
     "title": "Basado en la Ciencia Cognitiva",
-    "subtitle": "Cada función de ReeeeecallStudy se fundamenta en décadas de investigación revisada por pares en memoria, aprendizaje y neurociencia.",
+    "subtitle": "Cada función de Reklue se fundamenta en décadas de investigación revisada por pares en memoria, aprendizaje y neurociencia.",
     "chart": {
       "title": "Retención de Memoria a lo Largo del Tiempo",
       "subtitle": "Estudio intensivo vs. repetición espaciada",
@@ -283,12 +283,12 @@
     }
   },
   "seo": {
-    "title": "ReeeeecallStudy — Aprendizaje Inteligente con Tarjetas y Repetición Espaciada",
+    "title": "Reklue — Tarjetas de estudio y juegos mentales",
     "description": "Plataforma inteligente de aprendizaje con tarjetas y algoritmo de repetición espaciada (SRS) científicamente comprobado. Recuerda más rápido y por más tiempo."
   },
   "proof": {
     "eyebrow": "Datos reales",
-    "title": "ReeeeecallStudy en números",
+    "title": "Reklue en números",
     "subtitle": "Lo que hay ahora mismo dentro del servicio.",
     "cards": {
       "label": "Tarjetas creadas",

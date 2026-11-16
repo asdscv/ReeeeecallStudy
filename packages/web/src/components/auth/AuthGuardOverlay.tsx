@@ -325,7 +325,7 @@ export function AuthGuardOverlay() {
                     <div className="absolute inset-0 rounded-full bg-brand/30 blur-xl scale-150" />
                     <img
                       src="/favicon.png"
-                      alt="Reeeeecall"
+                      alt="Reklue"
                       className="w-12 h-12 relative"
                     />
                   </div>
@@ -334,7 +334,7 @@ export function AuthGuardOverlay() {
                 {/* Logo text */}
                 <motion.img
                   src="/logo-text.png"
-                  alt="Reeeeecall Study"
+                  alt="Reklue"
                   className="h-6 mb-6 brightness-0 invert"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}

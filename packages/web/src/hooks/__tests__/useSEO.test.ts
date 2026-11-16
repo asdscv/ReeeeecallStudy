@@ -395,12 +395,12 @@ describe('useSEO', () => {
         title: 'T',
         description: 'd',
         ogType: 'article',
-        articleAuthor: 'ReeeeecallStudy',
+        articleAuthor: 'Reklue',
       }),
     )
     const meta = document.querySelector('meta[property="article:author"]')
     expect(meta).toBeTruthy()
-    expect(meta?.getAttribute('content')).toBe('ReeeeecallStudy')
+    expect(meta?.getAttribute('content')).toBe('Reklue')
   })
 
   it('should cleanup article:author on unmount', () => {
@@ -409,7 +409,7 @@ describe('useSEO', () => {
         title: 'T',
         description: 'd',
         ogType: 'article',
-        articleAuthor: 'ReeeeecallStudy',
+        articleAuthor: 'Reklue',
       }),
     )
     expect(document.querySelector('meta[property="article:author"]')).toBeTruthy()

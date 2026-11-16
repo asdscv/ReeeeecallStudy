@@ -1,3 +1,4 @@
+import { withCurrentBrand } from '../lib/brand'
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import type { ContentListItem, ContentDetail } from '../types/content-blocks'
@@ -76,7 +77,7 @@ export const useContentStore = create<ContentState>((set, get) => ({
       return
     }
 
-    const rows = (data ?? []) as ContentListItem[]
+    const rows = withCurrentBrand((data ?? []) as ContentListItem[])
     const hasMore = rows.length > PAGE_SIZE
     const pageItems = hasMore ? rows.slice(0, PAGE_SIZE) : rows
 
@@ -126,7 +127,7 @@ export const useContentStore = create<ContentState>((set, get) => ({
       return
     }
 
-    set({ currentArticle: data as ContentDetail, detailLoading: false })
+    set({ currentArticle: withCurrentBrand(data as ContentDetail), detailLoading: false })
   },
 
   fetchRelatedArticles: async (slug: string, tags: string[]) => {
@@ -146,7 +147,7 @@ export const useContentStore = create<ContentState>((set, get) => ({
     }
 
     const tagSet = new Set(tags)
-    const scored = (data as ContentListItem[])
+    const scored = withCurrentBrand(data as ContentListItem[])
       .map((item) => ({
         item,
         score: (item.tags || []).filter((t) => tagSet.has(t)).length,

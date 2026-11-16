@@ -806,7 +806,7 @@ Locales: en, es, id, ja, ko, th, vi, zh. WP-L translates the other six from ko/e
 ## 5) Work packages: separate worktrees, exact file ownership
 
 **Setup.**
-- Worktrees: `git -C ~/development/ReeeeecallStudy/develop worktree add ../wt-bhc-<wp> -b feat/bhc-<wp> feat/brain-hard-content`.
+- Worktrees: `git -C ~/development/Reklue/develop worktree add ../wt-bhc-<wp> -b feat/bhc-<wp> feat/brain-hard-content`.
 - The integration branch `feat/brain-hard-content` is cut from the Quick Eye commit.
 - `pnpm install --frozen-lockfile` in each worktree; node lives in `/opt/homebrew/opt/node/bin`.
 - Never `git add -A`.

@@ -26,7 +26,7 @@ export function handleRobots(env) {
   const sections = []
 
   // Default user-agent: allow public, disallow private
-  sections.push(`# ReeeeecallStudy robots.txt
+  sections.push(`# Reklue robots.txt
 User-agent: *
 ${buildAllowRules(PUBLIC_PATHS)}
 ${buildDisallowRules(PRIVATE_PATHS)}`)

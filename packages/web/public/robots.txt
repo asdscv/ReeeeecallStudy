@@ -1,4 +1,4 @@
-# ReeeeecallStudy robots.txt
+# Reklue robots.txt
 User-agent: *
 Allow: /landing
 Allow: /insight

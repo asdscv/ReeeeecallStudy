@@ -938,7 +938,7 @@ export function SettingsScreen() {
         </TouchableOpacity>
 
         <Text style={[styles.versionText, { color: theme.colors.textTertiary }]}>
-          ReeeeecallStudy v{APP_VERSION}
+          Reklue v{APP_VERSION}
         </Text>
         <TouchableOpacity
           onPress={() => {

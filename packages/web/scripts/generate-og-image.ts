@@ -1,42 +1,37 @@
 import sharp from 'sharp'
 import { resolve } from 'path'
 
-const WIDTH = 1200
-const HEIGHT = 630
-
+// Regenerate the checked-in raster exports from the outlined SVG wordmark.
+// Existing asset URLs remain valid, including links shared before the rename.
 async function main() {
-  const logoPath = resolve(import.meta.dirname, '..', 'public', 'reeeeecallstudy_symbol_logo-removebg-preview.png')
-  const outPath = resolve(import.meta.dirname, '..', 'public', 'og-image.png')
+  const publicDir = resolve(import.meta.dirname, '..', 'public')
+  const wordmarkPath = resolve(publicDir, 'logo-text.svg')
+  const mobileDir = resolve(import.meta.dirname, '..', '..', 'mobile', 'assets')
+  const wordmark = await sharp(wordmarkPath, { density: 300 }).resize(840).png().toBuffer()
+  await sharp(wordmark).toFile(resolve(publicDir, 'logo-text.png'))
+  await sharp(wordmark).toFile(resolve(mobileDir, 'logo-text.png'))
 
-  // Scale logo to fill ~90% of width, maintaining aspect ratio
-  const targetLogoWidth = Math.round(WIDTH * 0.90)
-  const logo = await sharp(logoPath)
-    .resize(targetLogoWidth, null, { fit: 'inside' })
-    .toBuffer()
+  const symbol = await sharp(resolve(publicDir, 'favicon.png'))
+    .resize(220, 220, { fit: 'contain', background: '#00000000' }).png().toBuffer()
+  const logo = await sharp(wordmark).resize(650).png().toBuffer()
+  const logoHeight = (await sharp(logo).metadata()).height!
+  const combined = await sharp({
+    create: { width: 920, height: 240, channels: 4, background: '#00000000' },
+  }).composite([
+    { input: symbol, left: 0, top: 10 },
+    { input: logo, left: 250, top: Math.round((240 - logoHeight) / 2) },
+  ]).png().toBuffer()
 
-  const logoMeta = await sharp(logo).metadata()
-  const logoW = logoMeta.width!
-  const logoH = logoMeta.height!
-
-  // Center the logo
-  const left = Math.round((WIDTH - logoW) / 2)
-  const top = Math.round((HEIGHT - logoH) / 2)
-
-  // Create white background with logo centered
+  await sharp(combined).toFile(resolve(publicDir, 'reeeeecallstudy_symbol_logo-removebg-preview.png'))
   await sharp({
-    create: {
-      width: WIDTH,
-      height: HEIGHT,
-      channels: 4,
-      background: { r: 255, g: 255, b: 255, alpha: 1 },
-    },
-  })
-    .composite([{ input: logo, left, top }])
-    .png()
-    .toFile(outPath)
+    create: { width: 1200, height: 630, channels: 4, background: '#ffffff' },
+  }).composite([{ input: combined, left: 140, top: 195 }])
+    .png().toFile(resolve(publicDir, 'og-image.png'))
 
-  console.log(`OG image generated: ${outPath} (${WIDTH}x${HEIGHT})`)
-  console.log(`Logo: ${logoW}x${logoH}, positioned at (${left}, ${top})`)
+  console.log('Generated Reklue wordmarks, combined logo, and 1200×630 OG image.')
 }
 
-main()
+main().catch((error: unknown) => {
+  console.error(error)
+  process.exitCode = 1
+})

@@ -48,7 +48,7 @@ export class RNDevice implements IDeviceAdapter {
   }
 
   getUserAgent(): string {
-    return `ReeeeecallStudy/${Platform.OS}`
+    return `Reklue/${Platform.OS}`
   }
 
   getPlatform(): 'ios' | 'android' {
