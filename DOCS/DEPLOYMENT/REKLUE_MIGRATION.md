@@ -16,9 +16,11 @@
 
 - Google Play: 10 localized names/descriptions, 10 new feature graphics, support website and support email committed through Android Publisher API and read back successfully.
 - App Store: editable **1.0.6** version created; 8 names, subtitles, descriptions, keywords, support/privacy/marketing URLs and release notes saved and read back successfully.
-- Native release: **1.0.6**, retaining the existing app identities. Build/store submission and review status must be checked separately; a metadata save is not proof of public store approval.
+- Native release: **1.0.6**, retaining the existing app identities. Android build **55** was submitted successfully; Android Publisher readback shows production release 1.0.6 with version code 55. iOS build **63** was uploaded, processed as VALID and attached to the editable 1.0.6 version. Store approval/public availability must be checked separately.
 - Source graphics: `packages/mobile/store-assets/feature-graphics/`; regenerate with `pnpm --filter @reklue/web exec tsx scripts/generate-store-graphics.ts`.
-- Existing marketplace screenshots contain the previous official publisher label and need replacement. The user has been asked to select native Appium capture or a targeted code-based image edit.
+- All **114** existing store screenshots were downloaded at original size and checked with OCR. The old official publisher name appeared only in the 19 marketplace frames (10 Play locales, 8 iPhone locales and 1 iPad set). Those obsolete frames were removed from the editable listings, preserving the first **5** images and their order in every set. Apple live 1.0.5 screenshot IDs were checked to be separate and left untouched. No image editing or additional UI automation was required.
+- Production OTA update **73e6a0e4-6024-43fb-90ba-57331927af95** (runtime 1.0.6, iOS and Android) includes the final dark-mode wordmark fix. Main merge: `7d40fbbc3b822a2a06e203ee847e9b2681056e19`.
+- Apple review draft is prepared, but adding version 1.0.6 for review is blocked by the new required `socialMedia` age-rating answer. Existing `userGeneratedContent` is true. The owner has been asked to confirm the social-media classification because it can change the eligible age rating. No age-rating answer was guessed or changed.
 
 ## Preserved technical identities
 
@@ -39,5 +41,5 @@ These are compatibility/history references, not product display names. Do not re
 
 - Initial rebrand: 4,330 web tests and 245 Worker tests passed; all CI checks passed before the develop/main merges.
 - Additional compact/lowercase alias regression cases: 3 tests passed; installed-app schemes and slugs remain intact.
-- HTTPS migration: 247 Worker tests passed, including canonical HTTP upgrade and localhost preservation.
+- HTTPS migration: 247 Worker tests passed, including canonical HTTP upgrade and localhost preservation. Production HTTP, www and former-domain requests return path/query-preserving 308 redirects; canonical privacy and terms pages return 200.
 - iOS and Android Metro exports passed for 1.0.6. All 8 PNG graphics decoded at 1024×500; multilingual rendering checked visually. Lint: zero errors, 5 pre-existing warnings.
