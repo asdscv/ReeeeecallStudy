@@ -3,9 +3,9 @@
 > **이 문서가 스토어 등록정보의 원본이다.** 콘솔에 직접 쓰기 전에 여기를 먼저 고치고,
 > 고친 내용을 App Store 8개 로케일 / Google Play 10개 로케일에 그대로 옮긴다.
 >
-> **2026-11-16 리브랜딩 초안:** 브랜드를 **Reklue / 리클루**로 통일했다. 아래 내용은 스토어 반영용 원본이며 외부 콘솔에 적용됐다는 뜻은 아니다.
+> **2026-11-16 리브랜딩:** 브랜드를 **Reklue / 리클루**로 통일했다. Google Play 10개 로케일의 이름·설명은 콘솔 초안에 저장했다. 대표 그래픽은 한국어 교체 저장을 완료했고 나머지는 준비된 이미지로 교체 중이다. 스토어 공개·App Store 반영 완료를 뜻하지 않는다.
 > 기본 도메인은 `reklue.com`으로 전환하고, 앱 ID `com.reeeeecall.study`, EAS 프로젝트와 구매 상품 ID는 유지한다.
-> 기기 홈 화면 이름은 새 네이티브 빌드 설치 후 바뀐다.
+> 기기 홈 화면 이름은 새 네이티브 빌드 설치 후 바뀐다. 새 스토어 버전은 `1.0.6`이다(게시된 `1.0.5`에는 이름 변경용 빌드를 다시 붙일 수 없다).
 
 ## 글자수 한도 (초과하면 API 가 400 을 준다)
 
@@ -50,7 +50,7 @@ CJK 부분일치(`考试복습`)까지 봐야 한다.
 |---|---|---|
 | App Store 이름 | `Reklue: Study & Brain Games` | 27/30 |
 | App Store 부제 | `AI Cards & Spaced Repetition` | 28/30 |
-| App Store 키워드 | `recallstudy,recall,study,memorize,vocabulary,quiz,exam,revision,srs,language,school,cram` | 88/100 |
+| App Store 키워드 | `reklue,recall,study,memorize,vocabulary,quiz,exam,revision,srs,language,school,cram` | 83/100 |
 | Play 앱 이름 | `Reklue: Study & Brain Games` | 27/30 |
 | Play 짧은 설명 | Reklue: AI flashcards + spaced repetition (SRS) to memorize anything fast. | 74/80 |
 | 프로모션 텍스트 | New: turn a photo of your notes into a full flashcard deck with AI, and let spaced repetition schedule every review for you. 10 free AI cards every day. | 152/170 |

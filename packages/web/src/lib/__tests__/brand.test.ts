@@ -2,6 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { withCurrentBrand } from '@reklue/shared/lib/brand'
 
 describe('previously published brand copy', () => {
+  it('updates compact and lowercase aliases while preserving learning terminology', () => {
+    expect(withCurrentBrand('RecallStudy · recallstudy · reeeeecallstudy · 리콜 스터디'))
+      .toBe('Reklue · Reklue · Reklue · Reklue')
+    expect(withCurrentBrand('Active recall improves recall probability.'))
+      .toBe('Active recall improves recall probability.')
+  })
+
   it('updates nested article copy without mutating the stored article', () => {
     const article = {
       meta_title: 'Daily practice | ReeeeecallStudy',
