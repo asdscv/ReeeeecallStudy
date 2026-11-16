@@ -16,14 +16,11 @@ export function buildOrganizationJsonLd() {
     name: BRAND_NAME,
     url: SITE_URL,
     logo: { '@type': 'ImageObject', url: DEFAULT_OG_IMAGE, width: OG_IMAGE_WIDTH, height: OG_IMAGE_HEIGHT },
-    sameAs: [
-      'https://twitter.com/reeeeecallstudy',
-      'https://x.com/reeeeecallstudy',
-    ],
+    sameAs: [],
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer service',
-      email: 'admin@reeeeecallstudy.xyz',
+      email: 'admin@reklue.com',
       availableLanguage: ['English', 'Korean', 'Chinese', 'Japanese', 'Spanish', 'Vietnamese', 'Thai', 'Indonesian'],
     },
   }
@@ -209,7 +206,7 @@ export function buildProfilePageJsonLd(desc, lang) {
       url: SITE_URL,
       description: desc,
       logo: DEFAULT_OG_IMAGE,
-      sameAs: ['https://twitter.com/reeeeecallstudy', 'https://x.com/reeeeecallstudy'],
+      sameAs: [],
     },
     hasPart: [
       { '@type': 'Article', url: `${SITE_URL}/insight`, name: lang === 'ko' ? '학습 인사이트' : 'Learning Insights' },

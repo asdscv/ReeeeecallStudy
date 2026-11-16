@@ -7,27 +7,27 @@ import {
   type LearningGoalWithDecks, type GoalKnowledge,
 } from '../../stores/learning-store'
 import { currentPlanContext } from '../../lib/learning-plan-date'
-import { planComposition } from '@reeeeecall/shared/lib/plan-composition'
-import { studyRecap } from '@reeeeecall/shared/lib/study-recap'
-import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
-import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
-import { goalCompletion } from '@reeeeecall/shared/lib/goal-completion'
-import { caughtUp } from '@reeeeecall/shared/lib/caught-up'
+import { planComposition } from '@reklue/shared/lib/plan-composition'
+import { studyRecap } from '@reklue/shared/lib/study-recap'
+import { utcToLocalDateKey } from '@reklue/shared/lib/date-utils'
+import { goalKnowledgeSummary } from '@reklue/shared/lib/goal-knowledge-summary'
+import { goalCompletion } from '@reklue/shared/lib/goal-completion'
+import { caughtUp } from '@reklue/shared/lib/caught-up'
 import {
   latestAttemptForCard, attemptNeedsRemediation,
-} from '@reeeeecall/shared/lib/learning-attempt-selection'
+} from '@reklue/shared/lib/learning-attempt-selection'
 import {
   parseNewCardsPerDay, DEFAULT_NEW_CARDS_PER_DAY,
-} from '@reeeeecall/shared/learning/application/cadence'
-import { useQuizStore, type DailyCheckCount } from '@reeeeecall/shared/stores/quiz-store'
-import type { PlanWeek, DayState } from '@reeeeecall/shared/learning/application/plan-week'
+} from '@reklue/shared/learning/application/cadence'
+import { useQuizStore, type DailyCheckCount } from '@reklue/shared/stores/quiz-store'
+import type { PlanWeek, DayState } from '@reklue/shared/learning/application/plan-week'
 import { useDeckStore } from '../../stores/deck-store'
 import { ListSkeleton } from '../../components/common/Skeleton'
 import { AiRefusalNotice } from '../../components/ai/AiRefusalNotice'
 import {
   MCQ_FLAW_LABELS, SHORT_GAP_LABELS, ESSAY_ASPECT_LABELS, topLabels,
   isWeakTheme, isDiagnosisAction,
-} from '@reeeeecall/shared/lib/weak-themes'
+} from '@reklue/shared/lib/weak-themes'
 
 /**
  * One goal's plan — today, and the days after it.

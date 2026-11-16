@@ -1,4 +1,4 @@
-# ReeeCall Study — 상세 기능 명세서 (Feature Specification)
+# Reklue — 상세 기능 명세서 (Feature Specification)
 
 > **버전**: v2.0
 > **최종 수정**: 2026-02-14
@@ -148,7 +148,7 @@ reeecall-study/
 
 ```
 ┌─────────────────────────────────┐
-│         ReeeCall Study          │
+│         Reklue          │
 │                                 │
 │   이메일로 간편 로그인            │
 │                                 │
@@ -692,7 +692,7 @@ ORDER BY upload_date DESC;
 
 ```python
 """
-ReeeCall Study Bulk Import Script
+Reklue Bulk Import Script
 Supabase Python 클라이언트로 대량 카드 삽입
 """
 from supabase import create_client
@@ -796,7 +796,7 @@ def import_csv(file_path: str, deck_id: str, user_id: str,
 
 if __name__ == '__main__':
     import argparse
-    parser = argparse.ArgumentParser(description='ReeeCall Bulk Import')
+    parser = argparse.ArgumentParser(description='Reklue Bulk Import')
     parser.add_argument('file', help='JSON 또는 CSV 파일 경로')
     parser.add_argument('--deck-id', required=True)
     parser.add_argument('--user-id', required=True)
@@ -1478,7 +1478,7 @@ async function speakWithEdgeTTS(text: string, lang: string) {
 
 ## 10. 시각화 및 대시보드
 
-### 10.1 ReeeCall 잔디 (Heatmap)
+### 10.1 Reklue 잔디 (Heatmap)
 
 - GitHub Contribution Graph 스타일 365일 격자
 - 색상 강도: 학습한 카드 수에 비례 (0, 1~10, 11~30, 31~60, 61+)
@@ -1544,8 +1544,8 @@ export default {
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'ReeeCall Study',
-        short_name: 'ReeeCall',
+        name: 'Reklue',
+        short_name: 'Reklue',
         theme_color: '#3B82F6',
         icons: [{ src: '/icon-192.png', sizes: '192x192', type: 'image/png' }],
       },
@@ -1910,7 +1910,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import bulk_import, tts, stats
 
-app = FastAPI(title="ReeeCall Study API")
+app = FastAPI(title="Reklue API")
 
 app.add_middleware(
     CORSMiddleware,

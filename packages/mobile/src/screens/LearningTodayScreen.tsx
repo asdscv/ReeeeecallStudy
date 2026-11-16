@@ -10,30 +10,30 @@ import { Screen, ScreenHeader, Button } from '../components/ui'
 import { AiRefusalNotice } from '../components/ai/AiRefusalNotice'
 import { useTheme } from '../theme'
 import { testProps } from '../utils/testProps'
-import { useLearningStore } from '@reeeeecall/shared/stores/learning-store'
-import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
-import type { PlanSelection } from '@reeeeecall/shared/stores/study-store'
-import { currentPlanContext } from '@reeeeecall/shared/lib/learning-plan-date'
-import { planComposition } from '@reeeeecall/shared/lib/plan-composition'
-import { studyRecap } from '@reeeeecall/shared/lib/study-recap'
-import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
-import { goalCompletion } from '@reeeeecall/shared/lib/goal-completion'
-import { caughtUp } from '@reeeeecall/shared/lib/caught-up'
+import { useLearningStore } from '@reklue/shared/stores/learning-store'
+import { useDeckStore } from '@reklue/shared/stores/deck-store'
+import type { PlanSelection } from '@reklue/shared/stores/study-store'
+import { currentPlanContext } from '@reklue/shared/lib/learning-plan-date'
+import { planComposition } from '@reklue/shared/lib/plan-composition'
+import { studyRecap } from '@reklue/shared/lib/study-recap'
+import { goalKnowledgeSummary } from '@reklue/shared/lib/goal-knowledge-summary'
+import { goalCompletion } from '@reklue/shared/lib/goal-completion'
+import { caughtUp } from '@reklue/shared/lib/caught-up'
 import {
   latestAttemptForCard, attemptNeedsRemediation,
-} from '@reeeeecall/shared/lib/learning-attempt-selection'
+} from '@reklue/shared/lib/learning-attempt-selection'
 import {
   parseNewCardsPerDay, DEFAULT_NEW_CARDS_PER_DAY,
-} from '@reeeeecall/shared/learning/application/cadence'
-import { utcToLocalDateKey } from '@reeeeecall/shared/lib/date-utils'
-import { useQuizStore, type DailyCheckCount } from '@reeeeecall/shared/stores/quiz-store'
-import type { PlanWeek, DayState } from '@reeeeecall/shared/learning/application/plan-week'
+} from '@reklue/shared/learning/application/cadence'
+import { utcToLocalDateKey } from '@reklue/shared/lib/date-utils'
+import { useQuizStore, type DailyCheckCount } from '@reklue/shared/stores/quiz-store'
+import type { PlanWeek, DayState } from '@reklue/shared/learning/application/plan-week'
 import { useStudy } from '../hooks/useStudy'
 import type { AIStackParamList } from '../navigation/types'
 import {
   MCQ_FLAW_LABELS, SHORT_GAP_LABELS, ESSAY_ASPECT_LABELS, topLabels,
   isWeakTheme, isDiagnosisAction,
-} from '@reeeeecall/shared/lib/weak-themes'
+} from '@reklue/shared/lib/weak-themes'
 
 /**
  * Today's plan — mobile parity with the web `/learning` screen.

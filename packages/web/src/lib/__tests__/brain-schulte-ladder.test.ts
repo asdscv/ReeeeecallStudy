@@ -7,7 +7,7 @@
  * boards leave found numbers as they were.
  */
 import { describe, it, expect } from 'vitest'
-import { DEFAULT_CONTEXT, TIERS, createRng, maxColsFor, type CreateContext, type GridView, type RecentTrial } from '@reeeeecall/shared/lib/brain-games'
+import { DEFAULT_CONTEXT, TIERS, createRng, maxColsFor, type CreateContext, type GridView, type RecentTrial } from '@reklue/shared/lib/brain-games'
 import {
   SCHULTE_ACK_MS,
   SCHULTE_BANDS,
@@ -22,7 +22,7 @@ import {
   schulteModes,
   type SchulteMode,
   type SchulteState,
-} from '@reeeeecall/shared/lib/brain-games/games/schulte'
+} from '@reklue/shared/lib/brain-games/games/schulte'
 
 const DESKTOP: CreateContext = DEFAULT_CONTEXT
 const PHONE: CreateContext = { ...DEFAULT_CONTEXT, maxCols: maxColsFor(358), maxRows: 7 }

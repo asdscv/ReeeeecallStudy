@@ -13,9 +13,9 @@ import {
   baselineDurationMs, RECALL_MINUTES,
   legacyCardItemShape, planItemAnswerPayload, ANSWER_FACE_RESOLVER, TYPED_ANSWER_MAX_CHARS,
   type CandidateStudyLog,
-} from '@reeeeecall/shared/lib/learning-candidates'
-import { REVIEW_VALUE_AT_TARGET } from '@reeeeecall/shared/learning'
-import type { Card, CardTemplate } from '@reeeeecall/shared/types/database'
+} from '@reklue/shared/lib/learning-candidates'
+import { REVIEW_VALUE_AT_TARGET } from '@reklue/shared/learning'
+import type { Card, CardTemplate } from '@reklue/shared/types/database'
 
 const NOW = '2026-07-31T00:00:00.000Z'
 const NOW_MS = Date.parse(NOW)

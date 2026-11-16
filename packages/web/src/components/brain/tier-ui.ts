@@ -6,7 +6,7 @@ import {
   type BrainGameId,
   type BrainMeta,
   type BrainProgress,
-} from '@reeeeecall/shared/lib/brain-games'
+} from '@reklue/shared/lib/brain-games'
 
 /**
  * How the screens show a game's tier: per game only, never summed or averaged across games

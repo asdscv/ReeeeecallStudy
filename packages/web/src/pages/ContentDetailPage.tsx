@@ -1,4 +1,4 @@
-import { brainGuideFromTags } from '@reeeeecall/shared/lib/brain-content'
+import { brainGuideFromTags } from '@reklue/shared/lib/brain-content'
 import { useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -11,8 +11,8 @@ import { SEOHead } from '../components/content/SEOHead'
 import { FooterSection } from '../components/landing/FooterSection'
 import { buildArticleJsonLd, buildBreadcrumbJsonLd, buildHreflangAlternates, buildLearningResourceJsonLd } from '../lib/content-seo'
 import { SEO } from '../lib/seo-config'
-import { contentCanonicalUrl } from '@reeeeecall/shared/lib/content-canonical'
-import { withDropOffCtas } from '@reeeeecall/shared/lib/content-drop-off'
+import { contentCanonicalUrl } from '@reklue/shared/lib/content-canonical'
+import { withDropOffCtas } from '@reklue/shared/lib/content-drop-off'
 
 
 export function ContentDetailPage() {

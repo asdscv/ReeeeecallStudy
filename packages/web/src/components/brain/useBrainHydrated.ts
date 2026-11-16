@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
+import { useBrainStore } from '@reklue/shared/stores/brain-store'
 import { useAuthStore } from '../../stores/auth-store'
 import { brainStorageFor } from './brain-ui'
 

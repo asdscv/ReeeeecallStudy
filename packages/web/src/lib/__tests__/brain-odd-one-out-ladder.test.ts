@@ -8,7 +8,7 @@
  * a slow 75-year-old almost never does in the first.
  */
 import { describe, it, expect } from 'vitest'
-import { DEFAULT_CONTEXT, MECHANICS, TIERS, createRng, maxColsFor, type CreateContext, type GridView, type RecentTrial } from '@reeeeecall/shared/lib/brain-games'
+import { DEFAULT_CONTEXT, MECHANICS, TIERS, createRng, maxColsFor, type CreateContext, type GridView, type RecentTrial } from '@reklue/shared/lib/brain-games'
 import {
   GLYPH_PAIRS,
   LOOKALIKE_PAIRS,
@@ -26,7 +26,7 @@ import {
   oddTierStart,
   type OddKind,
   type OddOneOutState,
-} from '@reeeeecall/shared/lib/brain-games/games/odd-one-out'
+} from '@reklue/shared/lib/brain-games/games/odd-one-out'
 
 const DESKTOP: CreateContext = DEFAULT_CONTEXT
 const PHONE: CreateContext = { ...DEFAULT_CONTEXT, maxCols: maxColsFor(358), maxRows: 7 }

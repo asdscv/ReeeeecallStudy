@@ -1,4 +1,4 @@
-import type { IAudioAdapter } from '@reeeeecall/shared/adapters/audio'
+import type { IAudioAdapter } from '@reklue/shared/adapters/audio'
 
 // TODO: Phase 4 — Replace with expo-av
 export class RNAudio implements IAudioAdapter {

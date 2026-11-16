@@ -1,4 +1,4 @@
-# ReeeeecallStudy Mobile App — Master Plan
+# Reklue Mobile App — Master Plan
 
 > **Version**: 1.0
 > **Created**: 2026-03-16

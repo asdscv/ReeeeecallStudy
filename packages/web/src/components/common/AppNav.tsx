@@ -205,7 +205,7 @@ export function MenuSheet({ open, onClose }: { open: boolean; onClose: () => voi
         <div className="flex items-center justify-between h-14 px-4">
           <Link to="/dashboard" onClick={onClose} className="flex items-center gap-2 no-underline">
             <img src="/favicon.png" alt="" className="w-8 h-8 object-contain" />
-            <img src="/logo-text.png" alt="ReeeeecallStudy" className="h-8 object-contain dark:brightness-0 dark:invert" />
+            <img src="/logo-text.png" alt="Reklue" className="h-8 object-contain dark:brightness-0 dark:invert" />
           </Link>
           <button
             ref={closeRef}

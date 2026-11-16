@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from 'react-native-reanimated'
-import { formatCount } from '@reeeeecall/shared/lib/format-number'
+import { formatCount } from '@reklue/shared/lib/format-number'
 
 /**
  * Sessions this week out of the goal, as a ring that fills — the one progress figure the research

@@ -10,7 +10,7 @@
  * 4문항인지 아무 설명도 못 받습니다.
  */
 import { describe, it, expect } from 'vitest'
-import { quizGrowth } from '@reeeeecall/shared/lib/quiz-shortfall'
+import { quizGrowth } from '@reklue/shared/lib/quiz-shortfall'
 
 describe('생성 진행 판정', () => {
   it('다 찼으면 조회도 경고도 없다', () => {

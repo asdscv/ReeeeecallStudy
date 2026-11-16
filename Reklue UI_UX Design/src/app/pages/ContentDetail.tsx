@@ -209,7 +209,7 @@ export function ContentDetail() {
           {/* Final Paragraph */}
           <div className="mb-20">
             <p className="text-2xl text-gray-700 leading-relaxed">
-              SRS는 단순한 학습 도구가 아닙니다. 뇌과학과 인지심리학을 기반으로 한 과학적 학습 시스템입니다. ReeeCall과 함께 더 효율적으로, 더 오래 기억하세요.
+              SRS는 단순한 학습 도구가 아닙니다. 뇌과학과 인지심리학을 기반으로 한 과학적 학습 시스템입니다. Reklue과 함께 더 효율적으로, 더 오래 기억하세요.
             </p>
           </div>
         </div>
@@ -219,7 +219,7 @@ export function ContentDetail() {
       <section className="py-24 px-8 bg-black text-white">
         <div className="max-w-[900px] mx-auto text-center">
           <h2 className="text-5xl font-bold mb-8 tracking-tight">
-            ReeeCall로 시작하기
+            Reklue로 시작하기
           </h2>
           <p className="text-xl text-gray-400 mb-12">
             지금 바로 효율적인 학습을 경험하세요

@@ -9,9 +9,9 @@ import {
   DialogFooter,
 } from '../ui/dialog'
 import { useCardStore } from '../../stores/card-store'
-import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
-import { cardLength } from '@reeeeecall/shared/lib/card-content-limits'
-import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
+import { aiHubBus } from '@reklue/shared/lib/ai/hub/events'
+import { cardLength } from '@reklue/shared/lib/card-content-limits'
+import { useCardLimit } from '@reklue/shared/hooks/useCardLimit'
 import { CardLimitBlock } from './CardLimitBlock'
 import { useAuthStore } from '../../stores/auth-store'
 import { uploadFile, deleteFile, validateFile } from '../../lib/storage'

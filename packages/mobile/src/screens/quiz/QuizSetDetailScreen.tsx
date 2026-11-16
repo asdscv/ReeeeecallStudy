@@ -6,11 +6,11 @@ import { useTranslation } from 'react-i18next'
 import {
   useQuizStore, isDailyCheckTitle,
   type QuizSetRow, type QuizSetHistoryRun,
-} from '@reeeeecall/shared/stores/quiz-store'
+} from '@reklue/shared/stores/quiz-store'
 import {
   dateLine, tallyFromCounts, tallyLine, isRunUnfinished,
-} from '@reeeeecall/shared/lib/quiz-outcome'
-import { retakeNoteKey } from '@reeeeecall/shared/lib/quiz-pricing'
+} from '@reklue/shared/lib/quiz-outcome'
+import { retakeNoteKey } from '@reklue/shared/lib/quiz-pricing'
 import { Screen, Button, ScreenHeader } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'

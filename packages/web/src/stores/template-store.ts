@@ -1,2 +1,2 @@
 // Re-export from shared — single source of truth
-export { useTemplateStore } from '@reeeeecall/shared/stores/template-store'
+export { useTemplateStore } from '@reklue/shared/stores/template-store'

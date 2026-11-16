@@ -7,11 +7,11 @@
  * survive — which is where the design was decided.
  */
 import { describe, it, expect } from 'vitest'
-import { calculateSRS } from '@reeeeecall/shared/lib/srs'
+import { calculateSRS } from '@reklue/shared/lib/srs'
 import {
   goalCompletion, COMPLETION_RATIO, MATURE_INTERVAL_DAYS,
   DAYS_FROM_RUNG_1, DAYS_FROM_RUNG_3, DAYS_FROM_RUNG_8,
-} from '@reeeeecall/shared/lib/goal-completion'
+} from '@reklue/shared/lib/goal-completion'
 
 const counts = (over: Partial<Parameters<typeof goalCompletion>[0]> = {}) =>
   ({ total: 0, mature: 0, unseen: 0, rung1: 0, rung3: 0, rung8: 0, ...over })

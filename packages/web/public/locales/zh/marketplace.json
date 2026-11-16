@@ -58,9 +58,9 @@
     }
   },
   "preview": {
-    "title": "\"{{title}}\" - 闪卡牌组 | ReeeeecallStudy",
-    "description": "{{title}} — {{cardCount}} 张闪卡。在 ReeeeecallStudy 上预览和学习此牌组。",
-    "defaultDescription": "ReeeeecallStudy 上的闪卡牌组",
+    "title": "\"{{title}}\" - 闪卡牌组 | Reklue",
+    "description": "{{title}} — {{cardCount}} 张闪卡。在 Reklue 上预览和学习此牌组。",
+    "defaultDescription": "Reklue 上的闪卡牌组",
     "sampleCards": "示例卡片",
     "viewInMarket": "在市场中查看",
     "cardCount": "{{count, number}} 张卡片",

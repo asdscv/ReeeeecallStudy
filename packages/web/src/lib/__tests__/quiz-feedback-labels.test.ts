@@ -26,10 +26,10 @@ import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
   QUIZ_VERDICTS, QUIZ_GAPS, QUIZ_LEVELS, QUIZ_ASPECTS, QUIZ_FLAWS, QUIZ_MCQ_AXES,
-} from '@reeeeecall/shared/lib/quiz-feedback'
+} from '@reklue/shared/lib/quiz-feedback'
 import {
   QUIZ_ERROR_CODES, QUIZ_GENERATE_ACTION, QUIZ_FEEDBACK_REASONS,
-} from '@reeeeecall/shared/stores/quiz-store'
+} from '@reklue/shared/stores/quiz-store'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../../../..')
 const LOCALES = ['en', 'ko', 'ja', 'zh', 'vi', 'th', 'id', 'es'] as const

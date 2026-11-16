@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import { GAME_THEMES, type CellView, type ChoiceView, type GridView } from '@reeeeecall/shared/lib/brain-games'
+import { GAME_THEMES, type CellView, type ChoiceView, type GridView } from '@reklue/shared/lib/brain-games'
 import { BrainBoard } from '../BrainBoard'
 import { CELL_INK } from '../brain-ui'
 

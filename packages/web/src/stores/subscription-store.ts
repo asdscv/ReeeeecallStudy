@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { getDeviceId, getDeviceName } from '../lib/device-id'
 import { setCurrentTier } from '../lib/tier-config'
-import { loadEntitlements } from '@reeeeecall/shared/lib/entitlements'
+import { loadEntitlements } from '@reklue/shared/lib/entitlements'
 import type { PlanName, SubscriptionStatus } from '../lib/subscription-config'
 
 interface SessionInfo {

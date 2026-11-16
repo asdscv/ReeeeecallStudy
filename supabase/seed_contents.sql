@@ -20,13 +20,13 @@ INSERT INTO contents (slug, locale, title, subtitle, thumbnail_url, content_bloc
    {"type":"feature_cards","props":{"items":[{"icon":"brain","title":"Active Recall","description":"Testing yourself strengthens neural pathways more than passive reading","color":"blue"},{"icon":"clock","title":"Optimal Timing","description":"Review at the moment just before forgetting for maximum reinforcement","color":"green"},{"icon":"trending-up","title":"Progressive Intervals","description":"Each successful recall extends the interval before the next review","color":"purple"}]}},
    {"type":"heading","props":{"level":2,"text":"5 Tips for Effective Spaced Repetition","accent":true}},
    {"type":"numbered_list","props":{"items":[{"heading":"Start Small","description":"Begin with 10-20 new cards per day. Quality over quantity."},{"heading":"Be Consistent","description":"Daily practice beats marathon sessions. Even 10 minutes helps."},{"heading":"Use Active Recall","description":"Don''t just read — test yourself. The effort of remembering strengthens memory."},{"heading":"Trust the Algorithm","description":"Let the SRS schedule your reviews. It knows when you''re about to forget."},{"heading":"Keep Cards Simple","description":"One fact per card. Complex cards lead to confusion and poor recall."}]}},
-   {"type":"highlight_box","props":{"title":"Ready to Experience It?","description":"ReeeeecallStudy uses a scientifically-tuned SRS algorithm that automatically schedules your reviews at the optimal time. No more guessing when to study — the app handles it for you.","variant":"blue"}},
+   {"type":"highlight_box","props":{"title":"Ready to Experience It?","description":"Reklue uses a scientifically-tuned SRS algorithm that automatically schedules your reviews at the optimal time. No more guessing when to study — the app handles it for you.","variant":"blue"}},
    {"type":"cta","props":{"title":"Start Learning Smarter Today","description":"Join thousands of learners using spaced repetition to remember more in less time.","buttonText":"Get Started Free","buttonUrl":"/auth/login"}}
  ]'::jsonb,
  7, ARRAY['spaced-repetition', 'learning-science', 'memory'],
- 'The Science Behind Spaced Repetition | ReeeCall',
+ 'The Science Behind Spaced Repetition | Reklue',
  'Learn how spaced repetition leverages the forgetting curve to create lasting memories with less study time.',
- 'ReeeCall', true, '2026-01-15T10:00:00Z'),
+ 'Reklue', true, '2026-01-15T10:00:00Z'),
 
 -- Article 1: Korean
 ('spaced-repetition-science', 'ko',
@@ -46,9 +46,9 @@ INSERT INTO contents (slug, locale, title, subtitle, thumbnail_url, content_bloc
    {"type":"cta","props":{"title":"지금 바로 스마트하게 학습하세요","description":"간격 반복을 활용하여 적은 시간으로 더 많이 기억하는 학습자 대열에 합류하세요.","buttonText":"무료로 시작하기","buttonUrl":"/auth/login"}}
  ]'::jsonb,
  7, ARRAY['간격반복', '학습과학', '기억력'],
- '간격 반복 학습의 과학 | ReeeCall',
+ '간격 반복 학습의 과학 | Reklue',
  '간격 반복이 망각 곡선을 활용하여 적은 학습 시간으로 지속적인 기억을 만드는 방법을 알아보세요.',
- 'ReeeCall', true, '2026-01-15T10:00:00Z'),
+ 'Reklue', true, '2026-01-15T10:00:00Z'),
 
 -- Article 2: English
 ('flashcard-best-practices', 'en',
@@ -62,14 +62,14 @@ INSERT INTO contents (slug, locale, title, subtitle, thumbnail_url, content_bloc
    {"type":"paragraph","props":{"text":"The most common mistake is putting too much information on a single card. Each card should test **exactly one piece of knowledge**. If you find yourself writing long answers, break the card into multiple simpler cards."}},
    {"type":"feature_cards","props":{"items":[{"icon":"target","title":"Be Specific","description":"\"What is the capital of France?\" is better than \"Tell me about France\"","color":"blue"},{"icon":"zap","title":"Be Concise","description":"Short questions and answers lead to faster reviews and better retention","color":"amber"},{"icon":"lightbulb","title":"Use Context","description":"Add examples and mnemonics to make abstract concepts concrete","color":"green"}]}},
    {"type":"heading","props":{"level":2,"text":"Image-Enhanced Learning","accent":true}},
-   {"type":"paragraph","props":{"text":"Adding relevant images to your cards can boost retention by up to **65%**. Our visual memory is incredibly powerful — use it! ReeeeecallStudy supports image fields in custom templates, making it easy to create visual flashcards."}},
-   {"type":"highlight_box","props":{"title":"Pro Tip: Custom Templates","description":"Use ReeeeecallStudy''s template editor to create card layouts that match your learning style. Add image fields, audio for pronunciation, and multiple text fields for context.","variant":"green"}},
+   {"type":"paragraph","props":{"text":"Adding relevant images to your cards can boost retention by up to **65%**. Our visual memory is incredibly powerful — use it! Reklue supports image fields in custom templates, making it easy to create visual flashcards."}},
+   {"type":"highlight_box","props":{"title":"Pro Tip: Custom Templates","description":"Use Reklue''s template editor to create card layouts that match your learning style. Add image fields, audio for pronunciation, and multiple text fields for context.","variant":"green"}},
    {"type":"cta","props":{"title":"Create Better Flashcards Today","description":"Start with our customizable templates and build your perfect study deck.","buttonText":"Try It Free","buttonUrl":"/auth/login"}}
  ]'::jsonb,
  5, ARRAY['flashcards', 'study-tips', 'productivity'],
- 'How to Create Perfect Flashcards | ReeeCall',
+ 'How to Create Perfect Flashcards | Reklue',
  'Learn research-backed principles for designing flashcards that maximize retention and minimize study time.',
- 'ReeeCall', true, '2026-01-28T10:00:00Z'),
+ 'Reklue', true, '2026-01-28T10:00:00Z'),
 
 -- Article 2: Korean
 ('flashcard-best-practices', 'ko',
@@ -85,9 +85,9 @@ INSERT INTO contents (slug, locale, title, subtitle, thumbnail_url, content_bloc
    {"type":"cta","props":{"title":"오늘부터 더 나은 플래시카드를 만드세요","description":"커스터마이즈 가능한 템플릿으로 시작하고 완벽한 학습 덱을 만들어 보세요.","buttonText":"무료로 체험하기","buttonUrl":"/auth/login"}}
  ]'::jsonb,
  5, ARRAY['플래시카드', '학습팁', '생산성'],
- '완벽한 플래시카드 만드는 법 | ReeeCall',
+ '완벽한 플래시카드 만드는 법 | Reklue',
  '기억력을 극대화하고 학습 시간을 최소화하는 연구 기반 플래시카드 디자인 원칙을 알아보세요.',
- 'ReeeCall', true, '2026-01-28T10:00:00Z'),
+ 'Reklue', true, '2026-01-28T10:00:00Z'),
 
 -- Article 3: English
 ('active-recall-guide', 'en',
@@ -101,13 +101,13 @@ INSERT INTO contents (slug, locale, title, subtitle, thumbnail_url, content_bloc
    {"type":"heading","props":{"level":2,"text":"What Makes Active Recall So Powerful?","accent":true}},
    {"type":"paragraph","props":{"text":"When you try to recall information, you''re not just checking if you know it — you''re actually **strengthening the memory** itself. This is known as the *testing effect* or *retrieval practice effect*. Every time you successfully retrieve a memory, it becomes more durable and accessible."}},
    {"type":"numbered_list","props":{"items":[{"heading":"Close the Book","description":"Before reviewing, try to recall the key points from memory first."},{"heading":"Use Flashcards","description":"The question-answer format naturally encourages active recall."},{"heading":"Practice Explaining","description":"Teaching concepts to others (or an imaginary audience) forces deep recall."},{"heading":"Space Your Practice","description":"Combine active recall with spaced repetition for maximum effect."}]}},
-   {"type":"highlight_box","props":{"title":"The Perfect Combination","description":"Active recall + spaced repetition is the gold standard of evidence-based learning. ReeeeecallStudy combines both in a single, easy-to-use platform.","variant":"blue"}},
+   {"type":"highlight_box","props":{"title":"The Perfect Combination","description":"Active recall + spaced repetition is the gold standard of evidence-based learning. Reklue combines both in a single, easy-to-use platform.","variant":"blue"}},
    {"type":"cta","props":{"title":"Experience Evidence-Based Learning","description":"Try the study method backed by decades of cognitive science research.","buttonText":"Start Free","buttonUrl":"/auth/login"}}
  ]'::jsonb,
  6, ARRAY['active-recall', 'study-techniques', 'learning-science'],
- 'Active Recall: The Most Effective Study Technique | ReeeCall',
+ 'Active Recall: The Most Effective Study Technique | Reklue',
  'Discover why active recall outperforms re-reading and highlighting, and how to implement it in your study routine.',
- 'ReeeCall', true, '2026-02-10T10:00:00Z'),
+ 'Reklue', true, '2026-02-10T10:00:00Z'),
 
 -- Article 3: Korean
 ('active-recall-guide', 'ko',
@@ -120,13 +120,13 @@ INSERT INTO contents (slug, locale, title, subtitle, thumbnail_url, content_bloc
    {"type":"statistics","props":{"items":[{"value":"50%","label":"시험 점수 향상"},{"value":"2배","label":"학습 속도"},{"value":"80%","label":"장기 기억률"},{"value":"40%","label":"학습 시간 절약"}]}},
    {"type":"heading","props":{"level":2,"text":"능동적 회상이 강력한 이유","accent":true}},
    {"type":"paragraph","props":{"text":"정보를 떠올리려고 노력할 때, 단순히 알고 있는지 확인하는 것이 아닙니다 — 실제로 **기억 자체를 강화**하고 있는 것입니다. 이것을 *테스팅 효과* 또는 *인출 연습 효과*라고 합니다. 기억을 성공적으로 인출할 때마다 그 기억은 더 견고하고 접근하기 쉬워집니다."}},
-   {"type":"highlight_box","props":{"title":"완벽한 조합","description":"능동적 회상 + 간격 반복은 근거 기반 학습의 황금 기준입니다. ReeeeecallStudy는 두 가지를 하나의 사용하기 쉬운 플랫폼에서 결합합니다.","variant":"blue"}},
+   {"type":"highlight_box","props":{"title":"완벽한 조합","description":"능동적 회상 + 간격 반복은 근거 기반 학습의 황금 기준입니다. Reklue는 두 가지를 하나의 사용하기 쉬운 플랫폼에서 결합합니다.","variant":"blue"}},
    {"type":"cta","props":{"title":"근거 기반 학습을 경험하세요","description":"수십 년의 인지 과학 연구가 뒷받침하는 학습법을 직접 체험해 보세요.","buttonText":"무료로 시작하기","buttonUrl":"/auth/login"}}
  ]'::jsonb,
  6, ARRAY['능동적회상', '학습기법', '학습과학'],
- '능동적 회상: 가장 효과적인 학습 기법 | ReeeCall',
+ '능동적 회상: 가장 효과적인 학습 기법 | Reklue',
  '능동적 회상이 왜 반복 읽기와 형광펜 표시보다 뛰어난지, 그리고 학습 루틴에 어떻게 적용하는지 알아보세요.',
- 'ReeeCall', true, '2026-02-10T10:00:00Z'),
+ 'Reklue', true, '2026-02-10T10:00:00Z'),
 
 -- Article 1: Chinese (Simplified)
 ('spaced-repetition-science', 'zh',
@@ -142,9 +142,9 @@ INSERT INTO contents (slug, locale, title, subtitle, thumbnail_url, content_bloc
    {"type":"cta","props":{"title":"今天就开始更聪明地学习","description":"加入使用间隔重复在更短时间内记住更多内容的学习者行列。","buttonText":"免费开始","buttonUrl":"/auth/login"}}
  ]'::jsonb,
  7, ARRAY['间隔重复', '学习科学', '记忆力'],
- '间隔重复学习的科学 | ReeeeecallStudy',
+ '间隔重复学习的科学 | Reklue',
  '了解间隔重复如何利用遗忘曲线，用更少的学习时间创造持久记忆。',
- 'ReeeeecallStudy', true, '2026-01-15T10:00:00Z'),
+ 'Reklue', true, '2026-01-15T10:00:00Z'),
 
 -- Article 1: Japanese
 ('spaced-repetition-science', 'ja',
@@ -160,9 +160,9 @@ INSERT INTO contents (slug, locale, title, subtitle, thumbnail_url, content_bloc
    {"type":"cta","props":{"title":"今日からスマートに学習しましょう","description":"間隔反復を活用して、より短い時間でより多く記憶する学習者の仲間入りをしましょう。","buttonText":"無料で始める","buttonUrl":"/auth/login"}}
  ]'::jsonb,
  7, ARRAY['間隔反復', '学習科学', '記憶力'],
- '間隔反復学習の科学 | ReeeeecallStudy',
+ '間隔反復学習の科学 | Reklue',
  '間隔反復が忘却曲線を活用して、少ない学習時間で持続的な記憶を作る方法を学びましょう。',
- 'ReeeeecallStudy', true, '2026-01-15T10:00:00Z'),
+ 'Reklue', true, '2026-01-15T10:00:00Z'),
 
 -- Article 2: Chinese (Simplified)
 ('flashcard-best-practices', 'zh',
@@ -178,9 +178,9 @@ INSERT INTO contents (slug, locale, title, subtitle, thumbnail_url, content_bloc
    {"type":"cta","props":{"title":"今天就开始制作更好的闪卡","description":"从可自定义的模板开始，构建你完美的学习卡组。","buttonText":"免费试用","buttonUrl":"/auth/login"}}
  ]'::jsonb,
  5, ARRAY['闪卡', '学习技巧', '生产力'],
- '如何制作完美的闪卡 | ReeeeecallStudy',
+ '如何制作完美的闪卡 | Reklue',
  '学习基于研究的闪卡设计原则，最大化记忆效果并最小化学习时间。',
- 'ReeeeecallStudy', true, '2026-01-28T10:00:00Z'),
+ 'Reklue', true, '2026-01-28T10:00:00Z'),
 
 -- Article 2: Japanese
 ('flashcard-best-practices', 'ja',
@@ -196,9 +196,9 @@ INSERT INTO contents (slug, locale, title, subtitle, thumbnail_url, content_bloc
    {"type":"cta","props":{"title":"今日からより良いフラッシュカードを作りましょう","description":"カスタマイズ可能なテンプレートから始めて、完璧な学習デッキを構築しましょう。","buttonText":"無料で試す","buttonUrl":"/auth/login"}}
  ]'::jsonb,
  5, ARRAY['フラッシュカード', '学習ヒント', '生産性'],
- '完璧なフラッシュカードの作り方 | ReeeeecallStudy',
+ '完璧なフラッシュカードの作り方 | Reklue',
  '記憶力を最大化し学習時間を最小化する、研究に基づいたフラッシュカードデザイン原則を学びましょう。',
- 'ReeeeecallStudy', true, '2026-01-28T10:00:00Z'),
+ 'Reklue', true, '2026-01-28T10:00:00Z'),
 
 -- Article 3: Chinese (Simplified)
 ('active-recall-guide', 'zh',
@@ -210,13 +210,13 @@ INSERT INTO contents (slug, locale, title, subtitle, thumbnail_url, content_bloc
    {"type":"paragraph","props":{"text":"如果你还在用荧光笔标记教科书和反复阅读笔记，那你正在使用**效果最差**的学习方法之一。研究一致表明，主动回忆——从记忆中检索信息的练习——能产生显著更好的结果。"}},
    {"type":"heading","props":{"level":2,"text":"主动回忆为什么如此强大？","accent":true}},
    {"type":"paragraph","props":{"text":"当你尝试回忆信息时，你不仅仅是在检查自己是否知道——实际上是在**强化记忆本身**。这被称为*测试效应*或*检索练习效应*。每次成功检索记忆，它都会变得更持久、更容易获取。"}},
-   {"type":"highlight_box","props":{"title":"完美组合","description":"主动回忆 + 间隔重复是循证学习的黄金标准。ReeeeecallStudy将两者结合在一个易于使用的平台中。","variant":"blue"}},
+   {"type":"highlight_box","props":{"title":"完美组合","description":"主动回忆 + 间隔重复是循证学习的黄金标准。Reklue将两者结合在一个易于使用的平台中。","variant":"blue"}},
    {"type":"cta","props":{"title":"体验循证学习","description":"尝试数十年认知科学研究支持的学习方法。","buttonText":"免费开始","buttonUrl":"/auth/login"}}
  ]'::jsonb,
  6, ARRAY['主动回忆', '学习技巧', '学习科学'],
- '主动回忆：最有效的学习技巧 | ReeeeecallStudy',
+ '主动回忆：最有效的学习技巧 | Reklue',
  '了解主动回忆为什么优于反复阅读和荧光笔标记，以及如何将其应用到学习日程中。',
- 'ReeeeecallStudy', true, '2026-02-10T10:00:00Z'),
+ 'Reklue', true, '2026-02-10T10:00:00Z'),
 
 -- Article 3: Japanese
 ('active-recall-guide', 'ja',
@@ -228,10 +228,10 @@ INSERT INTO contents (slug, locale, title, subtitle, thumbnail_url, content_bloc
    {"type":"paragraph","props":{"text":"まだ教科書に蛍光ペンを引いたりノートを繰り返し読んだりしていませんか？最も**効果の低い**学習方法の一つを使っています。研究は一貫して、能動的想起——記憶から情報を引き出す練習——が劇的に良い結果を生み出すことを示しています。"}},
    {"type":"heading","props":{"level":2,"text":"能動的想起が強力な理由","accent":true}},
    {"type":"paragraph","props":{"text":"情報を思い出そうとする時、知っているかどうかを確認しているだけではありません——実際に**記憶そのものを強化**しているのです。これは*テスト効果*または*検索練習効果*と呼ばれています。記憶の検索に成功するたびに、その記憶はより堅固でアクセスしやすくなります。"}},
-   {"type":"highlight_box","props":{"title":"完璧な組み合わせ","description":"能動的想起 + 間隔反復はエビデンスベースの学習のゴールドスタンダードです。ReeeeecallStudyは両方を一つの使いやすいプラットフォームで組み合わせています。","variant":"blue"}},
+   {"type":"highlight_box","props":{"title":"完璧な組み合わせ","description":"能動的想起 + 間隔反復はエビデンスベースの学習のゴールドスタンダードです。Reklueは両方を一つの使いやすいプラットフォームで組み合わせています。","variant":"blue"}},
    {"type":"cta","props":{"title":"エビデンスベースの学習を体験しよう","description":"数十年の認知科学研究に裏付けられた学習法を試してみましょう。","buttonText":"無料で始める","buttonUrl":"/auth/login"}}
  ]'::jsonb,
  6, ARRAY['能動的想起', '学習テクニック', '学習科学'],
- '能動的想起：最も効果的な学習テクニック | ReeeeecallStudy',
+ '能動的想起：最も効果的な学習テクニック | Reklue',
  '能動的想起がなぜ繰り返し読書や蛍光ペンマーキングに勝るのか、そして学習ルーティンへの適用方法を学びましょう。',
- 'ReeeeecallStudy', true, '2026-02-10T10:00:00Z');
+ 'Reklue', true, '2026-02-10T10:00:00Z');

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Settings, Play, Trophy, Clock, Sparkles } from 'lucide-react'
-import { formatCount } from '@reeeeecall/shared/lib/format-number'
+import { formatCount } from '@reklue/shared/lib/format-number'
 import {
   BRAIN_GAMES,
   GAME_THEMES,
@@ -19,8 +19,8 @@ import {
   randomSeed,
   todaysPlanSeed,
   weekProgress,
-} from '@reeeeecall/shared/lib/brain-games'
-import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
+} from '@reklue/shared/lib/brain-games'
+import { useBrainStore } from '@reklue/shared/stores/brain-store'
 import { BRAIN_ICONS, cardBackground } from '../../components/brain/brain-ui'
 import { BrainSettingsDialog } from '../../components/brain/BrainSettingsDialog'
 import { Sparkline } from '../../components/brain/RoundSummary'

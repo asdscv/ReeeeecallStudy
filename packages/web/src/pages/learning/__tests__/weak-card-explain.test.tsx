@@ -28,7 +28,7 @@ const { storeState, quizState } = vi.hoisted(() => ({
 vi.mock('../../../stores/learning-store', () => ({
   useLearningStore: () => storeState.current,
 }))
-vi.mock('@reeeeecall/shared/stores/quiz-store', async (orig) => ({
+vi.mock('@reklue/shared/stores/quiz-store', async (orig) => ({
   ...(await orig<Record<string, unknown>>()),
   useQuizStore: () => quizState.current,
 }))

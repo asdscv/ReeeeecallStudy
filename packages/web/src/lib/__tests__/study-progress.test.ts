@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calculateStudyProgress } from '@reeeeecall/shared/lib/study-progress'
+import { calculateStudyProgress } from '@reklue/shared/lib/study-progress'
 
 describe('calculateStudyProgress', () => {
   it('uses ordinary card completion for non-cramming modes', () => {

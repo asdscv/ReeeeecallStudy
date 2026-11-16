@@ -128,7 +128,7 @@
     "stepOf": "Langkah {{current}} dari {{total}}",
     "restartOnboarding": "Mulai ulang tutorial",
     "welcome": {
-      "title": "Selamat datang di Reeeeecall!",
+      "title": "Selamat datang di Reklue!",
       "description": "Cara paling cerdas belajar dengan kartu hafalan. Buat dek, tambahkan kartu, dan biarkan algoritme pengulangan berjarak mengoptimalkan belajarmu.",
       "action": "Mulai"
     },
@@ -386,7 +386,7 @@
   },
   "skipToContent": "Lewati ke konten",
   "footer": {
-    "copyright": "© 2026 ReeeeecallStudy. Hak cipta dilindungi."
+    "copyright": "© 2026 Reklue. Hak cipta dilindungi."
   },
   "cancel": "Batal",
   "loading": "Memuat...",

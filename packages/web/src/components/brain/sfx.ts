@@ -1,4 +1,4 @@
-import type { BrainFx } from '@reeeeecall/shared/hooks/useBrainFx'
+import type { BrainFx } from '@reklue/shared/hooks/useBrainFx'
 
 /**
  * Game sounds, synthesised with Web Audio — no files to load, nothing to license, and every

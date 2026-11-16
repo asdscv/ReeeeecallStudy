@@ -4,19 +4,19 @@ import { SUPPORTED_LOCALES } from '../locale-utils'
 
 describe('generateSitemapXml', () => {
   const staticPages = [
-    { loc: 'https://reeeeecallstudy.xyz', changefreq: 'weekly' as const, priority: 1.0 },
-    { loc: 'https://reeeeecallstudy.xyz/insight', changefreq: 'daily' as const, priority: 0.9 },
+    { loc: 'https://reklue.com', changefreq: 'weekly' as const, priority: 1.0 },
+    { loc: 'https://reklue.com/insight', changefreq: 'daily' as const, priority: 0.9 },
   ]
 
   const contentPages = [
     {
-      loc: 'https://reeeeecallstudy.xyz/insight/spaced-repetition-guide',
+      loc: 'https://reklue.com/insight/spaced-repetition-guide',
       lastmod: '2025-06-01T00:00:00Z',
       changefreq: 'monthly' as const,
       priority: 0.8,
     },
     {
-      loc: 'https://reeeeecallstudy.xyz/insight/active-recall-techniques',
+      loc: 'https://reklue.com/insight/active-recall-techniques',
       lastmod: '2025-07-15T00:00:00Z',
       changefreq: 'monthly' as const,
       priority: 0.8,
@@ -40,14 +40,14 @@ describe('generateSitemapXml', () => {
 
   it('should include all static pages', () => {
     const xml = generateSitemapXml(staticPages, [])
-    expect(xml).toContain('<loc>https://reeeeecallstudy.xyz</loc>')
-    expect(xml).toContain('<loc>https://reeeeecallstudy.xyz/insight</loc>')
+    expect(xml).toContain('<loc>https://reklue.com</loc>')
+    expect(xml).toContain('<loc>https://reklue.com/insight</loc>')
   })
 
   it('should include all content pages', () => {
     const xml = generateSitemapXml([], contentPages)
-    expect(xml).toContain('<loc>https://reeeeecallstudy.xyz/insight/spaced-repetition-guide</loc>')
-    expect(xml).toContain('<loc>https://reeeeecallstudy.xyz/insight/active-recall-techniques</loc>')
+    expect(xml).toContain('<loc>https://reklue.com/insight/spaced-repetition-guide</loc>')
+    expect(xml).toContain('<loc>https://reklue.com/insight/active-recall-techniques</loc>')
   })
 
   it('should include lastmod for content pages', () => {
@@ -73,7 +73,7 @@ describe('generateSitemapXml', () => {
   it('should include hreflang alternates for static pages', () => {
     const xml = generateSitemapXml(staticPages, [])
     // Static pages should also have hreflang for multilingual support
-    const landingSection = xml.split('<loc>https://reeeeecallstudy.xyz</loc>')[1].split('</url>')[0]
+    const landingSection = xml.split('<loc>https://reklue.com</loc>')[1].split('</url>')[0]
     for (const locale of SUPPORTED_LOCALES) {
       expect(landingSection).toContain(`hreflang="${locale}"`)
     }
@@ -94,14 +94,14 @@ describe('generateSitemapXml', () => {
   it('should include listing pages when provided as third argument', () => {
     const listingPages = [
       {
-        loc: 'https://reeeeecallstudy.xyz/d/abc-123',
+        loc: 'https://reklue.com/d/abc-123',
         lastmod: '2025-08-01T00:00:00Z',
         changefreq: 'weekly' as const,
         priority: 0.7,
       },
     ]
     const xml = generateSitemapXml(staticPages, contentPages, listingPages)
-    expect(xml).toContain('<loc>https://reeeeecallstudy.xyz/d/abc-123</loc>')
+    expect(xml).toContain('<loc>https://reklue.com/d/abc-123</loc>')
     expect(xml).toContain('<lastmod>2025-08-01</lastmod>')
     expect(xml).toContain('<priority>0.7</priority>')
     const urlCount = (xml.match(/<url>/g) || []).length
@@ -111,13 +111,13 @@ describe('generateSitemapXml', () => {
   it('should include hreflang alternates for listing pages', () => {
     const listingPages = [
       {
-        loc: 'https://reeeeecallstudy.xyz/d/abc-123',
+        loc: 'https://reklue.com/d/abc-123',
         changefreq: 'weekly' as const,
         priority: 0.7,
       },
     ]
     const xml = generateSitemapXml([], [], listingPages)
-    const listingSection = xml.split('<loc>https://reeeeecallstudy.xyz/d/abc-123</loc>')[1].split('</url>')[0]
+    const listingSection = xml.split('<loc>https://reklue.com/d/abc-123</loc>')[1].split('</url>')[0]
     for (const locale of SUPPORTED_LOCALES) {
       expect(listingSection).toContain(`hreflang="${locale}"`)
     }

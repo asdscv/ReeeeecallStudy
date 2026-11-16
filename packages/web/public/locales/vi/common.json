@@ -128,7 +128,7 @@
     "stepOf": "Bước {{current}} / {{total}}",
     "restartOnboarding": "Xem lại hướng dẫn",
     "welcome": {
-      "title": "Chào mừng đến với Reeeeecall!",
+      "title": "Chào mừng đến với Reklue!",
       "description": "Cách học bằng thẻ ghi nhớ thông minh nhất. Tạo bộ thẻ, thêm thẻ và để thuật toán lặp lại giãn cách tối ưu việc học của bạn.",
       "action": "Bắt đầu"
     },
@@ -386,7 +386,7 @@
   },
   "skipToContent": "Bỏ qua đến nội dung",
   "footer": {
-    "copyright": "© 2026 ReeeeecallStudy. Bảo lưu mọi quyền."
+    "copyright": "© 2026 Reklue. Bảo lưu mọi quyền."
   },
   "cancel": "Hủy",
   "loading": "Đang tải...",

@@ -58,9 +58,9 @@
     }
   },
   "preview": {
-    "title": "\"{{title}}\" - Dek Kartu Kilat | ReeeeecallStudy",
-    "description": "{{title}} — {{cardCount}} kartu kilat. Pratinjau dan pelajari dek ini di ReeeeecallStudy.",
-    "defaultDescription": "Dek kartu kilat di ReeeeecallStudy",
+    "title": "\"{{title}}\" - Dek Kartu Kilat | Reklue",
+    "description": "{{title}} — {{cardCount}} kartu kilat. Pratinjau dan pelajari dek ini di Reklue.",
+    "defaultDescription": "Dek kartu kilat di Reklue",
     "sampleCards": "Contoh Kartu",
     "viewInMarket": "Lihat di Marketplace",
     "cardCount": "{{count, number}} kartu",

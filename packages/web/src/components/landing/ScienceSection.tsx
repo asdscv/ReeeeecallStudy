@@ -237,7 +237,7 @@ export function ScienceSection() {
               {t('science.title', 'Built on Cognitive Science')}
             </h2>
             <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-              {t('science.subtitle', 'Every feature in ReeeeecallStudy is grounded in decades of peer-reviewed research in memory, learning, and neuroscience.')}
+              {t('science.subtitle', 'Every feature in Reklue is grounded in decades of peer-reviewed research in memory, learning, and neuroscience.')}
             </p>
           </div>
         </ScrollReveal>

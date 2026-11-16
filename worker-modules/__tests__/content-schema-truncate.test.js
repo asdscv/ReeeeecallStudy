@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { truncateAtWordBoundary, validateArticle } from '../content-schema.js'
 
-const BRAND_SUFFIX = ' | ReeeeecallStudy'
+const BRAND_SUFFIX = ' | Reklue'
 
 function makeArticle(overrides = {}) {
   return {

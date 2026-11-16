@@ -10,7 +10,7 @@ function article(locale, slug = 'foo') {
     meta_title: `M-${locale}`, meta_description: `D-${locale}`,
     content_blocks: [{ type: 'paragraph', props: { text: 'Body text.' } }],
     tags: ['study'], reading_time_minutes: 5,
-    author_name: 'ReeeeecallStudy',
+    author_name: 'Reklue',
     published_at: '2026-01-01T00:00:00Z', updated_at: '2026-01-02T00:00:00Z',
   }
 }
@@ -34,7 +34,7 @@ afterEach(() => vi.unstubAllGlobals())
 describe('content-detail noindex policy (real handler behaviour)', () => {
   it('a non-indexable (zh) article is served noindex with NO zh hreflang', async () => {
     stubFetch([article('zh')])
-    const url = new URL('https://reeeeecallstudy.xyz/insight/foo?lang=zh')
+    const url = new URL('https://reklue.com/insight/foo?lang=zh')
     const res = await handleContentDetailBot('foo', url, env)
     expect(res).toBeTruthy()
     expect(res.headers.get('X-Robots-Tag')).toBe('noindex, follow')
@@ -45,7 +45,7 @@ describe('content-detail noindex policy (real handler behaviour)', () => {
 
   it('an indexable (en) article is served index with en hreflang', async () => {
     stubFetch([article('en', 'bar')])
-    const url = new URL('https://reeeeecallstudy.xyz/insight/bar')
+    const url = new URL('https://reklue.com/insight/bar')
     const res = await handleContentDetailBot('bar', url, env)
     expect(res.headers.get('X-Robots-Tag')).toContain('index, follow')
     const html = await res.text()
@@ -55,14 +55,14 @@ describe('content-detail noindex policy (real handler behaviour)', () => {
 
   it('?lang=zh with only an en row falls back to en and stays indexable', async () => {
     stubFetch([article('en', 'baz')])
-    const url = new URL('https://reeeeecallstudy.xyz/insight/baz?lang=zh')
+    const url = new URL('https://reklue.com/insight/baz?lang=zh')
     const res = await handleContentDetailBot('baz', url, env)
     expect(res.headers.get('X-Robots-Tag')).toContain('index') // served en
   })
 
   it('hreflang covers the indexable editions that exist (en, ko, ja), excludes the non-indexable zh', async () => {
     stubFetch([article('en', 'multi'), article('ko', 'multi'), article('ja', 'multi'), article('zh', 'multi')])
-    const url = new URL('https://reeeeecallstudy.xyz/insight/multi')
+    const url = new URL('https://reklue.com/insight/multi')
     const res = await handleContentDetailBot('multi', url, env)
     const html = await res.text()
     expect(html).toContain('hreflang="en"')
@@ -76,11 +76,11 @@ describe('content-detail noindex policy (real handler behaviour)', () => {
 describe('an indexed Japanese article speaks Japanese around the article too', () => {
   it('links and headings are in Japanese, not English', async () => {
     stubFetch([article('ja', 'jp')])
-    const res = await handleContentDetailBot('jp', new URL('https://reeeeecallstudy.xyz/insight/jp?lang=ja'), env)
+    const res = await handleContentDetailBot('jp', new URL('https://reklue.com/insight/jp?lang=ja'), env)
     expect(res.headers.get('X-Robots-Tag')).toContain('index, follow')
     const html = await res.text()
     expect(html).toContain('その他の学習インサイト')
-    expect(html).toContain('ReeeeecallStudyで学習を始める')
+    expect(html).toContain('Reklueで学習を始める')
     expect(html).not.toContain('More Learning Insights')
   })
 })

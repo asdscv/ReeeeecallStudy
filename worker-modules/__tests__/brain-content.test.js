@@ -75,7 +75,7 @@ describe('engine-grounded writing and publishing', () => {
   it('publishes a validated game destination, preserving it through UTM enrichment', () => {
     const a=article();expect(validateArticle(a).valid).toBe(true)
     enrichCtaUrls(a,'ko','codeBreak')
-    const href=new URL(a.content_blocks.at(-1).props.buttonUrl,'https://reeeeecallstudy.xyz')
+    const href=new URL(a.content_blocks.at(-1).props.buttonUrl,'https://reklue.com')
     expect(href.pathname).toBe('/auth/login');expect(href.searchParams.get('redirect')).toBe('/brain/play/codeBreak')
     expect(href.searchParams.get('utm_campaign')).toBe(a.slug)
     const blocks=withDropOffCtas(a.content_blocks,a.slug,'toeic:800','codeBreak','ko')

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Bulk import cards into ReeeCall Study from JSON or CSV files.
+Bulk import cards into Reklue from JSON or CSV files.
 
 Usage:
   python bulk_import.py data.json --deck-id X --user-id Y --template-id Z
@@ -138,7 +138,7 @@ def parse_mapping(mapping_str: str) -> dict[str, str]:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Bulk import cards into ReeeCall Study")
+    parser = argparse.ArgumentParser(description="Bulk import cards into Reklue")
     parser.add_argument("file", help="Path to JSON or CSV file")
     parser.add_argument("--deck-id", required=True, help="Target deck ID")
     parser.add_argument("--user-id", required=True, help="User ID")

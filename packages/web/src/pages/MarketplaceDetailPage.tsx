@@ -11,7 +11,7 @@ import { ReviewsSection } from '../components/marketplace/ReviewsSection'
 import { StarRatingInline } from '../components/marketplace/StarRating'
 import { getAnalyticsSessionId } from '../lib/analytics-session'
 import { VerifiedBadge } from '../components/marketplace/ListingCard'
-import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
+import { useCardLimit } from '@reklue/shared/hooks/useCardLimit'
 import { useDeckStore } from '../stores/deck-store'
 import type {
   MarketplaceListing,

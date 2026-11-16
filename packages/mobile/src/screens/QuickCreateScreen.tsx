@@ -5,11 +5,11 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
-import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
-import { useCardStore } from '@reeeeecall/shared/stores/card-store'
-import { useTemplateStore } from '@reeeeecall/shared/stores/template-store'
-import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
-import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
+import { useDeckStore } from '@reklue/shared/stores/deck-store'
+import { useCardStore } from '@reklue/shared/stores/card-store'
+import { useTemplateStore } from '@reklue/shared/stores/template-store'
+import { useCardLimit } from '@reklue/shared/hooks/useCardLimit'
+import { aiHubBus } from '@reklue/shared/lib/ai/hub/events'
 import { CardLimitNotice } from '../components/CardLimitNotice'
 import {
   clearQuickCreateDraft,
@@ -24,7 +24,7 @@ import {
   presetFieldSpecs,
   type QuickPreset,
   type QuickFieldSpec,
-} from '@reeeeecall/shared/lib/default-templates'
+} from '@reklue/shared/lib/default-templates'
 import type { DecksStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<DecksStackParamList, 'QuickCreate'>

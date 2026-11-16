@@ -8,7 +8,7 @@
  *     default Supabase local credentials are used (auto-detected)
  *
  * To run:
- *   pnpm --filter @reeeeecall/official-decks test:integration
+ *   pnpm --filter @reklue/official-decks test:integration
  */
 import { describe, it, expect, beforeAll } from "vitest";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";

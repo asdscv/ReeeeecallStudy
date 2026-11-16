@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import type { QuizStackParamList } from '../../navigation/types'
 import { useTranslation } from 'react-i18next'
-import { useQuizStore, groupMistakesByDeck } from '@reeeeecall/shared/stores/quiz-store'
+import { useQuizStore, groupMistakesByDeck } from '@reklue/shared/stores/quiz-store'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
 

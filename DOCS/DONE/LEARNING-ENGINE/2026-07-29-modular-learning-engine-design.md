@@ -12,7 +12,7 @@
 
 ## 1. Decision summary
 
-ReeeeecallStudy will evolve additively from a card/SRS application into a modular learning engine with this universal loop:
+Reklue will evolve additively from a card/SRS application into a modular learning engine with this universal loop:
 
 ```text
 Goal → Concept → Activity → Attempt → Feedback → Plan
@@ -858,8 +858,8 @@ Transaction + `ASSERT` + `ROLLBACK` tests cover:
 Use the repository's installed toolchain and report unavailable infrastructure explicitly:
 
 ```text
-pnpm --filter @reeeeecall/web test -- <target suites>
-pnpm --filter @reeeeecall/web build
+pnpm --filter @reklue/web test -- <target suites>
+pnpm --filter @reklue/web build
 pnpm exec tsc -p packages/shared/tsconfig.json --noEmit
 pnpm exec tsc -p packages/mobile/tsconfig.json --noEmit
 # SQL tests against local Supabase/Postgres when available

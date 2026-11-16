@@ -6,8 +6,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import * as Speech from 'expo-speech'
 import { Screen, TextInput, Button, ScreenHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
-import { useTemplateStore } from '@reeeeecall/shared/stores/template-store'
-import type { TemplateField, LayoutItem } from '@reeeeecall/shared/types/database'
+import { useTemplateStore } from '@reklue/shared/stores/template-store'
+import type { TemplateField, LayoutItem } from '@reklue/shared/types/database'
 import type { SettingsStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<SettingsStackParamList, 'TemplateEdit'>

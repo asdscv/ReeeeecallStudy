@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { renderHook } from '@testing-library/react'
-import type { CellTone, CellView, GridView, RoundView } from '@reeeeecall/shared/lib/brain-games'
-import type { BrainRound, TrialResult } from '@reeeeecall/shared/hooks/useBrainRound'
-import { useBrainFx, type BrainFx } from '@reeeeecall/shared/hooks/useBrainFx'
+import type { CellTone, CellView, GridView, RoundView } from '@reklue/shared/lib/brain-games'
+import type { BrainRound, TrialResult } from '@reklue/shared/hooks/useBrainRound'
+import { useBrainFx, type BrainFx } from '@reklue/shared/hooks/useBrainFx'
 
 /**
  * The round events the new boards add (GAMES_DIFFICULTY_PLAN §5, WP-J): Flash Grid's waves, a right

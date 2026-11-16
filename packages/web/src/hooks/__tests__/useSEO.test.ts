@@ -50,11 +50,10 @@ describe('useSEO', () => {
     expect(meta?.getAttribute('content')).toBe(OG_LOCALE_MAP[DEFAULT_LOCALE])
   })
 
-  it('should set twitter:site to configured handle', () => {
+  it('should omit an unregistered social handle', () => {
     renderHook(() => useSEO({ title: 'T', description: 'd' }))
     const meta = document.querySelector('meta[name="twitter:site"]')
-    expect(meta).toBeTruthy()
-    expect(meta?.getAttribute('content')).toBe(SEO.TWITTER_HANDLE)
+    expect(meta).toBeNull()
   })
 
   it('should set og:image:width and og:image:height when ogImage is provided', () => {
@@ -321,7 +320,7 @@ describe('useSEO', () => {
     expect(document.querySelector('meta[property="og:image"]')).toBeTruthy()
     expect(document.querySelector('meta[name="description"]')).toBeTruthy()
     expect(document.querySelector('meta[name="twitter:card"]')).toBeTruthy()
-    expect(document.querySelector('meta[name="twitter:site"]')).toBeTruthy()
+    expect(document.querySelector('meta[name="twitter:site"]')).toBeNull()
     expect(document.querySelector('meta[name="twitter:title"]')).toBeTruthy()
     expect(document.querySelector('meta[name="twitter:description"]')).toBeTruthy()
     expect(document.querySelector('meta[name="twitter:image"]')).toBeTruthy()
@@ -395,12 +394,12 @@ describe('useSEO', () => {
         title: 'T',
         description: 'd',
         ogType: 'article',
-        articleAuthor: 'ReeeeecallStudy',
+        articleAuthor: 'Reklue',
       }),
     )
     const meta = document.querySelector('meta[property="article:author"]')
     expect(meta).toBeTruthy()
-    expect(meta?.getAttribute('content')).toBe('ReeeeecallStudy')
+    expect(meta?.getAttribute('content')).toBe('Reklue')
   })
 
   it('should cleanup article:author on unmount', () => {
@@ -409,7 +408,7 @@ describe('useSEO', () => {
         title: 'T',
         description: 'd',
         ogType: 'article',
-        articleAuthor: 'ReeeeecallStudy',
+        articleAuthor: 'Reklue',
       }),
     )
     expect(document.querySelector('meta[property="article:author"]')).toBeTruthy()

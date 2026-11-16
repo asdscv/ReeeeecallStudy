@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { useFocusEffect } from '@react-navigation/native'
-import { useCardStore } from '@reeeeecall/shared/stores/card-store'
+import { useCardStore } from '@reklue/shared/stores/card-store'
 
 /**
  * Hook for card data — wraps shared card store for mobile.

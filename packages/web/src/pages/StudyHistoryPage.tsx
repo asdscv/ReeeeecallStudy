@@ -40,7 +40,7 @@ import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import { ListSkeleton } from '../components/common/Skeleton'
 import type { StudySession, StudyLog, Card, Deck, DeckStudyState } from '../types/database'
 import { AiActivityList } from '../components/study-history/AiActivityList'
-import { fetchAllRows } from '@reeeeecall/shared/lib/fetch-all-rows'
+import { fetchAllRows } from '@reklue/shared/lib/fetch-all-rows'
 
 const PersonalAnalyticsContent = lazy(() =>
   import('./PersonalAnalyticsPage').then(m => ({ default: m.PersonalAnalyticsContent }))

@@ -27,7 +27,7 @@ import {
   type CreateContext,
   type GridView,
   type Rng,
-} from '@reeeeecall/shared/lib/brain-games'
+} from '@reklue/shared/lib/brain-games'
 import {
   FLASH_GRID_GAP_MS,
   FLASH_GRID_MAX_CELLS,
@@ -36,8 +36,8 @@ import {
   flashGridExposureMs,
   memoryGrid,
   type MemoryGridState,
-} from '@reeeeecall/shared/lib/brain-games/games/memory-grid'
-import { SEQUENCE_LADDER, SEQUENCE_MIN_INTERVAL_MS, sequence, sequenceRung, type SequenceState } from '@reeeeecall/shared/lib/brain-games/games/sequence'
+} from '@reklue/shared/lib/brain-games/games/memory-grid'
+import { SEQUENCE_LADDER, SEQUENCE_MIN_INTERVAL_MS, sequence, sequenceRung, type SequenceState } from '@reklue/shared/lib/brain-games/games/sequence'
 
 const DESKTOP: CreateContext = DEFAULT_CONTEXT
 const PHONE: CreateContext = { ...DEFAULT_CONTEXT, maxCols: maxColsFor(358), maxRows: 7 }

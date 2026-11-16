@@ -1,3 +1,4 @@
+import { withCurrentBrand } from '../../packages/shared/lib/brand.ts'
 // RSS / Atom / JSON feed handler — extracted from worker.js handleRSSFeed
 import { SITE_URL, BRAND_NAME, DEFAULT_OG_IMAGE } from './constants.js'
 import { escapeHtml, getSupabaseRestUrl, getSupabaseAnonKey, localizedUrl } from './helpers.js'
@@ -11,7 +12,7 @@ export async function handleRSSFeed(env, format = 'rss', lang = 'en') {
     `${restUrl}/contents?is_published=eq.true&locale=eq.${lang}&select=slug,title,subtitle,meta_description,published_at,updated_at,tags,author_name,thumbnail_url,reading_time_minutes&order=published_at.desc&limit=50`,
     { headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` } },
   )
-  const articles = (await res.json()) || []
+  const articles = withCurrentBrand((await res.json()) || [])
 
   if (format === 'json') {
     // JSON Feed (https://jsonfeed.org/)
@@ -73,7 +74,7 @@ ${(a.tags || []).map((t) => `    <category term="${escapeHtml(t)}"/>`).join('\n'
   <icon>${SITE_URL}/favicon.png</icon>
   <logo>${DEFAULT_OG_IMAGE}</logo>
   <rights>Copyright ${new Date().getFullYear()} ${BRAND_NAME}</rights>
-  <generator>ReeeeecallStudy Content Pipeline</generator>
+  <generator>Reklue Content Pipeline</generator>
 ${entries}
 </feed>`
 
@@ -94,7 +95,7 @@ ${entries}
       <guid isPermaLink="true">${localizedUrl(`/insight/${a.slug}`, lang)}</guid>
       <description>${escapeHtml(a.meta_description || a.subtitle || '')}</description>
       <pubDate>${pubDate}</pubDate>
-      <author>admin@reeeeecallstudy.xyz (${escapeHtml(a.author_name || BRAND_NAME)})</author>
+      <author>admin@reklue.com (${escapeHtml(a.author_name || BRAND_NAME)})</author>
 ${(a.tags || []).map((t) => `      <category>${escapeHtml(t)}</category>`).join('\n')}
 ${a.thumbnail_url ? `      <enclosure url="${escapeHtml(a.thumbnail_url)}" type="image/jpeg" length="0"/>` : ''}
       <source url="${localizedUrl('/feed.xml', lang)}">${BRAND_NAME} Learning Insights</source>
@@ -109,13 +110,13 @@ ${a.thumbnail_url ? `      <enclosure url="${escapeHtml(a.thumbnail_url)}" type=
     <description>Science-backed learning strategies, spaced repetition tips, and study techniques. Free articles to help you study smarter and remember longer.</description>
     <language>${lang}</language>
     <lastBuildDate>${articles[0]?.published_at ? new Date(articles[0].published_at).toUTCString() : new Date().toUTCString()}</lastBuildDate>
-    <managingEditor>admin@reeeeecallstudy.xyz (${BRAND_NAME})</managingEditor>
-    <webMaster>admin@reeeeecallstudy.xyz (${BRAND_NAME})</webMaster>
+    <managingEditor>admin@reklue.com (${BRAND_NAME})</managingEditor>
+    <webMaster>admin@reklue.com (${BRAND_NAME})</webMaster>
     <copyright>Copyright ${new Date().getFullYear()} ${BRAND_NAME}</copyright>
     <category>Education</category>
     <category>Learning</category>
     <category>Study Tips</category>
-    <generator>ReeeeecallStudy Content Pipeline</generator>
+    <generator>Reklue Content Pipeline</generator>
     <docs>https://www.rssboard.org/rss-specification</docs>
     <ttl>60</ttl>
     <image>

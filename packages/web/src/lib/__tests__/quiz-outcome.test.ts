@@ -18,7 +18,7 @@ import { describe, it, expect } from 'vitest'
 import {
   itemOutcome, tallyQuiz, tallyLine, minCardsForMcq, tallyFromCounts, dateLine, calendarParts, isRunUnfinished,
   CORRECT_AT, PARTIAL_AT,
-} from '@reeeeecall/shared/lib/quiz-outcome'
+} from '@reklue/shared/lib/quiz-outcome'
 
 describe('one item', () => {
   it('separates ungraded from wrong', () => {

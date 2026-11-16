@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { writeCheckoutLoadingTab } from '../lib/payments/checkout-tab'
 import { useDeckStore } from './deck-store'
-import { getAiWalletSummary, type AiWalletSummary } from '@reeeeecall/shared/lib/ai/server-client'
+import { getAiWalletSummary, type AiWalletSummary } from '@reklue/shared/lib/ai/server-client'
 import {
   resolveProvider,
   resolveProviders,

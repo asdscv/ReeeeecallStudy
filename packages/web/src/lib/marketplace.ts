@@ -19,4 +19,4 @@ export {
   filterListings,
   sortListings,
   isListingOwner,
-} from '@reeeeecall/shared/lib/marketplace'
+} from '@reklue/shared/lib/marketplace'

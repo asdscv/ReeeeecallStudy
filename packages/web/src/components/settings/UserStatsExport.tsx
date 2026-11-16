@@ -4,7 +4,7 @@ import { Download, Loader2 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { exportToCsv } from '../../lib/csv-export'
 import { useAuthStore } from '../../stores/auth-store'
-import { fetchAllRows } from '@reeeeecall/shared/lib/fetch-all-rows'
+import { fetchAllRows } from '@reklue/shared/lib/fetch-all-rows'
 import { toast } from 'sonner'
 
 export function UserStatsExport() {

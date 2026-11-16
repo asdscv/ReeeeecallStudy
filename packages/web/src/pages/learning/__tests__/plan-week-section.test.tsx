@@ -24,7 +24,7 @@ const { storeState, quizState } = vi.hoisted(() => ({
 vi.mock('../../../stores/learning-store', () => ({
   useLearningStore: () => storeState.current,
 }))
-vi.mock('@reeeeecall/shared/stores/quiz-store', async (orig) => ({
+vi.mock('@reklue/shared/stores/quiz-store', async (orig) => ({
   ...(await orig<Record<string, unknown>>()),
   useQuizStore: () => quizState.current,
 }))
@@ -38,7 +38,7 @@ vi.mock('../../../stores/deck-store', () => ({
 }))
 
 import { LearningTodayPage } from '../LearningTodayPage'
-import { planWeek } from '@reeeeecall/shared/learning/application/plan-week'
+import { planWeek } from '@reklue/shared/learning/application/plan-week'
 
 const goal = {
   id: 'goal-1', domain_id: 'language', title: 'JLPT N2', target_date: null,

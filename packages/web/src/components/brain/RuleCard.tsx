@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Lightbulb, Info } from 'lucide-react'
-import type { GameTheme } from '@reeeeecall/shared/lib/brain-games'
+import type { GameTheme } from '@reklue/shared/lib/brain-games'
 
 /**
  * A rule the player has not met yet, told before the trial that uses it. The trial is held with

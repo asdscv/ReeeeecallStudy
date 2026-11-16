@@ -6,7 +6,7 @@
 
 ## 1. Decision
 
-ReeeeecallStudy will not expose a customer-facing programmable REST API. The removed contract is the former `Authorization: Bearer rc_...` flow, API-key management, developer API documentation, and customer API marketing.
+Reklue will not expose a customer-facing programmable REST API. The removed contract is the former `Authorization: Bearer rc_...` flow, API-key management, developer API documentation, and customer API marketing.
 
 Retained and explicitly out of scope:
 

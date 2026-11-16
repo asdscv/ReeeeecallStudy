@@ -1,6 +1,6 @@
 // App store links — single source for the web app and the Worker's crawler HTML.
 
-export const APP_STORE_URL = 'https://apps.apple.com/kr/app/reeeeecallstudy/id6761741123'
+export const APP_STORE_URL = 'https://apps.apple.com/app/id6761741123'
 export const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.reeeeecall.study'
 
 export interface StoreAttribution {

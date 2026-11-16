@@ -1,7 +1,7 @@
 import { config as sharedConfig } from './wdio.conf'
 import path from 'path'
 
-const APP_PATH = path.resolve(__dirname, 'ios/build/Build/Products/Debug-iphonesimulator/ReeeeecallStudy.app')
+const APP_PATH = path.resolve(__dirname, 'ios/build/Build/Products/Debug-iphonesimulator/Reklue.app')
 
 export const config: WebdriverIO.Config = {
   ...sharedConfig,

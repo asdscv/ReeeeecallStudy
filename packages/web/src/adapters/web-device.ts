@@ -1,4 +1,4 @@
-import type { IDeviceAdapter } from '@reeeeecall/shared/adapters/device'
+import type { IDeviceAdapter } from '@reklue/shared/adapters/device'
 
 const STORAGE_KEY = 'reeeeecall_device_id'
 

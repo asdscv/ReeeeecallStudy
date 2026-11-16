@@ -38,19 +38,19 @@ jobs:
       # are actually checked; plain `tsc --noEmit` on the root config is a no-op
       # because the root has `files: []` and only `references`.
       - name: Web typecheck
-        run: pnpm --filter @reeeeecall/web exec tsc -b --noEmit
+        run: pnpm --filter @reklue/web exec tsc -b --noEmit
 
       # The Playwright suite is in no other tsconfig, so without this nothing ever
       # type-checked it and its fixtures drifted to `any`.
       - name: Web e2e typecheck
-        run: pnpm --filter @reeeeecall/web typecheck:e2e
+        run: pnpm --filter @reklue/web typecheck:e2e
 
       # Strict gate. It was informational while develop carried 148 eslint errors;
       # those are cleared (6 were real defects, the rest missing types and
       # effect-driven state), so the escape hatch comes off and the debt cannot
       # silently return.
       - name: Web lint
-        run: pnpm --filter @reeeeecall/web lint
+        run: pnpm --filter @reklue/web lint
       # Strict gate. It was scoped to marketplace-only while a baseline of unrelated
       # errors existed; that baseline is now empty (`tsc --noEmit` → 0 errors), so the
       # escape hatch comes off — same call as the web lint gate above.
@@ -60,7 +60,7 @@ jobs:
       # CardUsageModal never passed it. `onSelect` is required now, so that shape is a
       # compile error (TS2741) — but only if this step can actually fail.
       - name: Mobile typecheck
-        run: pnpm --filter @reeeeecall/mobile exec tsc --noEmit
+        run: pnpm --filter @reklue/mobile exec tsc --noEmit
 
   # ─────────────────────────────────────────────────────────────────────
   # Job 1b: develop→main promotions must say their migrations were applied
@@ -243,8 +243,8 @@ jobs:
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - name: Run arch checks
-        # tsx is a transitive devDep of @reeeeecall/web; resolve via the web package
-        run: pnpm --filter @reeeeecall/web exec tsx ../../tools/check-arch.ts
+        # tsx is a transitive devDep of @reklue/web; resolve via the web package
+        run: pnpm --filter @reklue/web exec tsx ../../tools/check-arch.ts
 
   # ─────────────────────────────────────────────────────────────────────
   # Job 5: Migration safety — every migration must apply against fresh DB

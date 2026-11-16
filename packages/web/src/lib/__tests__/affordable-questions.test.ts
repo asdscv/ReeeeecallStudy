@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { affordableQuestionCount } from '@reeeeecall/shared/lib/quiz-pricing'
+import { affordableQuestionCount } from '@reklue/shared/lib/quiz-pricing'
 
 /** 이 함수가 실제로 읽는 필드만 담은 최소 견적. `as any` 는 eslint 가 막습니다. */
 type Quote = Parameters<typeof affordableQuestionCount>[0]

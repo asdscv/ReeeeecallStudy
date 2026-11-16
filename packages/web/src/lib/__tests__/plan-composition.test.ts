@@ -7,7 +7,7 @@
  * about how much work is left, which reads as the app being wrong about the learner's day.
  */
 import { describe, it, expect } from 'vitest'
-import { planComposition } from '@reeeeecall/shared/lib/plan-composition'
+import { planComposition } from '@reklue/shared/lib/plan-composition'
 
 const item = (
   status: string,

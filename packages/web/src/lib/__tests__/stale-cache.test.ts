@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createStaleCache } from '@reeeeecall/shared/lib/cache/stale-cache'
+import { createStaleCache } from '@reklue/shared/lib/cache/stale-cache'
 
 // A controllable clock so TTL behavior is deterministic (no real timers / Date faking).
 function fakeClock(start = 0) {

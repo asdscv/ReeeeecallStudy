@@ -94,9 +94,9 @@
 
 머지 전에 다음이 전부 참이어야 한다.
 
-- [ ] `pnpm --filter @reeeeecall/web exec tsc -b --noEmit` 통과 (`-p tsconfig.json` 은 **무동작**이다)
-- [ ] `pnpm --filter @reeeeecall/web lint` 에러 0
-- [ ] `pnpm --filter @reeeeecall/web test` 전체 통과
+- [ ] `pnpm --filter @reklue/web exec tsc -b --noEmit` 통과 (`-p tsconfig.json` 은 **무동작**이다)
+- [ ] `pnpm --filter @reklue/web lint` 에러 0
+- [ ] `pnpm --filter @reklue/web test` 전체 통과
 - [ ] i18n 게이트 통과 (웹 parity + 정적 키 + 모바일 스위트)
 - [ ] DB 계약을 바꿨으면 SQL 스위트 작성 + **`ci.yml` 등록** + 롤백 파일
 - [ ] 확장점을 만들었으면 우회 가드 테스트 동반 (제1원칙 R5)

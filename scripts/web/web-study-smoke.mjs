@@ -14,7 +14,7 @@
 import { chromium } from 'playwright'
 import fs from 'node:fs'
 
-const SITE = process.env.WEB_URL || 'https://reeeeecallstudy.xyz'
+const SITE = process.env.WEB_URL || 'https://reklue.com'
 const API = process.env.SUPABASE_URL || 'https://ixdapelfikaneexnskfm.supabase.co'
 const ANON = process.env.SUPABASE_ANON_KEY || 'sb_publishable_4F7XKb_Cifh2rujOiyP9RQ_ZU3HjQsV'
 const EMAIL = process.env.WEB_E2E_EMAIL

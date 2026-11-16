@@ -58,9 +58,9 @@
     }
   },
   "preview": {
-    "title": "\"{{title}}\" - フラッシュカードデッキ | ReeeeecallStudy",
-    "description": "{{title}} — フラッシュカード{{cardCount}}枚。ReeeeecallStudyでプレビューして学習しましょう。",
-    "defaultDescription": "ReeeeecallStudyのフラッシュカードデッキ",
+    "title": "\"{{title}}\" - フラッシュカードデッキ | Reklue",
+    "description": "{{title}} — フラッシュカード{{cardCount}}枚。Reklueでプレビューして学習しましょう。",
+    "defaultDescription": "Reklueのフラッシュカードデッキ",
     "sampleCards": "サンプルカード",
     "viewInMarket": "マーケットプレイスで見る",
     "cardCount": "{{count, number}}枚",

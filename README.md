@@ -1,73 +1,21 @@
-# React + TypeScript + Vite
+# Reklue · 리클루
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Flashcard learning and brain games for web, iOS, and Android. The app supports eight languages, spaced repetition, AI-assisted card creation, and deck sharing.
 
-Currently, two official plugins are available:
+- Web: https://reklue.com
+- `packages/web`: React + Vite web app
+- `packages/mobile`: Expo / React Native app
+- `packages/shared`: shared learning logic, state and brand configuration
+- `worker-modules`: content pipeline and server-rendered SEO
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+pnpm dev:mobile
+pnpm build
+pnpm test:worker
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The public brand is **Reklue** (Korean: **리클루**). The new canonical domain is `reklue.com`. The former `reeeeecallstudy.xyz` address redirects while its existing registration remains active. Workspace packages use `@reklue`. Registered app identifiers, the compatible deep-link scheme, stored preference keys, and service account identifiers remain stable for existing installs.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+See [deployment instructions](DOCS/DEPLOYMENT/README.md) and [store listing copy](DOCS/MOBILE/STORE_METADATA.md). Updating the device home-screen name requires a new native build; updating the store listing is a separate release step.

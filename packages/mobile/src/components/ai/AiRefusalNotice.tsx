@@ -4,7 +4,7 @@ import { useNavigation, type NavigationProp } from '@react-navigation/native'
 import {
   refusalFrom, refusalMessageKey, refusalFallbackKey, isWalletRefusal,
   type PaidActionId,
-} from '@reeeeecall/shared/lib/ai/refusal'
+} from '@reklue/shared/lib/ai/refusal'
 import { useTheme } from '../../theme'
 import { testProps } from '../../utils/testProps'
 

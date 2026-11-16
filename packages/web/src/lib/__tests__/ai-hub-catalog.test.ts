@@ -23,10 +23,10 @@ import {
   aiHubEntries,
   aiHubEntryFor,
   createDefaultAiHubRegistry,
-} from '@reeeeecall/shared/lib/ai/hub/catalog'
-import { isAiBadgeEligible } from '@reeeeecall/shared/lib/ai/hub/types'
-import { aiHubAnalyticsEvent } from '@reeeeecall/shared/lib/ai/hub/events'
-import type { AiHubAnalyticsEvent, AiHubEvent } from '@reeeeecall/shared/lib/ai/hub/events'
+} from '@reklue/shared/lib/ai/hub/catalog'
+import { isAiBadgeEligible } from '@reklue/shared/lib/ai/hub/types'
+import { aiHubAnalyticsEvent } from '@reklue/shared/lib/ai/hub/events'
+import type { AiHubAnalyticsEvent, AiHubEvent } from '@reklue/shared/lib/ai/hub/events'
 
 const REPO_ROOT = join(__dirname, '../../../../..')
 

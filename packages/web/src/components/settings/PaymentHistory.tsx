@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Loader2 } from 'lucide-react'
-import { formatCount, formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
+import { formatCount, formatUsdMicro } from '@reklue/shared/lib/ai/server-client'
 import { supabase } from '../../lib/supabase'
 import { toIntlLocale } from '../../lib/locale-utils'
 

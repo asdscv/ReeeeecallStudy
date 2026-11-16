@@ -1,5 +1,5 @@
-import { aiHubEntries } from '@reeeeecall/shared/lib/ai/hub/catalog'
-import type { AiHubMobileStack } from '@reeeeecall/shared/lib/ai/hub/types'
+import { aiHubEntries } from '@reklue/shared/lib/ai/hub/catalog'
+import type { AiHubMobileStack } from '@reklue/shared/lib/ai/hub/types'
 import type { AIStackParamList, MainTabParamList, QuizStackParamList } from '../../navigation/types'
 
 /**

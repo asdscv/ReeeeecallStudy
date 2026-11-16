@@ -73,7 +73,7 @@ packages/mobile/
 
 ```bash
 # Appium & drivers
-pnpm --filter @reeeeecall/mobile add -D \
+pnpm --filter @reklue/mobile add -D \
   appium \
   @wdio/cli \
   @wdio/local-runner \
@@ -147,7 +147,7 @@ export const config = {
     'appium:automationName': 'XCUITest',
     'appium:deviceName': process.env.IOS_DEVICE_NAME ?? 'iPhone 16',
     'appium:platformVersion': process.env.IOS_PLATFORM_VERSION ?? '18.0',
-    'appium:app': './ios/build/ReeeeecallStudy.app',
+    'appium:app': './ios/build/Reklue.app',
     'appium:noReset': false,
   }],
   port: 4723,
@@ -314,9 +314,9 @@ jobs:
       - run: pnpm install
       - run: appium driver install xcuitest
       - name: Build iOS
-        run: pnpm --filter @reeeeecall/mobile ios:build
+        run: pnpm --filter @reklue/mobile ios:build
       - name: Run Appium E2E (iOS)
-        run: pnpm --filter @reeeeecall/mobile test:e2e:ios
+        run: pnpm --filter @reklue/mobile test:e2e:ios
 
   test-android:
     runs-on: ubuntu-latest
@@ -326,7 +326,7 @@ jobs:
       - uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
-          script: pnpm --filter @reeeeecall/mobile test:e2e:android
+          script: pnpm --filter @reklue/mobile test:e2e:android
 ```
 
 ### 디바이스 클라우드 (선택)

@@ -12,7 +12,7 @@ describe('brain-game article conversion',()=>{
   it('a visitor signs in and returns to the actual game, with campaign attribution',()=>{
     draw()
     const link=screen.getByRole('link',{name:'두뇌훈련 시작하기'})
-    const url=new URL(link.getAttribute('href')!,'https://reeeeecallstudy.xyz')
+    const url=new URL(link.getAttribute('href')!,'https://reklue.com')
     expect(url.pathname).toBe('/auth/login')
     expect(url.searchParams.get('redirect')).toBe('/brain/play/codeBreak')
     expect(url.searchParams.get('utm_campaign')).toBe('code-break-rules')

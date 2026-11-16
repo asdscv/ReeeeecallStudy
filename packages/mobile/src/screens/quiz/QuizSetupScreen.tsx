@@ -3,19 +3,19 @@ import { View, Text, StyleSheet, ScrollView, Pressable, TextInput } from 'react-
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
-import { AI_HUB_QUIZ } from '@reeeeecall/shared/lib/ai/hub/catalog'
+import { AI_HUB_QUIZ } from '@reklue/shared/lib/ai/hub/catalog'
 import { AiCreditNotice } from '../../components/ai/AiCreditNotice'
 import {
   useQuizStore, QuizError, QUIZ_GENERATE_ACTION,
   type QuizQuestionType, type QuizQuote, type QuizzableCount, type QuizDifficultyBand,
-} from '@reeeeecall/shared/stores/quiz-store'
-import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
+} from '@reklue/shared/stores/quiz-store'
+import { useDeckStore } from '@reklue/shared/stores/deck-store'
 import { Screen, Button, ScreenHeader } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
 import type { QuizStackParamList } from '../../navigation/types'
-import { generateCostLine, freeLeftLine, affordableQuestionCount } from '@reeeeecall/shared/lib/quiz-pricing'
-import { minCardsForMcq } from '@reeeeecall/shared/lib/quiz-outcome'
+import { generateCostLine, freeLeftLine, affordableQuestionCount } from '@reklue/shared/lib/quiz-pricing'
+import { minCardsForMcq } from '@reklue/shared/lib/quiz-outcome'
 
 type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizSetup'>
 

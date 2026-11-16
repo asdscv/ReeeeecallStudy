@@ -1,8 +1,8 @@
 import { View, Text, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../theme'
-import { ratingColors } from '@reeeeecall/shared/design-tokens/colors'
-import type { RatingDistribution } from '@reeeeecall/shared/lib/study-history-stats'
+import { ratingColors } from '@reklue/shared/design-tokens/colors'
+import type { RatingDistribution } from '@reklue/shared/lib/study-history-stats'
 
 const RATING_COLORS: Record<string, string> = {
   again: ratingColors.again,

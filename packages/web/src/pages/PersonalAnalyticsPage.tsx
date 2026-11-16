@@ -8,7 +8,7 @@ import {
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../stores/auth-store'
 import { resolveRange, type DateRange, type TimePeriod } from '../lib/time-period'
-import { fetchAllRows } from '@reeeeecall/shared/lib/fetch-all-rows'
+import { fetchAllRows } from '@reklue/shared/lib/fetch-all-rows'
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
 

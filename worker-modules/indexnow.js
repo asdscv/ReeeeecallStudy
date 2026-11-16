@@ -8,7 +8,7 @@ const INDEXNOW_ENDPOINTS = [
   'https://searchadvisor.naver.com/indexnow',  // Naver
 ]
 
-const SITE_URL = 'https://reeeeecallstudy.xyz'
+const SITE_URL = 'https://reklue.com'
 
 /**
  * Submit newly published URLs to IndexNow-compatible search engines.
@@ -24,7 +24,7 @@ export async function submitToIndexNow(env, urls) {
   if (!urls || urls.length === 0) return
 
   const body = JSON.stringify({
-    host: 'reeeeecallstudy.xyz',
+    host: 'reklue.com',
     key,
     keyLocation: `${SITE_URL}/${key}.txt`,
     urlList: urls,

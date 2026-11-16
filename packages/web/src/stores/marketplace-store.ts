@@ -2,8 +2,8 @@ import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import { filterListings, sortListings, type SortBy, type ListingFilters, type MarketplaceListingData } from '../lib/marketplace'
 import { useDeckStore } from './deck-store'
-import { isCardLimitError } from '@reeeeecall/shared/stores/card-store'
-import { createStaleCache } from '@reeeeecall/shared/lib/cache/stale-cache'
+import { isCardLimitError } from '@reklue/shared/stores/card-store'
+import { createStaleCache } from '@reklue/shared/lib/cache/stale-cache'
 import type { MarketplaceListing, ShareMode } from '../types/database'
 
 // Public catalog read cache — see DOCS/TODO/cache-optimization-phase2.md.

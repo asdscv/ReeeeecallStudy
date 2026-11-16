@@ -1,5 +1,5 @@
 import * as SecureStore from 'expo-secure-store'
-import type { IStorage, ISessionStorage } from '@reeeeecall/shared/adapters/storage'
+import type { IStorage, ISessionStorage } from '@reklue/shared/adapters/storage'
 
 /**
  * Persistent storage backed by expo-secure-store (Keychain on iOS, Keystore on Android).

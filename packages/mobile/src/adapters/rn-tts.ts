@@ -1,5 +1,5 @@
 import * as Speech from 'expo-speech'
-import type { ITTSAdapter } from '@reeeeecall/shared/adapters/tts'
+import type { ITTSAdapter } from '@reklue/shared/adapters/tts'
 
 export class RNTTS implements ITTSAdapter {
   async speak(text: string, lang: string, rate: number = 0.9): Promise<void> {

@@ -3,7 +3,7 @@ import {
   QUICK_PRESETS,
   presetFieldSpecs,
   buildPresetTemplate,
-} from '@reeeeecall/shared/lib/default-templates'
+} from '@reklue/shared/lib/default-templates'
 
 describe('quick-create field-count presets', () => {
   it('exposes 4 presets, all 1 front, back 1..4, unique ids + template names', () => {

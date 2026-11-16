@@ -11,8 +11,8 @@
  * Korean speaker and Korean to an English speaker; it is the same rows either way.
  */
 import { describe, it, expect } from 'vitest'
-import { filterListings, getLearningLanguages } from '@reeeeecall/shared/lib/marketplace'
-import type { MarketplaceListingData } from '@reeeeecall/shared/lib/marketplace'
+import { filterListings, getLearningLanguages } from '@reklue/shared/lib/marketplace'
+import type { MarketplaceListingData } from '@reklue/shared/lib/marketplace'
 
 function deck(over: Partial<MarketplaceListingData> & { id: string }): MarketplaceListingData {
   return {

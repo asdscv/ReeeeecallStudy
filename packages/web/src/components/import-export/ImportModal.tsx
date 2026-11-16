@@ -8,7 +8,7 @@ import {
   DialogFooter,
 } from '../ui/dialog'
 import { useCardStore } from '../../stores/card-store'
-import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
+import { useCardLimit } from '@reklue/shared/hooks/useCardLimit'
 import { CardLimitBlock } from '../card/CardLimitBlock'
 import {
   parseImportJSON,

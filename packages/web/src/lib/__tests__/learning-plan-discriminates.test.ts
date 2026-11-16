@@ -22,11 +22,11 @@
  * each of those defects passed its own unit tests while the composition of them was inert.
  */
 import { describe, expect, it } from 'vitest'
-import { buildCandidatesFromCards } from '@reeeeecall/shared/lib/learning-candidates'
-import { buildDailyPlan } from '@reeeeecall/shared/learning'
-import { attachProgressToCards } from '@reeeeecall/shared/lib/learning-card-sources'
-import type { Card } from '@reeeeecall/shared/types/database'
-import type { UserCardProgress } from '@reeeeecall/shared/lib/srs-access'
+import { buildCandidatesFromCards } from '@reklue/shared/lib/learning-candidates'
+import { buildDailyPlan } from '@reklue/shared/learning'
+import { attachProgressToCards } from '@reklue/shared/lib/learning-card-sources'
+import type { Card } from '@reklue/shared/types/database'
+import type { UserCardProgress } from '@reklue/shared/lib/srs-access'
 
 const NOW = '2026-08-01T00:00:00.000Z'
 const DAY = 86_400_000

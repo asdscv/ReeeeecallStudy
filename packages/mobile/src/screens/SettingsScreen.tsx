@@ -23,21 +23,21 @@ import {
   useDeckStore,
   registerCardUsageDetailInterest,
   releaseCardUsageDetailInterest,
-} from '@reeeeecall/shared/stores/deck-store'
+} from '@reklue/shared/stores/deck-store'
 import { localPrefs } from '../utils/local-prefs'
 import { haptics, setHapticsEnabled } from '../utils/haptics'
 import type { SettingsStackParamList } from '../navigation/types'
 import { notificationService } from '../services/notifications'
 import { getMobileSupabase } from '../adapters'
 import { getMySubscription, type MySubscription } from '../services/billing'
-import { formatCount } from '@reeeeecall/shared/lib/ai/server-client'
-import type { SrsSettings } from '@reeeeecall/shared/types/database'
-import { DEFAULT_SRS_SETTINGS } from '@reeeeecall/shared/types/database'
-import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
+import { formatCount } from '@reklue/shared/lib/ai/server-client'
+import type { SrsSettings } from '@reklue/shared/types/database'
+import { DEFAULT_SRS_SETTINGS } from '@reklue/shared/types/database'
+import { useBrainStore } from '@reklue/shared/stores/brain-store'
 import { forgetBrainOnDevice } from '../components/brain/brain-ui'
 
-const PRIVACY_POLICY_URL = 'https://reeeeecallstudy.xyz/privacy-policy.html'
-const TERMS_OF_SERVICE_URL = 'https://reeeeecallstudy.xyz/terms-of-service.html'
+const PRIVACY_POLICY_URL = 'https://reklue.com/privacy-policy.html'
+const TERMS_OF_SERVICE_URL = 'https://reklue.com/terms-of-service.html'
 // [SUBSCRIPTION-HIDDEN] 구독 관리 URL — 복원 시 주석 해제
 // const MANAGE_SUBSCRIPTIONS_URL = 'https://apps.apple.com/account/subscriptions'
 const APP_VERSION = '1.0.1'
@@ -938,7 +938,7 @@ export function SettingsScreen() {
         </TouchableOpacity>
 
         <Text style={[styles.versionText, { color: theme.colors.textTertiary }]}>
-          ReeeeecallStudy v{APP_VERSION}
+          Reklue v{APP_VERSION}
         </Text>
         <TouchableOpacity
           onPress={() => {

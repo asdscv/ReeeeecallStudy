@@ -69,7 +69,7 @@ export function StudySession() {
 
   // Load swipe settings
   function loadSwipeSettings() {
-    const saved = localStorage.getItem('reeecall-settings');
+    const saved = localStorage.getItem('reklue-settings');
     if (saved) {
       const settings = JSON.parse(saved);
       setSwipeSettings(settings.swipe || null);

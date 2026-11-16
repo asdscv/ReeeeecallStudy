@@ -7,7 +7,7 @@ import {
   MAX_BATCH_SIZE,
   isBatchSizeConfigurable,
   clampBatchSize,
-} from '@reeeeecall/shared/lib/study-session-utils'
+} from '@reklue/shared/lib/study-session-utils'
 
 // ─── STUDY_MODE_OPTIONS ─────────────────────────────────────
 

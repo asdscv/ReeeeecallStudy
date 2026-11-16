@@ -5,15 +5,15 @@ import {
   useQuizStore, QuizError, QUIZ_GRADE_ACTION,
   optionFlaws, optionAxes, QUIZ_FEEDBACK_REASONS,
   type QuizRunItem, type QuizSubmitResult, type QuizQuote,
-} from '@reeeeecall/shared/stores/quiz-store'
+} from '@reklue/shared/stores/quiz-store'
 import { QuizFeedback } from './QuizFeedback'
 import { AiRefusalNotice } from '../../components/ai/AiRefusalNotice'
 import {
   quizGrowth, QUIZ_GROWTH_POLL_MS, QUIZ_GROWTH_IDLE_TICKS,
-} from '@reeeeecall/shared/lib/quiz-shortfall'
-import { answerLength } from '@reeeeecall/shared/lib/quiz-answer-limits'
-import { itemOutcome, tallyQuiz, tallyLine } from '@reeeeecall/shared/lib/quiz-outcome'
-import { gradeCostLine } from '@reeeeecall/shared/lib/quiz-pricing'
+} from '@reklue/shared/lib/quiz-shortfall'
+import { answerLength } from '@reklue/shared/lib/quiz-answer-limits'
+import { itemOutcome, tallyQuiz, tallyLine } from '@reklue/shared/lib/quiz-outcome'
+import { gradeCostLine } from '@reklue/shared/lib/quiz-pricing'
 
 /**
  * Taking the quiz. Outside the app Layout, like the study session, so nothing competes with

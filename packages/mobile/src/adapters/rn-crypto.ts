@@ -1,4 +1,4 @@
-import type { ICryptoAdapter } from '@reeeeecall/shared/adapters/crypto'
+import type { ICryptoAdapter } from '@reklue/shared/adapters/crypto'
 
 // TODO: Phase 2 — Replace with expo-crypto
 export class RNCrypto implements ICryptoAdapter {

@@ -7,7 +7,7 @@
  * false, and it is a one-character mistake (`?? 0`) away at every step.
  */
 import { describe, expect, it } from 'vitest'
-import { recallPercent } from '@reeeeecall/shared/lib/learning-recall-display'
+import { recallPercent } from '@reklue/shared/lib/learning-recall-display'
 
 describe('recallPercent', () => {
   it('renders a probability as whole percent', () => {

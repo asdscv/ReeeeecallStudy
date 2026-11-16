@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react'
 import type { PublicListingPreview } from '../../types/database'
 import {
   wordListHeading, wordListIntro, wordListColumns, wordListCta, wordRows, wordListIndexLink,
-} from '@reeeeecall/shared/lib/listing-seo'
+} from '@reklue/shared/lib/listing-seo'
 import { OfficialBadge } from '../common/OfficialBadge'
 import { useTrackEvent } from '../../hooks/useTrackEvent'
 

@@ -4,7 +4,7 @@ import Animated from 'react-native-reanimated'
 import { Feather } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
-import { formatCount } from '@reeeeecall/shared/lib/format-number'
+import { formatCount } from '@reklue/shared/lib/format-number'
 import {
   GAME_THEMES,
   TIER_COUNT,
@@ -16,10 +16,10 @@ import {
   type AchievementId,
   type BrainGameId,
   type PlanSlot,
-} from '@reeeeecall/shared/lib/brain-games'
-import { useTodaysTraining, type TrainingTotals } from '@reeeeecall/shared/hooks/useTodaysTraining'
-import type { RoundStats } from '@reeeeecall/shared/hooks/useBrainRound'
-import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
+} from '@reklue/shared/lib/brain-games'
+import { useTodaysTraining, type TrainingTotals } from '@reklue/shared/hooks/useTodaysTraining'
+import type { RoundStats } from '@reklue/shared/hooks/useBrainRound'
+import { useBrainStore } from '@reklue/shared/stores/brain-store'
 import { RoundView } from '../../components/brain/RoundView'
 import { GameIntro } from '../../components/brain/GameIntro'
 import { CanvasButton, CanvasSheet, Confetti, GameCanvas, GradientFill, StatTile } from '../../components/brain/GameCanvas'

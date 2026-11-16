@@ -13,7 +13,7 @@ import { createDrawerNavigator, type DrawerContentComponentProps } from '@react-
 import { getFocusedRouteNameFromRoute, useNavigationState, type NavigationProp, type ParamListBase } from '@react-navigation/native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
-import { aiHubEntries } from '@reeeeecall/shared/lib/ai/hub/catalog'
+import { aiHubEntries } from '@reklue/shared/lib/ai/hub/catalog'
 import { useTheme, palette } from '../theme'
 import { useAuthState } from '../hooks'
 import { useAiHubEventBridge } from '../hooks/useAiHubEventBridge'

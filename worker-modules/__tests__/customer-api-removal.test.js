@@ -17,7 +17,7 @@ describe('customer external API removal', () => {
     })
     vi.stubGlobal('fetch', outboundFetch)
     const env = makeEnv()
-    const request = new Request('https://reeeeecallstudy.xyz/api/decks', {
+    const request = new Request('https://reklue.com/api/decks', {
       headers: { Authorization: 'Bearer removed-customer-credential' },
     })
 

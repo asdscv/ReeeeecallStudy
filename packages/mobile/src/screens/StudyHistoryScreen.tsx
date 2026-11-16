@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
-import { modeFeedsSrsSchedule } from '@reeeeecall/shared/lib/study-mode-scheduling'
+import { modeFeedsSrsSchedule } from '@reklue/shared/lib/study-mode-scheduling'
 import { View, Text, FlatList, RefreshControl, TouchableOpacity, ScrollView, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -12,9 +12,9 @@ import { useTranslation } from 'react-i18next'
 import i18next from 'i18next'
 import { useTheme, palette } from '../theme'
 import { getMobileSupabase } from '../adapters'
-import type { TimePeriod } from '@reeeeecall/shared/lib/time-period'
-import { periodToDays } from '@reeeeecall/shared/lib/time-period'
-import { getStreakDays } from '@reeeeecall/shared/lib/stats'
+import type { TimePeriod } from '@reklue/shared/lib/time-period'
+import { periodToDays } from '@reklue/shared/lib/time-period'
+import { getStreakDays } from '@reklue/shared/lib/stats'
 import {
   filterSessionsByPeriod,
   filterSessionsByDeckScope,
@@ -24,7 +24,7 @@ import {
   computeModeBreakdown,
   type DeckScope,
   type ModeBreakdown,
-} from '@reeeeecall/shared/lib/study-history-stats'
+} from '@reklue/shared/lib/study-history-stats'
 import {
   formatDuration,
   getStudyModeLabel,
@@ -32,11 +32,11 @@ import {
   groupSessionsByDate,
   aggregateLogsToSessions,
   mergeSessionsWithLogs,
-} from '@reeeeecall/shared/lib/study-history'
-import type { StudySession, StudyLog } from '@reeeeecall/shared/types/database'
+} from '@reklue/shared/lib/study-history'
+import type { StudySession, StudyLog } from '@reklue/shared/types/database'
 import type { HomeStackParamList } from '../navigation/types'
 import { AiActivityList } from '../components/history/AiActivityList'
-import { fetchAllRows, fetchRowsByIds } from '@reeeeecall/shared/lib/fetch-all-rows'
+import { fetchAllRows, fetchRowsByIds } from '@reklue/shared/lib/fetch-all-rows'
 
 /**
  * Matches web StudyHistoryPage:

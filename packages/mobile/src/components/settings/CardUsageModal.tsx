@@ -3,7 +3,7 @@ import { View, Text, Modal, StyleSheet, TouchableOpacity, ScrollView, Pressable 
 import { useTranslation } from 'react-i18next'
 import { useNavigation } from '@react-navigation/native'
 import { useTheme } from '../../theme'
-import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
+import { useDeckStore } from '@reklue/shared/stores/deck-store'
 import { getMySubscription, type MySubscription } from '../../services/billing'
 import { CardUsagePanel } from './CardUsagePanel'
 import { PlanSelector } from './PlanSelector'

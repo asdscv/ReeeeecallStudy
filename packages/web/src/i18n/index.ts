@@ -1,6 +1,6 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
-import { formatDecimal } from '@reeeeecall/shared/lib/format-number'
+import { formatDecimal } from '@reklue/shared/lib/format-number'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import HttpBackend from 'i18next-http-backend'
 

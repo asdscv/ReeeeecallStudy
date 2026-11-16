@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import {
   asMcqFeedback, asShortAnswerFeedback, asEssayFeedback, asStoredRubric, splitBySpan,
-} from '@reeeeecall/shared/lib/quiz-feedback'
+} from '@reklue/shared/lib/quiz-feedback'
 
 /**
  * What the grader said, rendered without a word the model wrote.

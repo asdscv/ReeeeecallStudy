@@ -6,9 +6,9 @@
     "title1": "Learning That Transcends",
     "title2": "Memory Limits",
     "description": "Maximize your learning efficiency with scientifically proven spaced repetition (SRS).",
-    "subDescription": "With ReeeeecallStudy, you can remember faster and longer.",
+    "subDescription": "With Reklue, you can remember faster and longer.",
     "subtitle1": "Maximize your learning efficiency with scientifically proven spaced repetition (SRS).",
-    "subtitle2": "With ReeeeecallStudy, you can remember faster and longer.",
+    "subtitle2": "With Reklue, you can remember faster and longer.",
     "startFree": "Start Free",
     "learnMore": "Learn More",
     "cta": {
@@ -80,7 +80,7 @@
     "subtitle": "All tools for efficient learning in one place"
   },
   "why": {
-    "title": "Why ReeeeecallStudy?",
+    "title": "Why Reklue?",
     "subtitle": "Next-generation flashcard tool combining spaced repetition with modern UI",
     "points": [
       "Scientifically verified SRS learning algorithm",
@@ -94,7 +94,7 @@
     ]
   },
   "benefitsSection": {
-    "title": "Why ReeeeecallStudy?",
+    "title": "Why Reklue?",
     "subtitle": "Next-generation flashcard tool combining spaced repetition with modern UI",
     "cta": "Get Started Now"
   },
@@ -167,7 +167,7 @@
     "aiGenerate": "AI card generation"
   },
   "footer": {
-    "copyright": "© 2026 ReeeeecallStudy. All rights reserved.",
+    "copyright": "© 2026 Reklue. All rights reserved.",
     "tagline": "Smart flashcard learning platform with spaced repetition",
     "product": "Product",
     "resources": "Resources",
@@ -188,11 +188,11 @@
   "faq": {
     "title": "Frequently Asked Questions",
     "q1": "What is spaced repetition (SRS)?",
-    "a1": "Spaced repetition is a scientifically proven learning method that schedules reviews at optimal intervals to maximize long-term memory retention. ReeeeecallStudy uses an advanced SRS algorithm to automatically determine when you should review each flashcard.",
-    "q2": "Is ReeeeecallStudy free?",
+    "a1": "Spaced repetition is a scientifically proven learning method that schedules reviews at optimal intervals to maximize long-term memory retention. Reklue uses an advanced SRS algorithm to automatically determine when you should review each flashcard.",
+    "q2": "Is Reklue free?",
     "a2": "Yes — you can start free. Signing up gives you SRS, all six study modes, statistics and deck sharing with no limits.\n\nThe free plan does cap how many cards you can store, and a paid plan raises that cap (the exact numbers are shown in the pricing section above). AI card generation and AI quizzes come with a free allowance every day; beyond that they draw on your prepaid balance — and the charge is always shown before you confirm.",
     "q3": "What study modes are available?",
-    "a3": "ReeeeecallStudy supports 6 study modes: SRS for optimal review scheduling, sequential review for systematic revision, random for shuffled practice, sequential for in-order study, by date for time-based sorting, and cramming for focused repetition until mastered.",
+    "a3": "Reklue supports 6 study modes: SRS for optimal review scheduling, sequential review for systematic revision, random for shuffled practice, sequential for in-order study, by date for time-based sorting, and cramming for focused repetition until mastered.",
     "q4": "Can I share my flashcard decks?",
     "a4": "Yes! You can share decks in 3 modes: Copy (duplicate for others), Subscribe (sync updates), and Snapshot (frozen version). Browse and discover other users' decks in the community marketplace."
   },
@@ -214,7 +214,7 @@
   "science": {
     "badge": "Evidence-Based Learning",
     "title": "Built on Cognitive Science",
-    "subtitle": "Every feature in ReeeeecallStudy is grounded in decades of peer-reviewed research in memory, learning, and neuroscience.",
+    "subtitle": "Every feature in Reklue is grounded in decades of peer-reviewed research in memory, learning, and neuroscience.",
     "chart": {
       "title": "Memory Retention Over Time",
       "subtitle": "Traditional cramming vs. spaced repetition",
@@ -283,12 +283,12 @@
     }
   },
   "seo": {
-    "title": "ReeeeecallStudy — Smart Flashcard Learning with Spaced Repetition",
+    "title": "Reklue — Flashcards & Brain Games",
     "description": "Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm. Remember faster and longer."
   },
   "proof": {
     "eyebrow": "Live data",
-    "title": "ReeeeecallStudy by the numbers",
+    "title": "Reklue by the numbers",
     "subtitle": "What is actually in the service right now.",
     "cards": {
       "label": "Cards created",

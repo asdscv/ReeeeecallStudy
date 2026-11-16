@@ -7,7 +7,7 @@
  * 2026-11-13 «카드 갯수 더 늘리기»): 30 cards to L21 on five columns, 36 and 42 on a 6×6 / 7×6 screen.
  */
 import { describe, it, expect, vi } from 'vitest'
-import { DEFAULT_CONTEXT, MECHANICS, TIERS, createRng, maxColsFor, type CreateContext, type GridView, type RecentTrial, type Rng } from '@reeeeecall/shared/lib/brain-games'
+import { DEFAULT_CONTEXT, MECHANICS, TIERS, createRng, maxColsFor, type CreateContext, type GridView, type RecentTrial, type Rng } from '@reklue/shared/lib/brain-games'
 import {
   PAIRS_FAMILIES,
   PAIRS_FAMILY_CLASS,
@@ -20,7 +20,7 @@ import {
   pairsMaxLevel,
   type PairsFamilyName,
   type PairsState,
-} from '@reeeeecall/shared/lib/brain-games/games/pairs'
+} from '@reklue/shared/lib/brain-games/games/pairs'
 
 // Thousands of sampled trials per test: a second or three here, several times that on a CI runner,
 // where the 5s default would time out.

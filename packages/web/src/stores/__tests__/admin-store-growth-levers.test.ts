@@ -25,7 +25,7 @@ vi.mock('../../lib/supabase', () => ({ supabase: mockSupabase }))
 // The web store re-exports the shared one, which imports the shared client —
 // mocking only the web path leaves the real client in place and every assertion
 // sees zero calls.
-vi.mock('@reeeeecall/shared/lib/supabase', () => ({
+vi.mock('@reklue/shared/lib/supabase', () => ({
   supabase: mockSupabase,
   getSupabase: () => mockSupabase,
   initSupabase: vi.fn(),

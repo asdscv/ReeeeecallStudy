@@ -1,14 +1,14 @@
-import { brainGuide, brainGuidePath, brainGuideLoginPath, brainCtaCopy } from '@reeeeecall/shared/lib/brain-content'
+import { brainGuide, brainGuidePath, brainGuideLoginPath, brainCtaCopy } from '@reklue/shared/lib/brain-content'
 import { useAuthStore } from '../../../stores/auth-store'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight, Layers, Brain } from 'lucide-react'
 import type { AppCtaBlock as AppCtaBlockType } from '../../../types/content-blocks'
-import { playStoreUrlWithReferrer } from '@reeeeecall/shared/lib/app-store-links'
+import { playStoreUrlWithReferrer } from '@reklue/shared/lib/app-store-links'
 import { StoreBadges } from '../../common/AppDownload'
 import { useTrackEvent } from '../../../hooks/useTrackEvent'
 import { useOfficialDeck } from '../../../hooks/useOfficialDeck'
-import { isDeckLanguage, vocabHubForFamily, vocabHubPath, vocabHubShortTitle } from '@reeeeecall/shared/lib/vocab-hubs'
+import { isDeckLanguage, vocabHubForFamily, vocabHubPath, vocabHubShortTitle } from '@reklue/shared/lib/vocab-hubs'
 
 const MEDIUM = 'app_cta'
 

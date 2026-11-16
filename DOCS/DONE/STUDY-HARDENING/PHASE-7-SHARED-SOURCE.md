@@ -6,7 +6,7 @@
 
 - 설계 commit: `262726f docs(study): design phase 7 shared single source`
 - 구현 commit: `7a4fc74 refactor(study): one implementation of the study engine, not two`
-- PR: https://github.com/asdscv/ReeeeecallStudy/pull/343 (merge `43bf6ad`)
+- PR: https://github.com/asdscv/Reklue/pull/343 (merge `43bf6ad`)
 - 검증: web 전수 vitest 128 files / 2180 tests, 학습 store suite 7종 44 tests,
   web `tsc -b` / `vite build` / mobile `tsc` 무오류, Architecture Guard 통과 +
   사본 재생성 시 exit 1 확인, 신규 lint 오류 0
@@ -43,7 +43,7 @@ mobile 이 이전 동작을 유지하고, 테스트는 web 사본만 검증하�
 
 ## 2. 결정
 
-web 의 학습 구현 사본을 **삭제**하고 web product code 와 테스트가 `@reeeeecall/shared/...` 를
+web 의 학습 구현 사본을 **삭제**하고 web product code 와 테스트가 `@reklue/shared/...` 를
 직접 import 한다. 호환용 re-export 껍데기도 두지 않는다 — 껍데기를 남기면 mock 경로가 다시
 둘로 갈리고(#342 에서 68개 테스트를 깨뜨린 원인이 정확히 그것이다) 어느 쪽을 mock 해야 하는지
 매번 판단해야 한다.
@@ -71,7 +71,7 @@ product code (import 경로만 변경):
 테스트: `stores/__tests__/study-store-*.test.ts` 6종은 store 가 shared 가 되므로
 
 - import 를 shared 경로로 바꾼다.
-- **mock 경로를 shared 로 옮긴다** (`@reeeeecall/shared/lib/supabase`,
+- **mock 경로를 shared 로 옮긴다** (`@reklue/shared/lib/supabase`,
   `.../lib/rate-limit-instance`, `.../lib/srs`, `.../lib/srs-access`). web 경로만 mock 하면
   실제 (초기화되지 않은) shared client 가 호출되어 조용히 0-call 로 실패한다.
 

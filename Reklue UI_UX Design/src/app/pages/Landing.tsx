@@ -14,7 +14,7 @@ export function Landing() {
               <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-400 rounded-lg flex items-center justify-center">
                 <Brain className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">ReeeCall</span>
+              <span className="text-xl font-bold text-gray-900">Reklue</span>
             </div>
             <div className="hidden md:flex items-center gap-8">
               <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">기능</a>
@@ -65,7 +65,7 @@ export function Landing() {
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
               과학적인 간격 반복(SRS) 알고리즘으로 학습 효율을 극대화하세요.
               <br />
-              ReeeCall과 함께라면 더 빠르고 오래 기억할 수 있습니다.
+              Reklue과 함께라면 더 빠르고 오래 기억할 수 있습니다.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
@@ -108,7 +108,7 @@ export function Landing() {
               <div className="aspect-video flex items-center justify-center p-8">
                 <div className="text-center">
                   <Brain className="w-24 h-24 text-blue-400 mx-auto mb-4" />
-                  <p className="text-2xl font-semibold text-white mb-2">ReeeCall Study</p>
+                  <p className="text-2xl font-semibold text-white mb-2">Reklue Study</p>
                   <p className="text-gray-400">스마트한 플래시카드 학습 플랫폼</p>
                 </div>
               </div>
@@ -178,7 +178,7 @@ export function Landing() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                왜 ReeeCall인가?
+                왜 Reklue인가?
               </h2>
               <p className="text-xl text-gray-600 mb-8">
                 Anki의 강력함과 현대적인 UI를 결합한 차세대 플래시카드 학습 도구
@@ -224,7 +224,7 @@ export function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              숫자로 보는 ReeeCall
+              숫자로 보는 Reklue
             </h2>
             <p className="text-xl text-blue-100">
               전 세계 학습자들이 선택한 플랫폼
@@ -280,7 +280,7 @@ export function Landing() {
                 <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-400 rounded-lg flex items-center justify-center">
                   <Brain className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-xl font-bold text-white">ReeeCall</span>
+                <span className="text-xl font-bold text-white">Reklue</span>
               </div>
               <p className="text-sm">
                 스마트한 플래시카드 학습 플랫폼
@@ -316,7 +316,7 @@ export function Landing() {
           </div>
           
           <div className="border-t border-gray-800 pt-8 text-sm text-center">
-            <p>&copy; 2026 ReeeCall. All rights reserved.</p>
+            <p>&copy; 2026 Reklue. All rights reserved.</p>
           </div>
         </div>
       </footer>

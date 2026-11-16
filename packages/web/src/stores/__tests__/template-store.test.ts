@@ -24,7 +24,7 @@ const mockSupabase = vi.hoisted(() => ({
 }))
 
 vi.mock('../../lib/supabase', () => ({ supabase: mockSupabase }))
-vi.mock('@reeeeecall/shared/lib/supabase', () => ({
+vi.mock('@reklue/shared/lib/supabase', () => ({
   supabase: mockSupabase,
   getSupabase: () => mockSupabase,
   initSupabase: vi.fn(),
@@ -32,12 +32,12 @@ vi.mock('@reeeeecall/shared/lib/supabase', () => ({
 vi.mock('../../lib/rate-limit-instance', () => ({
   guard: { check: () => ({ allowed: true }), recordSuccess: vi.fn() },
 }))
-vi.mock('@reeeeecall/shared/lib/rate-limit-instance', () => ({
+vi.mock('@reklue/shared/lib/rate-limit-instance', () => ({
   guard: { check: () => ({ allowed: true }), recordSuccess: vi.fn() },
 }))
 
 import { useTemplateStore } from '../template-store'
-import { QUICK_PRESETS } from '@reeeeecall/shared/lib/default-templates'
+import { QUICK_PRESETS } from '@reklue/shared/lib/default-templates'
 
 // A thenable Supabase query-builder stub: every chained method returns itself,
 // awaiting resolves the provided value, and `.insert` is counted so a test can

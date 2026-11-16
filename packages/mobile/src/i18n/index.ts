@@ -4,7 +4,7 @@ import { Platform, NativeModules } from 'react-native'
 import { localPrefs } from '../utils/local-prefs'
 // Dependency-free on purpose — imported during i18n init, long before initSupabase() runs,
 // so it must not drag in the Supabase client the way lib/ai/server-client would.
-import { formatCount, formatDecimal } from '@reeeeecall/shared/lib/format-number'
+import { formatCount, formatDecimal } from '@reklue/shared/lib/format-number'
 
 // ── Supported languages: to add a new language, add an entry below + locale folder ──
 

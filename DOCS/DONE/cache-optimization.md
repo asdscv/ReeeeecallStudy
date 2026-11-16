@@ -71,7 +71,7 @@ createStaleCache({ ttlMs, now? }): StaleCache
 ## 4. Tests (real logic, not coverage filler)
 
 `packages/web/src/lib/__tests__/stale-cache.test.ts` (runs under web Vitest, can
-import `@reeeeecall/shared`): TTL boundary (fresh just before / stale at+after
+import `@reklue/shared`): TTL boundary (fresh just before / stale at+after
 ttl), `force` overrides freshness, `invalidate(key)` vs `invalidate()` (all),
 unknown key, independent keys don't interfere, injected-clock determinism.
 

@@ -5,7 +5,7 @@ import { useAuthStore } from '../stores/auth-store'
 import { useDeckStore } from '../stores/deck-store'
 import { supabase } from '../lib/supabase'
 import { daysAgoUTC } from '../lib/date-utils'
-import { fetchAllRows } from '@reeeeecall/shared/lib/fetch-all-rows'
+import { fetchAllRows } from '@reklue/shared/lib/fetch-all-rows'
 import {
   getForecastReviews,
   getHeatmapData,

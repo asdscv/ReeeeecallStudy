@@ -10,8 +10,8 @@ import {
   type MySubscription,
 } from '../../services/billing'
 import { purchaseService, SUBSCRIPTION_UI_ENABLED } from '../../services/purchases'
-import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
-import { formatCount } from '@reeeeecall/shared/lib/ai/server-client'
+import { formatProductPrice } from '@reklue/shared/lib/pricing'
+import { formatCount } from '@reklue/shared/lib/ai/server-client'
 
 // Card limits at or above this collapse to "unlimited" FOR DISPLAY only. As of mig 148
 // NO plan is unlimited (the top plan caps at 100,000); this now only fires for admins,

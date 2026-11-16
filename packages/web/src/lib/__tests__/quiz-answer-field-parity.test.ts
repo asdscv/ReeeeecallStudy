@@ -22,7 +22,7 @@ import {
   quizPromptText as sharedPrompt,
   quizContextLines as sharedContext,
   quizContextFields as sharedContextFields,
-} from '@reeeeecall/shared/lib/quiz-answer-field'
+} from '@reklue/shared/lib/quiz-answer-field'
 import {
   resolveQuizCardFaces as edgeResolve,
   resolveQuizCardCandidates as edgeCandidates,

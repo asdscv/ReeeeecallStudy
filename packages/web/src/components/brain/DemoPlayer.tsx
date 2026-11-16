@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useReducedMotion } from 'motion/react'
 import { Pointer, RotateCcw } from 'lucide-react'
-import { GAME_THEMES, buildDemo, maxColsFor, type BrainGameId } from '@reeeeecall/shared/lib/brain-games'
+import { GAME_THEMES, buildDemo, maxColsFor, type BrainGameId } from '@reklue/shared/lib/brain-games'
 import { BrainBoard } from './BrainBoard'
 
 const noop = () => {}

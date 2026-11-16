@@ -51,7 +51,7 @@ import {
   zestPlan,
   type BrainGameId,
   type BrainMeta,
-} from '@reeeeecall/shared/lib/brain-games'
+} from '@reklue/shared/lib/brain-games'
 
 // Thousands of sampled trials per test: a second or three here, several times that on a CI runner,
 // where the 5s default would time out.

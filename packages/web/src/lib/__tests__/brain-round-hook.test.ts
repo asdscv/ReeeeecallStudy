@@ -6,10 +6,10 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
-import { dayNumber, emptyHistory, emptyMeta, emptyProgress, hasBit, setBit, mechanicInfo, parseMeta, parseProgress, brainGame, DEFAULT_CONTEXT, MECHANICS, type BrainMeta, type BrainProgress, type CreateContext, type RoundView } from '@reeeeecall/shared/lib/brain-games'
-import { useBrainRound, type PlatformContext, type RoundStats } from '@reeeeecall/shared/hooks/useBrainRound'
-import { useTodaysTraining } from '@reeeeecall/shared/hooks/useTodaysTraining'
-import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
+import { dayNumber, emptyHistory, emptyMeta, emptyProgress, hasBit, setBit, mechanicInfo, parseMeta, parseProgress, brainGame, DEFAULT_CONTEXT, MECHANICS, type BrainMeta, type BrainProgress, type CreateContext, type RoundView } from '@reklue/shared/lib/brain-games'
+import { useBrainRound, type PlatformContext, type RoundStats } from '@reklue/shared/hooks/useBrainRound'
+import { useTodaysTraining } from '@reklue/shared/hooks/useTodaysTraining'
+import { useBrainStore } from '@reklue/shared/stores/brain-store'
 
 const PLATFORM: PlatformContext = { maxCols: 5 }
 

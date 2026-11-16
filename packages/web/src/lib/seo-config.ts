@@ -1,14 +1,17 @@
+import { SITE_URL } from '@reklue/shared/lib/site-url'
+import { BRAND_NAME } from '@reklue/shared/lib/brand'
+
 // Centralized SEO configuration — single source of truth
 export const SEO = {
-  SITE_URL: 'https://reeeeecallstudy.xyz',
-  BRAND_NAME: 'ReeeeecallStudy',
-  TWITTER_HANDLE: '@reeeeecallstudy',
-  DEFAULT_OG_IMAGE: 'https://reeeeecallstudy.xyz/og-image.png',
+  SITE_URL,
+  BRAND_NAME,
+  TWITTER_HANDLE: '',
+  DEFAULT_OG_IMAGE: `${SITE_URL}/og-image.png`,
   OG_IMAGE_WIDTH: 1200,
   OG_IMAGE_HEIGHT: 630,
   THEME_COLOR: '#2563eb',
-  AUTHOR_NAME: 'ReeeeecallStudy',
-  CONTACT_EMAIL: 'admin@reeeeecallstudy.xyz',
+  AUTHOR_NAME: BRAND_NAME,
+  CONTACT_EMAIL: 'admin@reklue.com',
   DEFAULT_LOCALE: 'en',
   // SUPPORTED_LOCALES = every UI/served language. INDEXABLE_LOCALES = the subset
   // we emit SEO indexing signals for (hreflang, JSON-LD inLanguage). This MIRRORS

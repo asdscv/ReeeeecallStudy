@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { modeFeedsSrsSchedule } from '@reeeeecall/shared/lib/study-mode-scheduling'
+import { modeFeedsSrsSchedule } from '@reklue/shared/lib/study-mode-scheduling'
 import { getStudyModeLabel, getStudyModeEmoji, formatDuration } from '../../lib/study-history'
 import type { ModeBreakdown, StudyTimeByMode } from '../../lib/study-history-stats'
 

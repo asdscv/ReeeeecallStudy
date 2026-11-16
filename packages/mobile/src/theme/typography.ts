@@ -4,7 +4,7 @@ import {
   fontSize,
   fontWeight,
   lineHeight,
-} from '@reeeeecall/shared/design-tokens/typography'
+} from '@reklue/shared/design-tokens/typography'
 
 /**
  * Design tokens — Typography

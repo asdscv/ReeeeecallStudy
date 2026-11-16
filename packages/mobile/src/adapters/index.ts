@@ -1,5 +1,5 @@
-import { initAdapters } from '@reeeeecall/shared/adapters'
-import { initSupabase, getSupabase } from '@reeeeecall/shared/lib/supabase'
+import { initAdapters } from '@reklue/shared/adapters'
+import { initSupabase, getSupabase } from '@reklue/shared/lib/supabase'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import Constants from 'expo-constants'
 import { Appearance } from 'react-native'

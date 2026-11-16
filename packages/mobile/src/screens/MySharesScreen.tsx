@@ -12,7 +12,7 @@ import { useNavigation, type NavigationProp } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
 import { Screen, ScreenHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
-import { statusColors } from '@reeeeecall/shared/design-tokens/colors'
+import { statusColors } from '@reklue/shared/design-tokens/colors'
 import { getMobileSupabase } from '../adapters'
 import type { MainTabParamList } from '../navigation/types'
 

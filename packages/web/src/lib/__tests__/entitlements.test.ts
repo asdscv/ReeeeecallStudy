@@ -10,14 +10,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const rpc = vi.fn()
-vi.mock('@reeeeecall/shared/lib/supabase', () => ({ supabase: { rpc: (...a: unknown[]) => rpc(...a) } }))
+vi.mock('@reklue/shared/lib/supabase', () => ({ supabase: { rpc: (...a: unknown[]) => rpc(...a) } }))
 
 const applied: Array<Record<string, number>> = []
-vi.mock('@reeeeecall/shared/lib/tier-config', () => ({
+vi.mock('@reklue/shared/lib/tier-config', () => ({
   applyServerQuotas: (q: Record<string, number>) => { applied.push(q) },
 }))
 
-const { loadEntitlements } = await import('@reeeeecall/shared/lib/entitlements')
+const { loadEntitlements } = await import('@reklue/shared/lib/entitlements')
 
 const full = {
   tier: 'plan_5k', is_paid: true, ads_free: true,

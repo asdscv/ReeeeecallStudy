@@ -155,5 +155,5 @@ reeeeecall://study/{deckId}      → Start Study
 reeeeecall://invite/{code}       → Accept Invite
 reeeeecall://auth/callback       → Auth Redirect
 
-https://reeeeecallstudy.xyz/...  → Universal Link (same routes)
+https://reklue.com/...  → Universal Link (same routes)
 ```

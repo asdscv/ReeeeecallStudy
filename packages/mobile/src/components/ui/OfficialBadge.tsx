@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../../theme'
-import type { BadgeType } from '@reeeeecall/shared/types/database'
+import type { BadgeType } from '@reklue/shared/types/database'
 
 interface OfficialBadgeProps {
   badgeType?: BadgeType

@@ -1,7 +1,7 @@
 {
-  "name": "ReeeeecallStudy — Smart Flashcard Learning with Spaced Repetition",
-  "short_name": "ReeeCall",
-  "description": "Free smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm. 5 study modes, deck sharing, and real-time analytics.",
+  "name": "Reklue — Flashcards & Brain Games",
+  "short_name": "Reklue",
+  "description": "Flashcards with spaced repetition, AI-assisted study, deck sharing, and brain games for memory, attention, speed and reasoning.",
   "start_url": "/landing",
   "scope": "/",
   "display": "standalone",

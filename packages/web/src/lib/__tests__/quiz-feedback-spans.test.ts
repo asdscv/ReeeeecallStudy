@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { splitBySpan } from '@reeeeecall/shared/lib/quiz-feedback'
+import { splitBySpan } from '@reklue/shared/lib/quiz-feedback'
 
 /**
  * A highlight reads as "this is the part that counted", so it has to sit on whole words.

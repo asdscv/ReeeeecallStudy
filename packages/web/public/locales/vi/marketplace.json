@@ -58,9 +58,9 @@
     }
   },
   "preview": {
-    "title": "\"{{title}}\" - Bộ thẻ ghi nhớ | ReeeeecallStudy",
-    "description": "{{title}} — {{cardCount}} thẻ ghi nhớ. Xem trước và học bộ thẻ này trên ReeeeecallStudy.",
-    "defaultDescription": "Bộ thẻ ghi nhớ trên ReeeeecallStudy",
+    "title": "\"{{title}}\" - Bộ thẻ ghi nhớ | Reklue",
+    "description": "{{title}} — {{cardCount}} thẻ ghi nhớ. Xem trước và học bộ thẻ này trên Reklue.",
+    "defaultDescription": "Bộ thẻ ghi nhớ trên Reklue",
     "sampleCards": "Thẻ mẫu",
     "viewInMarket": "Xem trong chợ ứng dụng",
     "cardCount": "{{count, number}} thẻ",

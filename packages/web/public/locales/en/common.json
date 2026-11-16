@@ -128,7 +128,7 @@
     "stepOf": "Step {{current}} of {{total}}",
     "restartOnboarding": "Restart Tutorial",
     "welcome": {
-      "title": "Welcome to Reeeeecall!",
+      "title": "Welcome to Reklue!",
       "description": "The smartest way to study with flashcards. Create decks, add cards, and let our spaced repetition algorithm optimize your learning.",
       "action": "Get Started"
     },
@@ -386,7 +386,7 @@
   },
   "skipToContent": "Skip to content",
   "footer": {
-    "copyright": "© 2026 ReeeeecallStudy. All rights reserved."
+    "copyright": "© 2026 Reklue. All rights reserved."
   },
   "cancel": "Cancel",
   "loading": "Loading...",

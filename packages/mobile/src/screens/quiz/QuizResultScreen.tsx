@@ -3,15 +3,15 @@ import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
-import { useQuizStore, type QuizRunItem } from '@reeeeecall/shared/stores/quiz-store'
+import { useQuizStore, type QuizRunItem } from '@reklue/shared/stores/quiz-store'
 import { Screen, Button } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
-import { tallyQuiz, tallyLine } from '@reeeeecall/shared/lib/quiz-outcome'
+import { tallyQuiz, tallyLine } from '@reklue/shared/lib/quiz-outcome'
 import { QuizFeedback } from './QuizFeedback'
 import { QuizVerdictBadge } from './QuizVerdictBadge'
 import type { QuizStackParamList } from '../../navigation/types'
-import { retakeNoteKey } from '@reeeeecall/shared/lib/quiz-pricing'
+import { retakeNoteKey } from '@reklue/shared/lib/quiz-pricing'
 
 type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizResult'>
 type Rt = RouteProp<QuizStackParamList, 'QuizResult'>

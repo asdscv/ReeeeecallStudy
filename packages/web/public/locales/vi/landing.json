@@ -6,9 +6,9 @@
     "title1": "Học tập vượt qua",
     "title2": "Giới hạn trí nhớ",
     "description": "Tối đa hóa hiệu quả học tập với phương pháp lặp lại ngắt quãng (SRS) đã được khoa học chứng minh.",
-    "subDescription": "Với ReeeeecallStudy, bạn có thể ghi nhớ nhanh hơn và lâu hơn.",
+    "subDescription": "Với Reklue, bạn có thể ghi nhớ nhanh hơn và lâu hơn.",
     "subtitle1": "Tối đa hóa hiệu quả học tập với phương pháp lặp lại ngắt quãng (SRS) đã được khoa học chứng minh.",
-    "subtitle2": "Với ReeeeecallStudy, bạn có thể ghi nhớ nhanh hơn và lâu hơn.",
+    "subtitle2": "Với Reklue, bạn có thể ghi nhớ nhanh hơn và lâu hơn.",
     "startFree": "Bắt đầu miễn phí",
     "learnMore": "Tìm hiểu thêm",
     "cta": {
@@ -80,7 +80,7 @@
     "subtitle": "Tất cả công cụ cho việc học hiệu quả trong một nơi"
   },
   "why": {
-    "title": "Tại sao chọn ReeeeecallStudy?",
+    "title": "Tại sao chọn Reklue?",
     "subtitle": "Công cụ thẻ ghi nhớ thế hệ mới kết hợp lặp lại ngắt quãng với giao diện hiện đại",
     "points": [
       "Thuật toán học SRS đã được khoa học xác minh",
@@ -94,7 +94,7 @@
     ]
   },
   "benefitsSection": {
-    "title": "Tại sao chọn ReeeeecallStudy?",
+    "title": "Tại sao chọn Reklue?",
     "subtitle": "Công cụ thẻ ghi nhớ thế hệ mới kết hợp lặp lại ngắt quãng với giao diện hiện đại",
     "cta": "Bắt đầu ngay"
   },
@@ -167,7 +167,7 @@
     "aiGenerate": "Tạo thẻ bằng AI"
   },
   "footer": {
-    "copyright": "© 2026 ReeeeecallStudy. Mọi quyền được bảo lưu.",
+    "copyright": "© 2026 Reklue. Mọi quyền được bảo lưu.",
     "tagline": "Nền tảng học thẻ ghi nhớ thông minh với lặp lại ngắt quãng",
     "product": "Sản phẩm",
     "resources": "Tài nguyên",
@@ -188,11 +188,11 @@
   "faq": {
     "title": "Câu hỏi thường gặp",
     "q1": "Lặp lại ngắt quãng (SRS) là gì?",
-    "a1": "Lặp lại ngắt quãng là phương pháp học đã được khoa học chứng minh, lên lịch ôn tập theo khoảng thời gian tối ưu để tối đa hóa ghi nhớ dài hạn. ReeeeecallStudy sử dụng thuật toán SRS tiên tiến để tự động xác định thời điểm bạn nên ôn tập mỗi thẻ.",
-    "q2": "ReeeeecallStudy có miễn phí không?",
+    "a1": "Lặp lại ngắt quãng là phương pháp học đã được khoa học chứng minh, lên lịch ôn tập theo khoảng thời gian tối ưu để tối đa hóa ghi nhớ dài hạn. Reklue sử dụng thuật toán SRS tiên tiến để tự động xác định thời điểm bạn nên ôn tập mỗi thẻ.",
+    "q2": "Reklue có miễn phí không?",
     "a2": "Có, bạn có thể bắt đầu miễn phí. Chỉ cần đăng ký là dùng được SRS, cả sáu chế độ học, thống kê và chia sẻ bộ thẻ không giới hạn.\n\nGói miễn phí có giới hạn số thẻ được lưu, còn gói trả phí sẽ nâng giới hạn đó (con số cụ thể hiển thị ở phần bảng giá phía trên). Tạo thẻ bằng AI và trắc nghiệm AI có hạn mức miễn phí mỗi ngày; vượt quá sẽ trừ vào số dư đã nạp — và mức trừ luôn hiện ra trước khi bạn xác nhận.",
     "q3": "Có những chế độ học nào?",
-    "a3": "ReeeeecallStudy hỗ trợ 6 chế độ học: SRS để xếp lịch ôn tối ưu, ôn tuần tự để ôn có hệ thống, ngẫu nhiên để luyện xáo trộn, tuần tự theo thứ tự, theo ngày để sắp xếp theo thời gian, và học dồn để lặp tập trung đến khi thuộc.",
+    "a3": "Reklue hỗ trợ 6 chế độ học: SRS để xếp lịch ôn tối ưu, ôn tuần tự để ôn có hệ thống, ngẫu nhiên để luyện xáo trộn, tuần tự theo thứ tự, theo ngày để sắp xếp theo thời gian, và học dồn để lặp tập trung đến khi thuộc.",
     "q4": "Tôi có thể chia sẻ bộ thẻ không?",
     "a4": "Có! Bạn có thể chia sẻ bộ thẻ theo 3 chế độ: Sao chép (nhân bản cho người khác), Đăng ký theo dõi (đồng bộ cập nhật), và Bản chụp (phiên bản cố định). Duyệt và khám phá bộ thẻ của người dùng khác trong chợ cộng đồng."
   },
@@ -214,7 +214,7 @@
   "science": {
     "badge": "Học tập dựa trên bằng chứng",
     "title": "Xây dựng trên Khoa học Nhận thức",
-    "subtitle": "Mọi tính năng của ReeeeecallStudy đều dựa trên hàng thập kỷ nghiên cứu được bình duyệt về trí nhớ, học tập và khoa học thần kinh.",
+    "subtitle": "Mọi tính năng của Reklue đều dựa trên hàng thập kỷ nghiên cứu được bình duyệt về trí nhớ, học tập và khoa học thần kinh.",
     "chart": {
       "title": "Tỷ lệ ghi nhớ theo thời gian",
       "subtitle": "Học nhồi nhét vs. lặp lại ngắt quãng",
@@ -283,12 +283,12 @@
     }
   },
   "seo": {
-    "title": "ReeeeecallStudy — Học thẻ ghi nhớ thông minh với lặp lại ngắt quãng",
+    "title": "Reklue — Thẻ ghi nhớ và trò chơi trí não",
     "description": "Nền tảng học thẻ ghi nhớ thông minh với thuật toán lặp lại ngắt quãng (SRS) đã được khoa học chứng minh. Ghi nhớ nhanh hơn và lâu hơn."
   },
   "proof": {
     "eyebrow": "Dữ liệu thật",
-    "title": "ReeeeecallStudy qua các con số",
+    "title": "Reklue qua các con số",
     "subtitle": "Đây là những gì thực sự có trong dịch vụ ngay lúc này.",
     "cards": {
       "label": "Thẻ đã tạo",

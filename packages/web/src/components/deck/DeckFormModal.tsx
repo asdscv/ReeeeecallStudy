@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '../ui/dialog'
-import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
+import { aiHubBus } from '@reklue/shared/lib/ai/hub/events'
 import { useDeckStore } from '../../stores/deck-store'
 import { DEFAULT_SRS_SETTINGS } from '../../types/database'
 import type { Deck } from '../../types/database'

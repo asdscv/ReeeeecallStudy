@@ -1,4 +1,4 @@
-# ReeeCall Study — Master Implementation Plan
+# Reklue Study — Master Implementation Plan
 
 > **Version**: 3.0
 > **Created**: 2026-02-15
@@ -439,8 +439,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'ReeeCall Study',
-        short_name: 'ReeeCall',
+        name: 'Reklue Study',
+        short_name: 'Reklue',
         description: '플래시카드 학습 앱',
         theme_color: '#3B82F6',
         background_color: '#F9FAFB',
@@ -716,7 +716,7 @@ Phase 5 ━━━━━━━━━━━━━━━━╋━ 병렬 가능 ━
 
 | 문서 | 경로 |
 |------|------|
-| 기능 명세서 | `ReeeCall_Study_Feature_Spec.md` |
+| 기능 명세서 | `Reklue_Feature_Spec.md` |
 | 디자인 프롬프트 | `design-prompt.md` |
 | 환경 변수 예시 | `.env.example` |
 | DB 마이그레이션 | `supabase/migrations/` |

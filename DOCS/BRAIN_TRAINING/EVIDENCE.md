@@ -51,7 +51,7 @@
 
 # 두뇌 트레이닝 재설계 설계 명세 (근거 기반 v2)
 
-ReeeeecallStudy: web React, Expo iOS/Android, 8개 로케일
+Reklue: web React, Expo iOS/Android, 8개 로케일
 
 이 문서는 검증 통과(verified)·정정(corrected) 판정을 받은 연구 결과만 사용했다. 정정된 항목은 정정된 내용을 따랐다. 연구 근거가 아니라 제품 판단으로 정한 수치에는 **[제품 결정]** 표시를 달았다. 이 값들은 출시 후 사용 기록을 보고 조정한다.
 
@@ -690,7 +690,7 @@ Notes:
   claim: In MCI, home-based web cognitive games (Lumosity-type) were outperformed by web crossword puzzles on the primary cognitive outcome over 78 weeks. A separate RCT of 40 h of 'brain-plasticity' training in amnestic MCI did not beat ordinary computer games.
   numbers: N=107 MCI (51 games, 56 crosswords). 12 weeks intensive + 6 boosters, 78-week follow-up. ADAS-Cog LS mean difference -1.44 (95% CI -2.83 to -0.06), P=0.04, favoring crosswords: games 9.53 to 9.93 (worse), crosswords 9.59 to 8.61 (better). FAQ function worse with games (-1.08; -1.97 to -0.18). Also Duff K et al. 2022, J Geriatr Psychiatry Neurol 35(3):400-409 (doi:10.1177/08919887211006472): 113 aMCI, 40 h plasticity-based CCT; computer-game controls did better right after training (p=0.02), no difference at 1 year.
   quality: Two small RCTs in MCI with active controls. Single trials with modest effects and secondary MRI findings.
-  implication: Commercial-style mini-games are not shown to beat simple word puzzles in impaired users. ReeeeecallStudy's core flashcard/word activity may be as valuable as the brain-training games, so position the games as one form of cognitive stimulation alongside study, not as superior medicine. Avoid comparative claims ('크로스워드보다 효과적').
+  implication: Commercial-style mini-games are not shown to beat simple word puzzles in impaired users. Reklue's core flashcard/word activity may be as valuable as the brain-training games, so position the games as one form of cognitive stimulation alongside study, not as superior medicine. Avoid comparative claims ('크로스워드보다 효과적').
 - (rct-speed-training #13) [corrected] Owen AM 2010 "Putting brain training to the test" Nature 465(7299):775-778 https://doi.org/10.1038/nature09042 (PMID 20407435, PMC2884087)
   claim: The largest online brain-training trial found improvements on the trained tasks but no transfer to untrained cognitive tests, even closely related ones. Short, frequent, gamified sessions were the 'failed' design pattern.
   numbers: 52,617 registered and 11,430 completed (ages 18-60). At least 10 min/day, 3 times a week, for 6 weeks. Mean 24.47 sessions (SD 16.95). Between-group effect sizes on benchmark tests 0.01 to 0.22. The control group (answering obscure questions online) improved similarly.
