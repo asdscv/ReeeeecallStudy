@@ -89,7 +89,7 @@ export function SignUpScreen() {
           {/* Brand header — matches web: icon + text logo */}
           <View style={styles.brandHeader}>
             <Image source={require('../../assets/logo-icon.png')} style={styles.logoIcon} resizeMode="contain" />
-            <Image source={require('../../assets/logo-text.png')} style={styles.logoTextImg} resizeMode="contain" />
+            <Image source={require('../../assets/logo-text.png')} style={[styles.logoTextImg, theme.isDark && { tintColor: theme.colors.text }]} resizeMode="contain" />
           </View>
 
           {/* Title */}

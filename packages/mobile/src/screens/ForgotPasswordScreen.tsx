@@ -40,7 +40,7 @@ export function ForgotPasswordScreen() {
             {/* Brand header */}
             <View style={styles.brandHeader}>
               <Image source={require('../../assets/logo-icon.png')} style={styles.logoIcon} resizeMode="contain" />
-              <Image source={require('../../assets/logo-text.png')} style={styles.logoTextImg} resizeMode="contain" />
+              <Image source={require('../../assets/logo-text.png')} style={[styles.logoTextImg, theme.isDark && { tintColor: theme.colors.text }]} resizeMode="contain" />
             </View>
 
             <Text style={[theme.typography.h2, { color: theme.colors.text, textAlign: 'center' }]}>
@@ -69,7 +69,7 @@ export function ForgotPasswordScreen() {
           {/* Brand header — matches web: icon + text logo */}
           <View style={styles.brandHeader}>
             <Image source={require('../../assets/logo-icon.png')} style={styles.logoIcon} resizeMode="contain" />
-            <Image source={require('../../assets/logo-text.png')} style={styles.logoTextImg} resizeMode="contain" />
+            <Image source={require('../../assets/logo-text.png')} style={[styles.logoTextImg, theme.isDark && { tintColor: theme.colors.text }]} resizeMode="contain" />
           </View>
 
           {/* Title */}

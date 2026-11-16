@@ -77,7 +77,7 @@ function DrawerContent({ navigation, state }: DrawerContentComponentProps) {
       {/* Logo — matches web: icon + text image */}
       <View style={[styles.drawerHeader, { borderBottomColor: theme.colors.border }]}>
         <Image source={require('../../assets/logo-icon.png')} style={styles.logoIcon} resizeMode="contain" />
-        <Image source={require('../../assets/logo-text.png')} style={styles.logoText} resizeMode="contain" />
+        <Image source={require('../../assets/logo-text.png')} style={[styles.logoText, theme.isDark && { tintColor: theme.colors.text }]} resizeMode="contain" />
       </View>
 
       <ScrollView style={styles.drawerScroll} showsVerticalScrollIndicator={false}>
