@@ -9,8 +9,8 @@
 import { describe, it, expect } from 'vitest'
 import {
   resolveQuizCardFaces, quizReferenceAnswer, quizPromptText, resolveQuizCardCandidates,
-} from '@reeeeecall/shared/lib/quiz-answer-field'
-import { resolveCardAnswerFaces, cardReferenceAnswer } from '@reeeeecall/shared/lib/card-answer'
+} from '@reklue/shared/lib/quiz-answer-field'
+import { resolveCardAnswerFaces, cardReferenceAnswer } from '@reklue/shared/lib/card-answer'
 
 const text = (key: string, order: number) => ({ key, name: key, type: 'text' as const, order })
 

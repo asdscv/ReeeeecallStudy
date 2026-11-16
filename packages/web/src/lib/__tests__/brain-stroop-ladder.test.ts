@@ -5,9 +5,9 @@
  * colour a colour-blind player could take for the stimulus ink — and a clock that moves every level.
  */
 import { describe, it, expect, vi } from 'vitest'
-import { DEFAULT_CONTEXT, INK_COLORS, INK_CONFUSABLE, MECHANICS, createRng, type BrainColor, type ChoiceView, type CreateContext, type RecentTrial } from '@reeeeecall/shared/lib/brain-games'
-import { BRAIN_COLORS, STROOP_MAX_LEVEL, stroop, stroopBand, stroopColors, stroopLimitMs } from '@reeeeecall/shared/lib/brain-games/games/stroop'
-import type { ChoiceState } from '@reeeeecall/shared/lib/brain-games/games/choice'
+import { DEFAULT_CONTEXT, INK_COLORS, INK_CONFUSABLE, MECHANICS, createRng, type BrainColor, type ChoiceView, type CreateContext, type RecentTrial } from '@reklue/shared/lib/brain-games'
+import { BRAIN_COLORS, STROOP_MAX_LEVEL, stroop, stroopBand, stroopColors, stroopLimitMs } from '@reklue/shared/lib/brain-games/games/stroop'
+import type { ChoiceState } from '@reklue/shared/lib/brain-games/games/choice'
 
 // Thousands of sampled trials per test: a second or three here, several times that on a CI runner,
 // where the 5s default would time out.

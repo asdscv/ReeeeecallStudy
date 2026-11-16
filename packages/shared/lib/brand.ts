@@ -10,7 +10,7 @@ const ADDRESS = /((?:https?:\/\/|mailto:)[^\s<>"']+|[A-Za-z0-9._%+-]+@[A-Za-z0-9
 
 export function withCurrentBrand<T>(value: T): T {
   if (typeof value === 'string') {
-    return value.split(ADDRESS).map((part, index) => index % 2 ? currentSiteAddress(part)
+    return value.split(ADDRESS).map((part, index) => index % 2 ? currentSiteAddress(part).replace(/\badmin@reeeeecallstudy\.xyz\b/g, 'admin@reklue.com')
       : part.replace(LEGACY_NAME, (_, prefix: string) => prefix + BRAND_NAME)).join('') as T
   }
   if (Array.isArray(value)) return value.map((item) => withCurrentBrand(item)) as T

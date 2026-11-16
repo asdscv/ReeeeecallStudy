@@ -838,7 +838,7 @@ Locales: en, es, id, ja, ko, th, vi, zh. WP-L translates the other six from ko/e
 
 ## 6) Verification plan
 
-1. **Unit tests and typecheck.** Run `pnpm --filter @reeeeecall/web test`, `tsc -b --noEmit` (the CI web typecheck), and the mobile `tsc`. The 9-game × level × screen `solution()` test must pass on every context, including `maxRows`.
+1. **Unit tests and typecheck.** Run `pnpm --filter @reklue/web test`, `tsc -b --noEmit` (the CI web typecheck), and the mobile `tsc`. The 9-game × level × screen `solution()` test must pass on every context, including `maxRows`.
 2. **Sample tables** (WP-M, `.audit/brain-samples.ts`). For each game and each whole level from 1 to its cap, record:
    - 6 example trials, the limit or exposure, and the tags.
    - 2000-draw shares: band/kind, trivial share, units-digit-alone share, answer position.

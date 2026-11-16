@@ -19,8 +19,8 @@ import landing_es from '../../packages/web/public/locales/es/landing.json'
 
 export { SITE_URL }
 export { BRAND_NAME }
-export const TWITTER_HANDLE = '@reeeeecallstudy'
-export const CONTACT_EMAIL = 'admin@reeeeecallstudy.xyz'
+export const TWITTER_HANDLE = ''
+export const CONTACT_EMAIL = 'admin@reklue.com'
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`
 export const OG_IMAGE_WIDTH = 1200
 export const OG_IMAGE_HEIGHT = 630

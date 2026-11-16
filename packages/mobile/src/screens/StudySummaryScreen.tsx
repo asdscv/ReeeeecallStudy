@@ -8,7 +8,7 @@ import { useStudy } from '../hooks/useStudy'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
 import { haptics } from '../utils/haptics'
-import { ratingColors } from '@reeeeecall/shared/design-tokens/colors'
+import { ratingColors } from '@reklue/shared/design-tokens/colors'
 import type { StudyStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<StudyStackParamList, 'StudySummary'>

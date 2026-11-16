@@ -42,4 +42,4 @@ fi
 umask 077
 printf "LOCAL_TEST_EMAIL=%s\nLOCAL_TEST_PASSWORD=%s\nLOCAL_ANON_KEY=%s\nDECK=%s\n" "$EMAIL" "$PW" "$AN" "$DECK" > "$HERE/local.env"
 echo "ready: $HERE/local.env (deck $DECK)"
-echo "web:    VITE_SUPABASE_URL=http://127.0.0.1:54321 VITE_SUPABASE_ANON_KEY=\$LOCAL_ANON_KEY pnpm --filter @reeeeecall/web exec vite --port 5192"
+echo "web:    VITE_SUPABASE_URL=http://127.0.0.1:54321 VITE_SUPABASE_ANON_KEY=\$LOCAL_ANON_KEY pnpm --filter @reklue/web exec vite --port 5192"

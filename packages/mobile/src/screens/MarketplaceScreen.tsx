@@ -5,7 +5,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, SearchBar, ListCard, ScreenHeader, EmptyState, ListSkeleton } from '../components/ui'
 import { OfficialBadge } from '../components/ui/OfficialBadge'
 import { testProps } from '../utils/testProps'
-import { useMarketplaceStore } from '@reeeeecall/shared/stores/marketplace-store'
+import { useMarketplaceStore } from '@reklue/shared/stores/marketplace-store'
 import {
   filterListings,
   sortListings,
@@ -19,7 +19,7 @@ import {
   LEARNING_LANGUAGES,
   NATIVE_LANGUAGES,
   STUDY_LEVELS,
-} from '@reeeeecall/shared/lib/marketplace'
+} from '@reklue/shared/lib/marketplace'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
 import type { MarketplaceStackParamList } from '../navigation/types'

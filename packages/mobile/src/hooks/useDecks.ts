@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { useFocusEffect } from '@react-navigation/native'
-import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
+import { useDeckStore } from '@reklue/shared/stores/deck-store'
 import { useAuthState } from './useAuthState'
 
 /**

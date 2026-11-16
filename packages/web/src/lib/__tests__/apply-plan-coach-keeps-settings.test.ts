@@ -15,7 +15,7 @@
  * a change, lost their schedule, and their intake stayed exactly where it was.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useLearningStore } from '@reeeeecall/shared/stores/learning-store'
+import { useLearningStore } from '@reklue/shared/stores/learning-store'
 
 const GOAL_ID = '11111111-1111-4111-8111-111111111111'
 

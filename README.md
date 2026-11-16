@@ -16,6 +16,6 @@ pnpm build
 pnpm test:worker
 ```
 
-The public brand is **Reklue** (Korean: **리클루**). The new canonical domain is `reklue.com`. The former `reeeeecallstudy.xyz` address redirects while its existing registration remains active. App identifiers, the deep-link scheme, package namespaces, and service account identifiers stay unchanged.
+The public brand is **Reklue** (Korean: **리클루**). The new canonical domain is `reklue.com`. The former `reeeeecallstudy.xyz` address redirects while its existing registration remains active. Workspace packages use `@reklue`. Registered app identifiers, the compatible deep-link scheme, stored preference keys, and service account identifiers remain stable for existing installs.
 
 See [deployment instructions](DOCS/DEPLOYMENT/README.md) and [store listing copy](DOCS/MOBILE/STORE_METADATA.md). Updating the device home-screen name requires a new native build; updating the store listing is a separate release step.

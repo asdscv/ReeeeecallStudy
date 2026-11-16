@@ -10,14 +10,14 @@ import {
 import { useDeckStore } from '../../stores/deck-store'
 import { useCardStore } from '../../stores/card-store'
 import { useTemplateStore } from '../../stores/template-store'
-import { useCardLimit } from '@reeeeecall/shared/hooks/useCardLimit'
+import { useCardLimit } from '@reklue/shared/hooks/useCardLimit'
 import { CardLimitBlock } from '../card/CardLimitBlock'
 import {
   QUICK_PRESETS,
   presetFieldSpecs,
   type QuickPreset,
   type QuickFieldSpec,
-} from '@reeeeecall/shared/lib/default-templates'
+} from '@reklue/shared/lib/default-templates'
 
 interface QuickCreateModalProps {
   open: boolean

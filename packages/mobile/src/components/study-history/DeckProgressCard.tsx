@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useTheme } from '../../theme'
 import { ProgressBar } from '../charts/ProgressBar'
 import { Badge } from '../ui'
-import type { ModeBreakdown } from '@reeeeecall/shared/lib/study-history-stats'
+import type { ModeBreakdown } from '@reklue/shared/lib/study-history-stats'
 
 interface DeckProgressCardProps {
   deckName: string

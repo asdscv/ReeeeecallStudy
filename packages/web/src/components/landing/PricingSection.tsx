@@ -5,7 +5,7 @@ import { Check, ArrowRight } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 import { supabase } from '../../lib/supabase'
 import { PAYMENTS_ENABLED } from '../../stores/billing-store'
-import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
+import { formatProductPrice } from '@reklue/shared/lib/pricing'
 
 // card_limit >= this sentinel means "unlimited" FOR DISPLAY. As of mig 148 NO catalog
 // plan is unlimited (the top plan is capped at 100,000); this only fires for admins,

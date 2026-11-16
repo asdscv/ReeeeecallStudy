@@ -36,7 +36,7 @@ import {
   type CodeBreakView,
   type CreateContext,
   type Rng,
-} from '@reeeeecall/shared/lib/brain-games'
+} from '@reklue/shared/lib/brain-games'
 import {
   CODE_BREAK_LADDER,
   CODE_BREAK_MAX_LEVEL,
@@ -50,9 +50,9 @@ import {
   scoreGuess,
   unpackCode,
   type CodeBreakState,
-} from '@reeeeecall/shared/lib/brain-games/games/code-break'
-import { useBrainRound } from '@reeeeecall/shared/hooks/useBrainRound'
-import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
+} from '@reklue/shared/lib/brain-games/games/code-break'
+import { useBrainRound } from '@reklue/shared/hooks/useBrainRound'
+import { useBrainStore } from '@reklue/shared/stores/brain-store'
 
 const PHONE: CreateContext = { ...DEFAULT_CONTEXT, maxCols: maxColsFor(358), maxRows: 7 }
 const BLOCKED: CreateContext = { ...PHONE, blockRules: ['codeBreak.repeats'] }

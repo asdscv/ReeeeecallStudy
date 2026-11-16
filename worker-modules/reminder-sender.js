@@ -36,7 +36,7 @@ async function sendEmail(to, subject, body, env) {
   //   await fetch('https://api.resend.com/emails', {
   //     method: 'POST',
   //     headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-  //     body: JSON.stringify({ from: 'Reklue <noreply@reeeeecallstudy.xyz>', to, subject, text: body }),
+  //     body: JSON.stringify({ from: 'Reklue <admin@reklue.com>', to, subject, text: body }),
   //   })
   console.log(`[REMINDER] To: ${to} | Subject: ${subject} | Body: ${body}`)
   return true

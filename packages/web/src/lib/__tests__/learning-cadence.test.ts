@@ -10,7 +10,7 @@ import { describe, it, expect } from 'vitest'
 import {
   EVERY_DAY, parseCadence, studyDaysBetween, perStudyDayMultiplier,
   type StudyCadence,
-} from '@reeeeecall/shared/learning/application/cadence'
+} from '@reklue/shared/learning/application/cadence'
 
 describe('parseCadence', () => {
   it('reads a stored rhythm', () => {

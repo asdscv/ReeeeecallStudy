@@ -19,8 +19,8 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import i18next from 'i18next'
 import {
   groupSessionsByDate, type SessionDateGroup,
-} from '@reeeeecall/shared/lib/study-history'
-import type { StudySession } from '@reeeeecall/shared/types/database'
+} from '@reklue/shared/lib/study-history'
+import type { StudySession } from '@reklue/shared/types/database'
 
 /** The eight locales this app ships. The bug was invisible in exactly one of them. */
 const LOCALES = ['en', 'ko', 'ja', 'zh', 'vi', 'th', 'id', 'es'] as const

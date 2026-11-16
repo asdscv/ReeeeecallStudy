@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
 import { Screen, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { BarChart } from '../components/charts'
-import { usePublisherStore } from '@reeeeecall/shared/stores/publisher-store'
+import { usePublisherStore } from '@reklue/shared/stores/publisher-store'
 import { useTheme } from '../theme'
 
 type TFunc = (key: string, options?: Record<string, unknown>) => string

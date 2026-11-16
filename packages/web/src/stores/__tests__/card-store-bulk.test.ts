@@ -9,8 +9,8 @@ const mockSupabase = vi.hoisted(() => ({
 vi.mock('../../lib/supabase', () => ({ supabase: mockSupabase }))
 // useCardStore re-exports the SHARED store, which imports from the shared
 // package paths — mock those too, else the real (uninitialized) shared
-// supabase/guard run. (alias @reeeeecall/shared → ../shared in vitest.config)
-vi.mock('@reeeeecall/shared/lib/supabase', () => ({ supabase: mockSupabase }))
+// supabase/guard run. (alias @reklue/shared → ../shared in vitest.config)
+vi.mock('@reklue/shared/lib/supabase', () => ({ supabase: mockSupabase }))
 
 // ─── Rate limit guard mock ──────────────────────────────────
 const mockGuard = vi.hoisted(() => ({
@@ -18,7 +18,7 @@ const mockGuard = vi.hoisted(() => ({
   recordSuccess: vi.fn(),
 }))
 vi.mock('../../lib/rate-limit-instance', () => ({ guard: mockGuard }))
-vi.mock('@reeeeecall/shared/lib/rate-limit-instance', () => ({ guard: mockGuard }))
+vi.mock('@reklue/shared/lib/rate-limit-instance', () => ({ guard: mockGuard }))
 
 import { useCardStore } from '../card-store'
 

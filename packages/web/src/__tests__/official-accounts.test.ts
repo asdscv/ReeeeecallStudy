@@ -13,7 +13,7 @@ import { act } from '@testing-library/react'
 
 const mockRpc = vi.fn()
 
-vi.mock('@reeeeecall/shared/lib/supabase', () => ({
+vi.mock('@reklue/shared/lib/supabase', () => ({
   supabase: {
     auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'admin-1' } } }) },
     rpc: (...args: unknown[]) => mockRpc(...args),
@@ -28,8 +28,8 @@ vi.mock('@reeeeecall/shared/lib/supabase', () => ({
 }))
 
 // Must import AFTER vi.mock
-import { useOfficialStore } from '@reeeeecall/shared/stores/official-store'
-import type { BadgeType } from '@reeeeecall/shared/types/database'
+import { useOfficialStore } from '@reklue/shared/stores/official-store'
+import type { BadgeType } from '@reklue/shared/types/database'
 
 // ---------------------------------------------------------------------------
 // Helpers

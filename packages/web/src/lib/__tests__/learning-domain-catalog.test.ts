@@ -15,7 +15,7 @@ import {
   createDefaultDomainRegistry, availableDomainIds, domainAdapterFor,
   languageDomainAdapter, generalDomainAdapter,
   activityMixForDomain, supportedActivityTypesForDomain, buildDailyPlan,
-} from '@reeeeecall/shared/learning'
+} from '@reklue/shared/learning'
 
 const NOW = '2026-08-01T00:00:00.000Z'
 

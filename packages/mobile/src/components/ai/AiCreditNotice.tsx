@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next'
 import { useNavigation, type NavigationProp } from '@react-navigation/native'
 import {
   getAiWalletSummary, formatUsdMicro, type AiWalletSummary,
-} from '@reeeeecall/shared/lib/ai/server-client'
+} from '@reklue/shared/lib/ai/server-client'
 import {
   creditNotice, aiFeatureRequiresCredits,
-} from '@reeeeecall/shared/lib/ai/credit-notice'
+} from '@reklue/shared/lib/ai/credit-notice'
 import { useTheme } from '../../theme'
 import { testProps } from '../../utils/testProps'
 

@@ -13,7 +13,7 @@ import {
 } from '../lib/study-history'
 import { computeSrsStats } from '../lib/study-history-stats'
 import type { StudySession, StudyLog, Card } from '../types/database'
-import { fetchAllRows, fetchRowsByIds } from '@reeeeecall/shared/lib/fetch-all-rows'
+import { fetchAllRows, fetchRowsByIds } from '@reklue/shared/lib/fetch-all-rows'
 
 type LogWithCard = StudyLog & { card?: Card }
 

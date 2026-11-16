@@ -10,13 +10,13 @@ import { useDashboardData } from '../hooks/useDashboardData'
 import { useGamification } from '../hooks/useGamification'
 import { useTheme, palette } from '../theme'
 import type { HomeStackParamList, MainTabParamList } from '../navigation/types'
-import type { TimePeriod } from '@reeeeecall/shared/lib/time-period'
-import { shouldShowHeatmap } from '@reeeeecall/shared/lib/time-period'
+import type { TimePeriod } from '@reklue/shared/lib/time-period'
+import { shouldShowHeatmap } from '@reklue/shared/lib/time-period'
 import { OnboardingModal } from '../components/OnboardingModal'
-import { ensureStarterSubscriptions } from '@reeeeecall/shared/stores/starter-decks'
+import { ensureStarterSubscriptions } from '@reklue/shared/stores/starter-decks'
 import { CardUsageCard } from '../components/settings/CardUsageCard'
 import { getMobileSupabase } from '../adapters'
-import { formatCount } from '@reeeeecall/shared/lib/format-number'
+import { formatCount } from '@reklue/shared/lib/format-number'
 
 type Nav = NativeStackNavigationProp<HomeStackParamList>
 

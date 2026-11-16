@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { formatUsdMicro, formatCount } from '@reeeeecall/shared/lib/ai/server-client'
-import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
+import { formatUsdMicro, formatCount } from '@reklue/shared/lib/ai/server-client'
+import { formatProductPrice } from '@reklue/shared/lib/pricing'
 
 // Regression guard for thousands grouping. Both helpers group WITHOUT Intl on purpose:
 // toLocaleString('en-US', …) silently drops separators on a Hermes build without full

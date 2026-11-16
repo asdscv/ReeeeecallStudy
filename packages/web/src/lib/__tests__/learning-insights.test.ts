@@ -10,7 +10,7 @@ import { describe, it, expect } from 'vitest'
 import {
   summarizeLearning, KNOWN_THRESHOLD, WEAK_MIN_ATTEMPTS, WEAK_MAX_MEAN_SCORE,
   type InsightAttempt, type InsightPlan,
-} from '@reeeeecall/shared/lib/learning-insights'
+} from '@reklue/shared/lib/learning-insights'
 
 const attempt = (over: Partial<InsightAttempt> = {}): InsightAttempt => ({
   card_id: 'card-1',

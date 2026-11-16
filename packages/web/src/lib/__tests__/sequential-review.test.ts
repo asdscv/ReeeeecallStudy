@@ -3,7 +3,7 @@ import {
   advanceSequentialReviewPosition,
   buildSequentialReviewQueue,
   computeSequentialReviewPositions,
-} from '@reeeeecall/shared/lib/study-session-utils'
+} from '@reklue/shared/lib/study-session-utils'
 
 // ─── Helpers ────────────────────────────────────────────────
 

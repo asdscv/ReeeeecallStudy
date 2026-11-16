@@ -23,17 +23,17 @@ import {
   useDeckStore,
   registerCardUsageDetailInterest,
   releaseCardUsageDetailInterest,
-} from '@reeeeecall/shared/stores/deck-store'
+} from '@reklue/shared/stores/deck-store'
 import { localPrefs } from '../utils/local-prefs'
 import { haptics, setHapticsEnabled } from '../utils/haptics'
 import type { SettingsStackParamList } from '../navigation/types'
 import { notificationService } from '../services/notifications'
 import { getMobileSupabase } from '../adapters'
 import { getMySubscription, type MySubscription } from '../services/billing'
-import { formatCount } from '@reeeeecall/shared/lib/ai/server-client'
-import type { SrsSettings } from '@reeeeecall/shared/types/database'
-import { DEFAULT_SRS_SETTINGS } from '@reeeeecall/shared/types/database'
-import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
+import { formatCount } from '@reklue/shared/lib/ai/server-client'
+import type { SrsSettings } from '@reklue/shared/types/database'
+import { DEFAULT_SRS_SETTINGS } from '@reklue/shared/types/database'
+import { useBrainStore } from '@reklue/shared/stores/brain-store'
 import { forgetBrainOnDevice } from '../components/brain/brain-ui'
 
 const PRIVACY_POLICY_URL = 'https://reklue.com/privacy-policy.html'

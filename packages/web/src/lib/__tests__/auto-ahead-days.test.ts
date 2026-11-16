@@ -12,8 +12,8 @@
  * opposite, and the reach follows.
  */
 import { describe, it, expect } from 'vitest'
-import { autoAheadDays } from '@reeeeecall/shared/stores/learning-store'
-import { EVERY_DAY, parseCadence } from '@reeeeecall/shared/learning/application/cadence'
+import { autoAheadDays } from '@reklue/shared/stores/learning-store'
+import { EVERY_DAY, parseCadence } from '@reklue/shared/learning/application/cadence'
 
 describe('autoAheadDays', () => {
   it('reaches a full week for someone who studies every day', () => {

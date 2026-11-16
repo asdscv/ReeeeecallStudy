@@ -7,7 +7,7 @@
  * and "the first value" is the answer.
  */
 import { describe, it, expect } from 'vitest'
-import { cardPromptLabel } from '@reeeeecall/shared/lib/card-prompt'
+import { cardPromptLabel } from '@reklue/shared/lib/card-prompt'
 
 describe('cardPromptLabel', () => {
   it('shows the prompt, not the answer, when jsonb reorders the keys', () => {

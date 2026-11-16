@@ -14,10 +14,10 @@
 import { describe, it, expect } from 'vitest'
 import {
   creditNotice, aiFeatureRequiresCredits,
-} from '@reeeeecall/shared/lib/ai/credit-notice'
+} from '@reklue/shared/lib/ai/credit-notice'
 import {
   aiHubEntries, AI_HUB_QUIZ, AI_HUB_GENERATE, AI_HUB_LEARNING_PLAN,
-} from '@reeeeecall/shared/lib/ai/hub/catalog'
+} from '@reklue/shared/lib/ai/hub/catalog'
 
 const money = (micro: number) => `$${(micro / 1_000_000).toFixed(2)}`
 

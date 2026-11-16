@@ -9,11 +9,11 @@ import { useStudy } from '../hooks/useStudy'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../theme'
 import { getMobileSupabase } from '../adapters'
-import { todayDateKey, utcToLocalDateKey, localDateToUTCRange } from '@reeeeecall/shared/lib/date-utils'
+import { todayDateKey, utcToLocalDateKey, localDateToUTCRange } from '@reklue/shared/lib/date-utils'
 import type { StudyStackParamList } from '../navigation/types'
-import type { StudyMode } from '@reeeeecall/shared/types/database'
-import type { CrammingFilter } from '@reeeeecall/shared/lib/cramming-queue'
-import { fetchAllRows, fetchRowsByIds } from '@reeeeecall/shared/lib/fetch-all-rows'
+import type { StudyMode } from '@reklue/shared/types/database'
+import type { CrammingFilter } from '@reklue/shared/lib/cramming-queue'
+import { fetchAllRows, fetchRowsByIds } from '@reklue/shared/lib/fetch-all-rows'
 
 type Nav = NativeStackNavigationProp<StudyStackParamList, 'StudySetup'>
 type Route = RouteProp<StudyStackParamList, 'StudySetup'>

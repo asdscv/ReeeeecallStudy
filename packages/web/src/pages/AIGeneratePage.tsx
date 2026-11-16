@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { AI_HUB_GENERATE } from '@reeeeecall/shared/lib/ai/hub/catalog'
+import { AI_HUB_GENERATE } from '@reklue/shared/lib/ai/hub/catalog'
 import { AiCreditNotice } from '../components/ai/AiCreditNotice'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAIGenerateStore } from '../stores/ai-generate-store'

@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
 import { useTheme, palette } from '../theme'
 import { getMobileSupabase } from '../adapters'
-import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
+import { aiHubBus } from '@reklue/shared/lib/ai/hub/events'
 import type { DecksStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<DecksStackParamList, 'DecksList'>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { buildDailyPlan, DAILY_PLANNER_VERSION, scoreCandidate } from '@reeeeecall/shared/learning'
-import type { LearningGoal, PlannerCandidate } from '@reeeeecall/shared/learning'
+import { buildDailyPlan, DAILY_PLANNER_VERSION, scoreCandidate } from '@reklue/shared/learning'
+import type { LearningGoal, PlannerCandidate } from '@reklue/shared/learning'
 
 const goal: LearningGoal = {
   id: 'goal-1', userId: 'user-1', domainId: 'language', title: 'English',

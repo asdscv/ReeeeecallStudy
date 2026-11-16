@@ -22,7 +22,7 @@ async function main() {
     { input: logo, left: 250, top: Math.round((240 - logoHeight) / 2) },
   ]).png().toBuffer()
 
-  await sharp(combined).toFile(resolve(publicDir, 'reeeeecallstudy_symbol_logo-removebg-preview.png'))
+  await sharp(combined).toFile(resolve(publicDir, 'reklue-logo.png'))
   await sharp({
     create: { width: 1200, height: 630, channels: 4, background: '#ffffff' },
   }).composite([{ input: combined, left: 140, top: 195 }])

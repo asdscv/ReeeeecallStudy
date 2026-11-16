@@ -1,4 +1,4 @@
-import type { IPlatformAdapter } from '@reeeeecall/shared/adapters/platform'
+import type { IPlatformAdapter } from '@reklue/shared/adapters/platform'
 import { Linking, Platform } from 'react-native'
 
 export class RNPlatform implements IPlatformAdapter {

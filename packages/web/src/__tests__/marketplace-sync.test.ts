@@ -35,7 +35,7 @@ const mockRpc = vi.fn()
 const mockFrom = vi.fn()
 const mockGetUser = vi.fn()
 
-vi.mock('@reeeeecall/shared/lib/supabase', () => ({
+vi.mock('@reklue/shared/lib/supabase', () => ({
   supabase: {
     auth: { getUser: () => mockGetUser() },
     rpc: (...args: unknown[]) => mockRpc(...args),
@@ -50,7 +50,7 @@ vi.mock('@reeeeecall/shared/lib/supabase', () => ({
 }))
 
 // Must import AFTER vi.mock so the mock takes effect
-import { useSyncStore } from '@reeeeecall/shared/stores/sync-store'
+import { useSyncStore } from '@reklue/shared/stores/sync-store'
 
 // ---------------------------------------------------------------------------
 // Helpers

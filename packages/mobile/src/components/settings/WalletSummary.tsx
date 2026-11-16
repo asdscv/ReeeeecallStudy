@@ -8,8 +8,8 @@ import {
   formatUsdMicro,
   type AiWalletSummary,
   type WalletUsageRow,
-} from '@reeeeecall/shared/lib/ai/server-client'
-import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
+} from '@reklue/shared/lib/ai/server-client'
+import { formatProductPrice } from '@reklue/shared/lib/pricing'
 import { Button } from '../ui'
 import { usePurchases } from '../../hooks/usePurchases'
 import { purchaseService, SUBSCRIPTION_UI_ENABLED } from '../../services/purchases'

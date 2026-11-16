@@ -7,7 +7,7 @@
  * estimate. `{{x, decimal}}` exists so the two cases cannot be confused again.
  */
 import { describe, it, expect } from 'vitest'
-import { formatCount, formatDecimal } from '@reeeeecall/shared/lib/format-number'
+import { formatCount, formatDecimal } from '@reklue/shared/lib/format-number'
 
 describe('formatDecimal', () => {
   it('keeps the fraction that formatCount throws away', () => {

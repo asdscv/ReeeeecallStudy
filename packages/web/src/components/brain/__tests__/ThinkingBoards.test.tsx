@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import { brainGame, createRng, DEFAULT_CONTEXT, GAME_THEMES, type BrainGameId, type MazeView } from '@reeeeecall/shared/lib/brain-games'
-import { mazeDragCells } from '@reeeeecall/shared/lib/brain-games/maze-drag'
+import { brainGame, createRng, DEFAULT_CONTEXT, GAME_THEMES, type BrainGameId, type MazeView } from '@reklue/shared/lib/brain-games'
+import { mazeDragCells } from '@reklue/shared/lib/brain-games/maze-drag'
 import { BrainBoard } from '../BrainBoard'
 
 for (const [id, level] of [['setMatch', 1], ['codeBreak', 1], ['makeNumber', 1], ['makeNumber', 7], ['makeNumber', 14], ['mazeRun', 1]] as const) {

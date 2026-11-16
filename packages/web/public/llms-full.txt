@@ -53,4 +53,4 @@ Insights cover spaced repetition, active recall, learning techniques, language s
 - RSS: https://reklue.com/feed.xml
 - Atom: https://reklue.com/feed.atom
 - JSON feed: https://reklue.com/feed.json
-- Support: admin@reeeeecallstudy.xyz
+- Support: admin@reklue.com

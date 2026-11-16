@@ -17,8 +17,8 @@ import {
   Zap,
   type LucideIcon,
 } from 'lucide-react'
-import { ACHIEVEMENTS, hasAchievement, type AchievementId } from '@reeeeecall/shared/lib/brain-games'
-import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
+import { ACHIEVEMENTS, hasAchievement, type AchievementId } from '@reklue/shared/lib/brain-games'
+import { useBrainStore } from '@reklue/shared/stores/brain-store'
 
 /**
  * Achievements are game facts ("cleared a round without losing a chance") — never streaks of days,

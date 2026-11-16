@@ -21,14 +21,14 @@ vi.mock('../../lib/supabase', () => ({ supabase: mockSupabase }))
 // The store under test is a re-export of the shared one, which imports the shared
 // client — mocking only the web path left the real (uninitialised) client in place,
 // so every assertion saw zero calls.
-vi.mock('@reeeeecall/shared/lib/supabase', () => ({
+vi.mock('@reklue/shared/lib/supabase', () => ({
   supabase: mockSupabase,
   getSupabase: () => mockSupabase,
   initSupabase: vi.fn(),
 }))
 
 import { useAuthStore, _resetAuthStoreInternals } from '../auth-store'
-import { useSubscriptionStore } from '@reeeeecall/shared/stores/subscription-store'
+import { useSubscriptionStore } from '@reklue/shared/stores/subscription-store'
 
 // initialize() drives the subscription store; keep its real actions restorable so a
 // test that swaps one in cannot leak into the next.

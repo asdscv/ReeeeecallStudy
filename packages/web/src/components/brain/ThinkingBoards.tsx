@@ -1,8 +1,8 @@
 import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Flag, KeyRound, Undo2 } from 'lucide-react'
-import { MAZE_WALL, SET_COLORS, type CodeBreakView, type MakeNumberView, type MazeView, type SetCard, type SetMatchView } from '@reeeeecall/shared/lib/brain-games'
-import { mazeDragCells, mazePoint, type MazePoint } from '@reeeeecall/shared/lib/brain-games/maze-drag'
+import { MAZE_WALL, SET_COLORS, type CodeBreakView, type MakeNumberView, type MazeView, type SetCard, type SetMatchView } from '@reklue/shared/lib/brain-games'
+import { mazeDragCells, mazePoint, type MazePoint } from '@reklue/shared/lib/brain-games/maze-drag'
 import type { BoardProps } from './BrainBoard'
 import { boardHeight } from './brain-ui'
 

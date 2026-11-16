@@ -4,7 +4,7 @@ import { Feather } from '@expo/vector-icons'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
-import { formatCount } from '@reeeeecall/shared/lib/format-number'
+import { formatCount } from '@reklue/shared/lib/format-number'
 import {
   ACHIEVEMENTS,
   BRAIN_GAMES,
@@ -25,8 +25,8 @@ import {
   weekProgress,
   type AchievementId,
   type BrainGameEntry,
-} from '@reeeeecall/shared/lib/brain-games'
-import { useBrainStore } from '@reeeeecall/shared/stores/brain-store'
+} from '@reklue/shared/lib/brain-games'
+import { useBrainStore } from '@reklue/shared/stores/brain-store'
 import { Screen, ScreenHeader } from '../../components/ui'
 import { useTheme } from '../../theme'
 import { testProps } from '../../utils/testProps'

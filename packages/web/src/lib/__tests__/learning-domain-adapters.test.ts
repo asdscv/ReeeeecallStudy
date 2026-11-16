@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { activitiesForLegacyCard, languageDomainAdapter } from '@reeeeecall/shared/learning'
-import type { Card } from '@reeeeecall/shared/types/database'
+import { activitiesForLegacyCard, languageDomainAdapter } from '@reklue/shared/learning'
+import type { Card } from '@reklue/shared/types/database'
 
 const card: Card = {
   id: 'card-1', deck_id: 'deck-1', user_id: 'user-1', template_id: 'template-1',

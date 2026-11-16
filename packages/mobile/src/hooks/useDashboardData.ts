@@ -8,10 +8,10 @@ import {
   getDailyStudyCounts,
   getForecastReviews,
   filterLogsByPeriod,
-} from '@reeeeecall/shared/lib/stats'
-import { fetchAllRows } from '@reeeeecall/shared/lib/fetch-all-rows'
-import { periodToDays, shouldShowHeatmap } from '@reeeeecall/shared/lib/time-period'
-import type { TimePeriod } from '@reeeeecall/shared/lib/time-period'
+} from '@reklue/shared/lib/stats'
+import { fetchAllRows } from '@reklue/shared/lib/fetch-all-rows'
+import { periodToDays, shouldShowHeatmap } from '@reklue/shared/lib/time-period'
+import type { TimePeriod } from '@reklue/shared/lib/time-period'
 
 function daysAgoUTC(n: number): string {
   const d = new Date()

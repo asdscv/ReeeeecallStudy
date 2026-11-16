@@ -10,13 +10,13 @@
 //
 // 사용:
 //   WEB_E2E_EMAIL=... WEB_E2E_PASSWORD=... node scripts/web/web-smoke.mjs
-//   WEB_URL=https://reeeeecallstudy.xyz  (기본값)
+//   WEB_URL=https://reklue.com  (기본값)
 //   EXPECT_CARD_LIMIT=5000               (서버가 말하는 한도. 화면과 대조한다)
 
 import { chromium } from 'playwright'
 import fs from 'node:fs'
 
-const SITE = process.env.WEB_URL || 'https://reeeeecallstudy.xyz'
+const SITE = process.env.WEB_URL || 'https://reklue.com'
 const EMAIL = process.env.WEB_E2E_EMAIL
 const PASS = process.env.WEB_E2E_PASSWORD
 const EXPECT_LIMIT = process.env.EXPECT_CARD_LIMIT || '5000'

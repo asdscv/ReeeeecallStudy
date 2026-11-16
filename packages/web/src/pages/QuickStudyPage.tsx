@@ -7,7 +7,7 @@ import { supabase } from '../lib/supabase'
 import { utcToLocalDateKey, localDateToUTCRange, todayDateKey } from '../lib/date-utils'
 import { DatePicker } from '../components/study/DatePicker'
 import { CrammingSetupPanel } from '../components/study/CrammingSetupPanel'
-import type { CrammingFilter } from '@reeeeecall/shared/lib/cramming-queue'
+import type { CrammingFilter } from '@reklue/shared/lib/cramming-queue'
 import {
   STUDY_MODE_OPTIONS,
   DEFAULT_BATCH_SIZE,
@@ -15,12 +15,12 @@ import {
   MAX_BATCH_SIZE,
   isBatchSizeConfigurable,
   clampBatchSize,
-} from '@reeeeecall/shared/lib/study-session-utils'
+} from '@reklue/shared/lib/study-session-utils'
 import { GuideHelpLink } from '../components/common/GuideHelpLink'
 import { CardGridSkeleton } from '../components/common/Skeleton'
 import { MultiDeckSelector } from '../components/study/MultiDeckSelector'
 import type { Deck, StudyMode } from '../types/database'
-import { fetchAllRows } from '@reeeeecall/shared/lib/fetch-all-rows'
+import { fetchAllRows } from '@reklue/shared/lib/fetch-all-rows'
 
 export function QuickStudyPage() {
   const { t } = useTranslation(['study', 'common'])

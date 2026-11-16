@@ -4,7 +4,7 @@ import {
   isStudyMode,
   normalizeRatingForMode,
   normalizeStudyConfig,
-} from '@reeeeecall/shared/lib/study-validation'
+} from '@reklue/shared/lib/study-validation'
 
 const base = () => ({ deckId: 'deck-1', mode: 'srs' as const, batchSize: 20 })
 

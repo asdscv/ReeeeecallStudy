@@ -6,9 +6,9 @@
  * position, the near-miss options, the clock, rule gating and the five deep kinds taking turns.
  */
 import { describe, it, expect, vi } from 'vitest'
-import { DEFAULT_CONTEXT, createRng, type ChoiceView, type CreateContext, type RecentTrial } from '@reeeeecall/shared/lib/brain-games'
-import { math, mathLimitMs } from '@reeeeecall/shared/lib/brain-games/games/math'
-import { MATH_DEEP_KINDS, mathPar } from '@reeeeecall/shared/lib/brain-games/games/math-bands'
+import { DEFAULT_CONTEXT, createRng, type ChoiceView, type CreateContext, type RecentTrial } from '@reklue/shared/lib/brain-games'
+import { math, mathLimitMs } from '@reklue/shared/lib/brain-games/games/math'
+import { MATH_DEEP_KINDS, mathPar } from '@reklue/shared/lib/brain-games/games/math-bands'
 
 // Thousands of sampled trials per test: a second or three here, several times that on a CI runner,
 // where the 5s default would time out.

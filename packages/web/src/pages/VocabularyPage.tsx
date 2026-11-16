@@ -8,7 +8,7 @@ import { SEOHead } from '../components/content/SEOHead'
 import { FooterSection } from '../components/landing/FooterSection'
 import { SEO } from '../lib/seo-config'
 import type { PublicListingPreview } from '../types/database'
-import { wordListHeading, wordRows } from '@reeeeecall/shared/lib/listing-seo'
+import { wordListHeading, wordRows } from '@reklue/shared/lib/listing-seo'
 import {
   VOCAB_HUBS, VOCAB_INDEX_PATH, VOCAB_EN_INDEX, VOCAB_LANGUAGE_INDEX,
   VOCAB_HUB_CHOOSER_HEADING, VOCAB_HUB_COLUMNS, LANGUAGE_NATIVE_NAME,
@@ -16,7 +16,7 @@ import {
   vocabHubHeading, vocabHubShortTitle, vocabHubDescription, vocabHubIntro,
   groupDecksForIndex, orderDecksByLanguage, vocabHubDeckTags,
   type DeckLang, type VocabHub,
-} from '@reeeeecall/shared/lib/vocab-hubs'
+} from '@reklue/shared/lib/vocab-hubs'
 
 // /vocabulary, /vocabulary/<lang>, /vocabulary/<exam-level> — the same pages the crawler HTML serves.
 

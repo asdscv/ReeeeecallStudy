@@ -88,8 +88,10 @@ export function buildMetaTags({
 
   // Twitter
   parts.push(`<meta name="twitter:card" content="summary_large_image">`)
-  parts.push(`<meta name="twitter:site" content="${TWITTER_HANDLE}">`)
-  parts.push(`<meta name="twitter:creator" content="${TWITTER_HANDLE}">`)
+  if (TWITTER_HANDLE) {
+    parts.push(`<meta name="twitter:site" content="${TWITTER_HANDLE}">`)
+    parts.push(`<meta name="twitter:creator" content="${TWITTER_HANDLE}">`)
+  }
   parts.push(`<meta name="twitter:title" content="${escapeHtml(title)}">`)
   parts.push(`<meta name="twitter:description" content="${escapeHtml(description)}">`)
   parts.push(`<meta name="twitter:image" content="${escapeHtml(img)}">`)

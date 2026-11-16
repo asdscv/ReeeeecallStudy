@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      '@reeeeecall/shared': path.resolve(__dirname, '../shared'),
+      '@reklue/shared': path.resolve(__dirname, '../shared'),
     },
   },
   test: {

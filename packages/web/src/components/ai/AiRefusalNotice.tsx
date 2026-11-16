@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import {
   refusalFrom, refusalMessageKey, refusalFallbackKey, isWalletRefusal,
   type PaidActionId,
-} from '@reeeeecall/shared/lib/ai/refusal'
+} from '@reklue/shared/lib/ai/refusal'
 
 /**
  * The one way this app says "that cost money and it did not happen".

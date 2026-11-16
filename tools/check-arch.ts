@@ -25,7 +25,7 @@ const DOMAIN_ROOTS = [
 const FORBIDDEN = [
   /from\s+['"](.*\/)?lib\/supabase['"]/,
   /from\s+['"]@supabase\/supabase-js['"]/,
-  /from\s+['"]@reeeeecall\/shared\/lib\/supabase['"]/,
+  /from\s+['"]@reklue\/shared\/lib\/supabase['"]/,
 ]
 
 // Allowlist — files that are themselves the supabase adapter or are
@@ -96,7 +96,7 @@ for (const rel of SINGLE_SOURCE_ONLY) {
 }
 
 if (duplicates > 0) {
-  console.error(`\n${duplicates} duplicated study module(s) found. Import from @reeeeecall/shared instead.`)
+  console.error(`\n${duplicates} duplicated study module(s) found. Import from @reklue/shared instead.`)
   process.exit(1)
 }
 

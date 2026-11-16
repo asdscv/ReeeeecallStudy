@@ -43,7 +43,7 @@ export function Layout() {
         <div className="max-w-6xl mx-auto px-4 h-full flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="text-lg font-bold text-gray-900">
-            ReeeCall Study
+            Reklue Study
           </Link>
 
           {/* Navigation */}

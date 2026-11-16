@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import { SrsQueueManager } from '@reeeeecall/shared/lib/study-queue'
-import type { QueueCard } from '@reeeeecall/shared/lib/study-queue'
-import type { SrsResult } from '@reeeeecall/shared/lib/srs'
+import { SrsQueueManager } from '@reklue/shared/lib/study-queue'
+import type { QueueCard } from '@reklue/shared/lib/study-queue'
+import type { SrsResult } from '@reklue/shared/lib/srs'
 
 function makeCard(id: string, status: QueueCard['srs_status'] = 'new'): QueueCard {
   return {

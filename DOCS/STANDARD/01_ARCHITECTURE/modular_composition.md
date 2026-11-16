@@ -40,7 +40,7 @@
 
 | 계층 | 경로 | 무엇이 사는가 | 무엇을 import 할 수 있나 |
 |---|---|---|---|
-| L4 앱 | `packages/web/src`, `packages/mobile/src` | 화면·라우팅·플랫폼 UI | shared 를 import (`@reeeeecall/shared/<subpath>`) |
+| L4 앱 | `packages/web/src`, `packages/mobile/src` | 화면·라우팅·플랫폼 UI | shared 를 import (`@reklue/shared/<subpath>`) |
 | L3 공유 유스케이스 | `packages/shared/stores` | zustand 스토어 = 유스케이스. supabase 접근은 여기까지 | lib·types·adapters |
 | L2 공유 도메인 | `packages/shared/lib`, `packages/shared/learning` | 순수 함수·커널·레지스트리. **supabase 금지** | types·adapters |
 | L1 포트 | `packages/shared/adapters` | 플랫폼 인터페이스만. 구현 없음 | 아무것도 import 하지 않음 |
@@ -83,12 +83,12 @@ Rule 2: 스터디 엔진 6개 파일이 `packages/web/src` 에 재등장하면 e
 ### R1 — 패키지 경계는 서브패스 import 로만 넘는다
 
 ```ts
-import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'   // ✅
+import { useDeckStore } from '@reklue/shared/stores/deck-store'   // ✅
 import { useDeckStore } from '../../../shared/stores/deck-store'      // ❌
-import { useDeckStore } from '@reeeeecall/shared'                     // ❌ (배럴 없음)
+import { useDeckStore } from '@reklue/shared'                     // ❌ (배럴 없음)
 ```
 
-- 실측: 상대경로로 패키지 경계를 넘는 곳 0건, bare `@reeeeecall/shared` import 0건.
+- 실측: 상대경로로 패키지 경계를 넘는 곳 0건, bare `@reklue/shared` import 0건.
 - `packages/shared/package.json` 의 `main`/`types` 는 **존재하지 않는** `./index.ts` 를 가리킨다. 배럴 import 를 쓰는 순간 해석 실패한다.
 - 경로 alias 는 소비자 쪽에 3중으로 선언된다: `packages/web/tsconfig.app.json:30` · `packages/mobile/tsconfig.json:13` · `packages/web/vite.config.ts:11`. 모바일 번들러는 alias 대신 `packages/mobile/metro.config.js` 의 워크스페이스 해석 설정(`watchFolders` · `nodeModulesPaths` · `sourceExts` TS 우선 · `unstable_enablePackageExports=false`)에 의존한다. **하나만 고치면 타입은 통과하고 번들이 깨진다.**
 - **게이트**: CI `lint-typecheck` / `Web typecheck`(오타 난 서브패스만). 상대경로 월경을 막는 게이트는 없다.

@@ -47,7 +47,7 @@ export function DeckStats({ deckId }: DeckStatsProps) {
     const averageInterval = reviewCount > 0 ? Math.round(totalInterval / reviewCount) : 0;
 
     // Calculate accuracy rate from session data
-    const allSessions = localStorage.getItem('reeecall-sessions');
+    const allSessions = localStorage.getItem('reklue-sessions');
     const sessions = allSessions ? JSON.parse(allSessions) : {};
     
     let totalRatings = 0;

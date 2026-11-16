@@ -16,16 +16,16 @@ const mockSupabase = vi.hoisted(() => {
   }
 })
 
-vi.mock('@reeeeecall/shared/lib/supabase', () => ({
+vi.mock('@reklue/shared/lib/supabase', () => ({
   supabase: mockSupabase,
   getSupabase: () => mockSupabase,
   initSupabase: vi.fn(),
 }))
-vi.mock('@reeeeecall/shared/lib/rate-limit-instance', () => ({
+vi.mock('@reklue/shared/lib/rate-limit-instance', () => ({
   guard: { check: vi.fn(() => ({ allowed: true })), recordSuccess: vi.fn() },
 }))
 
-import { useStudyStore } from '@reeeeecall/shared/stores/study-store'
+import { useStudyStore } from '@reklue/shared/stores/study-store'
 import type { Card } from '../../types/database'
 
 const card = {

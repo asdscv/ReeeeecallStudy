@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { withCurrentBrand } from '@reeeeecall/shared/lib/brand'
+import { withCurrentBrand } from '@reklue/shared/lib/brand'
 
 describe('previously published brand copy', () => {
   it('updates nested article copy without mutating the stored article', () => {
@@ -28,13 +28,13 @@ describe('previously published brand copy', () => {
       url: 'https://example.com/insight/hello',
       path: 'https://example.com/ReeeeecallStudy/logo.png',
       email: 'ReeeeecallStudy@example.com',
-      contact: 'admin@reeeeecallstudy.xyz',
+      contact: 'admin@reklue.com',
       package: 'com.reeeeecall.study',
       scheme: 'reeeeecall://auth/callback',
       slug: 'reeeeecall-study',
     }
     expect(withCurrentBrand(identities)).toEqual(identities)
     expect(withCurrentBrand('ReeeeecallStudy: admin@reeeeecallstudy.xyz'))
-      .toBe('Reklue: admin@reeeeecallstudy.xyz')
+      .toBe('Reklue: admin@reklue.com')
   })
 })

@@ -160,7 +160,7 @@ export function getTTS(): ITTSAdapter { return _tts }
 
 ```typescript
 // web/src/main.tsx
-import { initAdapters } from '@reeeeecall/shared/adapters'
+import { initAdapters } from '@reklue/shared/adapters'
 import { WebStorage } from './adapters/web-storage'
 import { WebCrypto } from './adapters/web-crypto'
 // ...
@@ -172,7 +172,7 @@ initAdapters({
 })
 
 // mobile/src/App.tsx
-import { initAdapters } from '@reeeeecall/shared/adapters'
+import { initAdapters } from '@reklue/shared/adapters'
 import { RNStorage } from './adapters/rn-storage'
 import { RNCrypto } from './adapters/rn-crypto'
 // ...

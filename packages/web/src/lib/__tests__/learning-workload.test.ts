@@ -16,8 +16,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   projectWorkload, daysForDailyBudget, learningAnswers, INTERVALS_DAYS, reviewsAddedTomorrow,
-} from '@reeeeecall/shared/learning'
-import { calculateSRS, type SrsCardData } from '@reeeeecall/shared/lib/srs'
+} from '@reklue/shared/learning'
+import { calculateSRS, type SrsCardData } from '@reklue/shared/lib/srs'
 
 const BASE = { secondsPerCard: 8, lapseRate: 0.10, consolidationDays: 14, seenCards: 0 }
 

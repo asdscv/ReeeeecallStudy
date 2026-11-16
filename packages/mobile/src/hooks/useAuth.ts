@@ -6,8 +6,8 @@ import * as AppleAuthentication from 'expo-apple-authentication'
 import * as Crypto from 'expo-crypto'
 import { getMobileSupabase } from '../adapters'
 import { clearNavState } from '../utils/nav-persistence'
-import { validatePassword } from '@reeeeecall/shared/lib/password-validation'
-import { localizeAuthError } from '@reeeeecall/shared/lib/auth-errors'
+import { validatePassword } from '@reklue/shared/lib/password-validation'
+import { localizeAuthError } from '@reklue/shared/lib/auth-errors'
 
 // Dismiss browser on redirect
 WebBrowser.maybeCompleteAuthSession()

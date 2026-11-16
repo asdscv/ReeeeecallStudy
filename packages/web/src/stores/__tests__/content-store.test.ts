@@ -22,7 +22,7 @@ beforeEach(() => {
 describe('article locale parity with the worker', () => {
   it('serves a Korean-only article on the default URL and advertises only existing languages', async () => {
     const locales = query({ data: [{ locale: 'ko' }], error: null })
-    const article = query({ data: { slug: 'ko-only', locale: 'ko', title: 'ReeeeecallStudy 시작하기', author_name: 'ReeeeecallStudy' }, error: null })
+    const article = query({ data: { slug: 'ko-only', locale: 'ko', title: 'Reklue 시작하기', author_name: 'Reklue' }, error: null })
     mocks.from.mockReturnValueOnce(locales).mockReturnValueOnce(article)
     await useContentStore.getState().fetchContentBySlug('ko-only')
     expect(article.eq).toHaveBeenCalledWith('locale', 'ko')

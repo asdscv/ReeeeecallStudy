@@ -1,4 +1,4 @@
-import { withCurrentBrand } from '@reeeeecall/shared/lib/brand'
+import { withCurrentBrand } from '@reklue/shared/lib/brand'
 import { create } from 'zustand'
 import { supabase } from '../lib/supabase'
 import type { ContentListItem, ContentDetail } from '../types/content-blocks'

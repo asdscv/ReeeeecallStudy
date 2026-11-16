@@ -19,8 +19,8 @@ import { PaymentHistory } from '../components/settings/PaymentHistory'
 import { PlanSelector } from '../components/billing/PlanSelector'
 import { isUnlimitedCardLimit } from '../lib/card-limit'
 import { CardUsagePanel } from '../components/billing/CardUsagePanel'
-import { registerCardUsageDetailInterest, releaseCardUsageDetailInterest } from '@reeeeecall/shared/stores/deck-store'
-import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
+import { registerCardUsageDetailInterest, releaseCardUsageDetailInterest } from '@reklue/shared/stores/deck-store'
+import { aiHubBus } from '@reklue/shared/lib/ai/hub/events'
 import {
   loadSettings,
   saveSettings,

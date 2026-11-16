@@ -35,7 +35,7 @@ const WS_TIMEOUT_MS = 10_000
 // fetch) and server-side callers send no Origin and ignore CORS, so they are
 // unaffected. Allowlist is env-driven (ALLOWED_ORIGINS) with a safe default.
 const ALLOWED_ORIGINS = (Deno.env.get('ALLOWED_ORIGINS') ??
-  'https://reeeeecallstudy.xyz,http://localhost:5173')
+  'https://reklue.com,http://localhost:5173')
   .split(',').map((s) => s.trim()).filter(Boolean)
 
 function corsHeadersFor(origin: string | null): Record<string, string> {

@@ -5,7 +5,7 @@ import {
   buildSequentialReviewQueue,
   computeSequentialPosition,
   computeSequentialReviewPositions,
-} from '@reeeeecall/shared/lib/study-session-utils'
+} from '@reklue/shared/lib/study-session-utils'
 
 interface MockCard {
   id: string

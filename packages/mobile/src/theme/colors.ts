@@ -6,7 +6,7 @@ import {
   palette as sharedPalette,
   lightTheme,
   darkTheme,
-} from '@reeeeecall/shared/design-tokens/colors'
+} from '@reklue/shared/design-tokens/colors'
 
 // Re-export shared palette with mobile-only additions
 export const palette = {

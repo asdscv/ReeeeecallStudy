@@ -5,13 +5,13 @@ import { BRAND_NAME } from './brand'
 export const SEO = {
   SITE_URL,
   BRAND_NAME,
-  TWITTER_HANDLE: '@reeeeecallstudy',
+  TWITTER_HANDLE: '',
   DEFAULT_OG_IMAGE: `${SITE_URL}/og-image.png`,
   OG_IMAGE_WIDTH: 1200,
   OG_IMAGE_HEIGHT: 630,
   THEME_COLOR: '#2563eb',
   AUTHOR_NAME: BRAND_NAME,
-  CONTACT_EMAIL: 'admin@reeeeecallstudy.xyz',
+  CONTACT_EMAIL: 'admin@reklue.com',
   DEFAULT_LOCALE: 'en',
   SUPPORTED_LOCALES: ['en', 'ko', 'zh', 'ja', 'vi', 'th', 'id', 'es'] as const,
 } as const

@@ -6,8 +6,8 @@ import {
   useDeckStore,
   registerCardUsageDetailInterest,
   releaseCardUsageDetailInterest,
-} from '@reeeeecall/shared/stores/deck-store'
-import { formatCount } from '@reeeeecall/shared/lib/ai/server-client'
+} from '@reklue/shared/stores/deck-store'
+import { formatCount } from '@reklue/shared/lib/ai/server-client'
 import { UNLIMITED_CARD_LIMIT } from './PlanSelector'
 import { CardUsageModal } from './CardUsageModal'
 

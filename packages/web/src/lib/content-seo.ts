@@ -1,5 +1,5 @@
 import i18next from 'i18next'
-import { contentCanonicalUrl } from '@reeeeecall/shared/lib/content-canonical'
+import { contentCanonicalUrl } from '@reklue/shared/lib/content-canonical'
 import type { ContentDetail } from '../types/content-blocks'
 import { SEO } from './seo-config'
 import type {
@@ -207,10 +207,7 @@ export function buildOrganizationJsonLd(): JsonLdOrganizationFull {
       width: SEO.OG_IMAGE_WIDTH,
       height: SEO.OG_IMAGE_HEIGHT,
     },
-    sameAs: [
-      `https://twitter.com/${SEO.TWITTER_HANDLE.replace('@', '')}`,
-      `https://x.com/${SEO.TWITTER_HANDLE.replace('@', '')}`,
-    ],
+    sameAs: [], // Add profiles once the Reklue accounts are registered.
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer service',

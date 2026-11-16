@@ -42,7 +42,7 @@ export function Login() {
       <div className="bg-white rounded-xl border border-gray-200 p-8 w-full max-w-md">
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            ReeeCall Study
+            Reklue Study
           </h1>
           <p className="text-gray-500">이름을 입력하여 시작하세요</p>
         </div>

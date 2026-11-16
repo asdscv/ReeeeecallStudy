@@ -19,7 +19,7 @@ import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { QUIZ_BATCH_SIZE } from '@reeeeecall/shared/stores/quiz-store'
+import { QUIZ_BATCH_SIZE } from '@reklue/shared/stores/quiz-store'
 import { MAX_QUIZ_BATCH } from '../../../../../supabase/functions/_shared/ai-quiz-prompts'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../../../../..')

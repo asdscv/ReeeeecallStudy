@@ -2,11 +2,11 @@ import { useState, useMemo } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { useTranslation } from 'react-i18next'
-import { dateLine } from '@reeeeecall/shared/lib/quiz-outcome'
+import { dateLine } from '@reklue/shared/lib/quiz-outcome'
 import { Screen, ScreenHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
 import { useGamification } from '../hooks/useGamification'
-import { formatCount } from '@reeeeecall/shared/lib/ai/server-client'
+import { formatCount } from '@reklue/shared/lib/ai/server-client'
 import {
   xpInCurrentLevel,
   xpToNextLevel,

@@ -22,7 +22,7 @@
 | | | `i18n — mobile locale suite` = `npx tsx packages/mobile/src/i18n/i18n.test.ts` | 모바일 로케일 8종 검사(590 assert) | 모바일 단위 테스트 **6개 중 나머지 5개는 CI 에 없다** |
 | | | `Upload coverage` | — | ⚠️ **영구 no-op**: `--coverage` 를 붙이는 곳이 없어 업로드할 파일이 생기지 않는다 |
 | 4 | **Integration (Supabase)** (`integration-tests`) | Docker supabase 스택(CLI **2.95.4 핀**) + `tests/integration` 5 spec | RPC 실경로(권한 포함) | env 없으면 스킵되도록 설계됨 |
-| 5 | **Architecture Guard** (`arch-guard`) | `Run arch checks` = `pnpm --filter @reeeeecall/web exec tsx ../../tools/check-arch.ts` | ① `packages/shared/lib/**` 의 supabase import ② 학습 엔진 6경로의 웹 재등장 | ⚠️ ①의 정규식이 **형제 import `./supabase` 를 놓친다**(현재 3파일 통과 중). `packages/shared/learning/**` 은 검사 대상이 아니다 |
+| 5 | **Architecture Guard** (`arch-guard`) | `Run arch checks` = `pnpm --filter @reklue/web exec tsx ../../tools/check-arch.ts` | ① `packages/shared/lib/**` 의 supabase import ② 학습 엔진 6경로의 웹 재등장 | ⚠️ ①의 정규식이 **형제 import `./supabase` 를 놓친다**(현재 3파일 통과 중). `packages/shared/learning/**` 은 검사 대상이 아니다 |
 | 6 | **Migration Safety** (`migration-safety`) | `db reset` + **idempotency check(2회)** | 마이그레이션 체인이 fresh DB 에 순서대로 적용되는가, 번호 중복 | 이미 적용된 마이그레이션의 **수정** 여부는 못 잡는다 |
 | 7 | **AI Credit Metering (postgres-15)** (`ai-credit-tests`) | plain postgres:15 + `bootstrap-auth.sql` 셰임 + `psql -v ON_ERROR_STOP=1` 로 SQL 스위트 실행 | DB 계약(과금·한도·권한·삭제 순서 …) | ★ **글롭이 아니라 손으로 적은 목록**이다. 등록하지 않은 스위트는 영원히 안 돈다 |
 

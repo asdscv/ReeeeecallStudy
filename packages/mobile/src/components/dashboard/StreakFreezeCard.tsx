@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { useTheme, palette } from '../../theme'
 import type { FreezeInfo } from '../../hooks/useGamification'
-import { formatCount } from '@reeeeecall/shared/lib/ai/server-client'
+import { formatCount } from '@reklue/shared/lib/ai/server-client'
 
 interface StreakFreezeCardProps {
   freezeInfo: FreezeInfo

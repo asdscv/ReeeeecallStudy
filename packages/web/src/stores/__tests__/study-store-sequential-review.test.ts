@@ -29,14 +29,14 @@ const mockSupabase = vi.hoisted(() => {
   }
 })
 
-vi.mock('@reeeeecall/shared/lib/supabase', () => ({
+vi.mock('@reklue/shared/lib/supabase', () => ({
   supabase: mockSupabase,
   getSupabase: () => mockSupabase,
   initSupabase: vi.fn(),
 }))
 
 // Mock rate limiter
-vi.mock('@reeeeecall/shared/lib/rate-limit-instance', () => ({
+vi.mock('@reklue/shared/lib/rate-limit-instance', () => ({
   guard: {
     check: vi.fn().mockReturnValue({ allowed: true }),
     recordSuccess: vi.fn(),
@@ -44,18 +44,18 @@ vi.mock('@reeeeecall/shared/lib/rate-limit-instance', () => ({
 }))
 
 // Mock SRS utilities (not needed for sequential_review)
-vi.mock('@reeeeecall/shared/lib/srs', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@reeeeecall/shared/lib/srs')>()),
+vi.mock('@reklue/shared/lib/srs', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@reklue/shared/lib/srs')>()),
   calculateSRS: vi.fn(),
 }))
 
-vi.mock('@reeeeecall/shared/lib/srs-access', () => ({
+vi.mock('@reklue/shared/lib/srs-access', () => ({
   getSrsSource: vi.fn().mockReturnValue('embedded'),
   mergeCardWithProgress: vi.fn(),
 }))
 
-import { useStudyStore } from '@reeeeecall/shared/stores/study-store'
-import { advanceSequentialReviewPosition } from '@reeeeecall/shared/lib/study-session-utils'
+import { useStudyStore } from '@reklue/shared/stores/study-store'
+import { advanceSequentialReviewPosition } from '@reklue/shared/lib/study-session-utils'
 import type { Card, DeckStudyState } from '../../types/database'
 
 // ─── Helpers ────────────────────────────────────────────────

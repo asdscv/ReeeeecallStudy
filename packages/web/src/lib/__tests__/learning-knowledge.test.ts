@@ -14,7 +14,7 @@ import {
   createDefaultKnowledgeRegistry, LEGACY_MATURE_INTERVAL_DAYS,
   knowledgeState, retentionCriterion, intervalCriterion, easeAboveDefaultCriterion,
   DEFAULT_TARGET_RETENTION, retentionStabilityMultiplier,
-} from '@reeeeecall/shared/learning'
+} from '@reklue/shared/learning'
 
 const NOW = '2026-08-01T00:00:00.000Z'
 const EXAM = '2026-11-01T00:00:00.000Z'   // 92 days out

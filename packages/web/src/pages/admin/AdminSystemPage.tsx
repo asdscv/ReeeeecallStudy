@@ -4,7 +4,7 @@ import { useAdminStore } from '../../stores/admin-store'
 import { AdminStatCard } from '../../components/admin/AdminStatCard'
 import { AdminErrorState } from '../../components/admin/AdminErrorState'
 import { computeConversionRate } from '../../lib/admin-stats'
-import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
+import { formatUsdMicro } from '@reklue/shared/lib/ai/server-client'
 
 function ProgressBar({ label, value, max, color = 'blue' }: { label: string; value: number; max: number; color?: string }) {
   const pct = max > 0 ? Math.round((value / max) * 100) : 0

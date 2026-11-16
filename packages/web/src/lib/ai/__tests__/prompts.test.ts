@@ -5,7 +5,7 @@ import { describe, it, expect } from 'vitest'
 // test was green while the live prompts were untested. The copy is now deleted.
 import {
   buildTemplatePrompt, buildDeckPrompt, buildCardsPrompt,
-} from '@reeeeecall/shared/lib/ai/prompts'
+} from '@reklue/shared/lib/ai/prompts'
 
 describe('buildTemplatePrompt', () => {
   it('returns system and user prompts', () => {

@@ -19,7 +19,7 @@ import {
   buildLearningResourceJsonLd,
 } from '../content-seo'
 import { SEO } from '../seo-config'
-import { contentCanonicalUrl } from '@reeeeecall/shared/lib/content-canonical'
+import { contentCanonicalUrl } from '@reklue/shared/lib/content-canonical'
 import type { ContentDetail } from '../../types/content-blocks'
 
 const mockArticle: ContentDetail = {
@@ -305,18 +305,15 @@ describe('buildOrganizationJsonLd', () => {
     expect(Array.isArray(result.sameAs)).toBe(true)
   })
 
-  it('should include both twitter.com and x.com in sameAs', () => {
-    const result = buildOrganizationJsonLd()
-    const handle = SEO.TWITTER_HANDLE.replace('@', '')
-    expect(result.sameAs).toContain(`https://twitter.com/${handle}`)
-    expect(result.sameAs).toContain(`https://x.com/${handle}`)
+  it('should not advertise legacy or unregistered social profiles', () => {
+    expect(buildOrganizationJsonLd().sameAs).toEqual([])
   })
 
   it('should include contactPoint with email', () => {
     const result = buildOrganizationJsonLd()
     expect(result.contactPoint['@type']).toBe('ContactPoint')
     expect(result.contactPoint.contactType).toBe('customer service')
-    expect(result.contactPoint.email).toBe('admin@reeeeecallstudy.xyz')
+    expect(result.contactPoint.email).toBe('admin@reklue.com')
   })
 
   it('should derive availableLanguage from SEO.SUPPORTED_LOCALES', () => {

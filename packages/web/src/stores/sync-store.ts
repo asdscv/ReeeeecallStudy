@@ -1,2 +1,2 @@
 // Re-export from shared package
-export { useSyncStore } from '@reeeeecall/shared/stores/sync-store'
+export { useSyncStore } from '@reklue/shared/stores/sync-store'

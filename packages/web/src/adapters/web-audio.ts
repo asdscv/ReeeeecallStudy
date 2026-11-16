@@ -1,4 +1,4 @@
-import type { IAudioAdapter } from '@reeeeecall/shared/adapters/audio'
+import type { IAudioAdapter } from '@reklue/shared/adapters/audio'
 
 export class WebAudio implements IAudioAdapter {
   private activeAudio: HTMLAudioElement | null = null

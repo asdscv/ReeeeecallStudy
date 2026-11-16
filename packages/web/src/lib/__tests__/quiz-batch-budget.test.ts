@@ -21,7 +21,7 @@
  * across batches can never exceed what was approved.
  */
 import { describe, it, expect } from 'vitest'
-import { QUIZ_BATCH_SIZE } from '@reeeeecall/shared/stores/quiz-store'
+import { QUIZ_BATCH_SIZE } from '@reklue/shared/stores/quiz-store'
 
 /** Unit prices from `ai_quiz_price_units` (mig 194:128-131), and the default unit price. */
 const UNITS_PER_QUESTION = { mcq: 2, short: 2, essay: 3 } as const

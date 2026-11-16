@@ -7,20 +7,20 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useTranslation } from 'react-i18next'
 import {
   quizGrowth, QUIZ_GROWTH_POLL_MS, QUIZ_GROWTH_IDLE_TICKS,
-} from '@reeeeecall/shared/lib/quiz-shortfall'
+} from '@reklue/shared/lib/quiz-shortfall'
 import {
   useQuizStore, QuizError, QUIZ_GRADE_ACTION, type QuizSubmitResult, type QuizQuote,
   optionFlaws, optionAxes, QUIZ_FEEDBACK_REASONS,
-} from '@reeeeecall/shared/stores/quiz-store'
+} from '@reklue/shared/stores/quiz-store'
 import { Screen, Button, EmptyState } from '../../components/ui'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
 import { AiRefusalNotice } from '../../components/ai/AiRefusalNotice'
-import { answerLength } from '@reeeeecall/shared/lib/quiz-answer-limits'
-import { itemOutcome, tallyQuiz, tallyLine } from '@reeeeecall/shared/lib/quiz-outcome'
+import { answerLength } from '@reklue/shared/lib/quiz-answer-limits'
+import { itemOutcome, tallyQuiz, tallyLine } from '@reklue/shared/lib/quiz-outcome'
 import { QuizFeedback } from './QuizFeedback'
 import type { QuizStackParamList } from '../../navigation/types'
-import { gradeCostLine } from '@reeeeecall/shared/lib/quiz-pricing'
+import { gradeCostLine } from '@reklue/shared/lib/quiz-pricing'
 
 type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizRun'>
 type Rt = RouteProp<QuizStackParamList, 'QuizRun'>

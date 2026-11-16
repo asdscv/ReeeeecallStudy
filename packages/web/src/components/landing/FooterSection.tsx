@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { ScrollReveal } from './ScrollReveal'
 import { LanguageSelector } from '../common/LanguageSelector'
 import { AppDownload } from '../common/AppDownload'
-import { VOCAB_INDEX_PATH, isDeckLanguage, vocabLanguageIndexPath } from '@reeeeecall/shared/lib/vocab-hubs'
+import { VOCAB_INDEX_PATH, isDeckLanguage, vocabLanguageIndexPath } from '@reklue/shared/lib/vocab-hubs'
 
 export function FooterSection() {
   const { t, i18n } = useTranslation('landing')
@@ -75,7 +75,7 @@ export function FooterSection() {
                   </Link>
                 </li>
                 <li>
-                  <a href="mailto:admin@reeeeecallstudy.xyz" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
+                  <a href="mailto:admin@reklue.com" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
                     {t('footer.help', 'Help')}
                   </a>
                 </li>
@@ -118,10 +118,10 @@ export function FooterSection() {
               {t('footer.copyright', '© 2026 Reklue. All rights reserved.')}
             </p>
             <a
-              href="mailto:admin@reeeeecallstudy.xyz"
+              href="mailto:admin@reklue.com"
               className="text-sm text-content-tertiary hover:text-muted-foreground transition no-underline"
             >
-              admin@reeeeecallstudy.xyz
+              admin@reklue.com
             </a>
           </div>
         </ScrollReveal>

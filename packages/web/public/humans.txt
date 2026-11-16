@@ -1,7 +1,6 @@
 /* TEAM */
 Name: Reklue
-Contact: admin@reeeeecallstudy.xyz
-Twitter: @reeeeecallstudy
+Contact: admin@reklue.com
 From: South Korea
 
 /* SITE */

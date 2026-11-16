@@ -13,7 +13,7 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { aiHubEntries } from '@reeeeecall/shared/lib/ai/hub/catalog'
+import { aiHubEntries } from '@reklue/shared/lib/ai/hub/catalog'
 
 const REPO_ROOT = join(__dirname, '../../../../..')
 

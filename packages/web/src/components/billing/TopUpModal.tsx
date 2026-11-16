@@ -11,7 +11,7 @@ import {
 import { useBillingStore, PAYMENTS_ACTIVE } from '../../stores/billing-store'
 import { PurchaseConsent } from './PurchaseConsent'
 import { preferredProviderId } from '../../lib/payments'
-import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
+import { formatProductPrice } from '@reklue/shared/lib/pricing'
 
 interface TopUpModalProps {
   open: boolean

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import type { CrammingFilter } from '@reeeeecall/shared/lib/cramming-queue'
+import type { CrammingFilter } from '@reklue/shared/lib/cramming-queue'
 
 interface CrammingSetupPanelProps {
   filter: CrammingFilter

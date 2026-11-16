@@ -1,8 +1,8 @@
 import { AppState } from 'react-native'
 import type { Feather } from '@expo/vector-icons'
-import { INK_COLORS, brainGame, maxColsFor, maxRowsFor, type BrainColor, type BrainGameId, type CellInk } from '@reeeeecall/shared/lib/brain-games'
-import type { PlatformContext } from '@reeeeecall/shared/hooks/useBrainRound'
-import { flushBrainCloud, useBrainStore, type BrainStorage } from '@reeeeecall/shared/stores/brain-store'
+import { INK_COLORS, brainGame, maxColsFor, maxRowsFor, type BrainColor, type BrainGameId, type CellInk } from '@reklue/shared/lib/brain-games'
+import type { PlatformContext } from '@reklue/shared/hooks/useBrainRound'
+import { flushBrainCloud, useBrainStore, type BrainStorage } from '@reklue/shared/stores/brain-store'
 import { localPrefs } from '../../utils/local-prefs'
 
 export type FeatherName = React.ComponentProps<typeof Feather>['name']

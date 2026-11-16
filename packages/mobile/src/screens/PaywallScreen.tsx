@@ -18,7 +18,7 @@ import { purchaseService, SUBSCRIPTION_UI_ENABLED } from '../services/purchases'
 import { recordPurchaseConsent, getPlanLimits } from '../services/billing'
 import type { PurchasesPackage } from 'react-native-purchases'
 import type { BillingProduct, PlanLimits } from '../services/billing'
-import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
+import { formatProductPrice } from '@reklue/shared/lib/pricing'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
 

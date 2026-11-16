@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { fetchAllRows, fetchRowsByIds } from '@reeeeecall/shared/lib/fetch-all-rows'
+import { fetchAllRows, fetchRowsByIds } from '@reklue/shared/lib/fetch-all-rows'
 
 type Result<T> = { data: T[] | null; error: unknown }
 

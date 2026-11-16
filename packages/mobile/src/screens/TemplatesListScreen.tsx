@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Screen, Button, Badge, ListCard, ScreenHeader } from '../components/ui'
 import { useTheme, palette } from '../theme'
-import { useTemplateStore } from '@reeeeecall/shared/stores/template-store'
-import { aiHubBus } from '@reeeeecall/shared/lib/ai/hub/events'
-import type { CardTemplate } from '@reeeeecall/shared/types/database'
+import { useTemplateStore } from '@reklue/shared/stores/template-store'
+import { aiHubBus } from '@reklue/shared/lib/ai/hub/events'
+import type { CardTemplate } from '@reklue/shared/types/database'
 import type { SettingsStackParamList } from '../navigation/types'
 
 type Nav = NativeStackNavigationProp<SettingsStackParamList, 'TemplatesList'>

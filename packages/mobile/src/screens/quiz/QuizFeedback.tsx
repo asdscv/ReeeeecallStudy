@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import {
   asMcqFeedback, asShortAnswerFeedback, asEssayFeedback, asStoredRubric, splitBySpan,
-} from '@reeeeecall/shared/lib/quiz-feedback'
+} from '@reklue/shared/lib/quiz-feedback'
 import { useTheme } from '../../theme'
 import { testProps } from '../../utils/testProps'
 

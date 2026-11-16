@@ -37,7 +37,7 @@ import {
   type BrainMeta,
   type BrainProgress,
   type V1GameId,
-} from '@reeeeecall/shared/lib/brain-games'
+} from '@reklue/shared/lib/brain-games'
 
 const v1Tier = (id: V1GameId, lv: number) => V1_TIERS[id].filter((t) => lv >= t - 1e-9).length
 

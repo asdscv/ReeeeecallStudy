@@ -5,5 +5,5 @@
 // copy here is how the two would drift into disagreeing about which day it is.
 export {
   currentPlanContext, localPlanDate, resolveTimezoneLabel, utcOffsetLabel,
-} from '@reeeeecall/shared/lib/learning-plan-date'
-export type { PlanDateContext } from '@reeeeecall/shared/lib/learning-plan-date'
+} from '@reklue/shared/lib/learning-plan-date'
+export type { PlanDateContext } from '@reklue/shared/lib/learning-plan-date'

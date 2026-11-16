@@ -12,10 +12,10 @@ import { testProps } from '../utils/testProps'
 import {
   availableDomainIds, projectWorkload, daysForDailyBudget, studyDaysBetween,
   perStudyDayMultiplier, DEFAULT_NEW_CARDS_PER_DAY,
-} from '@reeeeecall/shared/learning'
-import { useLearningStore } from '@reeeeecall/shared/stores/learning-store'
-import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
-import { useAuthStore } from '@reeeeecall/shared/stores/auth-store'
+} from '@reklue/shared/learning'
+import { useLearningStore } from '@reklue/shared/stores/learning-store'
+import { useDeckStore } from '@reklue/shared/stores/deck-store'
+import { useAuthStore } from '@reklue/shared/stores/auth-store'
 
 /**
  * Goals — mobile parity with the web `/learning/goals` screen.

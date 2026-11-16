@@ -44,9 +44,9 @@ import {
   type MazeView,
   type SetColor,
   type SetMatchView,
-} from '@reeeeecall/shared/lib/brain-games'
-import { SET_MATCH_LADDER, SET_MATCH_MAX_LEVEL, isSet, setMatch, setMatchBand, setsOn, type SetMatchState } from '@reeeeecall/shared/lib/brain-games/games/set-match'
-import { CODE_BREAK_LADDER, CODE_BREAK_MAX_LEVEL, codeBreak, codeBreakBand, scoreGuess, type CodeBreakState } from '@reeeeecall/shared/lib/brain-games/games/code-break'
+} from '@reklue/shared/lib/brain-games'
+import { SET_MATCH_LADDER, SET_MATCH_MAX_LEVEL, isSet, setMatch, setMatchBand, setsOn, type SetMatchState } from '@reklue/shared/lib/brain-games/games/set-match'
+import { CODE_BREAK_LADDER, CODE_BREAK_MAX_LEVEL, codeBreak, codeBreakBand, scoreGuess, type CodeBreakState } from '@reklue/shared/lib/brain-games/games/code-break'
 import {
   MAKE_NUMBER_LADDER,
   MAKE_NUMBER_MAX_LEVEL,
@@ -56,8 +56,8 @@ import {
   makeNumberBand,
   makeNumberLimitMs,
   type MakeNumberState,
-} from '@reeeeecall/shared/lib/brain-games/games/make-number'
-import { MAZE_HIDDEN_MIN_CELL, MAZE_LADDER, MAZE_MAX_LEVEL, MAZE_MIN_CELL, mazeBand, mazeFit, mazeRun, type MazeState } from '@reeeeecall/shared/lib/brain-games/games/maze-run'
+} from '@reklue/shared/lib/brain-games/games/make-number'
+import { MAZE_HIDDEN_MIN_CELL, MAZE_LADDER, MAZE_MAX_LEVEL, MAZE_MIN_CELL, mazeBand, mazeFit, mazeRun, type MazeState } from '@reklue/shared/lib/brain-games/games/maze-run'
 
 const NEW: readonly BrainGameId[] = ['setMatch', 'codeBreak', 'makeNumber', 'mazeRun']
 /** Desktop 7×7, a phone 5×7, a small phone 4×6. */

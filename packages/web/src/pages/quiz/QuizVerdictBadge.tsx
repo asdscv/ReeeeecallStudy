@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { itemOutcome, type QuizItemLike } from '@reeeeecall/shared/lib/quiz-outcome'
+import { itemOutcome, type QuizItemLike } from '@reklue/shared/lib/quiz-outcome'
 
 /**
  * 맞음 / 부분 / 틀림 / 채점 안 함 — the four words, and never a percentage.

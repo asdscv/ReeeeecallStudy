@@ -13,7 +13,7 @@ import type { PublicListingPreview } from '../types/database'
 import { OfficialWordList } from '../components/marketplace/OfficialWordList'
 import {
   wordListPageLanguage, wordListHeading, wordListDescription, wordListHreflang,
-} from '@reeeeecall/shared/lib/listing-seo'
+} from '@reklue/shared/lib/listing-seo'
 
 export function PublicListingPage() {
   const { listingId } = useParams<{ listingId: string }>()

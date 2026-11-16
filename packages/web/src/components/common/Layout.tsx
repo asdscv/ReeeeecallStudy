@@ -83,8 +83,8 @@ export function Layout() {
               <p className="text-sm text-muted-foreground">
                 {t('footer.copyright', '© 2026 Reklue. All rights reserved.')}
               </p>
-              <a href="mailto:admin@reeeeecallstudy.xyz" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
-                admin@reeeeecallstudy.xyz
+              <a href="mailto:admin@reklue.com" className="text-sm text-muted-foreground hover:text-foreground transition no-underline">
+                admin@reklue.com
               </a>
             </div>
           </div>

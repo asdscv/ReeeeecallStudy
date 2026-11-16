@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { aiHubBus, aiHubAnalyticsEvent } from '@reeeeecall/shared/lib/ai/hub/events'
+import { aiHubBus, aiHubAnalyticsEvent } from '@reklue/shared/lib/ai/hub/events'
 import { useTrackEvent } from './useTrackEvent'
 
 /**

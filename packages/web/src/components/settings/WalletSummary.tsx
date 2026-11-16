@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Loader2 } from 'lucide-react'
-import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
+import { formatUsdMicro } from '@reklue/shared/lib/ai/server-client'
 import { useBillingStore, PAYMENTS_ACTIVE } from '../../stores/billing-store'
 import { TopUpModal } from '../billing/TopUpModal'
 import { CreditLedgerList } from './CreditLedgerList'

@@ -1,2 +1,2 @@
 // Re-export from shared — single source of truth
-export { useSharingStore } from '@reeeeecall/shared/stores/sharing-store'
+export { useSharingStore } from '@reklue/shared/stores/sharing-store'

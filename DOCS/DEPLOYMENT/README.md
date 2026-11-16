@@ -35,7 +35,7 @@
 | iOS bundleId / ASC App ID | `com.reeeeecall.study` / `6761741123` |
 | Android package | `com.reeeeecall.study` |
 | 웹 도메인 | `https://reklue.com` (기존 `reeeeecallstudy.xyz`는 전환용 주소) |
-| Cloudflare Worker name | `reeeeecallstudy` (`wrangler.jsonc`) |
+| Cloudflare Worker name | `reklue` (`wrangler.jsonc`) |
 
 ### 2026-11-16 브랜드 변경 — Reklue / 리클루
 
@@ -48,7 +48,7 @@
 - 스토어 등록정보 원본은 `DOCS/MOBILE/STORE_METADATA.md`다. 코드 변경이나 웹 배포가
   App Store / Google Play 콘솔의 이름·설명을 자동으로 바꾸지는 않는다.
 - 글자 로고 SVG 원본은 `packages/web/public/logo-text.svg`, 웹·모바일 PNG와 공유 이미지
-  재생성은 `pnpm --filter @reeeeecall/web exec tsx scripts/generate-og-image.ts`.
+  재생성은 `pnpm --filter @reklue/web exec tsx scripts/generate-og-image.ts`.
 
 > ⚠️ Git/GitHub 작업은 `gh` 계정 **asdscv**로 한다(푸시 후에도 asdscv 활성 유지). EAS는 `~/.expo/state.json` 세션(asdscv) 사용.
 
@@ -67,7 +67,7 @@
 > 실측: 라이브 `reeeeecallstudy.xyz`가 `origin/main`에는 없고 `origin/develop`에만 있는 키를 서빙하고 있었다
 > (`develop`이 `main`보다 34커밋 앞선 시점).
 > ```bash
-> curl -sS https://reeeeecallstudy.xyz/locales/ko/ai-generate.json | jq .wallet.freeQuizOnly
+> curl -sS https://reklue.com/locales/ko/ai-generate.json | jq .wallet.freeQuizOnly
 > # → "오늘 남은 무료 문항 {{free}}개"   (develop 에만 있는 키)
 > git show origin/main:packages/web/public/locales/ko/ai-generate.json | jq .wallet.freeQuizOnly  # → null
 > ```
@@ -76,9 +76,9 @@
 ### 배포 확인
 ```bash
 # 사용자 뷰
-curl -sI https://reeeeecallstudy.xyz/ | head -1            # HTTP/2 200 기대
+curl -sI https://reklue.com/ | head -1            # HTTP/2 200 기대
 # Worker(SEO) 동작 — Googlebot으로 인사이트 hreflang 확인
-curl -s -A "Googlebot/2.1" https://reeeeecallstudy.xyz/insight | grep -o 'hreflang="[a-z-]*"' | sort -u
+curl -s -A "Googlebot/2.1" https://reklue.com/insight | grep -o 'hreflang="[a-z-]*"' | sort -u
 #   → en / ko / x-default 만 나오면 locale-policy(인덱싱 한·영 한정)가 살아있는 것
 ```
 > 로컬 sandbox에서 `curl`이 `000`이면 도메인 오타(`.study`가 아니라 **`.xyz`**)거나 egress 차단. python `urllib`로도 확인 가능.

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
-import { useQuizStore, isDailyCheckTitle, type AiActivityEntry } from '@reeeeecall/shared/stores/quiz-store'
-import { dateLine, tallyFromCounts, tallyLine } from '@reeeeecall/shared/lib/quiz-outcome'
-import { formatUsdMicro } from '@reeeeecall/shared/lib/ai/server-client'
+import { useQuizStore, isDailyCheckTitle, type AiActivityEntry } from '@reklue/shared/stores/quiz-store'
+import { dateLine, tallyFromCounts, tallyLine } from '@reklue/shared/lib/quiz-outcome'
+import { formatUsdMicro } from '@reklue/shared/lib/ai/server-client'
 import { testProps } from '../../utils/testProps'
 import { useTheme } from '../../theme'
 

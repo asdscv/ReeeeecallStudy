@@ -158,7 +158,7 @@ export function useSEO(options: SEOOptions) {
 
     // Twitter Card
     setMeta('name', 'twitter:card', ogImage ? 'summary_large_image' : 'summary')
-    setMeta('name', 'twitter:site', SEO.TWITTER_HANDLE)
+    if (SEO.TWITTER_HANDLE) setMeta('name', 'twitter:site', SEO.TWITTER_HANDLE)
     setMeta('name', 'twitter:title', title)
     setMeta('name', 'twitter:description', description)
     if (ogImage) {

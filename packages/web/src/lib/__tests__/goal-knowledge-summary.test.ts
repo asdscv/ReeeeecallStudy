@@ -19,7 +19,7 @@
  * a payload without it claims no backlog rather than falling back to the residual.
  */
 import { describe, it, expect } from 'vitest'
-import { goalKnowledgeSummary } from '@reeeeecall/shared/lib/goal-knowledge-summary'
+import { goalKnowledgeSummary } from '@reklue/shared/lib/goal-knowledge-summary'
 
 describe('goalKnowledgeSummary', () => {
   it('measures how far through the goal the learner is', () => {

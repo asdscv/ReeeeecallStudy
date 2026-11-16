@@ -20,7 +20,7 @@
 | Google Play 짧은 설명 | 80 | ✅ |
 | Google Play 긴 설명 | 4000 | ✅ 전문 검색 |
 
-**브랜드 표기**: 영어와 글로벌 브랜드는 `Reklue`, 한국어 발음 표기는 `리클루`다. 이름·부제·설명은 새 브랜드로 통일하고, 기존 `recallstudy`·`reeeeecallstudy` 검색어는 검색 연속성을 위한 비노출 키워드에만 유지한다.
+**브랜드 표기**: 영어와 글로벌 브랜드는 `Reklue`, 한국어 발음 표기는 `리클루`다. 이름·부제·설명은 새 브랜드로 통일하고, 스토어 키워드도 `reklue`로 통일한다.
 
 **이름/부제와 겹치는 키워드는 버려진 글자수다.** 2026-08-28 첫 작성 때 zh(`复习`,`考试`)·
 vi(`ghi nhớ`)·id(`belajar`,`kartu`)·es(`repaso`)가 이름/부제에 이미 있는 말을 키워드에서
@@ -99,7 +99,7 @@ Start studying smarter today. Download Reklue for free.
 |---|---|---|
 | App Store 이름 | `리클루 Reklue: 암기카드·두뇌 게임` | 22/30 |
 | App Store 부제 | `플래시카드 영단어 암기앱 간격반복` | 18/30 |
-| App Store 키워드 | `recallstudy,reeeeecallstudy,recall,study,단어암기,암기법,단어외우기,반복학습,복습,퀴즈,공부앱,자격증,토익,수능,공무원,오답노트` | 89/100 |
+| App Store 키워드 | `reklue,recall,study,단어암기,암기법,단어외우기,반복학습,복습,퀴즈,공부앱,자격증,토익,수능,공무원,오답노트` | 68/100 |
 | Play 앱 이름 | `리클루 Reklue: 암기카드·두뇌 게임` | 22/30 |
 | Play 짧은 설명 | Reklue - AI 암기카드와 과학적 간격반복(SRS)으로 영단어·시험공부를 가장 빠르게. | 51/80 |
 | 프로모션 텍스트 | 새 기능: 필기 사진 한 장이면 AI가 암기카드 한 덱을 만들어 줍니다. 복습 시점은 간격 반복이 알아서 잡습니다. 매일 AI 카드 10장 무료. | 81/170 |
@@ -148,7 +148,7 @@ Start studying smarter today. Download Reklue for free.
 |---|---|---|
 | App Store 이름 | `Reklue: 暗記カード・脳トレ` | 17/30 |
 | App Store 부제 | `フラッシュカード・間隔反復・英単語` | 17/30 |
-| App Store 키워드 | `recallstudy,reeeeecallstudy,recall,study,暗記アプリ,勉強,テスト対策,復習,クイズ,語彙,資格,受験,記憶術,SRS,問題集,語学` | 86/100 |
+| App Store 키워드 | `reklue,recall,study,暗記アプリ,勉強,テスト対策,復習,クイズ,語彙,資格,受験,記憶術,SRS,問題集,語学` | 65/100 |
 | Play 앱 이름 | `Reklue: 暗記カード・脳トレ` | 17/30 |
 | Play 짧은 설명 | Reklue - AIカード生成と科学的なSRS（間隔反復）で記憶力を最大化。 | 39/80 |
 | 프로모션 텍스트 | 新機能：ノートの写真から、AIが暗記カードのデッキを丸ごと作成。復習のタイミングは間隔反復におまかせ。毎日AIカード10枚が無料です。 | 67/170 |
@@ -197,7 +197,7 @@ Reklue— あらゆるものを暗記する、最もスマートな方法。
 |---|---|---|
 | App Store 이름 | `Reklue: 闪卡学习与脑力游戏` | 17/30 |
 | App Store 부제 | `AI记忆卡·间隔重复·考试复习` | 15/30 |
-| App Store 키워드 | `recallstudy,reeeeecallstudy,抽认卡,单词卡,测验,词汇,学习,SRS,笔记,英语,记忆法,记单词,刷题,速记,默写,外语,自学,考研,记忆训练` | 85/100 |
+| App Store 키워드 | `reklue,抽认卡,单词卡,测验,词汇,学习,SRS,笔记,英语,记忆法,记单词,刷题,速记,默写,外语,自学,考研,记忆训练` | 64/100 |
 | Play 앱 이름 | `Reklue: 闪卡学习与脑力游戏` | 17/30 |
 | Play 짧은 설명 | 用 AI 闪卡与科学的间隔重复（SRS），把任何知识牢牢记住。 | 31/80 |
 | 프로모션 텍스트 | 新功能：拍一张笔记照片，AI 就能生成一整副闪卡；复习时机交给间隔重复算法。每天 10 张 AI 卡片免费。 | 54/170 |
@@ -246,7 +246,7 @@ Reklue—— 记住任何东西的最聪明方式。
 |---|---|---|
 | App Store 이름 | `Reklue: Thẻ học & Trò trí não` | 29/30 |
 | App Store 부제 | `Lặp lại ngắt quãng & từ vựng` | 28/30 |
-| App Store 키워드 | `recallstudy,reeeeecallstudy,ôn tập,trắc nghiệm,thẻ học,SRS,ngôn ngữ,thi cử,tiếng anh,flashcard` | 94/100 |
+| App Store 키워드 | `reklue,ôn tập,trắc nghiệm,thẻ học,SRS,ngôn ngữ,thi cử,tiếng anh,flashcard` | 73/100 |
 | Play 앱 이름 | `Reklue: Thẻ học & Trò trí não` | 29/30 |
 | Play 짧은 설명 | Ghi nhớ nhanh hơn với thẻ ghi nhớ AI và hệ thống lặp lại ngắt quãng (SRS). | 74/80 |
 | 프로모션 텍스트 | Mới: biến ảnh chụp ghi chép thành cả một bộ thẻ ghi nhớ bằng AI, và để lặp lại ngắt quãng sắp lịch ôn cho bạn. 10 thẻ AI miễn phí mỗi ngày. | 139/170 |
@@ -295,7 +295,7 @@ Bắt đầu học thông minh hơn ngay hôm nay. Tải Reklue miễn phí.
 |---|---|---|
 | App Store 이름 | `Reklue: การ์ด & เกมฝึกสมอง` | 26/30 |
 | App Store 부제 | `ทบทวนเว้นระยะ ท่องศัพท์ SRS` | 27/30 |
-| App Store 키워드 | `recallstudy,reeeeecallstudy,ท่องจำ,แบบทดสอบ,คำศัพท์,ภาษา,สอบ,เรียน,บัตรคำ,ความจำ,อ่านหนังสือ` | 92/100 |
+| App Store 키워드 | `reklue,ท่องจำ,แบบทดสอบ,คำศัพท์,ภาษา,สอบ,เรียน,บัตรคำ,ความจำ,อ่านหนังสือ` | 71/100 |
 | Play 앱 이름 | `Reklue: การ์ด & เกมฝึกสมอง` | 26/30 |
 | Play 짧은 설명 | จำได้เร็วขึ้นด้วยแฟลชการ์ด AI และการทบทวนเว้นระยะ (SRS) ที่พิสูจน์แล้ว | 70/80 |
 | 프로모션 텍스트 | ใหม่: เปลี่ยนรูปสมุดจดให้เป็นชุดแฟลชการ์ดทั้งชุดด้วย AI และให้ระบบทบทวนเว้นระยะจัดตารางให้คุณ ฟรีวันละ 10 การ์ด AI | 114/170 |
@@ -344,7 +344,7 @@ Reklue — วิธีที่ฉลาดที่สุดในการจ
 |---|---|---|
 | App Store 이름 | `Reklue: Kartu & Game Otak` | 25/30 |
 | App Store 부제 | `Pengulangan Berjarak, Kosakata` | 30/30 |
-| App Store 키워드 | `recallstudy,reeeeecallstudy,hafalan,menghafal,kuis,ujian,bahasa,flashcard,SRS,ingatan,inggris,tes` | 97/100 |
+| App Store 키워드 | `reklue,hafalan,menghafal,kuis,ujian,bahasa,flashcard,SRS,ingatan,inggris,tes` | 76/100 |
 | Play 앱 이름 | `Reklue: Kartu & Game Otak` | 25/30 |
 | Play 짧은 설명 | Hafal lebih cepat dengan flashcard AI dan sistem pengulangan berjarak (SRS). | 76/80 |
 | 프로모션 텍스트 | Baru: ubah foto catatan Anda menjadi satu dek flashcard penuh dengan AI, dan biarkan pengulangan berjarak menjadwalkan ulasannya. 10 kartu AI gratis tiap hari. | 159/170 |
@@ -393,7 +393,7 @@ Mulai belajar lebih cerdas hari ini. Unduh Reklue gratis.
 |---|---|---|
 | App Store 이름 | `Reklue: Tarjetas y juegos` | 25/30 |
 | App Store 부제 | `Repetición espaciada y repaso` | 29/30 |
-| App Store 키워드 | `recallstudy,reeeeecallstudy,memorizar,vocabulario,examen,estudio,quiz,idiomas,fichas,SRS,oposiciones` | 100/100 |
+| App Store 키워드 | `reklue,memorizar,vocabulario,examen,estudio,quiz,idiomas,fichas,SRS,oposiciones` | 79/100 |
 | Play 앱 이름 | `Reklue: Tarjetas y juegos` | 25/30 |
 | Play 짧은 설명 | Memoriza más rápido con tarjetas de IA y repetición espaciada (SRS) científica. | 79/80 |
 | 프로모션 텍스트 | Nuevo: convierte una foto de tus apuntes en un mazo completo con IA y deja que la repetición espaciada programe cada repaso. 10 tarjetas de IA gratis al día. | 157/170 |
@@ -462,8 +462,8 @@ Empieza hoy a estudiar de forma más inteligente. Descarga Reklue gratis.
 
 | 항목 | 값 |
 |---|---|
-| 개인정보처리방침 | https://reeeeecallstudy.asdscv.workers.dev/privacy-policy.html |
-| 서비스 이용약관 | https://reeeeecallstudy.asdscv.workers.dev/terms-of-service.html |
+| 개인정보처리방침 | https://reklue.com/privacy-policy.html |
+| 서비스 이용약관 | https://reklue.com/terms-of-service.html |
 | 지원 | mailto:luke@rictax.kr |
 
 ## 스크린샷 / 이미지 — 2026-08-28 전량 교체

@@ -11,8 +11,8 @@
  * contains an audio field.
  */
 import { describe, expect, it } from 'vitest'
-import { resolveCardAnswerFaces, cardReferenceAnswer } from '@reeeeecall/shared/lib/card-answer'
-import type { Card, CardTemplate } from '@reeeeecall/shared/types/database'
+import { resolveCardAnswerFaces, cardReferenceAnswer } from '@reklue/shared/lib/card-answer'
+import type { Card, CardTemplate } from '@reklue/shared/types/database'
 
 const template = (over: Partial<CardTemplate> = {}): CardTemplate => ({
   id: 'tpl-1', user_id: 'user-1', name: 'T',

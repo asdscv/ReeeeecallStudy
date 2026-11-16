@@ -1,7 +1,7 @@
 import { supabase } from './supabase'
 import { utcToLocalDateKey, dateToLocalKey, parseUTC } from './date-utils'
 import type { StudyLog } from '../types/database'
-import { fetchAllRows } from '@reeeeecall/shared/lib/fetch-all-rows'
+import { fetchAllRows } from '@reklue/shared/lib/fetch-all-rows'
 
 // ─── Pure Functions (testable without Supabase) ──────────────────────
 

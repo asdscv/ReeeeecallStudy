@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { deckListingFilter, parseDeckFamily } from '@reeeeecall/shared/lib/official-deck-family'
+import { deckListingFilter, parseDeckFamily } from '@reklue/shared/lib/official-deck-family'
 
 export interface OfficialDeckSummary {
   id: string

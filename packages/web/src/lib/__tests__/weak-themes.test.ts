@@ -9,7 +9,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   validateWeakThemes, isWeakTheme, WEAK_THEMES, WEAK_THEME_MIN_CONFIDENCE,
-} from '@reeeeecall/shared/lib/weak-themes'
+} from '@reklue/shared/lib/weak-themes'
 
 const ALLOWED = ['a', 'b', 'c']
 const ok = (over: Record<string, unknown> = {}) =>

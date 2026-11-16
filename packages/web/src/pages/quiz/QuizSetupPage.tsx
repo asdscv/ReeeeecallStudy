@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { AI_HUB_QUIZ } from '@reeeeecall/shared/lib/ai/hub/catalog'
+import { AI_HUB_QUIZ } from '@reklue/shared/lib/ai/hub/catalog'
 import { AiCreditNotice } from '../../components/ai/AiCreditNotice'
 import { useNavigate } from 'react-router-dom'
 import {
   useQuizStore, QuizError, QUIZ_GENERATE_ACTION,
   type QuizQuestionType, type QuizQuote, type QuizzableCount, type QuizDifficultyBand,
-} from '@reeeeecall/shared/stores/quiz-store'
-import { useDeckStore } from '@reeeeecall/shared/stores/deck-store'
-import { minCardsForMcq } from '@reeeeecall/shared/lib/quiz-outcome'
-import { generateCostLine, freeLeftLine, affordableQuestionCount } from '@reeeeecall/shared/lib/quiz-pricing'
+} from '@reklue/shared/stores/quiz-store'
+import { useDeckStore } from '@reklue/shared/stores/deck-store'
+import { minCardsForMcq } from '@reklue/shared/lib/quiz-outcome'
+import { generateCostLine, freeLeftLine, affordableQuestionCount } from '@reklue/shared/lib/quiz-pricing'
 
 const TYPES: QuizQuestionType[] = ['mcq', 'short', 'essay']
 // Presets plus a free field up to MAX_COUNT. The presets stop where a learner's idea of "a

@@ -1,4 +1,4 @@
-import type { IPlatformAdapter } from '@reeeeecall/shared/adapters/platform'
+import type { IPlatformAdapter } from '@reklue/shared/adapters/platform'
 
 export class WebPlatform implements IPlatformAdapter {
   getOrigin(): string {

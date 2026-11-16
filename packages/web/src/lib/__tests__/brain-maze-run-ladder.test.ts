@@ -27,7 +27,7 @@ import {
   zestPlan,
   type CreateContext,
   type MazeView,
-} from '@reeeeecall/shared/lib/brain-games'
+} from '@reklue/shared/lib/brain-games'
 import {
   MAZE_COLORS,
   MAZE_HIDDEN_MIN_CELL,
@@ -41,7 +41,7 @@ import {
   mazeRun,
   measureWalk,
   type MazeState,
-} from '@reeeeecall/shared/lib/brain-games/games/maze-run'
+} from '@reklue/shared/lib/brain-games/games/maze-run'
 
 const DESKTOP = DEFAULT_CONTEXT
 /** A phone (5 columns × 7 rows of 56dp game cells). */

@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from 'react'
-import { useStudyStore, type PlanSelection } from '@reeeeecall/shared/stores/study-store'
-import type { StudyMode } from '@reeeeecall/shared/types/database'
-import type { CrammingFilter } from '@reeeeecall/shared/lib/cramming-queue'
-import { calculateStudyProgress } from '@reeeeecall/shared/lib/study-progress'
+import { useStudyStore, type PlanSelection } from '@reklue/shared/stores/study-store'
+import type { StudyMode } from '@reklue/shared/types/database'
+import type { CrammingFilter } from '@reklue/shared/lib/cramming-queue'
+import { calculateStudyProgress } from '@reklue/shared/lib/study-progress'
 import { haptics } from '../utils/haptics'
 
 /**
