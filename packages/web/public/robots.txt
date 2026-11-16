@@ -384,9 +384,9 @@ Allow: /rss.xml$
 Allow: /atom.xml$
 Disallow: /
 
-Sitemap: https://reeeeecallstudy.xyz/sitemap.xml
+Sitemap: https://reklue.com/sitemap.xml
 
 # AI/LLM context files
 # https://llmstxt.org/
-# llms.txt: https://reeeeecallstudy.xyz/llms.txt
-# llms-full.txt: https://reeeeecallstudy.xyz/llms-full.txt
+# llms.txt: https://reklue.com/llms.txt
+# llms-full.txt: https://reklue.com/llms-full.txt

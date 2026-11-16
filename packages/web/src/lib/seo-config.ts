@@ -1,11 +1,12 @@
+import { SITE_URL } from '@reeeeecall/shared/lib/site-url'
 import { BRAND_NAME } from '@reeeeecall/shared/lib/brand'
 
 // Centralized SEO configuration — single source of truth
 export const SEO = {
-  SITE_URL: 'https://reeeeecallstudy.xyz',
+  SITE_URL,
   BRAND_NAME,
   TWITTER_HANDLE: '@reeeeecallstudy',
-  DEFAULT_OG_IMAGE: 'https://reeeeecallstudy.xyz/og-image.png',
+  DEFAULT_OG_IMAGE: `${SITE_URL}/og-image.png`,
   OG_IMAGE_WIDTH: 1200,
   OG_IMAGE_HEIGHT: 630,
   THEME_COLOR: '#2563eb',

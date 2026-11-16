@@ -25,15 +25,15 @@ afterEach(() => vi.unstubAllGlobals())
 describe('official deck page = word list in the deck language', () => {
   it('serves the search-phrase heading, one canonical URL, the language cluster and 50 rows', async () => {
     stubPreview(official())
-    const res = await handleListingBotRequest('deck-ko', new URL('https://reeeeecallstudy.xyz/d/deck-ko?lang=en'), env)
+    const res = await handleListingBotRequest('deck-ko', new URL('https://reklue.com/d/deck-ko?lang=en'), env)
     const html = await res.text()
 
     expect(html).toMatch(/<html lang="ko"/)
     expect(html).toContain('<title>토익 800점 단어 1,500개 — 뜻·예문 (영어 → 한국어) | Reklue</title>')
     expect(html).toContain('<h1>토익 800점 단어 1,500개 — 뜻·예문 (영어 → 한국어)</h1>')
-    expect(html).toContain('<link rel="canonical" href="https://reeeeecallstudy.xyz/d/deck-ko">')
-    expect(html).toContain('hreflang="ko" href="https://reeeeecallstudy.xyz/d/deck-ko"')
-    expect(html).toContain('hreflang="ja" href="https://reeeeecallstudy.xyz/d/deck-ja"')
+    expect(html).toContain('<link rel="canonical" href="https://reklue.com/d/deck-ko">')
+    expect(html).toContain('hreflang="ko" href="https://reklue.com/d/deck-ko"')
+    expect(html).toContain('hreflang="ja" href="https://reklue.com/d/deck-ja"')
     expect(html).not.toContain('?lang=')
     expect((html.match(/<tr><td lang="en">/g) || []).length).toBe(50)
     expect(html).toContain('나머지 1,450개는 간격 반복으로 학습하기')
@@ -42,14 +42,14 @@ describe('official deck page = word list in the deck language', () => {
 
   it('escapes card text', async () => {
     stubPreview(official())
-    const html = await (await handleListingBotRequest('deck-ko', new URL('https://reeeeecallstudy.xyz/d/deck-ko'), env)).text()
+    const html = await (await handleListingBotRequest('deck-ko', new URL('https://reklue.com/d/deck-ko'), env)).text()
     expect(html).toContain('Example 0 &lt;b&gt;.')
     expect(html).not.toContain('Example 0 <b>.')
   })
 
   it('keeps the old layout for decks published by users', async () => {
     stubPreview(official({ owner_is_official: false, native_language: null, siblings: [] , sample_fields: [card(1)] }))
-    const html = await (await handleListingBotRequest('deck-ko', new URL('https://reeeeecallstudy.xyz/d/deck-ko'), env)).text()
+    const html = await (await handleListingBotRequest('deck-ko', new URL('https://reklue.com/d/deck-ko'), env)).text()
     expect(html).toContain('Flashcard Deck')
     expect(html).not.toContain('간격 반복으로 학습하기')
   })

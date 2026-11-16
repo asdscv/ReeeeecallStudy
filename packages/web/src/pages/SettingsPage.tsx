@@ -636,11 +636,11 @@ export function SettingsPage() {
 
         {/* ── Legal (compact inline, very bottom) ── */}
         <div className="flex items-center justify-center gap-3 py-2 text-sm text-content-tertiary">
-          <a href="https://reeeeecallstudy.xyz/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground transition no-underline text-content-tertiary">
+          <a href="https://reklue.com/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground transition no-underline text-content-tertiary">
             {t('legal.privacy')}
           </a>
           <span>·</span>
-          <a href="https://reeeeecallstudy.xyz/terms-of-service.html" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground transition no-underline text-content-tertiary">
+          <a href="https://reklue.com/terms-of-service.html" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground transition no-underline text-content-tertiary">
             {t('legal.terms')}
           </a>
         </div>

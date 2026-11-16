@@ -22,13 +22,13 @@ import { formatProductPrice } from '@reeeeecall/shared/lib/pricing'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme'
 
-const PRIVACY_POLICY_URL = 'https://reeeeecallstudy.xyz/privacy-policy.html'
-const TERMS_OF_SERVICE_URL = 'https://reeeeecallstudy.xyz/terms-of-service.html'
+const PRIVACY_POLICY_URL = 'https://reklue.com/privacy-policy.html'
+const TERMS_OF_SERVICE_URL = 'https://reklue.com/terms-of-service.html'
 const MANAGE_SUBSCRIPTIONS_URL = Platform.select({
   ios: 'https://apps.apple.com/account/subscriptions',
   default: 'https://play.google.com/store/account/subscriptions',
 })
-const REFUND_POLICY_URL = 'https://reeeeecallstudy.xyz/refund-policy.html'
+const REFUND_POLICY_URL = 'https://reklue.com/refund-policy.html'
 // Where a refund is actually requested. Neither store lets the developer issue one
 // from here: Apple decides every App Store refund, and a Play refund outside our
 // policy window is Google's call. On iOS we prefer the in-app StoreKit sheet and

@@ -14,6 +14,7 @@ import { handleRobots } from './worker-modules/seo/robots.js'
 import { handleRSSFeed } from './worker-modules/seo/feeds.js'
 import { getSupabaseAnonKey } from './worker-modules/seo/helpers.js'
 import { isUiLocale, isIndexable } from './worker-modules/locale-policy.js'
+import { SITE_URL, LEGACY_SITE_HOST } from './packages/shared/lib/site-url.ts'
 
 const SPA_BOT_PASSTHROUGH = new Set(['/privacy-policy', '/terms-of-service'])
 
@@ -38,6 +39,14 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url)
     const ua = request.headers.get('user-agent') || ''
+
+    // Keep old shares, article URLs and login return paths working during the move.
+    if ([LEGACY_SITE_HOST, `www.${LEGACY_SITE_HOST}`, 'www.reklue.com'].includes(url.hostname)) {
+      const target = new URL(SITE_URL)
+      target.pathname = url.pathname
+      target.search = url.search
+      return Response.redirect(target.toString(), 308)
+    }
 
     // Trailing slash redirect — prevent duplicate content (except root)
     if (url.pathname.length > 1 && url.pathname.endsWith('/')) {

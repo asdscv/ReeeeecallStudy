@@ -13,7 +13,7 @@ describe('buildHreflangTags', () => {
   it('always includes x-default pointing at the clean (param-free) URL', () => {
     const out = buildHreflangTags('/insight/foo', true, ['en'])
     expect(out).toContain(
-      '<link rel="alternate" hreflang="x-default" href="https://reeeeecallstudy.xyz/insight/foo">',
+      '<link rel="alternate" hreflang="x-default" href="https://reklue.com/insight/foo">',
     )
   })
 
@@ -28,6 +28,6 @@ describe('buildHreflangTags', () => {
 
   it('appends ?lang= per locale when queryParam is true', () => {
     const out = buildHreflangTags('/insight/foo', true, ['ko'])
-    expect(out).toContain('href="https://reeeeecallstudy.xyz/insight/foo?lang=ko"')
+    expect(out).toContain('href="https://reklue.com/insight/foo?lang=ko"')
   })
 })

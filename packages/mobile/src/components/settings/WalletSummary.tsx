@@ -19,7 +19,7 @@ import type { BillingProduct } from '../../services/billing'
 // Ledger rows shown before the "show all" toggle.
 const HISTORY_PREVIEW = 5
 
-const REFUND_POLICY_URL = 'https://reeeeecallstudy.xyz/refund-policy.html'
+const REFUND_POLICY_URL = 'https://reklue.com/refund-policy.html'
 
 // AI wallet / usage content for the mobile Settings accordion (충전금·사용량):
 // $ balance + today's free-tier usage + recent history (get_ai_wallet_summary, mig

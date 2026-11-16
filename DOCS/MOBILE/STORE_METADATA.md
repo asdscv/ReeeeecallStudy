@@ -4,7 +4,7 @@
 > 고친 내용을 App Store 8개 로케일 / Google Play 10개 로케일에 그대로 옮긴다.
 >
 > **2026-11-16 리브랜딩 초안:** 브랜드를 **Reklue / 리클루**로 통일했다. 아래 내용은 스토어 반영용 원본이며 외부 콘솔에 적용됐다는 뜻은 아니다.
-> 도메인 `reeeeecallstudy.xyz`, 앱 ID `com.reeeeecall.study`, EAS 프로젝트와 구매 상품 ID는 유지한다.
+> 기본 도메인은 `reklue.com`으로 전환하고, 앱 ID `com.reeeeecall.study`, EAS 프로젝트와 구매 상품 ID는 유지한다.
 > 기기 홈 화면 이름은 새 네이티브 빌드 설치 후 바뀐다.
 
 ## 글자수 한도 (초과하면 API 가 400 을 준다)

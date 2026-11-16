@@ -138,7 +138,7 @@ export function ShareDeckScreen() {
       return
     }
 
-    const link = `https://reeeeecallstudy.xyz/invite/${inviteCode}`
+    const link = `https://reklue.com/invite/${inviteCode}`
     setInviteLink(link)
     setCreating(false)
     await fetchShares()

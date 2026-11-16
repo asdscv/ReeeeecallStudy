@@ -29,7 +29,7 @@ describe('crawler HTML carries the same drop-off app links as the page', () => {
       if (u.includes('select=locale')) return { ok: true, json: async () => [{ locale: 'en' }] }
       return { ok: true, json: async () => [ARTICLE] }
     }))
-    const res = await handleContentDetailBot('toeic-part-5', new URL('https://reeeeecallstudy.xyz/insight/toeic-part-5'), env)
+    const res = await handleContentDetailBot('toeic-part-5', new URL('https://reklue.com/insight/toeic-part-5'), env)
     const html = await res.text()
 
     expect(html.match(/<aside><a href="https:\/\/apps\.apple\.com\//g)).toHaveLength(2)
@@ -39,6 +39,6 @@ describe('crawler HTML carries the same drop-off app links as the page', () => {
     expect(html).toContain('TOEIC Part 5 | Reklue')
     expect(html).toContain('Start with Reklue')
     expect(html).not.toContain('ReeeeecallStudy')
-    expect(html).toContain('https://reeeeecallstudy.xyz')
+    expect(html).toContain('https://reklue.com')
   })
 })

@@ -17,14 +17,15 @@ describe('previously published brand copy', () => {
     expect(result.author_name).toBe('Reklue')
     expect(result.content_blocks[0].props.title).toBe('Start with Reklue')
     expect(result.content_blocks[0].props.description).toBe('Reklue에서 학습하세요.')
-    expect(result.content_blocks[0].props.buttonUrl).toBe(article.content_blocks[0].props.buttonUrl)
+    expect(result.content_blocks[0].props.buttonUrl).toBe('https://reklue.com/auth/login?ref=ReeeeecallStudy')
+    expect(article.content_blocks[0].props.buttonUrl).toBe('https://reeeeecallstudy.xyz/auth/login?ref=ReeeeecallStudy')
     expect(article.author_name).toBe('ReeeeecallStudy')
     expect(withCurrentBrand(result)).toEqual(result)
   })
 
-  it('preserves domains, email addresses, links and installed-app identities', () => {
+  it('preserves unrelated domains, email addresses and installed-app identities', () => {
     const identities = {
-      url: 'https://reeeeecallstudy.xyz/insight/hello',
+      url: 'https://example.com/insight/hello',
       path: 'https://example.com/ReeeeecallStudy/logo.png',
       email: 'ReeeeecallStudy@example.com',
       contact: 'admin@reeeeecallstudy.xyz',

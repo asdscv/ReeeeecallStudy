@@ -3,9 +3,9 @@
   <ShortName>Reklue</ShortName>
   <Description>Search learning insights and study strategies on Reklue</Description>
   <InputEncoding>UTF-8</InputEncoding>
-  <Url type="text/html" template="https://reeeeecallstudy.xyz/insight?q={searchTerms}"/>
-  <Url type="application/opensearchdescription+xml" rel="self" template="https://reeeeecallstudy.xyz/opensearch.xml"/>
-  <Image height="16" width="16" type="image/png">https://reeeeecallstudy.xyz/favicon.png</Image>
+  <Url type="text/html" template="https://reklue.com/insight?q={searchTerms}"/>
+  <Url type="application/opensearchdescription+xml" rel="self" template="https://reklue.com/opensearch.xml"/>
+  <Image height="16" width="16" type="image/png">https://reklue.com/favicon.png</Image>
   <LongName>Reklue — Smart Flashcard Learning Insights</LongName>
   <Tags>spaced repetition flashcards study learning SRS</Tags>
   <Contact>admin@reeeeecallstudy.xyz</Contact>

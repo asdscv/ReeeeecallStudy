@@ -15,13 +15,13 @@
 
 ## Public Links
 
-- [English homepage](https://reeeeecallstudy.xyz/landing): Features and current plans
-- [Korean homepage](https://reeeeecallstudy.xyz/landing?lang=ko): Korean features and current plans
-- [Learning Insights](https://reeeeecallstudy.xyz/insight): Articles about learning and exam preparation
-- [Korean Learning Insights](https://reeeeecallstudy.xyz/insight?lang=ko): Korean articles
-- [Full product context](https://reeeeecallstudy.xyz/llms-full.txt)
-- [RSS feed](https://reeeeecallstudy.xyz/feed.xml)
-- [Sitemap index](https://reeeeecallstudy.xyz/sitemap.xml)
+- [English homepage](https://reklue.com/landing): Features and current plans
+- [Korean homepage](https://reklue.com/landing?lang=ko): Korean features and current plans
+- [Learning Insights](https://reklue.com/insight): Articles about learning and exam preparation
+- [Korean Learning Insights](https://reklue.com/insight?lang=ko): Korean articles
+- [Full product context](https://reklue.com/llms-full.txt)
+- [RSS feed](https://reklue.com/feed.xml)
+- [Sitemap index](https://reklue.com/sitemap.xml)
 
 ## Contact
 

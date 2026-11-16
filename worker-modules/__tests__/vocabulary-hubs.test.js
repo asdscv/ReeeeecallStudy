@@ -4,7 +4,7 @@ import { handleContentDetailBot } from '../seo/handlers/content-detail.js'
 import { matchBotRoute } from '../seo/page-registry.js'
 
 const env = { SUPABASE_ANON_KEY: 'anon', SUPABASE_URL: 'https://x.supabase.co' }
-const at = (path) => new URL(`https://reeeeecallstudy.xyz${path}`)
+const at = (path) => new URL(`https://reklue.com${path}`)
 
 const card = (i) => ({ field_values: { kind: 'word', front: `word${i}`, back: `뜻${i}`, example_front: `Example ${i} <b>.`, example_back: `예문 ${i}` } })
 const deck = (lang, over = {}) => ({
@@ -32,10 +32,10 @@ describe('English index', () => {
   it('links every exam hub and every language index, clustered with the language indexes', async () => {
     const html = await (await handleVocabularyBot(null, at('/vocabulary'), env)).text()
     expect(html).toMatch(/<html lang="en"/)
-    expect(html).toContain('<link rel="canonical" href="https://reeeeecallstudy.xyz/vocabulary">')
-    expect(html.match(/href="https:\/\/reeeeecallstudy\.xyz\/vocabulary\/(toeic|ielts|toefl)-[^"]+"/g)).toHaveLength(15)
-    expect(html).toContain('hreflang="ko" href="https://reeeeecallstudy.xyz/vocabulary/ko"')
-    expect(html).toContain('hreflang="x-default" href="https://reeeeecallstudy.xyz/vocabulary"')
+    expect(html).toContain('<link rel="canonical" href="https://reklue.com/vocabulary">')
+    expect(html.match(/href="https:\/\/reklue\.com\/vocabulary\/(toeic|ielts|toefl)-[^"]+"/g)).toHaveLength(15)
+    expect(html).toContain('hreflang="ko" href="https://reklue.com/vocabulary/ko"')
+    expect(html).toContain('hreflang="x-default" href="https://reklue.com/vocabulary"')
   })
 })
 
@@ -51,7 +51,7 @@ describe('language index', () => {
 
     expect(fetch.mock.calls[0][0]).toContain('native_language=eq.ko')
     expect(html).toMatch(/<html lang="ko"/)
-    expect(html).toContain('<link rel="canonical" href="https://reeeeecallstudy.xyz/vocabulary/ko">')
+    expect(html).toContain('<link rel="canonical" href="https://reklue.com/vocabulary/ko">')
     expect(html).toContain('토익 800점 단어 1,500개')
     expect(html.indexOf('/d/d800')).toBeLessThan(html.indexOf('/d/d900'))
     expect(html.indexOf('/d/d900')).toBeLessThan(html.indexOf('/d/dconv'))
@@ -77,9 +77,9 @@ describe('exam hub', () => {
     expect(decodeURIComponent(fetch.mock.calls[0][0])).toContain('category=eq.toeic&tags=cs.{level:800,source:en}')
     expect(JSON.parse(fetch.mock.calls[1][1].body)).toEqual({ p_listing_id: 'deck-ko' })
     expect(html).toContain('<h1>TOEIC 800 Vocabulary List — 1,500 Words with Example Sentences</h1>')
-    expect(html).toContain('<link rel="canonical" href="https://reeeeecallstudy.xyz/vocabulary/toeic-800">')
-    expect(html).toContain('<link rel="alternate" hreflang="ja" href="https://reeeeecallstudy.xyz/d/deck-ja">')
-    expect(html).toContain('<link rel="alternate" hreflang="en" href="https://reeeeecallstudy.xyz/vocabulary/toeic-800">')
+    expect(html).toContain('<link rel="canonical" href="https://reklue.com/vocabulary/toeic-800">')
+    expect(html).toContain('<link rel="alternate" hreflang="ja" href="https://reklue.com/d/deck-ja">')
+    expect(html).toContain('<link rel="alternate" hreflang="en" href="https://reklue.com/vocabulary/toeic-800">')
     expect((html.match(/<tr><td><strong>/g) || []).length).toBe(50)
     expect(html).toContain('Example 0 &lt;b&gt;.')
     expect(html).not.toContain('뜻0')
@@ -116,15 +116,15 @@ describe('crawler article HTML links into the word lists', () => {
     const html = await (await handleContentDetailBot('toeic-800-words', at('/insight/toeic-800-words?lang=ko'), env)).text()
     const lookup = decodeURIComponent(fetch.mock.calls.find(([u]) => u.includes('marketplace_listings'))[0])
     expect(lookup).toContain('category=eq.toeic&tags=cs.{level:800,source:en,target:ko}')
-    expect(html).toContain('<aside><a href="https://reeeeecallstudy.xyz/d/deck-ko">토익 800점 단어 1,500개')
-    expect(html).toContain('href="https://reeeeecallstudy.xyz/vocabulary/ko"')
+    expect(html).toContain('<aside><a href="https://reklue.com/d/deck-ko">토익 800점 단어 1,500개')
+    expect(html).toContain('href="https://reklue.com/vocabulary/ko"')
   })
 
   it('the English edition links the English hub — there is no English deck', async () => {
     const fetch = stubArticle(article('en'), [])
     const html = await (await handleContentDetailBot('toeic-800-words', at('/insight/toeic-800-words'), env)).text()
     expect(fetch.mock.calls.some(([u]) => u.includes('marketplace_listings'))).toBe(false)
-    expect(html).toContain('<aside><a href="https://reeeeecallstudy.xyz/vocabulary/toeic-800">TOEIC 800 Vocabulary List</a>')
-    expect(html).toContain('href="https://reeeeecallstudy.xyz/vocabulary"')
+    expect(html).toContain('<aside><a href="https://reklue.com/vocabulary/toeic-800">TOEIC 800 Vocabulary List</a>')
+    expect(html).toContain('href="https://reklue.com/vocabulary"')
   })
 })

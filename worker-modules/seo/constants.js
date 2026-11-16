@@ -1,3 +1,4 @@
+import { SITE_URL } from '../../packages/shared/lib/site-url.ts'
 import { BRAND_NAME } from '../../packages/shared/lib/brand.ts'
 // Keep in sync with packages/web/src/lib/seo-config.ts
 // (web INDEXABLE_LOCALES / SUPPORTED_LOCALES mirror these two policy views).
@@ -16,7 +17,7 @@ import landing_th from '../../packages/web/public/locales/th/landing.json'
 import landing_id from '../../packages/web/public/locales/id/landing.json'
 import landing_es from '../../packages/web/public/locales/es/landing.json'
 
-export const SITE_URL = 'https://reeeeecallstudy.xyz'
+export { SITE_URL }
 export { BRAND_NAME }
 export const TWITTER_HANDLE = '@reeeeecallstudy'
 export const CONTACT_EMAIL = 'admin@reeeeecallstudy.xyz'

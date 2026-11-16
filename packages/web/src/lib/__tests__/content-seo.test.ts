@@ -35,7 +35,7 @@ const mockArticle: ContentDetail = {
   meta_title: 'Test Article | Reklue',
   meta_description: 'Test description',
   og_image_url: 'https://example.com/og.jpg',
-  canonical_url: 'https://reeeeecallstudy.xyz/insight/test-article',
+  canonical_url: 'https://reklue.com/insight/test-article',
   author_name: 'Reklue',
   is_published: true,
   published_at: '2025-01-01T00:00:00Z',

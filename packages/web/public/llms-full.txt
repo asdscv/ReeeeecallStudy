@@ -38,19 +38,19 @@ The interface supports English (en), Korean (ko), Simplified Chinese (zh), Japan
 
 New Learning Insights articles are published in English and Korean. Older articles in other languages can remain available to readers, but their pages are excluded from search indexing under the current language policy. An article's translations depend on which languages actually exist for that article.
 
-English article URL: https://reeeeecallstudy.xyz/insight/{slug}
-Korean article URL: https://reeeeecallstudy.xyz/insight/{slug}?lang=ko
+English article URL: https://reklue.com/insight/{slug}
+Korean article URL: https://reklue.com/insight/{slug}?lang=ko
 
 Insights cover spaced repetition, active recall, learning techniques, language study, and exam preparation. Articles provide educational guidance; verify exam-specific facts against the examination body's current official materials.
 
 ## Public Links
 
-- Homepage and current plans: https://reeeeecallstudy.xyz/landing
-- Korean homepage: https://reeeeecallstudy.xyz/landing?lang=ko
-- Learning Insights: https://reeeeecallstudy.xyz/insight
-- Korean Learning Insights: https://reeeeecallstudy.xyz/insight?lang=ko
-- Sitemap: https://reeeeecallstudy.xyz/sitemap.xml
-- RSS: https://reeeeecallstudy.xyz/feed.xml
-- Atom: https://reeeeecallstudy.xyz/feed.atom
-- JSON feed: https://reeeeecallstudy.xyz/feed.json
+- Homepage and current plans: https://reklue.com/landing
+- Korean homepage: https://reklue.com/landing?lang=ko
+- Learning Insights: https://reklue.com/insight
+- Korean Learning Insights: https://reklue.com/insight?lang=ko
+- Sitemap: https://reklue.com/sitemap.xml
+- RSS: https://reklue.com/feed.xml
+- Atom: https://reklue.com/feed.atom
+- JSON feed: https://reklue.com/feed.json
 - Support: admin@reeeeecallstudy.xyz

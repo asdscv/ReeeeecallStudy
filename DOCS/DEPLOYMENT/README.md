@@ -34,13 +34,14 @@
 | Updates URL | `https://u.expo.dev/31c2c126-f26c-4b75-aa03-6255e68a6032` |
 | iOS bundleId / ASC App ID | `com.reeeeecall.study` / `6761741123` |
 | Android package | `com.reeeeecall.study` |
-| 웹 도메인 | `https://reeeeecallstudy.xyz` |
+| 웹 도메인 | `https://reklue.com` (기존 `reeeeecallstudy.xyz`는 전환용 주소) |
 | Cloudflare Worker name | `reeeeecallstudy` (`wrangler.jsonc`) |
 
 ### 2026-11-16 브랜드 변경 — Reklue / 리클루
 
 - 사용자에게 보이는 이름과 로고는 **Reklue**, 한국어 발음 표기는 **리클루**다.
-- 기존 도메인·메일 주소, Worker 이름, EAS slug/projectId, bundle/package ID,
+- 기본 도메인은 **reklue.com**으로 전환한다. 기존 **reeeeecallstudy.xyz**는 자동 연장을 해제하고 현재 등록 기간 동안 경로·쿼리를 유지해 새 주소로 308 이동한다.
+- 기존 메일 주소, Worker 이름, EAS slug/projectId, bundle/package ID,
   딥링크 scheme, 저장소/패키지 이름, 로그인·구매 식별자는 기존 값을 유지한다.
 - `packages/mobile/app.json`의 `expo.name` 변경은 **새 네이티브 빌드 설치 후**
   기기 홈 화면에 반영된다. OTA만으로 설치된 앱의 시스템 표시 이름을 바꿀 수 없다.
