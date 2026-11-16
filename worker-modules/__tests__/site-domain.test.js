@@ -4,6 +4,18 @@ import { currentSiteAddress } from '../../packages/shared/lib/site-url.ts'
 import { contentCanonicalUrl } from '../../packages/shared/lib/content-canonical.ts'
 
 describe('Reklue domain move', () => {
+  it('upgrades the canonical host to HTTPS with the return path intact', async () => {
+    const response = await worker.fetch(new Request('http://reklue.com/auth/callback?code=existing-code'), {})
+    expect(response.status).toBe(308)
+    expect(response.headers.get('Location')).toBe('https://reklue.com/auth/callback?code=existing-code')
+  })
+
+  it('continues serving a local HTTP development origin', async () => {
+    const assets = { fetch: vi.fn(async () => new Response('local')) }
+    const response = await worker.fetch(new Request('http://localhost:5197/logo-text.png'), { ASSETS: assets })
+    expect(await response.text()).toBe('local')
+  })
+
   it.each(['reeeeecallstudy.xyz', 'www.reeeeecallstudy.xyz', 'www.reklue.com'])(
     'redirects %s while retaining an existing invite path and query', async (host) => {
       const assets = { fetch: vi.fn() }
