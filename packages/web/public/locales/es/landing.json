@@ -338,7 +338,7 @@
     "navExperience": "Pruébalo",
     "title1": "Que se te quede.",
     "title2": "Tarjeta a tarjeta.",
-    "heroText": "De palabras nuevas a apuntes de examen. Aprende con tarjetas y vuelve cuando lo pida tu memoria.",
+    "heroText": "Aprende con tarjetas y repasa a tu ritmo. Cambia de reto con un juego mental breve.",
     "tryCard": "Probar una tarjeta",
     "heroCaption": "Tarjetas. Repetición espaciada. Juegos mentales. Todo en Reklue.",
     "featureEyebrow": "Más formas de aprender",
@@ -406,6 +406,26 @@
     "start": "Empezar a estudiar",
     "decksDescription": "Vocabulario, apuntes, temas de examen. Reúne lo que aprendes en un mazo.",
     "reviewDescription": "Recuerda la respuesta y valora cuánto recordaste. Tu valoración fija la próxima fecha de repaso.",
-    "gamesDescription": "Busca números, recuerda patrones y descifra códigos. Juega sin iniciar sesión."
+    "gamesDescription": "Busca números, recuerda patrones y descifra códigos. Inicia sesión para jugar."
+  },
+  "brainLanding": {
+    "nav": "Entrenamiento mental",
+    "eyebrow": "BRAIN TRAINING",
+    "title": "Entre sesiones de estudio,\nun reto diferente.",
+    "intro": "Busca números, recuerda posiciones que aparecen un instante y resuelve usando pistas.",
+    "cta": "Explorar juegos mentales",
+    "access": "Prueba aquí sin cuenta. Inicia sesión para jugar a los juegos completos.",
+    "memory": "Recordar posiciones",
+    "reasoning": "Razonar con pistas",
+    "search": "Buscar números",
+    "preview": "Vista previa",
+    "instruction": "Toca los números del 1 al 9 en orden.",
+    "board": "Vista previa de números",
+    "complete": "Los encontraste todos. ¿Otro reto?",
+    "wrong": "Busca el {{number}}. Inténtalo de nuevo.",
+    "next": "Siguiente número · {{number}}",
+    "reset": "Empezar otro tablero",
+    "play": "Jugar la versión completa",
+    "note": "El progreso de esta vista previa no se guarda."
   }
 }

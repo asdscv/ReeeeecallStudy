@@ -111,12 +111,16 @@ export function QuizRunScreen() {
 
   const items = useMemo(() => run?.items ?? [], [run])
   const item = items[index]
+  // Submitted answers are immutable: a reload/revisit must use the saved response.
+  const writtenAnswer = item?.answered
+    ? (typeof item.response?.text === 'string' ? item.response.text : '')
+    : text
 
   // Re-quoted per item: an essay costs four times a short answer, so one quote for the whole
   // run would show the wrong number on most of it.
   useEffect(() => {
-    // Nothing to quote for multiple choice — nothing is bought after a multiple-choice answer.
-    if (!item || item.question_type === 'mcq' || item.answered) return
+    // Quote pending and saved-but-ungraded written answers, including after a reload.
+    if (!item || item.question_type === 'mcq' || item.score !== null) return
     const itemId = item.item_id
     let cancelled = false
     void quote(QUIZ_GRADE_ACTION[item.question_type], 1)
@@ -167,7 +171,7 @@ export function QuizRunScreen() {
     if (!item || shownPrice === null) return
     setError(null)
     try {
-      await gradeWithAi(item.item_id, text.trim(), shownPrice)
+      await gradeWithAi(item.item_id, writtenAnswer.trim(), shownPrice)
     } catch (e) {
       setError(e instanceof QuizError ? e.code : 'UNKNOWN')
     }
@@ -197,7 +201,7 @@ export function QuizRunScreen() {
 
   /** Live length against the bound the SERVER applies. Mirrored, and pinned by a test. */
 
-  const length = answerLength(text, item?.question_type === 'essay' ? 'essay' : 'short')
+  const length = answerLength(writtenAnswer, item?.question_type === 'essay' ? 'essay' : 'short')
 
   const answered = item.answered || result !== null
   /** This item's verdict, and the run so far. Counts, never a ratio — see quiz-outcome.ts. */
@@ -316,7 +320,7 @@ export function QuizRunScreen() {
 
           {item.question_type !== 'mcq' && (
             <TextInput
-              value={text}
+              value={writtenAnswer}
               onChangeText={setText}
               editable={!answered}
               multiline
@@ -387,7 +391,7 @@ export function QuizRunScreen() {
               // For multiple choice "what the learner wrote" is the option they picked — the
               // string the spans were computed against. Passing the (always empty) text box
               // would silently drop every highlight they just paid for.
-              learnerText={item.question_type === 'mcq' ? (pickedOption ?? '') : text}
+              learnerText={item.question_type === 'mcq' ? (pickedOption ?? '') : writtenAnswer}
               referenceText={item.reference_answer}
             />
           )}

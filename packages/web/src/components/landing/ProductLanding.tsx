@@ -8,6 +8,7 @@ import { LanguageSelector } from '../common/LanguageSelector'
 import { AppDownload } from '../common/AppDownload'
 import { AppPreviewSection } from './AppPreviewSection'
 import { ProductShowcase } from './ProductShowcase'
+import { BrainTrainingSection } from './BrainTrainingSection'
 import { PricingSection } from './PricingSection'
 import { PAYMENTS_ENABLED } from '../../stores/billing-store'
 import { VOCAB_INDEX_PATH, isDeckLanguage, vocabLanguageIndexPath } from '@reklue/shared/lib/vocab-hubs'
@@ -32,7 +33,7 @@ function ProductNav() {
     <div className="rl-container rl-nav-row">
       <Link to="/landing" className="rl-wordmark" aria-label="Reklue"><img src="/brand/reklue-lockup-light.svg" className="rl-brand-lockup" width={132} height={42} alt="Reklue" /></Link>
       <nav className="rl-nav-links" aria-label={t('nav.menu')}>
-        <a href="#experience">{t('premium.navExperience')}</a><a href="#features">{t('nav.features', 'Features')}</a><a href="#faq">{t('nav.faq', 'FAQ')}</a><Link to="/insight">{t('nav.blog', 'Insights')}</Link>
+        <a href="#experience">{t('premium.navExperience')}</a><a href="#features">{t('nav.features', 'Features')}</a><a href="#brain-training">{t('brainLanding.nav')}</a><a href="#faq">{t('nav.faq', 'FAQ')}</a><Link to="/insight">{t('nav.blog', 'Insights')}</Link>
       </nav>
       <div className="rl-nav-actions">
         <div className="rl-nav-language"><LanguageSelector /></div>
@@ -40,7 +41,7 @@ function ProductNav() {
         <button type="button" className="rl-menu" aria-label={t('nav.menu')} aria-expanded={open} aria-controls="rl-mobile-nav" onClick={() => setOpen(!open)}>{open ? <X size={21} /> : <Menu size={21} />}</button>
       </div>
     </div>
-    {open && <nav id="rl-mobile-nav" className="rl-mobile-nav rl-container" aria-label={t('nav.menu')}><a href="#experience" onClick={() => setOpen(false)}>{t('premium.navExperience')}</a><a href="#features" onClick={() => setOpen(false)}>{t('nav.features', 'Features')}</a><a href="#faq" onClick={() => setOpen(false)}>{t('nav.faq', 'FAQ')}</a><Link to="/insight">{t('nav.blog', 'Insights')}</Link><LanguageSelector /></nav>}
+    {open && <nav id="rl-mobile-nav" className="rl-mobile-nav rl-container" aria-label={t('nav.menu')}><a href="#experience" onClick={() => setOpen(false)}>{t('premium.navExperience')}</a><a href="#features" onClick={() => setOpen(false)}>{t('nav.features', 'Features')}</a><a href="#brain-training" onClick={() => setOpen(false)}>{t('brainLanding.nav')}</a><a href="#faq" onClick={() => setOpen(false)}>{t('nav.faq', 'FAQ')}</a><Link to="/insight">{t('nav.blog', 'Insights')}</Link><LanguageSelector /></nav>}
   </header>
 }
 
@@ -82,5 +83,5 @@ function ProductFooter() {
 
 export function ProductLanding() {
   const { i18n } = useTranslation('landing')
-  return <div className="rl-product" lang={i18n.resolvedLanguage || i18n.language}><ProductNav /><main id="landing-main"><ProductHero /><ProductShowcase /><ProductHowTo />{PAYMENTS_ENABLED && <div className="rl-pricing"><PricingSection /></div>}<ProductFAQ /><ProductFinal /></main><ProductFooter /></div>
+  return <div className="rl-product" lang={i18n.resolvedLanguage || i18n.language}><ProductNav /><main id="landing-main"><ProductHero /><ProductShowcase /><BrainTrainingSection /><ProductHowTo />{PAYMENTS_ENABLED && <div className="rl-pricing"><PricingSection /></div>}<ProductFAQ /><ProductFinal /></main><ProductFooter /></div>
 }
