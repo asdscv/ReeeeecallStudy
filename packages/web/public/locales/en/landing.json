@@ -338,7 +338,7 @@
     "navExperience": "Experience",
     "title1": "Make it stick.",
     "title2": "One card at a time.",
-    "heroText": "From new words to exam notes. Learn with cards. Come back at a time that fits what you remember.",
+    "heroText": "Learn with cards. Review when it matters. Switch gears with a quick brain game.",
     "tryCard": "Try a card",
     "heroCaption": "Flashcards. Spaced repetition. Brain games. All in Reklue.",
     "featureEyebrow": "More ways to engage",
@@ -406,6 +406,26 @@
     "start": "Start studying",
     "decksDescription": "Vocabulary, class notes, exam topics. Bring what you learn together in a deck.",
     "reviewDescription": "Recall the answer, then rate how well you remembered. Your response sets the next review date.",
-    "gamesDescription": "Find numbers, remember patterns, and crack codes. Start playing without an account."
+    "gamesDescription": "Find numbers, remember patterns, and crack codes. Sign in to play the full games."
+  },
+  "brainLanding": {
+    "nav": "Brain training",
+    "eyebrow": "BRAIN TRAINING",
+    "title": "Between study sessions,\na different challenge.",
+    "intro": "Find scattered numbers, recall briefly shown positions, and work out the answer from clues.",
+    "cta": "Explore brain training",
+    "access": "Try the preview here. Sign in to play the full games.",
+    "memory": "Remember positions",
+    "reasoning": "Reason from clues",
+    "search": "Find the numbers",
+    "preview": "Preview",
+    "instruction": "Tap the numbers from 1 to 9 in order.",
+    "board": "Number Hunt preview",
+    "complete": "All found. Ready for another challenge?",
+    "wrong": "Look for {{number}} next. Try again.",
+    "next": "Next number · {{number}}",
+    "reset": "Start a new board",
+    "play": "Play the full game",
+    "note": "Progress in this preview is not saved."
   }
 }
