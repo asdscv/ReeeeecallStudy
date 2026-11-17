@@ -8,7 +8,10 @@ const OPT_OUT_KEY = 'reeeeecall-analytics-optout'
 
 export function isAnalyticsOptedOut(): boolean {
   try {
-    return localStorage.getItem(OPT_OUT_KEY) === '1'
+    const optedOut = localStorage.getItem(OPT_OUT_KEY) === '1' || navigator.doNotTrack === '1'
+      || (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true
+    syncEdgePreference(optedOut)
+    return optedOut
   } catch {
     return false // storage blocked → fall back to prior (tracking on) behavior
   }
@@ -21,4 +24,9 @@ export function setAnalyticsOptOut(optOut: boolean): void {
   } catch {
     /* storage blocked → nothing to persist */
   }
+  syncEdgePreference(optOut)
+}
+
+function syncEdgePreference(optOut: boolean): void {
+  document.cookie = `reklue_analytics_opt_out=${optOut ? '1' : ''}; Path=/; SameSite=Lax; Max-Age=${optOut ? 31536000 : 0}${location.protocol === 'https:' ? '; Secure' : ''}`
 }

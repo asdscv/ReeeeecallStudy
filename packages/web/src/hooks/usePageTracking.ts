@@ -1,14 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
-import { isBot } from '../lib/bot-detection'
+import { recordBrowserView } from '../lib/record-browser-view'
 import { normalizePagePath, shouldTrackPage } from '../lib/page-tracking'
 import { parseUtmParams } from '../lib/utm'
 import { getDeviceType } from '../lib/device-info'
 import { categorizeReferrer } from '../lib/referrer'
 import { viewRateLimiter } from '../lib/view-rate-limiter'
 import { getAnalyticsSessionId } from '../lib/analytics-session'
-import { logAnalyticsError } from '../lib/analytics-logger'
 import { isAnalyticsOptedOut } from '../lib/analytics-consent'
 
 /**
@@ -20,7 +18,6 @@ export function usePageTracking() {
   const prevPathRef = useRef<string>('')
 
   useEffect(() => {
-    if (isBot(navigator.userAgent)) return
     if (isAnalyticsOptedOut()) return
 
     const path = normalizePagePath(location.pathname)
@@ -39,8 +36,7 @@ export function usePageTracking() {
     const ownDomain = window.location.hostname
     const referrerInfo = categorizeReferrer(document.referrer, ownDomain)
 
-    supabase
-      .rpc('record_page_view', {
+    void recordBrowserView('page', {
         p_page_path: path,
         p_session_id: sessionId,
         p_referrer: document.referrer || null,
@@ -54,6 +50,5 @@ export function usePageTracking() {
         p_device_type: deviceType,
         p_viewport_width: window.innerWidth,
       })
-      .then(null, (e: unknown) => logAnalyticsError('record_page_view', e))
   }, [location.pathname])
 }

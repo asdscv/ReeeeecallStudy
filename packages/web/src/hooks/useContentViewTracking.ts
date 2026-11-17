@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
-import { supabase } from '../lib/supabase'
-import { isBot, isValidViewDuration } from '../lib/bot-detection'
+import { recordBrowserView } from '../lib/record-browser-view'
+import { isValidViewDuration } from '../lib/bot-detection'
 import { createViewDedupTracker } from '../lib/view-dedup'
 import { viewRateLimiter } from '../lib/view-rate-limiter'
 import { parseUtmParams } from '../lib/utm'
@@ -22,9 +22,6 @@ export function useContentViewTracking(contentId: string | undefined) {
   useEffect(() => {
     if (!contentId) return
     if (isAnalyticsOptedOut()) return
-
-    // Bot filtering
-    if (isBot(navigator.userAgent)) return
 
     const sessionId = getAnalyticsSessionId()
     startRef.current = Date.now()
@@ -49,8 +46,7 @@ export function useContentViewTracking(contentId: string | undefined) {
       // Rate limit check
       if (!viewRateLimiter.checkLimit('content_view').allowed) return
 
-      supabase
-        .rpc('record_content_view', {
+      void recordBrowserView('content', {
           p_content_id: contentId,
           p_session_id: sessionId,
           p_referrer: document.referrer || null,
@@ -65,7 +61,7 @@ export function useContentViewTracking(contentId: string | undefined) {
           p_viewport_width: viewportWidth,
         })
         .then(
-          ({ data }) => {
+          (data) => {
             if (typeof data === 'string' && data.length > 0) {
               viewIdRef.current = data
               viewTracker.markViewed(contentId, data)
