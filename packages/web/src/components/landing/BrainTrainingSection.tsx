@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight, RotateCcw } from 'lucide-react'
@@ -22,6 +22,12 @@ export function BrainTrainingSection() {
   const [missed, setMissed] = useState<number | null>(null)
   const complete = board.found === board.values.length
   const found = new Set(board.sequence.slice(0, board.found))
+
+  useEffect(() => {
+    if (window.location.hash !== '#brain-training') return
+    const frame = requestAnimationFrame(() => document.getElementById('brain-training')?.scrollIntoView())
+    return () => cancelAnimationFrame(frame)
+  }, [])
 
   const tap = (index: number) => {
     if (complete || found.has(index)) return
