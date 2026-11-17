@@ -1,29 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Check, ArrowRight } from 'lucide-react'
-import { motion, useReducedMotion } from 'motion/react'
+import { Check, ArrowRight, ChevronDown } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { PAYMENTS_ENABLED } from '../../stores/billing-store'
 import { formatProductPrice } from '@reklue/shared/lib/pricing'
+import { STUDY_MODES } from '@reklue/shared/lib/study-validation'
+import { BRAIN_GAMES } from '@reklue/shared/lib/brain-games/catalog'
+import './landing-pricing.css'
 
-// card_limit >= this sentinel means "unlimited" FOR DISPLAY. As of mig 148 NO catalog
-// plan is unlimited (the top plan is capped at 100,000); this only fires for admins,
-// whose effective limit stays 2e9 (mig 139). Kept so an admin-facing surface still reads
-// "무제한" rather than a huge number.
 const UNLIMITED_THRESHOLD = 1_000_000_000
-// 무료 한도는 **서버에서 읽습니다.**
-//
-// 여기 1000 이 박혀 있었습니다. 268 이 무료 한도를 5,000 으로 올리는 순간 랜딩만 옛 숫자를
-// 광고하게 됩니다 — 값을 데이터로 옮긴 의미가 없어집니다. `get_plan_limits()` 는 anon 에게도
-// 열려 있고 모바일 Paywall 이 이미 그것을 씁니다(billing.ts).
-//
-// 못 읽으면 **줄을 아예 그리지 않습니다.** 틀린 한도를 보여 주는 것보다 낫습니다 — 돈을
-// 요구하는 화면에서 잘못된 숫자는 그 자체가 약속 위반입니다.
-// Existing landing signup/login flow — every landing CTA routes here.
 const SIGNUP_ROUTE = '/auth/login'
 
-// Shape returned by get_public_plans() (mig 125) — snake_case JSON, public fields.
 interface RawPublicPlan {
   id: string
   title: string
@@ -33,22 +21,13 @@ interface RawPublicPlan {
   period: string | null
 }
 
-interface Tier {
-  key: string
-  name: string
-  price: string
-  cardLimitLine: string
-  blurb: string
-  cta: string
-  featured: boolean
-}
-
+/** Public presentation only. Limits, prices and allowances remain server-owned. */
 export function PricingSection() {
   const { t } = useTranslation('landing')
   const navigate = useNavigate()
-  const prefersReduced = useReducedMotion()
   const [plans, setPlans] = useState<RawPublicPlan[]>([])
   const [freeCardLimit, setFreeCardLimit] = useState<number | null>(null)
+  const [freeAiCardsPerDay, setFreeAiCardsPerDay] = useState<number | null>(null)
 
   useEffect(() => {
     let alive = true
@@ -59,136 +38,67 @@ export function PricingSection() {
       ])
       if (!alive) return
       if (!catalog.error && catalog.data) setPlans(catalog.data as RawPublicPlan[])
-      const row = limits.data as { free_card_limit?: number | null } | null
-      if (!limits.error && row?.free_card_limit != null) setFreeCardLimit(Number(row.free_card_limit))
+      const row = limits.data as { free_card_limit?: number | null; free_ai_cards_per_day?: number | null } | null
+      if (!limits.error && row?.free_card_limit != null && Number.isFinite(Number(row.free_card_limit))) {
+        setFreeCardLimit(Number(row.free_card_limit))
+      }
+      if (!limits.error && row?.free_ai_cards_per_day != null && Number.isFinite(Number(row.free_ai_cards_per_day))) {
+        setFreeAiCardsPerDay(Number(row.free_ai_cards_per_day))
+      }
     })()
-    return () => {
-      alive = false
-    }
+    return () => { alive = false }
   }, [])
 
-  // Belt-and-suspenders: the LandingPage guard already withholds this section
-  // when payments are off, but never render if the flag is not 'true'.
   if (!PAYMENTS_ENABLED) return null
 
-  // Price is always USD — the store charges USD everywhere (Toss/₩ dropped).
-  const fmtPrice = (p: RawPublicPlan) =>
-    formatProductPrice({ priceKrw: p.price_krw, priceUsdCents: p.price_usd_cents })
-  const isUnlimited = (cardLimit: number) => cardLimit >= UNLIMITED_THRESHOLD
-
-  // The card-limit line: "무제한 카드" for the sentinel, else "카드 {{count}}장".
-  const limitLine = (cardLimit: number) =>
-    isUnlimited(cardLimit)
-      ? t('pricing.unlimitedCards')
-      : t('pricing.upToCards', { count: cardLimit })
-
-  // Free tier is static; paid tiers are fetched (data-driven — a new catalog row
-  // appears here automatically). 267 retired the second subscription, so the catalog
-  // currently holds exactly one paid plan; the section renders however many are active
-  // and every number on the card comes from the catalog, not from this file.
-  const freeTier: Tier = {
-    key: 'free',
-    name: t('pricing.plans.free'),
-    price: t('pricing.freePrice'),
+  const limitLine = (cardLimit: number) => cardLimit >= UNLIMITED_THRESHOLD
+    ? t('pricing.unlimitedCards')
+    : t('pricing.upToCards', { count: cardLimit })
+  const freeTier = {
     cardLimitLine: freeCardLimit == null ? '' : limitLine(freeCardLimit),
-    blurb: t('pricing.plans.freeBlurb'),
-    cta: t('pricing.ctaFree'),
-    featured: false,
   }
+  const features = [
+    t('pricing.features.cards'),
+    t('pricing.features.decks'),
+    t('pricing.features.study', { count: STUDY_MODES.length }),
+    t('pricing.features.brain', { count: BRAIN_GAMES.length }),
+    t('pricing.features.history'),
+    ...(freeAiCardsPerDay != null && freeAiCardsPerDay > 0
+      ? [t('pricing.freeAiCards', { count: freeAiCardsPerDay })] : []),
+  ]
 
-  const paidTiers: Tier[] = plans.map((p, i) => {
-    return {
-      key: p.id,
-      // Plan name = the DB title ("Standard" / "Pro"), the single source of truth shared
-      // with the Settings PlanSelector + mobile Paywall (they all read billing_products.title).
-      // Plan names are proper nouns → NOT translated; the exact card count is on cardLimitLine.
-      name: p.title,
-      price: t('pricing.pricePerMonth', { price: fmtPrice(p) }),
-      cardLimitLine: limitLine(p.card_limit),
-      blurb: t('pricing.plans.standardBlurb'),
-      cta: t('pricing.ctaPaid'),
-      // Highlight the first paid tier as the recommended one.
-      featured: i === 0,
-    }
-  })
-
-  const tiers: Tier[] = [freeTier, ...paidTiers]
-
-  const container = {
-    hidden: {},
-    show: { transition: { staggerChildren: 0.08 } },
-  }
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const } },
-  }
-
-  return (
-    <section id="pricing" className="py-16 sm:py-20 md:py-28 px-4">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-10 sm:mb-14">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground tracking-tight mb-3">
-            {t('pricing.title')}
-          </h2>
-          <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-xl mx-auto">
-            {t('pricing.subtitle')}
-          </p>
-        </div>
-
-        <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 items-stretch"
-          variants={prefersReduced ? undefined : container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: '-60px' }}
-        >
-          {tiers.map((tier) => (
-            <motion.div
-              key={tier.key}
-              variants={prefersReduced ? undefined : item}
-              className={`relative flex flex-col bg-card rounded-2xl border p-5 sm:p-6 transition-all duration-300 hover:shadow-sm ${
-                tier.featured
-                  ? 'border-brand ring-1 ring-brand/40 shadow-sm'
-                  : 'border-border hover:border-border/80'
-              }`}
-            >
-              {tier.featured && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand px-3 py-1 text-xs font-semibold text-white shadow-sm">
-                  {t('pricing.recommended')}
-                </span>
-              )}
-
-              <h3 className="text-base font-semibold text-foreground mb-1">{tier.name}</h3>
-              <p className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight mb-4">
-                {tier.price}
-              </p>
-
-              <div className="flex items-center gap-2 text-sm text-foreground mb-2">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand/10 text-brand">
-                  <Check className="h-3.5 w-3.5" />
-                </span>
-                <span className="font-medium">{tier.cardLimitLine}</span>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-6">{tier.blurb}</p>
-
-              <motion.button
-                onClick={() => navigate(SIGNUP_ROUTE)}
-                className={`mt-auto inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition cursor-pointer ${
-                  tier.featured
-                    ? 'bg-brand text-brand-foreground hover:brightness-110 shadow-sm shadow-blue-600/25'
-                    : 'bg-accent text-foreground hover:bg-accent/70'
-                }`}
-                whileHover={prefersReduced ? undefined : { scale: 1.03 }}
-                whileTap={prefersReduced ? undefined : { scale: 0.98 }}
-              >
-                {tier.cta} <ArrowRight className="w-4 h-4" />
-              </motion.button>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        <p className="text-center text-xs text-muted-foreground mt-8">{t('pricing.note')}</p>
+  return <section id="pricing" className="rl-free-pricing" aria-labelledby="rl-pricing-title">
+    <div className="rl-container">
+      <div className="rl-free-pricing-heading">
+        <p className="rl-eyebrow">{t('pricing.freeIncludes')}</p>
+        <h2 id="rl-pricing-title">{t('pricing.title')}</h2>
+        <p>{t('pricing.subtitle')}</p>
       </div>
-    </section>
-  )
+      <article className="rl-free-plan" aria-labelledby="rl-free-plan-title" data-plan="free">
+        <div className="rl-free-plan-summary">
+          <span className="rl-free-plan-badge">{t('pricing.freeBadge')}</span>
+          <h3 id="rl-free-plan-title">{t('pricing.plans.free')}</h3>
+          <p className="rl-free-plan-price">{t('pricing.freePrice')}</p>
+          {freeTier.cardLimitLine && <p className="rl-free-plan-capacity">{freeTier.cardLimitLine}</p>}
+          <p className="rl-free-plan-description">{t('pricing.plans.freeBlurb')}</p>
+          <button type="button" className="rl-free-plan-cta" onClick={() => navigate(SIGNUP_ROUTE)}>{t('pricing.ctaFree')}<ArrowRight size={17} aria-hidden="true" /></button>
+        </div>
+        <ul className="rl-free-plan-features" aria-label={t('pricing.freeIncludes')}>
+          {features.map(feature => <li key={feature}><Check size={18} aria-hidden="true" /><span>{feature}</span></li>)}
+        </ul>
+      </article>
+      <p className="rl-free-pricing-note">{t('pricing.note')}</p>
+      {plans.length > 0 && <details className="rl-optional-plans">
+        <summary><span>{t('pricing.optionalTitle')}</span><ChevronDown size={18} aria-hidden="true" /></summary>
+        <p>{t('pricing.optionalText')}</p>
+        <div className="rl-optional-plan-list">
+          {plans.map(p => <article key={p.id} className="rl-optional-plan" aria-label={p.title} data-plan="paid">
+            <div><h3>{p.title}</h3><p>{t('pricing.pricePerMonth', { price: formatProductPrice({ priceKrw: p.price_krw, priceUsdCents: p.price_usd_cents }) })}</p></div>
+            <div><strong>{limitLine(p.card_limit)}</strong><p>{t('pricing.plans.standardBlurb')}</p></div>
+            <button type="button" onClick={() => navigate(SIGNUP_ROUTE)}>{t('pricing.ctaPaid')}<ArrowRight size={15} aria-hidden="true" /></button>
+          </article>)}
+        </div>
+      </details>}
+    </div>
+  </section>
 }

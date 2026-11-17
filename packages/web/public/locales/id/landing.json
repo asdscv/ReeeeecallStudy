@@ -147,7 +147,7 @@
   "nav": {
     "blog": "Wawasan",
     "login": "Masuk",
-    "start": "Mulai Sekarang",
+    "start": "Mulai gratis",
     "features": "Fitur",
     "science": "Sains",
     "results": "Hasil",
@@ -190,7 +190,7 @@
     "q1": "Bagaimana jadwal pengulangan ditentukan?",
     "a1": "Dalam mode SRS (pengulangan berjarak), kamu melihat jawaban lalu menilai seberapa baik kamu mengingatnya. Itu menentukan jadwal berikutnya. Kartu sulit muncul lebih cepat, kartu yang diingat dengan baik diberi jarak lebih panjang.",
     "q2": "Bisa mencoba gratis?",
-    "a2": "Bisa. Akun gratis dapat membuat kartu dan mengulang pelajaran. Penyimpanan kartu dan pemakaian AI gratis punya batas. Batas saat ini bisa dilihat di Pengaturan setelah mendaftar.",
+    "a2": "Ya. Buat kartu, impor dek publik, gunakan mode belajar termasuk SRS, dan mainkan semua permainan otak dengan paket gratis. Penyimpanan kartu dan pembuatan dengan AI gratis memiliki batas penggunaan. Penggunaan AI tambahan dan beberapa fitur, termasuk penilaian AI, dikenakan biaya terpisah.",
     "q3": "Bagaimana kalau mau belajar menjelang ujian?",
     "a3": "Selain SRS, ada pengulangan berurutan, acak, berurutan, berdasarkan tanggal, dan mode kebut. Ikuti jadwal untuk belajar sehari-hari, atau gunakan mode kebut untuk berlatih berulang sebelum ujian.",
     "q4": "Harus membuat semua kartu sendiri?",
@@ -266,25 +266,44 @@
     }
   },
   "pricing": {
-    "title": "Harga",
-    "subtitle": "Pilih paket yang sesuai dengan intensitas belajarmu",
+    "title": "Banyak yang bisa dilakukan, gratis.",
+    "subtitle": "Dari belajar dengan kartu hingga latihan otak, paket gratis sudah mencakup banyak fitur dasar.",
     "recommended": "Direkomendasikan",
     "freePrice": "Gratis",
     "pricePerMonth": "{{price}}/bln",
     "unlimitedCards": "Kartu tanpa batas",
     "upToCards": "Hingga {{count, number}} kartu",
     "ctaFree": "Mulai gratis",
-    "ctaPaid": "Mulai sekarang",
-    "note": "Pembayaran dilakukan setelah mendaftar, di Pengaturan.",
+    "ctaPaid": "Lihat paket penyimpanan",
+    "note": "Pembuatan kartu dan soal dengan AI memiliki kuota gratis. Penggunaan AI tambahan dan beberapa fitur, termasuk penilaian AI, dikenakan biaya terpisah.",
     "plans": {
       "free": "Gratis",
-      "freeBlurb": "Paket gratis yang cocok untuk memulai",
-      "standardBlurb": "Perluas pembelajaran dengan lebih banyak kartu"
-    }
+      "freeBlurb": "Belajar dengan kartu sendiri dan dek publik. Terus mengulang dan coba permainan otak.",
+      "standardBlurb": "Pilihan saat perlu menyimpan lebih banyak kartu."
+    },
+    "freeBadge": "Paket gratis yang lengkap",
+    "freeIncludes": "Termasuk dalam paket gratis",
+    "heroFeatures": "Buat kartu · Ulasan SRS · Semua permainan otak",
+    "freeAiCards": "Kartu AI gratis per hari: {{count, number}}",
+    "optionalTitle": "Butuh ruang untuk lebih banyak kartu?",
+    "optionalText": "Pilih paket tambahan saat perlu menyimpan lebih banyak kartu. Belajar dengan kartu dan latihan otak sudah termasuk dalam paket gratis.",
+    "features": {
+      "cards": "Buat dan edit kartu sendiri",
+      "decks": "Jelajahi dan impor dek publik",
+      "study": "{{count}} mode belajar, termasuk SRS",
+      "brain": "Akses semua {{count}} permainan otak",
+      "history": "Riwayat belajar dan sinkronisasi perangkat",
+      "study_one": "{{count}} mode belajar, termasuk SRS",
+      "study_other": "{{count}} mode belajar, termasuk SRS",
+      "brain_one": "Akses semua {{count}} permainan otak",
+      "brain_other": "Akses semua {{count}} permainan otak"
+    },
+    "freeAiCards_one": "Kartu AI gratis per hari: {{count, number}}",
+    "freeAiCards_other": "Kartu AI gratis per hari: {{count, number}}"
   },
   "seo": {
     "title": "Reklue — Biar tetap ingat. Satu kartu setiap kali.",
-    "description": "Dari kosakata hingga bahan ujian. Belajar lewat kartu, lalu kembali saat sesuai dengan ingatanmu. Kartu belajar. Pengulangan berjarak. Permainan otak. Semua di Reklue."
+    "description": "Mulai gratis dengan kartu belajar, pengulangan berjarak (SRS), dan latihan otak. Buat dek, ulangi, dan jelajahi permainan ingatan serta penalaran."
   },
   "proof": {
     "eyebrow": "Data nyata",
@@ -338,7 +357,7 @@
     "navExperience": "Coba langsung",
     "title1": "Biar tetap ingat.",
     "title2": "Satu kartu setiap kali.",
-    "heroText": "Belajar dengan kartu, ulangi sesuai ingatan. Ganti suasana dengan permainan otak singkat.",
+    "heroText": "Mulai belajar dengan kartu dan latihan otak secara gratis. Lanjutkan belajar dengan ulasan sesuai ingatan.",
     "tryCard": "Coba satu kartu",
     "heroCaption": "Kartu belajar. Pengulangan berjarak. Permainan otak. Semua di Reklue.",
     "featureEyebrow": "Lebih banyak cara untuk mencoba",
@@ -358,15 +377,15 @@
     "playTitle": "Temukan bedanya.\nHadapi tantangannya.",
     "playText": "Cari perubahan, ingat urutan, dan bereaksi sesuai aturan. Sesi singkat pun bisa menghadirkan tantangan berbeda.",
     "playLink": "Jelajahi permainan",
-    "extraNote": "AI bisa membantu membuat draf kartu untuk kamu periksa dan sunting. Fitur AI punya batas pemakaian tersendiri.",
+    "extraNote": "Pembuatan kartu dan soal dengan AI memiliki kuota gratis. Penggunaan AI tambahan dan beberapa fitur, termasuk penilaian AI, dikenakan biaya terpisah.",
     "howEyebrow": "Tanpa persiapan rumit",
     "howTitle": "Awal yang sederhana.",
     "faqEyebrow": "Kenali lebih dekat",
     "contact": "Hubungi kami",
     "finalTitle1": "Untuk saat nanti",
     "finalTitle2": "kamu perlu mengingat.",
-    "finalText": "Mulai dari satu hal yang ingin kamu simpan. Mulai dengan Reklue.",
-    "freeNote": "Bisa mulai gratis. Ada batas penyimpanan kartu dan pemakaian AI.",
+    "finalText": "Belajar dengan kartu, coba permainan otak. Mulai dengan paket gratis hari ini.",
+    "freeNote": "Belajar dengan kartu, ulasan SRS, dan semua permainan otak termasuk dalam paket gratis.",
     "footerText": "Tempat belajar dengan kartu dan fokus lewat permainan.",
     "demoLabel": "Demo kartu belajar interaktif",
     "flipBack": "Balik lagi",

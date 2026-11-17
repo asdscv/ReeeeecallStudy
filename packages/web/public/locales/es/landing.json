@@ -147,7 +147,7 @@
   "nav": {
     "blog": "Artículos",
     "login": "Iniciar Sesión",
-    "start": "Comenzar",
+    "start": "Empieza gratis",
     "features": "Funciones",
     "science": "Ciencia",
     "results": "Resultados",
@@ -190,7 +190,7 @@
     "q1": "¿Cómo se eligen las fechas de repaso?",
     "a1": "En modo SRS (repetición espaciada), compruebas la respuesta y valoras cuánto recordabas. Eso determina la próxima fecha. Las tarjetas difíciles vuelven antes y las que recuerdas bien dejan más tiempo entre repasos.",
     "q2": "¿Puedo probarlo gratis?",
-    "a2": "Sí. Con una cuenta gratuita puedes crear tarjetas y repasarlas. El almacenamiento y el uso gratuito de IA tienen límites. Puedes consultar tus límites actuales en Ajustes después de registrarte.",
+    "a2": "Sí. Puedes crear tarjetas, importar mazos públicos, usar modos de estudio como SRS y jugar a todos los juegos mentales con el plan gratuito. El almacenamiento y la generación gratuita con IA tienen límites de uso. El uso adicional de IA y algunas funciones, como la corrección con IA, se cobran aparte.",
     "q3": "¿Y si necesito estudiar antes de un examen?",
     "a3": "Además de SRS, hay repaso secuencial, aleatorio, secuencial, por fecha e intensivo. Puedes seguir las fechas de repaso a diario y repetir con el modo intensivo antes del examen.",
     "q4": "¿Tengo que crear todas las tarjetas?",
@@ -266,25 +266,44 @@
     }
   },
   "pricing": {
-    "title": "Precios",
-    "subtitle": "Elige el plan que se adapte a cuánto estudias",
+    "title": "Mucho por aprender, incluido gratis.",
+    "subtitle": "Desde tarjetas de estudio hasta juegos mentales, el plan gratuito incluye muchas funciones básicas.",
     "recommended": "Recomendado",
     "freePrice": "Gratis",
     "pricePerMonth": "{{price}}/mes",
     "unlimitedCards": "Tarjetas ilimitadas",
     "upToCards": "Hasta {{count, number}} tarjetas",
     "ctaFree": "Empezar gratis",
-    "ctaPaid": "Comenzar",
-    "note": "El pago se realiza tras registrarte, en Ajustes.",
+    "ctaPaid": "Ver planes de almacenamiento",
+    "note": "La generación de tarjetas y preguntas con IA incluye una cuota gratuita. El uso adicional de IA y algunas funciones, como la corrección con IA, se cobran aparte.",
     "plans": {
       "free": "Gratis",
-      "freeBlurb": "Un plan gratuito perfecto para empezar",
-      "standardBlurb": "Amplía tu aprendizaje con más tarjetas"
-    }
+      "freeBlurb": "Aprende con tus tarjetas y mazos públicos. Sigue repasando y prueba los juegos mentales.",
+      "standardBlurb": "Una opción cuando necesitas guardar más tarjetas."
+    },
+    "freeBadge": "Un plan gratuito completo",
+    "freeIncludes": "Incluido gratis",
+    "heroFeatures": "Crear tarjetas · Repaso SRS · Todos los juegos",
+    "freeAiCards": "Tarjetas de IA gratis al día: {{count, number}}",
+    "optionalTitle": "¿Necesitas espacio para más tarjetas?",
+    "optionalText": "Elige un plan superior cuando necesites guardar más tarjetas. El estudio y los juegos mentales también están incluidos en el plan gratuito.",
+    "features": {
+      "cards": "Crea y edita tus tarjetas",
+      "decks": "Explora e importa mazos públicos",
+      "study": "{{count}} modos de estudio, incluido SRS",
+      "brain": "Acceso a los {{count}} juegos mentales",
+      "history": "Historial de estudio y sincronización",
+      "study_one": "{{count}} modo de estudio, incluido SRS",
+      "study_other": "{{count}} modos de estudio, incluido SRS",
+      "brain_one": "Acceso a {{count}} juego mental",
+      "brain_other": "Acceso a los {{count}} juegos mentales"
+    },
+    "freeAiCards_one": "Tarjeta de IA gratis al día: {{count, number}}",
+    "freeAiCards_other": "Tarjetas de IA gratis al día: {{count, number}}"
   },
   "seo": {
     "title": "Reklue — Que se te quede. Tarjeta a tarjeta.",
-    "description": "De palabras nuevas a apuntes de examen. Aprende con tarjetas y vuelve cuando lo pida tu memoria. Tarjetas. Repetición espaciada. Juegos mentales. Todo en Reklue."
+    "description": "Empieza gratis con tarjetas, repetición espaciada (SRS) y juegos mentales. Crea un mazo, repasa y explora juegos de memoria y razonamiento."
   },
   "proof": {
     "eyebrow": "Datos reales",
@@ -338,7 +357,7 @@
     "navExperience": "Pruébalo",
     "title1": "Que se te quede.",
     "title2": "Tarjeta a tarjeta.",
-    "heroText": "Aprende con tarjetas y repasa a tu ritmo. Cambia de reto con un juego mental breve.",
+    "heroText": "Empieza gratis con tarjetas y juegos mentales. Sigue aprendiendo con repasos adaptados a tu memoria.",
     "tryCard": "Probar una tarjeta",
     "heroCaption": "Tarjetas. Repetición espaciada. Juegos mentales. Todo en Reklue.",
     "featureEyebrow": "Más formas de aprender",
@@ -358,15 +377,15 @@
     "playTitle": "Encuentra la diferencia.\nAcepta el reto.",
     "playText": "Detecta un cambio, recuerda una secuencia y responde a una regla. Una partida corta puede traer un desafío distinto.",
     "playLink": "Explorar los juegos",
-    "extraNote": "La IA puede ayudarte a redactar tarjetas para que las revises y corrijas. Las funciones de IA tienen límites de uso propios.",
+    "extraNote": "La generación de tarjetas y preguntas con IA incluye una cuota gratuita. El uso adicional de IA y algunas funciones, como la corrección con IA, se cobran aparte.",
     "howEyebrow": "Sin preparativos complicados",
     "howTitle": "Empezar es sencillo.",
     "faqEyebrow": "Más de cerca",
     "contact": "Contacta con nosotros",
     "finalTitle1": "Para la próxima vez",
     "finalTitle2": "que quieras recordar.",
-    "finalText": "Empieza por algo que quieras conservar. Empieza con Reklue.",
-    "freeNote": "Puedes empezar gratis. Se aplican límites de almacenamiento de tarjetas y uso de IA.",
+    "finalText": "Aprende con tarjetas y prueba un juego mental. Empieza hoy con el plan gratuito.",
+    "freeNote": "El estudio con tarjetas, el repaso SRS y todos los juegos mentales están incluidos en el plan gratuito.",
     "footerText": "Un lugar para aprender con tarjetas y concentrarte jugando.",
     "demoLabel": "Demostración interactiva de tarjetas",
     "flipBack": "Volver a girar",
