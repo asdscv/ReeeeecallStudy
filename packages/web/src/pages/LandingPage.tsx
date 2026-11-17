@@ -10,18 +10,7 @@ import {
 } from '../lib/content-seo'
 import { SEO } from '../lib/seo-config'
 
-import { LandingNav } from '../components/landing/LandingNav'
-import { HeroSection } from '../components/landing/HeroSection'
-import { FeaturesSection } from '../components/landing/FeaturesSection'
-import { HowItWorksSection } from '../components/landing/HowItWorksSection'
-import { PricingSection } from '../components/landing/PricingSection'
-import { FAQSection } from '../components/landing/FAQSection'
-import { FinalCTASection } from '../components/landing/FinalCTASection'
-import { LandingFooter } from '../components/landing/LandingFooter'
-import '../components/landing/landing.css'
-// Same flag that enables payment — when 'true' it lights up BOTH checkout and the
-// landing pricing section. When off, the pricing block is not rendered at all.
-import { PAYMENTS_ENABLED } from '../stores/billing-store'
+import { ProductLanding } from '../components/landing/ProductLanding'
 
 export function LandingPage() {
   const { t, i18n } = useTranslation('landing')
@@ -47,7 +36,7 @@ export function LandingPage() {
   ].filter(Boolean)
 
   return (
-    <div className="reklue-landing">
+    <>
       <SEOHead
         title={t('seo.title')}
         description={t('seo.description')}
@@ -59,17 +48,7 @@ export function LandingPage() {
         keywords={['spaced repetition', 'flashcards', 'SRS', 'study app', 'learning platform', 'memorization', 'active recall']}
         hreflangAlternates={buildStaticHreflangAlternates('/landing')}
       />
-      <LandingNav />
-      <main id="landing-main">
-        <HeroSection />
-        <FeaturesSection />
-        <HowItWorksSection />
-        {/* Keep the existing payment flag and pricing behavior. */}
-        {PAYMENTS_ENABLED && <PricingSection />}
-        <FAQSection />
-        <FinalCTASection />
-      </main>
-      <LandingFooter />
-    </div>
+      <ProductLanding />
+    </>
   )
 }
