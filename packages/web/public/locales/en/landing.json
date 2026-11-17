@@ -383,5 +383,29 @@
     "nextCard": "Next card",
     "pause": "Pause autoplay",
     "play": "Start autoplay"
+  },
+  "showcase": {
+    "eyebrow": "Explore Reklue",
+    "title": "Your study, in view.",
+    "intro": "Organize with cards. Review at your pace. Take a break with a quick game.",
+    "decks": "Organize",
+    "review": "Review",
+    "games": "Play",
+    "demo": "Sample workspace",
+    "search": "Search sample decks",
+    "deck": "Deck",
+    "cards": "Cards",
+    "preview": "Card preview",
+    "empty": "No matching sample decks.",
+    "study": "Try a review",
+    "today": "Today’s review",
+    "question": "Question",
+    "answer": "Answer",
+    "back": "Show question",
+    "reveal": "Reveal answer",
+    "start": "Start studying",
+    "decksDescription": "Vocabulary, class notes, exam topics. Bring what you learn together in a deck.",
+    "reviewDescription": "Recall the answer, then rate how well you remembered. Your response sets the next review date.",
+    "gamesDescription": "Find numbers, remember patterns, and crack codes. Start playing without an account."
   }
 }

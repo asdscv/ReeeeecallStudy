@@ -2,11 +2,12 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion, useReducedMotion } from 'motion/react'
-import { ArrowRight, ArrowUpRight, BookOpen, ChevronDown, Layers, Menu, Plus, X } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, ChevronDown, Menu, Plus, X } from 'lucide-react'
 import { useAuthStore } from '../../stores/auth-store'
 import { LanguageSelector } from '../common/LanguageSelector'
 import { AppDownload } from '../common/AppDownload'
 import { AppPreviewSection } from './AppPreviewSection'
+import { ProductShowcase } from './ProductShowcase'
 import { PricingSection } from './PricingSection'
 import { PAYMENTS_ENABLED } from '../../stores/billing-store'
 import { VOCAB_INDEX_PATH, isDeckLanguage, vocabLanguageIndexPath } from '@reklue/shared/lib/vocab-hubs'
@@ -54,33 +55,6 @@ function ProductHero() {
   </section>
 }
 
-function FeatureStory() {
-  const { t } = useTranslation('landing')
-  return <section id="features" className="rl-features" aria-labelledby="rl-features-title">
-    <div className="rl-container">
-      <Reveal className="rl-section-heading"><p className="rl-eyebrow">{t('premium.featureEyebrow')}</p><h2 id="rl-features-title">{t('premium.featureTitle1')}<br /><span>{t('premium.featureTitle2')}</span></h2><p>{t('premium.featureIntro')}</p></Reveal>
-      <div className="rl-feature-grid">
-        <Reveal className="rl-feature-panel rl-review-panel">
-          <div className="rl-panel-copy"><span className="rl-panel-label">{t('premium.reviewLabel')}</span><h3>{t('premium.reviewTitle')}</h3><p>{t('human.reviewText')}</p></div>
-          <div className="rl-review-visual" aria-hidden="true">
-            <div className="rl-mini-card rl-mini-card-back"><Layers size={24} /><span>curiosity</span></div><div className="rl-mini-card rl-mini-card-front"><div className="rl-mini-card-label">{t('premium.reviewExample')}</div><strong>serendipity</strong><div className="rl-rating-preview"><span>Again</span><span>Hard</span><span className="rl-rating-good">Good</span><span>Easy</span></div></div>
-            <div className="rl-timeline"><i /><span /><i /><span /><i className="rl-timeline-active" /><span /><i /></div>
-          </div>
-        </Reveal>
-        <Reveal className="rl-feature-panel rl-decks-panel" delay={.08}>
-          <div className="rl-panel-copy"><span className="rl-panel-label">{t('premium.deckLabel')}</span><h3>{t('premium.deckTitle')}</h3><p>{t('premium.deckText')}</p></div>
-          <div className="rl-deck-visual" aria-hidden="true">{['deckOne', 'deckTwo', 'deckThree'].map((k, i) => <div className={`rl-deck-tile rl-deck-tile-${i}`} key={k}><BookOpen size={21} /><span>{t(`premium.${k}`)}</span><ArrowUpRight size={17} /></div>)}</div>
-        </Reveal>
-        <Reveal className="rl-feature-panel rl-play-panel">
-          <div className="rl-panel-copy"><span className="rl-panel-label">{t('premium.playLabel')}</span><h3>{t('premium.playTitle')}</h3><p>{t('premium.playText')}</p><Link to="/brain" className="rl-link">{t('premium.playLink')}<ArrowUpRight size={16} aria-hidden="true" /></Link></div>
-          <div className="rl-game-art" aria-hidden="true"><div className="rl-game-orbit rl-game-orbit-one" /><div className="rl-game-orbit rl-game-orbit-two" /><div className="rl-grid-frame"><div className="rl-game-grid">{Array.from({ length: 16 }, (_, i) => <span key={i} className={i === 6 || i === 9 ? 'rl-cell-active' : ''} />)}</div></div></div>
-        </Reveal>
-      </div>
-      <Reveal className="rl-extra-note"><p>{t('premium.extraNote')}</p></Reveal>
-    </div>
-  </section>
-}
-
 function ProductHowTo() {
   const { t } = useTranslation('landing')
   return <section id="how-it-works" className="rl-how" aria-labelledby="rl-how-title"><div className="rl-container">
@@ -108,5 +82,5 @@ function ProductFooter() {
 
 export function ProductLanding() {
   const { i18n } = useTranslation('landing')
-  return <div className="rl-product" lang={i18n.resolvedLanguage || i18n.language}><ProductNav /><main id="landing-main"><ProductHero /><FeatureStory /><ProductHowTo />{PAYMENTS_ENABLED && <div className="rl-pricing"><PricingSection /></div>}<ProductFAQ /><ProductFinal /></main><ProductFooter /></div>
+  return <div className="rl-product" lang={i18n.resolvedLanguage || i18n.language}><ProductNav /><main id="landing-main"><ProductHero /><ProductShowcase /><ProductHowTo />{PAYMENTS_ENABLED && <div className="rl-pricing"><PricingSection /></div>}<ProductFAQ /><ProductFinal /></main><ProductFooter /></div>
 }

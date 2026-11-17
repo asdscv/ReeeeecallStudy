@@ -383,5 +383,29 @@
     "nextCard": "Siguiente tarjeta",
     "pause": "Pausar reproducción automática",
     "play": "Iniciar reproducción automática"
+  },
+  "showcase": {
+    "eyebrow": "Explora Reklue",
+    "title": "Tu estudio, a la vista.",
+    "intro": "Organiza con tarjetas. Repasa a tu ritmo. Descansa con un juego breve.",
+    "decks": "Organizar",
+    "review": "Repasar",
+    "games": "Jugar",
+    "demo": "Espacio de ejemplo",
+    "search": "Buscar mazos de ejemplo",
+    "deck": "Mazo",
+    "cards": "Tarjetas",
+    "preview": "Vista previa",
+    "empty": "No hay mazos de ejemplo que coincidan.",
+    "study": "Probar un repaso",
+    "today": "Repaso de hoy",
+    "question": "Pregunta",
+    "answer": "Respuesta",
+    "back": "Ver pregunta",
+    "reveal": "Mostrar respuesta",
+    "start": "Empezar a estudiar",
+    "decksDescription": "Vocabulario, apuntes, temas de examen. Reúne lo que aprendes en un mazo.",
+    "reviewDescription": "Recuerda la respuesta y valora cuánto recordaste. Tu valoración fija la próxima fecha de repaso.",
+    "gamesDescription": "Busca números, recuerda patrones y descifra códigos. Juega sin iniciar sesión."
   }
 }
