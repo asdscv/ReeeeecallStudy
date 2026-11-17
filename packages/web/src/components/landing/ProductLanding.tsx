@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion, useReducedMotion } from 'motion/react'
-import { ArrowRight, ArrowUpRight, ChevronDown, Menu, Plus, X } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Check, ChevronDown, Menu, Plus, X } from 'lucide-react'
 import { useAuthStore } from '../../stores/auth-store'
 import { LanguageSelector } from '../common/LanguageSelector'
 import { AppDownload } from '../common/AppDownload'
@@ -49,7 +49,7 @@ function ProductHero() {
   const { t } = useTranslation('landing')
   return <section className="rl-hero" aria-labelledby="rl-title">
     <div className="rl-hero-copy rl-container">
-      <Reveal className="rl-hero-layout"><div className="rl-hero-heading"><p className="rl-kicker"><span className="rl-status-dot" />{t('premium.heroCaption')}</p><h1 id="rl-title">{t('premium.title1')}<br /><span>{t('premium.title2')}</span></h1></div><div className="rl-hero-aside"><p className="rl-hero-description">{t('premium.heroText')}</p><div className="rl-hero-actions"><Link to="/auth/login" className="rl-pill">{t('hero.cta.start')}<ArrowRight size={16} aria-hidden="true" /></Link><a href="#experience" className="rl-link">{t('premium.tryCard')}<ChevronDown size={17} aria-hidden="true" /></a></div></div></Reveal>
+      <Reveal className="rl-hero-layout"><div className="rl-hero-heading"><p className="rl-kicker"><span className="rl-status-dot" />{t('premium.heroCaption')}</p><h1 id="rl-title">{t('premium.title1')}<br /><span>{t('premium.title2')}</span></h1></div><div className="rl-hero-aside"><p className="rl-hero-description">{t('premium.heroText')}</p><p className="rl-hero-free"><Check size={15} aria-hidden="true" /><span><strong>{t('pricing.freeIncludes')}</strong>{t('pricing.heroFeatures')}</span></p><div className="rl-hero-actions"><Link to="/auth/login" className="rl-pill">{t('hero.cta.start')}<ArrowRight size={16} aria-hidden="true" /></Link><a href="#experience" className="rl-link">{t('premium.tryCard')}<ChevronDown size={17} aria-hidden="true" /></a></div></div></Reveal>
     </div>
     <AppPreviewSection />
     <div className="rl-hero-index rl-container" aria-hidden="true"><span>01 / RECALL</span><span>Reklue</span><span>MAKE IT STICK.</span></div>
