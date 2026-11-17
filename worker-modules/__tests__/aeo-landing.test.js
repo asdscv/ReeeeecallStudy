@@ -18,6 +18,9 @@ describe('AEO public content', () => {
     expect(html).toContain(`<title>${escapeHtml(copy.seo.title)}</title>`)
     expect(html).toContain(escapeHtml(copy.faq.a2))
     expect(html).toContain(escapeHtml(copy.faq.a3))
+    expect(html).toContain(escapeHtml(copy.pricing.title))
+    expect(html).toContain(escapeHtml(copy.pricing.features.cards))
+    expect(html).toContain(escapeHtml(copy.pricing.heroFeatures))
     expect(html).toContain('id="brain-training"')
     expect(html).toContain(escapeHtml(copy.brainLanding.intro))
     for (const id of ['schulte', 'memoryGrid', 'codeBreak']) {

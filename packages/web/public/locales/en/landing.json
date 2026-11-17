@@ -147,7 +147,7 @@
   "nav": {
     "blog": "Insights",
     "login": "Log in",
-    "start": "Get Started",
+    "start": "Start free",
     "features": "Features",
     "science": "Science",
     "results": "Results",
@@ -190,7 +190,7 @@
     "q1": "How are review dates chosen?",
     "a1": "In SRS (spaced repetition) mode, you check the answer and rate how well you recalled it. That sets the next review date. Difficult cards come back sooner; cards you remember well get longer intervals.",
     "q2": "Can I try it for free?",
-    "a2": "Yes. A free account lets you create cards and review them. Card storage and free AI usage have limits. You can check your current limits in Settings after signing up.",
+    "a2": "Yes. Create cards, import public decks, use study modes including SRS, and play every brain game on the free plan. Card storage and free AI generation have usage limits. Extra AI usage and some features, including AI grading, are charged separately.",
     "q3": "What if I need to study before an exam?",
     "a3": "Alongside SRS, there are sequential review, random, sequential, by-date, and cramming modes. Follow your review dates day to day, or use cramming mode for repeated practice before a test.",
     "q4": "Do I have to make every card myself?",
@@ -266,25 +266,44 @@
     }
   },
   "pricing": {
-    "title": "Pricing",
-    "subtitle": "Choose the plan that fits how much you study",
+    "title": "So much, included for free.",
+    "subtitle": "From flashcard study to brain training, the free plan gives you plenty to work with.",
     "recommended": "Recommended",
     "freePrice": "Free",
     "pricePerMonth": "{{price}}/mo",
     "unlimitedCards": "Unlimited cards",
     "upToCards": "Up to {{count, number}} cards",
     "ctaFree": "Start free",
-    "ctaPaid": "Get started",
-    "note": "Checkout happens after sign-up, in Settings.",
+    "ctaPaid": "Explore storage plans",
+    "note": "AI card and quiz generation include free allowances. Extra AI usage and some features, including AI grading, are charged separately.",
     "plans": {
       "free": "Free",
-      "freeBlurb": "A free plan that's perfect to get started",
-      "standardBlurb": "Expand your learning with more cards"
-    }
+      "freeBlurb": "Learn with your own cards and public decks. Keep reviewing and try brain training.",
+      "standardBlurb": "An option when you need more card storage."
+    },
+    "freeBadge": "A generous free plan",
+    "freeIncludes": "Included for free",
+    "heroFeatures": "Create cards · SRS review · Every brain game",
+    "freeAiCards": "Daily free AI cards: {{count, number}}",
+    "optionalTitle": "Need more room for your cards?",
+    "optionalText": "Choose an upgrade when you need more card storage. Flashcard study and brain training are included in the free plan.",
+    "features": {
+      "cards": "Create and edit your own cards",
+      "decks": "Browse and import public decks",
+      "study": "{{count}} study modes, including SRS",
+      "brain": "Access to all {{count}} brain games",
+      "history": "Study history and sync across devices",
+      "study_one": "{{count}} study mode, including SRS",
+      "study_other": "{{count}} study modes, including SRS",
+      "brain_one": "Access to {{count}} brain game",
+      "brain_other": "Access to all {{count}} brain games"
+    },
+    "freeAiCards_one": "Daily free AI card: {{count, number}}",
+    "freeAiCards_other": "Daily free AI cards: {{count, number}}"
   },
   "seo": {
     "title": "Reklue — Make it stick. One card at a time.",
-    "description": "From new words to exam notes. Learn with cards. Come back at a time that fits what you remember. Flashcards. Spaced repetition. Brain games. All in Reklue."
+    "description": "Start flashcard study, spaced repetition (SRS) and brain training on the free plan. Build a deck, keep reviewing, and explore memory and reasoning games."
   },
   "proof": {
     "eyebrow": "Live data",
@@ -338,7 +357,7 @@
     "navExperience": "Experience",
     "title1": "Make it stick.",
     "title2": "One card at a time.",
-    "heroText": "Learn with cards. Review when it matters. Switch gears with a quick brain game.",
+    "heroText": "Flashcard study and brain training, free to start. Keep learning with reviews timed to your memory.",
     "tryCard": "Try a card",
     "heroCaption": "Flashcards. Spaced repetition. Brain games. All in Reklue.",
     "featureEyebrow": "More ways to engage",
@@ -358,15 +377,15 @@
     "playTitle": "Spot the difference.\nMeet the challenge.",
     "playText": "Find a change, remember a sequence, respond to a rule. A short session can bring a different kind of challenge.",
     "playLink": "Explore brain games",
-    "extraNote": "AI can help draft cards for you to check and edit. Separate usage limits apply to AI features.",
+    "extraNote": "AI card and quiz generation include free allowances. Extra AI usage and some features, including AI grading, are charged separately.",
     "howEyebrow": "No elaborate setup",
     "howTitle": "A simple place to begin.",
     "faqEyebrow": "A closer look",
     "contact": "Get in touch",
     "finalTitle1": "For the next time",
     "finalTitle2": "you need to remember.",
-    "finalText": "Start with one thing you want to keep. Start with Reklue.",
-    "freeNote": "Free to get started. Card storage and AI usage limits apply.",
+    "finalText": "Learn with cards. Take on a brain game. Start with the free plan today.",
+    "freeNote": "Flashcard study, SRS review and every brain game are included in the free plan.",
     "footerText": "A place to learn with cards and focus through play.",
     "demoLabel": "Interactive flashcard demo",
     "flipBack": "Turn back over",

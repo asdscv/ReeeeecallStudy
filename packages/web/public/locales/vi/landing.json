@@ -147,7 +147,7 @@
   "nav": {
     "blog": "Bài viết",
     "login": "Đăng nhập",
-    "start": "Bắt đầu ngay",
+    "start": "Bắt đầu miễn phí",
     "features": "Tính năng",
     "science": "Khoa học",
     "results": "Kết quả",
@@ -190,7 +190,7 @@
     "q1": "Ngày ôn được xếp như thế nào?",
     "a1": "Ở chế độ SRS (lặp lại ngắt quãng), bạn xem đáp án rồi đánh giá mức độ nhớ. Ngày ôn tiếp theo được xếp từ đó. Thẻ khó quay lại sớm hơn, thẻ đã nhớ có khoảng cách dài hơn.",
     "q2": "Tôi có thể dùng thử miễn phí không?",
-    "a2": "Có. Tài khoản miễn phí cho phép tạo thẻ và ôn tập. Số thẻ lưu trữ và lượt AI miễn phí có giới hạn. Bạn có thể xem hạn mức hiện tại trong Cài đặt sau khi đăng ký.",
+    "a2": "Có. Gói miễn phí cho phép tạo thẻ, nhập bộ thẻ công khai, dùng các chế độ học gồm SRS và chơi mọi trò trí não. Lưu thẻ và tạo bằng AI miễn phí có giới hạn sử dụng. Lượt AI bổ sung và một số tính năng như chấm bằng AI tính phí riêng.",
     "q3": "Nếu tôi cần ôn gấp trước kỳ thi thì sao?",
     "a3": "Ngoài SRS còn có ôn tuần tự, ngẫu nhiên, theo thứ tự, theo ngày và ôn cấp tốc. Hằng ngày bạn có thể ôn theo lịch, còn trước kỳ thi có thể lặp lại bằng chế độ ôn cấp tốc.",
     "q4": "Tôi phải tự làm tất cả thẻ sao?",
@@ -266,25 +266,44 @@
     }
   },
   "pricing": {
-    "title": "Bảng giá",
-    "subtitle": "Chọn gói phù hợp với mức độ học của bạn",
+    "title": "Miễn phí, vẫn học được rất nhiều.",
+    "subtitle": "Từ thẻ học đến rèn trí não, gói miễn phí đã có nhiều tính năng cơ bản.",
     "recommended": "Đề xuất",
     "freePrice": "Miễn phí",
     "pricePerMonth": "{{price}}/tháng",
     "unlimitedCards": "Thẻ không giới hạn",
     "upToCards": "Tối đa {{count, number}} thẻ",
     "ctaFree": "Bắt đầu miễn phí",
-    "ctaPaid": "Bắt đầu ngay",
-    "note": "Thanh toán được thực hiện sau khi đăng ký, trong phần Cài đặt.",
+    "ctaPaid": "Xem gói mở rộng",
+    "note": "Tạo thẻ và câu hỏi bằng AI có hạn mức miễn phí. Lượt AI bổ sung và một số tính năng như chấm bằng AI được tính phí riêng.",
     "plans": {
       "free": "Miễn phí",
-      "freeBlurb": "Gói miễn phí lý tưởng để bắt đầu",
-      "standardBlurb": "Mở rộng việc học với nhiều thẻ hơn"
-    }
+      "freeBlurb": "Học bằng thẻ của bạn và bộ thẻ công khai. Tiếp tục ôn tập và thử trò trí não.",
+      "standardBlurb": "Lựa chọn khi bạn cần lưu nhiều thẻ hơn."
+    },
+    "freeBadge": "Gói miễn phí phong phú",
+    "freeIncludes": "Có trong gói miễn phí",
+    "heroFeatures": "Tạo thẻ · Ôn SRS · Mọi trò trí não",
+    "freeAiCards": "Thẻ AI miễn phí mỗi ngày: {{count, number}}",
+    "optionalTitle": "Cần thêm chỗ lưu thẻ?",
+    "optionalText": "Chọn gói mở rộng khi cần lưu nhiều thẻ hơn. Học bằng thẻ và rèn trí não đã có trong gói miễn phí.",
+    "features": {
+      "cards": "Tạo và chỉnh sửa thẻ của bạn",
+      "decks": "Duyệt và nhập bộ thẻ công khai",
+      "study": "{{count}} chế độ học, gồm SRS",
+      "brain": "Chơi tất cả {{count}} trò trí não",
+      "history": "Lịch sử học và đồng bộ thiết bị",
+      "study_one": "{{count}} chế độ học, gồm SRS",
+      "study_other": "{{count}} chế độ học, gồm SRS",
+      "brain_one": "Chơi tất cả {{count}} trò trí não",
+      "brain_other": "Chơi tất cả {{count}} trò trí não"
+    },
+    "freeAiCards_one": "Thẻ AI miễn phí mỗi ngày: {{count, number}}",
+    "freeAiCards_other": "Thẻ AI miễn phí mỗi ngày: {{count, number}}"
   },
   "seo": {
     "title": "Reklue — Để nhớ lâu hơn. Từng thẻ một.",
-    "description": "Từ vựng hay kiến thức ôn thi. Học bằng thẻ, rồi quay lại vào thời điểm phù hợp với điều bạn nhớ. Thẻ học. Lặp lại ngắt quãng. Trò chơi trí não. Cùng Reklue."
+    "description": "Bắt đầu miễn phí với thẻ học, lặp lại ngắt quãng (SRS) và rèn trí não. Tạo bộ thẻ, ôn tập và khám phá trò chơi ghi nhớ, suy luận."
   },
   "proof": {
     "eyebrow": "Dữ liệu thật",
@@ -338,7 +357,7 @@
     "navExperience": "Trải nghiệm",
     "title1": "Để nhớ lâu hơn.",
     "title2": "Từng thẻ một.",
-    "heroText": "Học bằng thẻ, ôn theo trí nhớ. Đổi nhịp với một trò trí não ngắn.",
+    "heroText": "Học bằng thẻ và rèn trí não, bắt đầu miễn phí. Tiếp tục học với lịch ôn theo trí nhớ.",
     "tryCard": "Thử một thẻ",
     "heroCaption": "Thẻ học. Lặp lại ngắt quãng. Trò chơi trí não. Cùng Reklue.",
     "featureEyebrow": "Thêm cách để khám phá",
@@ -358,15 +377,15 @@
     "playTitle": "Tìm điểm khác biệt.\nĐón thử thách mới.",
     "playText": "Tìm sự thay đổi, nhớ thứ tự, phản ứng theo quy tắc. Một lượt chơi ngắn cũng mang đến một kiểu thử thách khác.",
     "playLink": "Khám phá trò chơi",
-    "extraNote": "AI có thể soạn nháp thẻ để bạn kiểm tra và chỉnh sửa. Các tính năng AI có giới hạn sử dụng riêng.",
+    "extraNote": "Tạo thẻ và câu hỏi bằng AI có hạn mức miễn phí. Lượt AI bổ sung và một số tính năng như chấm bằng AI được tính phí riêng.",
     "howEyebrow": "Không cần chuẩn bị cầu kỳ",
     "howTitle": "Bắt đầu thật đơn giản.",
     "faqEyebrow": "Tìm hiểu thêm",
     "contact": "Liên hệ với chúng tôi",
     "finalTitle1": "Để lần sau,",
     "finalTitle2": "bạn còn nhớ.",
-    "finalText": "Bắt đầu từ một điều bạn muốn ghi nhớ. Bắt đầu với Reklue.",
-    "freeNote": "Bắt đầu miễn phí. Có giới hạn lưu thẻ và sử dụng AI.",
+    "finalText": "Học bằng thẻ, thử thách với trò trí não. Bắt đầu bằng gói miễn phí ngay hôm nay.",
+    "freeNote": "Học bằng thẻ, ôn SRS và mọi trò trí não đều có trong gói miễn phí.",
     "footerText": "Nơi học bằng thẻ và tập trung qua trò chơi.",
     "demoLabel": "Demo thẻ học tương tác",
     "flipBack": "Lật lại",
