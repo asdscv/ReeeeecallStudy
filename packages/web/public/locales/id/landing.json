@@ -5,7 +5,7 @@
     "titleHighlight": "Batas Memori",
     "title1": "Pembelajaran yang Melampaui",
     "title2": "Batas Memori",
-    "description": "Maksimalkan efisiensi belajar Anda dengan pengulangan berjarak (SRS) yang terbukti secara ilmiah.",
+    "description": "Dari kosakata hingga bahan ujian. Belajar lewat kartu, lalu kembali saat sesuai dengan ingatanmu. Kartu belajar. Pengulangan berjarak. Permainan otak. Semua di Reklue.",
     "subDescription": "Dengan Reklue, Anda dapat mengingat lebih cepat dan lebih lama.",
     "subtitle1": "Maksimalkan efisiensi belajar Anda dengan pengulangan berjarak (SRS) yang terbukti secara ilmiah.",
     "subtitle2": "Dengan Reklue, Anda dapat mengingat lebih cepat dan lebih lama.",
@@ -124,18 +124,18 @@
     }
   },
   "howItWorks": {
-    "title": "Mulai dalam 3 Langkah Sederhana",
+    "title": "Beberapa kartu saja sudah cukup.",
     "step1": {
-      "title": "Buat Dek",
-      "desc": "Buat dek untuk mengatur kartu berdasarkan topik, lalu tambahkan kartu Anda."
+      "title": "Pilih hal yang ingin diingat",
+      "desc": "Tulis pertanyaan dan jawaban, atau cari dek publik. Beberapa kata cukup untuk sesi pertama."
     },
     "step2": {
-      "title": "Belajar",
-      "desc": "SRS menyajikan kartu ulasan pada waktu yang optimal."
+      "title": "Ingat dulu sebelum membalik",
+      "desc": "Lihat bagian depan kartu dan pikirkan sebentar. Periksa jawaban, lalu tandai seberapa baik kamu mengingatnya."
     },
     "step3": {
-      "title": "Lacak Progres",
-      "desc": "Periksa statistik pembelajaran dan tren pertumbuhan di dasbor."
+      "title": "Kembali saat jadwalnya tiba",
+      "desc": "Dalam mode SRS, setiap kartu punya jadwal pengulangan sendiri. Buka kartu yang sudah waktunya dan lanjutkan."
     }
   },
   "cta": {
@@ -186,15 +186,15 @@
   },
   "floatingCta": "Mulai Sekarang",
   "faq": {
-    "title": "Pertanyaan yang Sering Diajukan",
-    "q1": "Apa itu pengulangan berjarak (SRS)?",
-    "a1": "Pengulangan berjarak adalah metode pembelajaran yang terbukti secara ilmiah yang menjadwalkan ulasan pada interval optimal untuk memaksimalkan retensi memori jangka panjang. Reklue menggunakan algoritma SRS canggih untuk secara otomatis menentukan kapan Anda harus mengulas setiap kartu kilat.",
-    "q2": "Apakah Reklue gratis?",
-    "a2": "Ya, kamu bisa mulai gratis. Cukup daftar dan SRS, keenam mode belajar, statistik, serta berbagi dek bisa dipakai tanpa batas.\n\nPaket gratis membatasi jumlah kartu yang bisa disimpan, dan paket berbayar menaikkan batas itu (angka pastinya tampil di bagian harga di atas). Pembuatan kartu dengan AI dan kuis AI punya jatah gratis setiap hari; selebihnya dipotong dari saldo isi ulang — dan biayanya selalu ditampilkan sebelum kamu mengonfirmasi.",
-    "q3": "Mode belajar apa saja yang tersedia?",
-    "a3": "Reklue mendukung 6 mode belajar: SRS untuk penjadwalan tinjauan optimal, tinjauan berurutan untuk revisi sistematis, acak untuk latihan campur, berurutan sesuai urutan, per tanggal untuk penataan berbasis waktu, dan sistem kebut untuk pengulangan intensif sampai kuasai.",
-    "q4": "Bisakah saya berbagi dek kartu kilat saya?",
-    "a4": "Ya! Anda dapat berbagi dek dalam 3 mode: Salin (duplikat untuk orang lain), Berlangganan (sinkronisasi pembaruan), dan Snapshot (versi beku). Jelajahi dan temukan dek pengguna lain di marketplace komunitas."
+    "title": "Mungkin ini yang ingin kamu tanyakan",
+    "q1": "Bagaimana jadwal pengulangan ditentukan?",
+    "a1": "Dalam mode SRS (pengulangan berjarak), kamu melihat jawaban lalu menilai seberapa baik kamu mengingatnya. Itu menentukan jadwal berikutnya. Kartu sulit muncul lebih cepat, kartu yang diingat dengan baik diberi jarak lebih panjang.",
+    "q2": "Bisa mencoba gratis?",
+    "a2": "Bisa. Akun gratis dapat membuat kartu dan mengulang pelajaran. Penyimpanan kartu dan pemakaian AI gratis punya batas. Batas saat ini bisa dilihat di Pengaturan setelah mendaftar.",
+    "q3": "Bagaimana kalau mau belajar menjelang ujian?",
+    "a3": "Selain SRS, ada pengulangan berurutan, acak, berurutan, berdasarkan tanggal, dan mode kebut. Ikuti jadwal untuk belajar sehari-hari, atau gunakan mode kebut untuk berlatih berulang sebelum ujian.",
+    "q4": "Harus membuat semua kartu sendiri?",
+    "a4": "Tidak. Kamu bisa mengambil dek publik dari marketplace atau mengimpor berkas CSV dan JSON yang sudah ada. Dek sendiri bisa dibagikan lewat salinan, langganan, atau snapshot."
   },
   "statsSection": {
     "title": "Hasil Terbukti",
@@ -283,8 +283,8 @@
     }
   },
   "seo": {
-    "title": "Reklue — Kartu Belajar & Game Otak",
-    "description": "Platform pembelajaran kartu kilat cerdas dengan algoritma pengulangan berjarak (SRS) yang terbukti secara ilmiah. Ingat lebih cepat dan lebih lama."
+    "title": "Reklue — Biar tetap ingat. Satu kartu setiap kali.",
+    "description": "Dari kosakata hingga bahan ujian. Belajar lewat kartu, lalu kembali saat sesuai dengan ingatanmu. Kartu belajar. Pengulangan berjarak. Permainan otak. Semua di Reklue."
   },
   "proof": {
     "eyebrow": "Data nyata",
@@ -298,5 +298,90 @@
     "languages": "Bahasa",
     "modes": "Mode belajar",
     "footnote": "Dihitung di server, diperbarui tiap jam"
+  },
+  "human": {
+    "eyebrow": "Belajar. Lupa. Coba ingat lagi.",
+    "title1": "Kemarin masih ingat.",
+    "title2": "Kalau hari ini?",
+    "intro": "Ada kata yang terasa akrab, tapi saat mau dipakai malah lupa. Simpan di Reklue bersama catatan yang ingin kamu ingat, lalu buka lagi satu kartu demi satu.",
+    "seeHow": "Lihat cara pakainya",
+    "heroNote": "Kosakata, bahan ujian, atau catatan sendiri. Bisa mulai gratis.",
+    "demoLabel": "Coba balik satu kartu dulu.",
+    "demoSubject": "Kartu contoh · Kosakata bahasa Inggris",
+    "front": "Depan",
+    "back": "Belakang",
+    "demoAnswer": "ragu-ragu, bimbang",
+    "demoPrompt": "Coba ingat artinya sebelum melihat jawaban.",
+    "showAnswer": "Lihat jawaban",
+    "tryAgain": "Coba ingat lagi",
+    "demoNote": "Merasa kenal saat melihat jawaban berbeda dengan mengingatnya sendiri.",
+    "featuresEyebrow": "Untuk saat-saat seperti ini",
+    "featuresTitle": "Sedikit bantuan\nsaat belajar terasa buntu.",
+    "featuresIntro": "Sudah banyak yang perlu dipikirkan. Mengulang pelajaran bisa tetap sederhana.",
+    "reviewTitle": "Saat bingung harus mengulang apa",
+    "reviewText": "Lihat kartu dan tandai seberapa baik kamu mengingatnya. Jadwal berikutnya ditentukan dari situ, agar hal yang sulit muncul lebih sering.",
+    "cardsTitle": "Saat catatan tersebar di mana-mana",
+    "cardsText": "Catatan kelas, kata yang sering tertukar, bahan ujian. Jadikan pertanyaan dan jawaban, atau mulai dengan dek publik yang sudah ada.",
+    "paceTitle": "Saat hari ini butuh cara yang berbeda",
+    "paceText": "Lihat kartu berurutan, acak, atau ulangi menjelang ujian. Pilih mode yang cocok dengan kebutuhan belajarmu hari ini.",
+    "extra": "Bingung menulis kartu? AI bisa membuat draf untuk kamu periksa dan sunting. Fitur AI punya batas pemakaian tersendiri.",
+    "howEyebrow": "Pertama kali mencoba",
+    "pauseTitle": "Terlewat sehari? Lanjut lagi besok.",
+    "pauseText": "Tidak perlu memasukkan semuanya sekaligus. Mulai dari beberapa hal yang sering tertukar, lalu tambah saat perlu.",
+    "faqEyebrow": "Sebelum mulai",
+    "faqNote": "Ada pertanyaan atau hal yang kurang nyaman dipakai? Kirim pesan ke kami.",
+    "finalTitle": "Mulai dari kata yang selalu terlupa itu.",
+    "finalText": "Tulis satu hal di kartu hari ini, supaya nanti bisa kamu buka lagi.",
+    "footerNote": "Tempat menyimpan hal yang ingin kamu ingat."
+  },
+  "premium": {
+    "navExperience": "Coba langsung",
+    "title1": "Biar tetap ingat.",
+    "title2": "Satu kartu setiap kali.",
+    "heroText": "Dari kosakata hingga bahan ujian. Belajar lewat kartu, lalu kembali saat sesuai dengan ingatanmu.",
+    "tryCard": "Coba satu kartu",
+    "heroCaption": "Kartu belajar. Pengulangan berjarak. Permainan otak. Semua di Reklue.",
+    "featureEyebrow": "Lebih banyak cara untuk mencoba",
+    "featureTitle1": "Dari mempelajarinya.",
+    "featureTitle2": "Hingga bisa mengingatnya.",
+    "featureIntro": "Kartu untuk belajar, pengulangan sesuai ingatan, dan permainan untuk fokus sejenak. Pilih yang kamu perlukan.",
+    "reviewLabel": "Pengulangan berjarak",
+    "reviewTitle": "Sejauh ingatanmu,\nseperti itu jadwalnya.",
+    "reviewExample": "Contoh layar pengulangan",
+    "deckLabel": "Dek belajarmu",
+    "deckTitle": "Catatan tersebar.\nSatu tempat belajar.",
+    "deckText": "Kosakata, catatan kelas, bahan ujian. Buat kartu sendiri atau mulai dari dek publik.",
+    "deckOne": "Kosakata",
+    "deckTwo": "Persiapan ujian",
+    "deckThree": "Catatan harian",
+    "playLabel": "Permainan otak",
+    "playTitle": "Temukan bedanya.\nHadapi tantangannya.",
+    "playText": "Cari perubahan, ingat urutan, dan bereaksi sesuai aturan. Sesi singkat pun bisa menghadirkan tantangan berbeda.",
+    "playLink": "Jelajahi permainan",
+    "extraNote": "AI bisa membantu membuat draf kartu untuk kamu periksa dan sunting. Fitur AI punya batas pemakaian tersendiri.",
+    "howEyebrow": "Tanpa persiapan rumit",
+    "howTitle": "Awal yang sederhana.",
+    "faqEyebrow": "Kenali lebih dekat",
+    "contact": "Hubungi kami",
+    "finalTitle1": "Untuk saat nanti",
+    "finalTitle2": "kamu perlu mengingat.",
+    "finalText": "Mulai dari satu hal yang ingin kamu simpan. Mulai dengan Reklue.",
+    "freeNote": "Bisa mulai gratis. Ada batas penyimpanan kartu dan pemakaian AI.",
+    "footerText": "Tempat belajar dengan kartu dan fokus lewat permainan.",
+    "demoLabel": "Demo kartu belajar interaktif",
+    "flipBack": "Balik lagi",
+    "flipAnswer": "Balik untuk melihat jawaban",
+    "cardCategory": "Kartu contoh · Kosakata bahasa Inggris",
+    "cardPrompt": "Ingat kata ini?",
+    "answerLabel": "Belakang · Arti",
+    "meaning1": "penemuan beruntung yang tak terduga",
+    "meaning2": "rasa ingin tahu",
+    "meaning3": "momentum, daya gerak",
+    "ratingLabel": "Pilih tingkat ingatan untuk menuju kartu contoh berikutnya",
+    "demoNote": "Kartu contoh. Silakan coba balik kartunya.",
+    "previousCard": "Kartu sebelumnya",
+    "nextCard": "Kartu berikutnya",
+    "pause": "Jeda putar otomatis",
+    "play": "Mulai putar otomatis"
   }
 }

@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SEOHead } from '../components/content/SEOHead'
 import {
@@ -10,45 +9,11 @@ import {
   buildStaticHreflangAlternates,
 } from '../lib/content-seo'
 import { SEO } from '../lib/seo-config'
-import { useContentStore } from '../stores/content-store'
 
-import { ScrollProgress } from '../components/landing/ScrollProgress'
-import { LandingNav } from '../components/landing/LandingNav'
-import { HeroSection } from '../components/landing/HeroSection'
-import { TrustBadgesSection } from '../components/landing/TrustBadgesSection'
-import { AppPreviewSection } from '../components/landing/AppPreviewSection'
-import { FeaturesSection } from '../components/landing/FeaturesSection'
-import { ScienceSection } from '../components/landing/ScienceSection'
-import { StatsSection } from '../components/landing/StatsSection'
-import { ProofSection } from '../components/landing/ProofSection'
-import { HowItWorksSection } from '../components/landing/HowItWorksSection'
-import { InsightsSection } from '../components/landing/InsightsSection'
-import { PricingSection } from '../components/landing/PricingSection'
-import { FAQSection } from '../components/landing/FAQSection'
-import { FinalCTASection } from '../components/landing/FinalCTASection'
-import { FooterSection } from '../components/landing/FooterSection'
-import { FloatingCTA } from '../components/landing/FloatingCTA'
-// Same flag that enables payment — when 'true' it lights up BOTH checkout and the
-// landing pricing section. When off, the pricing block is not rendered at all.
-import { PAYMENTS_ENABLED } from '../stores/billing-store'
-
-/* Thin gradient divider — used between sections for visual rhythm */
-function Divider() {
-  return (
-    <div className="max-w-5xl mx-auto px-4">
-      <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-    </div>
-  )
-}
+import { ProductLanding } from '../components/landing/ProductLanding'
 
 export function LandingPage() {
   const { t, i18n } = useTranslation('landing')
-  const { fetchContents } = useContentStore()
-
-  useEffect(() => {
-    fetchContents(true)
-  }, [fetchContents, i18n.language])
-
   const howToSteps = [
     { name: t('howItWorks.step1.title'), text: t('howItWorks.step1.desc') },
     { name: t('howItWorks.step2.title'), text: t('howItWorks.step2.desc') },
@@ -71,11 +36,11 @@ export function LandingPage() {
   ].filter(Boolean)
 
   return (
-    <div className="min-h-screen bg-card">
+    <>
       <SEOHead
         title={t('seo.title')}
         description={t('seo.description')}
-        ogImage={SEO.DEFAULT_OG_IMAGE}
+        ogImage={`${SEO.SITE_URL}/brand/reklue-social-${i18n.language.startsWith('ko') ? 'ko' : 'en'}.png`}
         ogType="website"
         canonicalUrl={`${SEO.SITE_URL}/landing${i18n.language !== 'en' ? `?lang=${i18n.language}` : ''}`}
         noIndex={!(SEO.INDEXABLE_LOCALES as readonly string[]).includes(i18n.language)}
@@ -83,34 +48,7 @@ export function LandingPage() {
         keywords={['spaced repetition', 'flashcards', 'SRS', 'study app', 'learning platform', 'memorization', 'active recall']}
         hreflangAlternates={buildStaticHreflangAlternates('/landing')}
       />
-      <ScrollProgress />
-      <LandingNav />
-      <HeroSection />
-      <TrustBadgesSection />
-      <AppPreviewSection />
-      <Divider />
-      <FeaturesSection />
-      <Divider />
-      <ScienceSection />
-      <Divider />
-      <StatsSection />
-      <Divider />
-      <ProofSection />
-      <Divider />
-      <HowItWorksSection />
-      <InsightsSection />
-      {/* Pricing — gated: hidden until launch, appears when VITE_PAYMENTS_ENABLED === 'true' */}
-      {PAYMENTS_ENABLED && (
-        <>
-          <Divider />
-          <PricingSection />
-        </>
-      )}
-      <Divider />
-      <FAQSection />
-      <FinalCTASection />
-      <FooterSection />
-      <FloatingCTA />
-    </div>
+      <ProductLanding />
+    </>
   )
 }

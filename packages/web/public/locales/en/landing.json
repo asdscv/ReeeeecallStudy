@@ -5,7 +5,7 @@
     "titleHighlight": "Memory Limits",
     "title1": "Learning That Transcends",
     "title2": "Memory Limits",
-    "description": "Maximize your learning efficiency with scientifically proven spaced repetition (SRS).",
+    "description": "From new words to exam notes. Learn with cards. Come back at a time that fits what you remember. Flashcards. Spaced repetition. Brain games. All in Reklue.",
     "subDescription": "With Reklue, you can remember faster and longer.",
     "subtitle1": "Maximize your learning efficiency with scientifically proven spaced repetition (SRS).",
     "subtitle2": "With Reklue, you can remember faster and longer.",
@@ -124,18 +124,18 @@
     }
   },
   "howItWorks": {
-    "title": "Start in 3 Simple Steps",
+    "title": "A few cards are enough to begin.",
     "step1": {
-      "title": "Create a Deck",
-      "desc": "Create a deck to organize cards by topic, then add your cards."
+      "title": "Choose something to remember",
+      "desc": "Write a question and answer, or find a public deck. A few words are plenty for a first session."
     },
     "step2": {
-      "title": "Study",
-      "desc": "SRS presents review cards at the optimal timing."
+      "title": "Recall it before you turn it over",
+      "desc": "Take a moment with the front of the card. Check the answer, then mark how well you remembered it."
     },
     "step3": {
-      "title": "Track Progress",
-      "desc": "Check learning stats and growth trends on the dashboard."
+      "title": "Come back when it’s due",
+      "desc": "In SRS mode, each card gets its own next review date. Return to your due cards and carry on."
     }
   },
   "cta": {
@@ -186,15 +186,15 @@
   },
   "floatingCta": "Start Now",
   "faq": {
-    "title": "Frequently Asked Questions",
-    "q1": "What is spaced repetition (SRS)?",
-    "a1": "Spaced repetition is a scientifically proven learning method that schedules reviews at optimal intervals to maximize long-term memory retention. Reklue uses an advanced SRS algorithm to automatically determine when you should review each flashcard.",
-    "q2": "Is Reklue free?",
-    "a2": "Yes — you can start free. Signing up gives you SRS, all six study modes, statistics and deck sharing with no limits.\n\nThe free plan does cap how many cards you can store, and a paid plan raises that cap (the exact numbers are shown in the pricing section above). AI card generation and AI quizzes come with a free allowance every day; beyond that they draw on your prepaid balance — and the charge is always shown before you confirm.",
-    "q3": "What study modes are available?",
-    "a3": "Reklue supports 6 study modes: SRS for optimal review scheduling, sequential review for systematic revision, random for shuffled practice, sequential for in-order study, by date for time-based sorting, and cramming for focused repetition until mastered.",
-    "q4": "Can I share my flashcard decks?",
-    "a4": "Yes! You can share decks in 3 modes: Copy (duplicate for others), Subscribe (sync updates), and Snapshot (frozen version). Browse and discover other users' decks in the community marketplace."
+    "title": "A few things you might be wondering",
+    "q1": "How are review dates chosen?",
+    "a1": "In SRS (spaced repetition) mode, you check the answer and rate how well you recalled it. That sets the next review date. Difficult cards come back sooner; cards you remember well get longer intervals.",
+    "q2": "Can I try it for free?",
+    "a2": "Yes. A free account lets you create cards and review them. Card storage and free AI usage have limits. You can check your current limits in Settings after signing up.",
+    "q3": "What if I need to study before an exam?",
+    "a3": "Alongside SRS, there are sequential review, random, sequential, by-date, and cramming modes. Follow your review dates day to day, or use cramming mode for repeated practice before a test.",
+    "q4": "Do I have to make every card myself?",
+    "a4": "No. You can get public decks from the marketplace or import CSV and JSON files you already have. Your own decks can be shared by copy, subscription, or snapshot."
   },
   "statsSection": {
     "title": "Proven Results",
@@ -283,8 +283,8 @@
     }
   },
   "seo": {
-    "title": "Reklue — Flashcards & Brain Games",
-    "description": "Smart flashcard learning platform with scientifically proven spaced repetition (SRS) algorithm. Remember faster and longer."
+    "title": "Reklue — Make it stick. One card at a time.",
+    "description": "From new words to exam notes. Learn with cards. Come back at a time that fits what you remember. Flashcards. Spaced repetition. Brain games. All in Reklue."
   },
   "proof": {
     "eyebrow": "Live data",
@@ -298,5 +298,90 @@
     "languages": "Languages",
     "modes": "Study modes",
     "footnote": "Counted on the server, refreshed hourly"
+  },
+  "human": {
+    "eyebrow": "Learn it. Forget it. Come back to it.",
+    "title1": "You knew it yesterday.",
+    "title2": "How about today?",
+    "intro": "That word you recognize but can never quite recall. Keep it in Reklue, along with the notes and ideas you want to remember. Come back to them, one card at a time.",
+    "seeHow": "See how it works",
+    "heroNote": "Words, exam notes, or something you keep forgetting. Start free.",
+    "demoLabel": "Try turning over one card.",
+    "demoSubject": "Example card · English vocabulary",
+    "front": "Front",
+    "back": "Back",
+    "demoAnswer": "to pause because you are unsure",
+    "demoPrompt": "Think of the meaning before checking.",
+    "showAnswer": "Check the answer",
+    "tryAgain": "Try recalling it again",
+    "demoNote": "Recognizing an answer and remembering it on your own are different things.",
+    "featuresEyebrow": "For the familiar sticking points",
+    "featuresTitle": "A little help when\nstudying gets stuck.",
+    "featuresIntro": "You have enough to think about. Reviewing can stay simple.",
+    "reviewTitle": "When you don’t know what to review",
+    "reviewText": "Check a card and say how well you remembered it. That sets its next review date, so the things you find tricky come back more often.",
+    "cardsTitle": "When your notes are scattered",
+    "cardsText": "Class notes, awkward words, exam topics. Turn them into questions and answers, or pick up a public deck to get started.",
+    "paceTitle": "When today calls for a different pace",
+    "paceText": "Review cards in order, shuffle them, or go over them before an exam. Choose the mode that fits the studying you need to do today.",
+    "extra": "Need a hand writing cards? AI can make a draft for you to check and edit. Separate usage limits apply to AI features.",
+    "howEyebrow": "Your first few minutes",
+    "pauseTitle": "Missed a day? Pick up again tomorrow.",
+    "pauseText": "You don’t have to put everything in at once. Start with a few things you keep mixing up, and add more as you need them.",
+    "faqEyebrow": "Before you start",
+    "faqNote": "Questions or something that isn’t working for you? Write to us.",
+    "finalTitle": "Start with that word you keep forgetting.",
+    "finalText": "Put one thing on a card today. Give yourself a chance to come back to it.",
+    "footerNote": "A place for things you want to remember."
+  },
+  "premium": {
+    "navExperience": "Experience",
+    "title1": "Make it stick.",
+    "title2": "One card at a time.",
+    "heroText": "From new words to exam notes. Learn with cards. Come back at a time that fits what you remember.",
+    "tryCard": "Try a card",
+    "heroCaption": "Flashcards. Spaced repetition. Brain games. All in Reklue.",
+    "featureEyebrow": "More ways to engage",
+    "featureTitle1": "From learning it.",
+    "featureTitle2": "To calling it your own.",
+    "featureIntro": "Cards for learning. Reviews that follow your recall. Games for a moment of focus. Pick up what you need.",
+    "reviewLabel": "Spaced repetition",
+    "reviewTitle": "A different review.\nFor every memory.",
+    "reviewExample": "Illustrative review screen",
+    "deckLabel": "Your study decks",
+    "deckTitle": "Scattered notes.\nOne place to learn.",
+    "deckText": "Words, class notes, exam topics. Make your own cards, or get started with a public deck.",
+    "deckOne": "Vocabulary",
+    "deckTwo": "Exam prep",
+    "deckThree": "Daily notes",
+    "playLabel": "Brain games",
+    "playTitle": "Spot the difference.\nMeet the challenge.",
+    "playText": "Find a change, remember a sequence, respond to a rule. A short session can bring a different kind of challenge.",
+    "playLink": "Explore brain games",
+    "extraNote": "AI can help draft cards for you to check and edit. Separate usage limits apply to AI features.",
+    "howEyebrow": "No elaborate setup",
+    "howTitle": "A simple place to begin.",
+    "faqEyebrow": "A closer look",
+    "contact": "Get in touch",
+    "finalTitle1": "For the next time",
+    "finalTitle2": "you need to remember.",
+    "finalText": "Start with one thing you want to keep. Start with Reklue.",
+    "freeNote": "Free to get started. Card storage and AI usage limits apply.",
+    "footerText": "A place to learn with cards and focus through play.",
+    "demoLabel": "Interactive flashcard demo",
+    "flipBack": "Turn back over",
+    "flipAnswer": "Flip to see the answer",
+    "cardCategory": "Example card · English vocabulary",
+    "cardPrompt": "Does this word come to mind?",
+    "answerLabel": "Card back · Meaning",
+    "meaning1": "a fortunate discovery",
+    "meaning2": "a desire to know more",
+    "meaning3": "a force that keeps things going",
+    "ratingLabel": "Choose your recall rating to move to the next example",
+    "demoNote": "Example cards. Go ahead and turn one over.",
+    "previousCard": "Previous card",
+    "nextCard": "Next card",
+    "pause": "Pause autoplay",
+    "play": "Start autoplay"
   }
 }
