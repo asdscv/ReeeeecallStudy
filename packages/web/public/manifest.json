@@ -1,5 +1,5 @@
 {
-  "name": "Reklue — Flashcards & Brain Games",
+  "name": "Reklue \u2014 Flashcards & Brain Games",
   "short_name": "Reklue",
   "description": "Flashcards with spaced repetition, AI-assisted study, deck sharing, and brain games for memory, attention, speed and reasoning.",
   "start_url": "/landing",
@@ -10,7 +10,11 @@
   "background_color": "#ffffff",
   "lang": "en",
   "dir": "ltr",
-  "categories": ["education", "productivity", "utilities"],
+  "categories": [
+    "education",
+    "productivity",
+    "utilities"
+  ],
   "iarc_rating_id": "",
   "prefer_related_applications": false,
   "icons": [
@@ -18,7 +22,19 @@
       "src": "/favicon.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/brand/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "screenshots": [],
@@ -28,7 +44,12 @@
       "short_name": "Insights",
       "description": "Browse science-backed learning strategies",
       "url": "/insight",
-      "icons": [{ "src": "/favicon.png", "sizes": "512x512" }]
+      "icons": [
+        {
+          "src": "/favicon.png",
+          "sizes": "512x512"
+        }
+      ]
     }
   ]
 }
