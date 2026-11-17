@@ -97,6 +97,13 @@ export function QuizRunPage() {
     return () => clearInterval(id)
   }, [runId, stillGrowing, refreshRun, itemCount])
 
+  // A completed sitting is read-only, including when its URL is reopened.
+  useEffect(() => {
+    if (run && run.run_id === runId && run.status === 'completed') {
+      navigate(`/quiz/${runId}/result`, { replace: true })
+    }
+  }, [run, runId, navigate])
+
   const items = useMemo(() => run?.items ?? [], [run])
   const item: QuizRunItem | undefined = items[index]
 
