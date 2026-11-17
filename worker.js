@@ -15,6 +15,7 @@ import { handleRSSFeed } from './worker-modules/seo/feeds.js'
 import { getSupabaseAnonKey } from './worker-modules/seo/helpers.js'
 import { isUiLocale, isIndexable } from './worker-modules/locale-policy.js'
 import { SITE_URL, LEGACY_SITE_HOST } from './packages/shared/lib/site-url.ts'
+import { observeTraffic } from './worker-modules/traffic-observation.js'
 
 const SPA_BOT_PASSTHROUGH = new Set(['/privacy-policy', '/terms-of-service'])
 
@@ -36,7 +37,16 @@ export default {
     ctx.waitUntil(sendReminders(env))
   },
 
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
+    const response = await handleRequest(request, env)
+    if (ctx?.waitUntil) ctx.waitUntil(observeTraffic(request, response, env).catch(() => {
+      console.warn('traffic_observation_failed')
+    }))
+    return response
+  },
+}
+
+async function handleRequest(request, env) {
     const url = new URL(request.url)
     const ua = request.headers.get('user-agent') || ''
 
@@ -146,5 +156,4 @@ export default {
       return new Response(response.body, { status: response.status, statusText: response.statusText, headers })
     }
     return response
-  },
 }

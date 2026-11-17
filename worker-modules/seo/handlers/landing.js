@@ -1,6 +1,6 @@
 // Landing page bot handler — extracted from worker.js handleLandingBotRequest
 import {
-  SITE_URL, BRAND_NAME, DEFAULT_OG_IMAGE,
+  SITE_URL, BRAND_NAME,
   LANDING_TITLES, LANDING_DESCS, LANDING_FAQ, LANDING_HOWTO, LANDING_COPY,
   ROBOTS_INDEX, ROBOTS_NOINDEX, pageChrome,
 } from '../constants.js'
@@ -53,7 +53,7 @@ export async function handleLandingBotRequest(url) {
     description: pageDesc,
     ogType: 'website',
     ogUrl: canonicalUrl,
-    ogImage: DEFAULT_OG_IMAGE,
+    ogImage: `${SITE_URL}/brand/reklue-social-${lang === 'ko' ? 'ko' : 'en'}.png`,
     locale: lang,
     canonical: canonicalUrl,
     keywords: 'spaced repetition, flashcards, SRS, study app, learning platform, memorization, active recall, flashcard app, free study tool',
@@ -78,10 +78,11 @@ ${jsonLdScripts}`
 </header>
 
 <section>
-<h2>${escapeHtml(copy.features.title)}</h2>
+<h2>${escapeHtml(`${copy.premium.featureTitle1} ${copy.premium.featureTitle2}`)}</h2>
 <ul>
-${['srs', 'modes', 'aiCards', 'quiz', 'plan', 'stats', 'sharing', 'tts', 'responsive'].filter((key) => copy.features[key]).map((key) => `<li><strong>${escapeHtml(copy.features[key].title)}</strong> — ${escapeHtml(copy.features[key].description || copy.features[key].desc)}</li>`).join('\n')}
+${['review', 'deck', 'play'].map((key) => `<li><strong>${escapeHtml(copy.premium[`${key}Title`])}</strong> — ${escapeHtml(key === 'review' ? copy.human.reviewText : copy.premium[`${key}Text`])}</li>`).join('\n')}
 </ul>
+<p>${escapeHtml(copy.premium.extraNote)}</p>
 </section>
 
 <section>

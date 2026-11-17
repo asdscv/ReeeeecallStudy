@@ -1,6 +1,6 @@
 export const BOT_UA = new RegExp([
   // Search engines
-  'googlebot', 'google-inspectiontool', 'storebot-google',
+  'googlebot', 'googleother', 'google-inspectiontool', 'storebot-google',
   'bingbot', 'msnbot',
   'yandex', 'yandexbot',
   'baiduspider', 'baidu',

@@ -4,6 +4,9 @@ import { isBot, isValidViewDuration } from '../bot-detection'
 // ── isBot ──
 
 describe('isBot', () => {
+  it('detects GoogleOther, which does not contain the word bot', () => {
+    expect(isBot('Mozilla/5.0 Mobile Safari/537.36 (compatible; GoogleOther)')).toBe(true)
+  })
   it('detects Googlebot', () => {
     expect(isBot('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)')).toBe(true)
   })

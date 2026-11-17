@@ -5,7 +5,7 @@
     "titleHighlight": "Los Límites de la Memoria",
     "title1": "Aprendizaje Que Trasciende",
     "title2": "Los Límites de la Memoria",
-    "description": "Maximiza tu eficiencia de aprendizaje con la repetición espaciada (SRS) científicamente comprobada.",
+    "description": "De palabras nuevas a apuntes de examen. Aprende con tarjetas y vuelve cuando lo pida tu memoria. Tarjetas. Repetición espaciada. Juegos mentales. Todo en Reklue.",
     "subDescription": "Con Reklue, puedes recordar más rápido y por más tiempo.",
     "subtitle1": "Maximiza tu eficiencia de aprendizaje con la repetición espaciada (SRS) científicamente comprobada.",
     "subtitle2": "Con Reklue, puedes recordar más rápido y por más tiempo.",
@@ -124,18 +124,18 @@
     }
   },
   "howItWorks": {
-    "title": "Comienza en 3 Simples Pasos",
+    "title": "Con unas pocas tarjetas basta.",
     "step1": {
-      "title": "Crear un Mazo",
-      "desc": "Crea un mazo para organizar tarjetas por tema y luego agrega tus tarjetas."
+      "title": "Elige algo que quieras recordar",
+      "desc": "Escribe una pregunta y su respuesta o busca un mazo público. Unas pocas palabras bastan para la primera sesión."
     },
     "step2": {
-      "title": "Estudiar",
-      "desc": "SRS presenta las tarjetas de repaso en el momento óptimo."
+      "title": "Intenta recordar antes de girar",
+      "desc": "Mira el anverso y piensa un momento. Comprueba la respuesta e indica cuánto recordabas."
     },
     "step3": {
-      "title": "Seguir el Progreso",
-      "desc": "Consulta las estadísticas de aprendizaje y las tendencias de crecimiento en el panel."
+      "title": "Vuelve cuando toque repasar",
+      "desc": "En modo SRS, cada tarjeta tiene su próxima fecha de repaso. Vuelve a las tarjetas pendientes y continúa."
     }
   },
   "cta": {
@@ -186,15 +186,15 @@
   },
   "floatingCta": "Comenzar Ahora",
   "faq": {
-    "title": "Preguntas Frecuentes",
-    "q1": "¿Qué es la repetición espaciada (SRS)?",
-    "a1": "La repetición espaciada es un método de aprendizaje científicamente comprobado que programa los repasos en intervalos óptimos para maximizar la retención de la memoria a largo plazo. Reklue utiliza un algoritmo SRS avanzado para determinar automáticamente cuándo debes repasar cada tarjeta de estudio.",
-    "q2": "¿Reklue es gratis?",
-    "a2": "Sí, puedes empezar gratis. Al registrarte tienes SRS, los seis modos de estudio, estadísticas y compartir mazos sin límite.\n\nEl plan gratuito sí limita cuántas tarjetas puedes guardar, y un plan de pago amplía ese límite (las cifras exactas aparecen en la sección de precios). La generación de tarjetas con IA y los cuestionarios con IA incluyen un cupo gratis diario; a partir de ahí se descuentan de tu saldo, y el cargo siempre se muestra antes de confirmar.",
-    "q3": "¿Qué modos de estudio están disponibles?",
-    "a3": "Reklue admite 6 modos de estudio: SRS para programar repasos óptimos, repaso secuencial para revisar de forma sistemática, aleatorio para practicar mezclado, secuencial en orden, por fecha para organizar por tiempo y repaso intensivo hasta dominarlo.",
-    "q4": "¿Puedo compartir mis mazos de tarjetas de estudio?",
-    "a4": "¡Sí! Puedes compartir mazos en 3 modos: Copiar (duplicar para otros), Suscribir (sincronizar actualizaciones) e Instantánea (versión congelada). Explora y descubre los mazos de otros usuarios en el mercado comunitario."
+    "title": "Quizá te estés preguntando…",
+    "q1": "¿Cómo se eligen las fechas de repaso?",
+    "a1": "En modo SRS (repetición espaciada), compruebas la respuesta y valoras cuánto recordabas. Eso determina la próxima fecha. Las tarjetas difíciles vuelven antes y las que recuerdas bien dejan más tiempo entre repasos.",
+    "q2": "¿Puedo probarlo gratis?",
+    "a2": "Sí. Con una cuenta gratuita puedes crear tarjetas y repasarlas. El almacenamiento y el uso gratuito de IA tienen límites. Puedes consultar tus límites actuales en Ajustes después de registrarte.",
+    "q3": "¿Y si necesito estudiar antes de un examen?",
+    "a3": "Además de SRS, hay repaso secuencial, aleatorio, secuencial, por fecha e intensivo. Puedes seguir las fechas de repaso a diario y repetir con el modo intensivo antes del examen.",
+    "q4": "¿Tengo que crear todas las tarjetas?",
+    "a4": "No. Puedes obtener mazos públicos del mercado o importar tus archivos CSV y JSON. Tus propios mazos se pueden compartir por copia, suscripción o instantánea."
   },
   "statsSection": {
     "title": "Resultados Comprobados",
@@ -283,8 +283,8 @@
     }
   },
   "seo": {
-    "title": "Reklue — Tarjetas de estudio y juegos mentales",
-    "description": "Plataforma inteligente de aprendizaje con tarjetas y algoritmo de repetición espaciada (SRS) científicamente comprobado. Recuerda más rápido y por más tiempo."
+    "title": "Reklue — Que se te quede. Tarjeta a tarjeta.",
+    "description": "De palabras nuevas a apuntes de examen. Aprende con tarjetas y vuelve cuando lo pida tu memoria. Tarjetas. Repetición espaciada. Juegos mentales. Todo en Reklue."
   },
   "proof": {
     "eyebrow": "Datos reales",
@@ -298,5 +298,90 @@
     "languages": "Idiomas",
     "modes": "Modos de estudio",
     "footnote": "Contado en el servidor, actualizado cada hora"
+  },
+  "human": {
+    "eyebrow": "Lo aprendes. Lo olvidas. Lo vuelves a intentar.",
+    "title1": "Ayer te lo sabías.",
+    "title2": "¿Y hoy?",
+    "intro": "Esa palabra que reconoces, pero que nunca te sale cuando la necesitas. Guárdala en Reklue junto con tus apuntes y vuelve a ella, tarjeta a tarjeta.",
+    "seeHow": "Cómo se usa",
+    "heroNote": "Vocabulario, apuntes o eso que siempre se te olvida. Empieza gratis.",
+    "demoLabel": "Prueba a darle la vuelta a una tarjeta.",
+    "demoSubject": "Tarjeta de ejemplo · Vocabulario en inglés",
+    "front": "Anverso",
+    "back": "Reverso",
+    "demoAnswer": "dudar, vacilar",
+    "demoPrompt": "Piensa en el significado antes de mirar.",
+    "showAnswer": "Ver la respuesta",
+    "tryAgain": "Intentar recordarlo otra vez",
+    "demoNote": "Reconocer la respuesta y recordarla por tu cuenta son cosas distintas.",
+    "featuresEyebrow": "Para esos momentos de siempre",
+    "featuresTitle": "Una ayuda cuando\nestudiar se atasca.",
+    "featuresIntro": "Ya tienes bastante en la cabeza. Repasar puede ser sencillo.",
+    "reviewTitle": "Cuando no sabes qué repasar",
+    "reviewText": "Mira la tarjeta e indica cuánto recordabas. Así se fija su próxima fecha de repaso y lo que te cuesta aparece más a menudo.",
+    "cardsTitle": "Cuando tus apuntes están por todas partes",
+    "cardsText": "Notas de clase, palabras difíciles, temas de examen. Conviértelos en preguntas y respuestas, o empieza con un mazo público.",
+    "paceTitle": "Cuando hoy necesitas otro ritmo",
+    "paceText": "Repasa en orden, mezcla las tarjetas o repite antes de un examen. Elige el modo que encaje con lo que necesitas estudiar hoy.",
+    "extra": "Si te cuesta preparar tarjetas, la IA puede escribir un borrador para que lo revises y corrijas. Las funciones de IA tienen límites de uso propios.",
+    "howEyebrow": "Los primeros minutos",
+    "pauseTitle": "¿Te saltaste un día? Sigue mañana.",
+    "pauseText": "No hace falta añadirlo todo de golpe. Empieza con unas cuantas cosas que confundes y añade más cuando las necesites.",
+    "faqEyebrow": "Antes de empezar",
+    "faqNote": "¿Tienes preguntas o hay algo que te cuesta usar? Escríbenos.",
+    "finalTitle": "Empieza por esa palabra que siempre olvidas.",
+    "finalText": "Anota hoy una cosa en una tarjeta. Así podrás volver a ella.",
+    "footerNote": "Un sitio para lo que quieres recordar."
+  },
+  "premium": {
+    "navExperience": "Pruébalo",
+    "title1": "Que se te quede.",
+    "title2": "Tarjeta a tarjeta.",
+    "heroText": "De palabras nuevas a apuntes de examen. Aprende con tarjetas y vuelve cuando lo pida tu memoria.",
+    "tryCard": "Probar una tarjeta",
+    "heroCaption": "Tarjetas. Repetición espaciada. Juegos mentales. Todo en Reklue.",
+    "featureEyebrow": "Más formas de aprender",
+    "featureTitle1": "De aprenderlo.",
+    "featureTitle2": "A hacerlo tuyo.",
+    "featureIntro": "Tarjetas para estudiar, repasos según lo que recuerdas y juegos para concentrarte un rato. Elige lo que necesitas.",
+    "reviewLabel": "Repetición espaciada",
+    "reviewTitle": "Cada recuerdo,\nsu próximo repaso.",
+    "reviewExample": "Ejemplo de pantalla de repaso",
+    "deckLabel": "Tus mazos de estudio",
+    "deckTitle": "Apuntes dispersos.\nUn lugar para aprender.",
+    "deckText": "Vocabulario, notas de clase, temas de examen. Crea tus tarjetas o empieza con un mazo público.",
+    "deckOne": "Vocabulario",
+    "deckTwo": "Preparación de exámenes",
+    "deckThree": "Notas del día",
+    "playLabel": "Juegos mentales",
+    "playTitle": "Encuentra la diferencia.\nAcepta el reto.",
+    "playText": "Detecta un cambio, recuerda una secuencia y responde a una regla. Una partida corta puede traer un desafío distinto.",
+    "playLink": "Explorar los juegos",
+    "extraNote": "La IA puede ayudarte a redactar tarjetas para que las revises y corrijas. Las funciones de IA tienen límites de uso propios.",
+    "howEyebrow": "Sin preparativos complicados",
+    "howTitle": "Empezar es sencillo.",
+    "faqEyebrow": "Más de cerca",
+    "contact": "Contacta con nosotros",
+    "finalTitle1": "Para la próxima vez",
+    "finalTitle2": "que quieras recordar.",
+    "finalText": "Empieza por algo que quieras conservar. Empieza con Reklue.",
+    "freeNote": "Puedes empezar gratis. Se aplican límites de almacenamiento de tarjetas y uso de IA.",
+    "footerText": "Un lugar para aprender con tarjetas y concentrarte jugando.",
+    "demoLabel": "Demostración interactiva de tarjetas",
+    "flipBack": "Volver a girar",
+    "flipAnswer": "Girar para ver la respuesta",
+    "cardCategory": "Tarjeta de ejemplo · Vocabulario en inglés",
+    "cardPrompt": "¿Te viene a la mente esta palabra?",
+    "answerLabel": "Reverso · Significado",
+    "meaning1": "un hallazgo afortunado e inesperado",
+    "meaning2": "curiosidad",
+    "meaning3": "impulso, ímpetu",
+    "ratingLabel": "Elige cuánto recordabas para pasar al siguiente ejemplo",
+    "demoNote": "Son tarjetas de ejemplo. Prueba a girarlas.",
+    "previousCard": "Tarjeta anterior",
+    "nextCard": "Siguiente tarjeta",
+    "pause": "Pausar reproducción automática",
+    "play": "Iniciar reproducción automática"
   }
 }
