@@ -18,6 +18,11 @@ describe('AEO public content', () => {
     expect(html).toContain(`<title>${escapeHtml(copy.seo.title)}</title>`)
     expect(html).toContain(escapeHtml(copy.faq.a2))
     expect(html).toContain(escapeHtml(copy.faq.a3))
+    expect(html).toContain('id="brain-training"')
+    expect(html).toContain(escapeHtml(copy.brainLanding.intro))
+    for (const id of ['schulte', 'memoryGrid', 'codeBreak']) {
+      expect(html).toContain(`/brain/play/${id}`)
+    }
     const schemas = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)].map((m) => JSON.parse(m[1]))
     expect(schemas.map((s) => s['@type'])).not.toContain('Course')
     expect(schemas.map((s) => s['@type'])).not.toContain('ProfilePage')

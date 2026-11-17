@@ -1,0 +1,66 @@
+.rl-product .rl-brain { background: #0b111c; color: #f0f4fc; padding: 104px 0; }
+.rl-product .rl-brain-layout { display: grid; grid-template-columns: 1fr 1fr; grid-template-areas: "copy demo" "more demo"; column-gap: clamp(40px,6vw,88px); align-items: center; }
+.rl-product .rl-brain-copy { grid-area: copy; align-self: end; }
+.rl-product .rl-brain-copy > .rl-eyebrow { color: #8db9fa; font-size: 13px; margin-bottom: 23px; }
+.rl-product .rl-brain-copy > h2 { font-size: clamp(34px,3.7vw,49px); font-weight: 570; line-height: 1.3; letter-spacing: -.035em; white-space: pre-line; }
+.rl-product .rl-brain-intro { margin-top: 25px; max-width: 450px; font-size: 16px; color: #a9b6ca; line-height: 1.9; word-break: keep-all; }
+.rl-product .rl-brain-cta { display: inline-flex; align-items: center; gap: 27px; background: #eaf1ff; color: #142541; border-radius: 8px; padding: 14px 20px; margin-top: 30px; font-size: 14px; font-weight: 550; min-height: 48px; }
+.rl-product .rl-brain-cta:hover { background: #dbe8ff; }
+.rl-product .rl-brain-access { margin-top: 13px; font-size: 12px; line-height: 1.8; color: #8798b1; }
+.rl-product .rl-brain-more { grid-area: more; align-self: start; margin-top: 40px; border-top: 1px solid #253044; }
+.rl-product .rl-brain-more > a { display: flex; align-items: center; gap: 18px; padding: 22px 0; border-bottom: 1px solid #253044; }
+.rl-product .rl-brain-more > a > div:nth-child(2) { min-width: 0; }
+.rl-product .rl-brain-more > a > svg { margin-left: auto; color: #8ba6cf; flex-shrink: 0; transition: translate .2s; }
+.rl-product .rl-brain-more > a:hover > svg { translate: 4px; }
+.rl-product .rl-brain-category { font-size: 11px; color: #8ca0bd; }
+.rl-product .rl-brain-more h3 { font-size: 17px; font-weight: 530; margin-top: 5px; color: #e3eafa; }
+.rl-product .rl-brain-more p { font-size: 12px; line-height: 1.8; color: #95a5bf; margin-top: 6px; word-break: keep-all; }
+.rl-product .rl-brain-small-art { width: 64px; height: 68px; flex-shrink: 0; display: grid; place-items: center; border: 1px solid #30415d; background: #152138; border-radius: 8px; }
+.rl-product .rl-brain-pattern { display: grid; grid-template-columns: repeat(3,9px); gap: 4px; }
+.rl-product .rl-brain-pattern i { width: 9px; height: 9px; background: #354261; border-radius: 2px; }
+.rl-product .rl-brain-pattern i.is-on { background: #a0b8ef; }
+.rl-product .rl-brain-art-1 { border-color: #2b484c; background: #142b30; }
+.rl-product .rl-brain-code { display: flex; gap: 5px; font-size: 24px; font-weight: 450; color: #9ccdc8; font-variant-numeric: tabular-nums; }
+.rl-product .rl-brain-code > span { color: #4e7c7b; }
+.rl-product .rl-brain-demo { grid-area: demo; border: 1px solid #30425e; border-radius: 16px; background: radial-gradient(ellipse at 10% 0%,#1d3153a6,transparent 60%),#111b2b; padding: 31px; min-width: 0; box-shadow: 0 24px 80px #0002; }
+.rl-product .rl-brain-demo-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
+.rl-product .rl-brain-demo-header > div > span { font-size: 11px; color: #9bb1d2; }
+.rl-product .rl-brain-demo-header h3 { font-size: 22px; font-weight: 510; letter-spacing: -.02em; margin-top: 6px; }
+.rl-product .rl-brain-demo-label { font-size: 10px; color: #a1b5d4; border: 1px solid #3a4d6b; border-radius: 30px; padding: 5px 9px; line-height: 1.4; white-space: nowrap; }
+.rl-product .rl-brain-instruction { margin-top: 23px; font-size: 13px; color: #acbdd8; line-height: 1.7; }
+.rl-product .rl-brain-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin-top: 20px; }
+.rl-product .rl-brain-grid > button { aspect-ratio: 1.15; border: 1px solid #42608b; border-radius: 8px; background: #213858; color: #edf4ff; font-size: clamp(26px,3.2vw,37px); font-weight: 450; font-variant-numeric: tabular-nums; transition: background .2s,border-color .2s,color .2s; }
+.rl-product .rl-brain-grid > button:not(:disabled):hover { background: #2d4b74; border-color: #81adf2; }
+.rl-product .rl-brain-grid > button.is-found { background: #101b2c; border-color: #263b58; color: #617796; }
+.rl-product .rl-brain-grid > button.is-missed { border-color: #edbb89; color: #ffdab4; }
+.rl-product .rl-brain-progress { display: grid; grid-template-columns: repeat(9,minmax(0,1fr)); gap: 5px; margin-top: 22px; }
+.rl-product .rl-brain-progress > i { height: 3px; background: #2b3b54; border-radius: 3px; }
+.rl-product .rl-brain-progress > i.is-done { background: #89b2f3; }
+.rl-product .rl-brain-demo-status { display: flex; align-items: center; justify-content: space-between; gap: 15px; min-height: 66px; }
+.rl-product .rl-brain-demo-status > p { color: #bacbe5; font-size: 13px; line-height: 1.7; }
+.rl-product .rl-brain-reset { display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; background: transparent; border: 0; color: #a1b7d8; border-radius: 7px; }
+.rl-product .rl-brain-reset:hover { background: #263b58; }
+.rl-product .rl-brain-play-link { display: flex; justify-content: space-between; align-items: center; gap: 15px; color: #b2d2ff; border-top: 1px solid #30425e; padding-top: 20px; font-size: 13px; min-height: 44px; }
+.rl-product .rl-brain-play-link:hover { color: #fff; }
+.rl-product .rl-brain-preview-note { margin-top: 15px; font-size: 11px; color: #899dbd; line-height: 1.75; }
+@media (max-width: 900px) {
+  .rl-product .rl-brain { padding-block: 74px; }
+  .rl-product .rl-brain-layout { column-gap: 35px; }
+  .rl-product .rl-brain-demo { padding: 24px; }
+  .rl-product .rl-brain-small-art { display: none; }
+  .rl-product .rl-brain-grid { gap: 8px; }
+  .rl-product .rl-brain-demo-label { padding: 4px 7px; }
+}
+@media (max-width: 700px) {
+  .rl-product .rl-brain { padding-block: 64px; }
+  .rl-product .rl-brain-layout { grid-template-columns: 1fr; grid-template-areas: "copy" "demo" "more"; gap: 30px; }
+  .rl-product .rl-brain-copy > h2 { font-size: 36px; }
+  .rl-product .rl-brain-intro { font-size: 15px; margin-top: 21px; }
+  .rl-product .rl-brain-more { margin-top: 0; }
+  .rl-product .rl-brain-small-art { display: grid; }
+  .rl-product .rl-brain-demo { padding: 24px; max-width: 480px; width: 100%; justify-self: center; }
+  .rl-product .rl-brain-grid > button { font-size: 32px; min-height: 56px; min-width: 0; aspect-ratio: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rl-product .rl-brain-grid > button,.rl-product .rl-brain-more > a > svg { transition: none; }
+}
