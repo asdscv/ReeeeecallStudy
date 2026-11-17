@@ -1,6 +1,7 @@
 import { afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { randomUUID } from 'node:crypto'
+import { calculateSRS } from '../../packages/shared/lib/srs'
 
 const SUPABASE_URL = process.env.SUPABASE_LOCAL_URL ?? 'http://127.0.0.1:54321'
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
@@ -175,6 +176,32 @@ describe('study persistence RPCs — atomicity, idempotency, security', () => {
     expect(events.data).toHaveLength(1)
     const logs = await admin.from('study_logs').select('rating_event_id').eq('rating_event_id', eventId)
     expect(logs.data).toEqual([{ rating_event_id: eventId }])
+  })
+
+  itLocal('persists a capped Easy interval as whole days and undoes it without residue', async () => {
+    const owner = await createUser('srs-easy-cap')
+    const seed = await seedOwnedDeck(owner)
+    const seeded = await admin.from('cards').update({
+      srs_status: 'review', interval_days: 1, repetitions: 3, ease_factor: 4,
+    }).eq('id', seed.cardId).select('*').single()
+    expect(seeded.error).toBeNull()
+    const before = seeded.data!
+    const next = calculateSRS(before, 'easy')
+    expect(next.interval_days).toBe(4)
+    const eventId = randomUUID()
+    const params = {
+      ...applyParams(seed, randomUUID(), eventId),
+      p_rating: 'easy', p_expected_revision: before.srs_revision,
+      p_new_srs: { ...next, last_reviewed_at: new Date().toISOString() },
+    }
+    expect((await owner.client.rpc('apply_study_rating', params)).error).toBeNull()
+    expect((await owner.client.rpc('apply_study_rating', params)).error).toBeNull()
+    const saved = await admin.from('cards').select('interval_days,srs_revision').eq('id', seed.cardId).single()
+    expect(saved.data).toMatchObject({ interval_days: 4, srs_revision: before.srs_revision + 1 })
+    expect((await owner.client.rpc('undo_study_rating', { p_event_id: eventId })).error).toBeNull()
+    const restored = await admin.from('cards').select('interval_days,ease_factor,repetitions,srs_status').eq('id', seed.cardId).single()
+    expect(restored.data).toEqual({ interval_days: 1, ease_factor: 4, repetitions: 3, srs_status: 'review' })
+    expect((await admin.from('study_logs').select('rating_event_id').eq('rating_event_id', eventId)).data).toHaveLength(0)
   })
 
   itLocal('enforces RPC-only writes and SELECT-own RLS on the event ledger', async () => {

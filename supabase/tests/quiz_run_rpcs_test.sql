@@ -340,4 +340,64 @@ BEGIN
 END;
 $$;
 
+-- Regression: an exact match must preserve mathematical / programming meaning.
+-- Also exercise close/answer atomicity and rejected-call net-zero state.
+DO $$
+DECLARE
+  u uuid := 'ae400000-0000-4000-8000-000000000001';
+  d uuid; tpl uuid; c uuid; qs uuid; qr uuid; ri uuid;
+  r jsonb; j integer; before_state jsonb; after_state jsonb; before_cards text;
+  refs text[] := ARRAY['-1','C++','2.0','1/2','!!!','빙하','to lend','café','कि','x!','x?','a-b','node.js','3,14'];
+  responses text[] := ARRAY['1','C','20','12','???','빙하.','To Lend.','café','क','x','x','ab','nodejs','314'];
+BEGIN
+  INSERT INTO auth.users(id) VALUES (u);
+  SELECT id INTO tpl FROM card_templates WHERE user_id=u AND name='영어 단어';
+  INSERT INTO decks(user_id,name,default_template_id) VALUES(u,'Logic boundaries',tpl) RETURNING id INTO d;
+  INSERT INTO cards(user_id,deck_id,template_id,field_values)
+  VALUES(u,d,tpl,'{"field_1":"prompt","field_2":"answer"}') RETURNING id INTO c;
+  INSERT INTO quiz_sets(owner_user_id,deck_id,title,question_type,scope_kind,requested_count,generated_count,content_locale)
+  VALUES(u,d,'Logic boundaries','short','deck',14,14,'en') RETURNING id INTO qs;
+  FOR j IN 1..14 LOOP
+    INSERT INTO quiz_questions(set_id,owner_user_id,card_id,question_type,position,stem,reference_answer,source_fingerprint)
+    VALUES(qs,u,c,'short',j-1,'Write the answer',refs[j],'logic-boundaries');
+  END LOOP;
+  PERFORM set_config('request.jwt.claim.sub',u::text,true);
+  PERFORM set_config('request.jwt.claim.role','authenticated',true);
+  SELECT md5(to_jsonb(cards)::text) INTO before_cards FROM cards WHERE id=c;
+  r:=start_quiz_run(qs); qr:=(r->>'run_id')::uuid;
+  FOR j IN 1..14 LOOP
+    SELECT id INTO ri FROM quiz_run_items WHERE run_id=qr AND position=j-1;
+    r:=submit_quiz_answer(ri,jsonb_build_object('text',responses[j]),100);
+    IF j BETWEEN 6 AND 8 THEN
+      ASSERT (r->>'graded')::boolean AND (r->>'score')::numeric=1, format('exact match rejected: %s',r);
+    ELSE
+      ASSERT NOT (r->>'graded')::boolean AND r->>'score' IS NULL, format('different answer got a free correct mark: %s',r);
+      ASSERT r->>'reference_answer' IS NULL, 'ungraded answer disclosed the key';
+    END IF;
+  END LOOP;
+  ASSERT (SELECT score_raw=3 AND answered_count=14 FROM quiz_runs WHERE id=qr), 'wrong aggregate score';
+  ASSERT (SELECT md5(to_jsonb(cards)::text)=before_cards FROM cards WHERE id=c), 'quiz changed the SRS card';
+  ASSERT NOT EXISTS(SELECT 1 FROM ai_generation_jobs WHERE user_id=u), 'answer comparison started paid work';
+  ASSERT NOT EXISTS(SELECT 1 FROM ai_credit_ledger WHERE user_id=u), 'answer comparison moved money';
+
+  -- Close a new sitting with unanswered items. Reopening cannot add answers to it.
+  r:=start_quiz_run(qs); qr:=(r->>'run_id')::uuid;
+  SELECT id INTO ri FROM quiz_run_items WHERE run_id=qr ORDER BY position LIMIT 1;
+  PERFORM finish_quiz_run(qr);
+  SELECT jsonb_build_object('run',to_jsonb(q),'attempts',(SELECT count(*) FROM answer_attempts WHERE user_id=u))
+  INTO before_state FROM quiz_runs q WHERE id=qr;
+  BEGIN
+    PERFORM submit_quiz_answer(ri,'{"text":"-1"}',100);
+    RAISE EXCEPTION 'completed quiz accepted an answer';
+  EXCEPTION WHEN sqlstate 'P0011' THEN NULL;
+  END;
+  SELECT jsonb_build_object('run',to_jsonb(q),'attempts',(SELECT count(*) FROM answer_attempts WHERE user_id=u))
+  INTO after_state FROM quiz_runs q WHERE id=qr;
+  ASSERT before_state=after_state, 'rejected answer changed the completed run';
+  PERFORM finish_quiz_run(qr);
+  ASSERT (SELECT to_jsonb(q)=before_state->'run' FROM quiz_runs q WHERE id=qr), 'repeated finish mutated the run';
+  RAISE NOTICE 'quiz logic boundaries: meaning, free grading, closed-run and net-zero checks passed';
+END;
+$$;
+
 ROLLBACK;
