@@ -147,7 +147,7 @@
   "nav": {
     "blog": "学习洞察",
     "login": "登录",
-    "start": "立即开始",
+    "start": "免费开始",
     "features": "功能",
     "science": "学习科学",
     "results": "成果",
@@ -190,7 +190,7 @@
     "q1": "复习日期是怎么定的？",
     "a1": "在 SRS（间隔重复）模式下，查看答案后评价自己记得怎么样，系统会据此安排下次复习。难记的卡片间隔短，记得牢的卡片间隔长。",
     "q2": "可以免费试用吗？",
-    "a2": "可以。免费账号能创建卡片并复习。卡片存储数量和 AI 免费用量都有上限，注册后可在设置中查看当前额度。",
+    "a2": "可以。免费计划支持创建卡片、导入公开卡组、使用包含SRS的学习模式及全部脑力游戏。卡片存储和免费AI生成有用量上限。额外AI用量及AI评分等部分功能单独收费。",
     "q3": "考前可以集中复习吗？",
     "a3": "除了 SRS，还有顺序复习、随机、顺序、按日期和突击模式。平时按复习日期学习，考前可以用突击模式反复练习。",
     "q4": "每张卡片都要自己做吗？",
@@ -266,25 +266,44 @@
     }
   },
   "pricing": {
-    "title": "价格方案",
-    "subtitle": "选择适合你学习规模的方案",
+    "title": "免费，也能学很多。",
+    "subtitle": "从卡片学习到脑力训练，免费计划已包含丰富的基础功能。",
     "recommended": "推荐",
     "freePrice": "免费",
     "pricePerMonth": "{{price}}/月",
     "unlimitedCards": "无限卡片",
     "upToCards": "最多 {{count, number}} 张卡片",
     "ctaFree": "免费开始",
-    "ctaPaid": "立即开始",
-    "note": "注册并登录后可在设置中完成付款。",
+    "ctaPaid": "查看扩展计划",
+    "note": "AI卡片和问题生成提供免费额度。额外AI用量及AI评分等部分功能单独收费。",
     "plans": {
       "free": "免费",
-      "freeBlurb": "轻松上手的免费方案",
-      "standardBlurb": "用更多卡片扩展你的学习"
-    }
+      "freeBlurb": "用自己的卡片和公开卡组学习，持续复习，也能体验脑力训练。",
+      "standardBlurb": "需要更多卡片存储空间时可选择。"
+    },
+    "freeBadge": "丰富的免费计划",
+    "freeIncludes": "免费计划已包含",
+    "heroFeatures": "创建卡片 · SRS复习 · 全部脑力游戏",
+    "freeAiCards": "每天免费生成{{count, number}}张AI卡片",
+    "optionalTitle": "需要保存更多卡片吗？",
+    "optionalText": "需要更大卡片存储空间时再选择扩展计划。卡片学习和脑力训练也包含在免费计划中。",
+    "features": {
+      "cards": "自行创建和编辑卡片",
+      "decks": "浏览和导入公开卡组",
+      "study": "包含SRS的{{count}}种学习模式",
+      "brain": "使用全部{{count}}种脑力游戏",
+      "history": "学习记录与跨设备同步",
+      "study_one": "包含SRS的{{count}}种学习模式",
+      "study_other": "包含SRS的{{count}}种学习模式",
+      "brain_one": "使用全部{{count}}种脑力游戏",
+      "brain_other": "使用全部{{count}}种脑力游戏"
+    },
+    "freeAiCards_one": "每天免费生成{{count, number}}张AI卡片",
+    "freeAiCards_other": "每天免费生成{{count, number}}张AI卡片"
   },
   "seo": {
     "title": "Reklue — 让记忆留下，从一张卡片开始。",
-    "description": "从单词到考试知识点。用卡片学习，在适合你记忆的时间再次复习。 卡片学习、间隔重复、脑力游戏，尽在 Reklue。"
+    "description": "免费开始卡片创建、间隔重复（SRS）和脑力训练。建立卡组、持续复习，体验记忆和推理游戏。"
   },
   "proof": {
     "eyebrow": "真实数据",
@@ -338,7 +357,7 @@
     "navExperience": "亲自体验",
     "title1": "让记忆留下。",
     "title2": "从一张卡片开始。",
-    "heroText": "用卡片学习，按记忆情况复习。再用一场脑力游戏换个挑战。",
+    "heroText": "免费开始卡片学习和脑力训练，根据记忆情况持续复习。",
     "tryCard": "试一张卡片",
     "heroCaption": "卡片学习、间隔重复、脑力游戏，尽在 Reklue。",
     "featureEyebrow": "不止一种学习方式",
@@ -358,15 +377,15 @@
     "playTitle": "发现不同，\n迎接挑战。",
     "playText": "寻找变化、记住顺序、按规则反应。短短一局，也有不一样的挑战。",
     "playLink": "探索脑力游戏",
-    "extraNote": "AI 可以协助起草卡片，请自行核对和修改内容。AI 功能另有使用额度限制。",
+    "extraNote": "AI卡片和问题生成提供免费额度。额外AI用量及AI评分等部分功能单独收费。",
     "howEyebrow": "无需复杂准备",
     "howTitle": "开始，可以很简单。",
     "faqEyebrow": "进一步了解",
     "contact": "联系我们",
     "finalTitle1": "为了下次，",
     "finalTitle2": "还能想起来。",
-    "finalText": "从此刻想记住的一件事开始，从 Reklue 开始。",
-    "freeNote": "可以免费开始。卡片存储数量和 AI 使用量有额度限制。",
+    "finalText": "用卡片学习，挑战脑力游戏。现在就从免费计划开始。",
+    "freeNote": "卡片学习、SRS复习和全部脑力游戏都包含在免费计划中。",
     "footerText": "用卡片学习，用游戏投入当下。",
     "demoLabel": "卡片学习互动演示",
     "flipBack": "再次翻面",

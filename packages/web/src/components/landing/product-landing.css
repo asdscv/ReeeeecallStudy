@@ -103,10 +103,6 @@
 .rl-product .rl-steps h3 { font-size: 20px; font-weight: 600; line-height: 1.5; letter-spacing: -.5px; word-break: keep-all; }
 .rl-product .rl-steps p { font-size: 14px; line-height: 1.9; color: #626269; margin-top: 13px; word-break: keep-all; overflow-wrap: anywhere; }
 .rl-product .rl-pricing { background: #fff; }
-.rl-product .rl-pricing #pricing .grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; }
-.rl-product .rl-pricing #pricing .grid > div { flex: 1 1 320px; max-width: 420px; min-width: 0; padding: 32px; border-radius: 24px; }
-.rl-product .rl-pricing #pricing h2 { font-size: clamp(36px, 4vw, 48px); }
-.rl-product .rl-pricing #pricing .grid > div > p:first-of-type { font-size: 36px; }
 .rl-product .rl-faq { background: #f5f5f7; padding-block: 100px; }
 .rl-product .rl-faq-layout { display: grid; grid-template-columns: .8fr 1.2fr; gap: 90px; }
 .rl-product .rl-faq h2 { font-size: 40px; line-height: 1.2; }
@@ -296,3 +292,7 @@
 .rl-product .rl-flip-card[data-flipped=true] .rl-card-front { visibility: hidden; }
 .rl-product .rl-flip-card[data-flipped=true] .rl-card-back { visibility: visible; }
 @media (prefers-reduced-motion: reduce) { .rl-product .rl-card-face { transition: none; } }
+
+.rl-product .rl-hero-free { display: flex; align-items: flex-start; gap: 9px; color: #b0c4e2; font-size: 12px; line-height: 1.9; margin-top: 18px; word-break: keep-all; }
+.rl-product .rl-hero-free > svg { flex-shrink: 0; color: #8eb9f4; margin-top: 4px; }
+.rl-product .rl-hero-free strong { display: block; color: #dfebff; font-size: 12px; font-weight: 550; }

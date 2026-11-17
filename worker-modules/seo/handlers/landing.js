@@ -103,6 +103,14 @@ ${['review', 'deck', 'play'].map((key) => `<li><strong>${escapeHtml(copy.premium
 <ol>${howToHtml}</ol>
 </section>
 
+<section id="pricing">
+<h2>${escapeHtml(copy.pricing.title)}</h2>
+<p>${escapeHtml(copy.pricing.subtitle)}</p>
+<ul>${[copy.pricing.features.cards, copy.pricing.features.decks, copy.pricing.heroFeatures, copy.pricing.features.history].map((feature) => `<li>${escapeHtml(feature)}</li>`).join('')}</ul>
+<p>${escapeHtml(copy.pricing.note)}</p>
+<a href="${SITE_URL}/auth/login">${escapeHtml(copy.pricing.ctaFree)}</a>
+</section>
+
 <section>
 <h2>${escapeHtml(copy.faq.title)}</h2>
 ${faqHtml}
