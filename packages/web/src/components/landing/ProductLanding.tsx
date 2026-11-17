@@ -29,12 +29,12 @@ function ProductNav() {
   }, [open])
   return <header className="rl-nav">
     <div className="rl-container rl-nav-row">
-      <Link to="/landing" className="rl-wordmark" aria-label="Reklue"><img src="/favicon.png" width={26} height={26} alt="" />Reklue</Link>
+      <Link to="/landing" className="rl-wordmark" aria-label="Reklue"><img src="/brand/reklue-lockup-light.svg" className="rl-brand-lockup" width={132} height={42} alt="Reklue" /></Link>
       <nav className="rl-nav-links" aria-label={t('nav.menu')}>
         <a href="#experience">{t('premium.navExperience')}</a><a href="#features">{t('nav.features', 'Features')}</a><a href="#faq">{t('nav.faq', 'FAQ')}</a><Link to="/insight">{t('nav.blog', 'Insights')}</Link>
       </nav>
       <div className="rl-nav-actions">
-        <div className="rl-nav-language"><LanguageSelector compact /></div>
+        <div className="rl-nav-language"><LanguageSelector /></div>
         {user ? <Link to="/dashboard" className="rl-pill rl-pill-small">{t('nav.dashboard', 'Dashboard')}</Link> : <><Link to="/auth/login" className="rl-nav-login">{t('nav.login', 'Log in')}</Link><Link to="/auth/login" className="rl-pill rl-pill-small">{t('nav.start', 'Get Started')}</Link></>}
         <button type="button" className="rl-menu" aria-label={t('nav.menu')} aria-expanded={open} aria-controls="rl-mobile-nav" onClick={() => setOpen(!open)}>{open ? <X size={21} /> : <Menu size={21} />}</button>
       </div>
@@ -47,10 +47,10 @@ function ProductHero() {
   const { t } = useTranslation('landing')
   return <section className="rl-hero" aria-labelledby="rl-title">
     <div className="rl-hero-copy rl-container">
-      <Reveal><p className="rl-kicker">Reklue</p><h1 id="rl-title">{t('premium.title1')}<br /><span>{t('premium.title2')}</span></h1><p className="rl-hero-description">{t('premium.heroText')}</p><div className="rl-hero-actions"><Link to="/auth/login" className="rl-pill">{t('hero.cta.start')}<ArrowRight size={16} aria-hidden="true" /></Link><a href="#experience" className="rl-link">{t('premium.tryCard')}<ChevronDown size={17} aria-hidden="true" /></a></div></Reveal>
+      <Reveal className="rl-hero-layout"><div className="rl-hero-heading"><p className="rl-kicker"><span className="rl-status-dot" />{t('premium.heroCaption')}</p><h1 id="rl-title">{t('premium.title1')}<br /><span>{t('premium.title2')}</span></h1></div><div className="rl-hero-aside"><p className="rl-hero-description">{t('premium.heroText')}</p><div className="rl-hero-actions"><Link to="/auth/login" className="rl-pill">{t('hero.cta.start')}<ArrowRight size={16} aria-hidden="true" /></Link><a href="#experience" className="rl-link">{t('premium.tryCard')}<ChevronDown size={17} aria-hidden="true" /></a></div></div></Reveal>
     </div>
     <AppPreviewSection />
-    <p className="rl-hero-caption">{t('premium.heroCaption')}</p>
+    <div className="rl-hero-index rl-container" aria-hidden="true"><span>01 / RECALL</span><span>Reklue</span><span>MAKE IT STICK.</span></div>
   </section>
 }
 
@@ -96,16 +96,17 @@ function ProductFAQ() {
 
 function ProductFinal() {
   const { t } = useTranslation('landing')
-  return <section className="rl-final" aria-labelledby="rl-final-title"><div className="rl-container"><Reveal><div className="rl-final-icon" aria-hidden="true"><span /><span /><span /></div><p className="rl-kicker">Reklue</p><h2 id="rl-final-title">{t('premium.finalTitle1')}<br /><span>{t('premium.finalTitle2')}</span></h2><p>{t('premium.finalText')}</p><Link to="/auth/login" className="rl-pill">{t('hero.cta.start')}<ArrowRight size={16} aria-hidden="true" /></Link><small>{t('premium.freeNote')}</small></Reveal></div></section>
+  return <section className="rl-final" aria-labelledby="rl-final-title"><div className="rl-container"><Reveal><img className="rl-final-icon" src="/brand/reklue-symbol-primary.svg" width={112} height={112} alt="" /><p className="rl-kicker">Reklue</p><h2 id="rl-final-title">{t('premium.finalTitle1')}<br /><span>{t('premium.finalTitle2')}</span></h2><p>{t('premium.finalText')}</p><Link to="/auth/login" className="rl-pill">{t('hero.cta.start')}<ArrowRight size={16} aria-hidden="true" /></Link><small>{t('premium.freeNote')}</small></Reveal></div></section>
 }
 
 function ProductFooter() {
   const { t, i18n } = useTranslation('landing')
   const lang = i18n.language.slice(0, 2)
   const vocabularyPath = isDeckLanguage(lang) ? vocabLanguageIndexPath(lang) : VOCAB_INDEX_PATH
-  return <footer className="rl-footer"><div className="rl-container"><div className="rl-footer-top"><div><Link to="/landing" className="rl-wordmark"><img src="/favicon.png" width={25} height={25} alt="" />Reklue</Link><p>{t('premium.footerText')}</p><LanguageSelector direction="up" /></div><AppDownload showQr /></div><nav className="rl-footer-links" aria-label={t('footer.resources')}><Link to="/insight">{t('footer.blog', 'Insights')}</Link><Link to={vocabularyPath}>{t('footer.vocabulary', 'Vocabulary lists')}</Link><Link to="/brain">{t('premium.playLabel')}</Link><a href="mailto:admin@reklue.com">{t('footer.help', 'Help')}</a><a href="/terms-of-service.html" target="_blank" rel="noopener noreferrer">{t('footer.terms')}</a><a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer">{t('footer.privacy')}</a><a href="/refund-policy.html" target="_blank" rel="noopener noreferrer">{t('footer.refund')}</a></nav><div className="rl-footer-bottom"><small>{t('footer.copyright')}</small><a href="mailto:admin@reklue.com">admin@reklue.com</a></div></div></footer>
+  return <footer className="rl-footer"><div className="rl-container"><div className="rl-footer-top"><div><Link to="/landing" className="rl-wordmark"><img src="/brand/reklue-lockup-dark.svg" className="rl-brand-lockup" width={132} height={42} alt="Reklue" /></Link><p>{t('premium.footerText')}</p><LanguageSelector direction="up" /></div><AppDownload showQr /></div><nav className="rl-footer-links" aria-label={t('footer.resources')}><Link to="/insight">{t('footer.blog', 'Insights')}</Link><Link to={vocabularyPath}>{t('footer.vocabulary', 'Vocabulary lists')}</Link><Link to="/brain">{t('premium.playLabel')}</Link><a href="mailto:admin@reklue.com">{t('footer.help', 'Help')}</a><a href="/terms-of-service.html" target="_blank" rel="noopener noreferrer">{t('footer.terms')}</a><a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer">{t('footer.privacy')}</a><a href="/refund-policy.html" target="_blank" rel="noopener noreferrer">{t('footer.refund')}</a></nav><div className="rl-footer-bottom"><small>{t('footer.copyright')}</small><a href="mailto:admin@reklue.com">admin@reklue.com</a></div></div></footer>
 }
 
 export function ProductLanding() {
-  return <div className="rl-product"><ProductNav /><main id="landing-main"><ProductHero /><FeatureStory /><ProductHowTo />{PAYMENTS_ENABLED && <div className="rl-pricing"><PricingSection /></div>}<ProductFAQ /><ProductFinal /></main><ProductFooter /></div>
+  const { i18n } = useTranslation('landing')
+  return <div className="rl-product" lang={i18n.resolvedLanguage || i18n.language}><ProductNav /><main id="landing-main"><ProductHero /><FeatureStory /><ProductHowTo />{PAYMENTS_ENABLED && <div className="rl-pricing"><PricingSection /></div>}<ProductFAQ /><ProductFinal /></main><ProductFooter /></div>
 }

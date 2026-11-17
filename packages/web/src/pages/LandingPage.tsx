@@ -40,7 +40,7 @@ export function LandingPage() {
       <SEOHead
         title={t('seo.title')}
         description={t('seo.description')}
-        ogImage={SEO.DEFAULT_OG_IMAGE}
+        ogImage={`${SEO.SITE_URL}/brand/reklue-social-${i18n.language.startsWith('ko') ? 'ko' : 'en'}.png`}
         ogType="website"
         canonicalUrl={`${SEO.SITE_URL}/landing${i18n.language !== 'en' ? `?lang=${i18n.language}` : ''}`}
         noIndex={!(SEO.INDEXABLE_LOCALES as readonly string[]).includes(i18n.language)}
