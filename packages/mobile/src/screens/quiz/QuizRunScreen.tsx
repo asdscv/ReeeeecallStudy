@@ -102,6 +102,13 @@ export function QuizRunScreen() {
     return () => clearInterval(id)
   }, [runId, stillGrowing, refreshRun, itemCount])
 
+  // Reopening a completed sitting shows the result instead of accepting new answers.
+  useEffect(() => {
+    if (run && run.run_id === runId && run.status === 'completed') {
+      navigation.replace('QuizResult', { runId })
+    }
+  }, [run, runId, navigation])
+
   const items = useMemo(() => run?.items ?? [], [run])
   const item = items[index]
 

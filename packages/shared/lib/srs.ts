@@ -27,10 +27,7 @@ export interface SrsResult {
  * still belongs to the previous SRS day.
  */
 export function getSrsDayStart(dayStartHour: number = 4): Date {
-  const now = new Date()
-  const shifted = new Date(now.getTime() - dayStartHour * 3600_000)
-  shifted.setHours(0, 0, 0, 0)
-  return new Date(shifted.getTime() + dayStartHour * 3600_000)
+  return nextDayBoundary(new Date(), 0, dayStartHour)
 }
 
 function round(n: number): number {
@@ -56,11 +53,11 @@ function applyMeanReversion(ease: number): number {
  * Cap interval growth to prevent exponential explosion.
  * Based on Wickelgren (1974) Power Law — diminishing returns at high stability.
  *
- * Max growth: 3× current interval per single review.
+ * Max growth: 3× current interval per single review (rounded to whole days).
  */
 function capGrowth(newInterval: number, currentInterval: number, maxInterval: number, growthFactor: number = 3): number {
   if (currentInterval <= 0) return Math.min(newInterval, maxInterval)
-  const capped = Math.min(newInterval, currentInterval * growthFactor)
+  const capped = Math.min(newInterval, Math.round(currentInterval * growthFactor))
   return Math.min(capped, maxInterval)
 }
 
@@ -71,15 +68,15 @@ function capGrowth(newInterval: number, currentInterval: number, maxInterval: nu
  * so that studying at 10 PM means cards appear the next morning, not 24h later.
  */
 export function nextDayBoundary(now: Date, days: number, dayStartHour: number = 4): Date {
-  // Shift "now" back by dayStartHour to find which SRS-day we're in
-  const shifted = new Date(now.getTime() - dayStartHour * 3600_000)
-  // Start of the current SRS-day (midnight of the shifted date)
-  const base = new Date(shifted)
-  base.setHours(0, 0, 0, 0)
-  // Add 'days' SRS-days, then shift forward to the real clock
+  // Calendar arithmetic preserves the local boundary when a day is 23 or 25 hours.
+  // Subtracting/adding a fixed four hours can select yesterday after spring-forward
+  // and schedule 03:00/05:00 instead of 04:00 on a clock-change day.
+  const base = new Date(now)
+  base.setHours(dayStartHour, 0, 0, 0)
+  if (now.getTime() < base.getTime()) base.setDate(base.getDate() - 1)
   base.setDate(base.getDate() + days)
-  // The target time is dayStartHour on that calendar date
-  return new Date(base.getTime() + dayStartHour * 3600_000)
+  base.setHours(dayStartHour, 0, 0, 0)
+  return base
 }
 
 function addMinutes(date: Date, minutes: number): Date {
@@ -250,8 +247,6 @@ function calculateReview(
       reps += 1
       if (card.repetitions === 0) {
         interval = s.good_days
-      } else if (card.repetitions === 1) {
-        interval = Math.max(s.good_days, 3)
       } else {
         const hardIvl = Math.max(card.interval_days + 1, Math.round(card.interval_days * 1.2))
         interval = Math.max(hardIvl + 1, Math.round(card.interval_days * ease))
