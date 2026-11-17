@@ -5,7 +5,7 @@
     "titleHighlight": "Giới hạn trí nhớ",
     "title1": "Học tập vượt qua",
     "title2": "Giới hạn trí nhớ",
-    "description": "Tối đa hóa hiệu quả học tập với phương pháp lặp lại ngắt quãng (SRS) đã được khoa học chứng minh.",
+    "description": "Gom từ vựng, kiến thức ôn thi và ghi chú vào thẻ. Reklue xếp lịch ôn dựa trên mức độ nhớ từng thẻ. Bắt đầu miễn phí.",
     "subDescription": "Với Reklue, bạn có thể ghi nhớ nhanh hơn và lâu hơn.",
     "subtitle1": "Tối đa hóa hiệu quả học tập với phương pháp lặp lại ngắt quãng (SRS) đã được khoa học chứng minh.",
     "subtitle2": "Với Reklue, bạn có thể ghi nhớ nhanh hơn và lâu hơn.",
@@ -124,18 +124,18 @@
     }
   },
   "howItWorks": {
-    "title": "Bắt đầu trong 3 bước đơn giản",
+    "title": "Vài thẻ là đủ để bắt đầu.",
     "step1": {
-      "title": "Tạo bộ thẻ",
-      "desc": "Tạo bộ thẻ để sắp xếp thẻ theo chủ đề, rồi thêm thẻ."
+      "title": "Chọn điều bạn muốn nhớ",
+      "desc": "Viết câu hỏi và đáp án, hoặc tìm bộ thẻ công khai. Vài từ là đủ cho buổi học đầu tiên."
     },
     "step2": {
-      "title": "Học tập",
-      "desc": "SRS trình bày thẻ ôn tập vào thời điểm tối ưu."
+      "title": "Nhớ lại trước khi lật thẻ",
+      "desc": "Nhìn mặt trước và thử nghĩ một chút. Xem đáp án, rồi đánh dấu bạn đã nhớ được đến đâu."
     },
     "step3": {
-      "title": "Theo dõi tiến trình",
-      "desc": "Kiểm tra thống kê học tập và xu hướng phát triển trên bảng điều khiển."
+      "title": "Quay lại khi đến lịch ôn",
+      "desc": "Ở chế độ SRS, mỗi thẻ có ngày ôn tiếp theo riêng. Mở các thẻ đến hạn và học tiếp."
     }
   },
   "cta": {
@@ -186,15 +186,15 @@
   },
   "floatingCta": "Bắt đầu ngay",
   "faq": {
-    "title": "Câu hỏi thường gặp",
-    "q1": "Lặp lại ngắt quãng (SRS) là gì?",
-    "a1": "Lặp lại ngắt quãng là phương pháp học đã được khoa học chứng minh, lên lịch ôn tập theo khoảng thời gian tối ưu để tối đa hóa ghi nhớ dài hạn. Reklue sử dụng thuật toán SRS tiên tiến để tự động xác định thời điểm bạn nên ôn tập mỗi thẻ.",
-    "q2": "Reklue có miễn phí không?",
-    "a2": "Có, bạn có thể bắt đầu miễn phí. Chỉ cần đăng ký là dùng được SRS, cả sáu chế độ học, thống kê và chia sẻ bộ thẻ không giới hạn.\n\nGói miễn phí có giới hạn số thẻ được lưu, còn gói trả phí sẽ nâng giới hạn đó (con số cụ thể hiển thị ở phần bảng giá phía trên). Tạo thẻ bằng AI và trắc nghiệm AI có hạn mức miễn phí mỗi ngày; vượt quá sẽ trừ vào số dư đã nạp — và mức trừ luôn hiện ra trước khi bạn xác nhận.",
-    "q3": "Có những chế độ học nào?",
-    "a3": "Reklue hỗ trợ 6 chế độ học: SRS để xếp lịch ôn tối ưu, ôn tuần tự để ôn có hệ thống, ngẫu nhiên để luyện xáo trộn, tuần tự theo thứ tự, theo ngày để sắp xếp theo thời gian, và học dồn để lặp tập trung đến khi thuộc.",
-    "q4": "Tôi có thể chia sẻ bộ thẻ không?",
-    "a4": "Có! Bạn có thể chia sẻ bộ thẻ theo 3 chế độ: Sao chép (nhân bản cho người khác), Đăng ký theo dõi (đồng bộ cập nhật), và Bản chụp (phiên bản cố định). Duyệt và khám phá bộ thẻ của người dùng khác trong chợ cộng đồng."
+    "title": "Có thể bạn đang thắc mắc",
+    "q1": "Ngày ôn được xếp như thế nào?",
+    "a1": "Ở chế độ SRS (lặp lại ngắt quãng), bạn xem đáp án rồi đánh giá mức độ nhớ. Ngày ôn tiếp theo được xếp từ đó. Thẻ khó quay lại sớm hơn, thẻ đã nhớ có khoảng cách dài hơn.",
+    "q2": "Tôi có thể dùng thử miễn phí không?",
+    "a2": "Có. Tài khoản miễn phí cho phép tạo thẻ và ôn tập. Số thẻ lưu trữ và lượt AI miễn phí có giới hạn. Bạn có thể xem hạn mức hiện tại trong Cài đặt sau khi đăng ký.",
+    "q3": "Nếu tôi cần ôn gấp trước kỳ thi thì sao?",
+    "a3": "Ngoài SRS còn có ôn tuần tự, ngẫu nhiên, theo thứ tự, theo ngày và ôn cấp tốc. Hằng ngày bạn có thể ôn theo lịch, còn trước kỳ thi có thể lặp lại bằng chế độ ôn cấp tốc.",
+    "q4": "Tôi phải tự làm tất cả thẻ sao?",
+    "a4": "Không. Bạn có thể lấy bộ thẻ công khai từ chợ hoặc nhập tệp CSV, JSON sẵn có. Bộ thẻ tự làm có thể chia sẻ bằng cách sao chép, đăng ký theo dõi hoặc bản chụp."
   },
   "statsSection": {
     "title": "Kết quả đã được chứng minh",
@@ -283,8 +283,8 @@
     }
   },
   "seo": {
-    "title": "Reklue — Thẻ ghi nhớ và trò chơi trí não",
-    "description": "Nền tảng học thẻ ghi nhớ thông minh với thuật toán lặp lại ngắt quãng (SRS) đã được khoa học chứng minh. Ghi nhớ nhanh hơn và lâu hơn."
+    "title": "Reklue — Hôm qua còn nhớ. Hôm nay thì sao?",
+    "description": "Gom từ vựng, kiến thức ôn thi và ghi chú vào thẻ. Reklue xếp lịch ôn dựa trên mức độ nhớ từng thẻ. Bắt đầu miễn phí."
   },
   "proof": {
     "eyebrow": "Dữ liệu thật",
@@ -298,5 +298,40 @@
     "languages": "Ngôn ngữ",
     "modes": "Chế độ học",
     "footnote": "Đếm trên máy chủ, làm mới mỗi giờ"
+  },
+  "human": {
+    "eyebrow": "Học rồi quên, rồi lại nhớ.",
+    "title1": "Hôm qua còn nhớ.",
+    "title2": "Hôm nay thì sao?",
+    "intro": "Có những từ nhìn thì quen, đến lúc dùng lại chẳng nhớ ra. Lưu chúng cùng ghi chú và những điều muốn nhớ vào Reklue, rồi ôn lại từng thẻ một.",
+    "seeHow": "Xem cách sử dụng",
+    "heroNote": "Từ vựng, kiến thức ôn thi hay ghi chú của bạn. Bắt đầu miễn phí.",
+    "demoLabel": "Thử lật một thẻ nhé.",
+    "demoSubject": "Thẻ ví dụ · Từ vựng tiếng Anh",
+    "front": "Mặt trước",
+    "back": "Mặt sau",
+    "demoAnswer": "do dự, ngần ngại",
+    "demoPrompt": "Thử nhớ nghĩa trước khi xem đáp án.",
+    "showAnswer": "Xem đáp án",
+    "tryAgain": "Thử nhớ lại lần nữa",
+    "demoNote": "Nhìn đáp án thấy quen và tự nhớ ra là hai chuyện khác nhau.",
+    "featuresEyebrow": "Những lúc bạn cần",
+    "featuresTitle": "Một chút giúp đỡ\nkhi học mãi vẫn vướng.",
+    "featuresIntro": "Bạn đã có nhiều việc phải lo. Ôn bài không cần phức tạp thêm.",
+    "reviewTitle": "Khi không biết nên ôn gì",
+    "reviewText": "Xem thẻ và đánh dấu mức độ nhớ của bạn. Ngày ôn tiếp theo được xếp dựa trên đó, để những nội dung khó xuất hiện thường xuyên hơn.",
+    "cardsTitle": "Khi ghi chú nằm rải rác",
+    "cardsText": "Ghi chép trên lớp, từ hay nhầm, kiến thức ôn thi. Gom chúng thành câu hỏi và đáp án, hoặc bắt đầu với một bộ thẻ công khai.",
+    "paceTitle": "Khi hôm nay cần học theo cách khác",
+    "paceText": "Xem theo thứ tự, xáo trộn hoặc ôn dồn trước kỳ thi. Chọn cách phù hợp với việc học hôm nay của bạn.",
+    "extra": "Bí ý tưởng làm thẻ? AI có thể soạn nháp để bạn kiểm tra và sửa lại. Các tính năng AI có giới hạn sử dụng riêng.",
+    "howEyebrow": "Lần đầu sử dụng",
+    "pauseTitle": "Lỡ một ngày? Ngày mai học tiếp.",
+    "pauseText": "Không cần đưa tất cả vào ngay từ đầu. Bắt đầu với vài điều hay nhầm, rồi thêm dần khi cần.",
+    "faqEyebrow": "Trước khi bắt đầu",
+    "faqNote": "Có câu hỏi hoặc chỗ nào khó dùng? Viết cho chúng tôi nhé.",
+    "finalTitle": "Bắt đầu từ cái từ bạn cứ quên ấy.",
+    "finalText": "Ghi một điều thành thẻ hôm nay, để lần sau còn quay lại ôn.",
+    "footerNote": "Nơi cất những điều bạn muốn nhớ."
   }
 }

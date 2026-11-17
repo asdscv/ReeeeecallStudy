@@ -78,10 +78,11 @@ ${jsonLdScripts}`
 </header>
 
 <section>
-<h2>${escapeHtml(copy.features.title)}</h2>
+<h2>${escapeHtml(copy.human.featuresTitle)}</h2>
 <ul>
-${['srs', 'modes', 'aiCards', 'quiz', 'plan', 'stats', 'sharing', 'tts', 'responsive'].filter((key) => copy.features[key]).map((key) => `<li><strong>${escapeHtml(copy.features[key].title)}</strong> — ${escapeHtml(copy.features[key].description || copy.features[key].desc)}</li>`).join('\n')}
+${['review', 'cards', 'pace'].map((key) => `<li><strong>${escapeHtml(copy.human[`${key}Title`])}</strong> — ${escapeHtml(copy.human[`${key}Text`])}</li>`).join('\n')}
 </ul>
+<p>${escapeHtml(copy.human.extra)}</p>
 </section>
 
 <section>

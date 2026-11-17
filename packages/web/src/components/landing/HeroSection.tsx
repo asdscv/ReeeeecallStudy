@@ -1,117 +1,41 @@
-import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowRight, Zap } from 'lucide-react'
-import { motion, useReducedMotion } from 'motion/react'
-
-const EASE_OUT = [0.16, 1, 0.3, 1] as const
+import { ArrowRight, RotateCcw } from 'lucide-react'
 
 export function HeroSection() {
   const { t } = useTranslation('landing')
-  const navigate = useNavigate()
-  const prefersReduced = useReducedMotion()
-
-  const goLogin = () => navigate('/auth/login')
-
-  const container = {
-    hidden: {},
-    show: { transition: { staggerChildren: 0.12 } },
-  }
-
-  const fadeUp = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE_OUT } },
-  }
+  const [revealed, setRevealed] = useState(false)
 
   return (
-    <section className="relative py-16 sm:py-20 md:py-28 lg:py-32 px-4 overflow-hidden">
-      {/* Dot grid pattern background */}
-      <div
-        className="absolute inset-0 opacity-[0.4] dark:opacity-[0.15]"
-        aria-hidden
-        style={{
-          backgroundImage: 'radial-gradient(circle, rgb(var(--color-border)) 1px, transparent 1px)',
-          backgroundSize: '24px 24px',
-        }}
-      />
-
-      {/* Radial gradient fade — masks edges of dot grid */}
-      <div
-        className="absolute inset-0"
-        aria-hidden
-        style={{
-          background: 'radial-gradient(ellipse 70% 50% at 50% 50%, transparent 30%, hsl(var(--card)) 70%)',
-        }}
-      />
-
-      {/* Floating decorative blobs */}
-      {!prefersReduced && (
-        <>
-          <motion.div
-            className="absolute top-1/4 -left-20 w-72 h-72 bg-brand rounded-full blur-[100px] opacity-[0.08]"
-            animate={{ y: [0, -30, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div
-            className="absolute bottom-1/4 -right-20 w-80 h-80 bg-violet-500 rounded-full blur-[100px] opacity-[0.06]"
-            animate={{ y: [0, 30, 0] }}
-            transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        </>
-      )}
-
-      <motion.div
-        className="max-w-4xl mx-auto text-center relative z-10"
-        variants={prefersReduced ? undefined : container}
-        initial="hidden"
-        animate="show"
-      >
-        <motion.div variants={prefersReduced ? undefined : fadeUp}>
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-brand/10 text-brand text-xs sm:text-sm font-medium rounded-full mb-6 border border-brand/20">
-            <Zap className="w-3.5 h-3.5" />
-            {t('hero.badge')}
+    <section className="landing-hero landing-width" aria-labelledby="landing-title">
+      <div className="landing-hero-copy">
+        <p className="landing-eyebrow">{t('human.eyebrow')}</p>
+        <h1 id="landing-title">{t('human.title1')}<br /><span>{t('human.title2')}</span></h1>
+        <p className="landing-intro">{t('human.intro')}</p>
+        <div className="landing-actions">
+          <Link to="/auth/login" className="landing-button">{t('hero.cta.start')} <ArrowRight size={17} aria-hidden="true" /></Link>
+          <a href="#how-it-works" className="landing-text-link">{t('human.seeHow')} <span aria-hidden="true">↓</span></a>
+        </div>
+        <p className="landing-small-note">{t('human.heroNote')}</p>
+      </div>
+      <figure className="landing-example">
+        <figcaption>{t('human.demoLabel')}</figcaption>
+        <div className="landing-card-stack">
+          <div className="landing-study-card">
+            <div className="landing-card-top"><span>{t('human.demoSubject')}</span><span>{t(revealed ? 'human.back' : 'human.front')}</span></div>
+            <div className="landing-card-content" aria-live="polite" aria-atomic="true" id="landing-card-answer">
+              <p className={revealed ? 'landing-card-answer' : 'landing-card-word'} lang={revealed ? undefined : 'en'}>{revealed ? t('human.demoAnswer') : 'hesitate'}</p>
+              <p className="landing-card-example" lang={revealed ? 'en' : undefined}>{revealed ? 'Don’t hesitate to ask.' : t('human.demoPrompt')}</p>
+            </div>
+            <button type="button" className="landing-card-toggle" aria-controls="landing-card-answer" aria-expanded={revealed} onClick={() => setRevealed(!revealed)}>
+              {revealed ? <RotateCcw size={15} aria-hidden="true" /> : <ArrowRight size={15} aria-hidden="true" />}
+              {t(revealed ? 'human.tryAgain' : 'human.showAnswer')}
+            </button>
           </div>
-        </motion.div>
-
-        <motion.h1
-          variants={prefersReduced ? undefined : fadeUp}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-foreground leading-[1.1] tracking-tight mb-5 sm:mb-6"
-        >
-          {t('hero.title1')}
-          <br />
-          <span className="bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-clip-text text-transparent bg-[length:200%_auto] animate-[gradient-shift_4s_ease-in-out_infinite]">
-            {t('hero.title2')}
-          </span>
-        </motion.h1>
-
-        <motion.p
-          variants={prefersReduced ? undefined : fadeUp}
-          className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 sm:mb-12 leading-relaxed"
-        >
-          {t('hero.subtitle1')}
-          <br className="hidden sm:block" />
-          {t('hero.subtitle2')}
-        </motion.p>
-
-        <motion.div
-          variants={prefersReduced ? undefined : fadeUp}
-          className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4"
-        >
-          <motion.button
-            onClick={goLogin}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 bg-brand text-brand-foreground text-base font-semibold rounded-xl hover:brightness-110 transition shadow-lg shadow-blue-600/25 cursor-pointer"
-            whileHover={prefersReduced ? undefined : { scale: 1.04, boxShadow: '0 20px 40px rgba(37,99,235,0.3)' }}
-            whileTap={prefersReduced ? undefined : { scale: 0.98 }}
-          >
-            {t('hero.cta.start')} <ArrowRight className="w-5 h-5" />
-          </motion.button>
-          <button
-            onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-            className="w-full sm:w-auto px-8 py-3.5 border border-border text-foreground text-base font-medium rounded-xl hover:bg-muted transition cursor-pointer bg-transparent"
-          >
-            {t('hero.cta.learn')}
-          </button>
-        </motion.div>
-      </motion.div>
+        </div>
+        <p className="landing-example-note">{t('human.demoNote')}</p>
+      </figure>
     </section>
   )
 }
