@@ -383,5 +383,29 @@
     "nextCard": "下一张卡片",
     "pause": "暂停自动播放",
     "play": "开始自动播放"
+  },
+  "showcase": {
+    "eyebrow": "体验 Reklue",
+    "title": "学习，一目了然。",
+    "intro": "用卡片整理知识，按照记忆情况复习。也可以玩个小游戏，休息片刻。",
+    "decks": "整理卡片",
+    "review": "回忆复习",
+    "games": "轻松游戏",
+    "demo": "示例界面",
+    "search": "搜索示例卡组",
+    "deck": "卡组",
+    "cards": "卡片",
+    "preview": "卡片预览",
+    "empty": "没有匹配的示例卡组。",
+    "study": "试试复习",
+    "today": "今日复习",
+    "question": "问题",
+    "answer": "答案",
+    "back": "查看问题",
+    "reveal": "显示答案",
+    "start": "开始学习",
+    "decksDescription": "单词、课堂笔记、考试要点。把学过的内容整理到卡组里。",
+    "reviewDescription": "先回忆答案，再评价记忆程度。系统据此安排下次复习时间。",
+    "gamesDescription": "寻找数字、记住图案、破解密码。无需登录即可开始。"
   }
 }

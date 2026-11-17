@@ -78,7 +78,8 @@ ${jsonLdScripts}`
 </header>
 
 <section>
-<h2>${escapeHtml(`${copy.premium.featureTitle1} ${copy.premium.featureTitle2}`)}</h2>
+<h2>${escapeHtml(copy.showcase.title)}</h2>
+<p>${escapeHtml(copy.showcase.intro)}</p>
 <ul>
 ${['review', 'deck', 'play'].map((key) => `<li><strong>${escapeHtml(copy.premium[`${key}Title`])}</strong> — ${escapeHtml(key === 'review' ? copy.human.reviewText : copy.premium[`${key}Text`])}</li>`).join('\n')}
 </ul>

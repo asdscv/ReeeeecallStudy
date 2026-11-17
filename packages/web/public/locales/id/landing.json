@@ -383,5 +383,29 @@
     "nextCard": "Kartu berikutnya",
     "pause": "Jeda putar otomatis",
     "play": "Mulai putar otomatis"
+  },
+  "showcase": {
+    "eyebrow": "Jelajahi Reklue",
+    "title": "Belajar, dalam satu tampilan.",
+    "intro": "Susun dengan kartu. Ulangi sesuai ingatan. Rehat dengan permainan singkat.",
+    "decks": "Susun",
+    "review": "Ulangi",
+    "games": "Main",
+    "demo": "Tampilan contoh",
+    "search": "Cari dek contoh",
+    "deck": "Dek",
+    "cards": "Kartu",
+    "preview": "Pratinjau kartu",
+    "empty": "Tidak ada dek contoh yang cocok.",
+    "study": "Coba mengulang",
+    "today": "Ulasan hari ini",
+    "question": "Pertanyaan",
+    "answer": "Jawaban",
+    "back": "Lihat pertanyaan",
+    "reveal": "Lihat jawaban",
+    "start": "Mulai belajar",
+    "decksDescription": "Kosakata, catatan kelas, materi ujian. Kumpulkan yang dipelajari dalam satu dek.",
+    "reviewDescription": "Ingat jawabannya, lalu nilai seberapa baik Anda mengingatnya. Penilaian menentukan jadwal ulasan berikutnya.",
+    "gamesDescription": "Cari angka, ingat pola, dan pecahkan kode. Langsung main tanpa masuk akun."
   }
 }

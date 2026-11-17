@@ -383,5 +383,29 @@
     "nextCard": "Thẻ tiếp theo",
     "pause": "Tạm dừng tự động",
     "play": "Bắt đầu tự động"
+  },
+  "showcase": {
+    "eyebrow": "Khám phá Reklue",
+    "title": "Việc học, trong tầm mắt.",
+    "intro": "Sắp xếp bằng thẻ. Ôn theo trí nhớ. Nghỉ một chút với trò chơi nhanh.",
+    "decks": "Sắp xếp",
+    "review": "Ôn tập",
+    "games": "Chơi",
+    "demo": "Màn hình mẫu",
+    "search": "Tìm bộ thẻ mẫu",
+    "deck": "Bộ thẻ",
+    "cards": "Thẻ",
+    "preview": "Xem trước thẻ",
+    "empty": "Không có bộ thẻ mẫu phù hợp.",
+    "study": "Thử ôn tập",
+    "today": "Ôn tập hôm nay",
+    "question": "Câu hỏi",
+    "answer": "Đáp án",
+    "back": "Xem câu hỏi",
+    "reveal": "Hiện đáp án",
+    "start": "Bắt đầu học",
+    "decksDescription": "Từ vựng, ghi chép trên lớp, chủ đề ôn thi. Gom những gì bạn học vào bộ thẻ.",
+    "reviewDescription": "Nhớ lại đáp án rồi đánh giá mức độ ghi nhớ. Kết quả này quyết định ngày ôn tiếp theo.",
+    "gamesDescription": "Tìm số, nhớ hình và giải mã. Chơi ngay mà không cần đăng nhập."
   }
 }
