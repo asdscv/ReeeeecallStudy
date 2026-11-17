@@ -1,6 +1,6 @@
 // Landing page bot handler — extracted from worker.js handleLandingBotRequest
 import {
-  SITE_URL, BRAND_NAME, DEFAULT_OG_IMAGE,
+  SITE_URL, BRAND_NAME,
   LANDING_TITLES, LANDING_DESCS, LANDING_FAQ, LANDING_HOWTO, LANDING_COPY,
   ROBOTS_INDEX, ROBOTS_NOINDEX, pageChrome,
 } from '../constants.js'
@@ -53,7 +53,7 @@ export async function handleLandingBotRequest(url) {
     description: pageDesc,
     ogType: 'website',
     ogUrl: canonicalUrl,
-    ogImage: DEFAULT_OG_IMAGE,
+    ogImage: `${SITE_URL}/brand/reklue-social-${lang === 'ko' ? 'ko' : 'en'}.png`,
     locale: lang,
     canonical: canonicalUrl,
     keywords: 'spaced repetition, flashcards, SRS, study app, learning platform, memorization, active recall, flashcard app, free study tool',

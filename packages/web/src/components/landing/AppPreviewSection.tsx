@@ -46,7 +46,7 @@ export function AppPreviewSection() {
       <div className="rl-side-card rl-side-left" aria-hidden="true"><span>Reklue</span><strong>curiosity</strong><i /></div>
       <div className="rl-side-card rl-side-right" aria-hidden="true"><span>Reklue</span><strong>momentum</strong><i /></div>
       <div className="rl-card-pedestal">
-        <motion.button type="button" className="rl-flip-card" onClick={flip} aria-label={t(flipped ? 'premium.flipBack' : 'premium.flipAnswer')} animate={{ rotateY: flipped ? 180 : 0 }} transition={{ duration: reduced ? 0 : .85, ease: [.25, .8, .25, 1] }}>
+        <motion.button type="button" className="rl-flip-card" data-flipped={flipped} onClick={flip} aria-label={t(flipped ? 'premium.flipBack' : 'premium.flipAnswer')} animate={{ rotateY: flipped ? 180 : 0 }} transition={{ duration: reduced ? 0 : .85, ease: [.45, 0, .55, 1] }}>
           <div className="rl-card-face rl-card-front" aria-hidden={flipped}>
             <div className="rl-card-face-top"><span>{t('premium.cardCategory')}</span><span>0{index + 1} / 03</span></div>
             <div className="rl-card-face-center"><p className="rl-card-prompt">{t('premium.cardPrompt')}</p><strong lang="en">{WORDS[index]}</strong></div>
