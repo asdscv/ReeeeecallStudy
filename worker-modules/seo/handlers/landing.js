@@ -86,6 +86,18 @@ ${['review', 'deck', 'play'].map((key) => `<li><strong>${escapeHtml(copy.premium
 <p>${escapeHtml(copy.premium.extraNote)}</p>
 </section>
 
+<section id="brain-training">
+<h2>${escapeHtml(copy.brainLanding.title.replace(/\n/g, ' '))}</h2>
+<p>${escapeHtml(copy.brainLanding.intro)}</p>
+<p>${escapeHtml(copy.brainLanding.access)}</p>
+<ul>
+<li><a href="${SITE_URL}/brain/play/schulte">${escapeHtml(copy.brainLanding.search)}</a></li>
+<li><a href="${SITE_URL}/brain/play/memoryGrid">${escapeHtml(copy.brainLanding.memory)}</a></li>
+<li><a href="${SITE_URL}/brain/play/codeBreak">${escapeHtml(copy.brainLanding.reasoning)}</a></li>
+</ul>
+<a href="${SITE_URL}/brain">${escapeHtml(copy.brainLanding.cta)}</a>
+</section>
+
 <section>
 <h2>${escapeHtml(copy.howItWorks.title)}</h2>
 <ol>${howToHtml}</ol>

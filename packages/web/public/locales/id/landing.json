@@ -338,7 +338,7 @@
     "navExperience": "Coba langsung",
     "title1": "Biar tetap ingat.",
     "title2": "Satu kartu setiap kali.",
-    "heroText": "Dari kosakata hingga bahan ujian. Belajar lewat kartu, lalu kembali saat sesuai dengan ingatanmu.",
+    "heroText": "Belajar dengan kartu, ulangi sesuai ingatan. Ganti suasana dengan permainan otak singkat.",
     "tryCard": "Coba satu kartu",
     "heroCaption": "Kartu belajar. Pengulangan berjarak. Permainan otak. Semua di Reklue.",
     "featureEyebrow": "Lebih banyak cara untuk mencoba",
@@ -406,6 +406,26 @@
     "start": "Mulai belajar",
     "decksDescription": "Kosakata, catatan kelas, materi ujian. Kumpulkan yang dipelajari dalam satu dek.",
     "reviewDescription": "Ingat jawabannya, lalu nilai seberapa baik Anda mengingatnya. Penilaian menentukan jadwal ulasan berikutnya.",
-    "gamesDescription": "Cari angka, ingat pola, dan pecahkan kode. Langsung main tanpa masuk akun."
+    "gamesDescription": "Cari angka, ingat pola, dan pecahkan kode. Masuk untuk memainkan permainan lengkap."
+  },
+  "brainLanding": {
+    "nav": "Latihan otak",
+    "eyebrow": "BRAIN TRAINING",
+    "title": "Di sela belajar,\ncoba tantangan berbeda.",
+    "intro": "Cari angka yang tersebar, ingat posisi yang muncul sejenak, dan temukan jawaban dari petunjuk.",
+    "cta": "Jelajahi latihan otak",
+    "access": "Coba pratinjau tanpa akun. Masuk untuk memainkan permainan lengkap.",
+    "memory": "Ingat posisi",
+    "reasoning": "Menalar dari petunjuk",
+    "search": "Cari angka",
+    "preview": "Pratinjau",
+    "instruction": "Tekan angka 1 sampai 9 secara berurutan.",
+    "board": "Pratinjau urutan angka",
+    "complete": "Semua ditemukan. Coba tantangan berikutnya?",
+    "wrong": "Berikutnya {{number}}. Cari lagi.",
+    "next": "Angka berikutnya · {{number}}",
+    "reset": "Mulai papan baru",
+    "play": "Mainkan permainan lengkap",
+    "note": "Kemajuan pratinjau ini tidak disimpan."
   }
 }

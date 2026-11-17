@@ -338,7 +338,7 @@
     "navExperience": "Trải nghiệm",
     "title1": "Để nhớ lâu hơn.",
     "title2": "Từng thẻ một.",
-    "heroText": "Từ vựng hay kiến thức ôn thi. Học bằng thẻ, rồi quay lại vào thời điểm phù hợp với điều bạn nhớ.",
+    "heroText": "Học bằng thẻ, ôn theo trí nhớ. Đổi nhịp với một trò trí não ngắn.",
     "tryCard": "Thử một thẻ",
     "heroCaption": "Thẻ học. Lặp lại ngắt quãng. Trò chơi trí não. Cùng Reklue.",
     "featureEyebrow": "Thêm cách để khám phá",
@@ -406,6 +406,26 @@
     "start": "Bắt đầu học",
     "decksDescription": "Từ vựng, ghi chép trên lớp, chủ đề ôn thi. Gom những gì bạn học vào bộ thẻ.",
     "reviewDescription": "Nhớ lại đáp án rồi đánh giá mức độ ghi nhớ. Kết quả này quyết định ngày ôn tiếp theo.",
-    "gamesDescription": "Tìm số, nhớ hình và giải mã. Chơi ngay mà không cần đăng nhập."
+    "gamesDescription": "Tìm số, nhớ hình và giải mã. Đăng nhập để chơi trò đầy đủ."
+  },
+  "brainLanding": {
+    "nav": "Rèn trí não",
+    "eyebrow": "BRAIN TRAINING",
+    "title": "Giữa những buổi học,\nthử thách khác đang chờ.",
+    "intro": "Tìm số rải rác, nhớ vị trí vừa hiện lên và dùng manh mối để tìm đáp án.",
+    "cta": "Khám phá trò trí não",
+    "access": "Chơi thử tại đây không cần tài khoản. Đăng nhập để chơi trò đầy đủ.",
+    "memory": "Nhớ vị trí",
+    "reasoning": "Suy luận từ manh mối",
+    "search": "Tìm các số",
+    "preview": "Xem thử",
+    "instruction": "Nhấn các số từ 1 đến 9 theo thứ tự.",
+    "board": "Chơi thử tìm số",
+    "complete": "Đã tìm hết. Thử thách tiếp theo nhé?",
+    "wrong": "Tiếp theo là {{number}}. Hãy tìm lại.",
+    "next": "Số tiếp theo · {{number}}",
+    "reset": "Bắt đầu bảng mới",
+    "play": "Chơi trò đầy đủ",
+    "note": "Tiến độ chơi thử không được lưu."
   }
 }

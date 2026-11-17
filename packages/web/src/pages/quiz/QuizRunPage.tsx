@@ -106,12 +106,16 @@ export function QuizRunPage() {
 
   const items = useMemo(() => run?.items ?? [], [run])
   const item: QuizRunItem | undefined = items[index]
+  // Submitted answers are immutable: a reload/revisit must use the saved response.
+  const writtenAnswer = item?.answered
+    ? (typeof item.response?.text === 'string' ? item.response.text : '')
+    : text
 
   // Re-quote per item: the price depends on the type, and an essay costs four times a short
   // answer. Quoting once for the run would show the wrong number on most of it.
   useEffect(() => {
-    // Nothing to quote for multiple choice — nothing is bought after a multiple-choice answer.
-    if (!item || item.question_type === 'mcq' || item.answered) return
+    // Quote pending and saved-but-ungraded written answers, including after a reload.
+    if (!item || item.question_type === 'mcq' || item.score !== null) return
     const itemId = item.item_id
     let cancelled = false
     void quote(QUIZ_GRADE_ACTION[item.question_type], 1)
@@ -163,7 +167,7 @@ export function QuizRunPage() {
     if (!item || shownPrice === null) return
     setError(null)
     try {
-      await gradeWithAi(item.item_id, text.trim(), shownPrice)
+      await gradeWithAi(item.item_id, writtenAnswer.trim(), shownPrice)
     } catch (e) {
       // The CODE, not a sentence. `AiRefusalNotice` decides what it means and what the
       // learner can do about it — which on this screen is the whole point: a refused grade
@@ -220,7 +224,7 @@ export function QuizRunPage() {
   const tally = tallyQuiz(items.map((i) => ({ answered: i.answered, score: i.score })))
   const line = tallyLine(tally)
   /** Live length against the bound the SERVER will apply. Mirrored, and pinned by a test. */
-  const length = answerLength(text, item?.question_type === 'essay' ? 'essay' : 'short')
+  const length = answerLength(writtenAnswer, item?.question_type === 'essay' ? 'essay' : 'short')
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-4 min-h-screen">
@@ -330,7 +334,7 @@ export function QuizRunPage() {
       {item.question_type !== 'mcq' && (
         <>
           <textarea
-            value={text}
+            value={writtenAnswer}
             onChange={(e) => setText(e.target.value)}
             disabled={answered}
             rows={item.question_type === 'essay' ? 8 : 3}
@@ -387,7 +391,7 @@ export function QuizRunPage() {
           // For multiple choice "what the learner wrote" is the option they picked. The spans
           // were computed against that string server-side, so passing the textarea (always
           // empty here) would silently drop every highlight that was just paid for.
-          learnerText={item.question_type === 'mcq' ? (pickedOption ?? '') : text}
+          learnerText={item.question_type === 'mcq' ? (pickedOption ?? '') : writtenAnswer}
           referenceText={item.reference_answer}
         />
       )}
