@@ -83,6 +83,12 @@ curl -s -A "Googlebot/2.1" https://reklue.com/insight | grep -o 'hreflang="[a-z-
 ```
 > 로컬 sandbox에서 `curl`이 `000`이면 도메인 오타(`.study`가 아니라 **`.xyz`**)거나 egress 차단. python `urllib`로도 확인 가능.
 
+### 웹 구글 로그인
+
+- Google Auth Platform의 기존 **Web application** 클라이언트에서 **Authorized JavaScript origins**에 `https://reklue.com`을 추가한다. 별도로 테스트할 스테이징이나 로컬 환경의 origin도 같은 클라이언트에 등록한다. Branding의 앱 이름은 `Reklue`로 설정하고 브랜드 인증 상태를 확인한다.
+- Cloudflare 웹 빌드 환경에 `VITE_GOOGLE_CLIENT_ID`로 동일 클라이언트의 공개 ID를 넣는다. 로컬에서는 `packages/web/.env.local`에 설정한다. 이 값이 있는 빌드에서 공식 Google 버튼과 ID 토큰 교환이 활성화되며, 설정이 없는 빌드는 기존 Google 리디렉션을 사용한다.
+- Supabase가 같은 클라이언트 ID를 이미 사용하므로 Google 제공자나 세션을 변경할 필요가 없다. 기존 OAuth 콜백은 네이티브 앱에서 계속 사용한다.
+
 ---
 
 ## 2. 모바일 OTA (EAS Update)
