@@ -3,12 +3,27 @@ import { test, expect } from '@playwright/test'
 /**
  * OAuth Providers E2E Tests
  *
- * Tests the UI rendering and flow initiation for all OAuth providers
- * (Google, Apple). Actual OAuth consent requires real credentials,
- * so we test up to the redirect point.
+ * Google uses its own button and sends an ID token to Supabase. Apple
+ * starts a redirect flow. No real social account is needed for these tests.
  */
 test.describe('OAuth Providers', () => {
   test.use({ storageState: { cookies: [], origins: [] } }) // unauthenticated
+
+  test.beforeEach(async ({ page }) => {
+    await page.route('https://accounts.google.com/gsi/client', route => route.fulfill({
+      contentType: 'application/javascript',
+      body: `let receiveCredential;
+        window.google = { accounts: { id: {
+          initialize({ callback }) { receiveCredential = callback; },
+          renderButton(container) {
+            const button = document.createElement('button');
+            button.textContent = 'Continue with Google';
+            button.onclick = () => receiveCredential({ credential: 'test-google-id-token' });
+            container.append(button);
+          }
+        } } };`,
+    }))
+  })
 
   // ─── Shared: both providers visible ──────────────────────────
 
@@ -42,37 +57,34 @@ test.describe('OAuth Providers', () => {
 
   // ─── Google ──────────────────────────────────────────────────
 
-  test('Google button has logo SVG and correct text', async ({ page }) => {
+  test('Google sign-in uses the button rendered by Google Identity Services', async ({ page }) => {
     await page.goto('/auth/login')
     const btn = page.getByTestId('google-login-button')
-    await expect(btn.locator('svg')).toBeVisible()
-    await expect(btn).toContainText(/Google/)
+    await expect(btn.getByRole('button', { name: 'Continue with Google' })).toBeVisible()
   })
 
-  test('clicking Google button initiates OAuth redirect', async ({ page }) => {
+  test('clicking Google sends an ID token without navigating away', async ({ page }) => {
+    await page.route('**/auth/v1/token?grant_type=id_token', route => route.fulfill({
+      status: 400,
+      json: { message: 'Invalid test token' },
+    }))
     await page.goto('/auth/login')
-    const btn = page.getByTestId('google-login-button')
-
-    await Promise.all([
-      page.waitForURL(
-        url => url.toString().includes('accounts.google.com') || url.toString().includes('supabase'),
-        { timeout: 10_000 }
-      ).catch(() => null),
-      btn.click(),
+    const [exchange] = await Promise.all([
+      page.waitForRequest('**/auth/v1/token?grant_type=id_token'),
+      page.getByTestId('google-login-button').getByRole('button').click(),
     ])
-
-    const url = page.url()
-    const isRedirected = url.includes('accounts.google.com') || url.includes('supabase')
-    const isLoading = await btn.isDisabled().catch(() => false)
-    expect(isRedirected || isLoading).toBeTruthy()
+    expect(exchange.postDataJSON()).toMatchObject({
+      provider: 'google', id_token: 'test-google-id-token', nonce: expect.any(String),
+    })
+    await expect(page).toHaveURL(/\/auth\/login$/)
   })
 
   // ─── Apple ───────────────────────────────────────────────────
 
-  test('Apple button has logo SVG and correct text', async ({ page }) => {
+  test('Apple button has the Apple logo and label', async ({ page }) => {
     await page.goto('/auth/login')
     const btn = page.getByTestId('apple-login-button')
-    await expect(btn.locator('svg')).toBeVisible()
+    await expect(btn.getByRole('img', { name: 'Apple' })).toBeVisible()
     await expect(btn).toContainText(/Apple/)
   })
 
@@ -83,21 +95,18 @@ test.describe('OAuth Providers', () => {
   })
 
   test('clicking Apple button initiates OAuth redirect', async ({ page }) => {
+    await page.route('**/auth/v1/authorize?**', route => route.fulfill({
+      contentType: 'text/plain',
+      body: 'Apple authorization redirect',
+    }))
     await page.goto('/auth/login')
     const btn = page.getByTestId('apple-login-button')
 
-    await Promise.all([
-      page.waitForURL(
-        url => url.toString().includes('appleid.apple.com') || url.toString().includes('supabase'),
-        { timeout: 10_000 }
-      ).catch(() => null),
+    const [authorization] = await Promise.all([
+      page.waitForRequest('**/auth/v1/authorize?**'),
       btn.click(),
     ])
-
-    const url = page.url()
-    const isRedirected = url.includes('appleid.apple.com') || url.includes('supabase')
-    const isLoading = await btn.isDisabled().catch(() => false)
-    expect(isRedirected || isLoading).toBeTruthy()
+    expect(new URL(authorization.url()).searchParams.get('provider')).toBe('apple')
   })
 
   // ─── Mutual exclusion ───────────────────────────────────────
@@ -105,7 +114,7 @@ test.describe('OAuth Providers', () => {
   test('both OAuth buttons share disabled state', async ({ page }) => {
     await page.goto('/auth/login')
 
-    const googleBtn = page.getByTestId('google-login-button')
+    const googleBtn = page.getByTestId('google-login-button').getByRole('button')
     const appleBtn = page.getByTestId('apple-login-button')
 
     // Before click, both should be enabled

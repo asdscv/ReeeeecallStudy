@@ -1,6 +1,7 @@
-import { render, screen } from '@testing-library/react'
+import { webcrypto } from 'node:crypto'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { LoginPage } from '../LoginPage'
 
@@ -15,12 +16,24 @@ const mockSignIn = vi.fn()
 const mockSignUp = vi.fn()
 const mockResetPassword = vi.fn()
 const mockCheckNicknameAvailability = vi.fn()
+const mockSignInWithProvider = vi.fn()
+const mockSignInWithIdToken = vi.fn()
+const mockAttachAttribution = vi.fn()
+
+vi.mock('@reklue/shared/lib/supabase', () => ({
+  getSupabase: () => ({ auth: { signInWithIdToken: mockSignInWithIdToken } }),
+}))
+
+vi.mock('../../../lib/attribution', () => ({
+  attachAttributionToProfile: () => mockAttachAttribution(),
+}))
 
 vi.mock('../../../stores/auth-store', () => ({
   useAuthStore: (selector: (s: Record<string, unknown>) => unknown) =>
     selector({
       signIn: mockSignIn,
       signUp: mockSignUp,
+      signInWithProvider: mockSignInWithProvider,
       resetPassword: mockResetPassword,
       checkNicknameAvailability: mockCheckNicknameAvailability,
     }),
@@ -41,6 +54,67 @@ beforeEach(() => {
   Object.defineProperty(window, 'location', {
     writable: true,
     value: { ...originalLocation, search: '' },
+  })
+})
+
+afterEach(() => {
+  vi.unstubAllEnvs()
+  vi.unstubAllGlobals()
+})
+
+describe('Google popup sign-in', () => {
+  const initialize = vi.fn<(options: {
+    client_id: string
+    nonce: string
+    ux_mode: 'popup'
+    callback: (response: { credential: string }) => void
+  }) => void>()
+
+  beforeEach(() => {
+    vi.stubEnv('VITE_GOOGLE_CLIENT_ID', 'reklue.apps.googleusercontent.com')
+    vi.stubGlobal('crypto', webcrypto)
+    vi.stubGlobal('google', { accounts: { id: { initialize, renderButton: vi.fn() } } })
+  })
+
+  it('exchanges the Google credential once using the original nonce', async () => {
+    mockSignInWithIdToken.mockResolvedValue({ error: null })
+    renderLogin()
+    await waitFor(() => expect(initialize).toHaveBeenCalledOnce())
+    const [options] = initialize.mock.calls[0]
+
+    await act(async () => {
+      options.callback({ credential: 'google-id-token' })
+      options.callback({ credential: 'google-id-token' })
+    })
+
+    expect(mockSignInWithProvider).not.toHaveBeenCalled()
+    expect(mockSignInWithIdToken).toHaveBeenCalledExactlyOnceWith({
+      provider: 'google',
+      token: 'google-id-token',
+      nonce: expect.any(String),
+    })
+    const { nonce } = mockSignInWithIdToken.mock.calls[0][0]
+    const digest = await webcrypto.subtle.digest('SHA-256', new TextEncoder().encode(nonce))
+    expect(options).toMatchObject({
+      client_id: 'reklue.apps.googleusercontent.com',
+      ux_mode: 'popup',
+      nonce: Buffer.from(digest).toString('hex'),
+    })
+    expect(mockAttachAttribution).toHaveBeenCalledOnce()
+  })
+
+  it('renders a fresh Google sign-in attempt after an exchange failure', async () => {
+    mockSignInWithIdToken.mockResolvedValue({ error: new Error('Invalid token') })
+    renderLogin()
+    await waitFor(() => expect(initialize).toHaveBeenCalledOnce())
+    const [first] = initialize.mock.calls[0]
+
+    await act(async () => first.callback({ credential: 'rejected-token' }))
+
+    expect(screen.getByText('oauthError')).toBeInTheDocument()
+    await waitFor(() => expect(initialize).toHaveBeenCalledTimes(2))
+    expect(initialize.mock.calls[1][0].nonce).not.toBe(first.nonce)
+    expect(mockAttachAttribution).not.toHaveBeenCalled()
   })
 })
 
