@@ -28,7 +28,7 @@ import type { CrammingFilter } from '@reklue/shared/lib/cramming-queue'
 import type { StudyMode, Profile } from '../types/database'
 
 export function StudySessionPage() {
-  const { t } = useTranslation('study')
+  const { t } = useTranslation(['study', 'learning'])
   const { deckId } = useParams<{ deckId: string }>()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
@@ -108,7 +108,8 @@ export function StudySessionPage() {
     const ids = raw.split(',').map((id) => id.trim()).filter(Boolean)
     return ids.length > 0 ? ids : null
   }, [searchParams])
-  const { plan, planItems, planCards, fetchPlan } = useLearningStore()
+  const { plan, planItems, planCards, planLoading, planAbsentFor, planErrorFrom, fetchPlan } = useLearningStore()
+  const planMatches = !!plan && plan.goal_id === goalId && plan.plan_date === planDate
 
   useEffect(() => {
     if (goalId && planDate) void fetchPlan(goalId, planDate)
@@ -123,7 +124,7 @@ export function StudySessionPage() {
    */
   const planSelection: PlanSelection | null = useMemo(() => {
     if (!goalId || !planDate || !deckId) return null
-    if (!plan || plan.goal_id !== goalId || plan.plan_date !== planDate) return null
+    if (!planMatches) return null
     const cardIds: string[] = []
     const items: Record<string, PlanSelection['items'][string]> = {}
     for (const item of [...planItems].sort((a, b) => a.position - b.position)) {
@@ -138,7 +139,7 @@ export function StudySessionPage() {
       }
     }
     return cardIds.length > 0 ? { goalId, cardIds, items } : null
-  }, [goalId, planDate, deckId, plan, planItems, planCards])
+  }, [goalId, planDate, deckId, planMatches, planItems, planCards])
 
   /** Where "exit" and "back" go. A plan session came from the plan, not from the deck. */
   const exitPath = goalId ? `/learning/${goalId}` : `/decks/${deckId}`
@@ -206,7 +207,6 @@ export function StudySessionPage() {
       if (remaining != null && remaining <= 0) {
         // Time's up - use dedicated store action to gracefully end
         useStudyStore.getState().crammingTimeUp()
-        clearInterval(interval)
       }
     }, 1000)
 
@@ -344,8 +344,31 @@ export function StudySessionPage() {
     onHelp: handleToggleShortcuts,
   })
 
+  const waitingForPlan = !!(goalId && planDate && !planSelection)
+  if (waitingForPlan && !planLoading) {
+    if (planMatches || planAbsentFor === `${goalId}|${planDate}`) {
+      return <NoCardsDue
+        mode="srs"
+        backLabel={t('summary.backToPlan')}
+        otherModeLabel={null}
+        onBackToDeck={() => { reset(); navigate(exitPath) }}
+        onOtherMode={() => navigate(exitPath)}
+      />
+    }
+    if (planErrorFrom === 'read') {
+      return (
+        <div className="min-h-screen bg-background grid place-content-center gap-4 p-4 text-center">
+          <p role="alert" className="text-sm text-content-secondary">{t('learning:today.error.readFailed')}</p>
+          <button type="button" onClick={() => navigate(exitPath)} className="text-sm text-brand">
+            {t('summary.backToPlan')}
+          </button>
+        </div>
+      )
+    }
+  }
+
   // Loading state — card-shaped skeleton so the first card swaps in seamlessly
-  if (phase === 'loading') {
+  if (phase === 'loading' || waitingForPlan) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="w-full max-w-2xl" aria-busy="true" aria-live="polite">

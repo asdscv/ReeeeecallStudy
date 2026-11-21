@@ -197,6 +197,7 @@ export interface CodeBreakState {
   repeats: boolean
   maxGuesses: number
   guesses: CodeBreakGuess[]
+  timedOut: boolean
   entry: number[]
   crossed: number[]
   /** How many codes the trial could have been. */
@@ -215,7 +216,7 @@ function solved(s: CodeBreakState): boolean {
 }
 
 function over(s: CodeBreakState): boolean {
-  return solved(s) || s.guesses.length >= s.maxGuesses
+  return s.timedOut || solved(s) || s.guesses.length >= s.maxGuesses
 }
 
 /** Guesses the demo player weighs per turn, and the possible codes it weighs them against. */
@@ -297,6 +298,7 @@ export const codeBreak: BrainGameDef<CodeBreakState> = {
       repeats: b.repeats,
       maxGuesses: b.maxGuesses,
       guesses: [],
+      timedOut: false,
       entry: [],
       crossed: [],
       space: codeSpace(b),
@@ -332,11 +334,11 @@ export const codeBreak: BrainGameDef<CodeBreakState> = {
     }
     return s
   },
-  timeout: (s) => s,
+  timeout: (s) => over(s) ? s : { ...s, timedOut: true, plan: [] },
   outcome(s) {
     if (!over(s)) return null
     if (solved(s)) return { correct: true, accuracy: 1, guesses: s.guesses.length }
-    // Out of guesses: how close the answers came (codeBreakNarrowed) softens the drop.
+    // Narrowing the possible codes softens the drop when guesses or time run out.
     return { correct: false, accuracy: codeBreakNarrowed(s), guesses: s.guesses.length }
   },
   timeLimitMs: () => null,

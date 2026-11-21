@@ -86,6 +86,17 @@ it('an extreme cannot silently enable a blocked rule', () => {
   }
 })
 
+it('finishes a timed Code Break trial and locks its keypad on expiration', () => {
+  const { def } = brainGame('codeBreak')
+  const state = def.create(def.maxLevel!(DEFAULT_CONTEXT), createRng(19), DEFAULT_CONTEXT)
+  expect(def.timeLimitMs(state)).toBeGreaterThan(0)
+  const expired = def.timeout(state)
+  expect(def.outcome(expired)).toMatchObject({ correct: false, guesses: 0 })
+  expect(def.view(expired)).toMatchObject({ kind: 'codeBreak', locked: true, solved: false })
+  expect(def.acceptsInput(expired)).toBe(false)
+  expect(def.timeout(expired)).toBe(expired)
+})
+
 it('the gentle span steps really show one, two, three, then four items without a gap', () => {
   const ctx = { ...DEFAULT_CONTEXT, maxCols: 5, maxRows: 7 }
   for (const id of ['memoryGrid', 'sequence'] as const) {
