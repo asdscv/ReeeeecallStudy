@@ -1,9 +1,9 @@
 ---
-status: in_review
+status: implemented
 author: 118505801+asdscv@users.noreply.github.com
 created: 2026-11-21
 updated: 2026-11-21
-related_prs: []
+related_prs: ['#672']
 ---
 
 # 플래시카드·시험·게임 로직 감사
@@ -29,3 +29,5 @@ related_prs: []
 ## 적용 순서
 
 운영 웹 배포 전 Supabase에 마이그레이션 291을 적용한다. 기존 호출 시그니처를 유지한다. 롤백은 같은 함수의 평가값 검증을 복구하며 저장된 기록을 보존한다.
+
+2026-11-21 운영 DB에서 291 적용과 스모크 검증을 완료했다. 테스트 트랜잭션은 롤백했다.
