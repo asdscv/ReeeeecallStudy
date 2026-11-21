@@ -102,6 +102,21 @@ describe('level ceilings', () => {
 })
 
 describe('active time', () => {
+  it('counts a tap at its deadline as a timeout even before the timer callback executes', () => {
+    seed((p) => ({ ...p, games: { ...p.games, math: { level: 6, bestLevel: 6, rounds: 25, wins: 20 } } }))
+    const { result } = renderHook(() => useBrainRound('math', PLATFORM))
+    if (result.current.intro) act(() => result.current.ackIntro())
+    const timer = result.current.timer!
+    const answer = result.current.solution![0]
+    expect(timer).not.toBeNull()
+
+    // Moving the wall clock without running queued timers models a late browser callback.
+    vi.setSystemTime(timer.startedAt + timer.limitMs)
+    act(() => result.current.tap(answer))
+
+    expect(result.current.result).toMatchObject({ correct: false, timedOut: true, points: 0 })
+  })
+
   it('reports time played, not time paused', () => {
     seed()
     const { result } = renderHook(() => useBrainRound('stroop', PLATFORM))

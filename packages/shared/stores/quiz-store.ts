@@ -362,6 +362,7 @@ const newClientRef = newPersistenceId
 interface QuizState {
   sets: QuizSetRow[]
   run: QuizRun | null
+  failedRunId: string | null
   loading: boolean
   generating: boolean
   grading: boolean
@@ -437,7 +438,7 @@ interface QuizState {
    * run has to be able to grow. Idempotent — safe to call on every load and every advance.
    */
   refreshRun: (runId: string) => Promise<void>
-  loadRun: (runId: string) => Promise<void>
+  loadRun: (runId: string, options?: { ifCurrent?: boolean }) => Promise<void>
   submit: (itemId: string, response: Record<string, unknown>, durationMs?: number) => Promise<QuizSubmitResult>
   gradeWithAi: (itemId: string, answer: string, maxPriceMicro: number) => Promise<void>
   /**
@@ -505,9 +506,13 @@ interface QuizState {
   loadSet: (setId: string) => Promise<QuizSetRow | null>
 }
 
+// An old read can finish after navigation or after a mutation triggered a newer read.
+let activeRunRequest: { runId: string } | null = null
+
 export const useQuizStore = create<QuizState>((set, get) => ({
   sets: [],
   run: null,
+  failedRunId: null,
   loading: false,
   generating: false,
   generateProgress: null,
@@ -825,20 +830,27 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   },
 
   refreshRun: async (runId) => {
-    // Failure here is not worth surfacing: the learner still has the questions they have,
-    // and the next advance tries again.
-    const { data } = await supabase.rpc('append_quiz_run_items', { p_run_id: runId })
-    if ((data as { added?: number } | null)?.added) await get().loadRun(runId)
+    if (activeRunRequest?.runId !== runId) return
+    try {
+      const { data } = await supabase.rpc('append_quiz_run_items', { p_run_id: runId })
+      if ((data as { added?: number } | null)?.added) await get().loadRun(runId, { ifCurrent: true })
+    } catch {
+      // Keep the questions already loaded. The next poll can pick up the rest.
+    }
   },
 
-  loadRun: async (runId) => {
-    set({ loading: true })
+  loadRun: async (runId, { ifCurrent = false } = {}) => {
+    if (ifCurrent && activeRunRequest?.runId !== runId) return
+    const request = { runId }
+    activeRunRequest = request
+    set({ failedRunId: null })
     try {
       const { data, error } = await supabase.rpc('get_quiz_run_items', { p_run_id: runId })
       if (error) throw error
-      set({ run: data as QuizRun })
-    } finally {
-      set({ loading: false })
+      if (activeRunRequest === request) set({ run: data as QuizRun })
+    } catch (error) {
+      if (activeRunRequest === request) set({ failedRunId: runId })
+      throw error
     }
   },
 
@@ -854,6 +866,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   },
 
   gradeWithAi: async (itemId, answer, maxPriceMicro) => {
+    const run = get().run
     set({ grading: true })
     try {
       const { error } = await supabase.functions.invoke('ai-generate', {
@@ -866,8 +879,9 @@ export const useQuizStore = create<QuizState>((set, get) => ({
         },
       })
       if (error) throw new QuizError(await quizErrorCode(error))
-      const run = get().run
-      if (run) await get().loadRun(run.run_id)
+      if (run?.items.some(item => item.item_id === itemId)) {
+        await get().loadRun(run.run_id, { ifCurrent: true })
+      }
     } finally {
       set({ grading: false })
     }
@@ -885,18 +899,18 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   },
 
   override: async (itemId, score) => {
+    const runId = get().run?.run_id
     const { error } = await supabase.rpc('override_quiz_grade', {
       p_run_item_id: itemId, p_score: score,
     })
     if (error) throw error
-    const run = get().run
-    if (run) await get().loadRun(run.run_id)
+    if (runId) await get().loadRun(runId, { ifCurrent: true })
   },
 
   finishRun: async (runId) => {
     const { error } = await supabase.rpc('finish_quiz_run', { p_run_id: runId })
     if (error) throw error
-    await get().loadRun(runId)
+    await get().loadRun(runId, { ifCurrent: true })
   },
 
   loadMistakes: async (deckId, limit) => {

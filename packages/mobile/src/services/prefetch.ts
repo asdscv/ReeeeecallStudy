@@ -141,7 +141,7 @@ export const prefetch = new PrefetchService()
     const supabase = getMobileSupabase()
     const { data } = await supabase
       .from('profiles')
-      .select('theme, tts_enabled, tts_speed, tts_provider, answer_mode, answer_timing, display_name, daily_new_limit, daily_study_goal')
+      .select('theme, tts_enabled, tts_speed, tts_provider, answer_mode, display_name, daily_new_limit, daily_study_goal')
       .eq('id', userId)
       .single()
     if (data) {

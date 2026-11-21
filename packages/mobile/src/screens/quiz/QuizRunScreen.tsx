@@ -21,6 +21,7 @@ import { itemOutcome, tallyQuiz, tallyLine } from '@reklue/shared/lib/quiz-outco
 import { QuizFeedback } from './QuizFeedback'
 import type { QuizStackParamList } from '../../navigation/types'
 import { gradeCostLine } from '@reklue/shared/lib/quiz-pricing'
+import { useQuizAction } from '@reklue/shared/hooks/useQuizAction'
 
 type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizRun'>
 type Rt = RouteProp<QuizStackParamList, 'QuizRun'>
@@ -45,14 +46,20 @@ const QUIZ_SPECIFIC_ERRORS = new Set([
 ])
 
 export function QuizRunScreen() {
+  const { runId } = useRoute<Rt>().params
+  return <QuizRun key={runId} runId={runId} />
+}
+
+function QuizRun({ runId }: { runId: string }) {
   const theme = useTheme()
   const { t } = useTranslation('quiz')
   const navigation = useNavigation<Nav>()
-  const { runId } = useRoute<Rt>().params
   const {
-    run, loading, loadRun, refreshRun, submit, gradeWithAi, quote, grading, finishRun,
+    run: loadedRun, failedRunId, loadRun, refreshRun, submit, gradeWithAi, quote, grading, finishRun,
     rateItem, itemRatings,
   } = useQuizStore()
+  const run = loadedRun?.run_id === runId ? loadedRun : null
+  const { pending, perform } = useQuizAction()
 
   const [index, setIndex] = useState(0)
   const [choice, setChoice] = useState<number | null>(null)
@@ -70,7 +77,7 @@ export function QuizRunScreen() {
   const drafts = useRef<Record<string, string>>({})
   const startedAt = useRef(Date.now())
 
-  useEffect(() => { void loadRun(runId) }, [runId, loadRun])
+  useEffect(() => { void loadRun(runId).catch(() => {}) }, [runId, loadRun])
 
   /**
    * A long quiz is still being written while its first questions are answered.
@@ -145,8 +152,8 @@ export function QuizRunScreen() {
     startedAt.current = Date.now()
   }
 
-  const submitAnswer = async () => {
-    if (!item) return
+  const submitAnswer = () => perform(async () => {
+    if (!item || item.answered || result !== null) return
     setError(null)
     try {
       const payload = item.question_type === 'mcq' ? { choice } : { text: text.trim() }
@@ -158,16 +165,16 @@ export function QuizRunScreen() {
       if (item.question_type !== 'mcq' && submitted && submitted.graded !== true && shownPrice !== null) {
         await gradeWithAi(item.item_id, text.trim(), shownPrice)
       }
-      await loadRun(runId)
     } catch (e) {
       setError(e instanceof QuizError ? e.code : 'UNKNOWN')
+    } finally {
       // 채점이 거절돼도 답안은 서버에 있습니다. 다시 읽지 않으면 화면만 답하지 않은 상태로 남아
       // 같은 답을 또 제출하게 됩니다.
-      await loadRun(runId)
+      await loadRun(runId, { ifCurrent: true }).catch(() => setError(current => current ?? 'UNKNOWN'))
     }
-  }
+  })
 
-  const requestGrade = async () => {
+  const requestGrade = () => perform(async () => {
     if (!item || shownPrice === null) return
     setError(null)
     try {
@@ -175,14 +182,18 @@ export function QuizRunScreen() {
     } catch (e) {
       setError(e instanceof QuizError ? e.code : 'UNKNOWN')
     }
-  }
+  })
 
-  const finish = async () => {
-    await finishRun(runId)
-    navigation.replace('QuizResult', { runId })
-  }
+  const finish = () => perform(async () => {
+    setError(null)
+    try {
+      await finishRun(runId)
+    } catch {
+      setError('UNKNOWN')
+    }
+  })
 
-  if (loading && !run) {
+  if (!run && failedRunId !== runId) {
     return <Screen><Text style={[theme.typography.body, styles.center, { color: theme.colors.textSecondary }]}>{t('run.loading')}</Text></Screen>
   }
   if (!run || items.length === 0) {
@@ -190,7 +201,7 @@ export function QuizRunScreen() {
     return (
       <Screen>
         <EmptyState
-          title={t('run.empty')}
+          title={t(run ? 'run.empty' : 'error.UNKNOWN')}
           actionTitle={t('run.backToQuiz')}
           onAction={() => navigation.navigate('QuizHome')}
         />
@@ -261,7 +272,7 @@ export function QuizRunScreen() {
             return (
               <View key={optionIndex}>
               <Pressable
-                disabled={answered}
+                disabled={answered || pending}
                 onPress={() => setChoice(optionIndex)}
                 style={[styles.option, {
                   borderColor: isCorrect ? theme.colors.primary : isPicked ? theme.colors.primary : theme.colors.border,
@@ -322,7 +333,7 @@ export function QuizRunScreen() {
             <TextInput
               value={writtenAnswer}
               onChangeText={setText}
-              editable={!answered}
+            editable={!answered && !pending}
               multiline
               placeholder={t(`run.placeholder.${item.question_type}`)}
               placeholderTextColor={theme.colors.textSecondary}
@@ -499,9 +510,9 @@ export function QuizRunScreen() {
               onPress={() => void submitAnswer()}
               // 제출이 곧 채점이므로 채점될 수 없는 길이는 제출도 막습니다. 예전에는 열 글자
               // 서술형도 제출됐다가 채점에서 거절됐고, 화면은 그걸 우리 잘못처럼 말했습니다.
-              disabled={item.question_type === 'mcq'
+              disabled={pending || (item.question_type === 'mcq'
                 ? choice === null
-                : text.trim() === '' || length.state === 'too_short' || length.state === 'too_long'}
+                : text.trim() === '' || length.state === 'too_short' || length.state === 'too_long')}
               {...testProps('quiz-submit')}
             />
           ) : (
@@ -514,7 +525,7 @@ export function QuizRunScreen() {
                 <Button
                   title={grading ? t('run.grading') : t('run.grade')}
                   onPress={() => void requestGrade()}
-                  disabled={grading || shownPrice === null}
+                  disabled={pending || grading || shownPrice === null}
                   {...testProps('quiz-grade')}
                 />
               )}
@@ -522,6 +533,7 @@ export function QuizRunScreen() {
                 title={isLast ? t('run.finish') : t('run.next')}
                 variant={item.question_type !== 'mcq' && item.score === null ? 'secondary' : 'primary'}
                 onPress={() => (isLast ? void finish() : goTo(index + 1))}
+                disabled={pending}
                 {...testProps(isLast ? 'quiz-finish' : 'quiz-next')}
               />
               {/* What grading costs, or that it is covered. Beside the buttons rather than on

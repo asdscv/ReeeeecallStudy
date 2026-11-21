@@ -72,6 +72,10 @@ direct study writes out from under the still-live pre-cutover build (hence the 1
 Verified on prod: cutover RPCs reachable by `authenticated`, `insert_study_log` → PGRST202, direct
 `study_logs`/`user_card_progress` writes → 42501, `cards` content columns still writable.
 
+## Prod migration 291 (2026-11-21)
+
+운영 이력 290과 기존 평점 검증식을 먼저 확인했다. 드라이런을 롤백한 뒤 마이그레이션 291과 이력 기록을 한 트랜잭션으로 적용했다. 순차·랜덤·날짜별 학습에서 `known`, `unknown`, `next`가 각각 기록되고 완료 집계에 포함되는 것을 운영 DB에서 확인했다. 검증 트랜잭션은 롤백했다. 내부 RPC의 실행 권한 제한과 SRS 리비전 검증도 유지됐다. [학습 세션 감사 PR #672](https://github.com/asdscv/Reklue/pull/672)
+
 ## Note on git drift
 Prod DB has migs 148–154 applied; the migration **files** live on the `feat/mobile-iap-integration`
 branch (committed) and reconcile to `main` when that branch merges. Web ops changes (Pack A UI,

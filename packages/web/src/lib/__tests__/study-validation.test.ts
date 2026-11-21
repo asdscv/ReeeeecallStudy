@@ -79,6 +79,8 @@ describe('study-validation', () => {
     expect(normalizeRatingForMode('cramming', 'unknown')).toBe('missed')
     expect(normalizeRatingForMode('cramming', 'anything')).toBeNull()
     expect(normalizeRatingForMode('sequential', 'next')).toBe('next')
+    expect(normalizeRatingForMode('by_date', 'viewed')).toBe('next')
+    expect(normalizeRatingForMode('sequential_review', 'next')).toBeNull()
     expect(normalizeRatingForMode('random', 'again')).toBeNull()
   })
 

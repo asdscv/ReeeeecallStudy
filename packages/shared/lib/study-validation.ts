@@ -13,7 +13,6 @@ export const STUDY_MODES = [
 ] as const satisfies readonly StudyMode[]
 
 const SRS_RATINGS = new Set(['again', 'hard', 'good', 'easy'])
-const SIMPLE_RATINGS = new Set(['known', 'unknown', 'next', 'viewed'])
 
 export type NormalizedStudyRating =
   | 'again'
@@ -25,7 +24,6 @@ export type NormalizedStudyRating =
   | 'known'
   | 'unknown'
   | 'next'
-  | 'viewed'
 
 export interface StudyConfigInput {
   deckId: unknown
@@ -302,5 +300,7 @@ export function normalizeRatingForMode(
     return rating === 'got_it' || rating === 'missed' ? rating : null
   }
 
-  return SIMPLE_RATINGS.has(rating) ? rating as NormalizedStudyRating : null
+  if (rating === 'known' || rating === 'unknown') return rating
+  if (mode !== 'sequential_review' && (rating === 'next' || rating === 'viewed')) return 'next'
+  return null
 }

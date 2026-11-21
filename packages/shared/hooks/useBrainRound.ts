@@ -235,7 +235,7 @@ interface State {
 type Action =
   | { type: 'advance'; now: number }
   | { type: 'tap'; index: number; now: number }
-  | { type: 'timeout'; now: number }
+  | { type: 'timeout'; trialId: number; now: number }
   | { type: 'inputStarted'; now: number }
   | { type: 'next'; level: number; seed: number; now: number }
   | { type: 'end'; reason: 'lives' | 'cap' | 'stop' | 'void' | 'time'; now: number }
@@ -625,14 +625,16 @@ function reducer(state: State, action: Action): State {
     case 'advance':
       return state.result || state.over ? state : judge(state, def.advance(state.round), action.now, state.timedOut)
     case 'tap':
-      if (state.result || state.over || state.paused || !def.acceptsInput(state.round)) return state
-      return judge(state, def.tap(state.round, action.index), action.now, false)
     case 'timeout': {
       if (state.result || state.over || state.paused) return state
-      // A timer is a request, not a verdict: only a deadline that has really passed counts.
+      if (action.type === 'timeout' && action.trialId !== state.trialId) return state
+      if (action.type === 'tap' && !def.acceptsInput(state.round)) return state
+      // Input and timer callbacks can reach the reducer in either order at the deadline.
       const limit = trialLimit(state)
-      if (limit !== null && state.inputStartedAt !== null && action.now < state.inputStartedAt + limit - 50) return state
-      return judge(state, def.timeout(state.round), action.now, true)
+      if (limit !== null && state.inputStartedAt !== null && action.now >= state.inputStartedAt + limit) {
+        return judge(state, def.timeout(state.round), action.now, true)
+      }
+      return action.type === 'tap' ? judge(state, def.tap(state.round, action.index), action.now, false) : state
     }
     case 'inputStarted':
       return state.inputStartedAt === null ? { ...state, inputStartedAt: action.now } : state
@@ -1103,11 +1105,18 @@ export function useBrainRound(gameId: BrainGameId, platform: PlatformContext, op
 
   useEffect(() => {
     if (state.inputStartedAt === null || busy || limit === null || state.paused) return
-    const left = state.inputStartedAt + limit - Date.now()
-    const t = setTimeout(() => dispatch({ type: 'timeout', now: Date.now() }), Math.max(0, left))
-    return () => clearTimeout(t)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.trialId, state.inputStartedAt, busy, state.paused])
+    const deadline = state.inputStartedAt + limit
+    let timer: ReturnType<typeof setTimeout>
+    const schedule = () => {
+      timer = setTimeout(() => {
+        const now = Date.now()
+        if (now < deadline) schedule()
+        else dispatch({ type: 'timeout', trialId: state.trialId, now })
+      }, Math.max(0, Math.ceil(deadline - Date.now())))
+    }
+    schedule()
+    return () => clearTimeout(timer)
+  }, [state.trialId, state.inputStartedAt, busy, state.paused, limit])
 
   // A rule met is remembered at once — a player who quits right after its card is not shown it again.
   const seenCount = state.seenAdded.length
