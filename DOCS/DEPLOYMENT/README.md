@@ -83,6 +83,12 @@ curl -s -A "Googlebot/2.1" https://reklue.com/insight | grep -o 'hreflang="[a-z-
 ```
 > 로컬 sandbox에서 `curl`이 `000`이면 도메인 오타(`.study`가 아니라 **`.xyz`**)거나 egress 차단. python `urllib`로도 확인 가능.
 
+### 웹 구글 로그인
+
+- Reklue Google Cloud 프로젝트(`reeeeecallstudy`)의 **Reklue Web** 클라이언트는 `https://reklue.com`에서 공식 Google 버튼을 표시한다. 호스트가 추가되면 Google Auth Platform의 **Authorized JavaScript origins**에도 등록한다.
+- 운영 웹 클라이언트의 공개 ID는 `packages/web/.env.production`의 `VITE_GOOGLE_CLIENT_ID`에 있다. 별도 개발 환경에서는 해당 origin을 승인받은 개발용 클라이언트 ID를 `packages/web/.env.local`에 설정한다. 값이 비어 있으면 기존 Google 리디렉션을 사용한다.
+- Supabase의 Google 클라이언트 ID 목록은 네이티브 앱이 사용하는 리디렉션 클라이언트를 첫 번째로 두고, **Reklue Web** ID를 다음에 둔다. 웹 팝업은 ID 토큰을 교환하며 nonce 검증을 사용한다.
+
 ---
 
 ## 2. 모바일 OTA (EAS Update)

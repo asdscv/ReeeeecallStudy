@@ -66,7 +66,6 @@ interface ProfileData {
   tts_speed: number
   tts_provider: 'web_speech' | 'edge_tts'
   answer_mode: 'button' | 'swipe'
-  answer_timing: 'before' | 'same' | 'after'
 }
 
 type Nav = NativeStackNavigationProp<SettingsStackParamList, 'SettingsHome'>
@@ -127,7 +126,6 @@ export function SettingsScreen() {
     tts_speed: 0.9,
     tts_provider: 'web_speech',
     answer_mode: 'button',
-    answer_timing: 'after',
   })
   const [language, setLanguage] = useState(i18n.language || 'en')
   const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'system'>('system')
@@ -174,7 +172,6 @@ export function SettingsScreen() {
             tts_speed: (p.tts_speed as number) ?? 0.9,
             tts_provider: (p.tts_provider as ProfileData['tts_provider']) ?? 'web_speech',
             answer_mode: (p.answer_mode as ProfileData['answer_mode']) ?? 'button',
-            answer_timing: (p.answer_timing as ProfileData['answer_timing']) ?? 'after',
           })
           setSavedDisplayName((p.display_name as string) ?? '')
           const lang = p.language as string | undefined
@@ -529,33 +526,6 @@ export function SettingsScreen() {
               )
             })}
           </View>
-          <View style={styles.segmentRow}>
-            {(['before', 'same', 'after'] as const).map((timing) => {
-              const isActive = profile.answer_timing === timing
-              const labels = { before: t('answerMode.before'), same: t('answerMode.same'), after: t('answerMode.after') }
-              return (
-                <TouchableOpacity
-                  key={timing}
-                  testID={`settings-timing-${timing}`}
-                  onPress={() => saveProfile({ answer_timing: timing })}
-                  style={[
-                    styles.segmentButton,
-                    {
-                      backgroundColor: isActive ? palette.blue[500] : theme.colors.surface,
-                      borderColor: isActive ? palette.blue[500] : theme.colors.border,
-                    },
-                  ]}
-                >
-                  <Text style={[styles.segmentLabel, { color: isActive ? '#FFFFFF' : theme.colors.text }]}>
-                    {labels[timing]}
-                  </Text>
-                </TouchableOpacity>
-              )
-            })}
-          </View>
-          <Text style={[theme.typography.caption, { color: theme.colors.textTertiary }]}>
-            {t('answerMode.timingDesc')}
-          </Text>
         </CollapsibleSection>
 
         {/* ── New Card Limit — standalone card ── */}

@@ -55,6 +55,7 @@ export default defineConfig({
   webServer: {
     command: 'npm run dev',
     url: BASE_URL,
+    env: { VITE_GOOGLE_CLIENT_ID: process.env.VITE_GOOGLE_CLIENT_ID ?? 'reklue-test.apps.googleusercontent.com' },
     reuseExistingServer: !process.env.CI,
     timeout: 30_000,
   },

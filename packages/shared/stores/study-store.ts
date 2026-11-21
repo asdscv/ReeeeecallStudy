@@ -8,7 +8,7 @@ import { CrammingQueueManager, filterCardsForCramming, type CrammingFilter, type
 import { getRatingExitDirection, type ExitDirection } from '../lib/study-exit-direction'
 import { guard } from '../lib/rate-limit-instance'
 import { getSrsSource, mergeCardWithProgress, type SrsSource, type UserCardProgress } from '../lib/srs-access'
-import { fetchAllRows } from '../lib/fetch-all-rows'
+import { fetchAllRows, fetchRowsByIds } from '../lib/fetch-all-rows'
 import { newPersistenceId } from '../lib/persistence-id'
 import { normalizeRatingForMode, normalizeStudyConfig } from '../lib/study-validation'
 import { useCardStore } from './card-store'
@@ -186,6 +186,10 @@ const initialStats: SessionStats = {
   totalDurationMs: 0,
 }
 
+// Shared by the serialized writes for one session, including writes queued before an ack.
+// A rejected write invalidates the optimistic state for that card until an undo or a fresh session.
+let confirmedSrsRevisions = new Map<string, number | null>()
+
 export const useStudyStore = create<StudyState>((set, get) => ({
   phase: 'idle',
   config: null,
@@ -215,9 +219,6 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   sessionFinalized: false,
 
   initSession: async (config: StudyConfig) => {
-    // Prevent double-init (React StrictMode / effect re-runs)
-    if (get().phase === 'loading') return
-
     try {
       config = normalizeStudyConfig(config)
     } catch (err) {
@@ -254,15 +255,28 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       return
     }
 
+    // StrictMode can repeat a load; navigation can request a different session mid-load.
+    if (get().phase === 'loading' && JSON.stringify(get().config) === JSON.stringify(config)) return
     const check = guard.check('study_session_start', 'study_sessions_daily')
-    if (!check.allowed) { set({ phase: 'idle' }); return }
+    if (!check.allowed) { get().reset(); return }
 
+    const clientSessionId = newPersistenceId()
+    const isCurrent = () => get().clientSessionId === clientSessionId
+    confirmedSrsRevisions = new Map()
     set({
       phase: 'loading',
       config,
       subscriptionLocked: false,
+      queue: [],
+      currentIndex: 0,
+      isFlipped: false,
+      isRating: false,
+      exitDirection: null,
+      lastRatedCard: null,
+      sessionStats: { ...initialStats },
+      sessionSaved: false,
       // One idempotency key per session: rating events and finalize share it.
-      clientSessionId: newPersistenceId(),
+      clientSessionId,
       persistenceError: null,
       persistenceChain: Promise.resolve(),
       undoState: 'idle',
@@ -272,6 +286,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     try {
 
     const { data: { user } } = await supabase.auth.getUser()
+    if (!isCurrent()) return
     if (!user) { set({ phase: 'idle' }); return }
     set({ userId: user.id })
 
@@ -304,6 +319,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         const { data, error } = await supabase.rpc('is_subscribed_deck_active', { p_deck_id: config.deckId })
         if (!error && data != null) active = data as boolean
       }
+      if (!isCurrent()) return
       if (active !== true) {
         set({ phase: 'completed', subscriptionLocked: true, srsSource, queue: [], srsQueueManager: null, crammingManager: null, sessionStats: { ...initialStats, totalCards: 0 } })
         return
@@ -328,6 +344,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       .eq('user_id', user.id)
       .single()
 
+    if (!isCurrent()) return
     if (!studyState) {
       const { data: created } = await supabase
         .from('deck_study_state')
@@ -372,7 +389,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     // for reuse across every owned-deck queue query below.
     let activeThreshold: string | null = null
     if (srsSource === 'embedded') {
-      const { data: thresholdData } = await supabase.rpc('get_active_card_threshold')
+      const { data: thresholdData, error } = await supabase.rpc('get_active_card_threshold')
+      if (error) throw error
       activeThreshold = (thresholdData as string | null) ?? null
     }
 
@@ -393,6 +411,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         fetchAllRows<UserCardProgress>(() =>
           supabase.from('user_card_progress').select('*').eq('deck_id', config.deckId).eq('user_id', user.id)),
       ])
+      if (!isCurrent()) return
       let progressMap = new Map<string, UserCardProgress>()
       for (const p of progressRows) progressMap.set(p.card_id, p)
 
@@ -425,81 +444,22 @@ export const useStudyStore = create<StudyState>((set, get) => ({
 
     switch (config.mode) {
       case 'srs': {
-        // ── The day's plan for this deck ──────────────────────────────────────
-        // The planner has already decided WHICH cards and HOW MANY, including its own
-        // new-card intake cap, so none of the due/limit logic below applies: re-deriving
-        // the queue here would silently drop rows the plan promised. Order is the
-        // planner's ranking, not next_review_at.
-        if (config.planSelection) {
-          const wanted = config.planSelection.cardIds
-          const rank = new Map(wanted.map((id, index) => [id, index]))
-          let planCards: Card[]
-          if (mergedAll) {
-            planCards = mergedAll.filter((card) => rank.has(card.id))
-          } else {
-            planCards = []
-            for (let i = 0; i < wanted.length; i += PLAN_CARD_FETCH_CHUNK) {
-              const { data } = await supabase
-                .from('cards')
-                .select('*')
-                .eq('deck_id', config.deckId)
-                .in('id', wanted.slice(i, i + PLAN_CARD_FETCH_CHUNK) as string[])
-              planCards.push(...((data ?? []) as Card[]))
-            }
-          }
-          // A card the plan names but this deck no longer has (deleted since the plan was
-          // built) simply does not appear. Its plan item stays pending, which is the honest
-          // record — better than a queue entry that cannot be rendered.
-          cards = planCards.sort((a, b) => (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0))
-
+        const wanted = config.planSelection?.cardIds ?? config.cardSelection
+        if (wanted) {
+          // Plans and weak-card reviews set their own order and can include future due dates.
+          // A card can have been archived, suspended or deleted since the selection was made.
+          const picked = mergedAll ?? await fetchRowsByIds<Card>(wanted, (ids) => withArchiveBoundary(
+            supabase.from('cards').select('*').eq('deck_id', config.deckId)
+              .neq('srs_status', 'suspended').in('id', ids),
+            activeThreshold,
+          ), PLAN_CARD_FETCH_CHUNK)
+          const eligible = new Map(picked.filter(card => card.srs_status !== 'suspended').map(card => [card.id, card]))
+          cards = wanted.flatMap(id => {
+            const card = eligible.get(id)
+            return card ? [card] : []
+          })
           if (cards.length > 0) {
-            const queueCards: QueueCard[] = cards.map(c => ({
-              id: c.id,
-              srs_status: c.srs_status,
-              ease_factor: c.ease_factor,
-              interval_days: c.interval_days,
-              repetitions: c.repetitions,
-            }))
-            srsQueueManager = new SrsQueueManager(queueCards, srsSettings ?? undefined)
-          }
-          break
-        }
-
-        // ── An explicit list of cards ─────────────────────────────────────────
-        // The diagnostics panel names cards the learner keeps failing. They are usually NOT
-        // due, so every due-date rule below would drop them — which is why this branch exists
-        // rather than a filter on the ordinary queue. Same fetch shape as the plan branch;
-        // the difference is downstream, where no plan item is completed.
-        if (config.cardSelection) {
-          const wanted = config.cardSelection
-          const rank = new Map(wanted.map((id, index) => [id, index]))
-          let picked: Card[]
-          if (mergedAll) {
-            picked = mergedAll.filter((card) => rank.has(card.id))
-          } else {
-            picked = []
-            for (let i = 0; i < wanted.length; i += PLAN_CARD_FETCH_CHUNK) {
-              const { data } = await supabase
-                .from('cards')
-                .select('*')
-                .eq('deck_id', config.deckId)
-                .in('id', wanted.slice(i, i + PLAN_CARD_FETCH_CHUNK))
-              picked.push(...((data ?? []) as Card[]))
-            }
-          }
-          // A card deleted since the diagnostics were computed simply does not appear, the
-          // same way a plan names cards the deck may no longer have.
-          cards = picked.sort((a, b) => (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0))
-
-          if (cards.length > 0) {
-            const queueCards: QueueCard[] = cards.map(c => ({
-              id: c.id,
-              srs_status: c.srs_status,
-              ease_factor: c.ease_factor,
-              interval_days: c.interval_days,
-              repetitions: c.repetitions,
-            }))
-            srsQueueManager = new SrsQueueManager(queueCards, srsSettings ?? undefined)
+            srsQueueManager = new SrsQueueManager(cards, srsSettings ?? undefined, Date.now, { preserveOrder: true })
           }
           break
         }
@@ -716,6 +676,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       }
     }
 
+    if (!isCurrent()) return
     if (cards.length === 0) {
       set({
         phase: 'completed',
@@ -745,6 +706,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       )
     }
 
+    srsQueueManager?.presentCurrentCard()
     guard.recordSuccess('study_sessions_daily')
     set({
       phase: 'studying',
@@ -766,7 +728,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
 
     } catch (err) {
       console.error('[study-store] initSession failed:', err)
-      set({ phase: 'completed', queue: [], sessionStats: { ...initialStats, totalCards: 0 } })
+      if (isCurrent()) set({ phase: 'completed', queue: [], sessionStats: { ...initialStats, totalCards: 0 } })
     }
   },
 
@@ -783,6 +745,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     // pre-undo SRS revision and rejected (PT409), or worse, ordered after the undo and
     // silently undone with it. Wait for the undo to settle.
     if (undoState === 'pending') return
+    const revisions = confirmedSrsRevisions
 
     const normalizedRating = normalizeRatingForMode(config.mode, rating)
     if (!normalizedRating) return
@@ -915,6 +878,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     // ★ Optimistic UI update — set state BEFORE DB writes ★
     // Brief delay so :active press effect is visible before buttons unmount
     await new Promise(r => setTimeout(r, 120))
+    if (get().clientSessionId !== clientSessionId) return
 
     if (isComplete) {
       set({
@@ -952,7 +916,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         },
       })
     } else if (isSrsMode) {
-      const nextQueueCard = srsQueueManager!.currentCard()
+      const nextQueueCard = srsQueueManager!.presentCurrentCard()
       const nextCardIndex = nextQueueCard
         ? updatedQueue.findIndex(c => c.id === nextQueueCard.id)
         : currentIndex + 1
@@ -995,7 +959,6 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     // allowed partial success, duplicate logs, and stale overwrites.
     const isSrsPersist = modeFeedsSrsSchedule(config.mode) && srsResult !== null
     const persistSource = isSrsPersist ? srsSource : 'none'
-    const expectedRevision = isSrsPersist ? (card.srs_revision ?? 0) : null
     const newSrsPayload = isSrsPersist && srsResult
       ? {
           srs_status: srsResult.srs_status,
@@ -1024,7 +987,16 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     // calls cannot be made safe from a client: whichever half fails second leaves the plan and
     // the schedule disagreeing. A card the plan does not name (an SRS requeue can only replay
     // cards already in the queue, so this is defensive) falls back to the plain rating.
+    const recordRatingError = (message: string, code: string | null) => {
+      if (isSrsPersist) revisions.set(card.id, null)
+      if (get().clientSessionId === persistSessionId) {
+        set({ persistenceError: { scope: 'rating', code, message } })
+      }
+    }
     const applyRating = async () => {
+      const confirmedRevision = revisions.get(card.id)
+      if (isSrsPersist && confirmedRevision === null) return
+      const expectedRevision = isSrsPersist ? (confirmedRevision ?? card.srs_revision ?? 0) : null
       const { data, error } = planItem && config.planSelection && isSrsPersist
         ? await supabase.rpc('apply_plan_study_rating', {
           p_event_id: ratingEventId,
@@ -1072,13 +1044,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           `[study-store] ${planItem ? 'apply_plan_study_rating' : 'apply_study_rating'} failed:`,
           error.message, error.code,
         )
-        set({
-          persistenceError: {
-            scope: 'rating',
-            code: (error as { code?: string }).code ?? null,
-            message: error.message,
-          },
-        })
+        recordRatingError(error.message, error.code ?? null)
         return
       }
 
@@ -1086,7 +1052,8 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       // rating of this card is not rejected as stale.
       const appliedRevision = (data as { applied_revision?: number | null } | null)?.applied_revision
       if (typeof appliedRevision === 'number') {
-        set({
+        revisions.set(card.id, appliedRevision)
+        if (get().clientSessionId === persistSessionId) set({
           queue: get().queue.map(c => (c.id === card.id ? { ...c, srs_revision: appliedRevision } : c)),
         })
       }
@@ -1096,7 +1063,10 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     set({
       persistenceChain: get().persistenceChain
         .then(applyRating)
-        .catch(err => console.error('[study-store] persistence chain error:', err)),
+        .catch(err => {
+          console.error('[study-store] persistence chain error:', err)
+          recordRatingError(err instanceof Error ? err.message : String(err), null)
+        }),
     })
 
 
@@ -1107,10 +1077,11 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   endSession: async () => {
-    const { config, studyState, sessionStats, sessionStartedAt, maxCardPosition, crammingManager, userId, sessionSaved, clientSessionId, sessionFinalized, phase } = get()
+    const { config, queue, studyState, sessionStats, sessionStartedAt, maxCardPosition, crammingManager, userId, sessionSaved, clientSessionId, sessionFinalized, phase } = get()
     if (!config || !userId) return
     // Prevent duplicate session recording (race between rateCard completion and crammingTimeUp)
     if (sessionSaved) return
+    const isCurrent = () => get().clientSessionId === clientSessionId
     set({ sessionSaved: true })
 
     // SRS for this deck just changed via study (which writes cards/user_card_progress
@@ -1150,10 +1121,10 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       // An undo can settle while this finalize waits its turn in the chain, so the
       // cursor inputs are re-read: the entry-time snapshot would push the cursor past
       // cards the user just took back.
-      const { sessionStats: settledStats, queue: settledQueue } = get()
+      const { sessionStats: settledStats, queue: settledQueue } = isCurrent() ? get() : { sessionStats, queue }
       if (settledStats.cardsStudied === 0) {
         // Everything was undone: there is nothing to record. Same phase rule as below.
-        if (phase === 'studying' || get().phase !== 'studying') set({ phase: 'completed' })
+        if (isCurrent() && (phase === 'studying' || get().phase !== 'studying')) set({ phase: 'completed' })
         return
       }
 
@@ -1212,14 +1183,14 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       if (error) {
         const rpcName = sessionFinalized ? 'refresh_study_session' : 'finalize_study_session'
         console.error(`[study-store] ${rpcName} failed:`, error.message, error.code)
-        set({
+        if (isCurrent()) set({
           persistenceError: {
             scope: 'session',
             code: (error as { code?: string }).code ?? null,
             message: error.message,
           },
         })
-      } else {
+      } else if (isCurrent()) {
         // Only a confirmed write may switch later completions onto the refresh path:
         // a failed finalize left no row, and finalize is safe to retry.
         set({ sessionFinalized: true })
@@ -1229,7 +1200,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     // An undo from the completion screen can move the user back into the session
     // while this finalize is in flight; forcing 'completed' here would yank them to
     // the summary screen. A direct endSession call (exit / time-up) still completes.
-    if (phase === 'studying' || get().phase !== 'studying') set({ phase: 'completed' })
+    if (isCurrent() && (phase === 'studying' || get().phase !== 'studying')) set({ phase: 'completed' })
   },
 
   exitSession: async () => {
@@ -1271,12 +1242,13 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   undoLastRating: async () => {
-    const { lastRatedCard, phase, isRating, undoState } = get()
+    const { lastRatedCard, phase, isRating, undoState, clientSessionId } = get()
     if (!lastRatedCard || (phase !== 'studying' && phase !== 'completed')) return
     // A rating mid-flight owns the snapshot we would restore, and a second undo
     // would send the same event twice while the first is still deciding.
     if (isRating || undoState === 'pending') return
     const wasCompleted = phase === 'completed'
+    const revisions = confirmedSrsRevisions
 
     set({ undoState: 'pending' })
 
@@ -1312,7 +1284,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
             `[study-store] ${undoAttemptId ? 'undo_plan_study_rating' : 'undo_study_rating'} failed:`,
             error.message, error.code,
           )
-          set({
+          if (get().clientSessionId === clientSessionId) set({
             persistenceError: {
               scope: 'undo',
               code: (error as { code?: string }).code ?? null,
@@ -1326,7 +1298,10 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         // rejected as stale (PT409). An already-undone event returns the same
         // payload, so a retry is a success too.
         const revision = (data as { applied_revision?: number | null } | null)?.applied_revision
-        if (typeof revision === 'number') restoredRevision = revision
+        if (typeof revision === 'number') {
+          restoredRevision = revision
+          revisions.set(lastRatedCard.cardId, revision)
+        }
       }
 
       // Queued behind the apply for this event; otherwise undo can arrive first and
@@ -1340,6 +1315,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       set({ persistenceChain: queued })
       await queued
 
+      if (get().clientSessionId !== clientSessionId) return
       if (!accepted) {
         // Keep the rated state: it is what the server still holds, and lastRatedCard
         // stays so the user can retry the undo.
@@ -1399,6 +1375,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
           p_cursor_after: null,
           p_metadata: null,
         })
+        if (get().clientSessionId !== sessionIdToDiscard) return
         if (error) {
           console.error('[study-store] refresh_study_session failed:', error.message, error.code)
           set({
@@ -1423,10 +1400,11 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       await queued
     }
 
-    set({ undoState: 'idle' })
+    if (get().clientSessionId === clientSessionId) set({ undoState: 'idle' })
   },
 
   reset: () => {
+    confirmedSrsRevisions = new Map()
     set({
       phase: 'idle',
       config: null,

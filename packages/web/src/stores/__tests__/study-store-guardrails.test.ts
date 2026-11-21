@@ -109,3 +109,47 @@ describe('study-store rating guardrails', () => {
     })
   })
 })
+
+it('lets a different deck replace a loading session without accepting stale data', async () => {
+  let releaseFirst!: (response: { data: { user: { id: string } | null } }) => void
+  mockSupabase.auth.getUser.mockReturnValueOnce(new Promise(resolve => { releaseFirst = resolve }))
+  mockSupabase.auth.getUser.mockResolvedValueOnce({ data: { user: { id: 'user-2' } } })
+  const { initSession } = useStudyStore.getState()
+  const waiting = initSession({ deckId: 'first-deck', mode: 'sequential', batchSize: 1 })
+  await initSession({ deckId: 'second-deck', mode: 'sequential', batchSize: 1 })
+  releaseFirst({ data: { user: { id: 'user-1' } } })
+  await waiting
+
+  expect(useStudyStore.getState()).toMatchObject({
+    config: { deckId: 'second-deck' },
+    userId: 'user-2',
+  })
+  expect(mockSupabase.auth.getUser).toHaveBeenCalledTimes(2)
+})
+
+it('finalizes the original session if the learner has already opened another', async () => {
+  let releaseWrite!: () => void
+  setSession({
+    config: { deckId: 'deck-1', mode: 'sequential', batchSize: 1 },
+    clientSessionId: 'first-session',
+    sessionStats: { totalCards: 1, cardsStudied: 1, ratings: { known: 1 }, totalDurationMs: 500 },
+    studyState: { sequential_pos: 0 },
+    maxCardPosition: 8,
+    persistenceChain: new Promise<void>(resolve => { releaseWrite = resolve }),
+  })
+  const finishing = useStudyStore.getState().endSession()
+  setSession({
+    config: { deckId: 'deck-2', mode: 'srs', batchSize: 1 },
+    clientSessionId: 'second-session',
+  })
+  releaseWrite()
+  await finishing
+
+  expect(mockSupabase.rpc).toHaveBeenCalledWith('finalize_study_session', expect.objectContaining({
+    p_client_session_id: 'first-session',
+    p_deck_id: 'deck-1',
+    p_cursor_before: { sequential_pos: 0 },
+    p_cursor_after: { sequential_pos: 1 },
+  }))
+  expect(useStudyStore.getState()).toMatchObject({ phase: 'studying', sessionFinalized: false })
+})

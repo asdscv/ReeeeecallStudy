@@ -16,6 +16,7 @@ export interface SrsDelayedQueueCard {
 export interface SrsQueueSnapshot {
   queue: QueueCard[]
   cursor: number
+  currentPresented: boolean
   studied: number
   delayedQueue: SrsDelayedQueueCard[]
   nextSequence: number
@@ -36,6 +37,7 @@ export interface SrsQueueSnapshot {
 export class SrsQueueManager {
   private queue: QueueCard[]
   private cursor = 0
+  private currentPresented = false
   private studied = 0
   private delayedQueue: SrsDelayedQueueCard[] = []
   private nextSequence = 0
@@ -43,17 +45,23 @@ export class SrsQueueManager {
   private readonly srsSettings?: SrsSettings
   private readonly clock: () => number
 
-  constructor(cards: QueueCard[], srsSettings?: SrsSettings, clock: () => number = Date.now) {
+  constructor(
+    cards: QueueCard[],
+    srsSettings?: SrsSettings,
+    clock: () => number = Date.now,
+    { preserveOrder = false }: { preserveOrder?: boolean } = {},
+  ) {
     this.srsSettings = srsSettings
     this.clock = clock
     this.originalCount = cards.length
 
     // Sort: due learning first, then review, then new. Array#sort is stable, so
     // source ordering remains deterministic inside each status group.
-    this.queue = [...cards].sort((a, b) => {
+    this.queue = [...cards]
+    if (!preserveOrder) {
       const order = { learning: 0, review: 1, new: 2, suspended: 3 }
-      return (order[a.srs_status] ?? 3) - (order[b.srs_status] ?? 3)
-    })
+      this.queue.sort((a, b) => (order[a.srs_status] ?? 3) - (order[b.srs_status] ?? 3))
+    }
   }
 
   /** Get the current immediately eligible card without advancing. */
@@ -61,6 +69,13 @@ export class SrsQueueManager {
     this.promoteDueCards()
     if (this.cursor >= this.queue.length) return null
     return this.queue[this.cursor]
+  }
+
+  /** Once displayed, the card remains current until it is rated. */
+  presentCurrentCard(): QueueCard | null {
+    const card = this.currentCard()
+    this.currentPresented = card !== null
+    return card
   }
 
   /**
@@ -73,6 +88,7 @@ export class SrsQueueManager {
 
     this.studied++
     this.cursor++
+    this.currentPresented = false
 
     if (result?.srs_status !== 'learning') return
 
@@ -127,6 +143,7 @@ export class SrsQueueManager {
     return {
       queue: this.queue.map(card => ({ ...card })),
       cursor: this.cursor,
+      currentPresented: this.currentPresented,
       studied: this.studied,
       delayedQueue: this.delayedQueue.map(entry => ({
         ...entry,
@@ -140,6 +157,7 @@ export class SrsQueueManager {
   restore(snap: SrsQueueSnapshot): void {
     this.queue = snap.queue.map(card => ({ ...card }))
     this.cursor = snap.cursor
+    this.currentPresented = snap.currentPresented
     this.studied = snap.studied
     this.delayedQueue = snap.delayedQueue.map(entry => ({
       ...entry,
@@ -149,7 +167,7 @@ export class SrsQueueManager {
   }
 
   private promoteDueCards(): void {
-    if (this.delayedQueue.length === 0) return
+    if (this.currentPresented || this.delayedQueue.length === 0) return
 
     const now = this.clock()
     let dueCount = 0

@@ -12,6 +12,7 @@ import { QuizFeedback } from './QuizFeedback'
 import { QuizVerdictBadge } from './QuizVerdictBadge'
 import type { QuizStackParamList } from '../../navigation/types'
 import { retakeNoteKey } from '@reklue/shared/lib/quiz-pricing'
+import { useQuizAction } from '@reklue/shared/hooks/useQuizAction'
 
 type Nav = NativeStackNavigationProp<QuizStackParamList, 'QuizResult'>
 type Rt = RouteProp<QuizStackParamList, 'QuizResult'>
@@ -25,30 +26,41 @@ type Rt = RouteProp<QuizStackParamList, 'QuizResult'>
  * judgement.
  */
 export function QuizResultScreen() {
+  const { runId } = useRoute<Rt>().params
+  return <QuizResult key={runId} runId={runId} />
+}
+
+function QuizResult({ runId }: { runId: string }) {
   const theme = useTheme()
   const { t } = useTranslation('quiz')
   const navigation = useNavigation<Nav>()
-  const { runId } = useRoute<Rt>().params
-  const { run, loadRun, override, startRun } = useQuizStore()
-  const [busy, setBusy] = useState<string | null>(null)
+  const { run: loadedRun, failedRunId, loadRun, override, startRun } = useQuizStore()
+  const run = loadedRun?.run_id === runId ? loadedRun : null
+  const { pending, perform } = useQuizAction()
+  const [actionFailed, setActionFailed] = useState(false)
 
-  useEffect(() => { void loadRun(runId) }, [runId, loadRun])
+  useEffect(() => { void loadRun(runId).catch(() => {}) }, [runId, loadRun])
 
-  const retake = async () => {
+  const retake = () => perform(async () => {
     if (!run) return
-    // Always free: the questions are the asset, and a set that charged on every sitting would
-    // never become a habit.
-    const newRunId = await startRun(run.set_id)
-    navigation.replace('QuizRun', { runId: newRunId })
-  }
+    setActionFailed(false)
+    try {
+      const newRunId = await startRun(run.set_id)
+      navigation.replace('QuizRun', { runId: newRunId })
+    } catch {
+      setActionFailed(true)
+    }
+  })
 
-  const flip = async (item: QuizRunItem, score: number) => {
-    setBusy(item.item_id)
-    try { await override(item.item_id, score) } finally { setBusy(null) }
-  }
+  const flip = (item: QuizRunItem, score: number) => perform(async () => {
+    setActionFailed(false)
+    try { await override(item.item_id, score) } catch { setActionFailed(true) }
+  })
 
   if (!run) {
-    return <Screen><Text style={[theme.typography.body, styles.center, { color: theme.colors.textSecondary }]}>{t('run.loading')}</Text></Screen>
+    return <Screen><Text style={[theme.typography.body, styles.center, { color: theme.colors.textSecondary }]}>
+      {t(failedRunId === runId ? 'error.UNKNOWN' : 'run.loading')}
+    </Text></Screen>
   }
 
   // COUNTS, not a percentage.
@@ -145,7 +157,7 @@ export function QuizResultScreen() {
                   {t('result.overrideLabel')}
                 </Text>
                 <Pressable
-                  disabled={busy === item.item_id || item.score === 1}
+                  disabled={pending || item.score === 1}
                   onPress={() => void flip(item, 1)}
                   style={[styles.chip, { borderColor: theme.colors.border, opacity: item.score === 1 ? 0.4 : 1 }]}
                   {...testProps(`quiz-mark-correct-${i}`)}
@@ -153,7 +165,7 @@ export function QuizResultScreen() {
                   <Text style={[theme.typography.caption, { color: theme.colors.text }]}>{t('result.markCorrect')}</Text>
                 </Pressable>
                 <Pressable
-                  disabled={busy === item.item_id || item.score === 0}
+                  disabled={pending || item.score === 0}
                   onPress={() => void flip(item, 0)}
                   style={[styles.chip, { borderColor: theme.colors.border, opacity: item.score === 0 ? 0.4 : 1 }]}
                   {...testProps(`quiz-mark-wrong-${i}`)}
@@ -172,7 +184,12 @@ export function QuizResultScreen() {
         }]}>
           {t(retakeNoteKey(run.items[0]?.question_type))}
         </Text>
-        <Button title={t('result.retake')} onPress={() => void retake()} {...testProps('quiz-retake')} />
+        {actionFailed && (
+          <Text accessibilityRole="alert" style={[theme.typography.caption, styles.center, { color: theme.colors.textSecondary }]}>
+            {t('error.UNKNOWN')}
+          </Text>
+        )}
+        <Button title={t('result.retake')} onPress={() => void retake()} disabled={pending} {...testProps('quiz-retake')} />
         <Button
           title={t('run.backToQuiz')}
           variant="secondary"

@@ -1,20 +1,56 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { QuizRunPage } from '../QuizRunPage'
 
-const { state, quote, gradeWithAi, loadRun } = vi.hoisted(() => ({
+const { state, quote, gradeWithAi, loadRun, submit } = vi.hoisted(() => ({
   state: { run: null as null | Record<string, unknown> },
   quote: vi.fn(async () => ({ price_micro: 10000 })),
-  gradeWithAi: vi.fn(async () => {}), loadRun: vi.fn(async () => {}),
+  gradeWithAi: vi.fn(async () => {}), loadRun: vi.fn(async () => {}), submit: vi.fn(),
 }))
 vi.mock('@reklue/shared/stores/quiz-store', () => ({
-  useQuizStore: () => ({ run: state.run, loadRun, quote, gradeWithAi, grading: false, itemRatings: {} }),
+  useQuizStore: () => ({ run: state.run, loadRun, quote, gradeWithAi, submit, grading: false, itemRatings: {} }),
   QuizError: class extends Error {}, QUIZ_GRADE_ACTION: { short: 'grade_short', essay: 'grade_essay' },
   optionFlaws: () => [], optionAxes: () => [], QUIZ_FEEDBACK_REASONS: [],
 }))
 beforeEach(() => { vi.clearAllMocks(); state.run = null })
 afterEach(cleanup)
+
+const choiceRun = (id: string, stem: string) => ({
+  run_id: id, status: 'in_progress', item_count: 1, requested_count: 1,
+  items: [{ item_id: id + '-item', question_type: 'mcq', stem, options: ['First choice', 'Second choice'],
+    answered: false, status: 'pending', score: null, response: null, reference_answer: null, feedback: null }],
+})
+
+function renderCurrentQuiz() {
+  return render(<MemoryRouter initialEntries={['/quiz/current']}><Routes>
+    <Route path="/quiz/:runId" element={<QuizRunPage />} />
+  </Routes></MemoryRouter>)
+}
+
+describe('quiz run actions', () => {
+  it('keeps a different run from exposing its questions while the active URL loads', () => {
+    state.run = choiceRun('old', 'Question from the previous sitting')
+    renderCurrentQuiz()
+    expect(screen.queryByText('Question from the previous sitting')).not.toBeInTheDocument()
+  })
+
+  it('sends a single submission while an answer is still being saved', async () => {
+    state.run = choiceRun('current', 'Choose an answer')
+    let saveAnswer = (_result: object) => {}
+    submit.mockReturnValue(new Promise<object>(resolve => { saveAnswer = resolve }))
+    renderCurrentQuiz()
+    fireEvent.click(screen.getByRole('button', { name: 'First choice' }))
+    const button = screen.getByRole('button', { name: 'run.submit' })
+
+    act(() => {
+      fireEvent.click(button)
+      fireEvent.click(button)
+    })
+    await act(async () => saveAnswer({ graded: true, score: 1 }))
+    expect(submit).toHaveBeenCalledTimes(1)
+  })
+})
 
 describe('completed quiz navigation', () => {
   it('opens the result instead of allowing a completed sitting to be answered again', async () => {

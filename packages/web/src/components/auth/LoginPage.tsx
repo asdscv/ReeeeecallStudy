@@ -2,9 +2,12 @@ import { rememberBrainAuthReturn } from '../../lib/brain-auth-return'
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { getSupabase } from '@reklue/shared/lib/supabase'
 import { useAuthStore } from '../../stores/auth-store'
+import { attachAttributionToProfile } from '../../lib/attribution'
 import { localizeAuthError } from '../../lib/auth-errors'
 import { validatePassword, validatePasswordMatch } from '../../lib/password-validation'
+import { GoogleSignInButton } from './GoogleSignInButton'
 
 type Mode = 'login' | 'signup' | 'forgot'
 
@@ -50,6 +53,8 @@ export function LoginPage() {
   const [nicknameCheckError, setNicknameCheckError] = useState<string | null>(null)
 
   const [oauthLoading, setOauthLoading] = useState<string | null>(null)
+  const [googleAttempt, setGoogleAttempt] = useState(0)
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim()
 
   const signIn = useAuthStore((s) => s.signIn)
   const signUp = useAuthStore((s) => s.signUp)
@@ -67,6 +72,22 @@ export function LoginPage() {
       rememberBrainAuthReturn(null)
       setError(t('oauthError'))
       setOauthLoading(null)
+    }
+  }
+
+  const handleGoogleCredential = async (token: string, nonce: string) => {
+    setOauthLoading('google')
+    setError(null)
+
+    try {
+      const { error } = await getSupabase().auth.signInWithIdToken({ provider: 'google', token, nonce })
+      if (error) throw error
+      // The auth store receives SIGNED_IN and LoginRedirect handles the return URL.
+      void attachAttributionToProfile()
+    } catch {
+      setError(t('oauthError'))
+      setOauthLoading(null)
+      setGoogleAttempt(attempt => attempt + 1)
     }
   }
 
@@ -198,6 +219,7 @@ export function LoginPage() {
 
   const isSubmitDisabled =
     loading ||
+    oauthLoading !== null ||
     !email ||
     (mode !== 'forgot' && !password) ||
     (mode === 'signup' && !nickname.trim()) ||
@@ -324,21 +346,30 @@ export function LoginPage() {
               </div>
 
               <div className="space-y-3">
-                <button
-                  type="button"
-                  onClick={() => handleOAuthLogin('google')}
-                  disabled={oauthLoading !== null}
-                  data-testid="google-login-button"
-                  className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-card border border-border rounded-lg font-medium text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
-                >
-                  <img src="/google-logo.png" alt="Google" width="18" height="18" />
-                  {oauthLoading === 'google' ? t('loggingIn') : t('continueWithGoogle')}
-                </button>
+                {googleClientId ? (
+                  <GoogleSignInButton
+                    key={googleAttempt}
+                    clientId={googleClientId}
+                    disabled={loading || oauthLoading !== null}
+                    onCredential={handleGoogleCredential}
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleOAuthLogin('google')}
+                    disabled={loading || oauthLoading !== null}
+                    data-testid="google-login-button"
+                    className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-card border border-border rounded-lg font-medium text-foreground hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
+                  >
+                    <img src="/google-logo.png" alt="Google" width="18" height="18" />
+                    {oauthLoading === 'google' ? t('loggingIn') : t('continueWithGoogle')}
+                  </button>
+                )}
 
                 <button
                   type="button"
                   onClick={() => handleOAuthLogin('apple')}
-                  disabled={oauthLoading !== null}
+                  disabled={loading || oauthLoading !== null}
                   data-testid="apple-login-button"
                   className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-black text-white rounded-lg font-medium hover:bg-foreground disabled:opacity-50 disabled:cursor-not-allowed transition cursor-pointer"
                 >

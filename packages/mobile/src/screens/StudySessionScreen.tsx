@@ -139,7 +139,6 @@ export function StudySessionScreen() {
       const remaining = crammingManager.remainingTimeMs()
       if (remaining != null && remaining <= 0) {
         crammingTimeUp()
-        clearInterval(interval)
       }
     }, 1000)
     return () => clearInterval(interval)

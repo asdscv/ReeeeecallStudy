@@ -6,6 +6,7 @@ import { QuizFeedback } from './QuizFeedback'
 import { tallyQuiz, tallyLine } from '@reklue/shared/lib/quiz-outcome'
 import { QuizVerdictBadge } from './QuizVerdictBadge'
 import { retakeNoteKey } from '@reklue/shared/lib/quiz-pricing'
+import { useQuizAction } from '@reklue/shared/hooks/useQuizAction'
 
 /**
  * What the sitting came to, and the one control that matters: the learner can overrule any
@@ -18,29 +19,40 @@ import { retakeNoteKey } from '@reklue/shared/lib/quiz-pricing'
  * ever inflates scores.
  */
 export function QuizResultPage() {
-  const { t } = useTranslation('quiz')
   const { runId } = useParams<{ runId: string }>()
+  return runId ? <QuizResult key={runId} runId={runId} /> : null
+}
+
+function QuizResult({ runId }: { runId: string }) {
+  const { t } = useTranslation('quiz')
   const navigate = useNavigate()
-  const { run, loadRun, override, startRun } = useQuizStore()
-  const [busy, setBusy] = useState<string | null>(null)
+  const { run: loadedRun, failedRunId, loadRun, override, startRun } = useQuizStore()
+  const run = loadedRun?.run_id === runId ? loadedRun : null
+  const { pending, perform } = useQuizAction()
+  const [actionFailed, setActionFailed] = useState(false)
 
-  useEffect(() => { if (runId) void loadRun(runId) }, [runId, loadRun])
+  useEffect(() => { void loadRun(runId).catch(() => {}) }, [runId, loadRun])
 
-  const retake = async () => {
+  const retake = () => perform(async () => {
     if (!run) return
-    // Free, always: the questions are the asset, and a set that costs money every sitting
-    // would never become a habit.
-    const newRunId = await startRun(run.set_id)
-    navigate(`/quiz/${newRunId}/run`)
-  }
+    setActionFailed(false)
+    try {
+      const newRunId = await startRun(run.set_id)
+      navigate(`/quiz/${newRunId}/run`)
+    } catch {
+      setActionFailed(true)
+    }
+  })
 
-  const flip = async (item: QuizRunItem, score: number) => {
-    setBusy(item.item_id)
-    try { await override(item.item_id, score) } finally { setBusy(null) }
-  }
+  const flip = (item: QuizRunItem, score: number) => perform(async () => {
+    setActionFailed(false)
+    try { await override(item.item_id, score) } catch { setActionFailed(true) }
+  })
 
   if (!run) {
-    return <div className="max-w-2xl mx-auto p-8 text-center text-sm text-content-tertiary">{t('run.loading')}</div>
+    return <div className="max-w-2xl mx-auto p-8 text-center text-sm text-content-tertiary">
+      {t(failedRunId === runId ? 'error.UNKNOWN' : 'run.loading')}
+    </div>
   }
 
   // COUNTS, not a percentage.
@@ -129,7 +141,7 @@ export function QuizResultPage() {
                 <span className="text-xs text-content-tertiary">{t('result.overrideLabel')}</span>
                 <button
                   type="button"
-                  disabled={busy === item.item_id || item.score === 1}
+                  disabled={pending || item.score === 1}
                   onClick={() => void flip(item, 1)}
                   className="px-2 py-1 text-xs rounded border border-border text-foreground cursor-pointer hover:border-brand/40 disabled:opacity-40"
                 >
@@ -137,7 +149,7 @@ export function QuizResultPage() {
                 </button>
                 <button
                   type="button"
-                  disabled={busy === item.item_id || item.score === 0}
+                  disabled={pending || item.score === 0}
                   onClick={() => void flip(item, 0)}
                   className="px-2 py-1 text-xs rounded border border-border text-foreground cursor-pointer hover:border-brand/40 disabled:opacity-40"
                 >
@@ -154,12 +166,14 @@ export function QuizResultPage() {
       <p className="text-xs text-content-tertiary text-center">
         {t(retakeNoteKey(run.items[0]?.question_type))}
       </p>
+      {actionFailed && <p role="alert" className="text-sm text-content-secondary text-center">{t('error.UNKNOWN')}</p>}
 
       <div className="flex gap-2">
         <button
           type="button"
           onClick={() => void retake()}
-          className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-brand-foreground rounded-lg cursor-pointer transition-colors hover:bg-brand-hover"
+          disabled={pending}
+          className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-brand-foreground rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50"
         >
           {t('result.retake')}
         </button>

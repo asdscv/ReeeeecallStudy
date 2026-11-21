@@ -14,6 +14,7 @@ import {
 import { answerLength } from '@reklue/shared/lib/quiz-answer-limits'
 import { itemOutcome, tallyQuiz, tallyLine } from '@reklue/shared/lib/quiz-outcome'
 import { gradeCostLine } from '@reklue/shared/lib/quiz-pricing'
+import { useQuizAction } from '@reklue/shared/hooks/useQuizAction'
 
 /**
  * Taking the quiz. Outside the app Layout, like the study session, so nothing competes with
@@ -39,13 +40,19 @@ const QUIZ_SPECIFIC_ERRORS = new Set([
 ])
 
 export function QuizRunPage() {
-  const { t } = useTranslation('quiz')
   const { runId } = useParams<{ runId: string }>()
+  return runId ? <QuizRun key={runId} runId={runId} /> : null
+}
+
+function QuizRun({ runId }: { runId: string }) {
+  const { t } = useTranslation('quiz')
   const navigate = useNavigate()
   const {
-    run, loading, loadRun, refreshRun, submit, gradeWithAi, quote, grading, finishRun,
+    run: loadedRun, failedRunId, loadRun, refreshRun, submit, gradeWithAi, quote, grading, finishRun,
     rateItem, itemRatings,
   } = useQuizStore()
+  const run = loadedRun?.run_id === runId ? loadedRun : null
+  const { pending, perform } = useQuizAction()
   /** Which item's reason chips are open. One at a time; closed by choosing or by moving on. */
   const [reasonsFor, setReasonsFor] = useState<string | null>(null)
 
@@ -64,7 +71,7 @@ export function QuizRunPage() {
   const [error, setError] = useState<string | null>(null)
   const [startedAt, setStartedAt] = useState(() => Date.now())
 
-  useEffect(() => { if (runId) void loadRun(runId) }, [runId, loadRun])
+  useEffect(() => { void loadRun(runId).catch(() => {}) }, [runId, loadRun])
 
   /**
    * A long quiz is still being written while its first questions are being answered.
@@ -134,8 +141,8 @@ export function QuizRunPage() {
     setStartedAt(Date.now())
   }
 
-  const submitAnswer = async () => {
-    if (!item) return
+  const submitAnswer = () => perform(async () => {
+    if (!item || item.answered || result !== null) return
     setError(null)
     try {
       const payload = item.question_type === 'mcq'
@@ -154,16 +161,16 @@ export function QuizRunPage() {
       if (item.question_type !== 'mcq' && submitted && submitted.graded !== true && shownPrice !== null) {
         await gradeWithAi(item.item_id, text.trim(), shownPrice)
       }
-      if (runId) await loadRun(runId)
     } catch (e) {
       setError(e instanceof QuizError ? e.code : 'UNKNOWN')
+    } finally {
       // 채점이 거절돼도 답안은 이미 서버에 있습니다. 다시 읽어 두지 않으면 화면만 답하지 않은
       // 상태로 남아, 학습자가 같은 답을 또 제출하게 됩니다.
-      if (runId) await loadRun(runId)
+      await loadRun(runId, { ifCurrent: true }).catch(() => setError(current => current ?? 'UNKNOWN'))
     }
-  }
+  })
 
-  const requestGrade = async () => {
+  const requestGrade = () => perform(async () => {
     if (!item || shownPrice === null) return
     setError(null)
     try {
@@ -174,15 +181,18 @@ export function QuizRunPage() {
       // here used to print "충전하면 계속할 수 있어요" with no way to 충전 anywhere on the run.
       setError(e instanceof QuizError ? e.code : 'UNKNOWN')
     }
-  }
+  })
 
-  const finish = async () => {
-    if (!runId) return
-    await finishRun(runId)
-    navigate(`/quiz/${runId}/result`)
-  }
+  const finish = () => perform(async () => {
+    setError(null)
+    try {
+      await finishRun(runId)
+    } catch {
+      setError('UNKNOWN')
+    }
+  })
 
-  if (loading && !run) {
+  if (!run && failedRunId !== runId) {
     return <div className="max-w-2xl mx-auto p-8 text-center text-sm text-content-tertiary">{t('run.loading')}</div>
   }
   if (!run || items.length === 0) {
@@ -190,7 +200,7 @@ export function QuizRunPage() {
     // real state with a real explanation, not a crash.
     return (
       <div className="max-w-2xl mx-auto p-8 text-center space-y-3">
-        <p className="text-sm text-muted-foreground">{t('run.empty')}</p>
+        <p className="text-sm text-muted-foreground">{t(run ? 'run.empty' : 'error.UNKNOWN')}</p>
         <button
           type="button"
           onClick={() => navigate('/quiz')}
@@ -296,7 +306,7 @@ export function QuizRunPage() {
               <li key={optionIndex}>
                 <button
                   type="button"
-                  disabled={answered}
+                  disabled={answered || pending}
                   onClick={() => setChoice(optionIndex)}
                   // `whitespace-pre-wrap`: an option is card content and card content has line
                   // breaks in it. A math card's answer field holds two formulas on two lines —
@@ -336,7 +346,7 @@ export function QuizRunPage() {
           <textarea
             value={writtenAnswer}
             onChange={(e) => setText(e.target.value)}
-            disabled={answered}
+            disabled={answered || pending}
             rows={item.question_type === 'essay' ? 8 : 3}
             placeholder={t(`run.placeholder.${item.question_type}`)}
             className="w-full px-3 py-2 text-sm bg-background border border-border rounded-lg text-foreground disabled:opacity-60"
@@ -485,9 +495,9 @@ export function QuizRunPage() {
             onClick={() => void submitAnswer()}
             // 제출이 곧 채점이므로, 채점될 수 없는 길이는 제출도 막습니다. 예전에는 열 글자
             // 서술형도 제출됐다가 채점에서 거절됐고, 화면은 그것을 우리 잘못처럼 말했습니다.
-            disabled={item.question_type === 'mcq'
+            disabled={pending || (item.question_type === 'mcq'
               ? choice === null
-              : text.trim() === '' || length.state === 'too_short' || length.state === 'too_long'}
+              : text.trim() === '' || length.state === 'too_short' || length.state === 'too_long')}
             className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-brand-foreground rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50"
           >
             {t('run.submit')}
@@ -503,7 +513,7 @@ export function QuizRunPage() {
               <button
                 type="button"
                 onClick={() => void requestGrade()}
-                disabled={grading || shownPrice === null}
+                disabled={pending || grading || shownPrice === null}
                 className="flex-1 px-3 py-2 text-sm font-medium bg-brand text-brand-foreground rounded-lg cursor-pointer transition-colors hover:bg-brand-hover disabled:opacity-50"
               >
                 {/* The price stays off the BUTTON — a button is a decision, not a price tag —
@@ -515,6 +525,7 @@ export function QuizRunPage() {
             <button
               type="button"
               onClick={() => (isLast ? void finish() : goTo(index + 1))}
+              disabled={pending}
               className={`px-3 py-2 text-sm font-medium rounded-lg cursor-pointer transition-colors ${
                 item.question_type !== 'mcq' && item.score === null
                   ? 'flex-1 border border-border text-foreground hover:border-brand/40'

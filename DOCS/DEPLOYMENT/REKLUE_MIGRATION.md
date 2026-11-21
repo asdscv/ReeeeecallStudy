@@ -4,7 +4,7 @@
 
 - Public brand: Reklue / 리클루. Repository: `asdscv/Reklue`. Workspace packages: `@reklue/*`.
 - Canonical site: `https://reklue.com`. Cloudflare Worker: `reklue`; both `reklue.com/*` and `www.reklue.com/*` are routed to it.
-- Registrar nameservers: `martin.ns.cloudflare.com`, `samara.ns.cloudflare.com`.
+- Registrar nameservers: `martin.ns.cloudflare.com`, `samara.ns.cloudflare.com`. Registrant contact verification completed in HostingKR; the domain detail page now reports normal status without the unverified-contact label.
 - Former domain: `reeeeecallstudy.xyz`, automatic renewal OFF; existing registration remains active until February 2027 for redirects. Paths and queries are preserved.
 - Support: `admin@reklue.com`, Cloudflare Email Routing enabled to the existing verified owner mailbox.
 - Supabase project display name: Reklue. Auth Site URL: `https://reklue.com`; allowed callback: `https://reklue.com/auth/callback`.
@@ -16,9 +16,13 @@
 
 - Google Play: 10 localized names/descriptions, 10 new feature graphics, support website and support email committed through Android Publisher API and read back successfully.
 - App Store: editable **1.0.6** version created; 8 names, subtitles, descriptions, keywords, support/privacy/marketing URLs and release notes saved and read back successfully.
-- Native release: **1.0.6**, retaining the existing app identities. Build/store submission and review status must be checked separately; a metadata save is not proof of public store approval.
+- Native release: **1.0.6**, retaining the existing app identities. Android build **55** was submitted successfully; Android Publisher readback shows production release 1.0.6 with version code 55. iOS build **63** was uploaded, processed as VALID and attached to the editable 1.0.6 version. Store approval/public availability must be checked separately.
 - Source graphics: `packages/mobile/store-assets/feature-graphics/`; regenerate with `pnpm --filter @reklue/web exec tsx scripts/generate-store-graphics.ts`.
-- Existing marketplace screenshots contain the previous official publisher label and need replacement. The user has been asked to select native Appium capture or a targeted code-based image edit.
+- All **114** existing store screenshots were downloaded at original size and checked with OCR. The old official publisher name appeared only in the 19 marketplace frames (10 Play locales, 8 iPhone locales and 1 iPad set). Those obsolete frames were removed from the editable listings, preserving the first **5** images and their order in every set. Apple live 1.0.5 screenshot IDs were checked to be separate and left untouched. No image editing or additional UI automation was required.
+- Production OTA update **73e6a0e4-6024-43fb-90ba-57331927af95** (runtime 1.0.6, iOS and Android) includes the final dark-mode wordmark fix. Main merge: `7d40fbbc3b822a2a06e203ee847e9b2681056e19`.
+- Apple 1.0.6 was submitted successfully after the owner authorized the social-media age-rating answer. Only `socialMedia=true` and `socialMediaAgeRestricted=false` changed in the declaration; all other existing age answers were verified unchanged. Submission `606b32d3-397f-4266-8637-4bd9c7affb5c`, submitted at `2026-11-16T10:27:33Z`, was read back with one version item and **WAITING_FOR_REVIEW** on both submission and version.
+- Play privacy-policy URL changed to `https://reklue.com/privacy-policy` and included in the existing release review. Publishing Overview confirms 1.0.6 and the localized rebrand are in review; automatic pre-review checks also cover the privacy-policy change.
+- Apple bundle registration display name is now **Reklue**; bundle identifier `com.reeeeecall.study` is unchanged. Google Cloud deployment project display name is now **Reklue**; project ID `reeeeecallstudy` and number `203245252470` are unchanged.
 
 ## Preserved technical identities
 
@@ -30,14 +34,15 @@ These are compatibility/history references, not product display names. Do not re
 - Applied SQL migration history and Google service-account/project IDs.
 - Former-domain redirect rules and their regression fixtures.
 
-## Outstanding console checks
+## Automation status and final login verification
 
 - Search keyword automation still reads the former Search Console property until the user confirms restricted access for the existing keyword service account on the new property. A briefly added grant was immediately revoked; only the owner remains on the new property.
-- Registrar contact verification, Google OAuth consent branding, and the Play privacy-policy setting need final console verification. Computer Use was returning `cgWindowNotFound` for both Chrome and Finder; no security warnings or authentication protections were bypassed.
+- Google login verified end to end with the owner’s `asdscv@gmail.com`: the actual Reklue login button opened Google account selection, selecting the existing authorized account returned successfully to `https://reklue.com/dashboard`, and the page title was Reklue. Google account selection displays the existing Supabase authentication hostname rather than the former product name. The public client remains `212581278702-r7560o2uu0b9gubgnrlncmiini7bf6i6.apps.googleusercontent.com`; credentials, callbacks, providers and permissions were unchanged. The earlier request to authenticate another Google account was incorrect and withdrawn; no further owner sign-in is required for this verification. Customizing Google’s generic authentication-host display would be a separate branding change, not a remaining legacy-name replacement.
+- Registrar verification and Play privacy-policy checks above are complete. Apple 1.0.6 was reread as WAITING_FOR_REVIEW. Public Apple lookup still returns 1.0.5 under the former name; public Google Play also still shows the former name until its submitted changes are approved. Submission is not proof of public store availability.
 
 ## Verification
 
 - Initial rebrand: 4,330 web tests and 245 Worker tests passed; all CI checks passed before the develop/main merges.
 - Additional compact/lowercase alias regression cases: 3 tests passed; installed-app schemes and slugs remain intact.
-- HTTPS migration: 247 Worker tests passed, including canonical HTTP upgrade and localhost preservation.
+- HTTPS migration: 247 Worker tests passed, including canonical HTTP upgrade and localhost preservation. Production HTTP, www and former-domain requests return path/query-preserving 308 redirects; canonical privacy and terms pages return 200.
 - iOS and Android Metro exports passed for 1.0.6. All 8 PNG graphics decoded at 1024×500; multilingual rendering checked visually. Lint: zero errors, 5 pre-existing warnings.
